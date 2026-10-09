@@ -289,7 +289,7 @@ function visibleItems(){
 }
 function renderPager(total){var pages=Math.max(1,Math.ceil(total/perPage));if(page>pages)page=pages;var p=document.getElementById("pager");p.innerHTML="";if(pages<=1)return;for(let i=1;i<=pages;i++){var b=document.createElement("button");b.className="pagebtn"+(i===page?" on":"");b.textContent=i;b.onclick=function(){page=i;draw();window.scrollTo({top:0,behavior:"smooth"})};p.appendChild(b)}}
 function draw(){
- var list=visibleItems(),start=(page-1)*perPage,current=list.slice(start,start+perPage),allInTab=categoryItems(),tb=document.getElementById("tb");
+ var list=visibleItems();page=Math.min(page,Math.max(1,Math.ceil(list.length/perPage)));var start=(page-1)*perPage,current=list.slice(start,start+perPage),allInTab=categoryItems(),tb=document.getElementById("tb");
  tb.innerHTML="";
  current.forEach(function(x){
   var a=!!saved[x.id],tr=document.createElement("tr");
