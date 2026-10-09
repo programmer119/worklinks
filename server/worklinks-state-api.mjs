@@ -65,7 +65,7 @@ function load(user){
 }
 function save(user,db){
   const file=fileFor(user),tmp=file+'.'+crypto.randomUUID()+'.tmp';
-  try{fs.writeFileSync(tmp,JSON.stringify(db),{mode:0o600,flag:'wx'});fs.renameSync(tmp,file);}
+  try{fs.writeFileSync(tmp,JSON.stringify(db),{mode:0o600,flag:'wx'});if(fs.existsSync(file))fs.copyFileSync(file,file+'.bak');fs.renameSync(tmp,file);}
   finally{try{fs.unlinkSync(tmp);}catch{}}
 }
 function snapshot(db){return{status:db.status,hidden:db.hidden,business:db.business,outcomes:db.outcomes};}
