@@ -1,0 +1,27 @@
+name: WorkLinks state safety
+on:
+  push:
+    branches: [main, "feature/safe-application-status-sync-20261009"]
+    paths:
+      - "startup-support/index.html"
+      - "server/worklinks-state-api.mjs"
+      - "tests/worklinks-state.test.mjs"
+      - ".github/workflows/worklinks-state-ci.yml"
+  pull_request:
+    paths:
+      - "startup-support/index.html"
+      - "server/worklinks-state-api.mjs"
+      - "tests/worklinks-state.test.mjs"
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test migration and sync behavior
+        run: node --test tests/worklinks-state.test.mjs
