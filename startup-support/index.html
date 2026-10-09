@@ -51,7 +51,7 @@
   <button class="workspace-tab" data-view="sales">영업대행</button>
 </div>
 <section id="supportView" class="workspace-view on">
-<div class="syncbox"><details id="syncDetails"><summary>계정 로그인 · 브라우저/서버 동기화</summary><form class="syncrow" id="syncLoginForm"><input id="syncUser" autocomplete="username" placeholder="사용자 ID" aria-label="사용자 ID" required><input id="syncPass" type="password" autocomplete="current-password" placeholder="비밀번호" aria-label="비밀번호" required><button type="submit">로그인</button></form><div class="syncrow" id="syncLoggedIn" hidden><b id="syncAccount"></b><button type="button" id="syncNow">지금 동기화</button><button type="button" id="syncLogout">로그아웃</button></div></details><div class="syncstate" id="syncState">현재 브라우저에 저장 중 · 서버 연결 확인 중</div></div><div class="panel"><div class="tabs"><button class="tab on" data-tab="all">전체</button><button class="tab" data-tab="general">일반</button><button class="tab" data-tab="patent">특허</button><button class="tab" data-tab="consulting">설명회·컨설팅</button><button class="tab" data-tab="applied">지원완료</button><button class="tab" data-tab="business">사업자</button><button class="tab" data-tab="hidden">숨김</button></div><div class="filters"><button class="f on" data-f="all">전체</button><button class="f" data-f="eligible">지원가능</button><button class="f" data-f="ineligible">불가</button><span class="stats" id="stats"></span></div><div class="note">전체·일반·특허·설명회 탭에서는 지원완료 공고가 제외되고, 지원완료 탭에서 심사중·성공·실패를 기록합니다. 기존 체크·숨김·사업자 지정은 보존합니다. 로그인 시 이 브라우저의 기존 기록을 서버와 병합하며, 서버 연결에 실패해도 브라우저 기록은 지우지 않습니다.</div></div>
+<div class="syncbox"><details id="syncDetails"><summary>계정 로그인 · 브라우저/서버 동기화</summary><form class="syncrow" id="syncLoginForm"><input id="syncUser" autocomplete="username" placeholder="사용자 ID" aria-label="사용자 ID" required><input id="syncPass" type="password" autocomplete="current-password" placeholder="비밀번호" aria-label="비밀번호" required><button type="submit">로그인</button></form><div class="syncrow" id="syncLoggedIn" hidden><b id="syncAccount"></b><button type="button" id="syncNow">지금 동기화</button><button type="button" id="syncConflicts" hidden>충돌 기록 확인</button><button type="button" id="syncLogout">로그아웃</button></div></details><div class="syncstate" id="syncState">현재 브라우저에 저장 중 · 서버 연결 확인 중</div></div><div class="panel"><div class="tabs"><button class="tab on" data-tab="all">전체</button><button class="tab" data-tab="general">일반</button><button class="tab" data-tab="patent">특허</button><button class="tab" data-tab="consulting">설명회·컨설팅</button><button class="tab" data-tab="applied">지원완료</button><button class="tab" data-tab="business">사업자</button><button class="tab" data-tab="hidden">숨김</button></div><div class="filters"><button class="f on" data-f="all">전체</button><button class="f" data-f="eligible">지원가능</button><button class="f" data-f="ineligible">불가</button><span class="stats" id="stats"></span></div><div class="note">전체·일반·특허·설명회 탭에서는 지원완료 공고가 제외되고, 지원완료 탭에서 심사중·성공·실패를 기록합니다. 기존 체크·숨김·사업자 지정은 보존합니다. 로그인 시 이 브라우저의 기존 기록을 서버와 병합하며, 서버 연결에 실패해도 브라우저 기록은 지우지 않습니다.</div></div>
 <div class="box"><table><thead><tr><th>지원여부</th><th>타이틀</th><th>D-DAY</th><th>기간</th><th>주요지원내용</th><th>핵심조건</th><th id="actionHead">관리</th></tr></thead><tbody id="tb"></tbody></table><div class="pager" id="pager"></div></div>
 </section>
 <section id="jobsView" class="workspace-view">
@@ -191,20 +191,27 @@ var items=[{"id":"etri-technology-new-business-model-2026","category":"general",
 var statusKey="externaltools_startup_support_status_v1",hiddenKey="worklinks_startup_support_hidden_v1",businessKey="worklinks_startup_support_business_v1",outcomeKey="worklinks_startup_support_outcomes_v1";
 function readSafe(key){try{var v=JSON.parse(localStorage.getItem(key)||"null");return v&&typeof v==="object"&&!Array.isArray(v)?v:{};}catch(e){return {};}}
 var guest={status:readSafe(statusKey),hidden:readSafe(hiddenKey),business:readSafe(businessKey),outcomes:readSafe(outcomeKey)};
-var saved=guest.status,hidden=guest.hidden,business=guest.business,outcomes=guest.outcomes,category="all",filter="all",page=1,perPage=10,activeUser=null,pendingOps=[],syncBusy=false;
+var saved=guest.status,hidden=guest.hidden,business=guest.business,outcomes=guest.outcomes,category="all",filter="all",page=1,perPage=10,activeUser=null,pendingOps=[],conflicts=[],revisions={status:{},hidden:{},business:{},outcomes:{}},syncBusy=false;
 var apiBase=(document.querySelector('meta[name="worklinks-state-api"]')?.content||"").replace(/\/$/,"");
 function userStorageKey(user){return "worklinks_account_state_v1:"+encodeURIComponent(user);}
-function userRecord(){return{version:1,status:saved,hidden:hidden,business:business,outcomes:outcomes,pending:pendingOps,bootstrapped:true};}
+function userRecord(){return{version:2,status:saved,hidden:hidden,business:business,outcomes:outcomes,revisions:revisions,pending:pendingOps,conflicts:conflicts,bootstrapped:true};}
 function persistAccount(){if(activeUser)localStorage.setItem(userStorageKey(activeUser),JSON.stringify(userRecord()));}
-function setSyncState(message){document.getElementById("syncState").textContent=message;}
+function setSyncState(message){document.getElementById("syncState").textContent=message+(conflicts.length?" · 충돌 "+conflicts.length+"건(원본 보관)":"");document.getElementById("syncConflicts").hidden=!activeUser||!conflicts.length;}
 function putField(field,key,value){if(field==="status")saved[key]=value;else if(field==="hidden")hidden[key]=value;else if(field==="business")business[key]=value;else if(field==="outcomes")outcomes[key]=value;}
 function changed(field,key,value){
  putField(field,key,value);
- if(activeUser){pendingOps.push({id:crypto.randomUUID(),field:field,key:key,value:value});persistAccount();flushSync();}
- else{localStorage.setItem(({status:statusKey,hidden:hiddenKey,business:businessKey,outcomes:outcomeKey})[field],JSON.stringify(({status:saved,hidden:hidden,business:business,outcomes:outcomes})[field]));}
+ if(activeUser){
+  var previous=pendingOps.find(function(op){return op.field===field&&op.key===key;});
+  var baseRevision=previous?previous.baseRevision:(revisions[field]?.[key]||0);
+  pendingOps=pendingOps.filter(function(op){return !(op.field===field&&op.key===key);});
+  pendingOps.push({id:crypto.randomUUID(),field:field,key:key,value:value,baseRevision:baseRevision});
+  persistAccount();flushSync();
+ }else{
+  localStorage.setItem(({status:statusKey,hidden:hiddenKey,business:businessKey,outcomes:outcomeKey})[field],JSON.stringify(({status:saved,hidden:hidden,business:business,outcomes:outcomes})[field]));
+ }
  draw();
 }
-function hydrate(state){saved={...(state.status||{})};hidden={...(state.hidden||{})};business={...(state.business||{})};outcomes={...(state.outcomes||{})};}
+function hydrate(state){saved={...(state.status||{})};hidden={...(state.hidden||{})};business={...(state.business||{})};outcomes={...(state.outcomes||{})};revisions={status:{...(state.revisions?.status||{})},hidden:{...(state.revisions?.hidden||{})},business:{...(state.revisions?.business||{})},outcomes:{...(state.revisions?.outcomes||{})}};}
 function positives(obj){return Object.fromEntries(Object.entries(obj||{}).filter(function(e){return e[1]===true;}));}
 async function api(path,options){if(!apiBase)throw Error("서버 주소가 설정되지 않았습니다");var r=await fetch(apiBase+"/api/worklinks/"+path,{credentials:"include",...options,headers:{"Content-Type":"application/json","X-Worklinks-Client":"web",...(options?.headers||{})}});var data=await r.json().catch(function(){return {};});if(!r.ok)throw Error(data.error||("서버 오류 "+r.status));return data;}
 async function connectUser(user){
@@ -217,6 +224,7 @@ async function connectUser(user){
  }
  activeUser=user;
  pendingOps=Array.isArray(rec.pending)?rec.pending:[];
+ conflicts=Array.isArray(rec.conflicts)?rec.conflicts:[];
  hydrate(data.state||{});
  pendingOps.forEach(function(op){putField(op.field,op.key,op.value);});
  persistAccount();
@@ -231,11 +239,23 @@ async function flushSync(){
  syncBusy=true;var user=activeUser;
  try{
   if(pendingOps.length){
+   pendingOps.forEach(function(op){if(!Number.isSafeInteger(op.baseRevision))op.baseRevision=revisions[op.field]?.[op.key]||0;});
    var batch=pendingOps.slice();var response=await api("state/patch",{method:"POST",body:JSON.stringify({operations:batch})});
    if(activeUser!==user)return;
-   var done=new Set(batch.map(function(x){return x.id;}));
-   pendingOps=pendingOps.filter(function(x){return !done.has(x.id);});
-   hydrate(response.state||{});pendingOps.forEach(function(op){putField(op.field,op.key,op.value);});
+   var accepted=new Set(response.accepted||[]),rejected=new Map((response.conflicts||[]).map(function(x){return[x.id,x];}));
+   var latestPending=pendingOps.slice();
+   for(const sent of batch){
+    if(!rejected.has(sent.id))continue;
+    var newer=latestPending.find(function(op){return op.field===sent.field&&op.key===sent.key;})||sent;
+    pendingOps=pendingOps.filter(function(op){return !(op.field===sent.field&&op.key===sent.key);});
+    if(!conflicts.some(function(x){return x.id===newer.id;}))conflicts.push({...newer,serverValue:rejected.get(sent.id).serverValue});
+   }
+   pendingOps=pendingOps.filter(function(op){return !accepted.has(op.id);});
+   hydrate(response.state||{});
+   pendingOps.forEach(function(op){
+    if(batch.some(function(s){return accepted.has(s.id)&&s.field===op.field&&s.key===op.key;}))op.baseRevision=revisions[op.field]?.[op.key]||0;
+    putField(op.field,op.key,op.value);
+   });
   }else{
    var current=await api("state");if(activeUser!==user)return;hydrate(current.state||{});
   }
@@ -250,9 +270,16 @@ document.getElementById("syncLoginForm").onsubmit=async function(ev){
  catch(e){setSyncState("로그인 또는 서버 연결 실패 · 기존 브라우저 기록 보존: "+e.message);}
 };
 document.getElementById("syncNow").onclick=flushSync;
+document.getElementById("syncConflicts").onclick=function(){
+ if(!conflicts.length)return;
+ var op=conflicts.shift(),title=items.find(function(x){return x.id===op.key;})?.title||op.key;
+ var keep=window.confirm("기록 충돌: "+title+"\n항목: "+op.field+"\n브라우저 변경: "+String(op.value)+"\n서버 최신값: "+String(op.serverValue)+"\n\n확인: 브라우저 변경을 다시 서버에 적용\n취소: 서버 최신값 유지");
+ if(keep)changed(op.field,op.key,op.value);else{persistAccount();draw();}
+ setSyncState("로그인: "+activeUser+" · 충돌 처리 기록 저장됨");
+};
 document.getElementById("syncLogout").onclick=async function(){
  try{await flushSync();await api("logout",{method:"POST"});}catch(e){}
- activeUser=null;pendingOps=[];saved=guest.status;hidden=guest.hidden;business=guest.business;outcomes=guest.outcomes;
+ activeUser=null;pendingOps=[];conflicts=[];revisions={status:{},hidden:{},business:{},outcomes:{}};saved=guest.status;hidden=guest.hidden;business=guest.business;outcomes=guest.outcomes;
  document.getElementById("syncLoginForm").hidden=false;document.getElementById("syncLoggedIn").hidden=true;
  setSyncState("로그아웃 · 기존 브라우저 기록 보존 · 계정별 로컬 기록도 유지");draw();
 };
