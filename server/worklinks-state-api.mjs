@@ -57,7 +57,7 @@ function json(res,code,body,headers={}){
   res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','Content-Length':Buffer.byteLength(content),...headers});
   res.end(content);
 }
-function defaultDb(){return{version:1,status:{},hidden:{},business:{},outcomes:{},migrations:[],seenOps:[]};}
+function defaultDb(){return{version:2,counter:0,status:{},hidden:{},business:{},outcomes:{},revisions:{status:{},hidden:{},business:{},outcomes:{}},migrations:[],seenOps:[]};}
 function fileFor(user){return path.join(DATA_DIR,crypto.createHash('sha256').update(user).digest('hex')+'.json');}
 function load(user){
   try{const db=JSON.parse(fs.readFileSync(fileFor(user),'utf8'));return{...defaultDb(),...db};}
@@ -68,7 +68,8 @@ function save(user,db){
   try{fs.writeFileSync(tmp,JSON.stringify(db),{mode:0o600,flag:'wx'});if(fs.existsSync(file))fs.copyFileSync(file,file+'.bak');fs.renameSync(tmp,file);}
   finally{try{fs.unlinkSync(tmp);}catch{}}
 }
-function snapshot(db){return{status:db.status,hidden:db.hidden,business:db.business,outcomes:db.outcomes};}
+function snapshot(db){return{status:db.status,hidden:db.hidden,business:db.business,outcomes:db.outcomes,revisions:db.revisions};}
+function touch(db,field,key){db.counter=(db.counter||0)+1;db.revisions[field][key]=db.counter;}
 function validKey(key){return typeof key==='string'&&key.length<=180&&/^[a-zA-Z0-9._:-]+$/.test(key);}
 function permittedOrigin(req){
   const origin=req.headers.origin;
@@ -126,11 +127,11 @@ async function handle(req,res){
       for(const field of ['status','hidden','business']){
         const src=input[field]||{};
         if(src&&typeof src==='object'&&!Array.isArray(src))
-          for(const [key,val] of Object.entries(src))if(validKey(key)&&val===true&&db[field][key]!==true)db[field][key]=true;
+          for(const [key,val] of Object.entries(src))if(validKey(key)&&val===true&&db[field][key]!==true){db[field][key]=true;touch(db,field,key);}
       }
       const src=input.outcomes||{};
       if(src&&typeof src==='object'&&!Array.isArray(src))
-        for(const [key,val] of Object.entries(src))if(validKey(key)&&['success','failure'].includes(val)&&!db.outcomes[key])db.outcomes[key]=val;
+        for(const [key,val] of Object.entries(src))if(validKey(key)&&['success','failure'].includes(val)&&!db.outcomes[key]){db.outcomes[key]=val;touch(db,'outcomes',key);}
       db.migrations.push(migrationId);if(db.migrations.length>3000)db.migrations.shift();
       save(user,db);
     }
@@ -142,16 +143,22 @@ async function handle(req,res){
     for(const op of ops){
       if(!op||typeof op.id!=='string'||op.id.length>120||!validKey(op.key)||!allowedFields.has(op.field))return json(res,400,{error:'Invalid operation'});
       if(op.field==='outcomes'?!['pending','success','failure'].includes(op.value):typeof op.value!=='boolean')return json(res,400,{error:'Invalid value'});
+      if(!Number.isSafeInteger(op.baseRevision)||op.baseRevision<0)return json(res,400,{error:'Invalid revision'});
     }
-    const db=load(user),seen=new Set(db.seenOps);
+    const db=load(user),seen=new Set(db.seenOps),conflicts=[],accepted=[];
     for(const op of ops){
-      if(seen.has(op.id))continue;
-      db[op.field][op.key]=op.value;
-      db.seenOps.push(op.id);seen.add(op.id);
+      if(seen.has(op.id)){accepted.push(op.id);continue;}
+      const actual=db.revisions[op.field][op.key]||0;
+      if(actual!==op.baseRevision&&db[op.field][op.key]!==op.value){
+        conflicts.push({id:op.id,field:op.field,key:op.key,serverValue:db[op.field][op.key],serverRevision:actual});
+        continue;
+      }
+      if(db[op.field][op.key]!==op.value){db[op.field][op.key]=op.value;touch(db,op.field,op.key);}
+      db.seenOps.push(op.id);seen.add(op.id);accepted.push(op.id);
     }
     if(db.seenOps.length>3000)db.seenOps=db.seenOps.slice(-3000);
-    save(user,db);
-    return json(res,200,{state:snapshot(db),accepted:ops.map(op=>op.id)});
+    if(accepted.length)save(user,db);
+    return json(res,200,{state:snapshot(db),accepted,conflicts});
   }
   return json(res,404,{error:'Not found'});
 }
