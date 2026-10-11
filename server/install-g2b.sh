@@ -72,5 +72,6 @@ today="$(TZ=Asia/Seoul date +%Y%m%d)"
 curl -fsS --max-time 19 "http://127.0.0.1:18191/api/g2b/bids?kind=servc&from=$today&to=$today&page=1&rows=5" \
   | "$PYTHON_BIN" -c 'import sys,json; j=json.load(sys.stdin); print("ok=%s total=%s returned=%s error=%s" % (j.get("ok"),j.get("totalCount"),len(j.get("items",[])),j.get("error")));sys.exit(0 if j.get("ok") else 1)'
 echo 'LOCAL: http://127.0.0.1:18191'
-echo 'HTTPS: Cloudflare Tunnel api-worklinks.suaveforge.com -> http://localhost:18191'
-echo 'Keep port 18191 closed externally.'
+echo 'EXTERNAL HTTPS: route existing HTTPS high-port listener to http://127.0.0.1:18191, with no new Tunnel.'
+echo 'ALTERNATIVE: direct HTTPS high-port supported when BIND_HOST, G2B_TLS_CERT_FILE, G2B_TLS_KEY_FILE are set in the service environment.'
+echo 'Direct public plaintext HTTP is intentionally refused. Plain port 18191 is local-only until TLS is configured.'
