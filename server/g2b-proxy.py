@@ -17,6 +17,7 @@ except ImportError:
     from urllib.error import HTTPError, URLError
 
 PORT = int(os.environ.get('PORT', '18191'))
+QUAL_REPORT_PATH = os.environ.get('G2B_QUAL_REPORT', '/app/reports/qualification-year.json')
 BIND_HOST = os.environ.get('BIND_HOST', '127.0.0.1')
 TLS_CERT_FILE = os.environ.get('G2B_TLS_CERT_FILE', '').strip()
 TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
@@ -124,6 +125,16 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
                     'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/qualifications':
+                # Aggregated public counts, no keys or raw sensitive data in report.
+                try:
+                    with open(QUAL_REPORT_PATH, 'r') as f:
+                        report = json.load(f)
+                except (OSError, IOError, ValueError):
+                    raise ApiError('annual_report_not_available', 503)
+                if not isinstance(report, dict) or not isinstance(report.get('counts'), list):
+                    raise ApiError('annual_report_invalid', 503)
+                return self.reply(200, {'ok':True, 'report':report})
             if u.path == '/api/g2b/company':
                 bizno = re.sub(r'[^0-9]', '', get('bizno'))
                 if len(bizno) != 10:
