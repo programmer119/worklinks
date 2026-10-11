@@ -154,7 +154,7 @@
     <div class="qual-method"><b>숫자 보는 법</b> · <b>확인 사례</b>는 실제 공고문/공고정보에서 해당 요건을 확인한 서로 다른 공고 수이고, 1년 통계가 아닙니다. <b>1년 업종검색 건수</b>는 나라장터 용역·물품을 업종코드로 조회해 중복 제거한 수로, SW 제목 후보 수와 전체 검색 수를 따로 표시합니다. 직접생산확인서·중소기업확인서 등은 첨부원문 전수 집계 전까지 횟수를 표시하지 않습니다. 복수 코드는 각각 세지만 같은 공고를 한 항목에 중복 합산하지 않습니다. <b>등록업종</b>과 <b>직접생산·중소기업 등 증명서</b>는 구별합니다.</div>
     <div id="qualSummary" class="qual-summary"></div>
     <div class="qual-toolbar"><input id="qualQuery" type="search" placeholder="1468, 직접생산, DB, 정보통신, 자격명 검색" aria-label="필요 자격 검색"><select id="qualCategory" aria-label="자격 유형"><option value="all">전체 유형</option><option value="industry">업종·면허 등록</option><option value="production">직접생산확인</option><option value="certificate">기타 확인서·증빙</option><option value="special">분야별 추가조건</option></select></div>
-    <div class="qual-table-wrap"><table class="qual-table"><thead><tr><th>요구 자격 / 코드</th><th>대표 적용 분야</th><th>확인 사례</th><th>창컴 보유 여부</th></tr></thead><tbody id="qualRows"></tbody></table></div>
+    <div class="qual-table-wrap"><table class="qual-table"><thead><tr><th>요구 자격 / 코드</th><th>대표 적용 분야</th><th>최근 1년 검색 / 공고 근거</th><th>창컴 보유 여부</th></tr></thead><tbody id="qualRows"></tbody></table></div>
     <div class="qual-foot">근거: <a href="https://www.data.go.kr/data/15129394/openapi.do" target="_blank" rel="noopener noreferrer">나라장터 공식 입찰공고 API</a> · <a href="https://www.smpp.go.kr/prd/prdinfo/smlpzbtwncmptprd/SelectSmlpzBtwnCmptprdListVw.do" target="_blank" rel="noopener noreferrer">SMPP 중소기업자간 경쟁제품 품목표</a> · 개별 공고 원문. 등록 가능한 품목 목록에 있다고 해서 최근 1년 실제 요구가 있었다는 뜻은 아닙니다. 직접생산의 실제 보유·유효기간은 업체별 별도 조회가 필요합니다. 공동수급·분담이행은 공고별로 판단합니다.</div>
   </div>
 </div>
@@ -319,7 +319,12 @@ function qualProof(item){
 function renderQualifications(){
  const term=(document.getElementById('qualQuery')?.value||'').trim().toLowerCase();
  const group=document.getElementById('qualCategory')?.value||'all';
- const visible=qualCatalog.filter(function(q){return (group==='all'||q.category===group)&&(!term||[q.id,q.name,q.use].join(' ').toLowerCase().includes(term))});
+ const visible=qualCatalog.filter(function(q){return (group==='all'||q.category===group)&&(!term||[q.id,q.name,q.use].join(' ').toLowerCase().includes(term))}).sort(function(a,b){
+  const x=qualAnnualRecord(a.id),y=qualAnnualRecord(b.id);
+  if(!!x!==!!y)return x?-1:1;
+  if(x&&y)return y.swTitleCount-x.swTitleCount;
+  return qualProof(b).confirmed.length-qualProof(a).confirmed.length;
+ });
  const coverage=qualEvidence.length;
  document.getElementById('qualSummary').textContent=qualAnnualReport
  ?'업종코드 통계 '+qualAnnualReport.from+'~'+qualAnnualReport.to+' · 나라장터 용역·물품 · 완료된 '+qualAnnualReport.counts.filter(function(x){return x.complete===true}).length+'종만 표시'+(qualAnnualReport.complete?'':' (일부 코드 미완료)')+' · 조회 '+qualAnnualReport.apiCalls+'회 · 직접생산 등 첨부 원문 요구 횟수는 미전수'
