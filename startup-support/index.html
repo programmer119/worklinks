@@ -172,7 +172,7 @@
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">서버 프록시 연동 테스트</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">공고 조회 테스트</button></div></div>
       <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
       <div class="g2b-results" id="g2bApiResult">용역·물품·공사·외자 4종류의 최근 공고 1페이지씩을 조회합니다. 전체 공고 전수 수집은 별도 배치 작업이 필요합니다.</div>
-      <div class="g2b-api-settings"><label for="g2bBaseUrl">API 서버</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
+      <div class="g2b-api-settings"><label for="g2bBaseUrl">고포트 HTTPS API 주소</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
     </div>
 
 
@@ -264,7 +264,7 @@ function g2bCandidateTitle(t){
 function g2bSetEndpoint(s){
  try{
   const u=new URL(String(s||'').trim());
-  if(u.protocol!=='https:' || u.username || u.password || u.search || u.hash || u.port || !u.hostname.endsWith('.suaveforge.com') || !u.pathname.replace(/\/+$/,'').endsWith('/api/g2b'))throw Error('invalid');
+  if(u.protocol!=='https:' || u.username || u.password || u.search || u.hash || !u.hostname.endsWith('.suaveforge.com') || !u.pathname.replace(/\/+$/,'').endsWith('/api/g2b'))throw Error('invalid');
   G2B_PROXY_URL=u.href.replace(/\/+$/,'');
   localStorage.setItem('worklinks_g2b_base_v1',G2B_PROXY_URL);
   return true;
@@ -318,7 +318,7 @@ async function g2bLoadBids(){
 (function(){
  const u=document.getElementById('g2bBaseUrl');u.value=G2B_PROXY_URL;
  document.getElementById('g2bBaseSave').addEventListener('click',function(){
-  if(!g2bSetEndpoint(u.value)){document.getElementById('g2bApiStatus').textContent='HTTPS *.suaveforge.com 도메인의 /api/g2b 경로만 허용';return}
+  if(!g2bSetEndpoint(u.value)){document.getElementById('g2bApiStatus').textContent='HTTPS *.suaveforge.com[:고포트]/api/g2b 주소만 허용';return}
   document.getElementById('g2bApiStatus').textContent='서버 연결 확인 중…';g2bCheckStatus()
  });
  document.getElementById('g2bLoad').addEventListener('click',g2bLoadBids);
