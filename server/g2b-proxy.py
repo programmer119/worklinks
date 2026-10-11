@@ -158,11 +158,27 @@ def query_saved_bids(limit,offset,only_sw=False):
         total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
         matching=con.execute('SELECT COUNT(*) FROM bid_notices WHERE sw_candidate=1').fetchone()[0]
         where='WHERE sw_candidate=1' if only_sw else ''
-        rows=con.execute('SELECT payload FROM bid_notices '+where+
-                         ' ORDER BY last_seen DESC,kind,bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
-        return {'ok':True,'items':[json.loads(row[0]) for row in rows],
-                'totalCount':matching if only_sw else total,'storedTotal':total,
-                'candidateTotal':matching,'limit':limit,'offset':offset,'persisted':True}
+        history=con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='recurring_projects'").fetchone()
+        if history:
+            rows=con.execute('SELECT b.payload,r.history_json,r.repeat_years FROM bid_notices b '+
+                'LEFT JOIN recurring_projects r ON b.kind=r.kind AND b.bid_no=r.bid_no '+
+                (('WHERE b.sw_candidate=1 ') if only_sw else '')+
+                'ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
+        else:
+            rows=[(v[0],None,0) for v in con.execute('SELECT payload FROM bid_notices '+where+
+                    ' ORDER BY last_seen DESC,kind,bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()]
+        items=[]
+        for payload,series,years in rows:
+            obj=json.loads(payload)
+            if series and (years or 0)>=2:
+                try:
+                    obj['repeatHistory']=json.loads(series)
+                    obj['repeatYears']=int(years)
+                except (ValueError,TypeError): pass
+            items.append(obj)
+        return {'ok':True,'items':items,'totalCount':matching if only_sw else total,
+                'storedTotal':total,'candidateTotal':matching,
+                'limit':limit,'offset':offset,'persisted':True}
     finally:con.close()
 
 def crawler_state():
