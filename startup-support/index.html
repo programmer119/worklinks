@@ -268,7 +268,7 @@ function draw(){var list=visibleItems(),start=(page-1)*perPage,current=list.slic
     btn.addEventListener("mouseleave",function(){if(document.activeElement!==btn)hide()});
     btn.addEventListener("focus",function(){show(btn)});
     btn.addEventListener("blur",hide);
-    btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(active===btn&&!bubble.hidden)hide();else show(btn)});
+    btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();show(btn)});
   });
   document.getElementById("bidGuideClose").addEventListener("click",function(){guide.open=false;hide()});
   guide.addEventListener("toggle",function(){if(!guide.open)hide()});
