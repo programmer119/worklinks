@@ -78,6 +78,7 @@
 .g2b-api-settings input{min-width:230px;flex:1;max-width:510px;border:1px solid #cbd5e1;padding:7px 9px;border-radius:8px;background:#fff;font-size:12px}
 .g2b-api-settings button{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#334155;cursor:pointer;padding:7px 9px;font-size:12px}
 
+.partner-industry-list{display:grid;gap:7px;font-size:12px;color:#334155}.partner-industry-list>div{padding:8px 10px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:8px;line-height:1.6}
 </style>
 </head>
 <body><main>
@@ -169,9 +170,9 @@
     <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
     <div class="partner-summary" id="partnerSummary"></div>
     <div class="g2b-panel" id="g2bPanel">
-      <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">서버 프록시 연동 테스트</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">공고 조회 테스트</button></div></div>
+      <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">API 실시간 샘플 조회</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">샘플 공고 조회</button></div></div>
       <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
-      <div class="g2b-results" id="g2bApiResult">용역·물품·공사·외자 4종류의 최근 공고 1페이지씩을 조회합니다. 전체 공고 전수 수집은 별도 배치 작업이 필요합니다.</div>
+      <div class="g2b-results" id="g2bApiResult">현재 샘플 조회 단계: 최근 7일 · 4종류 · 종류별 첫 100건만 확인합니다. 데이터베이스 저장·전체 페이지 순회·자동 갱신은 미구현입니다.</div>
       <div class="g2b-api-settings"><label for="g2bBaseUrl">고포트 HTTPS API 주소</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
     </div>
 
@@ -217,7 +218,8 @@ var partners=[
    {label:"직접생산 · 정보시스템개발서비스 8111159901",state:"pending",value:"보유·유효기간 미검증",detail:"SMPP 직접생산확인조회에서 업체명/사업자번호와 품명번호로 증명서 유효기간 확인 필요."},
    {label:"SW사업자 일반현황 관리확인서",state:"pending",value:"최근 신고 서류 미검증",detail:"최근년도 결산신고 확인서 원본 또는 공공 SW사업자 확인자료 대조 필요."},
    {label:"중소기업확인서 · 공공입찰용",state:"pending",value:"유효기간 미검증",detail:"SMPP 중·소기업 확인서에서 입찰용 발급 현황 및 유효기간 확인 필요."},
-   {label:"한전 SRM / 나라장터 등록",state:"pending",value:"현재 입찰 등록상태 미검증",detail:"입찰 참여 이력은 있으나 SRM 등록상태와 해당 공고 신청 가능 여부는 별도."}
+   {label:"나라장터 업체 등록",state:"pending",value:"업체정보 API 조회 대기",detail:"나라장터 사용자정보 API에서 사업자번호 일치 및 등록일을 검증합니다."},
+   {label:"한전 SRM 입찰등록",state:"pending",value:"SRM 개별 등록 미검증",detail:"나라장터 등록과 별개로 한전 SRM의 등록상태 및 해당 입찰 신청 가능 여부는 확인해야 합니다."}
   ],
   sources:[{name:"기업정보",url:"https://www.saramin.co.kr/zf_user/company-info/view/csn/RGRWM0lxUDBXVnJpcmlhUTBFWlBiZz09/company_nm/%EC%B0%BD%EC%BB%B4%EC%A0%95%EB%B3%B4%ED%86%B5%EC%8B%A0%28%EC%A3%BC%29"},{name:"직접생산확인 조회",url:"https://www.smpp.go.kr/cst/smppInf/selectDpCnfrmnListVw.do"},{name:"중소기업확인 조회",url:"https://smpp.go.kr/cst/smppInf/selectMiddlSslentrSchtwrListVw.do"},{name:"나라장터",url:"https://www.g2b.go.kr/"},{name:"나라장터 등록업종 API",url:"https://www.data.go.kr/data/15129466/openapi.do"}]
  }
@@ -226,14 +228,56 @@ function htmlEscape(v){return String(v===undefined||v===null?"":v).replace(/[&<>
 function renderPartners(){
  var box=document.getElementById("partnerCompanyCards");if(!box)return;
  box.innerHTML=partners.map(function(p){
-  var q=p.qualifications.map(function(y){return '<div class="partner-qual"><b>'+htmlEscape(y.label)+'</b><span class="partner-state '+(y.state==="confirmed"?"confirmed":"")+'">'+(y.state==="confirmed"?"분류 확인":"증빙 확인 필요")+'</span> <strong>'+htmlEscape(y.value)+'</strong><p>'+htmlEscape(y.detail)+'</p></div>'}).join("");
+  var q=p.qualifications.map(function(y){
+   var stateText=y.state==="confirmed"?"공식 조회 확인":y.state==="expired"?"만료·상태 확인":y.state==="checking"?"조회 중":"추가 증빙 필요";
+   return '<div class="partner-qual"><b>'+htmlEscape(y.label)+'</b><span class="partner-state '+(y.state==="confirmed"?"confirmed":"")+'">'+stateText+'</span> <strong>'+htmlEscape(y.value)+'</strong><p>'+htmlEscape(y.detail)+'</p></div>'
+  }).join("");
   var sources=p.sources.map(function(x){return '<a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.name)+' ↗</a>'}).join("");
-  return '<article class="partner-company"><h3>'+htmlEscape(p.name)+'</h3><div class="partner-sector">'+htmlEscape(p.established)+' · '+htmlEscape(p.type)+' · 사업자번호 '+htmlEscape(p.businessNo||'미확인')+'<br><b>수행 분야:</b> '+p.sectors.map(htmlEscape).join(" · ")+'</div><div class="partner-quals">'+q+'</div><div class="partner-actions">'+sources+'</div></article>'
+  var status=p.registryError?'<div class="partner-sector" style="color:#b91c1c">나라장터 등록업종 조회 실패: '+htmlEscape(p.registryError)+'</div>':(p.registryCheckedAt?'<div class="partner-sector">나라장터 API 확인 시각: '+htmlEscape(p.registryCheckedAt)+'</div>':'<div class="partner-sector">나라장터 등록업종: 조회 대기</div>');
+  var industry=(p.industryRecords||[]).length?'<section class="partner-company"><h4>나라장터 실제 등록업종 ('+p.industryRecords.length+'개)</h4><div class="partner-industry-list">'+p.industryRecords.map(function(x){return '<div><b>'+htmlEscape(x.code)+'</b> '+htmlEscape(x.name)+' <span class="partner-state '+(x.status==="정상"?"confirmed":"")+'">'+htmlEscape(x.status||"등록 조회됨")+'</span> '+(x.expiresAt?' · 유효기간 '+htmlEscape(x.expiresAt).slice(0,10):'')+'</div>'}).join("")+'</div><p class="partner-foot">※ 나라장터 업종등록 현황이며, 개별 사업의 직접생산·수행실적·인력·공동수급 허용 여부까지 증명하지는 않습니다.</p></section>':'';
+  return '<article class="partner-company"><h3>'+htmlEscape(p.name)+'</h3><div class="partner-sector">'+htmlEscape(p.established)+' · '+htmlEscape(p.type)+' · 사업자번호 '+htmlEscape(p.businessNo||'미확인')+'<br><b>수행 분야:</b> '+p.sectors.map(htmlEscape).join(" · ")+'</div><div class="partner-quals">'+q+'</div><div class="partner-actions"><button type="button" class="partner-launch" data-partner-refresh="'+htmlEscape(p.id)+'">나라장터 자격 다시 조회</button>'+sources+'</div>'+status+industry+'</article>';
  }).join("");
  document.getElementById("partnerHeaderCount").textContent=String(partners.length);
 }
+function setPartnerQual(p,label,update){
+ var q=p.qualifications.find(function(x){return x.label===label});
+ if(q)Object.assign(q,update);
+}
+async function refreshPartnerRegistry(p){
+ if(!p || !p.businessNo)return;
+ setPartnerQual(p,"SW사업자 · 컴퓨터관련서비스사업 1468",{state:"checking",value:"나라장터 공식 API 조회 중"});
+ setPartnerQual(p,"나라장터 업체 등록",{state:"checking",value:"공식 API 조회 중"});
+ p.registryError="";renderPartners();
+ try{
+  const data=await g2bFetch('/company?bizno='+encodeURIComponent(p.businessNo.replace(/\D/g,'')));
+  if(!data.found || !data.company)throw Error('업체번호에 해당하는 등록정보 없음');
+  p.registryCheckedAt=data.checkedAt||"";
+  p.industryRecords=Array.isArray(data.industries)?data.industries:[];
+  setPartnerQual(p,"나라장터 업체 등록",{
+   state:"confirmed",value:"조달업체 등록정보 확인",
+   detail:"나라장터 사용자정보서비스 조회 완료 · "+String(data.company.name||"")+" · 등록일 "+String(data.company.registeredAt||"미표시")
+  });
+  const rec=p.industryRecords.find(function(x){return String(x.code)==="1468"});
+  const expiry=rec?String(rec.expiresAt||""):"";
+  const expired=expiry && /^\d{4}-\d{2}-\d{2}/.test(expiry) && expiry.slice(0,10) < new Date(Date.now()+32400000).toISOString().slice(0,10);
+  const good=rec && String(rec.status)==="정상" && !expired;
+  setPartnerQual(p,"SW사업자 · 컴퓨터관련서비스사업 1468",{
+   state:good?"confirmed":(rec?"expired":"pending"),
+   value:good?"1468 정상 등록 · 공식 API 검증":(rec?"등록 기록은 있으나 현재 상태 주의":"1468 등록 조회 안 됨"),
+   detail:rec?("업종명 "+rec.name+" · 상태 "+(rec.status||"미확인")+" · 만료 "+(expiry||"미표시")):"조회된 업종에 1468이 없습니다. 조회 결과·조회범위를 재검증해야 합니다."
+  });
+  if(!data.complete){
+   p.registryError="등록업종 일부만 수신되었습니다. 코드 누락 여부 최종 판정 보류.";
+  }
+ }catch(e){
+  p.registryError=String(e.message||e);
+  setPartnerQual(p,"SW사업자 · 컴퓨터관련서비스사업 1468",{state:"pending",value:"실시간 검증 실패",detail:"API 연결 실패로 적격·부적격 판정하지 않습니다."});
+  setPartnerQual(p,"나라장터 업체 등록",{state:"pending",value:"실시간 검증 실패",detail:"API 연결 실패로 현재 등록상태 미확정"});
+ }
+ renderPartners();
+}
 var partnerModal=document.getElementById("partnersModal"),partnerLastFocus=null;
-function openPartnerModal(){partnerLastFocus=document.activeElement;renderPartners();partnerModal.classList.add("open");partnerModal.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";document.getElementById("partnersClose").focus()}
+function openPartnerModal(){partnerLastFocus=document.activeElement;renderPartners();partnerModal.classList.add("open");partnerModal.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";document.getElementById("partnersClose").focus();partners.forEach(refreshPartnerRegistry)}
 function closePartnerModal(){partnerModal.classList.remove("open");partnerModal.setAttribute("aria-hidden","true");document.body.style.overflow="";if(partnerLastFocus&&partnerLastFocus.focus)partnerLastFocus.focus()}
 document.getElementById("partnersOpen").addEventListener("click",openPartnerModal);
 document.getElementById("partnersClose").addEventListener("click",closePartnerModal);
@@ -241,6 +285,7 @@ partnerModal.addEventListener("click",function(e){if(e.target===partnerModal)clo
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&partnerModal.classList.contains("open"))closePartnerModal()});
 document.getElementById("jobCards").addEventListener("click",function(e){if(e.target.closest&&e.target.closest("[data-partner-detail]"))openPartnerModal()});
 renderPartners();
+document.getElementById('partnerCompanyCards').addEventListener('click',function(e){var b=e.target.closest('[data-partner-refresh]');if(b){var p=partners.find(function(x){return x.id===b.dataset.partnerRefresh});if(p)refreshPartnerRegistry(p)}});
 function partnerIdsOfJob(x){return Array.isArray(x.partnerIds)?x.partnerIds:[]}
 function partnerJobInfo(x){
  var ids=partnerIdsOfJob(x);if(!ids.length)return "";
@@ -283,7 +328,7 @@ async function g2bCheckStatus(){
  const el=document.getElementById('g2bApiStatus');
  try{
   const result=await g2bFetch('/status');
-  el.textContent=result.configured?'프록시 연결됨 · 서버 인증키 설정됨 · 공고 조회 테스트를 눌러 실응답 확인':'프록시 연결됨 · 서버 인증키 미설정 (서버123 비공개 g2b.env 필요)';
+  el.textContent=result.configured?'프록시 연결됨 · 인증키 확인됨 · 샘플 조회 가능 (DB 자동 수집 아님)':'프록시 연결됨 · 서버 인증키 미설정 (서버123 비공개 g2b.env 필요)';
  }catch(e){el.textContent='API 서버 미연결/미배포: '+String(e.message||e).slice(0,110)}
 }
 async function g2bLoadBids(){
@@ -311,7 +356,7 @@ async function g2bLoadBids(){
   }
   if(counts.length){g2bLiveJobs=found;renderJobs();}
   status.textContent=(counts.length===4?'API 응답 성공 4/4':'API 부분 성공 '+counts.length+'/4')+' · 필터 통과 '+found.length+'건';
-  out.textContent='조회범위 '+from+'~'+to+' · '+counts.join(' / ')+(errors.length?' · 오류: '+errors.join(' | '):'')+' · 최근 7일 분야당 최대 100건을 검사했으며 전수 수집은 아님';
+  out.textContent='조회범위 '+from+'~'+to+' · '+counts.join(' / ')+(errors.length?' · 오류: '+errors.join(' | '):'')+' · 최근 7일 분야당 첫 100건만 검사 · 일시적 화면 반영 · DB 미저장';
  }catch(e){status.textContent='API 조회 실패: '+String(e.message||e).slice(0,120);}
  finally{g2bLoading=false;b.disabled=false}
 }
