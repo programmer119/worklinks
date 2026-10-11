@@ -250,7 +250,7 @@ function partnerJobInfo(x){
 
 
 /* 공개 페이지에 API 키를 두지 않는다. 서버123 HTTPS API URL만 저장 (인증키 아님). */
-var G2B_DEFAULT_URL='https://api-worklinks.suaveforge.com/api/g2b';
+var G2B_DEFAULT_URL='https://api-suaveforge.suaveforge.com:18458/api/g2b';
 var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL;
 var g2bLiveJobs=[],g2bLoading=false;
 function g2bKoreaDay(offset){
@@ -291,7 +291,7 @@ async function g2bLoadBids(){
  g2bLoading=true;
  const b=document.getElementById('g2bLoad'),status=document.getElementById('g2bApiStatus'),out=document.getElementById('g2bApiResult');
  b.disabled=true;status.textContent='나라장터 공고 조회 중…';
- const from=g2bKoreaDay(-1),to=g2bKoreaDay(0),groups=['servc','thng','cnstwk','frgcpt'];
+ const from=g2bKoreaDay(-6),to=g2bKoreaDay(0),groups=['servc','thng','cnstwk','frgcpt'];
  const found=[],errors=[],counts=[];
  try{
   const attempts=await Promise.allSettled(groups.map(function(kind){
@@ -311,7 +311,7 @@ async function g2bLoadBids(){
   }
   if(counts.length){g2bLiveJobs=found;renderJobs();}
   status.textContent=(counts.length===4?'API 응답 성공 4/4':'API 부분 성공 '+counts.length+'/4')+' · 필터 통과 '+found.length+'건';
-  out.textContent='조회범위 '+from+'~'+to+' · '+counts.join(' / ')+(errors.length?' · 오류: '+errors.join(' | '):'')+' · 최근 2일 분야당 최대 100건을 검사했으며 전수 수집은 아님';
+  out.textContent='조회범위 '+from+'~'+to+' · '+counts.join(' / ')+(errors.length?' · 오류: '+errors.join(' | '):'')+' · 최근 7일 분야당 최대 100건을 검사했으며 전수 수집은 아님';
  }catch(e){status.textContent='API 조회 실패: '+String(e.message||e).slice(0,120);}
  finally{g2bLoading=false;b.disabled=false}
 }
