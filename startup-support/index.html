@@ -213,7 +213,7 @@
     <div class="g2b-panel" id="g2bPanel">
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">API 조회·DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">공고 조회·저장</button></div></div>
       <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
-      <div class="g2b-results" id="g2bApiResult">최근 7일 공고를 유형별 최대 100건씩 조회하여 서버 DB에 중복 없이 저장합니다. 저장된 공고는 새로고침할 때 자동으로 불러옵니다. 전국 전수수집은 별도 작업입니다.</div>
+      <div class="g2b-results" id="g2bApiResult">최근 7일 공고를 유형별 최대 100건씩 조회합니다. 서버 DB 연결 시 영구 저장되며, 연결 전에는 현재 브라우저에 임시 보존합니다. 전국 전수수집은 별도 작업입니다.</div>
       <div class="g2b-api-settings"><label for="g2bBaseUrl">고포트 HTTPS API 주소</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
     </div>
 
@@ -471,43 +471,64 @@ async function g2bCheckStatus(){
  const el=document.getElementById('g2bApiStatus');
  try{
   const result=await g2bFetch('/status');
-  el.textContent=result.configured?'나라장터 연결됨 · 조회한 공고 서버 DB 영구 저장 활성':'프록시 연결됨 · 서버 인증키 미설정 (서버123 비공개 g2b.env 필요)';
+  el.textContent=result.configured?'나라장터 연결됨 · 서버 저장 가능 여부는 공고 조회 결과에서 확인':'프록시 연결됨 · 서버 인증키 미설정 (서버123 비공개 g2b.env 필요)';
  }catch(e){el.textContent='API 서버 미연결/미배포: '+String(e.message||e).slice(0,110)}
 }
 
+const G2B_LOCAL_KEY='worklinks_g2b_saved_notice_jobs_v1';
+function g2bLocalRead(){
+ try{const a=JSON.parse(localStorage.getItem(G2B_LOCAL_KEY)||'[]');return Array.isArray(a)?a:[]}
+ catch{return []}
+}
+function g2bLocalWrite(jobsToAdd){
+ const map=new Map();
+ for(const j of g2bLocalRead().concat(jobsToAdd||[])){
+  if(j&&j.id&&/^g2b-/.test(j.id))map.set(j.id,j);
+ }
+ const rows=[...map.values()].slice(-1500);
+ try{localStorage.setItem(G2B_LOCAL_KEY,JSON.stringify(rows));return rows.length}
+ catch{return -1}
+}
+function g2bCardFromRecord(x){
+ if(!x||!g2bCandidateTitle(String(x.title||''))||!x.bidNo)return null;
+ const id='g2b-'+x.kind+'-'+x.bidNo+'-'+x.order;
+ return {id,entry:'business',type:'나라장터 API',title:x.title||'(제목 없음)',
+  url:x.url||'https://www.g2b.go.kr/',org:x.org||x.agency||'발주기관 미확인',
+  period:x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요',
+  amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',
+  reason:'나라장터에서 조회된 SW·DB·AI 관련 공고 후보',
+  condition:'참가자격·공동수급·분담이행·하도급·SW 범위 원문 확인 필요',
+  partnerIds:['changcom'],partnerBidMode:'공고 원문 확인 필요',
+  partnerScope:'SW·정보화 관련 제목 검색',partnerVerified:false};
+}
 async function g2bLoadSaved(){
- let items=[],total=0,complete=false;
+ const saved=new Map(g2bLocalRead().map(j=>[j.id,j]));
+ g2bLiveJobs=[...saved.values()];renderJobs();
+ const out=document.getElementById('g2bApiResult');
+ if(saved.size)out.textContent='브라우저 보존 일감 '+saved.size+'건 불러옴 · 서버 DB 연결 확인 중';
+ let total=0,serverOk=false,complete=false;
  try{
   for(let offset=0;offset<10000;offset+=500){
    const data=await g2bFetch('/saved?limit=500&offset='+offset);
+   serverOk=true;
    const part=Array.isArray(data.items)?data.items:[];
    total=Number(data.totalCount||0);
-   items.push(...part);
+   for(const x of part){
+    const j=g2bCardFromRecord(x);
+    if(j)saved.set(j.id,j);
+   }
    if(part.length===0||offset+part.length>=total){complete=true;break}
   }
-  const found=new Map();
-  for(const x of items){
-   if(!g2bCandidateTitle(x.title||''))continue;
-   const id='g2b-'+x.kind+'-'+x.bidNo+'-'+x.order;
-   if(!x.bidNo || found.has(id))continue;
-   found.set(id,{id,entry:'business',type:'나라장터 API · DB저장',title:x.title||'(제목 없음)',
-    url:x.url||'https://www.g2b.go.kr/',org:x.org||x.agency||'발주기관 미확인',
-    period:x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요',
-    amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',
-    reason:'나라장터에서 조회되어 서버 DB에 저장된 SW·DB·AI 관련 공고 후보',
-    condition:'참가자격·공동수급·분담이행·하도급·SW 범위 원문 확인 필요',
-    partnerIds:['changcom'],partnerBidMode:'공고 원문 확인 필요',
-    partnerScope:'SW·정보화 관련 제목 검색',partnerVerified:false});
-  }
-  g2bLiveJobs=[...found.values()];renderJobs();
-  document.getElementById('g2bApiResult').textContent='DB 저장 공고 '+total+'건 · SW 관련 제목 '+found.size+'건 표시 · 새로고침 후에도 유지'+(complete?'':' · 일부만 로딩');
-  return {total,matched:found.size,complete};
+  g2bLiveJobs=[...saved.values()];renderJobs();
+  g2bLocalWrite(g2bLiveJobs);
+  out.textContent='서버 DB 저장 '+total+'건 · 화면 SW 후보 '+g2bLiveJobs.length+'건 · 새로고침 후 유지'+(complete?'':' · 일부 페이지');
+  return {total,matched:g2bLiveJobs.length,serverOk,complete};
  }catch(e){
-  document.getElementById('g2bApiResult').textContent='서버 DB 로딩 실패: '+String(e.message||e).slice(0,95);
-  return null;
+  g2bLiveJobs=[...saved.values()];renderJobs();
+  out.textContent='이 브라우저에 '+saved.size+'건 보존됨 · 서버 공용 DB는 아직 미연결 ('+String(e.message||e).slice(0,55)+')';
+  return {total:saved.size,matched:saved.size,serverOk:false,complete:false};
  }
 }
-
 async function g2bLoadBids(){
  if(g2bLoading)return;
  g2bLoading=true;
@@ -523,7 +544,10 @@ async function g2bLoadBids(){
    const kind=groups[i],a=attempts[i];
    if(a.status!=='fulfilled'){errors.push(kind+': '+String(a.reason?.message||a.reason).slice(0,65));continue}
    const data=a.value;
-   if(!data.persisted){errors.push(kind+': DB 저장 확인 안 됨');continue}
+   const incoming=(data.items||[]).map(g2bCardFromRecord).filter(Boolean);
+   const localCount=g2bLocalWrite(incoming);
+   if(localCount<0)errors.push(kind+': 브라우저 저장용량 부족');
+   if(!data.persisted)errors.push(kind+': 서버 DB 미반영 (브라우저에만 보존)');
    counts.push(kind+' '+data.items.length+'/'+data.totalCount);
    for(const x of data.items){
     if(!g2bCandidateTitle(x.title||''))continue;
