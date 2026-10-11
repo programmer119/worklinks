@@ -283,7 +283,8 @@ var qualEvidence=[
  {id:"R26BK01360591",url:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01360591&bidPbancOrd=000&fileSeq=2&prcmBsneSeCd=03",label:"RPA 유지보수",codes:["8111189901"]},
  {id:"R26BK01674565",url:"https://kr-bid.com/notices/R26BK01674565",label:"정보보안 유지·관리",codes:["8111189901|8111229901"]},
  {id:"R26BK01563864",url:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01563864&bidPbancOrd=000&fileSeq=2&prcmBsneSeCd=01",label:"정보시스템·장비 혼합",codes:["1468","0036","8111179901","SME"]},
- {id:"R26BK01677264",url:"https://kr-bid.com/notices/R26BK01677264",label:"충북 도로대장 관리시스템",codes:["1468","5029","6039","8111189901","SME"]}
+ {id:"R26BK01677264",url:"https://kr-bid.com/notices/R26BK01677264",label:"충북 도로대장 관리시스템",codes:["1468","5029","6039","8111189901","SME"]},
+ {id:"R26BK01399303",url:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01399303&bidPbancOrd=000&fileSeq=1&prcmBsneSeCd=03",label:"대구 공공정보시스템 유지관리",codes:["1468","8111189901","REGION"]}
 ];
 var qualCatalog=[
  {id:"1468",name:"소프트웨어사업자 · 컴퓨터관련서비스사업",category:"industry",use:"SI·시스템 구축·유지관리·정보화",partner:"yes"},
@@ -299,11 +300,17 @@ var qualCatalog=[
  {id:"8111229901",name:"소프트웨어유지및지원서비스 직접생산확인증명서",category:"production",use:"상용 SW·보안 솔루션 유지지원",partner:"unknown"},
  {id:"8111179901",name:"정보인프라구축서비스 직접생산확인증명서",category:"production",use:"서버·인프라·네트워크 구축",partner:"unknown"},
  {id:"8111200201",name:"데이터처리서비스 직접생산확인증명서",category:"production",use:"데이터 가공·정제·처리",partner:"unknown"},
+ {id:"8111200202",name:"빅데이터분석서비스 직접생산확인증명서",category:"production",use:"빅데이터 분석·통계·AI 학습데이터 분야",partner:"unknown"},
+ {id:"8115169901",name:"공간정보DB구축서비스 직접생산확인증명서",category:"production",use:"GIS·공간정보·전자지도 DB 구축",partner:"unknown"},
+ {id:"8111219901",name:"인터넷지원개발서비스 직접생산확인증명서",category:"production",use:"웹 기반 SW·인터넷 서비스 개발",partner:"unknown"},
+ {id:"8111159801",name:"패키지소프트웨어개발및도입서비스 직접생산확인증명서",category:"production",use:"패키지SW 개발·도입·공급",partner:"unknown"},
+ {id:"8111181101",name:"운영위탁서비스 직접생산확인증명서",category:"production",use:"시스템·정보화 운영 위탁",partner:"unknown"},
  {id:"SME",name:"중소기업·소상공인확인서(입찰 유효기간)",category:"certificate",use:"중소기업자간 경쟁·제한경쟁",partner:"unknown"},
  {id:"SWSTATUS",name:"소프트웨어사업자 일반현황 관리확인서",category:"certificate",use:"공공 SW 사업 참여범위·중소SW 제한 확인",partner:"unknown"},
  {id:"PERFORMANCE",name:"실적증명서·유사용역 수행실적",category:"certificate",use:"공고별 최소 수행실적·제안 평가",partner:"unknown"},
  {id:"TECHSTAFF",name:"상근 기술인력·4대보험 가입자명부",category:"certificate",use:"핵심기술자·상주인력 입증",partner:"unknown"},
- {id:"SECURITY",name:"정보보호·보안제품 인증(해당 사업)",category:"special",use:"GS·CC·보안 관련 조달 특수요건; 제품 인증과 업체면허는 구별",partner:"unknown"}
+ {id:"SECURITY",name:"정보보호·보안제품 인증(해당 사업)",category:"special",use:"GS·CC·보안 관련 조달 특수요건; 제품 인증과 업체면허는 구별",partner:"unknown"},
+ {id:"REGION",name:"지역제한(법인 본점 소재지·공고별)",category:"special",use:"지역 제한경쟁·사업자 소재지 조건",partner:"unknown"}
 ];
 function qualProof(item){
  const confirmed=qualEvidence.filter(function(e){return e.codes.includes(item.id)});
