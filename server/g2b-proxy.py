@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """WorkLinks G2B API proxy. CentOS 7 / Python 2.7+ standard library only."""
 from __future__ import print_function
-import os, sys, re, json, time, datetime, threading
+import os, sys, re, json, time, datetime, threading, ssl
 try:
     from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
     from SocketServer import ThreadingMixIn
@@ -17,6 +17,9 @@ except ImportError:
     from urllib.error import HTTPError, URLError
 
 PORT = int(os.environ.get('PORT', '18191'))
+BIND_HOST = os.environ.get('BIND_HOST', '127.0.0.1')
+TLS_CERT_FILE = os.environ.get('G2B_TLS_CERT_FILE', '').strip()
+TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
 SECRET_PATH = os.environ.get('G2B_SECRET_PATH', '/home/worklinks/g2b/secrets/g2b.env')
 API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService'
 AWARD_BASE = 'https://apis.data.go.kr/1230000/as/ScsbidInfoService'
@@ -165,4 +168,19 @@ class Handler(BaseHTTPRequestHandler):
         sys.stderr.write('[worklinks-g2b] '+fmt%args+'\n')
 
 if __name__=='__main__':
-    ThreadedServer(('127.0.0.1',PORT),Handler).serve_forever()
+    server = ThreadedServer((BIND_HOST,PORT),Handler)
+    if bool(TLS_CERT_FILE) != bool(TLS_KEY_FILE):
+        raise SystemExit('TLS certificate and key must both be supplied')
+    if BIND_HOST not in ('127.0.0.1','::1','localhost') and not TLS_CERT_FILE:
+        raise SystemExit('Refusing public plaintext HTTP: configure G2B_TLS_CERT_FILE and G2B_TLS_KEY_FILE')
+    if TLS_CERT_FILE:
+        # TLS 1.2 minimum; CentOS7 Python 2.7 SSLContext availability depends on security updates.
+        if not hasattr(ssl,'PROTOCOL_TLSv1_2'):
+            raise SystemExit('Python/OpenSSL with TLS 1.2 required for direct HTTPS')
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.load_cert_chain(certfile=TLS_CERT_FILE,keyfile=TLS_KEY_FILE)
+        server.socket = context.wrap_socket(server.socket,server_side=True)
+        print('G2B serving HTTPS on %s:%s' % (BIND_HOST,PORT))
+    else:
+        print('G2B serving HTTP (loopback only) on %s:%s' % (BIND_HOST,PORT))
+    server.serve_forever()
