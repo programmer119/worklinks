@@ -81,7 +81,7 @@ def format_bid(x, kind):
             'title':get('bidNtceNm'),'org':get('ntceInsttNm','dminsttNm'),
             'agency':get('dminsttNm'),'posted':get('bidNtceDt'),
             'closes':get('bidClseDt'),'budget':get('asignBdgtAmt','presmptPrce'),
-            'url':link if isinstance(link,str) and link.startswith('https://') else '',
+            'url':link if link and link.startswith('https://') else '',
             'state':get('bidNtceSttusNm'),'contract':get('cntrctCnclsMthdNm')}
 
 def date(s):
