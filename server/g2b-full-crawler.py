@@ -10,6 +10,7 @@ import datetime as dt
 import json
 import os
 import random
+import re
 import signal
 import sqlite3
 import sys
@@ -60,6 +61,15 @@ def connect():
     db.execute('PRAGMA journal_mode=WAL')
     db.execute('CREATE TABLE IF NOT EXISTS bid_notices (kind TEXT NOT NULL,bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,first_seen TEXT NOT NULL,last_seen TEXT NOT NULL,PRIMARY KEY(kind,bid_no,bid_ord))')
     db.execute('CREATE INDEX IF NOT EXISTS bid_notices_seen_idx ON bid_notices(last_seen DESC)')
+    cols=[r[1] for r in db.execute('PRAGMA table_info(bid_notices)').fetchall()]
+    if 'sw_candidate' not in cols:
+        db.execute('ALTER TABLE bid_notices ADD COLUMN sw_candidate INTEGER NOT NULL DEFAULT 0')
+        with db:
+            for kind,no,order,payload in db.execute('SELECT kind,bid_no,bid_ord,payload FROM bid_notices').fetchall():
+                try: flag=is_sw(json.loads(payload))
+                except Exception: flag=0
+                db.execute('UPDATE bid_notices SET sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',(flag,kind,no,order))
+    db.execute('CREATE INDEX IF NOT EXISTS bid_notices_sw_seen_idx ON bid_notices(sw_candidate,last_seen DESC)')
     db.execute('CREATE TABLE IF NOT EXISTS crawl_windows (kind TEXT NOT NULL,day TEXT NOT NULL,expected INTEGER NOT NULL,received INTEGER NOT NULL,pages INTEGER NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(kind,day))')
     db.execute('CREATE TABLE IF NOT EXISTS crawl_status (id INTEGER PRIMARY KEY CHECK(id=1),state TEXT NOT NULL,run_started TEXT,run_finished TEXT,last_success TEXT,request_count INTEGER NOT NULL DEFAULT 0,error_count INTEGER NOT NULL DEFAULT 0,message TEXT)')
     db.execute("INSERT OR IGNORE INTO crawl_status (id,state,request_count,error_count) VALUES(1,'pending',0,0)")
@@ -99,6 +109,16 @@ def call(key,kind,day,page):
             if attempt<4:time.sleep(min(8,attempt*1.7)+random.random())
     raise RuntimeError('upstream_error_'+str(last))
 
+# Broad, title/subject-based preliminary relevance. Archive ALL bid notices either way.
+SW_TERMS=re.compile(r'(소프트웨어|정보.?시스템|통합.?시스템|시스템|인공지능|머신러닝|딥러닝|기계학습|LLM|RAG|AI|ICT|IT서비스|빅데이터|데이터|데이타|디비|DB|정보화|디지털|전자문서|전자세금계산서|플랫폼|웹사이트|홈페이지|웹서비스|웹페이지|클라우드|서버|네트워크|인터넷|앱개발|모바일앱|애플리케이션|어플리케이션|SW|S/W|CCTV|보안솔루션|정보보호|사이버보안|API|GIS|ERP|CRM|RPA|메타버스|VR|AR|블록체인|영상인식|OCR|디지털콘텐츠)',re.I)
+SW_BOUNDARY=re.compile(r'\b(IT|AI|DB|SW|API|ICT|ERP|CRM|RPA|LLM|RAG|GIS|OCR)\b',re.I)
+def is_sw(bid):
+    subject=bid.get('purchsObjPrdctList') or ''
+    if isinstance(subject,(list,dict)):
+        subject=json.dumps(subject,ensure_ascii=False)
+    txt=str(bid.get('title') or '')+' '+str(subject)
+    return int(bool(SW_TERMS.search(txt) or SW_BOUNDARY.search(txt)))
+
 def compact(x,kind):
     def get(*names):
         for name in names:
@@ -123,8 +143,8 @@ def save(db,items):
     if not values:return 0
     with db:
         db.executemany('INSERT OR IGNORE INTO bid_notices (kind,bid_no,bid_ord,payload,first_seen,last_seen) VALUES(?,?,?,?,?,?)',values)
-        db.executemany('UPDATE bid_notices SET payload=?,last_seen=? WHERE kind=? AND bid_no=? AND bid_ord=?',
-                       [(v[3],now,v[0],v[1],v[2]) for v in values])
+        db.executemany('UPDATE bid_notices SET payload=?,last_seen=?,sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',
+                       [(v[3],now,is_sw(json.loads(v[3])),v[0],v[1],v[2]) for v in values])
     return len(values)
 
 def scan_day(db,key,kind,day):
