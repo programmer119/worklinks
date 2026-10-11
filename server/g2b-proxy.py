@@ -126,7 +126,41 @@ class Handler(BaseHTTPRequestHandler):
             if not get_key(): raise ApiError('secret_not_configured',503)
             if u.path == '/api/g2b/company':
                 bizno = re.sub(r'[^0-9]', '', get('bizno'))
-                if not re.match(r'^\d{10}
+                if len(bizno) != 10:
+                    raise ApiError('invalid_bizno', 400)
+                ck = ('company', bizno)
+                with lock: saved = cache.get(ck)
+                if saved and saved[0] > time.time():
+                    return self.reply(200, saved[1])
+                basic = request_api(COMPANY_BASE, 'getPrcrmntCorpBasicInfo02', {
+                    'pageNo':1, 'numOfRows':30, 'inqryDiv':3, 'bizno':bizno
+                })
+                industry = request_api(COMPANY_BASE, 'getPrcrmntCorpIndstrytyInfo02', {
+                    'pageNo':1, 'numOfRows':100, 'inqryDiv':1, 'bizno':bizno
+                })
+                matching = [x for x in basic['items'] if re.sub(r'[^0-9]','',str(x.get('bizno') or '')) == bizno]
+                codes = [
+                    {'code':str(x.get('indstrytyCd') or ''),
+                     'name':x.get('indstrytyNm') or '',
+                     'status':x.get('indstrytyStatsNm') or '',
+                     'registeredAt':x.get('rgstDt') or '',
+                     'expiresAt':x.get('vldPrdExprtDt') or '',
+                     'representative':str(x.get('rprsntIndstrytyYn') or '')}
+                    for x in industry['items']
+                    if re.sub(r'[^0-9]', '', str(x.get('bizno') or '')) == bizno
+                ]
+                result = {
+                    'ok':True, 'bizno':bizno, 'found':bool(matching),
+                    'company':{'name':matching[0].get('corpNm') or '',
+                               'registeredAt':matching[0].get('rgstDt') or ''} if matching else None,
+                    'industries':codes, 'industryCount':industry['totalCount'],
+                    'complete':len(industry['items']) >= industry['totalCount'],
+                    'has1468':any(x['code']=='1468' for x in codes),
+                    'source':'나라장터 사용자정보서비스',
+                    'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
+                }
+                with lock: cache[ck] = (time.time()+3600, result)
+                return self.reply(200,result)
             if u.path == '/api/g2b/awards':
                 bid_no = get('bidNo').strip()
                 if not re.match(r'^[a-zA-Z0-9-]{8,40}$',bid_no):
