@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """WorkLinks G2B API proxy. CentOS 7 / Python 2.7+ standard library only."""
 from __future__ import print_function
-import os, sys, re, json, time, datetime, threading, ssl
+import os, sys, re, json, time, datetime, threading, ssl, sqlite3
 try:
     from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
     from SocketServer import ThreadingMixIn
@@ -18,6 +18,7 @@ except ImportError:
 
 PORT = int(os.environ.get('PORT', '18191'))
 QUAL_REPORT_PATH = os.environ.get('G2B_QUAL_REPORT', '/app/reports/qualification-year.json')
+G2B_DB_PATH = os.environ.get('G2B_DB_PATH', '/home/worklinks/g2b/data/bids.sqlite3')
 BIND_HOST = os.environ.get('BIND_HOST', '127.0.0.1')
 TLS_CERT_FILE = os.environ.get('G2B_TLS_CERT_FILE', '').strip()
 TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
@@ -94,6 +95,51 @@ def date(s):
     try: return datetime.datetime.strptime(s,'%Y%m%d').date()
     except ValueError: raise ApiError('invalid_date',400)
 
+
+# Persistent storage for all returned G2B notices (not just SW-title hits).
+# The UI applies SW-related relevance filtering, so persistence never discards
+# notices that appeared on the user's screen.
+def open_bid_db():
+    parent = os.path.dirname(G2B_DB_PATH)
+    if not os.path.isdir(parent):
+        os.makedirs(parent)
+    con = sqlite3.connect(G2B_DB_PATH, timeout=15)
+    con.execute('PRAGMA busy_timeout=15000')
+    con.execute('CREATE TABLE IF NOT EXISTS bid_notices (kind TEXT NOT NULL, bid_no TEXT NOT NULL, bid_ord TEXT NOT NULL, payload TEXT NOT NULL, first_seen TEXT NOT NULL, last_seen TEXT NOT NULL, PRIMARY KEY (kind,bid_no,bid_ord))')
+    con.execute('CREATE INDEX IF NOT EXISTS bid_notices_seen_idx ON bid_notices(last_seen DESC)')
+    return con
+
+def persist_bids(items):
+    now = datetime.datetime.utcnow().isoformat()+'Z'
+    changed=0
+    con=open_bid_db()
+    try:
+        with con:
+            for x in items:
+                kind=str(x.get('kind') or '')[:12]
+                no=str(x.get('bidNo') or '')[:60]
+                order=str(x.get('order') or '0')[:12]
+                if kind not in BID_OPS or not no:
+                    continue
+                payload=json.dumps(x, ensure_ascii=False, separators=(',',':'))
+                con.execute('INSERT OR IGNORE INTO bid_notices (kind,bid_no,bid_ord,payload,first_seen,last_seen) VALUES (?,?,?,?,?,?)',(kind,no,order,payload,now,now))
+                con.execute('UPDATE bid_notices SET payload=?,last_seen=? WHERE kind=? AND bid_no=? AND bid_ord=?',(payload,now,kind,no,order))
+                changed+=1
+            total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
+        return {'received':changed,'storedTotal':total}
+    finally:
+        con.close()
+
+def query_saved_bids(limit,offset):
+    con=open_bid_db()
+    try:
+        count=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
+        rows=con.execute('SELECT payload FROM bid_notices ORDER BY last_seen DESC, kind, bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
+        return {'ok':True,'items':[json.loads(row[0]) for row in rows],
+                'totalCount':count,'limit':limit,'offset':offset,'persisted':True}
+    finally:
+        con.close()
+
 class ThreadedServer(ThreadingMixIn,HTTPServer):
     daemon_threads = True
 
@@ -125,6 +171,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
                     'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/saved':
+                try: limit,offset=int(get('limit','500')),int(get('offset','0'))
+                except ValueError: raise ApiError('invalid_saved_pagination',400)
+                if not (1<=limit<=500 and 0<=offset<=100000):
+                    raise ApiError('invalid_saved_pagination',400)
+                return self.reply(200,query_saved_bids(limit,offset))
             if u.path == '/api/g2b/qualifications':
                 # Aggregated public counts, no keys or raw sensitive data in report.
                 try:
@@ -200,6 +252,11 @@ class Handler(BaseHTTPRequestHandler):
                 'rows':rows,'totalCount':data['totalCount'],
                 'items':[format_bid(x,kind) for x in data['items']],
                 'generated_at':datetime.datetime.utcnow().isoformat()+'Z','cached':False}
+            # The database write must succeed before acknowledging the fetch.
+            stats=persist_bids(result['items'])
+            result['persisted']=True
+            result['savedReceived']=stats['received']
+            result['savedTotal']=stats['storedTotal']
             with lock:
                 if len(cache)>150: cache.clear()
                 cache[ck] = (time.time()+900,result)
