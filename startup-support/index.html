@@ -63,6 +63,21 @@
 .partner-job-note button{background:transparent;color:#1d4ed8;border:0;cursor:pointer;text-decoration:underline;font-weight:750;padding:1px 3px}
 .partner-summary{font-size:12px;color:#64748b;margin:8px 0}
 @media(max-width:700px){.head-actions{gap:6px}.partner-launch{padding:8px 10px}.partner-modal{padding:8px}.partner-sheet{max-height:calc(100dvh - 16px);padding:14px}.partner-quals{grid-template-columns:1fr}.partner-sheet-head h2{font-size:19px}}
+
+/* 나라장터 API 테스트 · 정적 일감과 별도 */
+.g2b-panel{margin-top:12px;padding:13px 14px;border:1px solid #dbeafe;border-radius:13px;background:#f8fbff}
+.g2b-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.g2b-head h3{font-size:14px;margin:0}
+.g2b-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.g2b-controls button{border:1px solid #1e40af;background:#1e40af;color:#fff;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:800;cursor:pointer}
+.g2b-controls button:disabled{background:#94a3b8;border-color:#94a3b8;cursor:wait}
+.g2b-status{font-size:12px;color:#475569;margin:8px 0 4px;line-height:1.55}
+.g2b-results{font-size:12px;color:#334155;margin-top:5px}
+.g2b-live-tag{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:2px 6px;background:#dbeafe;color:#1e40af}
+.g2b-api-settings{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:9px;font-size:12px}
+.g2b-api-settings input{min-width:230px;flex:1;max-width:510px;border:1px solid #cbd5e1;padding:7px 9px;border-radius:8px;background:#fff;font-size:12px}
+.g2b-api-settings button{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#334155;cursor:pointer;padding:7px 9px;font-size:12px}
+
 </style>
 </head>
 <body><main>
@@ -153,6 +168,13 @@
     </div>
     <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
     <div class="partner-summary" id="partnerSummary"></div>
+    <div class="g2b-panel" id="g2bPanel">
+      <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">서버 프록시 연동 테스트</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">공고 조회 테스트</button></div></div>
+      <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
+      <div class="g2b-results" id="g2bApiResult">용역·물품·공사·외자 4종류의 최근 공고 1페이지씩을 조회합니다. 전체 공고 전수 수집은 별도 배치 작업이 필요합니다.</div>
+      <div class="g2b-api-settings"><label for="g2bBaseUrl">API 서버</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
+    </div>
+
 
   </div>
   <div class="cards" id="jobCards"></div>
@@ -226,9 +248,86 @@ function partnerJobInfo(x){
  return '<div class="partner-job-note"><b>협업 검토 · '+matches+'</b> <button type="button" data-partner-detail="1">파트너 자격 보기</button><div><b>참여 방식:</b> '+htmlEscape(x.partnerBidMode||"공고 원문 확인 필요")+'</div><div><b>수행 분야:</b> '+htmlEscape(x.partnerScope||"SW·DB·데이터·AI")+'</div><div>※ 기술분야 후보일 뿐, 업체 자격·공동수급 허용 및 실제 수주 가능은 검증 전입니다.</div></div>';
 }
 
+
+/* 공개 페이지에 API 키를 두지 않는다. 서버123 HTTPS API URL만 저장 (인증키 아님). */
+var G2B_DEFAULT_URL='https://api-worklinks.suaveforge.com/api/g2b';
+var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL;
+var g2bLiveJobs=[],g2bLoading=false;
+function g2bKoreaDay(offset){
+ const kst=new Date(Date.now()+9*3600000);
+ kst.setUTCDate(kst.getUTCDate()+offset);
+ return kst.toISOString().slice(0,10).replace(/-/g,'');
+}
+function g2bCandidateTitle(t){
+ return /(개발|구축|고도화|유지\s*보수|운영\s*관리|정보\s*시스템|데이터|디비|DB|인공지능|AI|딥러닝|기계학습|LLM|RAG|소프트웨어|S\/W|SW|전산|정보화|디지털|전자|플랫폼|클라우드|서버|정보\s*보호|사이버|홈페이지|웹|모바일|앱|자동화|정보\s*통신|실시간|빅데이터|ICT)/i.test(t);
+}
+function g2bSetEndpoint(s){
+ try{
+  const u=new URL(String(s||'').trim());
+  if(u.protocol!=='https:' || u.username || u.password || u.search || u.hash || u.port || !u.hostname.endsWith('.suaveforge.com') || !u.pathname.replace(/\/+$/,'').endsWith('/api/g2b'))throw Error('invalid');
+  G2B_PROXY_URL=u.href.replace(/\/+$/,'');
+  localStorage.setItem('worklinks_g2b_base_v1',G2B_PROXY_URL);
+  return true;
+ }catch{return false}
+}
+async function g2bFetch(path){
+ const c=new AbortController(),timeout=setTimeout(function(){c.abort()},14000);
+ try{
+  const resp=await fetch(G2B_PROXY_URL+path,{signal:c.signal,cache:'no-store'});
+  const json=await resp.json().catch(function(){throw Error('JSON 응답 아님 (HTTP '+resp.status+')')});
+  if(!resp.ok||!json.ok)throw Error(json.error||('HTTP '+resp.status));
+  return json;
+ }finally{clearTimeout(timeout)}
+}
+async function g2bCheckStatus(){
+ const el=document.getElementById('g2bApiStatus');
+ try{
+  const result=await g2bFetch('/status');
+  el.textContent=result.configured?'프록시 연결됨 · 서버 인증키 설정됨 · 공고 조회 테스트를 눌러 실응답 확인':'프록시 연결됨 · 서버 인증키 미설정 (서버123 비공개 g2b.env 필요)';
+ }catch(e){el.textContent='API 서버 미연결/미배포: '+String(e.message||e).slice(0,110)}
+}
+async function g2bLoadBids(){
+ if(g2bLoading)return;
+ g2bLoading=true;
+ const b=document.getElementById('g2bLoad'),status=document.getElementById('g2bApiStatus'),out=document.getElementById('g2bApiResult');
+ b.disabled=true;status.textContent='나라장터 공고 조회 중…';
+ const from=g2bKoreaDay(-1),to=g2bKoreaDay(0),groups=['servc','thng','cnstwk','frgcpt'];
+ const found=[],errors=[],counts=[];
+ try{
+  const attempts=await Promise.allSettled(groups.map(function(kind){
+   return g2bFetch('/bids?kind='+kind+'&from='+from+'&to='+to+'&page=1&rows=100');
+  }));
+  for(let i=0;i<attempts.length;i++){
+   const kind=groups[i],a=attempts[i];
+   if(a.status!=='fulfilled'){errors.push(kind+': '+String(a.reason?.message||a.reason).slice(0,65));continue}
+   const data=a.value;
+   counts.push(kind+' '+data.items.length+'/'+data.totalCount);
+   for(const x of data.items){
+    if(!g2bCandidateTitle(x.title||''))continue;
+    const id='g2b-'+kind+'-'+x.bidNo+'-'+x.order;
+    if(found.some(function(p){return p.id===id}))continue;
+    found.push({id,entry:'business',type:'나라장터 API',title:x.title||'(제목 없음)',url:x.url||'https://www.g2b.go.kr/',org:x.org||x.agency||'발주기관 미확인',period:(x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요'),amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',reason:'나라장터 API에서 확인된 SW·DB·AI 또는 유관 공고이며 발주 원문 검토 필요',condition:'참가자격·공동수급·분담이행·하도급·SW 범위 원문 확인 필요',partnerIds:['changcom'],partnerBidMode:'공고 원문 미확인 · 자격 자동판정 없음',partnerScope:'제목 기준 SW·정보화 일감 후보',partnerVerified:false});
+   }
+  }
+  if(counts.length){g2bLiveJobs=found;renderJobs();}
+  status.textContent=(counts.length===4?'API 응답 성공 4/4':'API 부분 성공 '+counts.length+'/4')+' · 필터 통과 '+found.length+'건';
+  out.textContent='조회범위 '+from+'~'+to+' · '+counts.join(' / ')+(errors.length?' · 오류: '+errors.join(' | '):'')+' · 최근 2일 분야당 최대 100건을 검사했으며 전수 수집은 아님';
+ }catch(e){status.textContent='API 조회 실패: '+String(e.message||e).slice(0,120);}
+ finally{g2bLoading=false;b.disabled=false}
+}
+(function(){
+ const u=document.getElementById('g2bBaseUrl');u.value=G2B_PROXY_URL;
+ document.getElementById('g2bBaseSave').addEventListener('click',function(){
+  if(!g2bSetEndpoint(u.value)){document.getElementById('g2bApiStatus').textContent='HTTPS *.suaveforge.com 도메인의 /api/g2b 경로만 허용';return}
+  document.getElementById('g2bApiStatus').textContent='서버 연결 확인 중…';g2bCheckStatus()
+ });
+ document.getElementById('g2bLoad').addEventListener('click',g2bLoadBids);
+ g2bCheckStatus();
+})();
+
 var jobFilter="all";localStorage.setItem("worklinks_job_filter_v1","all");
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
-function renderJobs(){var el=document.getElementById("jobCards");if(!el)return;var candidates=jobs.filter(function(x){return partnerIdsOfJob(x).length>0});document.getElementById("partnerJobCount").textContent="("+candidates.length+")";document.getElementById("partnerSummary").textContent="파트너 등록 "+partners.length+"개사 · 협업 검토 일감 "+candidates.length+"건 · 증빙 적격 확정 0건 · 전국 전수 수집 아님";if(jobFilter==="sources"){el.innerHTML=jobSources.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag">탐색경로</span></div><h3><a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener">'+htmlEscape(x.name)+'</a></h3><p>'+htmlEscape(x.note)+'</p></article>'}).join("");}else{var list=jobs.filter(function(x){return jobFilter==="all"||(jobFilter==="partner"?partnerIdsOfJob(x).length>0:x.entry===jobFilter)});el.innerHTML=list.length?list.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag hot">'+htmlEscape(x.type)+'</span><span class="tag">'+jobEntryLabel(x.entry)+'</span><span class="tag">'+htmlEscape(x.fit)+'</span></div><h3><a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.title)+'</a></h3><div class="meta">'+htmlEscape(x.org)+' · '+htmlEscape(x.period)+' · '+htmlEscape(x.amount)+'</div><div class="why"><b>왜 볼 가치가 있나</b><br>'+htmlEscape(x.reason)+'</div><p><b>체크:</b> '+htmlEscape(x.condition)+'</p>'+partnerJobInfo(x)+'</article>'}).join(""):'<div class="emptycard">이 조건에 맞는 선별 일감이 없습니다.</div>';}document.querySelectorAll(".jobf").forEach(function(b){b.classList.toggle("on",b.dataset.jobf===jobFilter)})}
+function renderJobs(){var el=document.getElementById("jobCards");if(!el)return;var allJobs=jobs.concat(g2bLiveJobs);var candidates=allJobs.filter(function(x){return partnerIdsOfJob(x).length>0});document.getElementById("partnerJobCount").textContent="("+candidates.length+")";document.getElementById("partnerSummary").textContent="파트너 등록 "+partners.length+"개사 · 협업 검토 일감 "+candidates.length+"건 (API 가져온 항목 "+g2bLiveJobs.length+"건) · 적격 확정 0건 · 전수 수집 아님";if(jobFilter==="sources"){el.innerHTML=jobSources.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag">탐색경로</span></div><h3><a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.name)+'</a></h3><p>'+htmlEscape(x.note)+'</p></article>'}).join("");}else{var list=allJobs.filter(function(x){return jobFilter==="all"||(jobFilter==="partner"?partnerIdsOfJob(x).length>0:x.entry===jobFilter)});el.innerHTML=list.length?list.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag hot">'+htmlEscape(x.type)+'</span><span class="tag">'+jobEntryLabel(x.entry)+'</span><span class="tag">'+htmlEscape(x.fit)+'</span></div><h3><a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.title)+'</a></h3><div class="meta">'+htmlEscape(x.org)+' · '+htmlEscape(x.period)+' · '+htmlEscape(x.amount)+'</div><div class="why"><b>왜 볼 가치가 있나</b><br>'+htmlEscape(x.reason)+'</div><p><b>체크:</b> '+htmlEscape(x.condition)+'</p>'+partnerJobInfo(x)+'</article>'}).join(""):'<div class="emptycard">이 조건에 맞는 선별 일감이 없습니다.</div>';}document.querySelectorAll(".jobf").forEach(function(b){b.classList.toggle("on",b.dataset.jobf===jobFilter)})}
 function renderSales(){var el=document.getElementById("salesCards");if(!el)return;el.innerHTML=salesAgencies.length?salesAgencies.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag hot">'+x.kind+'</span><span class="tag">'+x.grade+'</span></div><h3><a href="'+x.url+'" target="_blank" rel="noopener">'+x.name+'</a></h3><div class="why"><b>선별 이유</b><br>'+x.why+'</div><p><b>상담 때 확인:</b> '+x.check+'</p></article>'}).join(""):'<div class="emptycard">현재 선별된 영업대행사가 없습니다.</div>'}
 function setWorkspaceView(view){document.querySelectorAll(".workspace-tab").forEach(function(b){b.classList.toggle("on",b.dataset.view===view)});document.querySelectorAll(".workspace-view").forEach(function(v){v.classList.remove("on")});var target=document.getElementById(view+"View");if(target)target.classList.add("on");localStorage.setItem("worklinks_workspace_view_v1",view)}
 document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});renderJobs();renderSales();var requestedView=new URLSearchParams(location.search).get("view");setWorkspaceView(["support","jobs","sales"].includes(requestedView)?requestedView:(localStorage.getItem("worklinks_workspace_view_v1")||"support"));
