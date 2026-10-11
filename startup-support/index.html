@@ -124,6 +124,44 @@
 .qual-proof a{display:inline-block;border:1px solid #dbeafe;padding:2px 5px;border-radius:6px;font-size:11px;white-space:nowrap}
 @media(max-width:700px){.qual-launch{padding:8px 10px}.qual-sheet{padding:14px}.qual-table th,.qual-table td{padding:8px;min-width:110px}.qual-table th:first-child,.qual-table td:first-child{min-width:145px}.qual-head h2{font-size:19px}}
 
+
+/* JOBS: compact scan cards + read-on-click detail + evidence-level qualification comparison */
+#jobCards.cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#jobCards .job-mini{padding:13px 14px;border-radius:13px;min-height:144px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+#jobCards .job-mini:hover,#jobCards .job-mini:focus-visible{border-color:#94a3b8;box-shadow:0 3px 12px rgba(15,23,42,.09);outline:none}
+#jobCards .job-mini .cardtop{margin-bottom:6px;gap:5px}
+#jobCards .job-mini h3{font-size:14px;line-height:1.45;min-height:40px;margin:2px 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#jobCards .job-mini .job-card-title{display:block;width:100%;border:0;background:transparent;padding:0;color:#123765;font-weight:850;font-size:inherit;line-height:inherit;text-align:left;cursor:pointer}
+#jobCards .job-mini .meta{font-size:11px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+#jobCards .job-mini .job-timeline{font-size:11px;margin:6px 0 7px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#jobCards .job-mini .job-footer{display:flex;justify-content:space-between;gap:7px;align-items:center;border-top:1px solid #edf2f7;padding-top:7px}
+#jobCards .job-mini .job-partners{margin:0;flex:1;min-width:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#jobCards .job-mini .job-partners a{font-size:11px}
+#jobCards .job-mini .job-source-link,.job-external-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:850;color:#334155;white-space:nowrap;text-decoration:none}
+#jobCards .job-mini .job-source-link:hover,.job-external-link:hover{background:#eff6ff}
+#jobCards .job-mini .job-match-brief{font-size:11px;margin-left:auto;white-space:nowrap}
+.jobmatch-chip{font-size:11px;padding:3px 7px;border-radius:6px;font-weight:800;display:inline-flex;align-items:center;gap:4px}
+.jobmatch-chip.ok{background:#ecfdf5;color:#047857}
+.jobmatch-chip.missing{background:#fef2f2;color:#b91c1c}
+.jobmatch-chip.pending{background:#fffbeb;color:#92400e}
+.jobmatch-chip.unknown{background:#f1f5f9;color:#475569}
+.job-detail-sheet{max-width:825px}
+.job-detail-context{font-size:13px;color:#475569;line-height:1.75}
+.job-detail-section{margin-top:14px}
+.job-detail-section h3{margin:0 0 7px;font-size:14px;color:#0f172a}
+.job-detail-section p{margin:0;font-size:13px;line-height:1.75;color:#334155}
+.job-detail-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:15px}
+.job-match-summary{margin:12px 0 8px;padding:11px 12px;border-radius:10px;background:#f8fafc;font-size:12px;color:#334155;line-height:1.7}
+.job-match-grid{display:grid;gap:8px}
+.job-match-row{display:flex;align-items:flex-start;gap:12px;justify-content:space-between;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px}
+.job-match-main{min-width:0;font-size:12px;line-height:1.7}
+.job-match-main strong{font-size:12px;color:#0f172a}
+.job-match-main small{display:block;font-size:11px;color:#64748b;line-height:1.55;margin-top:2px}
+.job-match-row .jobmatch-chip{flex:none}
+.job-match-warning{font-size:11px;color:#64748b;margin:9px 0;line-height:1.7}
+.job-match-company{background:#f8fafc;padding:10px 12px;margin-top:9px;border-radius:10px}
+@media(max-width:1120px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){#jobCards.cards{grid-template-columns:1fr}#jobCards .job-mini{min-height:0}#jobCards .job-mini h3{min-height:0}}
 </style>
 </head>
 <body><main>
@@ -170,6 +208,15 @@
     <div class="qual-toolbar"><input id="qualQuery" type="search" placeholder="1468, 직접생산, DB, 정보통신, 자격명 검색" aria-label="필요 자격 검색"><select id="qualCategory" aria-label="자격 유형"><option value="all">전체 유형</option><option value="industry">업종·면허 등록</option><option value="production">직접생산확인</option><option value="certificate">기타 확인서·증빙</option><option value="special">분야별 추가조건</option></select></div>
     <div class="qual-table-wrap"><table class="qual-table"><thead><tr><th>요구 자격 / 코드</th><th>대표 적용 분야</th><th>최근 1년 검색 / 공고 근거</th><th>창컴 보유 여부</th></tr></thead><tbody id="qualRows"></tbody></table></div>
     <div class="qual-foot">근거: <a href="https://www.data.go.kr/data/15129394/openapi.do" target="_blank" rel="noopener noreferrer">나라장터 공식 입찰공고 API</a> · <a href="https://www.smpp.go.kr/prd/prdinfo/smlpzbtwncmptprd/SelectSmlpzBtwnCmptprdListVw.do" target="_blank" rel="noopener noreferrer">SMPP 중소기업자간 경쟁제품 품목표</a> · 개별 공고 원문. 등록 가능한 품목 목록에 있다고 해서 최근 1년 실제 요구가 있었다는 뜻은 아닙니다. 직접생산의 실제 보유·유효기간은 업체별 별도 조회가 필요합니다. 공동수급·분담이행은 공고별로 판단합니다.</div>
+  </div>
+</div>
+
+<div class="partner-modal" id="jobDetailModal" role="dialog" aria-modal="true" aria-labelledby="jobDetailTitle" aria-hidden="true">
+  <div class="partner-sheet job-detail-sheet" tabindex="-1">
+    <div class="partner-sheet-head"><div><h2 id="jobDetailTitle">일감 상세</h2><p id="jobDetailSub"></p></div>
+      <button class="partner-close" type="button" id="jobDetailClose" aria-label="일감 상세 닫기">✕</button>
+    </div>
+    <div id="jobDetailBody"></div>
   </div>
 </div>
 <div class="partner-modal" id="jobHistoryModal" role="dialog" aria-modal="true" aria-labelledby="jobHistoryTitle" aria-hidden="true">
@@ -411,9 +458,7 @@ function renderPartners(){
   return '<article class="partner-company"><h3>'+htmlEscape(p.name)+'</h3><div class="partner-sector">'+htmlEscape(p.established)+' · '+htmlEscape(p.type)+' · 사업자번호 '+htmlEscape(p.businessNo||'미확인')+'<br><b>수행 분야:</b> '+p.sectors.map(htmlEscape).join(" · ")+'</div><div class="partner-quals">'+q+'</div><div class="partner-actions"><button type="button" class="partner-launch" data-partner-refresh="'+htmlEscape(p.id)+'">나라장터 자격 다시 조회</button>'+sources+'</div>'+status+industry+'</article>';
  }).join("");
  document.getElementById("partnerHeaderCount").textContent=String(partners.length);
- var spot=document.getElementById('partnerJobContext');
- const x=partnerScopedJob;
- spot.innerHTML=x?'<div class="qual-method"><b>선택한 일감</b> '+htmlEscape(x.title)+'<div style="margin-top:5px"><b>입찰 참가조건:</b> '+htmlEscape(x.condition||'공고 원문 확인 필요')+'</div><div style="margin-top:5px"><b>공동수급·협업:</b> '+htmlEscape(x.partnerBidMode||'공고 원문 확인 필요')+'</div><div style="margin-top:7px;color:#92400e">표시된 파트너가 이 일감에 입찰할 수 있다는 최종 판정은 아닙니다. 증빙을 대조해야 합니다.</div></div>':'';
+ renderPartnerJobContext();
 }
 function setPartnerQual(p,label,update){
  var q=p.qualifications.find(function(x){return x.label===label});
@@ -429,6 +474,7 @@ async function refreshPartnerRegistry(p){
   if(!data.found || !data.company)throw Error('업체번호에 해당하는 등록정보 없음');
   p.registryCheckedAt=data.checkedAt||"";
   p.industryRecords=Array.isArray(data.industries)?data.industries:[];
+  p.registryComplete=data.complete===true;
   setPartnerQual(p,"나라장터 업체 등록",{
    state:"confirmed",value:"조달업체 등록정보 확인",
    detail:"나라장터 사용자정보서비스 조회 완료 · "+String(data.company.name||"")+" · 등록일 "+String(data.company.registeredAt||"미표시")
@@ -451,6 +497,9 @@ async function refreshPartnerRegistry(p){
   setPartnerQual(p,"나라장터 업체 등록",{state:"pending",value:"실시간 검증 실패",detail:"API 연결 실패로 현재 등록상태 미확정"});
  }
  renderPartners();
+ if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
+ if(partnerScopedJob)renderPartnerJobContext();
+ renderJobs();
 }
 var partnerModal=document.getElementById("partnersModal"),partnerLastFocus=null,partnerScopedCompany=null,partnerScopedJob=null;
 function openPartnerModal(partnerId,jobId){
@@ -465,6 +514,7 @@ function openPartnerModal(partnerId,jobId){
  subtitle.textContent=job?('이 일감: '+job.title+' · 참가자격·공동수급 여부는 공고 원문 기준'): '업체별 공공입찰 업종·직접생산·수행분야·증빙 확인 현황';
  partnerModal.classList.add('open');partnerModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';document.getElementById('partnersClose').focus();
  if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
+ if(job)loadJobEligibility(job);
 }
 function closePartnerModal(){partnerModal.classList.remove("open");partnerModal.setAttribute("aria-hidden","true");document.body.style.overflow="";partnerScopedCompany=null;partnerScopedJob=null;if(partnerLastFocus&&partnerLastFocus.focus)partnerLastFocus.focus()}
 document.getElementById("partnersOpen").addEventListener("click",function(){openPartnerModal(null,null)});
@@ -475,7 +525,15 @@ document.getElementById("jobCards").addEventListener("click",function(e){
  const partner=e.target.closest('[data-partner-id]');
  if(partner){e.preventDefault();openPartnerModal(partner.dataset.partnerId,partner.dataset.jobId);return}
  const history=e.target.closest('[data-history-id]');
- if(history){openHistoryModal(history.dataset.historyId)}
+ if(history){openHistoryModal(history.dataset.historyId);return}
+ if(e.target.closest('[data-external-source]'))return;
+ const card=e.target.closest('[data-job-card]');
+ if(card)openJobDetail(card.dataset.jobCard);
+});
+document.getElementById("jobCards").addEventListener("keydown",function(e){
+ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-job-card]')){
+   e.preventDefault();openJobDetail(e.target.dataset.jobCard)
+ }
 });
 renderPartners();
 document.getElementById('partnerCompanyCards').addEventListener('click',function(e){var b=e.target.closest('[data-partner-refresh]');if(b){var p=partners.find(function(x){return x.id===b.dataset.partnerRefresh});if(p)refreshPartnerRegistry(p)}});
@@ -709,6 +767,196 @@ document.getElementById('jobHistoryClose').addEventListener('click',function(){
 });
 document.getElementById('jobHistoryModal').addEventListener('click',function(e){if(e.target===this)document.getElementById('jobHistoryClose').click()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('jobHistoryModal').classList.contains('open'))document.getElementById('jobHistoryClose').click()});
+
+/* This compares only observable requirements; a match is never "100%" until all
+   tender attachments, license alternatives, documentation and delivery rules have been verified. */
+var bidEligibilityCache=new Map(),activeDetailJobId=null,jobDetailPriorFocus=null,eligibilityLoading=new Set();
+function getJobById(id){return jobs.concat(g2bLiveJobs).find(function(x){return x.id===id})}
+function jobBidIdentity(x){
+ const text=[x.noticeNumber||'',x.id||'',x.url||'',x.condition||''].join(' ');
+ const m=text.match(/R\d{2}BK\d{8}/i);
+ if(!m)return null;
+ const ord=(x.noticeOrder||((String(x.url||'').match(/bidPbancOrd=(\d{3})/)||[])[1])||'000');
+ return {bidNo:m[0],order:String(ord).padStart(3,'0')};
+}
+function jobOriginUrl(x){
+ const id=jobBidIdentity(x),url=String(x.url||'');
+ if(/^https:\/\//.test(url)&&!/^https:\/\/(?:www\.)?g2b\.go\.kr\/?$/.test(url))return url;
+ if(id)return 'https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo='+encodeURIComponent(id.bidNo)+'&bidPbancOrd='+encodeURIComponent(id.order);
+ return /^https:\/\//.test(url)?url:'https://www.g2b.go.kr/';
+}
+function jobEligibilityData(x){
+ const i=jobBidIdentity(x);
+ return i?bidEligibilityCache.get(i.bidNo+':'+i.order):null;
+}
+async function loadJobEligibility(x){
+ const id=jobBidIdentity(x);
+ if(!id)return;
+ const key=id.bidNo+':'+id.order;
+ if(bidEligibilityCache.has(key)||eligibilityLoading.has(key))return;
+ eligibilityLoading.add(key);
+ try{bidEligibilityCache.set(key,await g2bFetch('/eligibility?bidNo='+encodeURIComponent(id.bidNo)+'&order='+encodeURIComponent(id.order)))}
+ catch(e){bidEligibilityCache.set(key,{ok:false,error:String(e.message||e).slice(0,100)})}
+ finally{
+  eligibilityLoading.delete(key);
+  if(activeDetailJobId===x.id)renderJobDetail(x);
+  if(partnerScopedJob&&partnerScopedJob.id===x.id)renderPartnerJobContext();
+  renderJobs();
+ }
+}
+function partnerRegisteredCode(p,code){
+ if(!p||!p.registryCheckedAt||!Array.isArray(p.industryRecords))return null;
+ const found=p.industryRecords.find(function(q){return String(q.code)===String(code)});
+ if(!found)return p.registryComplete===true?false:null;
+ const expiry=String(found.expiresAt||'');
+ const end=expiry.match(/\d{4}-\d{2}-\d{2}/);
+ const expired=end&&end[0]<kstISO();
+ return String(found.status)==='정상'&&!expired;
+}
+function comparePartnerJob(x,p){
+ const rows=[],req=jobEligibilityData(x);
+ const add=(id,label,status,reason,source)=>{
+  if(rows.some(function(r){return r.id===id}))return;
+  rows.push({id,label,status,reason,source:source||'공고 요약'});
+ };
+ if(req?.ok){
+  const grouped={};
+  for(const line of req.requirements||[]){
+   const group=String(line.group||'기타')||'기타';
+   (grouped[group]||(grouped[group]=[])).push(line);
+  }
+  for(const [group,entries] of Object.entries(grouped)){
+   const allCodes=[...new Set(entries.flatMap(function(line){return (line.codes||[]).map(String)}))];
+   const names=entries.map(function(line){return line.name||'면허 상세 확인 필요'}).filter(Boolean);
+   const statusValues=allCodes.map(function(code){return partnerRegisteredCode(p,code)});
+   let status='unknown',reason='업종번호 확인 또는 등록업종 API 확인 필요';
+   if(!allCodes.length)reason='공고 제한 조건에 코드가 없어 수동 대조 필요';
+   else if(statusValues.some(function(v){return v===true})){
+     status='ok';reason='나라장터 업체등록 업종과 일치하는 코드 확인 ('+allCodes.filter(function(c){return partnerRegisteredCode(p,c)===true}).join(', ')+')';
+   }else if(statusValues.every(function(v){return v===false})){
+     status='missing';reason='현재 조회된 정상 등록업종 중 일치 코드 없음. 대체 가능 코드·그룹 관계는 원문 확인 필요';
+   }
+   add('license-'+group,'면허제한 '+group+'그룹 · '+names.join(' 또는 '),status,reason,'나라장터 면허제한 API');
+  }
+  if(!req.complete)add('partial','면허제한 일부만 조회됨','unknown','페이지 누락이 있어 추가 조건 확인 필요','나라장터 API');
+ }
+ const txt=String(x.condition||'')+' '+String(x.partnerBidMode||'');
+ const certRules=[
+  ['direct','직접생산확인증명서','직접생산|8111159901|8111189901|8111200201|직접생산확인'],
+  ['smecert','공공입찰용 중소기업·소상공인확인서','중소기업.?확인|소상공인.?확인|중소기업/소상공인'],
+  ['swstatus','SW사업자 일반현황 관리확인서','일반현황.?관리확인|SW사업자.?신고'],
+  ['experience','유사용역 수행실적·기술평가','실적.?이상|유사.?실적|경력.?이상'],
+  ['region','지역·현장 소재지 조건','지역.?제한|지역.?입찰|본점.?소재']
+ ];
+ for(const [id,label,pattern] of certRules){
+  if(new RegExp(pattern).test(txt))add('proof-'+id,label,'pending',
+   id==='smecert'?'법인/중소기업 분류와 입찰용 확인서 유효기간은 별개입니다. SMPP 원본 확인 필요':
+   id==='direct'?'직접생산확인서 품명번호·보유 여부·유효기간 미확인':
+   id==='swstatus'?'당해 연도 SW사업자 증명 원문 미확인':
+   id==='region'?'업체 본점 지역과 공고 지역제한을 아직 대조하지 않았습니다.':
+   '투입인력·유사용역 실적 증빙 및 평가기준 미확인',
+   '공고 요약·첨부 원문 확인 필요');
+ }
+ if(/\bSRM\b|한전SRM|한전\s*SRM/.test(txt)){
+  add('proof-srm','한전 SRM 업체 등록','pending','한전 SRM 별도 등록상태 미확인','한전 SRM');
+ }
+ if(/공동수급.*불허|공동수급.*불가|공동수급\s*금지/.test(txt)){
+  add('consortium','공동수급 제한','pending',
+   '공동수급 불가. 창컴 단독 입찰 여부는 다른 참가조건을 모두 대조해야 확정할 수 있습니다.','공고 요약');
+ }else if(/공동수급/.test(txt)){
+  add('consortium','공동수급·분담이행 가능 여부','pending',
+   '협업 가능 여부·지분·분담 범위는 공고 원문 확인 필요','공고 요약');
+ }
+ if(!req||!req.ok){
+  const codeMatches=[...new Set((txt.match(/(?<!\d)(1468|1426|1469|1470|1169|0036)(?!\d)/g)||[]))];
+  for(const code of codeMatches){
+   const matched=partnerRegisteredCode(p,code);
+   add('hint-'+code,'SW 관련 업종 '+code,matched===true?'ok':matched===false?'missing':'unknown',
+     matched===true?'나라장터 정상 등록업종 일치':
+     matched===false?'확인된 업체 등록업종에 없음':'업체 등록정보·공고 원문 확인 필요',
+     '공고 요약 (공식 면허제한 조회로 확인 권장)');
+  }
+ }
+ if(!rows.length || !req?.ok){
+  add('unverified','공고 첨부원문 전체 자격요건','unknown',
+    req?.error?'면허제한 API 응답 오류: '+req.error:
+    '공고별 면허제한·직접생산·지역·실적·인력·납품 조건을 전부 확인한 상태가 아닙니다.','검증 대기');
+ }else add('other','공고 첨부문서 추가조건','unknown',
+   '면허제한 API만으로 전체 참가자격·입찰 적격을 확정할 수 없습니다.','공고문·RFP');
+ const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
+  pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
+ return {rows,counts,complete:false};
+}
+function matchRowsHTML(x,p){
+ const result=comparePartnerJob(x,p),c=result.counts;
+ let verdict=c.missing?'등록업종 부족 '+c.missing+'건 · 추가 대조 필요':
+  c.pending?'일치 '+c.ok+'건 · 증빙/제약 '+c.pending+'건 확인 필요':
+  c.ok?'업종 '+c.ok+'건 확인 · 나머지 원문 검증 필요':'입찰자격 아직 미확정';
+ const summary='<div class="job-match-summary"><b>'+htmlEscape(p.name)+'</b> · '+htmlEscape(verdict)+
+  '<div style="margin-top:3px">충족 <b>'+c.ok+'</b> · 등록업종 불일치 <b>'+c.missing+'</b> · 증빙 필요 <b>'+c.pending+'</b> · 미확인 <b>'+c.unknown+'</b></div></div>';
+ const caption={ok:'일치',missing:'부족',pending:'증빙 필요',unknown:'미확인'};
+ return summary+'<div class="job-match-grid">'+result.rows.map(function(q){
+  return '<div class="job-match-row"><div class="job-match-main"><strong>'+htmlEscape(q.label)+'</strong>'+
+   '<small>'+htmlEscape(q.reason)+'</small><small>근거: '+htmlEscape(q.source)+'</small></div>'+
+   '<span class="jobmatch-chip '+q.status+'">'+caption[q.status]+'</span></div>';
+ }).join('')+'</div><p class="job-match-warning">※ 업종 등록 일치는 전체 입찰자격 충족을 의미하지 않습니다. 공고 원문·증명서 유효기간·컨소시엄 규정 최종확인 전에는 100% 일치로 표시하지 않습니다.</p>';
+}
+function renderPartnerJobContext(){
+ const place=document.getElementById('partnerJobContext'),x=partnerScopedJob;
+ if(!x){place.innerHTML='';return}
+ const p=partners.find(function(z){return z.id===partnerScopedCompany});
+ place.innerHTML='<section class="job-detail-section"><h3>이 일감에서의 자격 적합성</h3>'+
+  (p?matchRowsHTML(x,p):'<p>비교할 파트너를 선택하세요.</p>')+
+  '</section>';
+}
+function renderJobDetail(x){
+ if(activeDetailJobId!==x.id)return;
+ const time=jobTimeInfo(x),partnerList=partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)});
+ const orig=jobOriginUrl(x);
+ document.getElementById('jobDetailTitle').textContent=x.title||'일감 상세';
+ document.getElementById('jobDetailSub').textContent=(x.org||'발주기관 미확인')+' · '+(x.type||'')+(x.noticeNumber?' · 공고번호 '+x.noticeNumber:'');
+ const chips='<span class="jobmatch-chip '+(time.key==='closed'?'unknown':time.key==='closing'?'pending':'ok')+'">'+htmlEscape(time.label)+'</span>';
+ const base='<div class="job-detail-context">'+chips+
+  ' <b>예산:</b> '+htmlEscape(x.amount||'확인 필요')+
+  '<div><b>공고·모집 기간:</b> '+htmlEscape(time.text)+'</div>'+
+  (x.noticeNumber?'<div><b>공고번호/차수:</b> '+htmlEscape(x.noticeNumber)+' / '+htmlEscape(x.noticeOrder||'000')+'</div>':'')+
+  '</div><div class="job-detail-section"><h3>사업 내용·검토 이유</h3><p>'+htmlEscape(x.reason||'사업범위 원문 확인 필요')+'</p></div>'+
+  '<div class="job-detail-section"><h3>공고의 참가조건·제한</h3><p>'+htmlEscape(x.condition||'공고 원문 확인 필요')+'</p>'+
+  '<p style="margin-top:6px"><b>공동수급:</b> '+htmlEscape(x.partnerBidMode||'원문 확인 필요')+'</p></div>';
+ const m=partnerList.length?'<section class="job-detail-section"><h3>협력 파트너 조건 대조</h3>'+
+   partnerList.map(function(p){return '<div class="job-match-company">'+matchRowsHTML(x,p)+
+   '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">업체 전체 정보 보기 ↗</a></div>'}).join('')+
+   '</section>':'<div class="job-detail-section"><h3>협력 파트너</h3><p>이 일감에 연결된 파트너가 없습니다.</p></div>';
+ const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
+  (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
+ document.getElementById('jobDetailBody').innerHTML=base+m+actions;
+}
+function openJobDetail(id){
+ const x=getJobById(id);if(!x)return;
+ jobDetailPriorFocus=document.activeElement;
+ activeDetailJobId=id;
+ const m=document.getElementById('jobDetailModal');m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ renderJobDetail(x);
+ document.getElementById('jobDetailClose').focus();
+ const p=partners.find(function(p){return partnerIdsOfJob(x).includes(p.id)});
+ if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
+ loadJobEligibility(x);
+}
+function closeJobDetail(){
+ const m=document.getElementById('jobDetailModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');
+ activeDetailJobId=null;document.body.style.overflow='';
+ if(jobDetailPriorFocus?.focus)jobDetailPriorFocus.focus();
+}
+document.getElementById('jobDetailClose').addEventListener('click',closeJobDetail);
+document.getElementById('jobDetailModal').addEventListener('click',function(e){if(e.target===this)closeJobDetail()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&activeDetailJobId)closeJobDetail()});
+document.getElementById('jobDetailBody').addEventListener('click',function(e){
+ const partner=e.target.closest('[data-partner-id]');
+ if(partner){e.preventDefault();closeJobDetail();openPartnerModal(partner.dataset.partnerId,partner.dataset.jobId);return}
+ const history=e.target.closest('[data-history-id]');
+ if(history){closeJobDetail();openHistoryModal(history.dataset.historyId)}
+});
+
 var jobFilter="all",jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1","all");
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
 function renderJobs(){
@@ -750,15 +998,24 @@ function renderJobs(){
   document.getElementById('g2bMore').textContent='일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x);
-    const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+n+'년 연속 · 연도별 업체</button>':'';
-    const badge=t.key==='closed'?'closed':t.key==='closing'?'closing':t.key==='unknown'?'unknown':'';
-    return '<article class="card"><div class="cardtop"><span class="job-status '+badge+'">'+htmlEscape(t.label)+'</span><span class="tag">'+htmlEscape(x.type||'일감')+'</span><span class="tag">'+htmlEscape(jobEntryLabel(x.entry))+'</span>'+repeat+'</div>'+
-    '<h3><a href="'+htmlEscape(x.url||'https://www.g2b.go.kr/')+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.title)+'</a></h3>'+
-    '<div class="meta">'+htmlEscape(x.org)+' · '+htmlEscape(x.amount||'예산 확인 필요')+'</div>'+
-    '<div class="job-timeline"><b>공고·모집 기간</b> '+htmlEscape(t.text)+'</div>'+
-    '<div class="why"><b>검토 이유</b> '+htmlEscape(x.reason||'공고 원문 확인 필요')+'</div>'+
-    '<p><b>참가 조건:</b> '+htmlEscape(x.condition||'공고 원문 확인 필요')+'</p>'+partnerJobInfo(x)+
-    '</article>';
+    const badges='<span class="job-status '+(t.key==='closed'?'closed':t.key==='closing'?'closing':t.key==='unknown'?'unknown':'')+'">'+htmlEscape(t.label)+'</span>'+
+      (n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+n+'년 연속</button>':'');
+    const partnerList=partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)});
+    const partner=partnerList.length?'<div class="job-partners">파트너: '+
+       partnerList.map(function(p){return '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>'}).join(' · ')+
+       '</div>':'<div class="job-partners"></div>';
+    const match=partnerList.length?comparePartnerJob(x,partnerList[0]):null;
+    const matchBadge=match&&match.counts.missing?'<span class="jobmatch-chip missing">업종 부족 '+match.counts.missing+'</span>':
+      match&&match.counts.ok?'<span class="jobmatch-chip ok">업종 '+match.counts.ok+' 일치</span>':
+      partnerList.length?'<span class="jobmatch-chip pending">자격 검토 중</span>':'';
+    return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기" >'+
+      '<div class="cardtop">'+badges+'<span class="tag">'+htmlEscape(x.type||'일감')+'</span></div>'+
+      '<h3><button class="job-card-title" type="button" data-job-detail="'+htmlEscape(x.id)+'">'+htmlEscape(x.title)+'</button></h3>'+
+      '<div class="meta">'+htmlEscape(x.org||'기관 미확인')+' · '+htmlEscape(x.amount||'예산 미확인')+'</div>'+
+      '<div class="job-timeline">'+htmlEscape(t.text)+'</div>'+
+      '<div class="job-footer">'+partner+matchBadge+
+      '<a class="job-source-link" data-external-source="1" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" aria-label="'+htmlEscape(x.title)+' 원문 공고 보기">원문 공고 ↗</a>'+
+      '</div></article>';
   }).join(''):'<div class="emptycard">이 조건에 해당하는 일감이 없습니다.</div>';
  }
  document.querySelectorAll('.jobf').forEach(function(b){b.classList.toggle('on',b.dataset.jobf===filter)});
