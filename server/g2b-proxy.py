@@ -99,6 +99,17 @@ def date(s):
 # Persistent storage for all returned G2B notices (not just SW-title hits).
 # The UI applies SW-related relevance filtering, so persistence never discards
 # notices that appeared on the user's screen.
+# Discovery only: title/subject match is a candidate, not a verified bid qualification.
+SW_TERMS=re.compile(u'(소프트웨어|정보.?시스템|통합.?시스템|시스템|인공지능|머신러닝|딥러닝|기계학습|LLM|RAG|AI|ICT|IT서비스|빅데이터|데이터|데이타|디비|DB|정보화|디지털|전자문서|전자세금계산서|플랫폼|웹사이트|홈페이지|웹서비스|웹페이지|클라우드|서버|네트워크|인터넷|앱개발|모바일앱|애플리케이션|어플리케이션|SW|S/W|CCTV|보안솔루션|정보보호|사이버보안|API|GIS|ERP|CRM|RPA|메타버스|VR|AR|블록체인|영상인식|OCR|디지털콘텐츠)',re.I)
+SW_BOUNDARY=re.compile(r'\b(IT|AI|DB|SW|API|ICT|ERP|CRM|RPA|LLM|RAG|GIS|OCR)\b',re.I)
+def sw_candidate(bid):
+    text=bid.get('title') or ''
+    subjects=bid.get('purchsObjPrdctList') or ''
+    if isinstance(subjects,(list,dict)):
+        subjects=json.dumps(subjects,ensure_ascii=False)
+    title=u'%s %s'%(text,subjects)
+    return bool(SW_TERMS.search(title) or SW_BOUNDARY.search(title))
+
 def open_bid_db():
     parent = os.path.dirname(G2B_DB_PATH)
     if not os.path.isdir(parent):
@@ -107,6 +118,17 @@ def open_bid_db():
     con.execute('PRAGMA busy_timeout=15000')
     con.execute('CREATE TABLE IF NOT EXISTS bid_notices (kind TEXT NOT NULL, bid_no TEXT NOT NULL, bid_ord TEXT NOT NULL, payload TEXT NOT NULL, first_seen TEXT NOT NULL, last_seen TEXT NOT NULL, PRIMARY KEY (kind,bid_no,bid_ord))')
     con.execute('CREATE INDEX IF NOT EXISTS bid_notices_seen_idx ON bid_notices(last_seen DESC)')
+    fields=[row[1] for row in con.execute('PRAGMA table_info(bid_notices)').fetchall()]
+    if 'sw_candidate' not in fields:
+        con.execute('ALTER TABLE bid_notices ADD COLUMN sw_candidate INTEGER NOT NULL DEFAULT 0')
+        rows=con.execute('SELECT kind,bid_no,bid_ord,payload FROM bid_notices').fetchall()
+        with con:
+            for kind,no,order,payload in rows:
+                try: found=sw_candidate(json.loads(payload))
+                except (TypeError,ValueError): found=False
+                con.execute('UPDATE bid_notices SET sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',
+                            (int(found),kind,no,order))
+    con.execute('CREATE INDEX IF NOT EXISTS bid_notices_sw_seen_idx ON bid_notices(sw_candidate,last_seen DESC)')
     return con
 
 def persist_bids(items):
@@ -123,22 +145,45 @@ def persist_bids(items):
                     continue
                 payload=json.dumps(x, ensure_ascii=False, separators=(',',':'))
                 con.execute('INSERT OR IGNORE INTO bid_notices (kind,bid_no,bid_ord,payload,first_seen,last_seen) VALUES (?,?,?,?,?,?)',(kind,no,order,payload,now,now))
-                con.execute('UPDATE bid_notices SET payload=?,last_seen=? WHERE kind=? AND bid_no=? AND bid_ord=?',(payload,now,kind,no,order))
+                con.execute('UPDATE bid_notices SET payload=?,last_seen=?,sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',(payload,now,int(sw_candidate(x)),kind,no,order))
                 changed+=1
             total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
         return {'received':changed,'storedTotal':total}
     finally:
         con.close()
 
-def query_saved_bids(limit,offset):
+def query_saved_bids(limit,offset,only_sw=False):
     con=open_bid_db()
     try:
-        count=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
-        rows=con.execute('SELECT payload FROM bid_notices ORDER BY last_seen DESC, kind, bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
+        total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
+        matching=con.execute('SELECT COUNT(*) FROM bid_notices WHERE sw_candidate=1').fetchone()[0]
+        where='WHERE sw_candidate=1' if only_sw else ''
+        rows=con.execute('SELECT payload FROM bid_notices '+where+
+                         ' ORDER BY last_seen DESC,kind,bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
         return {'ok':True,'items':[json.loads(row[0]) for row in rows],
-                'totalCount':count,'limit':limit,'offset':offset,'persisted':True}
-    finally:
-        con.close()
+                'totalCount':matching if only_sw else total,'storedTotal':total,
+                'candidateTotal':matching,'limit':limit,'offset':offset,'persisted':True}
+    finally:con.close()
+
+def crawler_state():
+    con=open_bid_db()
+    try:
+        rows=con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='crawl_status'").fetchall()
+        if not rows:
+            return {'ok':True,'installed':False,'state':'not_installed',
+                    'storedTotal':con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]}
+        meta=con.execute('SELECT state,run_started,run_finished,last_success,request_count,error_count,message FROM crawl_status WHERE id=1').fetchone()
+        windows=con.execute('SELECT COUNT(*),SUM(received),MAX(checked_at) FROM crawl_windows').fetchone()
+        count=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
+        candidates=con.execute('SELECT COUNT(*) FROM bid_notices WHERE sw_candidate=1').fetchone()[0]
+        return {'ok':True,'installed':True,'state':meta[0] if meta else 'unknown',
+                'runStarted':meta[1] if meta else None,'runFinished':meta[2] if meta else None,
+                'lastSuccess':meta[3] if meta else None,
+                'requestsLastRun':meta[4] if meta else 0,'errorsLastRun':meta[5] if meta else 0,
+                'message':meta[6] if meta else None,'windowsChecked':windows[0],
+                'noticesReadAcrossWindows':windows[1] or 0,'lastWindowCheck':windows[2],
+                'storedTotal':count,'candidateTotal':candidates}
+    finally:con.close()
 
 class ThreadedServer(ThreadingMixIn,HTTPServer):
     daemon_threads = True
@@ -171,12 +216,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
                     'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/crawl-status':
+                return self.reply(200,crawler_state())
             if u.path == '/api/g2b/saved':
                 try: limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except ValueError: raise ApiError('invalid_saved_pagination',400)
                 if not (1<=limit<=500 and 0<=offset<=100000):
                     raise ApiError('invalid_saved_pagination',400)
-                return self.reply(200,query_saved_bids(limit,offset))
+                return self.reply(200,query_saved_bids(limit,offset,get('sw','0')=='1'))
             if u.path == '/api/g2b/qualifications':
                 # Aggregated public counts, no keys or raw sensitive data in report.
                 try:
