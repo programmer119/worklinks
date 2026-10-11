@@ -261,19 +261,18 @@ function qualAnnualRecord(code){
  return Array.isArray(a)?a.find(function(x){return x.code===code && x.complete===true}):null;
 }
 async function fetchQualAnnual(){
- try{
-  const url=G2B_PROXY_URL+'/qualifications';
-  const controller=new AbortController();
-  const kill=setTimeout(function(){controller.abort()},15000);
-  let r,j;
+ const candidates=['./qualification-year.json',G2B_PROXY_URL+'/qualifications'];
+ let error='';
+ for(const url of candidates){
   try{
-   r=await fetch(url,{cache:'no-store',signal:controller.signal});
-   j=await r.json();
-  }finally{clearTimeout(kill)}
-  if(!r.ok||!j.ok||!j.report||!j.report.complete)throw Error(j.error||'1년 통계 자료 미완성');
-  qualAnnualReport=j.report;qualAnnualError='';
- }catch(e){qualAnnualError=String(e.message||e).slice(0,90)}
- renderQualifications();
+   const controller=new AbortController(),kill=setTimeout(function(){controller.abort()},13000);
+   let r,j;try{r=await fetch(url,{cache:'no-store',signal:controller.signal});j=await r.json()}finally{clearTimeout(kill)}
+   const report=(j&&j.report)?j.report:j;
+   if(!r.ok||!report||!report.complete||!Array.isArray(report.counts))throw Error((j&&j.error)||'자료 미완성');
+   qualAnnualReport=report;qualAnnualError='';renderQualifications();return;
+  }catch(e){error=String(e.message||e).slice(0,70)}
+ }
+ qualAnnualError=error||'집계 대기';renderQualifications();
 }
 var qualEvidence=[
  {id:"R26BK01532347",url:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01532347&bidPbancOrd=000&fileSeq=6&prcmBsneSeCd=03",label:"공공 SW 구축 공고",codes:["1468","8111159901","SME","SWSTATUS"]},
