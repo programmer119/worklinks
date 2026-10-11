@@ -528,7 +528,6 @@ function g2bCardFromServer(x){
   partnerScope:'SW·데이터·AI 관련 제목 또는 발주품목 후보',partnerVerified:false};
 }
 async function g2bLoadSaved(append){
- if(g2bLoading&&!append)return null;
  const out=document.getElementById('g2bApiResult'),more=document.getElementById('g2bMore');
  if(!append){g2bOffset=0;g2bSavedTotal=0;more.style.display='none'}
  try{
