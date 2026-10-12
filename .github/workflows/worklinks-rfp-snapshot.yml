@@ -31,9 +31,36 @@ jobs:
           set -Eeuo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add startup-support/rfp-clauses.json
-          if git diff --cached --quiet; then echo 'RFP_SNAPSHOT_UNCHANGED'; exit 0; fi
-          git commit -m 'data: refresh official G2B RFP qualification snippets'
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
+          cp startup-support/rfp-clauses.json /tmp/worklinks-rfp-new.json
+          # Retry from newest main instead of rebasing two snapshot JSON objects.
+          # Merge by notice and keep prior readable text if a later API call is empty.
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 - <<'PY'
+          import datetime,json,pathlib
+          dst=pathlib.Path('startup-support/rfp-clauses.json')
+          new=json.loads(pathlib.Path('/tmp/worklinks-rfp-new.json').read_text())
+          old=json.loads(dst.read_text()) if dst.exists() else {'byNotice':{}}
+          merged=dict(old.get('byNotice') or {})
+          for key,item in (new.get('byNotice') or {}).items():
+            prior=merged.get(key)
+            if prior:
+              if prior.get('status')=='text_extracted_requires_review' and item.get('status')!='text_extracted_requires_review':
+                continue
+              if item.get('checkedAt','') < prior.get('checkedAt',''):
+                continue
+            merged[key]=item
+          result={**new,'byNotice':dict(list(merged.items())[-150:])}
+          dst.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print('RFP_MERGED_RECORDS',len(result['byNotice']))
+          PY
+            git add startup-support/rfp-clauses.json
+            if git diff --cached --quiet; then echo 'RFP_SNAPSHOT_UNCHANGED'; exit 0; fi
+            git commit -m 'data: merge G2B RFP evidence without dropping older snippets'
+            if git push origin HEAD:main; then echo 'RFP_SNAPSHOT_PUBLISHED'; exit 0; fi
+            echo "RFP_PUBLISH_CONFLICT_RETRY_$attempt"
+            sleep 2
+          done
+          echo 'RFP_SNAPSHOT_PUBLISH_RETRIES_EXHAUSTED'
+          exit 1
