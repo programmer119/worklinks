@@ -1,0 +1,57 @@
+// Run: node tests/worklinks-jobs-regression.cjs (no external dependencies).
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../startup-support/index.html'),'utf8');
+const part=(from,to)=>{
+ const a=source.indexOf(from),b=source.indexOf(to,a+from.length);
+ assert.ok(a>=0&&b>a,'missing source section '+from);
+ return source.slice(a,b);
+};
+const time=new Function(
+ 'function kstNow(){return new Date(Date.UTC(2026,9,12,10,0))};'+
+ "function kstISO(){return '2026-10-12'};"+
+ part('function dayValue(value,asEnd){','function jobAmountLabel(raw){')+
+ 'return {dayValue,jobTimeInfo,jobDayCounter};'
+)();
+assert.equal(new Date(time.dayValue('2026-10-14T18:00:00+09:00')).toISOString().slice(0,16),'2026-10-14T18:00');
+assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'202610141500'})).label,'D-2');
+assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'2026-10-12 18:00'})).label,'D-0');
+assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:''})).label,'일정 미확인');
+assert.equal(time.jobTimeInfo({closes:'2026.10.10 18:00'}).key,'closed');
+const scope=new Function(part('const hardwarePurchasePattern=','function noticeGroupKey(x){')+'return jobSoftwareScope;')();
+assert.equal(scope({kind:'thng',title:'GPU 컴퓨터 서버 구매'}),'out');
+assert.equal(scope({kind:'cnstwk',title:'CCTV 통신 공사'}),'out');
+const match=new Function(
+ 'function partnerRegisteredCode(p,c){return Object.hasOwn(p,c)?p[c]:null};'+
+ "function jobSoftwareScope(x){return x.kind==='thng'?'out':'candidate'};"+
+ 'function jobEligibilityData(x){return x.req};'+
+ part('function licenseLogic(line){','function jobPartnerMatches(x){')+
+ 'return {jobQualificationVerdict};'
+)();
+const p={registryCheckedAt:'2026-10-12',registryComplete:true,1468:true,1426:false};
+const req=name=>({ok:true,complete:true,requirements:[{name,codes:['1468','1426'],group:'1'}]});
+assert.equal(match.jobQualificationVerdict({kind:'servc',req:req('1468 또는 1426')},p).type,'industry_match');
+assert.equal(match.jobQualificationVerdict({kind:'servc',req:req('1468 / 1426')},p).type,'unverified');
+assert.equal(match.jobQualificationVerdict({kind:'servc',req:req('1468 및 1426 모두')},p).type,'missing');
+assert.equal(match.jobQualificationVerdict({kind:'thng',req:req('1468 또는 1426')},p).type,'not_applicable');
+const dedupe=new Function(
+ 'function jobBidIdentity(x){return x.noticeNumber?{bidNo:x.noticeNumber}:null};'+
+ 'function jobOriginUrl(x){return x.url||"https://www.g2b.go.kr/"};'+
+ 'function jobTimeInfo(x){return {start:Date.parse(x.startAt||x.posted)||null,key:x.state||"open"}};'+
+ part('function noticeGroupKey(x){','function licenseLogic(line){')+
+ 'return collapseSimilarNotices;'
+)();
+const base={kind:'servc',title:'공공정보시스템 유지관리',org:'시청',amount:'100000000'};
+const versions=dedupe([
+ {...base,id:'old',noticeNumber:'R26BK00000001',noticeOrder:'000',posted:'2026-10-01',state:'open'},
+ {...base,id:'new',noticeNumber:'R26BK00000001',noticeOrder:'001',posted:'2026-10-02',state:'closed'}
+]);
+assert.equal(versions.length,1);
+assert.equal(versions[0].id,'new','correction must supersede the old open order');
+assert.equal(versions[0].variants.length,2);
+assert.equal(dedupe([
+ {...base,id:'annual-1',noticeNumber:'R25BK00000001',posted:'2025-10-01'},
+ {...base,id:'annual-2',noticeNumber:'R26BK00000002',posted:'2026-10-01'}
+]).length,2,'annual reprocurement must remain separate');
+console.log('Worklinks job regression: deadline, scope, AND/OR, correction, yearly bids PASS');
