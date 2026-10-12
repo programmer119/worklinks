@@ -26,6 +26,7 @@ SECRET_PATH = os.environ.get('G2B_SECRET_PATH', '/home/worklinks/g2b/secrets/g2b
 API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService'
 AWARD_BASE = 'https://apis.data.go.kr/1230000/as/ScsbidInfoService'
 CONTRACT_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctInfoService'
+CONTRACT_PROCESS_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctProcssIntgOpenService'
 COMPANY_BASE = 'https://apis.data.go.kr/1230000/ao/UsrInfoService02'
 BID_OPS = {
     'servc':'getBidPblancListInfoServcPPSSrch',
@@ -53,6 +54,24 @@ class ApiError(Exception):
         Exception.__init__(self, msg)
         self.msg, self.status = msg, status
 
+def classify_upstream_http_error(e):
+    """Return a safe status/error identifier; never expose raw gateway HTML, key or URL."""
+    status=int(getattr(e,'code',502))
+    try:
+        response=e.read(3072)
+        if not isinstance(response,str):response=response.decode('utf-8','ignore')
+    except (OSError,IOError,UnicodeError):response=''
+    known=('SERVICE_ACCESS_DENIED_ERROR','PERMISSION_DENIED',
+           'SERVICE_KEY_IS_NOT_REGISTERED_ERROR','SERVICE_KEY_IS_NULL',
+           'DEADLINE_HAS_EXPIRED_ERROR','LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR',
+           'LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR',
+           'INVALID_REQUEST_PARAMETER_ERROR','NO_OPENAPI_SERVICE_ERROR','HTTP_ERROR',
+           'APPLICATION_ERROR','BLACKLIST_IP_ACCESS_ERROR')
+    for value in known:
+        if value in response.upper():
+            return 'upstream_http_%s_%s'%(status,value)
+    return 'upstream_http_%s'%status
+
 def request_api(base, operation, params):
     token = get_key()
     if not token: raise ApiError('secret_not_configured', 503)
@@ -64,7 +83,7 @@ def request_api(base, operation, params):
             'Accept':'application/json', 'User-Agent':'WorkLinksG2B/1.0'
         }), timeout=14)
         raw = response.read()
-    except HTTPError as e: raise ApiError('upstream_http_' + str(e.code))
+    except HTTPError as e: raise ApiError(classify_upstream_http_error(e))
     except (URLError, IOError, ValueError): raise ApiError('upstream_unreachable')
     try: doc = json.loads(raw.decode('utf-8'))
     except (ValueError, UnicodeError): raise ApiError('upstream_not_json')
@@ -99,19 +118,78 @@ def date(s):
 
 
 def contract_capability_query():
-    """Discover key authorization/schema only; NOT a company performance record."""
-    result=request_api(CONTRACT_BASE,'getCntrctInfoListServc',{
-        'pageNo':1,'numOfRows':1,'inqryDiv':1,
-        'inqryBgnDt':'202610010000','inqryEndDt':'202610012359'})
-    first=result['items'][0] if result['items'] else {}
-    return {
-        'ok':True,'authorized':True,'operation':'getCntrctInfoListServc',
-        'schemaFields':sorted(first.keys()) if isinstance(first,dict) else [],
-        'sampleCount':result['totalCount'],
-        'companyHistoryVerified':False,
-        'limitations':'인증·호출 가능 여부 검사. 개별 업체 실적·계약완료·검수·실적증명서 확인 아님.',
-        'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
-    }
+    """Probe two documented services independently, without claiming completed work."""
+    attempts=[]
+    targets=[
+        ('contract_info',CONTRACT_BASE,'getCntrctInfoListServc',{
+            'pageNo':1,'numOfRows':1,'inqryDiv':1,
+            'inqryBgnDt':'202610010000','inqryEndDt':'202610012359'}),
+        ('contract_process',CONTRACT_PROCESS_BASE,'getCntrctProcssIntgOpenServc',{
+            'pageNo':1,'numOfRows':1,'inqryDiv':1,'bidNtceNo':'R25BK00826083'})
+    ]
+    for name,base,operation,params in targets:
+        try:
+            data=request_api(base,operation,params)
+            first=data['items'][0] if data['items'] else {}
+            attempts.append({'service':name,'operation':operation,'ok':True,
+                'schemaFields':sorted(first.keys()) if isinstance(first,dict) else [],
+                'sampleCount':data['totalCount'],'error':''})
+        except ApiError as e:
+            attempts.append({'service':name,'operation':operation,'ok':False,
+                             'error':e.msg,'schemaFields':[],'sampleCount':None})
+    original,alternative=attempts
+    denied=('ACCESS_DENIED' in original['error'] or 'PERMISSION_DENIED' in original['error'] or
+            'upstream_http_403' in original['error'])
+    return {'ok':original['ok'],'authorized':True if original['ok'] else
+            (False if denied else None),
+            'operation':original['operation'],'error':original['error'],
+            'schemaFields':original['schemaFields'],'sampleCount':original['sampleCount'],
+            'alternative':alternative,'probes':attempts,
+            'officialContractInfoUrl':'https://www.data.go.kr/data/15129427/openapi.do',
+            'officialContractProcessUrl':'https://www.data.go.kr/data/15129459/openapi.do',
+            'companyHistoryVerified':False,'contractPerformanceVerified':False,
+            'limitations':'인증·접근만 검사합니다. 낙찰, 계약, 검수, 수행완료, 실적증명은 서로 다릅니다.',
+            'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'}
+
+
+def contract_evidence_query(bid_no,bizno):
+    """Check known public contract process by bid, without attributing anonymous rows."""
+    params={'pageNo':1,'numOfRows':100,'inqryDiv':1,'bidNtceNo':bid_no}
+    data=request_api(CONTRACT_PROCESS_BASE,'getCntrctProcssIntgOpenServc',params)
+    complete=len(data['items'])>=data['totalCount']
+    verified=[];unattributed=0;other=0
+    number_fields=('cntrctCorpBizno','cntrctCorpBizNo','cntrctEntrprsBizno',
+                   'cntrctEntrprsBizNo','cntrctCorpBrno','cntrctCorpBizrno',
+                   'cntrctEntrprsBrno','contractorBizno','bizno')
+    for row in data['items']:
+        if not isinstance(row,dict):continue
+        row_no=str(row.get('bidNtceNo') or row.get('bidPblancNo') or '')
+        if row_no and row_no!=bid_no:continue
+        number=next((re.sub(r'\\D','',str(row.get(k))) for k in number_fields
+                     if row.get(k)), '')
+        if not number:
+            unattributed+=1
+            continue
+        if number!=bizno:
+            other+=1
+            continue
+        verified.append({
+            'bidNo':bid_no,'companyBiznoMatched':True,
+            'contractNo':_pick(row,['cntrctNo','dcsnCntrctNo','cntrctRefNo']),
+            'title':_pick(row,['cntrctNm','cntrctName','bidNtceNm']),
+            'date':_pick(row,['cntrctCnclsDate','cntrctDate','cntrctDt']),
+            'amount':_pick(row,['thtmCntrctAmt','cntrctAmt','totCntrctAmt']),
+            'agency':_pick(row,['cntrctInsttNm','dminsttNm','ntceInsttNm']),
+            'performanceComplete':None,'inspectionComplete':None,'certificateAvailable':None
+        })
+    return {'ok':True,'bidNo':bid_no,'bizno':bizno,'totalCount':data['totalCount'],
+            'complete':complete,'contracts':verified,'attributableCount':len(verified),
+            'unattributedCount':unattributed,'otherCompanyCount':other,
+            'schemaFields':sorted(data['items'][0].keys()) if data['items'] and isinstance(data['items'][0],dict) else [],
+            'source':'나라장터 계약과정통합공개서비스',
+            'contractPerformanceVerified':False,
+            'limitations':'사업자번호 일치가 명시된 계약기록만 회사에 귀속. 이행완료·검수·실적증명은 별도 확인 필요.'}
+
 
 def _bid_evidence_fetch(operation, bid_no, order):
     """Public notice metadata. Missing API rows NEVER means unrestricted/qualified."""
@@ -483,11 +561,26 @@ class Handler(BaseHTTPRequestHandler):
                 if saved and saved[0]>time.time():return self.reply(200,saved[1])
                 try:result=contract_capability_query()
                 except ApiError as e:
-                    result={'ok':False,'authorized':False,'error':e.msg,
+                    result={'ok':False,'authorized':None,'error':e.msg,
                             'service':'조달청 나라장터 계약정보서비스',
                             'applicationUrl':'https://www.data.go.kr/data/15129427/openapi.do',
                             'companyHistoryVerified':False}
                 with lock:cache[ck]=(time.time()+3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-evidence':
+                bid_no=get('bidNo').strip()
+                bizno=re.sub(r'\\D','',get('bizno').strip())
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
+                    raise ApiError('invalid_contract_lookup',400)
+                ck=('contract-evidence',bid_no,bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                try:result=contract_evidence_query(bid_no,bizno)
+                except ApiError as e:
+                    result={'ok':False,'bidNo':bid_no,'bizno':bizno,'error':e.msg,
+                            'contractPerformanceVerified':False,
+                            'officialUrl':'https://www.data.go.kr/data/15129459/openapi.do'}
+                with lock:cache[ck]=(time.time()+6*3600,result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/bid-evidence':
                 bid_no=get('bidNo').strip()
