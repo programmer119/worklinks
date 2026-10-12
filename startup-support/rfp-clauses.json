@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-12T07:29:57.291085+00:00",
+  "generatedAt": "2026-10-12T08:42:22.485035+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -104,15 +104,18 @@
       "classificationVersion": 2
     },
     "R26BK01760085:000": {
-      "status": "no_eorder_files",
-      "reasonCode": "eorder_api_returned_zero",
-      "source": "나라장터 e발주 첨부파일 API",
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
       "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-12T07:25:09.778847+00:00",
-      "classificationVersion": 2
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
     },
     "R26BK01759338:000": {
       "status": "no_eorder_files",
@@ -139,8 +142,11 @@
     "R26BK01756420:000": {
       "status": "text_extracted_requires_review",
       "reasonCode": "readable_text_requires_full_review",
-      "source": "나라장터 e발주 첨부파일 API",
+      "source": "나라장터 e발주 + 입찰공고 상세",
       "count": 1,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": null,
+      "noticeDetailError": "",
       "files": [
         {
           "name": "제안요청서(전자입찰26-021호).hwp",
@@ -226,8 +232,8 @@
       ],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-12T07:25:09.778847+00:00",
-      "classificationVersion": 2
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
     },
     "R26BK01761377:000": {
       "status": "no_eorder_files",
@@ -283,6 +289,247 @@
       "contractPerformanceVerified": false,
       "checkedAt": "2026-10-12T07:29:57.291085+00:00",
       "classificationVersion": 2
+    },
+    "R26BK01747588:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01753150:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01753757:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01753455:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01753451:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01753373:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01752850:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01752716:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01746881:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01746850:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01746812:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01746720:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01751970:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01745211:001": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01751053:000": {
+      "status": "no_official_attachment_metadata",
+      "reasonCode": "eorder_api_zero__notice_detail_api_error",
+      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "count": 0,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": 0,
+      "noticeDetailError": "",
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
+    },
+    "R26BK01750103:000": {
+      "status": "text_extracted_requires_review",
+      "reasonCode": "readable_text_requires_full_review",
+      "source": "나라장터 e발주 + 입찰공고 상세",
+      "count": 1,
+      "eorderCount": null,
+      "noticeDetailDocumentCount": null,
+      "noticeDetailError": "",
+      "files": [
+        {
+          "name": "(제안요청서) 실시간 탐지를 위한 도로손상 7종 학습데이터 전처리 용역.hwpx",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059247&rfpOrd=000&rfpUntyAtchFileNo=1",
+          "readable": true,
+          "textChars": 11259,
+          "topics": {
+            "입찰참가자격": 1,
+            "직접생산": 0,
+            "중소기업": 1,
+            "수행실적": 18,
+            "기술인력": 13,
+            "지역제한": 1,
+            "공동수급": 4
+          },
+          "snippets": []
+        }
+      ],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:42:22.485035+00:00",
+      "classificationVersion": 3
     }
   }
 }
