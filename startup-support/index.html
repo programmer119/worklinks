@@ -521,10 +521,14 @@ function renderPartners(){
   var sources=p.sources.map(function(x){return '<a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.name)+' ↗</a>'}).join("");
    const contractDenied=p.contractCapability&&p.contractCapability.authorized===false;
    const nextActions=contractDenied?
-     '<div class="partner-next-action"><strong>계약실적 API 접근 확인 필요</strong>'+
-     '<p>기존 API 키는 유지. 공공데이터포털에서 나라장터 계약정보서비스의 <b>활용신청/승인 상태</b>를 확인해야 합니다. 현재 응답: '+htmlEscape(p.contractCapability.error||'접근 실패')+'. 다른 공공 API는 계속 조회합니다.</p>'+
-     '<a href="https://www.data.go.kr/data/15129427/openapi.do" target="_blank" rel="noopener noreferrer">계약정보서비스 활용신청·승인 확인 ↗</a>'+
-     '<small>신규 키를 이 화면이나 채팅에 입력하지 마세요. 기존 서버 키가 해당 서비스에 승인되면 다시 조회합니다.</small></div>':'';
+     '<div class="partner-next-action"><strong>계약정보 API 서비스별 활용 등록 확인 필요</strong>'+
+     '<p>기존 키로 낙찰정보와 직접생산 조회는 정상입니다. 계약정보: '+
+     htmlEscape(p.contractCapability.error||'접근 실패')+
+     ' · 계약과정통합공개: '+htmlEscape(p.contractCapability.alternative?.error||'미조회')+
+     '. 두 서비스 모두 SERVICE_KEY_IS_NOT_REGISTERED_ERROR이면 각 서비스의 활용등록/승인을 확인해야 합니다. 입찰 낙찰이력이 없거나 수행실적이 없다는 의미는 아닙니다.</p>'+
+     '<a href="https://www.data.go.kr/data/15129427/openapi.do" target="_blank" rel="noopener noreferrer">① 나라장터 계약정보서비스 활용신청 ↗</a>'+
+     '<a href="https://www.data.go.kr/data/15129459/openapi.do" target="_blank" rel="noopener noreferrer">② 계약과정통합공개서비스 활용신청 ↗</a>'+
+     '<small>기존 서비스키를 사용합니다. 키를 채팅에 전송하지 마세요. 승인 후 서버에서 다시 조회합니다.</small></div>':'';
   var status=p.registryError?'<div class="partner-sector" style="color:#b91c1c">나라장터 등록업종 조회 실패: '+htmlEscape(p.registryError)+'</div>':(p.registryCheckedAt?'<div class="partner-sector">나라장터 API 확인 시각: '+htmlEscape(p.registryCheckedAt)+'</div>':'<div class="partner-sector">나라장터 등록업종: 조회 대기</div>');
   var industry=(p.industryRecords||[]).length?'<section class="partner-company"><h4>나라장터 실제 등록업종 ('+p.industryRecords.length+'개)</h4><div class="partner-industry-list">'+p.industryRecords.map(function(x){return '<div><b>'+htmlEscape(x.code)+'</b> '+htmlEscape(x.name)+' <span class="partner-state '+(x.status==="정상"?"confirmed":"")+'">'+htmlEscape(x.status||"등록 조회됨")+'</span> '+(x.expiresAt?' · 유효기간 '+htmlEscape(x.expiresAt).slice(0,10):'')+'</div>'}).join("")+'</div><p class="partner-foot">※ 나라장터 업종등록 현황이며, 개별 사업의 직접생산·수행실적·인력·공동수급 허용 여부까지 증명하지는 않습니다.</p></section>':'';
   var production=(p.productionRecords||[]).length?'<section class="partner-company"><h4>직접생산 발급현황 ('+p.productionRecords.length+'개) · 2026-02-01 기준</h4><div class="partner-industry-list">'+p.productionRecords.map(function(x){const today=new Date(Date.now()+32400000).toISOString().slice(0,10);return '<div><b>'+htmlEscape(x.product||'세부품목명 미제공')+'</b>'+(x.productCode?' ('+htmlEscape(x.productCode)+')':'')+' · 유효기간 '+htmlEscape(x.validFrom||'미표시')+' ~ '+htmlEscape(x.validTo||'미표시')+(x.validTo&&x.validTo<today?' · 종료일 경과':'')+'</div>'}).join('')+'</div><p class="partner-foot">※ 연간 공개자료의 발급내역이며 현재 증명서 상태는 SMPP에서 별도로 확인해야 합니다.</p></section>':p.productionCheckedAt?'<div class="partner-sector">2026-02-01 직접생산 공개자료에서 해당 업체 미발견 · 현재 미보유 판정 아님</div>':p.productionError?'<div class="partner-sector" style="color:#b91c1c">직접생산 조회 실패: '+htmlEscape(p.productionError)+'</div>':'';
