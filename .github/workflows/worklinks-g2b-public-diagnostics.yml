@@ -7,6 +7,7 @@ on:
       - 'server/g2b-proxy.py'
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
+      - 'startup-support/direct-production-snapshot.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -41,6 +42,21 @@ jobs:
             if actual!=expected:print('LIVE_FRONTEND_NOTE=may still be propagating')
           except Exception as e:
             print('LIVE_FRONTEND_CHECK_UNAVAILABLE',type(e).__name__,str(e)[:140])
+          PY
+      - name: Verify published direct-production data (no private API key)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,pathlib
+          local=json.loads(pathlib.Path('startup-support/direct-production-snapshot.json').read_text())
+          url='https://worklinks.suaveforge.com/startup-support/direct-production-snapshot.json'
+          req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-Production-Smoke/1.0','Cache-Control':'no-cache'})
+          with urllib.request.urlopen(req,timeout=25) as f:
+            remote=json.load(f)
+          assert remote==local,'PUBLISHED_PRODUCTION_SNAPSHOT_MISMATCH'
+          rows=remote['recordsByBizno'].get('1308185973',[])
+          assert any(r.get('product')=='정보시스템개발서비스' for r in rows),'MISSING_CHANGCOM_CERTIFICATE'
+          print('DIRECT_PRODUCTION_LIVE_SNAPSHOT=PASS','CHANGCOM_CERTIFICATES',len(rows),'SNAPSHOT_DATE',remote['snapshotDate'])
           PY
       - name: Check public backend without exposing secrets
         shell: bash
