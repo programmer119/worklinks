@@ -186,6 +186,31 @@ assert.ok(source.includes("refreshPartnerSme(p)"));
 assert.ok(source.includes("sme-cert-snapshot.json"));
 
 
+// Verify the actual comparePartnerJob complete flag is evidence dependent.
+const completion=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
+ part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+'return comparePartnerJob;'
+)(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
+ ()=>({applicable:false}),()=>({attachments:{ok:true,items:[]}}),
+ ()=>({status:'unknown'}),
+ x=>x.reviewed?{status:'fully_reviewed',reviewComplete:true,requiredConditionsComplete:true,
+   files:[{readable:true,reviewComplete:true,topics:{},name:'공식 공고'}]}:
+   {status:'text_extracted_requires_review',reviewComplete:false,files:[{readable:true,reviewComplete:false,topics:{},name:'RFP'}]},
+ ()=> '');
+assert.equal(completion({reviewed:false},{}).complete,false,'snippets cannot certify a bid');
+assert.equal(completion({reviewed:true},{}).complete,true,'fully verified and no outstanding requirements is achievable');
+assert.equal(completion({reviewed:true},{}).rows.find(q=>q.id==='attachment').status,'ok');
+assert.equal(completion({reviewed:false},{}).rows.find(q=>q.id==='attachment').status,'unknown');
+assert.ok(source.includes('id="jobInfoFold"'));
+assert.ok(source.includes('id="jobMissingInfo"'));
+assert.ok(source.includes('id="jobDecisionSummary"'));
+assert.ok(source.includes('id="g2bPanel"'));
+assert.ok(source.indexOf('id="jobInfoFold"')<source.indexOf('class="jobfilters"'));
+assert.ok(source.includes('#jobsView .jobf{font-size:16px'));
+assert.ok(source.includes('#jobsView .job-vf{font-size:16px'));
+assert.ok(source.includes('#jobCards .job-mini h3{font-size:17px'));
+assert.ok(source.includes('원문·첨부 전수검토'));
+assert.ok(!source.includes('return {rows,counts,complete:false};'));
+
 // Each thumbnail must show the COMPLETE 4-state result per company, not
 // interpret an industry-only match as bid-ready.
 const resultsById={
