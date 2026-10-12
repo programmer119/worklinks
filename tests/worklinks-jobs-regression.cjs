@@ -128,7 +128,7 @@ assert.ok(source.includes('필수 업종 불일치'));
 assert.ok(!source.includes('조건 검증 대기</span>'));
 assert.ok(!source.includes('>검증 대기 </span>'));
 assert.ok(!source.includes("matchCode+' 일치 · 증빙 필요"));
-assert.ok(source.includes('공고의 요구 등록업종 '));
+assert.ok(source.includes('공고의 면허제한 등록업종 '));
 assert.ok(source.includes('바로 입찰 가능 확정은 아닙니다.'));
 assert.ok(source.includes("htmlEscape(p.short||p.name)"));
 
