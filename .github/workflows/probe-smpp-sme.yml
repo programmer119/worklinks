@@ -27,23 +27,32 @@ jobs:
               try:body=raw.decode(codec);print('DECODED_AS',codec);break
               except UnicodeDecodeError:pass
             else:body=raw.decode('utf-8','replace')
-            def compact(value,limit=1500):
-              return re.sub(r'\\s+',' ',html.unescape(value))[:limit]
-            m=re.search(r'<form\\s+name="searchForm".*?</form>',body,re.S|re.I)
-            print('SEARCH_FORM_FOUND',bool(m))
-            if m:
-              form=m.group(0)
-              print('SEARCH_FORM_FIELDS',re.findall(r'name="([^"]+)"',form,re.I))
-              print('SEARCH_FORM_INPUTS',re.findall(r'<input[^>]*>',form,re.I)[:18])
-              for term in ['사업자등록번호','검색','searchBsnmNo','searchNm','onclick=']:
-                for match in list(re.finditer(term,form,re.I))[:4]:
-                  print('FORM_LOOKUP',term,compact(form[max(0,match.start()-200):match.start()+330],530))
-            for marker in ['function fn_search','function fn_getList','function fn_searchData','function fn_searchList','function fn_selectList','function fn_getSearch','function fn_searchBtn']:
-              pos=body.find(marker)
-              print('JS_FN',marker,pos,compact(body[pos:pos+1900],1900) if pos>=0 else '')
-            for tag in re.findall(r'<script[^>]+src="([^"]+)"',body,re.I):
-              if 'middl' in tag.lower() or 'smppInf' in tag:
-                print('RELEVANT_SCRIPT',tag)
+            pos=body.find('<form name="searchForm"')
+            print('FORM_POSITION',pos)
+            if pos<0:raise RuntimeError('SME_SEARCH_FORM_MISSING')
+            end=body.find('</form>',pos)
+            form=body[pos:end+7]
+            names=re.findall('name="([^"]+)"',form)
+            print('SEARCH_FORM_FIELDS',names)
+            for name in sorted(set(names)):
+              m=re.search(r'<input[^>]*name="'+re.escape(name)+r'"[^>]*>',form,re.I)
+              if m:print('FORM_INPUT',name,re.sub('[\\r\\n\\t]+',' ',m.group(0))[:270])
+            from urllib.parse import urlencode
+            data={'searchBsnmNo':'1308185973','pageIndex':'1','menuId':'1050506'}
+            req=urllib.request.Request(url,data=urlencode(data).encode(),headers={
+              'User-Agent':'Mozilla/5.0 (compatible; WorkLinks-Official-SME-Verification/1.0)',
+              'Content-Type':'application/x-www-form-urlencoded',
+              'Referer':url})
+            with urllib.request.urlopen(req,timeout=28) as r:
+              result=r.read().decode('utf-8','replace')
+              print('SEARCH_HTTP',r.status,'RESULT_LENGTH',len(result),'FINAL_URL',r.url)
+            for term in ['창컴정보통신','1308185973','검색결과가 없습니다','데이터가 없습니다','중기업','소기업','소상공인','기업규모','인증일']:
+              hits=[m.start() for m in re.finditer(term,result)]
+              print('RESULT_TERM',term,'COUNT',len(hits))
+              for pos in hits[:2]:
+                print('RESULT_CONTEXT',term,re.sub(r'\\s+',' ',result[max(0,pos-220):pos+350])[:600])
+            i=result.find('창컴정보통신')
+            if i>=0:print('RESULT_ROW',re.sub(r'\\s+',' ',result[max(0,i-900):i+1600])[:2500])
           except Exception as e:
             print('SMPP_PROBE_ERROR',type(e).__name__,str(e)[:250])
             raise
