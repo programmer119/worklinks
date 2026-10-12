@@ -134,6 +134,18 @@ jobs:
                              'rawFields':(evidence.get('attachments') or {}).get('rawFields'),
                              'items':len((evidence.get('attachments') or {}).get('items') or []),
                              'error':(evidence.get('attachments') or {}).get('error')}})
+          for notice in ['R25BK00826083','R22BK00000000']:
+            award=get('/awards?bidNo='+notice)
+            if award:
+              entries=award.get('items') or []
+              matches=[x for x in entries if any('창컴정보통신' in str(v) for k,v in x.items() if isinstance(v,str))]
+              print('OFFICIAL_AWARD_PROBE',notice,{
+                'ok':award.get('ok'),'totalCount':award.get('totalCount'),
+                'received':len(entries),'fields':sorted(entries[0].keys()) if entries else [],
+                'matched':len(matches)})
+              if matches:
+                print('OFFICIAL_AWARD_MATCH',notice,{k:v for k,v in matches[0].items()
+                  if k in ['bidNtceNo','bidNtceNm','bidwinnrNm','bidwinnrBizno','bidwinnrBizNo','sucsfBidAmt','sucsfBidRate','opengDt','scsbidDt','bidwinnrBizNo','fnlSucsfBidAmt']})
           contract=get('/contract-capability')
           if contract:
             print('OFFICIAL_CONTRACT_API_CAPABILITY',{
