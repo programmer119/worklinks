@@ -282,7 +282,7 @@
       <button class="jobf" data-jobf="sources">수요처 탐색경로</button>
     </div>
     <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
-    <div class="partner-summary" id="partnerSummary"></div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="qualified">업종 일치 우선 (기본)</option><option value="deadline">마감 임박순</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
+    <div class="partner-summary" id="partnerSummary"></div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
     <div class="g2b-panel" id="g2bPanel">
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
       <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
@@ -606,33 +606,56 @@ function collapseSimilarNotices(all){
   }))};
  });
 }
+function licenseLogic(line){
+ const declared=String(line.logic||'').toUpperCase();
+ if(declared==='OR'||declared==='AND')return declared;
+ const t=[line.name,line.permittedIndustries,line.fieldRestrictions].join(' ');
+ if(/또는|택일|중\\s*(?:한\\s*가지|하나|1종)|\\bOR\\b/i.test(t))return 'OR';
+ if(/모두|동시\\s*보유|각각\\s*보유|\\bAND\\b/i.test(t))return 'AND';
+ return 'UNKNOWN';
+}
+function licenseLineResult(line,p){
+ const codes=[...new Set((line.codes||[]).map(String))];
+ if(!codes.length)return {state:'unknown',matched:[],missing:[],reason:'면허제한 코드가 제공되지 않음'};
+ const values=codes.map(c=>({code:c,state:partnerRegisteredCode(p,c)}));
+ const matched=values.filter(v=>v.state===true).map(v=>v.code);
+ const missing=values.filter(v=>v.state===false).map(v=>v.code);
+ const logic=codes.length===1?'AND':licenseLogic(line);
+ if(logic==='OR'&&matched.length)return {state:'ok',matched,missing:[],reason:'허용 업종 중 일치'};
+ if(logic==='AND'&&missing.length)return {state:'missing',matched,missing,reason:'동시 필수 업종 부족'};
+ if(matched.length===codes.length)return {state:'ok',matched,missing:[],reason:'해당 업종 전부 일치'};
+ if(missing.length===codes.length)return {state:'missing',matched:[],missing,reason:'해당 업종 전부 미등록'};
+ return {state:'unknown',matched,missing,reason:'복수 업종의 대체(OR)·동시 필수(AND) 관계 또는 현재 상태 확인 필요'};
+}
 function jobQualificationVerdict(x,p){
- if(!p || jobSoftwareScope(x)!=='candidate')return {type:'not_applicable',codes:[],reason:'해당 사업의 독립 SW 수행범위가 검증되지 않음'};
+ if(!p||jobSoftwareScope(x)!=='candidate')return {type:'not_applicable',codes:[],missing:[],reason:'독립 SW 수행범위 확인되지 않음'};
  const r=jobEligibilityData(x);
- if(!r?.ok||!r.complete)return {type:'unverified',codes:[],reason:'공고별 면허제한 조회 대기 또는 불완전'};
- if(!p.registryCheckedAt||p.registryComplete!==true)return {type:'unverified',codes:[],reason:'파트너 최신 등록업종 확인 대기'};
- if(!Array.isArray(r.requirements)||r.requirements.length===0)return {type:'unverified',codes:[],reason:'공고의 필수 등록업종이 API에 명시되지 않음'};
- const groups=new Map(),uncoded=[];
+ if(!r?.ok||!r.complete)return {type:'unverified',codes:[],missing:[],reason:'공고별 면허제한 자료 조회 대기·불완전'};
+ if(!p.registryCheckedAt||p.registryComplete!==true)return {type:'unverified',codes:[],missing:[],reason:'파트너의 전체 등록업종 자료 확인 대기'};
+ if(!Array.isArray(r.requirements)||!r.requirements.length)return {type:'unverified',codes:[],missing:[],reason:'공고에 필수 등록업종이 표시되지 않음'};
+ const groups=new Map();
  for(const line of r.requirements){
-  const group=String(line.group||'기본');
-  if(!groups.has(group))groups.set(group,new Set());
-  const codes=(line.codes||[]).map(String);
-  if(codes.length===0){uncoded.push(line.name||'면허 제한 조건');continue}
-  codes.forEach(c=>groups.get(group).add(c));
+  const key=String(line.group||line.sequence||'기본');
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(line);
  }
- if(uncoded.length)return {type:'unverified',codes:[],reason:'코드 없는 별도 면허제한 '+uncoded.length+'건'};
- const matched=[],missing=[];
- for(const [group,codes] of groups){
-  if(!codes.size)return {type:'unverified',codes:[],reason:'업종제한 코드 미확인'};
-  const goods=[...codes].filter(c=>partnerRegisteredCode(p,c)===true);
-  const allKnown=[...codes].every(c=>partnerRegisteredCode(p,c)!==null);
-  if(goods.length)matched.push(...goods);
-  else if(allKnown)missing.push(group+':'+[...codes].join('/'));
-  else return {type:'unverified',codes:[],reason:'현재 업종 상태 확정 불가'};
+ const matched=[],missing=[],uncertain=[];
+ for(const [group,lines] of groups){
+  const assessments=lines.map(line=>licenseLineResult(line,p));
+  const goods=assessments.flatMap(v=>v.matched);
+  // Multiple rows in a group do NOT imply OR: all must match to be safe.
+  if(assessments.every(v=>v.state==='ok')){matched.push(...goods);continue}
+  if(assessments.every(v=>v.state==='missing')){
+   missing.push(group+':'+lines.flatMap(v=>v.codes||[]).join('/'));continue;
+  }
+  // If any row might be an alternative, do not invent AND/OR semantics.
+  uncertain.push(group+': 조건 관계·증빙 검증 필요');
  }
- if(!matched.length&&!missing.length)return {type:'unverified',codes:[],reason:'면허제한 조건이 조회되지 않음'};
- return {type:missing.length?'missing':'industry_match',
-  codes:[...new Set(matched)],missing,reason:missing.length?'면허제한 '+missing.length+'개 그룹의 일치 업종 없음':'공고의 조회된 등록업종 조건과 일치'};
+ if(missing.length)return {type:'missing',codes:[...new Set(matched)],missing,uncertain,reason:'등록 업종 부족 '+missing.length+'개 그룹 · 전체 참가조건 추가 확인'};
+ if(uncertain.length)return {type:'unverified',codes:[...new Set(matched)],missing:[],uncertain,reason:'업종 일부 일치하나 필수·대체 관계 '+uncertain.length+'개 그룹 검증 필요'};
+ if(!matched.length)return {type:'unverified',codes:[],missing:[],reason:'입찰 제한 업종 판별 불가'};
+ return {type:'industry_match',codes:[...new Set(matched)],missing:[],uncertain:[],
+  reason:'조회된 면허제한 업종 조건 일치. 증명서·실적·지역·인력·공동수급은 별도 확인 필요'};
 }
 function jobPartnerMatches(x){
  return partners.map(p=>({p,result:jobQualificationVerdict(x,p)}))
@@ -984,81 +1007,68 @@ function partnerRegisteredCode(p,code){
  if(!p||!p.registryCheckedAt||!Array.isArray(p.industryRecords))return null;
  const found=p.industryRecords.find(function(q){return String(q.code)===String(code)});
  if(!found)return p.registryComplete===true?false:null;
- const expiry=String(found.expiresAt||'');
- const end=expiry.match(/\d{4}-\d{2}-\d{2}/);
- const expired=end&&end[0]<kstISO();
- return String(found.status)==='정상'&&!expired;
+ const expiry=String(found.expiresAt||'').replace(/\\//g,'-');
+ const end=expiry.match(/\\d{4}-\\d{2}-\\d{2}/);
+ if(end&&end[0]<kstISO())return false;
+ const status=String(found.status||'').trim();
+ if(status==='정상'||status==='유효')return true;
+ if(/만료|폐업|취소|말소|정지|불가/.test(status))return false;
+ // Missing/unknown official status must not be silently treated as an active license.
+ return null;
 }
 function comparePartnerJob(x,p){
  const rows=[],req=jobEligibilityData(x);
  const add=(id,label,status,reason,source)=>{
-  if(rows.some(function(r){return r.id===id}))return;
+  if(rows.some(r=>r.id===id))return;
   rows.push({id,label,status,reason,source:source||'공고 요약'});
  };
- if(req?.ok){
-  const grouped={};
+ if(jobSoftwareScope(x)!=='candidate'){
+  add('scope','SW 독립 수행범위','missing','현재 공고에서 SW 파트너가 담당할 별도 과업을 확인하지 못했습니다.','공고 제목·구분');
+ }else if(req?.ok){
+  const groups=new Map();
   for(const line of req.requirements||[]){
-   const group=String(line.group||'기타')||'기타';
-   (grouped[group]||(grouped[group]=[])).push(line);
+   const key=String(line.group||line.sequence||'기본');
+   if(!groups.has(key))groups.set(key,[]);
+   groups.get(key).push(line);
   }
-  for(const [group,entries] of Object.entries(grouped)){
-   const allCodes=[...new Set(entries.flatMap(function(line){return (line.codes||[]).map(String)}))];
-   const names=entries.map(function(line){return line.name||'면허 상세 확인 필요'}).filter(Boolean);
-   const statusValues=allCodes.map(function(code){return partnerRegisteredCode(p,code)});
-   let status='unknown',reason='업종번호 확인 또는 등록업종 API 확인 필요';
-   if(!allCodes.length)reason='공고 제한 조건에 코드가 없어 수동 대조 필요';
-   else if(statusValues.some(function(v){return v===true})){
-     status='ok';reason='나라장터 업체등록 업종과 일치하는 코드 확인 ('+allCodes.filter(function(c){return partnerRegisteredCode(p,c)===true}).join(', ')+')';
-   }else if(statusValues.every(function(v){return v===false})){
-     status='missing';reason='현재 조회된 정상 등록업종 중 일치 코드 없음. 대체 가능 코드·그룹 관계는 원문 확인 필요';
+  for(const [group,lines] of groups){
+   lines.forEach(function(line,i){
+    const q=licenseLineResult(line,p),codes=(line.codes||[]).map(String);
+    const matchCodes=q.matched.join(', ');
+    add('license-'+group+'-'+i,
+     '면허제한 '+group+' · '+(line.name||codes.join('/')||'세부코드 확인 필요'),
+     q.state==='ok'?'ok':q.state==='missing'?'missing':'unknown',
+     (q.state==='ok'?'일치 업종코드 '+matchCodes+' · ':q.state==='missing'?'부족 업종코드 '+q.missing.join(', ')+' · ':'')+q.reason,
+     '나라장터 면허제한 API');
+   });
+   if(lines.length>1&&!lines.every(line=>licenseLineResult(line,p).state==='ok')){
+    add('logic-'+group,'동일 그룹 복수 제한의 필수·대체 관계','unknown',
+     '그룹번호가 같아도 대체 허용으로 단정하지 않습니다. 공고 첨부원문 확인 필요','공고 원문');
    }
-   add('license-'+group,'면허제한 '+group+'그룹 · '+names.join(' 또는 '),status,reason,'나라장터 면허제한 API');
   }
-  if(!req.complete)add('partial','면허제한 일부만 조회됨','unknown','페이지 누락이 있어 추가 조건 확인 필요','나라장터 API');
+  if(!req.complete)add('partial','면허제한 일부만 조회됨','unknown','조회 페이지 누락 또는 제한 항목 누락','나라장터 API');
  }
  const txt=String(x.condition||'')+' '+String(x.partnerBidMode||'');
  const certRules=[
-  ['direct','직접생산확인증명서','직접생산|8111159901|8111189901|8111200201|직접생산확인'],
-  ['smecert','공공입찰용 중소기업·소상공인확인서','중소기업.?확인|소상공인.?확인|중소기업/소상공인'],
-  ['swstatus','SW사업자 일반현황 관리확인서','일반현황.?관리확인|SW사업자.?신고'],
-  ['experience','유사용역 수행실적·기술평가','실적.?이상|유사.?실적|경력.?이상'],
-  ['region','지역·현장 소재지 조건','지역.?제한|지역.?입찰|본점.?소재']
+  ['direct','직접생산확인증명서',/직접생산|8111159901|8111189901|8111200201/],
+  ['smecert','공공입찰용 중소기업확인서',/중소기업.?확인|소상공인.?확인/],
+  ['swstatus','SW사업자 일반현황 관리확인서',/일반현황.?관리확인|SW사업자.?신고/],
+  ['experience','수행실적·인력','실적'],
  ];
- for(const [id,label,pattern] of certRules){
-  if(new RegExp(pattern).test(txt))add('proof-'+id,label,'pending',
-   id==='smecert'?'법인/중소기업 분류와 입찰용 확인서 유효기간은 별개입니다. SMPP 원본 확인 필요':
-   id==='direct'?'직접생산확인서 품명번호·보유 여부·유효기간 미확인':
-   id==='swstatus'?'당해 연도 SW사업자 증명 원문 미확인':
-   id==='region'?'업체 본점 지역과 공고 지역제한을 아직 대조하지 않았습니다.':
-   '투입인력·유사용역 실적 증빙 및 평가기준 미확인',
-   '공고 요약·첨부 원문 확인 필요');
+ // Proof requirements may exist in attachments even when not present in the summary.
+ for(const [id,label,re] of certRules){
+  if(re.test(txt))add('proof-'+id,label,'pending','업체 원본 증빙의 보유·유효기간 별도 확인 필요','공고 조건 요약');
  }
- if(/\bSRM\b|한전SRM|한전\s*SRM/.test(txt)){
-  add('proof-srm','한전 SRM 업체 등록','pending','한전 SRM 별도 등록상태 미확인','한전 SRM');
- }
- if(/공동수급.*불허|공동수급.*불가|공동수급\s*금지/.test(txt)){
-  add('consortium','공동수급 제한','pending',
-   '공동수급 불가. 창컴 단독 입찰 여부는 다른 참가조건을 모두 대조해야 확정할 수 있습니다.','공고 요약');
+ if(/지역.?제한|본점.?소재/.test(txt))add('region','지역제한','pending','업체 본점 소재지와 공고의 허용 지역 대조 필요','공고 조건 요약');
+ if(/공동수급.*불허|공동수급.*불가|공동수급\\s*금지/.test(txt)){
+  add('joint','공동수급 금지','missing','공동수급 입찰 불가. 단독 가능 여부는 별도 자격 검토','공고 조건 요약');
  }else if(/공동수급/.test(txt)){
-  add('consortium','공동수급·분담이행 가능 여부','pending',
-   '협업 가능 여부·지분·분담 범위는 공고 원문 확인 필요','공고 요약');
+  add('joint','공동수급·분담이행','pending','허용 방식·분담 범위 원문 확인 필요','공고 조건 요약');
  }
- if(!req||!req.ok){
-  const codeMatches=[...new Set((txt.match(/(?<!\d)(1468|1426|1469|1470|1169|0036)(?!\d)/g)||[]))];
-  for(const code of codeMatches){
-   const matched=partnerRegisteredCode(p,code);
-   add('hint-'+code,'SW 관련 업종 '+code,matched===true?'ok':matched===false?'missing':'unknown',
-     matched===true?'나라장터 정상 등록업종 일치':
-     matched===false?'확인된 업체 등록업종에 없음':'업체 등록정보·공고 원문 확인 필요',
-     '공고 요약 (공식 면허제한 조회로 확인 권장)');
-  }
- }
- if(!rows.length || !req?.ok){
-  add('unverified','공고 첨부원문 전체 자격요건','unknown',
-    req?.error?'면허제한 API 응답 오류: '+req.error:
-    '공고별 면허제한·직접생산·지역·실적·인력·납품 조건을 전부 확인한 상태가 아닙니다.','검증 대기');
- }else add('other','공고 첨부문서 추가조건','unknown',
-   '면허제한 API만으로 전체 참가자격·입찰 적격을 확정할 수 없습니다.','공고문·RFP');
+ if(!req?.ok)add('license-unavailable','공식 면허제한 자료','unknown',
+  '공고별 공식 면허제한 데이터 확인 전. 업종 추정으로 적격 판정 금지','나라장터 API');
+ add('attachment','직접생산·중소기업·실적·인력·지역·계약 제한','unknown',
+  '업종 일치는 전체 입찰 참가 가능 확인이 아닙니다. 원문 첨부서류와 보유증빙 대조 필요','공고문·RFP');
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  return {rows,counts,complete:false};
@@ -1202,7 +1212,7 @@ function renderJobs(){
     const knownMatch=eligibility.type==='industry_match';
     const matchCode=knownMatch?eligibility.codes.filter(c=>partnerIndustryKnownCodes.has(c))[0]:'';
     const matchBadge=eligibility.type==='industry_match'?
-      '<span class="jobmatch-chip ok" title="업종 일치만 확인 · 전체 입찰 적격 아님">'+htmlEscape(matchCode?matchCode+' 일치':'등록업종 일치')+'</span>':
+      '<span class="jobmatch-chip ok" title="업종 일치만 확인 · 전체 입찰 적격 아님">'+htmlEscape(matchCode?matchCode+' 일치 · 증빙 필요':'업종 일치 · 증빙 필요')+'</span>':
       eligibility.type==='missing'?
       '<span class="jobmatch-chip missing" title="'+htmlEscape(eligibility.reason)+'">업종 '+eligibility.missing.length+'개 부족</span>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
