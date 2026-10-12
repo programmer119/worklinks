@@ -24,6 +24,7 @@ cp -p "$SRC" "$NEXT"
 trap 'rm -f "$NEXT"' EXIT
 dk run --rm -v "$NEXT:/app/api.py:ro" "$IMG" python -m py_compile /app/api.py
 dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_direct_production.py:/app/test_direct_production.py:ro" "$IMG" python /app/test_direct_production.py
+dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_bid_evidence.py:/app/test_bid_evidence.py:ro" "$IMG" python /app/test_bid_evidence.py
 dk run --rm -i -v "$NEXT:/app/api.py:ro" -e G2B_DB_PATH=/tmp/test.sqlite3 "$IMG" python - <<'PY'
 import datetime,json,runpy
 p=runpy.run_path('/app/api.py',run_name='preflight_test')
