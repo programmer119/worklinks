@@ -485,6 +485,7 @@ var partners=[
    {label:"SW사업자 일반현황 관리확인서",state:"pending",value:"최근 신고 서류 미검증",detail:"최근년도 결산신고 확인서 원본 또는 공공 SW사업자 확인자료 대조 필요."},
    {label:"중소기업확인서 · 공공입찰용",state:"pending",value:"유효기간 미검증",detail:"SMPP 중·소기업 확인서에서 입찰용 발급 현황 및 유효기간 확인 필요."},
    {label:"나라장터 업체 등록",state:"pending",value:"업체정보 API 조회 대기",detail:"나라장터 사용자정보 API에서 사업자번호 일치 및 등록일을 검증합니다."},
+   {label:"공공계약·수행실적",state:"pending",value:"조달청 계약정보 API 접근 검사 대기",detail:"계약·이행·검수실적은 공개 계약정보와 실적증명서를 구분하여 확인해야 합니다."},
    {label:"한전 SRM 입찰등록",state:"pending",value:"SRM 개별 등록 미검증",detail:"나라장터 등록과 별개로 한전 SRM의 등록상태 및 해당 입찰 신청 가능 여부는 확인해야 합니다."}
   ],
   sources:[{name:"기업정보",url:"https://www.saramin.co.kr/zf_user/company-info/view/csn/RGRWM0lxUDBXVnJpcmlhUTBFWlBiZz09/company_nm/%EC%B0%BD%EC%BB%B4%EC%A0%95%EB%B3%B4%ED%86%B5%EC%8B%A0%28%EC%A3%BC%29"},{name:"직접생산확인 조회",url:"https://www.smpp.go.kr/cst/smppInf/selectDpCnfrmnListVw.do"},{name:"중소기업확인 조회",url:"https://smpp.go.kr/cst/smppInf/selectMiddlSslentrSchtwrListVw.do"},{name:"나라장터",url:"https://www.g2b.go.kr/"},{name:"나라장터 등록업종 API",url:"https://www.data.go.kr/data/15129466/openapi.do"}]
@@ -564,6 +565,27 @@ async function refreshPartnerProduction(p){
  try{return await p.productionPromise}finally{p.productionPromise=null}
 }
 
+
+var contractCapabilityPromise=null,contractCapabilityRecord=null;
+async function refreshContractCapability(){
+ if(contractCapabilityPromise)return contractCapabilityPromise;
+ contractCapabilityPromise=(async function(){
+  try{contractCapabilityRecord=await g2bFetch('/contract-capability')}
+  catch(e){contractCapabilityRecord={ok:false,authorized:false,error:String(e.message||e)}}
+  for(const p of partners.filter(z=>z.businessNo)){
+   p.contractCapability=contractCapabilityRecord;
+   const authorized=contractCapabilityRecord.authorized===true;
+   setPartnerQual(p,'공공계약·수행실적',{state:'pending',
+    value:authorized?'계약 API 접근 가능 · 업체 수행실적 별도 대조':'계약 API 권한·접근 확인 필요',
+    detail:authorized?'공식 계약정보 API 호출 성공. 개별 업체의 전체 계약·검수·실적증명서는 아직 확인되지 않음.':
+     '사유: '+(contractCapabilityRecord.error||'미승인')+' · 활용신청 https://www.data.go.kr/data/15129427/openapi.do'});
+  }
+  renderPartners();renderJobs();
+  if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
+  return contractCapabilityRecord;
+ })();
+ try{return await contractCapabilityPromise}finally{contractCapabilityPromise=null}
+}
 async function refreshPartnerSme(p){
  if(!p||!p.businessNo)return;
  if(p.smePromise)return p.smePromise;
@@ -662,6 +684,7 @@ function openPartnerModal(partnerId,jobId){
   if(p&&!p.productionCheckedAt&&!p.productionPromise)refreshPartnerProduction(p);
   if(p&&!p.smeCheckedAt&&!p.smePromise)refreshPartnerSme(p);
  if(job){loadJobEligibility(job);loadJobEvidence(job)}
+ refreshContractCapability();
 }
 function closePartnerModal(){partnerModal.classList.remove("open");partnerModal.setAttribute("aria-hidden","true");document.body.style.overflow="";partnerScopedCompany=null;partnerScopedJob=null;if(partnerLastFocus&&partnerLastFocus.focus)partnerLastFocus.focus()}
 document.getElementById("partnersOpen").addEventListener("click",function(){openPartnerModal(null,null)});
@@ -814,7 +837,7 @@ function refreshAllPartnerRegistries(){
  if(partnerRefreshPromise)return partnerRefreshPromise;
  if(partnerFetchStarted)return Promise.resolve();
  partnerFetchStarted=true;
- partnerRefreshPromise=Promise.allSettled(partners.filter(p=>p.businessNo).map(p=>Promise.allSettled([refreshPartnerRegistry(p),refreshPartnerProduction(p),refreshPartnerSme(p)])))
+ partnerRefreshPromise=Promise.allSettled([refreshContractCapability(),...partners.filter(p=>p.businessNo).map(p=>Promise.allSettled([refreshPartnerRegistry(p),refreshPartnerProduction(p),refreshPartnerSme(p)]))])
   .then(function(){renderJobs()}).finally(function(){partnerRefreshPromise=null});
  return partnerRefreshPromise;
 }
@@ -1305,7 +1328,13 @@ function comparePartnerJob(x,p){
   ['staff','기술인력·자격',/기술인력|투입인력|상주인력|전담인력|자격증/],
  ];
  for(const [id,label,re] of certRules){
-  if(re.test(txt))add('proof-'+id,label,'pending','업체 증빙과 공고 원문 요구기준 대조 필요','공고 조건 요약');
+  if(!re.test(txt))continue;
+  const reason=id==='experience'?
+   (p.contractCapability?.authorized===true?
+    '조달청 계약정보서비스 접근 성공 · 업체별 계약내역·수행완료/검수·유사분야 실적증명서 별도 대조 필요':
+    '조달청 계약정보 API 조회권한 확인 필요 · https://www.data.go.kr/data/15129427/openapi.do'):
+   '업체 증빙과 공고 원문 요구기준 대조 필요';
+  add('proof-'+id,label,'pending',reason,id==='experience'?'조달청 계약정보서비스':'공고 조건 요약');
  }
  const evidence=jobEvidenceData(x);
  if(/지역.?제한|본점.?소재/.test(txt)||evidence?.region?.items?.length){
