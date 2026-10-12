@@ -497,13 +497,15 @@ async function refreshPartnerProduction(p){
    const bizno=p.businessNo.replace(/\D/g,'');
    let data;
    try{
-    const response=await fetch('./direct-production-snapshot.json',{cache:'no-store'});
-    if(!response.ok)throw Error('public_snapshot_unavailable');
-    const source=await response.json();
-    if(!source.ok||source.complete!==true||!source.recordsByBizno||!Object.prototype.hasOwnProperty.call(source.recordsByBizno,bizno))throw Error('public_snapshot_incomplete');
-    data={ok:true,complete:true,snapshotDate:source.snapshotDate,records:source.recordsByBizno[bizno],checkedAt:new Date().toISOString(),source:'공공데이터포털 CSV'};
-   }catch(e){
     data=await g2bFetch('/direct-production?bizno='+encodeURIComponent(bizno));
+    p.productionDataSource='실제 공공데이터 API';
+   }catch(e){
+    const response=await fetch('./direct-production-snapshot.json',{cache:'no-store'});
+    if(!response.ok)throw Error('API 실패 · 공개자료도 조회 불가: '+String(e.message||e));
+    const source=await response.json();
+    if(!source.ok||source.complete!==true||!source.recordsByBizno||!Object.prototype.hasOwnProperty.call(source.recordsByBizno,bizno))throw Error('공개자료 불완전');
+    data={ok:true,complete:true,snapshotDate:source.snapshotDate,records:source.recordsByBizno[bizno],checkedAt:new Date().toISOString(),source:'공공데이터포털 CSV'};
+    p.productionDataSource='공개 CSV 대체조회';
    }
    if(data.complete!==true||!/^\d{4}-\d{2}-\d{2}$/.test(String(data.snapshotDate||""))||!Array.isArray(data.records))throw Error("불완전한 발급현황 응답");
    p.productionRecords=data.records;p.productionCheckedAt=data.checkedAt||"";p.productionSnapshotDate=data.snapshotDate;
@@ -513,7 +515,7 @@ async function refreshPartnerProduction(p){
    setPartnerQual(p,"직접생산 · 정보시스템개발서비스 8111159901",{
     state:"snapshot",
     value:matched.length?(matched.length+"건 발급내역 확인"+(datesOk.length?" · 기재 종료일 미경과 "+datesOk.length+"건":"")):(data.snapshotDate+" 해당 품목 미발견"),
-    detail:data.snapshotDate+" 자료 기준. 현재 인증 상태·취소·변경은 SMPP 별도 검증 필요."
+    detail:(p.productionDataSource||"공공데이터 조회")+" · "+data.snapshotDate+" 자료 기준. 현재 인증 상태·취소·변경은 SMPP 별도 검증 필요."
    });
   }catch(e){
    p.productionError=String(e.message||e);p.productionRecords=[];p.productionCheckedAt="";
