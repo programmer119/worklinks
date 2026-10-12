@@ -1019,7 +1019,7 @@ function renderJobs(){
        '</div>':'<div class="job-partners"></div>';
     const match=partnerList.length?comparePartnerJob(x,partnerList[0]):null;
     const matchCode=match?.rows.find(function(row){return row.status==='ok'&&row.source==='나라장터 면허제한 API'});
-    const matchName=matchCode?.label?.match(/\\b(1468|1426|1469|1470|1169|0036)\\b/)?.[1]||'업종';
+    const matchName=matchCode?.label?.match(/\b(1468|1426|1469|1470|1169|0036)\b/)?.[1]||'업종';
     const matchBadge=match&&match.counts.missing?'<span class="jobmatch-chip missing" title="자세한 부족 조건은 카드를 눌러 확인">업종 부족 '+match.counts.missing+'</span>':
       match&&match.counts.ok?'<span class="jobmatch-chip ok" title="전체 입찰 적격 확정 아님">'+htmlEscape(matchName)+' 일치</span>':
       partnerList.length?'<span class="jobmatch-chip pending">자격 확인 중</span>':'';
