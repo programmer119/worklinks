@@ -75,7 +75,7 @@ def discover(limit,prior=None):
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 if cached.get('reviewComplete') is True:continue
-                if cached.get('classificationVersion')==3:
+                if cached.get('classificationVersion')==4:
                     try:
                         checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                         if checked.tzinfo and (now-checked).total_seconds()<36*3600:
@@ -188,6 +188,45 @@ def parse_clauses(text):
         snippets.append({'topic':match,'text':clean})
         if len(snippets)>=16:break
     return triggers,snippets
+def extract_rule_candidates(text,filename):
+    """Bounded evidence candidates, not final required/fulfilled qualifications.
+
+    Every item points to a literal official-document phrase; mandatory status
+    stays unreviewed until the complete notice and appendices are validated.
+    """
+    raw_lines=[' '.join(line.split()) for line in re.split(r'\n+',text[:350_000])]
+    rules={
+      'industry_code':r'업종\s*코드|업종코드|업종으로\s*입찰|소프트웨어사업자',
+      'direct_production':r'직접\s*생산|세부\s*품명\s*번호',
+      'sme_certificate':r'소기업.?소상공인\s*확인서|중소기업\s*확인서|소기업\s*확인서',
+      'staff_proof':r'재직.{0,12}경력|경력.{0,12}학력|자격.?증명서|투입\s*인력',
+      'performance_proof':r'실적\s*증명|수행\s*실적|유사\s*용역\s*실적',
+      'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소',
+      'joint_participation':r'공동\s*수급|분담\s*이행|하도급'
+    }
+    out=[];seen=set()
+    for line in raw_lines:
+        if not 14<=len(line)<=800:continue
+        for topic,rx in rules.items():
+            if not re.search(rx,line,re.I):continue
+            if topic=='industry_code':
+                codes=re.findall(r'(?<!\d)\d{4}(?!\d)',line)
+                codes=[c for c in codes if not c.startswith('20')]
+            elif topic=='direct_production':
+                codes=re.findall(r'(?<!\d)\d{10}(?!\d)',line)
+            else:codes=[]
+            phrase=line[:270]
+            key=(topic,phrase)
+            if key in seen:continue
+            seen.add(key)
+            out.append({'type':topic,'codes':codes[:6],'sourceFile':filename[:160],
+               'sourceText':phrase,'reviewStatus':'unreviewed',
+               'explicitMust':bool(re.search(r'반드시|필수|입찰참가자격|소지하여야|제출하여야|첨부하여야',line)),
+               'documentRequiresManualFullReview':True})
+            if len(out)>=42:return out
+    return out
+
+
 def process(no,ordn):
     data=fetch_json(BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn}))
     docs=data.get('attachments') or {}
@@ -220,7 +259,10 @@ def process(no,ordn):
             content=extract(name,download(url))
             if len(content.strip())<100:raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
-            record.update({'readable':True,'textChars':len(content),'topics':triggers,'snippets':snippets})
+            candidate_rules=extract_rule_candidates(content,name)
+            record.update({'readable':True,'textChars':len(content),'topics':triggers,
+                           'snippets':snippets,'clauseCandidates':candidate_rules,
+                           'fullReviewPending':True})
         except Exception as ex:
             record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
@@ -263,13 +305,13 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==3 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                if cached.get('classificationVersion')==4 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
                     print('RFP_CACHE_HIT',key);continue
             except ValueError:pass
         try:
             data=process(no,ordn)
             data['checkedAt']=now.isoformat()
-            data['classificationVersion']=3
+            data['classificationVersion']=4
             results[key]=data
             print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])))
             success+=int(data['status']=='text_extracted_requires_review')
