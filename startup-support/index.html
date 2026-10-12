@@ -483,7 +483,7 @@ function renderQualifications(){
 })();
 
 var partners=[
- {id:"changcom",name:"창컴정보통신(주)",short:"창컴",businessNo:"130-81-85973",established:"2002년 설립",type:"중소기업(기업정보상)",sectors:["공공정보화·업무시스템","데이터베이스 구축·정비","전산자료 처리·디지털화","정보시스템 운영·유지관리"],
+ {id:"changcom",name:"창컴정보통신(주)",short:"창컴",businessNo:"130-81-85973",awardBidNos:["R25BK00826083","20221204854"],established:"2002년 설립",type:"중소기업(기업정보상)",sectors:["공공정보화·업무시스템","데이터베이스 구축·정비","전산자료 처리·디지털화","정보시스템 운영·유지관리"],
   qualifications:[
    {label:"법인·중소기업 분류",state:"confirmed",value:"기업정보에서 확인",detail:"2002년 설립 법인·중소기업으로 조회. 공공입찰용 유효 중소기업확인서는 별도 조회 필요."},
    {label:"SW사업자 · 컴퓨터관련서비스사업 1468",state:"pending",value:"현재 등록 미검증",detail:"과거 SW업체 이력만으로 현행 나라장터 업체 등록(1468)을 확정할 수 없음. 등록업종 조회 필요."},
@@ -493,6 +493,7 @@ var partners=[
    {label:"나라장터 업체 등록",state:"pending",value:"업체정보 API 조회 대기",detail:"나라장터 사용자정보 API에서 사업자번호 일치 및 등록일을 검증합니다."},
    {label:"직원 수(참고)",state:"pending",value:"나라장터 업체정보 조회 대기",detail:"직원 수는 개별 기술인력의 자격·투입가능성 증명이 아닙니다."},
    {label:"본점 소재지·지역코드",state:"pending",value:"나라장터 업체정보 주소 조회 대기",detail:"본점 주소 및 등록 지역코드를 공식 API에서 대조합니다."},
+   {label:"공식 낙찰이력",state:"pending",value:"나라장터 공식 낙찰 확인 중",detail:"낙찰업체 사업자번호 대조. 계약 이행·검수 실적은 별도입니다."},
    {label:"공공계약·수행실적",state:"pending",value:"조달청 계약정보 API 접근 검사 대기",detail:"계약·이행·검수실적은 공개 계약정보와 실적증명서를 구분하여 확인해야 합니다."},
    {label:"한전 SRM 입찰등록",state:"pending",value:"SRM 개별 등록 미검증",detail:"나라장터 등록과 별개로 한전 SRM의 등록상태 및 해당 입찰 신청 가능 여부는 확인해야 합니다."}
   ],
@@ -581,6 +582,37 @@ async function refreshPartnerProduction(p){
 
 
 var contractCapabilityPromise=null,contractCapabilityRecord=null;
+
+async function refreshPartnerAwardEvidence(p){
+ if(!p?.businessNo)return;
+ if(p.awardEvidencePromise)return p.awardEvidencePromise;
+ p.awardEvidencePromise=(async function(){
+  const bids=[...new Set(p.awardBidNos||[])].slice(0,15),bizno=p.businessNo.replace(/\D/g,'');
+  const responses=await Promise.allSettled(bids.map(id=>g2bFetch('/awards?bidNo='+encodeURIComponent(id))));
+  const verified=[],errors=[];
+  for(let i=0;i<bids.length;i++){
+   if(responses[i].status!=='fulfilled'){errors.push(bids[i]+' API 조회 실패');continue}
+   const data=responses[i].value;
+   if(!Array.isArray(data.items)||Number(data.totalCount)>data.items.length){errors.push(bids[i]+' 응답 일부만 조회');continue}
+   for(const r of data.items){
+    if(String(r.bidNtceNo||'')!==bids[i]||String(r.bidwinnrBizno||'').replace(/\D/g,'')!==bizno)continue;
+    verified.push({bidNo:bids[i],title:String(r.bidNtceNm||''),winner:String(r.bidwinnrNm||''),
+     amount:Number(r.sucsfbidAmt)||0,awardedAt:String(r.fnlSucsfDate||''),source:'나라장터 낙찰정보서비스'});
+   }
+  }
+  p.awardEvidence=verified;p.awardEvidenceErrors=errors;p.awardCheckedAt=new Date().toISOString();
+  setPartnerQual(p,'공식 낙찰이력',{
+   state:verified.length?'confirmed':'pending',
+   value:verified.length?'낙찰 '+verified.length+'건 · 사업자번호 일치':'낙찰이력 추가 검증 필요',
+   detail:verified.length?'공식 나라장터 낙찰업체 사업자번호를 확인. 계약체결·이행완료·검수·실적증명서까지 증명하지는 않음. 확인 후보 공고에 한정.':
+    errors.join(' / ')||'현재 확인한 공고에서 낙찰 기록 미발견. 전체 실적 없음으로 판정하지 않음.'
+  });
+  renderPartners();renderJobs();
+  if(activeDetailJobId){const j=getJobById(activeDetailJobId);if(j)renderJobDetail(j)}
+  if(partnerScopedJob)renderPartnerJobContext();
+ })();
+ try{return await p.awardEvidencePromise}finally{p.awardEvidencePromise=null}
+}
 async function refreshContractCapability(){
  if(contractCapabilityPromise)return contractCapabilityPromise;
  contractCapabilityPromise=(async function(){
@@ -714,6 +746,7 @@ function openPartnerModal(partnerId,jobId){
   if(p&&!p.smeCheckedAt&&!p.smePromise)refreshPartnerSme(p);
  if(job){loadJobEligibility(job);loadJobEvidence(job)}
  refreshContractCapability();
+ if(p&&!p.awardCheckedAt)refreshPartnerAwardEvidence(p);
 }
 function closePartnerModal(){partnerModal.classList.remove("open");partnerModal.setAttribute("aria-hidden","true");document.body.style.overflow="";partnerScopedCompany=null;partnerScopedJob=null;if(partnerLastFocus&&partnerLastFocus.focus)partnerLastFocus.focus()}
 document.getElementById("partnersOpen").addEventListener("click",function(){openPartnerModal(null,null)});
@@ -866,7 +899,7 @@ function refreshAllPartnerRegistries(){
  if(partnerRefreshPromise)return partnerRefreshPromise;
  if(partnerFetchStarted)return Promise.resolve();
  partnerFetchStarted=true;
- partnerRefreshPromise=Promise.allSettled([refreshContractCapability(),...partners.filter(p=>p.businessNo).map(p=>Promise.allSettled([refreshPartnerRegistry(p),refreshPartnerProduction(p),refreshPartnerSme(p)]))])
+ partnerRefreshPromise=Promise.allSettled([refreshContractCapability(),...partners.filter(p=>p.businessNo).map(p=>Promise.allSettled([refreshPartnerRegistry(p),refreshPartnerProduction(p),refreshPartnerSme(p),refreshPartnerAwardEvidence(p)]))])
   .then(function(){renderJobs()}).finally(function(){partnerRefreshPromise=null});
  return partnerRefreshPromise;
 }
