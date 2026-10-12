@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-12T07:27:46.137071+00:00",
+  "generatedAt": "2026-10-12T07:29:57.291085+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -227,6 +227,61 @@
       "reviewComplete": false,
       "contractPerformanceVerified": false,
       "checkedAt": "2026-10-12T07:25:09.778847+00:00",
+      "classificationVersion": 2
+    },
+    "R26BK01761377:000": {
+      "status": "no_eorder_files",
+      "reasonCode": "eorder_api_returned_zero",
+      "source": "나라장터 e발주 첨부파일 API",
+      "count": 0,
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T07:29:57.291085+00:00",
+      "classificationVersion": 2
+    },
+    "R26BK01760809:000": {
+      "status": "no_eorder_files",
+      "reasonCode": "eorder_api_returned_zero",
+      "source": "나라장터 e발주 첨부파일 API",
+      "count": 0,
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T07:29:57.291085+00:00",
+      "classificationVersion": 2
+    },
+    "R26BK01759631:000": {
+      "status": "no_eorder_files",
+      "reasonCode": "eorder_api_returned_zero",
+      "source": "나라장터 e발주 첨부파일 API",
+      "count": 0,
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T07:29:57.291085+00:00",
+      "classificationVersion": 2
+    },
+    "R26BK01759114:000": {
+      "status": "no_eorder_files",
+      "reasonCode": "eorder_api_returned_zero",
+      "source": "나라장터 e발주 첨부파일 API",
+      "count": 0,
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T07:29:57.291085+00:00",
+      "classificationVersion": 2
+    },
+    "R26BK01765618:000": {
+      "status": "no_eorder_files",
+      "reasonCode": "eorder_api_returned_zero",
+      "source": "나라장터 e발주 첨부파일 API",
+      "count": 0,
+      "files": [],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T07:29:57.291085+00:00",
       "classificationVersion": 2
     }
   }
