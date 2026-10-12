@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """WorkLinks automatic, citation-checked RFP clause interpretation.
 
-Public G2B notice clauses only. Uses GitHub Models with the Actions GITHUB_TOKEN
-(models:read). No user-supplied API key and no credentials inside the output.
-AI results are evidence *classifications*, NOT automatic eligibility approvals.
+Public G2B notice clauses only. Uses an explicitly configured OPENAI_API_KEY
+for GPT classification; otherwise uses conservative deterministic keyword rules.
+No credentials are stored in reports. Neither route is an eligibility approval.
 """
 import argparse
 import datetime as dt
