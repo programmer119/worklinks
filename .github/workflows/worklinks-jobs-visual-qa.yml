@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/worklinks-jobs-visual-qa.yml'
       - 'startup-support/index.html'
+      - 'startup-support/ai-qualification.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -32,7 +33,24 @@ jobs:
               page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('바로 지원 확정')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
               print('WORKLINKS_BROWSER_LIVE_DATA',page.evaluate("({serverAvailable:g2bServerAvailable,savedTotal:g2bSavedTotal,liveRows:g2bLiveJobs.length,visibleCards:document.querySelectorAll('#jobCards .job-mini').length})"))
-              help=page.locator('#jobInfoFold')
+              page.wait_for_function("typeof rfpAiByNotice !== 'undefined' && rfpAiByNotice.size>0",timeout=25000)
+              evidence=page.evaluate("""() => {
+                const all=jobs.concat(g2bLiveJobs);
+                for(const [key,item] of rfpAiByNotice.entries()){
+                  const x=all.find(y=>{const i=jobBidIdentity(y);return i && i.bidNo+':'+i.order===key});
+                  if(!x)continue;
+                  const checked=rfpAiForJob(x);
+                  if(!checked)continue;
+                  return {notice:key,status:checked.analysisStatus,
+                    classified:checked.requirements.length,
+                    model:checked.model,verdict:participationVerdict(x,partners[0]).type};
+                }
+                return null;
+              }""")
+              assert evidence is not None,'must match a live stored notice to its citation-verified snapshot'
+              assert evidence['status'] in ('classified','rule_based')
+              print('WORKLINKS_LIVE_RFP_AUTO_CLASSIFICATION',json.dumps(evidence,ensure_ascii=False))
+                            help=page.locator('#jobInfoFold')
               assert help.count()==1
               assert not help.evaluate('(e)=>e.open'),'diagnostics must be hidden by default'
               assert not page.locator('#g2bPanel').is_visible(),'API debug panel must be collapsed'
