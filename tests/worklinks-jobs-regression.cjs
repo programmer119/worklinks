@@ -73,6 +73,31 @@ assert.deepEqual(companyMatching.partnerIdsOfJob({kind:'servc',verdict:'unverifi
 assert.deepEqual(companyMatching.partnerCandidateIdsOfJob({kind:'servc',verdict:'missing'}),[]);
 assert.deepEqual(companyMatching.partnerCandidateIdsOfJob({kind:'thng',verdict:'unverified'}),[]);
 
+// Exercise the ACTUAL registration-status regex, not a stubbed helper.
+const realCompany={id:'changcom',registryCheckedAt:'2026-10-12T11:00:00+09:00',
+ registryComplete:true,industryRecords:[
+  {code:'1468',status:'정상',expiresAt:'2099-12-31 00:00:00'},
+  {code:'1426',status:'정상',expiresAt:'2099-12-31 00:00:00'},
+  {code:'1169',status:'',expiresAt:''}
+ ]};
+const official={ok:true,complete:true,requirements:[
+ {name:'소프트웨어사업자(컴퓨터관련서비스사업)',codes:['1468'],logic:'UNKNOWN',group:'',sequence:'1'}
+]};
+const real=new Function('partners','jobEligibilityData','kstISO','jobBidIdentity','jobTimeInfo','jobOriginUrl',
+ part('const partnerIndustryKnownCodes=','var partnerFetchStarted=false')+
+ part('function partnerRegisteredCode(p,code){','function comparePartnerJob(x,p){')+
+ 'return {partnerRegisteredCode,jobQualificationVerdict,jobPartnerMatches};'
+)([realCompany],x=>x.req,()=>'2026-10-12',()=>null,()=>({start:null}),()=>'' );
+const realJob={kind:'servc',title:'2026년 광해정보통합관리시스템 유지관리 용역',req:official};
+assert.equal(real.partnerRegisteredCode(realCompany,'1468'),true);
+assert.equal(real.partnerRegisteredCode(realCompany,'1426'),true);
+assert.equal(real.partnerRegisteredCode(realCompany,'1169'),null,'unknown status must not be treated as confirmed');
+assert.equal(real.jobQualificationVerdict(realJob,realCompany).type,'industry_match');
+assert.equal(real.jobPartnerMatches(realJob).length,1,'official 1468 bid must be listed under Changcom');
+const expiredCompany={...realCompany,industryRecords:[{code:'1468',status:'정상',expiresAt:'2025-01-01'}]};
+assert.equal(real.partnerRegisteredCode(expiredCompany,'1468'),false,'expired registration is not valid');
+
+
 // Partner selector is sourced from the registry and includes *separately labeled* pending candidates.
 const filterSection=part('var jobFilter="all",jobRenderLimit=100','function jobEntryLabel(v){');
 const filterSelect={
