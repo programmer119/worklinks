@@ -1215,7 +1215,7 @@ function renderJobs(){
  const candidateCount=active.filter(o=>partnerIdsOfJob(o.x).length===0&&partnerCandidateIdsOfJob(o.x).length>0).length;
  const partnerCount=confirmedCount+candidateCount;
  const registryFailures=partners.filter(p=>p.registryError).length;
- document.getElementById('partnerJobCount').textContent='('+partnerCount+')';
+ document.getElementById('partnerJobCount').textContent='(확인 '+confirmedCount+' · 대기 '+candidateCount+')';
  document.getElementById('partnerSummary').textContent=
    '미마감 '+active.length+'건 · 업종 일치 확인 '+confirmedCount+'건 · 검증 대기 후보 '+candidateCount+'건'+
    (registryFailures?' · 업체등록 조회 오류 '+registryFailures+'개사':'')+
