@@ -463,6 +463,8 @@ class Handler(BaseHTTPRequestHandler):
                                'addressDetail':_pick(matching[0],['dtlAdrs']),
                                'regionName':_pick(matching[0],['rgnNm']),
                                'regionCode':_pick(matching[0],['rgnCd']),
+                               'employeeCount':_pick(matching[0],['emplyeNum']),
+                               'headOfficeKind':_pick(matching[0],['hdoffceDivNm']),
                                'addressField':next((key for key in ['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), ''),
                                'availableFields':sorted(matching[0].keys())
                               } if matching else None,
