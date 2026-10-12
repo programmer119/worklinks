@@ -1,0 +1,74 @@
+name: Refresh Worklinks production snapshot
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-production-snapshot.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '21 3 1 * *'
+permissions:
+  contents: write
+concurrency:
+  group: production-public-snapshot
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download public CSV and extract partner certificates
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import csv,io,json,re,urllib.request,pathlib,datetime,html
+          page='https://www.data.go.kr/data/3061008/fileData.do'
+          def read(url):
+              r=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':page})
+              with urllib.request.urlopen(r,timeout=65) as f:return f.read()
+          webpage=read(page).decode('utf-8')
+          urls=re.findall(r'https://www.data.go.kr/cmm/cmm/fileDownload.do[^"<> ]+',webpage)
+          if not urls:raise SystemExit('CSV_URL_NOT_FOUND')
+          raw=read(html.unescape(urls[0]))
+          for codec in ('utf-8-sig','cp949','euc-kr'):
+              try:csv_text=raw.decode(codec);break
+              except UnicodeDecodeError:continue
+          else:raise SystemExit('CSV_ENCODING_FAILED')
+          reader=csv.DictReader(io.StringIO(csv_text))
+          cols=set(reader.fieldnames or [])
+          if not {'사업자번호','세부품명'}.issubset(cols):
+              raise SystemExit('INVALID_CSV_COLUMNS '+repr(sorted(cols)))
+          source=pathlib.Path('startup-support/index.html').read_text()
+          biznos=set(re.sub(r'\D','',n) for n in re.findall(r'businessNo:"([0-9-]{10,15})"',source))
+          if not biznos:raise SystemExit('PARTNER_LIST_EMPTY')
+          result={n:[] for n in sorted(biznos)}
+          total=0
+          for row in reader:
+              total+=1
+              bizno=re.sub(r'\D','',row.get('사업자번호') or '')
+              if bizno not in result:continue
+              result[bizno].append({'product':row.get('세부품명') or '',
+                  'validFrom':row.get('유효기간 시작일') or '',
+                  'validTo':row.get('유효기간 종료일') or ''})
+          if total<20000:raise SystemExit('INCOMPLETE_CSV '+str(total))
+          date=re.search(r'직접생산확인증명서발급현황_(\d{8})',webpage)
+          if not date:raise SystemExit('SOURCE_DATE_NOT_FOUND')
+          snapshot='-'.join([date.group(1)[:4],date.group(1)[4:6],date.group(1)[6:]])
+          document={'ok':True,'complete':True,'source':'중소벤처기업부 직접생산확인증명서발급현황',
+              'sourceUrl':page,'snapshotDate':snapshot,'recordCount':total,
+              'recordsByBizno':result}
+          dest=pathlib.Path('startup-support/direct-production-snapshot.json')
+          dest.write_text(json.dumps(document,ensure_ascii=False,indent=2)+'\n')
+          print('DIRECT_PRODUCTION_CSV_ROWS',total)
+          print('DIRECT_PRODUCTION_SNAPSHOT',snapshot)
+          print('DIRECT_PRODUCTION_PARTNERS',{k:len(v) for k,v in result.items()})
+          PY
+      - name: Publish partner snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add startup-support/direct-production-snapshot.json
+          if git diff --cached --quiet; then echo 'SNAPSHOT_UNCHANGED'; exit 0; fi
+          git commit -m 'data: update partner direct-production public snapshot'
+          git push
