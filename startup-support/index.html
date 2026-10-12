@@ -294,6 +294,11 @@
 #jobsView .job-info-pop .bid-method p,#jobsView .job-info-pop .bid-method .bid-method-notes{font-size:14px}
 
 #jobsView #g2bMore{font-size:16px;min-height:45px;padding:11px 17px}
+
+#jobsView .job-rfp-candidates>b{display:block;font-size:16px;margin:12px 0 8px;color:#0f172a}
+#jobsView .job-rfp-candidates .job-match-row{padding:11px 8px;font-size:14px}
+#jobsView .job-rfp-candidates .job-match-main small{display:block;font-size:13px;line-height:1.5;margin-top:5px;white-space:normal}
+#jobsView .job-rfp-candidates .jobmatch-chip{white-space:nowrap;align-self:center}
 </style>
 </head>
 <body><main>
@@ -1436,9 +1441,15 @@ const productionNames=['정보시스템개발서비스','정보시스템유지�
 function extractedRfpRequirements(x){
  const data=typeof rfpSnapshotForJob==='function'?rfpSnapshotForJob(x):null;
  if(data?.status!=='text_extracted_requires_review'||data.reviewComplete!==false)return '';
- return (data.files||[]).filter(f=>f.readable).flatMap(f=>
-  (f.snippets||[]).filter(v=>['직접생산','중소기업','수행실적','기술인력','지역제한','공동수급'].includes(v.topic))
-    .map(v=>String(v.text||''))).join(' ').slice(0,5000);
+ return (data.files||[]).filter(f=>f.readable).flatMap(f=>{
+  const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&
+   ['industry_code','direct_production','sme_certificate','staff_proof',
+    'performance_proof','region_restriction','joint_participation'].includes(v.type))
+   .map(v=>String(v.sourceText||''));
+  const snippets=(f.snippets||[]).filter(v=>['직접생산','중소기업','수행실적','기술인력','지역제한','공동수급'].includes(v.topic))
+   .map(v=>String(v.text||''));
+  return structured.concat(snippets);
+ }).join(' ').slice(0,9000);
 }
 function productionRequirementCheck(x,p){
  const rfpText=extractedRfpRequirements(x);
@@ -1704,7 +1715,18 @@ function renderJobDetail(x){
  const extractHTML=readable.length?'<section class="job-detail-section"><h3>공식 RFP 텍스트 발췌 · 자동분석 참고</h3>'+
   '<p>공식 다운로드 문서 '+readable.length+'건 · 해당 문구의 필수·선택·예외 조항은 원문 재확인이 필요합니다.</p>'+
   readable.map(f=>'<div class="job-match-company"><b>'+htmlEscape(f.name)+'</b>'+
-    (Array.isArray(f.snippets)?f.snippets.slice(0,8).map(v=>'<div class="job-match-row"><div class="job-match-main"><strong>'+htmlEscape(v.topic)+'</strong><small>'+htmlEscape(v.text)+'</small></div><span class="jobmatch-chip unknown">원문 검토</span></div>').join(''):'')+'</div>').join('')+
+    (Array.isArray(f.clauseCandidates)&&f.clauseCandidates.length?
+      '<div class="job-rfp-candidates"><b>원문에서 발견한 참가조건·증빙 후보 ('+f.clauseCandidates.length+'건)</b>'+
+      f.clauseCandidates.slice(0,24).map(c=>{
+       const names={industry_code:'등록업종',direct_production:'직접생산',sme_certificate:'기업규모 확인',
+        staff_proof:'기술인력 증빙',performance_proof:'수행실적',region_restriction:'지역제한',joint_participation:'공동수급'};
+       return '<div class="job-match-row"><div class="job-match-main"><strong>'+htmlEscape(names[c.type]||c.type)+
+        (c.codes?.length?' · '+htmlEscape(c.codes.join(', ')):'')+'</strong>'+
+        '<small>'+htmlEscape(c.sourceText||'')+'</small>'+
+        '<small>출처: '+htmlEscape(c.sourceFile||f.name)+'</small></div>'+
+        '<span class="jobmatch-chip pending">필수·예외 검토</span></div>';
+      }).join('')+'</div>':
+      (Array.isArray(f.snippets)?f.snippets.slice(0,8).map(v=>'<div class="job-match-row"><div class="job-match-main"><strong>'+htmlEscape(v.topic)+'</strong><small>'+htmlEscape(v.text)+'</small></div><span class="jobmatch-chip unknown">원문 검토</span></div>').join(''):''))+'</div>').join('')+
   '<p>※ RFP 자동 발췌는 실적·인력·지역의 충족 판정이 아닙니다. 전체 부속서류 및 증빙을 따로 대조해야 합니다.</p></section>':'';
  const variantLinks=Array.isArray(x.variants)&&x.variants.length>1?
  '<section class="job-detail-section"><h3>같은 제목·기관·금액의 공고 '+x.variants.length+'건</h3><p>정정·재공고 또는 별도 발주인지 각 원문에서 확인하세요.</p>'+
