@@ -44,4 +44,38 @@ try:
 finally:
     rfp.fetch_json=orig_fetch
     rfp.download=orig_download
+# Pagination, already-checked suppression, urgency and 1468 matching priority.
+orig_discovery=rfp.fetch_json
+try:
+    fake_date=rfp.dt.datetime.now(rfp.dt.timezone(rfp.dt.timedelta(hours=9))).date()
+    deadline=fake_date.strftime('%Y%m%d')+'1700'
+    rows=[
+      {'bidNo':'R26BK12345601','order':'000','kind':'servc','closes':deadline,
+       'bidEligibility':{'requirements':[{'codes':['1468']}]}},
+      {'bidNo':'R26BK12345602','order':'000','kind':'servc','closes':deadline},
+      {'bidNo':'R26BK12345603','order':'000','kind':'thng','closes':deadline},
+    ]
+    calls=[]
+    def pages(url):
+        calls.append(url)
+        if 'offset=0' in url:
+            return {'ok':True,'totalCount':503,'items':rows+[
+               {'bidNo':'bad','order':'000','closes':deadline} for _ in range(497)]}
+        if 'offset=500' in url:
+            return {'ok':True,'totalCount':503,'items':[
+             {'bidNo':'R26BK12345604','order':'000','kind':'servc','closes':deadline,
+              'bidEligibility':{'requirements':[{'codes':['1468']}]}}
+             for _ in range(3)]}
+        raise AssertionError(url)
+    rfp.fetch_json=pages
+    prior={'R26BK12345601:000':{'classificationVersion':3,'checkedAt':
+       rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
+    result=rfp.discover(10,prior)
+    assert len(calls)==2,'discovery must request the next 500 notice page'
+    assert result[0][0]=='R26BK01756420','fixture must remain for regression'
+    assert result[1][0]=='R26BK12345604','new matching code 1468 should be prioritized'
+    assert all(v[0]!='R26BK12345601' for v in result)
+finally:
+    rfp.fetch_json=orig_discovery
+
 print('WORKLINKS_RFP_FAILURE_CLASSIFICATION=PASS')
