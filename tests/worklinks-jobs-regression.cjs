@@ -16,7 +16,7 @@ const time=new Function(
 )();
 assert.equal(new Date(time.dayValue('2026-10-14T18:00:00+09:00')).toISOString().slice(0,16),'2026-10-14T18:00');
 assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'202610141500'})).label,'D-2');
-assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'2026-10-12 18:00'})).label,'D-0');
+assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'2026-10-12 18:00'})).label,'D-DAY');
 assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:''})).label,'일정 미확인');
 assert.equal(time.jobTimeInfo({closes:'2026.10.10 18:00'}).key,'closed');
 assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'2026-10-15 18:00'})).label,'D-3');
@@ -97,6 +97,18 @@ assert.equal(real.jobPartnerMatches(realJob).length,1,'official 1468 bid must be
 const expiredCompany={...realCompany,industryRecords:[{code:'1468',status:'정상',expiresAt:'2025-01-01'}]};
 assert.equal(real.partnerRegisteredCode(expiredCompany,'1468'),false,'expired registration is not valid');
 
+
+// Readable card and detail copy: no opaque 1468 chip or duplicate "pending" labels.
+assert.ok(source.includes("diff===0?'D-DAY':'D-'+diff"));
+assert.ok(source.includes('업종 일치 · 추가서류 확인 필요'));
+assert.ok(source.includes('입찰자격 확인 중'));
+assert.ok(source.includes('필수 업종 불일치'));
+assert.ok(!source.includes('조건 검증 대기</span>'));
+assert.ok(!source.includes('>검증 대기 </span>'));
+assert.ok(!source.includes("matchCode+' 일치 · 증빙 필요"));
+assert.ok(source.includes('공고의 요구 등록업종 '));
+assert.ok(source.includes('바로 입찰 가능 확정은 아닙니다.'));
+assert.ok(source.includes("htmlEscape(p.short||p.name)"));
 
 // Partner selector is sourced from the registry and includes *separately labeled* pending candidates.
 const filterSection=part('var jobFilter="all",jobRenderLimit=100','function jobEntryLabel(v){');
