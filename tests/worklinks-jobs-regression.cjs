@@ -45,6 +45,10 @@ assert.equal(match.jobQualificationVerdict({kind:'servc',req:req('1468 또는 14
 assert.equal(match.jobQualificationVerdict({kind:'servc',req:req('1468 / 1426')},p).type,'unverified');
 assert.equal(match.jobQualificationVerdict({kind:'servc',req:req('1468 및 1426 모두')},p).type,'missing');
 assert.equal(match.jobQualificationVerdict({kind:'thng',req:req('1468 또는 1426')},p).type,'not_applicable');
+assert.equal(match.jobQualificationVerdict({kind:'servc',req:{ok:true,complete:true,requirements:[]}},p).type,'no_restriction',
+ 'zero official industry-restriction rows are NOT a permanent verification failure');
+assert.equal(match.jobQualificationVerdict({kind:'servc',req:{ok:false,complete:false,requirements:[]}},p).type,'unverified',
+ 'API error cannot be interpreted as no restrictions');
 const dedupe=new Function(
  'function jobBidIdentity(x){return x.noticeNumber?{bidNo:x.noticeNumber}:null};'+
  'function jobOriginUrl(x){return x.url||"https://www.g2b.go.kr/"};'+
@@ -228,6 +232,10 @@ const bidder={id:'changcom',short:'창컴',name:'창컴정보통신(주)',smeRec
 const verdict=(x,p=bidder)=>verdictMod.participationVerdict({kind:'servc',...x},p);
 assert.equal(verdict({industry:'industry_match'}).type,'conditional');
 assert.equal(verdict({industry:'unverified'}).type,'checking');
+assert.equal(verdict({industry:'no_restriction'}).type,'conditional','official 0 industry restrictions are a positive check but not ready');
+assert.equal(verdict({industry:'no_restriction',full:false,ok:2,pending:0,unknown:1}).type,'conditional');
+assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'checking',
+ 'zero industry restrictions is not sufficient for final ready under the full-document gate');
 assert.equal(verdict({industry:'missing'}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked');
@@ -246,22 +254,28 @@ assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all noti
 
 // Status filters must be interactive, cover all currently displayed items, and
 // show a reason even when the notice is outside the software candidate scope.
-const filterView=new Function('partners','participationVerdict','document','htmlEscape',
+const filterView=new Function('partners','participationVerdict','document','htmlEscape','jobQualificationVerdict',
  part('function partnerVerdictTypes(x,selected){','function jobEntryLabel(v){')+
  'return {partnerVerdictTypes,matchesVerdictFilter,refreshVerdictFilters};'
 )([bidder],(x,p)=>({type:x.verdict||'checking'}),{
  querySelectorAll:()=>[],
  getElementById:()=>({hidden:false})
-},value=>String(value));
+},value=>String(value),(x,p)=>({type:x.industry||'unverified'}));
 for(const [verdict,type] of [['ready','ready'],['conditional','conditional'],['blocked','blocked'],['checking','checking']]){
  assert.equal(filterView.matchesVerdictFilter({verdict},null,type),true);
  assert.equal(filterView.matchesVerdictFilter({verdict},null,'all'),true);
  assert.equal(filterView.matchesVerdictFilter({verdict},null,type==='ready'?'blocked':'ready'),false);
 }
+assert.equal(filterView.matchesVerdictFilter({industry:'industry_match'},null,'registered'),true);
+assert.equal(filterView.matchesVerdictFilter({industry:'no_restriction'},null,'no-restriction'),true);
+assert.equal(filterView.matchesVerdictFilter({industry:'unverified'},null,'registered'),false);
+assert.equal(filterView.matchesVerdictFilter({industry:'unverified'},null,'no-restriction'),false);
 assert.ok(source.includes('data-verdict-filter="ready"'));
 assert.ok(source.includes('data-verdict-filter="conditional"'));
 assert.ok(source.includes('data-verdict-filter="blocked"'));
 assert.ok(source.includes('data-verdict-filter="checking"'));
+assert.ok(source.includes('data-verdict-filter="registered"'));
+assert.ok(source.includes('data-verdict-filter="no-restriction"'));
 assert.ok(source.includes("document.querySelectorAll('[data-verdict-filter]')"));
 assert.ok(source.includes("scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter))"));
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
