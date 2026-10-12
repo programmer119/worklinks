@@ -30,6 +30,7 @@ jobs:
               page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
               page.locator('#jobsView.on').wait_for(timeout=25000)
               page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('바로 지원 확정')",timeout=30000)
+              page.wait_for_function("document.querySelectorAll('#jobCards .job-mini').length>=20",timeout=45000)
               help=page.locator('#jobInfoFold')
               assert help.count()==1
               assert not help.evaluate('(e)=>e.open'),'diagnostics must be hidden by default'
