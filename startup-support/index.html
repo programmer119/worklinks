@@ -1479,17 +1479,15 @@ function extractedRfpRequirements(x){
  if(ai){
   // Exclude optional/context-only clauses from mandatory requirement matching.
   return (ai.requirements||[]).filter(c=>c.classification==='mandatory'||
-       (c.classification==='prohibited'&&c.type==='joint_participation')||
-       c.classification==='unknown').map(c=>String(c.sourceText||'')).join(' ').slice(0,9000);
+       (c.classification==='prohibited'&&c.type==='joint_participation')).map(c=>String(c.sourceText||'')).join(' ').slice(0,9000);
  }
  return (data.files||[]).filter(f=>f.readable).flatMap(f=>{
-  const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&
+  const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&v.explicitMust===true&&
    ['industry_code','direct_production','sme_certificate','staff_proof',
     'performance_proof','region_restriction','joint_participation'].includes(v.type))
    .map(v=>String(v.sourceText||''));
-  const snippets=(f.snippets||[]).filter(v=>['직접생산','중소기업','수행실적','기술인력','지역제한','공동수급'].includes(v.topic))
-   .map(v=>String(v.text||''));
-  return structured.concat(snippets);
+  // The snippets are highlights, not authoritative mandatory conditions.
+  return structured;
  }).join(' ').slice(0,9000);
 }
 function productionRequirementCheck(x,p){
@@ -1594,7 +1592,7 @@ function comparePartnerJob(x,p){
  }
  const certRules=[
   ['swstatus','SW사업자 일반현황 관리확인서',/일반현황.?관리확인|SW사업자.?신고/],
-  ['experience','수행실적',/실적/],
+  ['experience','수행실적',/실적\s*증명|실적증명서|최근\s*\d.{0,20}실적|유사\s*용역\s*실적|실적\s*보유|수행실적\s*제출/],
   ['staff','기술인력·자격',/기술인력|투입인력|상주인력|전담인력|자격증/],
  ];
  for(const [id,label,re] of certRules){
