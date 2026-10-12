@@ -1363,7 +1363,7 @@ function rfpAiForJob(x){
  const id=jobBidIdentity(x);
  const key=id? id.bidNo+':'+id.order:'';
  const report=rfpAiByNotice.get(key),source=rfpSnapshotByNotice.get(key);
- if(!report||report.analysisStatus!=='classified'||!source)return null;
+ if(!report||!['classified','rule_based'].includes(report.analysisStatus)||!source)return null;
  const original=new Set((source.files||[]).filter(f=>f.readable)
   .flatMap(f=>(f.clauseCandidates||[]).map(c=>
    String(c.type||'')+'|'+String(c.sourceFile||f.name||'')+'|'+String(c.sourceText||'').trim().slice(0,280))));
@@ -1556,11 +1556,11 @@ function comparePartnerJob(x,p){
       partnerRegisteredCode(p,codes[0])===true)status='ok';
    if(clause.classification==='mandatory'&&
       (clause.type==='staff_proof'||clause.type==='performance_proof'))status='pending';
-   add('ai-'+clause.index,'AI 분류: '+(labelOf[clause.type]||clause.type)+
+   add('ai-'+clause.index,(aiReport.analysisStatus==='classified'?'AI 분류: ':'규칙 분류: ')+(labelOf[clause.type]||clause.type)+
      ' · '+(clause.classification==='mandatory'?'필수':
       clause.classification==='prohibited'?'금지·제한':'불명확'),
      status,clause.sourceText+' · '+clause.reason+
-     ' · 전체 공고·예외 조항은 아직 미검토','공식 RFP '+clause.sourceFile+' · AI 문장 해석');
+     ' · 전체 공고·예외 조항은 아직 미검토','공식 RFP '+clause.sourceFile+' · '+(aiReport.analysisStatus==='classified'?'AI 문장 해석':'명시적 문구 규칙분류'));
   }
  }
  const txt=String(x.condition||'')+' '+String(x.partnerBidMode||'')+' '+extractedRfpRequirements(x);
@@ -1771,14 +1771,14 @@ function renderJobDetail(x){
  const extracted=rfpSnapshotForJob(x);
  const aiReport=typeof rfpAiForJob==='function'?rfpAiForJob(x):null;
  const aiLabels={mandatory:'필수조건',optional:'선택사항',prohibited:'금지·제한',context_only:'참고 설명',unknown:'원문 재검토'};
- const aiHTML=aiReport?'<section class="job-detail-section"><h3>AI 참가조건 자동분류 · '+aiReport.interpretedCount+'개 조항</h3>'+
-  '<p>공식 문서에서 인용한 구절의 AI 분류입니다. 전체 공고 검토나 바로 지원 가능 판정은 아닙니다.</p>'+
+ const aiHTML=aiReport?'<section class="job-detail-section"><h3>'+(aiReport.analysisStatus==='classified'?'AI 참가조건 해석':'참가조건 규칙분류')+' · '+aiReport.interpretedCount+'개 조항</h3>'+
+  '<p>공식 문서에서 인용한 구절의 '+(aiReport.analysisStatus==='classified'?'AI 해석':'명시적 문구 탐지')+' 결과입니다. 전체 공고 검토나 바로 지원 가능 판정은 아닙니다.</p>'+ 
   (aiReport.requirements||[]).slice(0,50).map(r=>
    '<div class="job-match-row"><div class="job-match-main"><strong>'+
    htmlEscape(aiLabels[r.classification]||'검토 필요')+
    ' · '+htmlEscape(r.type)+(r.codes?.length?' · '+htmlEscape(r.codes.join(', ')):'')+
    '</strong><small>'+htmlEscape(r.sourceText||'')+'</small>'+
-   '<small>AI 해석: '+htmlEscape(r.reason||'')+' · 파일: '+htmlEscape(r.sourceFile||'')+
+   '<small>'+(aiReport.analysisStatus==='classified'?'AI 해석: ':'분류 근거: ')+htmlEscape(r.reason||'')+' · 파일: '+htmlEscape(r.sourceFile||'')+
    '</small></div><span class="jobmatch-chip pending">전체 공고 미검토</span></div>').join('')+
   '</section>':'';
  const readable=(extracted?.files||[]).filter(f=>f.readable);
