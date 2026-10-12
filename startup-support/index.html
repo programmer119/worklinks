@@ -617,6 +617,8 @@ async function refreshPartnerRegistry(p){
   if(!data.found || !data.company)throw Error('업체번호에 해당하는 등록정보 없음');
   p.registryCheckedAt=data.checkedAt||"";
   p.industryRecords=Array.isArray(data.industries)?data.industries:[];
+  p.registeredAddress=String(data.company.address||'').trim();
+  p.registeredAddressField=String(data.company.addressField||'').trim();
   p.registryComplete=data.complete===true;
   setPartnerQual(p,"나라장터 업체 등록",{
    state:"confirmed",value:"조달업체 등록정보 확인",
@@ -1164,6 +1166,45 @@ async function loadJobEligibility(x){
   if(partnerScopedJob&&partnerScopedJob.id===x.id)renderPartnerJobContext();
   renderJobs();
  }
+}
+
+var bidEvidenceCache=new Map(),bidEvidenceLoading=new Set();
+function jobEvidenceData(x){
+ const id=jobBidIdentity(x);return id?bidEvidenceCache.get(id.bidNo+':'+id.order):null;
+}
+async function loadJobEvidence(x){
+ const id=jobBidIdentity(x);if(!id)return;
+ const key=id.bidNo+':'+id.order;
+ if(bidEvidenceCache.has(key)||bidEvidenceLoading.has(key))return;
+ bidEvidenceLoading.add(key);
+ try{
+  bidEvidenceCache.set(key,await g2bFetch('/bid-evidence?bidNo='+encodeURIComponent(id.bidNo)+'&order='+encodeURIComponent(id.order)));
+ }catch(e){
+  bidEvidenceCache.set(key,{ok:false,error:String(e.message||e).slice(0,130)});
+ }finally{
+  bidEvidenceLoading.delete(key);
+  if(activeDetailJobId===x.id)renderJobDetail(x);
+  if(partnerScopedJob&&partnerScopedJob.id===x.id)renderPartnerJobContext();
+  renderJobs();
+ }
+}
+function normalizedRegion(x){
+ return String(x||'').replace(/특별시|광역시|특별자치시|특별자치도|자치도|도|시|군|구|\s/g,'');
+}
+function regionRequirementCheck(x,p){
+ const data=jobEvidenceData(x),region=data?.region;
+ if(!data)return {status:'pending',reason:'나라장터 참가가능지역 API 조회 전'};
+ if(region?.ok!==true||region.complete!==true)return {status:'unknown',
+  reason:'공고별 지역제한 공식 조회 불완전: '+(region?.error||data.error||'')};
+ if(!region.items?.length)return {status:'unknown',
+  reason:'참가가능지역 0건 · 전국 허용으로 임의 판단 불가 · 공고 원문 확인'};
+ const names=region.items.map(q=>q.name).filter(Boolean);
+ const addr=String(p.registeredAddress||'').trim();
+ if(!addr)return {status:'pending',reason:'업체 본점 주소 공식 데이터 미확인 · 허용지역 '+names.join(', ')};
+ if(names.some(n=>/전국|제한없음/.test(n)))return {status:'ok',reason:'전국 허용 · 나라장터 회사 등록 주소 '+addr};
+ const match=names.some(n=>{const r=normalizedRegion(n),a=normalizedRegion(addr);return r.length>=2&&a.includes(r)});
+ if(match)return {status:'ok',reason:'나라장터 허용지역 '+names.join(', ')+' · 업체 주소 '+addr+' 일치 (공고 기준시점 주소는 추가 확인)'};
+ return {status:'unknown',reason:'허용지역 '+names.join(', ')+' · 공식 주소 '+addr+' · 기준시점 및 지역관계 추가 대조 필요'};
 }
 function partnerRegisteredCode(p,code){
  if(!p||!p.registryCheckedAt||!Array.isArray(p.industryRecords))return null;
