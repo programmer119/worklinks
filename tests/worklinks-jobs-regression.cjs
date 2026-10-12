@@ -55,19 +55,33 @@ assert.equal(dedupe([
  {...base,id:'annual-2',noticeNumber:'R26BK00000002',posted:'2026-10-01'}
 ]).length,2,'annual reprocurement must remain separate');
 
-// Partner selector is sourced from the registry and filters by *confirmed* match IDs.
+// Verified matches and pending candidates are distinct. Never count hardware or known failures.
+const companyMatching=new Function('partners','jobQualificationVerdict','jobSoftwareScope',
+ part('function jobPartnerMatches(x){','var partnerFetchStarted=false')+
+ 'return {jobPartnerMatches,jobPartnerCandidates,partnerIdsOfJob,partnerCandidateIdsOfJob};'
+)([{id:'changcom',name:'창컴정보통신(주)'}],
+ (x,p)=>({type:x.verdict}),
+ x=>x.kind==='thng'?'out':'candidate'
+);
+assert.deepEqual(companyMatching.partnerIdsOfJob({kind:'servc',verdict:'industry_match'}),['changcom']);
+assert.deepEqual(companyMatching.partnerCandidateIdsOfJob({kind:'servc',verdict:'unverified'}),['changcom']);
+assert.deepEqual(companyMatching.partnerIdsOfJob({kind:'servc',verdict:'unverified'}),[]);
+assert.deepEqual(companyMatching.partnerCandidateIdsOfJob({kind:'servc',verdict:'missing'}),[]);
+assert.deepEqual(companyMatching.partnerCandidateIdsOfJob({kind:'thng',verdict:'unverified'}),[]);
+
+// Partner selector is sourced from the registry and includes *separately labeled* pending candidates.
 const filterSection=part('var jobFilter="all",jobRenderLimit=100','function jobEntryLabel(v){');
 const filterSelect={
  value:'all',innerHTML:'',closest:()=>({classList:{toggle:()=>{}}})
 };
 const companies=[{id:'changcom',name:'창컴정보통신(주)'}];
-const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob',
+const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob',
  filterSection+
  'return {syncPartnerFilterChoices,jobMatchesSelectedPartner,getSelected:()=>selectedPartnerId,setSelected:v=>{selectedPartnerId=v}};'
 )(
  companies,{getElementById:id=>id==='partnerFilter'?filterSelect:null},
  value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
- {setItem:()=>{}},x=>x.matches||[]
+ {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[]
 );
 filterFns.syncPartnerFilterChoices();
 assert.ok(filterSelect.innerHTML.includes('value="all">모두'));
@@ -76,6 +90,9 @@ assert.equal(filterFns.jobMatchesSelectedPartner({matches:['changcom']},'all'),t
 assert.equal(filterFns.jobMatchesSelectedPartner({matches:[]},'all'),false);
 assert.equal(filterFns.jobMatchesSelectedPartner({matches:['changcom']},'changcom'),true);
 assert.equal(filterFns.jobMatchesSelectedPartner({matches:['other']},'changcom'),false);
+assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['changcom']},'all'),true);
+assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['changcom']},'changcom'),true);
+assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['another']},'changcom'),false);
 companies.push({id:'newpartner',name:'신규 파트너'});
 filterFns.syncPartnerFilterChoices();
 assert.ok(filterSelect.innerHTML.includes('value="newpartner">신규 파트너'));
@@ -87,4 +104,4 @@ companies.pop();
 filterFns.syncPartnerFilterChoices();
 assert.equal(filterSelect.value,'all','removed partner safely resets to all');
 
-console.log('Worklinks job regression: deadlines, scope, AND/OR, corrections, partner dropdown PASS');
+console.log('Worklinks job regression: deadlines, scope, AND/OR, corrections, verified/pending partner filters PASS');
