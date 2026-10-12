@@ -31,18 +31,24 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import hashlib,pathlib,urllib.request
-          url='https://worklinks.suaveforge.com/startup-support/index.html?cachebust=ci-main'
+          import hashlib,pathlib,urllib.request,time
+          url='https://worklinks.suaveforge.com/startup-support/index.html'
           expected=pathlib.Path('startup-support/index.html').read_bytes()
-          try:
-            req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-Deploy-Verification/1.0','Cache-Control':'no-cache'})
-            with urllib.request.urlopen(req,timeout=22) as f: actual=f.read()
-            print('LIVE_HTML_SHA256',hashlib.sha256(actual).hexdigest())
-            print('GIT_HTML_SHA256',hashlib.sha256(expected).hexdigest())
-            print('LIVE_FRONTEND_MATCHES_MAIN',actual==expected)
-            if actual!=expected:print('LIVE_FRONTEND_NOTE=may still be propagating')
-          except Exception as e:
-            print('LIVE_FRONTEND_CHECK_UNAVAILABLE',type(e).__name__,str(e)[:140])
+          print('GIT_HTML_SHA256',hashlib.sha256(expected).hexdigest())
+          matched=False
+          for attempt in range(1,17):
+            try:
+              req=urllib.request.Request(url+'?ver='+str(int(time.time())),headers={
+                'User-Agent':'WorkLinks-Deploy-Verification/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=12) as f: actual=f.read()
+              matched=actual==expected
+              print('DEPLOY_CHECK',attempt,'MATCH',matched,'LIVE_HTML_SHA256',hashlib.sha256(actual).hexdigest())
+              if matched:break
+            except Exception as e:
+              print('DEPLOY_RETRY',attempt,type(e).__name__,str(e)[:120])
+            time.sleep(4)
+          print('LIVE_FRONTEND_MATCHES_MAIN',matched)
+          if not matched:raise SystemExit('LIVE_FRONTEND_NOT_CURRENT_AFTER_RETRIES')
           PY
       - name: Verify published direct-production data (no private API key)
         shell: bash
