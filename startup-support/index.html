@@ -414,6 +414,8 @@
  <button type="button" class="job-vf conditional" data-verdict-filter="conditional" aria-pressed="false">조건부 <span data-verdict-count="conditional">0</span></button>
  <button type="button" class="job-vf blocked" data-verdict-filter="blocked" aria-pressed="false">지원 불가 <span data-verdict-count="blocked">0</span></button>
  <button type="button" class="job-vf checking" data-verdict-filter="checking" aria-pressed="false">검증 중 <span data-verdict-count="checking">0</span></button>
+ <button type="button" class="job-vf" data-verdict-filter="registered" aria-pressed="false" title="업종등록에 한해 공식 조건과 일치 · 다른 입찰자격 미확정">등록업종 일치 <span data-verdict-count="registered">0</span></button>
+ <button type="button" class="job-vf" data-verdict-filter="no-restriction" aria-pressed="false" title="공식 면허제한 API 정상조회 0건 · 다른 공고 참가조건 미확정">업종 제한 0건 <span data-verdict-count="no-restriction">0</span></button>
 
  </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select> </div>
 
@@ -1867,12 +1869,21 @@ function partnerVerdictTypes(x,selected){
  return [...new Set(companies.map(p=>participationVerdict(x,p).type))];
 }
 function matchesVerdictFilter(x,selected,filter){
+ if(filter==='registered'||filter==='no-restriction'){
+  const list=selected?[selected]:partners;
+  const expected=filter==='registered'?'industry_match':'no_restriction';
+  return list.some(p=>jobQualificationVerdict(x,p).type===expected);
+ }
  return filter==='all'||partnerVerdictTypes(x,selected).includes(filter);
 }
 function refreshVerdictFilters(rows,selected){
- const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0};
- for(const o of rows)for(const type of partnerVerdictTypes(o.x,selected)){
-  if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;
+ const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0};
+ for(const o of rows){
+  for(const type of partnerVerdictTypes(o.x,selected)){
+   if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;
+  }
+  if(matchesVerdictFilter(o.x,selected,'registered'))counts.registered++;
+  if(matchesVerdictFilter(o.x,selected,'no-restriction'))counts['no-restriction']++;
  }
  document.querySelectorAll('[data-verdict-filter]').forEach(function(b){
   const type=b.dataset.verdictFilter,on=type===jobVerdictFilter;
@@ -1908,6 +1919,8 @@ function renderJobs(){
  // Only request company-owned documents when the specific notice references that requirement.
  const readyCount=statusTotal('ready');
  const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
+ const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
+ const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
  const fullReviewCount=considered.filter(o=>{
   const r=rfpSnapshotForJob(o.x);
   return r?.reviewComplete===true&&r?.requiredConditionsComplete===true&&
@@ -1916,8 +1929,7 @@ function renderJobs(){
  const summaryEl=document.getElementById('jobDecisionSummary');
  if(summaryEl)summaryEl.textContent=readyCount?
   '바로 지원 확정 '+readyCount+'건 · 공고별 증빙 및 필수 참가조건 대조 결과':
-  '바로 지원 확정 0건 · 공식 원문·필수조건 전체 검토 완료 '+fullReviewCount+
-  '건 / SW 검토후보 '+considered.length+'건. 업체 자격 부족 0건이라는 뜻도, 전체 탈락이라는 뜻도 아닙니다.';
+  '등록업종 일치 '+industryMatched+'건 · 면허제한 0건 '+industryUnrestricted+'건 · 바로 지원 확정 0건 (원문 전체 검증 '+fullReviewCount+'/'+considered.length+'건). 업종 일치만으로 모든 참가자격이 충족되는 것은 아닙니다.';
  const proofEl=document.getElementById('jobMissingInfo');
  if(proofEl){
   const counts={original:0,license:0,direct:0,staff:0,experience:0,sw:0,sme:0,region:0};
@@ -1977,7 +1989,11 @@ function renderJobs(){
      const rank=function(x){
       const list=selectedPartnerId==='all'?partners:partners.filter(p=>p.id===selectedPartnerId);
       const types=list.map(p=>participationVerdict(x,p).type);
-      return types.includes('ready')?0:types.includes('conditional')?1:types.includes('checking')?2:types.includes('blocked')?3:4;
+      const industry=list.map(p=>jobQualificationVerdict(x,p).type);
+      return types.includes('ready')?0:
+       industry.includes('industry_match')?1:
+       industry.includes('no_restriction')?2:
+       types.includes('conditional')?3:types.includes('checking')?4:types.includes('blocked')?5:6;
      };
      const diff=rank(a.x)-rank(b.x);
      if(diff)return diff;
