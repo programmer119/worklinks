@@ -96,6 +96,64 @@ def date(s):
     except ValueError: raise ApiError('invalid_date',400)
 
 
+
+def _bid_evidence_fetch(operation, bid_no, order):
+    """Public notice metadata. Missing API rows NEVER means unrestricted/qualified."""
+    try:
+        result=request_api(API_BASE,operation,{
+            'pageNo':1,'numOfRows':100,'inqryDiv':2,
+            'bidNtceNo':bid_no,'bidNtceOrd':order})
+        if result['totalCount']>100:
+            return {'ok':False,'complete':False,'error':'evidence_over_100_not_fetched',
+                    'count':result['totalCount'],'items':[]}
+        items=[]
+        for row in result['items']:
+            other=str(row.get('bidNtceNo') or '')
+            if other and other!=bid_no:continue
+            ordinal=str(row.get('bidNtceOrd') or '')
+            if ordinal and ordinal.zfill(3)!=order:continue
+            items.append(row)
+        return {'ok':True,'complete':len(result['items'])>=result['totalCount'],
+                'count':result['totalCount'],'items':items}
+    except ApiError as e:
+        return {'ok':False,'complete':False,'error':e.msg,'count':None,'items':[]}
+
+def _pick(row, names):
+    for key in names:
+        value=row.get(key)
+        if value is not None and str(value).strip():
+            return str(value).strip()
+    return ''
+
+def bid_evidence_query(bid_no, order):
+    regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn',bid_no,order)
+    attachments=_bid_evidence_fetch('getBidPblancListInfoEorderAtchFileInfo',bid_no,order)
+    normalized_regions=[]
+    for row in regions['items']:
+        name=_pick(row,['prtcptPsblRgnNm','prtcptPsblRgnCdNm','rgnNm','rgnName'])
+        code=_pick(row,['prtcptPsblRgnCd','rgnCd','rgnCode'])
+        if name or code:normalized_regions.append({'name':name,'code':code})
+    normalized_attachments=[]
+    for row in attachments['items']:
+        name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName','eorderAtchFileNm'])
+        url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl','fileDownloadUrl','eorderAtchFileUrl'])
+        # Links must remain official HTTPS URLs; never convert arbitrary API strings into a link.
+        if url and not re.match(r'^https://',url,re.I):url=''
+        if name or url:normalized_attachments.append({'name':name,'url':url})
+    return {
+        'ok':regions['ok'] or attachments['ok'],'bidNo':bid_no,'order':order,
+        'region':{'ok':regions['ok'],'complete':regions['complete'],
+                  'count':regions['count'],'items':normalized_regions,
+                  'rawFields':sorted(regions['items'][0].keys()) if regions['items'] else [],
+                  'error':regions.get('error','')},
+        'attachments':{'ok':attachments['ok'],'complete':attachments['complete'],
+                       'count':attachments['count'],'items':normalized_attachments,
+                       'rawFields':sorted(attachments['items'][0].keys()) if attachments['items'] else [],
+                       'error':attachments.get('error','')},
+        'checkedAt':datetime.datetime.utcnow().isoformat()+'Z',
+        'limitations':'공고 원문 첨부 미열람. 지역조회 0건은 전국 허용 증명이 아님.'
+    }
+
 # Persistent storage for all returned G2B notices (not just SW-title hits).
 # The UI applies SW-related relevance filtering, so persistence never discards
 # notices that appeared on the user's screen.
@@ -384,7 +442,10 @@ class Handler(BaseHTTPRequestHandler):
                 result = {
                     'ok':True, 'bizno':bizno, 'found':bool(matching),
                     'company':{'name':matching[0].get('corpNm') or '',
-                               'registeredAt':matching[0].get('rgstDt') or ''} if matching else None,
+                               'registeredAt':matching[0].get('rgstDt') or '',
+                               'address':_pick(matching[0],['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr']),
+                               'addressField':next((key for key in ['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), '')
+                              } if matching else None,
                     'industries':codes, 'industryCount':industry_total,
                     'unattributedResponseRows':sum(1 for x in industry_rows if not x.get('bizno') and not x.get('bsnsRgstNo')),
                     'complete':len(industry_rows) >= industry_total,
@@ -393,6 +454,17 @@ class Handler(BaseHTTPRequestHandler):
                     'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
                 }
                 with lock: cache[ck] = (time.time()+3600, result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/bid-evidence':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('bid-evidence',bid_no,order)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=bid_evidence_query(bid_no,order)
+                with lock:cache[ck]=(time.time()+6*3600,result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/eligibility':
                 bid_no=get('bidNo').strip()
