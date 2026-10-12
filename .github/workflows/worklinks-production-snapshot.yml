@@ -71,4 +71,6 @@ jobs:
           git add startup-support/direct-production-snapshot.json
           if git diff --cached --quiet; then echo 'SNAPSHOT_UNCHANGED'; exit 0; fi
           git commit -m 'data: update partner direct-production public snapshot'
-          git push
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
