@@ -494,16 +494,26 @@ async function refreshPartnerProduction(p){
   setPartnerQual(p,"직접생산 · 정보시스템개발서비스 8111159901",{state:"checking",value:"직접생산 자료 조회 중",detail:"2026-02-01 발급 현황 조회"});
   p.productionError="";renderPartners();
   try{
-   const data=await g2bFetch('/direct-production?bizno='+encodeURIComponent(p.businessNo.replace(/\D/g,'')));
-   if(data.complete!==true||data.snapshotDate!=="2026-02-01"||!Array.isArray(data.records))throw Error("불완전한 발급현황 응답");
-   p.productionRecords=data.records;p.productionCheckedAt=data.checkedAt||"";
+   const bizno=p.businessNo.replace(/\D/g,'');
+   let data;
+   try{
+    const response=await fetch('./direct-production-snapshot.json',{cache:'no-store'});
+    if(!response.ok)throw Error('public_snapshot_unavailable');
+    const source=await response.json();
+    if(!source.ok||source.complete!==true||!source.recordsByBizno||!Object.prototype.hasOwnProperty.call(source.recordsByBizno,bizno))throw Error('public_snapshot_incomplete');
+    data={ok:true,complete:true,snapshotDate:source.snapshotDate,records:source.recordsByBizno[bizno],checkedAt:new Date().toISOString(),source:'공공데이터포털 CSV'};
+   }catch(e){
+    data=await g2bFetch('/direct-production?bizno='+encodeURIComponent(bizno));
+   }
+   if(data.complete!==true||!/^\d{4}-\d{2}-\d{2}$/.test(String(data.snapshotDate||""))||!Array.isArray(data.records))throw Error("불완전한 발급현황 응답");
+   p.productionRecords=data.records;p.productionCheckedAt=data.checkedAt||"";p.productionSnapshotDate=data.snapshotDate;
    const matched=data.records.filter(x=>String(x.productCode||"")==="8111159901"||/정보시스템개발서비스/.test(String(x.product||"")));
    const today=new Date(Date.now()+32400000).toISOString().slice(0,10);
    const datesOk=matched.filter(x=>x.validTo&&x.validTo>=today&&(!x.validFrom||x.validFrom<=today));
    setPartnerQual(p,"직접생산 · 정보시스템개발서비스 8111159901",{
     state:"snapshot",
-    value:matched.length?(matched.length+"건 발급내역 확인"+(datesOk.length?" · 기재 종료일 미경과 "+datesOk.length+"건":"")):"2026-02-01 해당 품목 미발견",
-    detail:"2026-02-01 자료 기준. 현재 인증 상태·취소·변경은 SMPP 별도 검증 필요."
+    value:matched.length?(matched.length+"건 발급내역 확인"+(datesOk.length?" · 기재 종료일 미경과 "+datesOk.length+"건":"")):(data.snapshotDate+" 해당 품목 미발견"),
+    detail:data.snapshotDate+" 자료 기준. 현재 인증 상태·취소·변경은 SMPP 별도 검증 필요."
    });
   }catch(e){
    p.productionError=String(e.message||e);p.productionRecords=[];p.productionCheckedAt="";
