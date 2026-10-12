@@ -557,8 +557,18 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,result)
             if u.path == '/api/g2b/contract-capability':
                 ck=('contract-capability',)
-                with lock:saved=cache.get(ck)
-                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                with lock:
+                    saved=cache.get(ck)
+                    refresh_key=('contract-refresh-throttle',)+ck
+                    throttle=cache.get(refresh_key)
+                    # Only bypass FAILED cached responses; successful results remain
+                    # immutable until TTL. Prevent unbounded public upstream refresh.
+                    forced=(get('refresh','')=='1' and
+                            (not saved or saved[1].get('ok') is False) and
+                            (not throttle or throttle[0]<time.time()))
+                    if forced:cache[refresh_key]=(time.time()+120,None)
+                if saved and saved[0]>time.time() and not forced:
+                    return self.reply(200,saved[1])
                 try:result=contract_capability_query()
                 except ApiError as e:
                     result={'ok':False,'authorized':None,'error':e.msg,
@@ -573,8 +583,16 @@ class Handler(BaseHTTPRequestHandler):
                 if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
                     raise ApiError('invalid_contract_lookup',400)
                 ck=('contract-evidence',bid_no,bizno)
-                with lock:saved=cache.get(ck)
-                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                with lock:
+                    saved=cache.get(ck)
+                    refresh_key=('contract-refresh-throttle',)+ck
+                    throttle=cache.get(refresh_key)
+                    forced=(get('refresh','')=='1' and
+                            (not saved or saved[1].get('ok') is False) and
+                            (not throttle or throttle[0]<time.time()))
+                    if forced:cache[refresh_key]=(time.time()+120,None)
+                if saved and saved[0]>time.time() and not forced:
+                    return self.reply(200,saved[1])
                 try:result=contract_evidence_query(bid_no,bizno)
                 except ApiError as e:
                     result={'ok':False,'bidNo':bid_no,'bizno':bizno,'error':e.msg,
