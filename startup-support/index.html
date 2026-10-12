@@ -524,6 +524,7 @@ async function refreshPartnerProduction(p){
   renderPartners();
   if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
   if(partnerScopedJob)renderPartnerJobContext();
+  renderJobs();
  })();
  try{return await p.productionPromise}finally{p.productionPromise=null}
 }
@@ -1196,8 +1197,10 @@ function matchRowsHTML(x,p){
   status.type==='unverified'?
   '아직 참여 가능 여부를 판정할 수 없습니다. 이유: '+(status.reason||'공고 자격과 업체 등록 상태 확인 중')+'. 공고 원문과 현재 보유 자격 대조가 필요합니다.':
   'SW 업무를 별도로 맡을 수 있는 공고인지 확인되지 않았습니다.';
+ const direct=productionRequirementCheck(x,p);
+ const productionSummary=direct.applicable?'<div style="margin-top:5px"><b>직접생산:</b> '+htmlEscape(direct.reason)+'</div>':'';
  const summary='<div class="job-match-summary"><b>'+htmlEscape(p.name)+'</b> · <strong>'+htmlEscape(verdict)+'</strong>'+
-  '<div style="margin-top:5px">'+htmlEscape(why)+'</div>'+
+  '<div style="margin-top:5px">'+htmlEscape(why)+'</div>'+productionSummary+
   '<div style="margin-top:6px">세부 확인: 일치 <b>'+c.ok+'</b> · 불일치·참여제한 <b>'+c.missing+'</b> · 서류 확인 필요 <b>'+c.pending+'</b> · 원문 확인 <b>'+c.unknown+'</b></div></div>';
  const caption={ok:'일치',missing:'부족',pending:'증빙 필요',unknown:'미확인'};
  return summary+'<div class="job-match-grid">'+result.rows.map(function(q){
@@ -1379,6 +1382,9 @@ function renderJobs(){
       '<span class="jobmatch-chip pending" title="'+htmlEscape(eligibility.reason)+' · 아직 참여 가능 여부를 판단할 수 없습니다.">입찰자격 확인 중</span>':
       eligibility.type==='missing'?
       '<span class="jobmatch-chip missing" title="'+htmlEscape(eligibility.reason)+' · 공고 원문의 대체업종 가능 여부 확인 필요">필수 업종 불일치</span>':'';
+    const direct=chosen?productionRequirementCheck(x,chosen.p):{applicable:false};
+    const directBadge=direct.applicable?'<span class="jobmatch-chip '+(direct.status==='ok'?'ok':'pending')+
+      '" title="'+htmlEscape(direct.reason)+'">'+(direct.status==='ok'?'직접생산 발급자료 일치':'직접생산 추가확인')+'</span>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
@@ -1388,7 +1394,7 @@ function renderJobs(){
        '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
-       '<div class="job-footer">'+partner+matchBadge+
+       '<div class="job-footer">'+partner+matchBadge+directBadge+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
        '</div></div></article>';
   }).join(''):'<div class="emptycard">이 조건에 해당하는 일감이 없습니다.</div>';
