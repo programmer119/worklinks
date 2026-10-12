@@ -10,7 +10,7 @@ API=worklinks-g2b-api
 CRAWLER=worklinks-g2b-crawler
 API_SOURCE="$BASE/g2b-proxy-docker.py"
 CRAWLER_SOURCE="$BASE/g2b-full-crawler.py"
-API_REV=383f207af40377f25b825fc9234d6ee9eef34065
+API_REV=838fdc6bc009944fff638ae16ceb996f7ce877db
 CRAWLER_REV=54ad9fae04603d93caaf882e028f5b4aef708731
 IMG=python:3.11-alpine
 dk(){ "$DOCKER" -H "$SOCKET" "$@"; }
