@@ -30,7 +30,8 @@ jobs:
               page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
               page.locator('#jobsView.on').wait_for(timeout=25000)
               page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('바로 지원 확정')",timeout=30000)
-              page.wait_for_function("document.querySelectorAll('#jobCards .job-mini').length>=20",timeout=45000)
+              page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
+              print('WORKLINKS_BROWSER_LIVE_DATA',page.evaluate("({serverAvailable:g2bServerAvailable,savedTotal:g2bSavedTotal,liveRows:g2bLiveJobs.length,visibleCards:document.querySelectorAll('#jobCards .job-mini').length})"))
               help=page.locator('#jobInfoFold')
               assert help.count()==1
               assert not help.evaluate('(e)=>e.open'),'diagnostics must be hidden by default'
