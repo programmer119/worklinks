@@ -134,7 +134,7 @@ jobs:
                              'rawFields':(evidence.get('attachments') or {}).get('rawFields'),
                              'items':len((evidence.get('attachments') or {}).get('items') or []),
                              'error':(evidence.get('attachments') or {}).get('error')}})
-          for notice in ['R25BK00826083','R22BK00000000']:
+          for notice in ['R25BK00826083','20221204854']:
             award=get('/awards?bidNo='+notice)
             if award:
               entries=award.get('items') or []
