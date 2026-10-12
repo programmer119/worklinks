@@ -61,8 +61,9 @@ def discover(limit):
     except Exception as e:
         print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(e).__name__,str(e)[:140])
     # Deterministic extraction fixture, itself an official current/recent public RFP.
-    seen.setdefault('R26BK01756420:000',('R26BK01756420','000','2099-01-01'))
-    return sorted(seen.values(),key=lambda x:x[2])[:limit]
+    fixture=('R26BK01756420','000','2000-01-01')
+    seen.pop('R26BK01756420:000',None)
+    return [fixture]+sorted(seen.values(),key=lambda x:x[2])[:max(0,limit-1)]
 def legal_file(item):
     url=str(item.get('url') or '')
     u=urllib.parse.urlsplit(url)
@@ -146,7 +147,7 @@ def process(no,ordn):
         except Exception as ex:
             record['error']=type(ex).__name__+': '+str(ex)[:90]
         saved.append(record)
-    return {'status':'text_extracted_requires_review' if any(x.get('readable') for x in saved) else 'text_unavailable',
+    return {'status':'text_extracted_requires_review' if any(x.get('readable') for x in saved) else ('no_eorder_files' if not docs.get('items') else 'text_unavailable'),
             'source':'나라장터 e발주 첨부파일 API','count':docs.get('count'),'files':saved,
             'reviewComplete':False,'contractPerformanceVerified':False}
 def main():
