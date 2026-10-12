@@ -138,6 +138,20 @@ jobs:
                              'rawFields':(evidence.get('attachments') or {}).get('rawFields'),
                              'items':len((evidence.get('attachments') or {}).get('items') or []),
                              'error':(evidence.get('attachments') or {}).get('error')}})
+          for notice in ['R26BK01756420','R26BK01764502','R26BK01764267']:
+            metadata=get('/bid-evidence?bidNo='+notice+'&order=000')
+            if metadata:
+              nd=metadata.get('noticeDocuments') or {}
+              docs=(metadata.get('attachments') or {})
+              print('OFFICIAL_NOTICE_DETAIL_FILES',notice,{
+                'noticeDetailOk':nd.get('ok'),'noticeDetailError':nd.get('error'),
+                'noticeDetailCount':len(nd.get('items') or []),
+                'noticeRows':nd.get('noticeRows'),
+                'specFields':nd.get('foundDocumentFields'),
+                'noticeRawSpecKeys':[v for v in nd.get('returnedRawFields') or [] if 'Spec' in v or 'atch' in v.lower()],
+                'eorderCount':docs.get('eorderCount'),
+                'mergedCount':docs.get('count'),
+                'fileNames':[x.get('name') for x in docs.get('items') or []][:8]})
           for notice in ['R25BK00826083','20221204854']:
             award=get('/awards?bidNo='+notice)
             if award:
