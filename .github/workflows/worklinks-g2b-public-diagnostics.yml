@@ -134,12 +134,21 @@ jobs:
                              'rawFields':(evidence.get('attachments') or {}).get('rawFields'),
                              'items':len((evidence.get('attachments') or {}).get('items') or []),
                              'error':(evidence.get('attachments') or {}).get('error')}})
+          contract=get('/contract-capability')
+          if contract:
+            print('OFFICIAL_CONTRACT_API_CAPABILITY',{
+              'ok':contract.get('ok'),'authorized':contract.get('authorized'),
+              'error':contract.get('error'),
+              'sampleCount':contract.get('sampleCount'),
+              'fields':contract.get('schemaFields'),
+              'companyHistoryVerified':contract.get('companyHistoryVerified')})
           company=get('/company?bizno=1308185973')
           if company:
             print('PARTNER_REGISTRY',{
               'found':company.get('found'),'complete':company.get('complete'),
               'companyAddressField':(company.get('company') or {}).get('addressField'),
               'companyAddressAvailable':bool((company.get('company') or {}).get('address')),
+              'availableCompanyFields':(company.get('company') or {}).get('availableFields'),
               'industryCount':company.get('industryCount'),'returnedRows':len(company.get('industries') or []),
               'unattributedResponseRows':company.get('unattributedResponseRows')})
             print('PARTNER_REGISTRY_CODES',[
