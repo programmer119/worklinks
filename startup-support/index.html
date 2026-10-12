@@ -285,6 +285,14 @@
 @media(max-width:1220px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:780px){#jobCards.cards{grid-template-columns:1fr}#jobsView .panel{padding:16px}#jobsView .job-info-pop{position:fixed;left:12px;right:12px;top:75px;width:auto;max-height:80vh;padding:16px}#jobsView .jobf,#jobsView .job-vf{font-size:15px;padding:10px 13px}#jobCards .job-mini{grid-template-columns:82px minmax(0,1fr)}}
 
+
+#jobsView .job-info-pop .bid-guide{display:block;position:relative;margin:15px 0 6px}
+#jobsView .job-info-pop .bid-guide>summary{display:block;width:100%;height:auto;text-align:left;border:1px solid #cbd5e1;border-radius:10px;padding:12px 15px;background:#f8fafc;color:#1e293b;font-size:16px;font-weight:850;line-height:1.5;cursor:pointer}
+#jobsView .job-info-pop .bid-guide[open]>summary{border-color:#94a3b8;background:#f1f5f9;color:#0f172a}
+#jobsView .job-info-pop .bid-guide-pop{position:static;top:auto;right:auto;width:100%;max-height:none;overflow:visible;box-shadow:none;border:0;border-radius:0;padding:14px 0;font-size:15px}
+#jobsView .job-info-pop .bid-method h4{font-size:15px}
+#jobsView .job-info-pop .bid-method p,#jobsView .job-info-pop .bid-method .bid-method-notes{font-size:14px}
+
 </style>
 </head>
 <body><main>
@@ -342,22 +350,8 @@
       <div class="job-info-pop">
         <h3>지원자격 부족조건 · 원자료</h3>
         <div id="jobMissingInfo" class="job-missing-info">미확인 조건을 집계 중입니다.</div>
-        <div class="note">업종과 발주기관 분야에 상관없이 SW·DB·데이터·AI 관련 발주를 탐색합니다. 파트너 협업에는 직접수주·공동수급·분담이행·공급/납품 참여 가능성을 구분해 표시하고, 미확인 자격 때문에 검색단계에서 제외하지 않습니다.</div>
-        <div class="note"><b>자동확인 소스</b> · 개별 협회/학회/연맹/조합 홈페이지 · 네이버 카페 공개글 · BAND 공개페이지 · 업종 커뮤니티 · Facebook 공개그룹 · Discord 공개영역 · 일반 웹검색 <span class="warn">· 회원전용/비공개는 접근제한으로 표시</span></div>
-        <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
-        <small class="job-vf-note">업체별 자격·증빙 근거 기준 · 원문 또는 회사 증빙 미확인은 '검증 중/조건부'로 표시</small>
-        <div class="partner-summary" id="partnerSummary"></div>
-        <div class="g2b-panel" id="g2bPanel">
-      <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
-      <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
-      <div class="g2b-results" id="g2bCrawlProgress" aria-live="polite">자동수집기 상태 확인 중…</div>
-      <div class="g2b-results" id="g2bApiResult">서버123이 나라장터 용역·물품·공사·외자 공고를 날짜별 마지막 페이지까지 자동 수집합니다. 모든 공고는 서버 DB에 저장하고 SW·DB·AI 관련 후보만 여기 표시합니다. 조회 버튼은 DB 화면 갱신용입니다.</div>
-      <div class="g2b-api-settings"><label for="g2bBaseUrl">고포트 HTTPS API 주소</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
-    </div>
-      </div>
-    </details>
-    <details class="bid-guide" id="bidGuide">
-      <summary aria-label="나라장터 낙찰방식 안내" title="나라장터 낙찰방식 안내">!</summary>
+        <details class="bid-guide" id="bidGuide">
+      <summary aria-label="나라장터 낙찰방식 안내" title="나라장터 낙찰방식 안내">입찰방식·용어 자세히 보기 ▾</summary>
       <div class="bid-guide-pop">
         <div class="bid-guide-top"><h3>나라장터 주요 낙찰방식</h3><button class="bid-guide-close" type="button" id="bidGuideClose" aria-label="안내 닫기">✕</button></div>
         <p class="bid-guide-intro">가격만 싼 곳이 이기는 건 아니에요. 공고마다 회사를 고르는 규칙이 달라요. 어려운 말 옆의 <b>?</b>에 마우스를 올리거나 눌러보세요.</p>
@@ -375,7 +369,22 @@
         <div class="bid-basic-list"><span class="bid-basic"><span class="bid-term">기초금액<button class="bid-term-help" type="button" aria-label="기초금액 설명" data-tip="발주기관이 미리 공개하는 기준 금액이에요. 예를 들어 '이번 일의 기준은 1억 원'이라고 적어 둔 숫자예요.">?</button></span></span><span class="bid-basic"><span class="bid-term">복수예비가격<button class="bid-term-help" type="button" aria-label="복수예비가격 설명" data-tip="기초금액 근처에 미리 만들어 두는 후보 가격들이에요. 흔히 15개 중 선택된 4개를 평균해 최종 예정가격을 만들어요.">?</button></span></span><span class="bid-basic"><span class="bid-term">예정가격<button class="bid-term-help" type="button" aria-label="예정가격 설명" data-tip="낙찰 여부를 판단할 때 쓰는 최종 기준 가격이에요. 복수예가 방식을 쓰면 개찰 때 결정돼요.">?</button></span></span><span class="bid-basic"><span class="bid-term">사정률<button class="bid-term-help" type="button" aria-label="사정률 설명" data-tip="최종 예정가격이 기초금액의 몇 %인지를 보여주는 비율이에요. 1억 원 기준으로 9,900만 원이면 99%예요.">?</button></span></span><span class="bid-basic"><span class="bid-term">낙찰하한율<button class="bid-term-help" type="button" aria-label="낙찰하한율 설명" data-tip="너무 싸게 써서 부실하게 일할 위험을 막기 위한 가격 하한 비율이에요. 적용 여부와 수치는 공고마다 달라요.">?</button></span></span><span class="bid-basic"><span class="bid-term">정성평가<button class="bid-term-help" type="button" aria-label="정성평가 설명" data-tip="'계획이 얼마나 좋은가?'처럼 평가자가 제안 내용을 살펴 점수를 주는 방식이에요.">?</button></span></span><span class="bid-basic"><span class="bid-term">정량평가<button class="bid-term-help" type="button" aria-label="정량평가 설명" data-tip="회사 실적, 인력 수, 증명서처럼 숫자나 객관적인 자료로 점수를 매기는 방식이에요.">?</button></span></span><span class="bid-basic"><span class="bid-term">유찰<button class="bid-term-help" type="button" aria-label="유찰 설명" data-tip="조건에 맞는 참가자가 없거나 정해진 조건을 충족하지 못해 이번 입찰에서 계약 상대를 정하지 못한 일이에요.">?</button></span></span></div>
         <p class="bid-guide-footer">※ 위 항목들은 이해를 위한 실무 분류예요. '소액수의 견적'은 낙찰 평가법이 아니라 별도의 계약 절차이며, 2단계 경쟁과 규격·가격 동시입찰도 절차가 달라요. 실제 참가자격·점수 비율·낙찰하한율·가격 산식은 <a href="https://www.g2b.go.kr/" target="_blank" rel="noopener noreferrer">나라장터 공고문</a>을 우선 확인하세요.</p>
       </div>
-    </details></div></div>
+    </details>
+        <div class="note">업종과 발주기관 분야에 상관없이 SW·DB·데이터·AI 관련 발주를 탐색합니다. 파트너 협업에는 직접수주·공동수급·분담이행·공급/납품 참여 가능성을 구분해 표시하고, 미확인 자격 때문에 검색단계에서 제외하지 않습니다.</div>
+        <div class="note"><b>자동확인 소스</b> · 개별 협회/학회/연맹/조합 홈페이지 · 네이버 카페 공개글 · BAND 공개페이지 · 업종 커뮤니티 · Facebook 공개그룹 · Discord 공개영역 · 일반 웹검색 <span class="warn">· 회원전용/비공개는 접근제한으로 표시</span></div>
+        <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
+        <small class="job-vf-note">업체별 자격·증빙 근거 기준 · 원문 또는 회사 증빙 미확인은 '검증 중/조건부'로 표시</small>
+        <div class="partner-summary" id="partnerSummary"></div>
+        <div class="g2b-panel" id="g2bPanel">
+      <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
+      <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
+      <div class="g2b-results" id="g2bCrawlProgress" aria-live="polite">자동수집기 상태 확인 중…</div>
+      <div class="g2b-results" id="g2bApiResult">서버123이 나라장터 용역·물품·공사·외자 공고를 날짜별 마지막 페이지까지 자동 수집합니다. 모든 공고는 서버 DB에 저장하고 SW·DB·AI 관련 후보만 여기 표시합니다. 조회 버튼은 DB 화면 갱신용입니다.</div>
+      <div class="g2b-api-settings"><label for="g2bBaseUrl">고포트 HTTPS API 주소</label><input id="g2bBaseUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" aria-label="Worklinks 서버 프록시 주소"><button type="button" id="g2bBaseSave">주소 저장·상태 확인</button></div>
+    </div>
+      </div>
+    </details>
+</div></div>
 
 
     <div class="jobfilters">
