@@ -50,6 +50,24 @@ jobs:
               assert evidence is not None,'must match a live stored notice to its citation-verified snapshot'
               assert evidence['status'] in ('classified','rule_based')
               print('WORKLINKS_LIVE_RFP_AUTO_CLASSIFICATION',json.dumps(evidence,ensure_ascii=False))
+              # The client must show truly checked industry status as one-click filters,
+              # while no-license-restriction must NOT be called bid-ready.
+              page.wait_for_function("partners.length>0 && !!partners[0].registryCheckedAt && partners[0].registryComplete===true",timeout=45000)
+              industry_counts=page.evaluate("""() => {
+                const match=Number(document.querySelector('[data-verdict-count="registered"]').textContent);
+                const noRestriction=Number(document.querySelector('[data-verdict-count="no-restriction"]').textContent);
+                const summary=document.querySelector('#jobDecisionSummary').textContent;
+                return {match,noRestriction,summary};
+              }""")
+              assert industry_counts['match']>0,'official registered industry matches must be visible'
+              assert industry_counts['noRestriction']>=0
+              assert '등록업종 일치' in industry_counts['summary']
+              assert '면허제한 0건' in industry_counts['summary']
+              page.locator('[data-verdict-filter="registered"]').click()
+              assert page.locator('[data-verdict-filter="registered"]').get_attribute('aria-pressed')=='true'
+              assert page.locator('#jobCards .job-mini').count()>0
+              page.locator('[data-verdict-filter="all"]').click()
+              print('WORKLINKS_LIVE_INDUSTRY_FILTERS=PASS',json.dumps(industry_counts,ensure_ascii=False))
               help=page.locator('#jobInfoFold')
               assert help.count()==1
               assert not help.evaluate('(e)=>e.open'),'diagnostics must be hidden by default'
