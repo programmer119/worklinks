@@ -68,7 +68,7 @@ try:
              for _ in range(3)]}
         raise AssertionError(url)
     rfp.fetch_json=pages
-    prior={'R26BK12345601:000':{'classificationVersion':3,'checkedAt':
+    prior={'R26BK12345601:000':{'classificationVersion':4,'checkedAt':
        rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
     result=rfp.discover(10,prior)
     assert len(calls)==2,'discovery must request the next 500 notice page'
@@ -77,5 +77,16 @@ try:
     assert all(v[0]!='R26BK12345601' for v in result)
 finally:
     rfp.fetch_json=orig_discovery
+
+sample='''- 소프트웨어사업자(컴퓨터관련서비스사업)[업종코드 : 1468] 업종으로 반드시 등록한 자
+- 직접생산확인증명서(세부품명: 정보시스템유지관리서비스, 세부품명번호 : 8111189901)를 소지한 자
+- 제안서에는 투입인력 재직·경력·학력·자격증명서 서류 원본 또는 사본을 첨부하여야 함
+- 공동수급 금지. 단독입찰만 허용
+''';
+c=rfp.extract_rule_candidates(sample,'공식 제안요청서.hwp')
+assert any(x['type']=='industry_code' and '1468' in x['codes'] for x in c)
+assert any(x['type']=='direct_production' and '8111189901' in x['codes'] for x in c)
+assert any(x['type']=='staff_proof' and x['reviewStatus']=='unreviewed' for x in c)
+assert all(x['documentRequiresManualFullReview'] for x in c)
 
 print('WORKLINKS_RFP_FAILURE_CLASSIFICATION=PASS')
