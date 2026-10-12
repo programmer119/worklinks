@@ -1,0 +1,50 @@
+name: WorkLinks public RFP text extraction capability
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-rfp-content-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Install a reader for official HWP RFPs
+        run: python3 -m pip install -q pyhwp --break-system-packages
+      - name: Download one publicly linked official bid RFP and test extraction
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.parse,json,subprocess,tempfile,pathlib,re,hashlib
+          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/bid-evidence?bidNo=R26BK01756420&order=000'
+          with urllib.request.urlopen(urllib.request.Request(api,headers={'User-Agent':'WorkLinksRFPCheck/1.0'}),timeout=25) as response:
+            evidence=json.load(response)
+          files=evidence.get('attachments',{}).get('items') or []
+          print('DOCUMENT_METADATA_COUNT',len(files))
+          if not files:raise SystemExit('NO_PUBLIC_RFP_METADATA')
+          selected=next((x for x in files if (x.get('name') or '').lower().endswith('.hwp')),None)
+          if not selected:raise SystemExit('NO_SAMPLE_HWP')
+          url=selected['url'];parsed=urllib.parse.urlparse(url)
+          if parsed.scheme!='https' or parsed.netloc!='www.g2b.go.kr' or not parsed.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
+            raise SystemExit('UNEXPECTED_RFP_HOST_OR_PATH')
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+          with urllib.request.urlopen(req,timeout=35) as response:
+            if int(response.headers.get('Content-Length') or '0')>16_000_000:raise SystemExit('OVERSIZE_DOCUMENT')
+            raw=response.read(16_000_001)
+            print('RFP_DOWNLOAD_STATUS',response.status,'TYPE',response.headers.get('Content-Type'),
+                  'BYTES',len(raw),'MAGIC',repr(raw[:12]))
+          if len(raw)>16_000_000:raise SystemExit('OVERSIZE_DOCUMENT')
+          if not raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):raise SystemExit('NOT_OLD_HWP_BINARY')
+          with tempfile.TemporaryDirectory() as td:
+            path=pathlib.Path(td)/'rfp.hwp'
+            path.write_bytes(raw)
+            process=subprocess.run(['hwp5txt',str(path)],capture_output=True,timeout=50)
+            text=process.stdout.decode('utf-8','replace')
+            print('HWP_EXTRACT_RETURN_CODE',process.returncode,'TEXT_CHARS',len(text),'STDERR_SIZE',len(process.stderr))
+            for term in ['입찰참가자격','수행실적','실적','투입인력','기술인력','지역제한','제안요청서','공동수급']:
+              print('RFP_TERM',term,len(re.findall(re.escape(term),text)))
+            if process.returncode!=0 or len(text)<100:raise SystemExit('HWP_EXTRACT_FAILED')
+            print('PUBLIC_RFP_TEXT_READABLE=PASS')
+          PY
