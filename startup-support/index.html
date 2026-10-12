@@ -329,7 +329,7 @@
  <button type="button" class="job-vf conditional" data-verdict-filter="conditional" aria-pressed="false">조건부 <span data-verdict-count="conditional">0</span></button>
  <button type="button" class="job-vf blocked" data-verdict-filter="blocked" aria-pressed="false">지원 불가 <span data-verdict-count="blocked">0</span></button>
  <button type="button" class="job-vf checking" data-verdict-filter="checking" aria-pressed="false">검증 중 <span data-verdict-count="checking">0</span></button>
- <small class="job-vf-note">선택한 업체의 자격·증빙 기준 · 미검증 조건은 합격 처리하지 않음</small>
+ <small class="job-vf-note">업체별 자격·증빙 근거 기준 · 원문 또는 회사 증빙 미확인은 '검증 중/조건부'로 표시</small>
  </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
     <div class="g2b-panel" id="g2bPanel">
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
@@ -1474,7 +1474,7 @@ function renderJobs(){
  const active=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key!=='closed'});
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
- const candidateJobs=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
+ const candidateJobs=active;
  const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>participationVerdict(o.x,p).type===type)).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
  document.getElementById('partnerJobCount').textContent='(바로 '+statusTotal('ready')+' · 조건부 '+statusTotal('conditional')+
@@ -1491,7 +1491,7 @@ function renderJobs(){
   el.innerHTML=jobSources.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag">탐색경로</span></div><h3><a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.name)+'</a></h3><p>'+htmlEscape(x.note)+'</p></article>'}).join('');
  }else{
   const sort=document.getElementById('jobSort').value;
-  const selectedCompany=selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
+  const selectedCompany=filter==='partner'&&selectedPartnerId!=='all'?partners.find(p=>p.id===selectedPartnerId):null;
   const scopeRows=(filter==='closed'?closed:active).filter(function(o){
     const x=o.x;
     if(filter==='all'||filter==='closed')return true;
