@@ -240,6 +240,51 @@
 .partner-next-action p{margin:5px 0 8px;font-size:11px;line-height:1.5;color:#6b4b17}
 .partner-next-action a{display:inline-flex;background:#fff;border:1px solid #d6a857;color:#92400e;border-radius:7px;padding:6px 8px;font-weight:750;font-size:11px;text-decoration:none}
 .partner-next-action small{display:block;font-size:10px;color:#7c5b24;line-height:1.4;margin-top:7px}
+
+/* Accessibility and information hierarchy: Jobs primary controls are large,
+   tiny diagnostics sit inside the user-opened ! popover. */
+#jobsView{font-size:16px}
+#jobsView .panel{padding:20px 22px}
+#jobsView .job-titlebar{position:relative;gap:12px;align-items:center}
+#jobsView .job-titlebar>b{font-size:24px;line-height:1.35;letter-spacing:-.3px}
+#jobsView .job-title-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
+#jobsView .job-info-fold>summary{width:46px;height:46px;border:2px solid #cbd5e1;border-radius:50%;font-size:23px;font-weight:900;display:grid;place-items:center;cursor:pointer;background:#fff;list-style:none;color:#111827}
+#jobsView .job-info-fold>summary::-webkit-details-marker{display:none}
+#jobsView .job-info-fold[open]>summary,#jobsView .job-info-fold>summary:hover{background:#0f172a;color:#fff;border-color:#0f172a}
+#jobsView .bid-guide>summary{height:46px;width:46px;border-width:2px;font-size:23px}
+#jobsView .job-info-pop{position:absolute;z-index:80;right:54px;top:calc(100% + 9px);width:min(850px,calc(100vw - 38px));max-height:min(76vh,860px);overflow:auto;background:#fff;border:1px solid #cbd5e1;border-radius:16px;padding:22px;box-shadow:0 22px 48px rgba(15,23,42,.24);font-size:15px;line-height:1.65}
+#jobsView .job-info-pop h3{font-size:21px;margin:0 0 12px;color:#0f172a}
+#jobsView .job-info-pop .note,#jobsView .job-info-pop .partner-summary,#jobsView .job-info-pop .job-vf-note{display:block;font-size:15px;line-height:1.6;color:#334155;margin:12px 0 0;padding-top:10px;border-top:1px solid #e2e8f0}
+#jobsView .job-info-pop .g2b-panel{margin-top:16px}
+#jobsView .job-missing-info{padding:14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;font-size:15px;color:#0f172a;line-height:1.65}
+#jobsView .job-missing-info strong{font-size:17px}
+#jobsView .jobfilters{gap:10px;margin-top:18px}
+#jobsView .jobf{font-size:16px;padding:11px 18px;min-height:46px;line-height:1.35}
+#jobsView .partner-filter-control{font-size:16px;gap:9px;padding:5px 8px 5px 14px}
+#jobsView .partner-filter-control select{font-size:16px;min-width:110px;max-width:min(260px,48vw);min-height:38px;padding:8px 10px}
+#jobsView .job-decision-summary{font-size:16px;font-weight:730;color:#1e293b;line-height:1.55;margin:17px 0 5px}
+#jobsView .job-verdict-filter{gap:10px;margin:15px 0}
+#jobsView .job-verdict-filter>strong{font-size:16px}
+#jobsView .job-vf{font-size:16px;font-weight:850;min-height:48px;padding:11px 16px;border-radius:11px}
+#jobsView .job-vf [data-verdict-count]{font-size:17px;opacity:1}
+#jobsView .job-sort-row{font-size:15px;margin:14px 0}
+#jobsView .job-sort-row select{font-size:15px;min-height:45px;padding:9px 13px}
+#jobCards.cards{gap:15px}
+#jobCards .job-mini{min-height:169px;grid-template-columns:90px minmax(0,1fr);border-radius:15px}
+#jobCards .job-core{padding:15px 16px 13px;gap:10px}
+#jobCards .job-day{font-size:20px}
+#jobCards .job-day .job-date{font-size:13px;font-weight:850}
+#jobCards .job-mini h3{font-size:17px;line-height:1.4}
+#jobCards .job-mini .job-meta-row{font-size:13px;color:#475569}
+#jobCards .job-verdict-partner{font-size:14px}
+#jobCards .job-verdict{font-size:14px;padding:7px 10px;font-weight:900}
+#jobCards .job-verdict-why{font-size:13px;color:#334155;font-weight:650;line-height:1.45}
+#jobCards .job-mini .job-source-link{font-size:13px;font-weight:850;padding:8px 11px}
+#jobCards .job-mini .job-partners,#jobCards .job-mini .job-partners a{font-size:13px}
+#jobCards .job-mini .job-repeat{font-size:12px}
+@media(max-width:1220px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:780px){#jobCards.cards{grid-template-columns:1fr}#jobsView .panel{padding:16px}#jobsView .job-info-pop{position:fixed;left:12px;right:12px;top:75px;width:auto;max-height:80vh;padding:16px}#jobsView .jobf,#jobsView .job-vf{font-size:15px;padding:10px 13px}#jobCards .job-mini{grid-template-columns:82px minmax(0,1fr)}}
+
 </style>
 </head>
 <body><main>
