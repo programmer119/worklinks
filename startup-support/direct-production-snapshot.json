@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "complete": true,
+  "source": "중소벤처기업부 직접생산확인증명서발급현황",
+  "sourceUrl": "https://www.data.go.kr/data/3061008/fileData.do",
+  "snapshotDate": "2026-02-01",
+  "recordCount": 241597,
+  "recordsByBizno": {
+    "1308185973": [
+      {
+        "product": "데이터처리서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "정보인프라구축서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "빅데이터분석서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "정보시스템개발서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "패키지소프트웨어개발및도입서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "소프트웨어유지및지원서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "운영위탁서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "정보시스템유지관리서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      },
+      {
+        "product": "인터넷지원개발서비스",
+        "validFrom": "2025-01-16",
+        "validTo": "2027-01-15"
+      }
+    ]
+  }
+}
