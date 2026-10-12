@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-12T07:25:09.778847+00:00",
+  "generatedAt": "2026-10-12T07:27:46.137071+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -126,13 +126,15 @@
       "classificationVersion": 2
     },
     "R26BK01760089:000": {
-      "status": "text_unavailable",
+      "status": "no_eorder_files",
       "source": "나라장터 e발주 첨부파일 API",
       "count": 0,
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-12T06:49:08.020208+00:00"
+      "checkedAt": "2026-10-12T06:49:08.020208+00:00",
+      "reasonCode": "eorder_api_returned_zero",
+      "classificationVersion": 2
     },
     "R26BK01756420:000": {
       "status": "text_extracted_requires_review",
