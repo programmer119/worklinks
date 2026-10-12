@@ -127,6 +127,19 @@ assert.ok(source.includes("공개자료 기준일 이후 취소·변경 여부�
 assert.ok(source.includes('productionRequirementCheck(x,p)'));
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 
+// Region lookup: one proved region match, and two fail-closed unknown cases.
+const regional=new Function('jobEvidenceData',
+ part('function normalizedRegion(x){','function partnerRegisteredCode(p,code){')+
+ 'return regionRequirementCheck;'
+)(x=>x.regionEvidence||null);
+const seoulCompany={registeredAddress:'서울특별시 양천구',registeredRegionName:'서울특별시',registeredRegionCode:'11'};
+const seoulBid={regionEvidence:{region:{ok:true,complete:true,items:[{name:'서울특별시',code:'11'}]}}};
+assert.equal(regional(seoulBid,seoulCompany).status,'ok');
+assert.equal(regional({regionEvidence:{region:{ok:true,complete:true,items:[]}}},seoulCompany).status,'unknown','zero region rows cannot mean nationwide');
+assert.equal(regional(seoulBid,{}).status,'pending','no company address must not be a match');
+assert.equal(regional({regionEvidence:{region:{ok:false,error:'upstream_http_403'}}},seoulCompany).status,'unknown');
+assert.ok(source.includes('data.company.regionCode'));
+
 // Official SMPP SME validity must be compared, not left generically pending.
 const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck',
  part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
