@@ -573,28 +573,38 @@ function noticeGroupKey(x){
  return (x.kind||'curated')+'|'+org+'|'+title+'|'+cost;
 }
 function collapseSimilarNotices(all){
- const groups=new Map();
+ const groups=[],byNotice=new Map(),bySignature=new Map();
  for(const x of all){
-  if(!x.noticeNumber&&!x.kind){groups.set(x.id,[x]);continue}
-  const key=noticeGroupKey(x);
-  if(!groups.has(key))groups.set(key,[]);
-  groups.get(key).push(x);
+  const identity=jobBidIdentity(x),no=identity&&identity.bidNo;
+  let group=no?byNotice.get(no):null;
+  const key=noticeGroupKey(x),timestamp=jobTimeInfo(x).start;
+  if(!group && x.kind && key){
+   for(const candidate of bySignature.get(key)||[]){
+    const other=jobTimeInfo(candidate[0]).start;
+    // Near-identical agency/title/budget reissues may have a different notice no.
+    // Never collapse annual reprocurement or notices with unknown issue dates.
+    if(timestamp!==null&&other!==null&&Math.abs(timestamp-other)<=21*86400000){group=candidate;break}
+   }
+  }
+  if(!group){group=[];groups.push(group)}
+  group.push(x);
+  if(no)byNotice.set(no,group);
+  if(!bySignature.has(key))bySignature.set(key,[]);
+  if(!bySignature.get(key).includes(group))bySignature.get(key).push(group);
  }
- const collapsed=[];
- for(const list of groups.values()){
-  if(list.length===1){collapsed.push(list[0]);continue}
-  list.sort(function(a,b){
-   const aa=jobTimeInfo(a),bb=jobTimeInfo(b);
-   const stat=x=>x.key==='closed'?1:0;
-   return stat(aa)-stat(bb)||(bb.start||0)-(aa.start||0)||String(b.noticeOrder||'').localeCompare(String(a.noticeOrder||''));
+ return groups.map(function(group){
+  if(group.length===1)return group[0];
+  // A correction / cancellation supersedes an older open order.
+  group.sort(function(a,b){
+   const ao=Number(a.noticeOrder||'0'),bo=Number(b.noticeOrder||'0');
+   return bo-ao||(jobTimeInfo(b).start||0)-(jobTimeInfo(a).start||0)||
+    Number(!!b.kind)-Number(!!a.kind);
   });
-  const winner={...list[0],variants:list.map(x=>({
+  return {...group[0],variants:group.map(x=>({
    id:x.id,noticeNumber:x.noticeNumber,noticeOrder:x.noticeOrder,
    url:jobOriginUrl(x),posted:x.startAt||x.posted||'',closes:x.endAt||x.closes||''
   }))};
-  collapsed.push(winner);
- }
- return collapsed;
+ });
 }
 function jobQualificationVerdict(x,p){
  if(!p || jobSoftwareScope(x)!=='candidate')return {type:'not_applicable',codes:[],reason:'해당 사업의 독립 SW 수행범위가 검증되지 않음'};
@@ -826,17 +836,26 @@ function kstISO(){return kstNow().toISOString().slice(0,10)}
 function dayValue(value,asEnd){
  if(!value)return null;
  const s=String(value).trim();
- const m=s.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+ // G2B and curated notices use both ISO/KST and compact YYYYMMDDHHMMSS forms.
+ const m=s.match(/^(\d{4})[-./]?(\d{2})[-./]?(\d{2})(?:[ T]?(\d{2})(?::?(\d{2}))?(?::?(\d{2}))?)?(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/i) ||
+  s.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?(Z|[+-]\d{2}:?\d{2})?$/i);
  if(!m)return null;
- const y=+m[1],mo=+m[2],d=+m[3],h=m[4]!==undefined?+m[4]:(asEnd?23:0),minute=m[5]!==undefined?+m[5]:(asEnd?59:0);
- if(mo<1||mo>12||d<1||d>31||h>23||minute>59)return null;
- const stamp=Date.UTC(y,mo-1,d,h,minute,asEnd?59:0);
- const t=new Date(stamp);
- if(t.getUTCFullYear()!==y||t.getUTCMonth()!==mo-1||t.getUTCDate()!==d)return null;
- return stamp;
+ const y=+m[1],mo=+m[2],d=+m[3],hasTime=m[4]!==undefined;
+ const h=hasTime?+m[4]:(asEnd?23:0),minute=m[5]!==undefined?+m[5]:(asEnd?59:0),sec=m[6]!==undefined?+m[6]:(asEnd?59:0);
+ if(mo<1||mo>12||d<1||d>31||h>23||minute>59||sec>59)return null;
+ const base=Date.UTC(y,mo-1,d,h,minute,sec),checked=new Date(base);
+ if(checked.getUTCFullYear()!==y||checked.getUTCMonth()!==mo-1||checked.getUTCDate()!==d)return null;
+ const zone=m[7]||'';
+ // Return a KST wall-clock axis timestamp, consistent with kstNow().
+ if(!zone)return base;
+ if(zone.toUpperCase()==='Z')return base+9*3600000;
+ const parts=zone.match(/^([+-])(\d{2}):?(\d{2})$/);
+ if(!parts||+parts[2]>23||+parts[3]>59)return null;
+ const offset=(parts[1]==='+'?1:-1)*(+parts[2]*60+ +parts[3]);
+ return base-offset*60000+9*3600000;
 }
 function jobTimeInfo(x){
- let start=dayValue(x.startAt||x.posted,false),end=dayValue(x.endAt||x.closes,true);
+ let start=dayValue(x.startAt||x.posted,false),end=dayValue(x.endAt||x.closes||x.deadline,true);
  const raw=String(x.period||'');
  if(!start||!end){
    let chunks=(raw.match(/20\d{2}[.\/-]\d{1,2}[.\/-]\d{1,2}(?:\s+\d{1,2}:\d{2})?/g)||[]);
@@ -865,7 +884,7 @@ function jobTimeInfo(x){
    D-0 is always the calendar date of closing; no date => D-? */
 function jobDayCounter(time){
  if(time.key==='closed')return {label:/취소|철회/.test(time.label)?'취소':'마감',kind:'closed'};
- if(time.end===null)return {label:'D-?',kind:'unknown'};
+ if(time.end===null)return {label:'일정 미확인',kind:'unknown'};
  const today=Math.floor(kstNow().getTime()/86400000);
  const last=Math.floor(time.end/86400000);
  const day=Math.max(0,last-today);
