@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/worklinks-production-snapshot.yml'
+      - 'startup-support/index.html'
   workflow_dispatch:
   schedule:
     - cron: '21 3 1 * *'
