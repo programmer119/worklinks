@@ -1794,6 +1794,57 @@ function renderJobs(){
   ' · 지원 불가 '+statusTotal('blocked')+' · 검증 중 '+statusTotal('checking')+
   (registryFailures?' · 업체등록 API 오류 '+registryFailures+'개사':'')+
   ' · SW 수행범위 불명확 '+rejected+'건 별도 제외';
+ // Explain why a "ready: 0" count is not a blanket company disqualification.
+ // Only request company-owned documents when the specific notice references that requirement.
+ const readyCount=statusTotal('ready');
+ const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
+ const fullReviewCount=considered.filter(o=>{
+  const r=rfpSnapshotForJob(o.x);
+  return r?.reviewComplete===true&&r?.requiredConditionsComplete===true&&
+   Array.isArray(r.files)&&r.files.length>0&&r.files.every(z=>z.readable&&z.reviewComplete);
+ }).length;
+ const summaryEl=document.getElementById('jobDecisionSummary');
+ if(summaryEl)summaryEl.textContent=readyCount?
+  '바로 지원 확정 '+readyCount+'건 · 공고별 증빙 및 필수 참가조건 대조 결과':
+  '바로 지원 확정 0건 · 공식 원문·필수조건 전체 검토 완료 '+fullReviewCount+
+  '건 / SW 검토후보 '+considered.length+'건. 업체 자격 부족 0건이라는 뜻도, 전체 탈락이라는 뜻도 아닙니다.';
+ const proofEl=document.getElementById('jobMissingInfo');
+ if(proofEl){
+  const counts={original:0,license:0,direct:0,staff:0,experience:0,sw:0,sme:0,region:0};
+  const selected=selectedPartnerId==='all'?partners[0]:partners.find(p=>p.id===selectedPartnerId);
+  const sample=considered.slice(0,100);
+  for(const o of sample){
+   if(!selected)break;
+   const proof=comparePartnerJob(o.x,selected);
+   for(const q of proof.rows){
+    if(q.status==='ok')continue;
+    if(q.id==='attachment'||q.id==='rfp-extracted'||q.id==='rfp-no-eorder')counts.original++;
+    if(q.id==='license-unavailable'||q.id==='partial')counts.license++;
+    if(q.id==='direct'||q.id==='direct-current')counts.direct++;
+    if(q.id==='proof-staff')counts.staff++;
+    if(q.id==='proof-experience')counts.experience++;
+    if(q.id==='proof-swstatus')counts.sw++;
+    if(q.id==='sme-expiry')counts.sme++;
+    if(q.id==='region')counts.region++;
+   }
+  }
+  const mention=[];
+  if(counts.staff)mention.push('기술인력·경력·재직 '+counts.staff+'건');
+  if(counts.experience)mention.push('수행실적증명 '+counts.experience+'건');
+  if(counts.sw)mention.push('SW사업자 일반현황 '+counts.sw+'건');
+  if(counts.sme)mention.push('중소기업확인서 종료일 '+counts.sme+'건');
+  const demand=mention.length?'해당 조건이 등장하는 공고: '+mention.join(' / ')+
+   '. 필요 서류와 자격기준은 각 공고 상세에서 확인합니다. 업체가 자료를 보유하지 않았다는 뜻은 아닙니다.':
+   '지금 회사에 일괄 요청할 추가 서류는 확정되지 않았습니다. 공고별 필수조항 확인이 우선입니다.';
+  proofEl.innerHTML='<strong>왜 바로 지원 0건인가?</strong>'+
+   '<p>자동 확인된 등록업종·직접생산·소기업 발급자료는 그대로 반영합니다. 바로 지원은 공식 공고 원문과 모든 필수조건까지 검증된 경우에만 확정합니다.</p>'+
+   '<p><b>시스템이 더 확보할 것:</b> 원문·첨부 전수검토 '+fullReviewCount+'/'+considered.length+
+   '건 완료 · 현재 화면 상위 '+sample.length+'건 표본에서 원문 미확인 '+counts.original+
+   '항목, 업종 제한정보 미확인 '+counts.license+'항목, 직접생산 현재상태 확인 '+counts.direct+'항목.</p>'+
+   '<p><b>업체 증빙이 필요할 수 있는 항목:</b> '+htmlEscape(demand)+'</p>'+
+   '<p>※ 한 공고에 여러 미확인 항목이 있을 수 있습니다. 공고를 눌러 정확한 요구사유와 출처를 확인하세요.</p>';
+ }
+
  const filter=jobFilter;
  if(filter==='sources'){
   document.getElementById('jobVerdictFilter').hidden=true;
