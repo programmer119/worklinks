@@ -812,15 +812,17 @@ function g2bCardFromServer(x){
   partnerBidMode:'허용 방식 미수집',
   partnerScope:'SW·데이터·AI 관련 제목 또는 발주품목 후보',partnerVerified:false};
 }
+var g2bLinkedEligibility=null;
 async function g2bLoadSaved(append){
  const out=document.getElementById('g2bApiResult'),more=document.getElementById('g2bMore');
  try{
   if(!append){
    const seen=new Map(),pageSize=500;
-   let total=0;
+   let total=0,linkedOnServer=null;
    for(let offset=0;offset<100000;offset+=pageSize){
     const data=await g2bFetch('/saved?sw=1&limit='+pageSize+'&offset='+offset);
     total=Number(data.totalCount||0);
+    if(Number.isFinite(Number(data.eligibilityLinked)))linkedOnServer=Number(data.eligibilityLinked);
     const records=Array.isArray(data.items)?data.items:[];
     for(const row of records){
      if(row.bidEligibility?.ok&&row.bidNo){
@@ -833,7 +835,7 @@ async function g2bLoadSaved(append){
     if(!records.length||offset+records.length>=total)break;
    }
    g2bLiveJobs=[...seen.values()];
-   g2bServerAvailable=true;g2bSavedTotal=total;jobRenderLimit=100;
+   g2bServerAvailable=true;g2bSavedTotal=total;g2bLinkedEligibility=linkedOnServer;jobRenderLimit=100;
   }else{
    jobRenderLimit+=100;
   }
@@ -843,7 +845,7 @@ async function g2bLoadSaved(append){
   const ok=checked.filter(v=>v?.ok&&v?.complete);
   const failed=checked.filter(v=>!v?.ok);
   const empty=ok.filter(v=>!Array.isArray(v.requirements)||v.requirements.length===0);
-  out.textContent='서버 DB SW 후보 '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 업종요건 조회 성공 '+ok.length.toLocaleString('ko-KR')+
+  out.textContent='서버 DB SW 후보 '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 업종요건 DB 연결 '+(g2bLinkedEligibility===null?'미지원':g2bLinkedEligibility.toLocaleString('ko-KR')+'건')+' · 업종요건 조회 성공 '+ok.length.toLocaleString('ko-KR')+
    '건 (면허제한 없음 '+empty.length.toLocaleString('ko-KR')+'건) · 조회 오류 '+failed.length.toLocaleString('ko-KR')+
    '건 · 미조회 '+Math.max(0,g2bSavedTotal-checked.length).toLocaleString('ko-KR')+
    '건 · 업종 일치는 전체 입찰자격 확인이 아닙니다.';
