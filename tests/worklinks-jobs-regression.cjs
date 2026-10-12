@@ -120,6 +120,24 @@ assert.equal(direct('정보시스템개발서비스 및 정보시스템유지관
 assert.ok(source.includes("공개자료 기준일 이후 취소·변경 여부는 SMPP 최신 확인 필요"));
 assert.ok(source.includes('directBadge'));
 
+// Official SMPP SME validity must be compared, not left generically pending.
+const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
+ part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
+ 'return comparePartnerJob;'
+)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}));
+const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
+const smePartner={smeRecord:{size:'소기업',issuedAt:'2026-04-01',validState:'valid'},
+ smeCheckedAt:'2026-10-12T05:04:00Z'};
+const smeRows=smeCmp(smeBid,smePartner).rows;
+assert.equal(smeRows.find(q=>q.id==='sme-issuance').status,'ok');
+assert.equal(smeRows.find(q=>q.id==='sme-validity').status,'ok');
+assert.equal(smeRows.find(q=>q.id==='sme-scale').status,'ok');
+assert.equal(smeRows.find(q=>q.id==='sme-expiry').status,'unknown');
+assert.equal(smeCmp(smeBid,{smeRecord:{...smePartner.smeRecord,validState:'unknown'},smeCheckedAt:'2026-10-12'}).rows.find(q=>q.id==='sme-validity').status,'pending');
+assert.equal(smeCmp(smeBid,{}).rows.find(q=>q.id==='sme-issuance').status,'pending');
+assert.ok(source.includes("refreshPartnerSme(p)"));
+assert.ok(source.includes("sme-cert-snapshot.json"));
+
 // Readable card and detail copy: no opaque 1468 chip or duplicate "pending" labels.
 assert.ok(source.includes("diff===0?'D-DAY':'D-'+diff"));
 assert.ok(source.includes('업종 일치 · 추가서류 확인 필요'));
