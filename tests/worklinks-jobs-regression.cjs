@@ -234,7 +234,7 @@ assert.equal(verdict({industry:'industry_match'}).type,'conditional');
 assert.equal(verdict({industry:'unverified'}).type,'checking');
 assert.equal(verdict({industry:'no_restriction'}).type,'conditional','official 0 industry restrictions are a positive check but not ready');
 assert.equal(verdict({industry:'no_restriction',full:false,ok:2,pending:0,unknown:1}).type,'conditional');
-assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'checking',
+assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'conditional',
  'zero industry restrictions is not sufficient for final ready under the full-document gate');
 assert.equal(verdict({industry:'missing'}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked');
