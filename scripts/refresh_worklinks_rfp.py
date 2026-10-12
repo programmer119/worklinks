@@ -44,27 +44,60 @@ def fetch_json(url):
 def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
     return m.group(1)+m.group(2)+m.group(3) if m else ''
-def discover(limit):
+def discover(limit,prior=None):
+    """Page through all live SW candidates; prioritize unreviewed, matching, urgent.
+
+    Only notice metadata is queried here. Never claim an individual notice fully
+    reviewed because the saved API or an attachment API happens to return zero.
+    """
+    prior=prior or {}
     seen={}
+    tz=dt.timezone(dt.timedelta(hours=9))
+    today=dt.datetime.now(tz).date()
+    now=dt.datetime.now(dt.timezone.utc)
     try:
-        data=fetch_json(BASE+'saved?sw=1&limit=500&offset=0')
-        if data.get('ok'):
-            for item in data.get('items',[]):
+        total=None
+        for offset in range(0,20000,500):
+            data=fetch_json(BASE+'saved?sw=1&limit=500&offset='+str(offset))
+            if not data.get('ok'):
+                print('RFP_DISCOVER_SERVER_ERROR',data.get('error','unknown'))
+                break
+            total=int(data.get('totalCount') or 0)
+            rows=data.get('items') or []
+            for item in rows:
                 no=str(item.get('bidNo') or '')
                 if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11})',no):continue
                 order=str(item.get('order') or '0').zfill(3)
-                today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
                 end=datestr(item.get('closes'))
                 if not end:continue
                 date=dt.datetime.strptime(end,'%Y%m%d').date()
-                if today<=date<=today+dt.timedelta(days=18):
-                    seen[no+':'+order]=(no,order,date.isoformat())
+                if date<today or date>today+dt.timedelta(days=18):continue
+                key=no+':'+order
+                cached=prior.get(key) or {}
+                if cached.get('reviewComplete') is True:continue
+                if cached.get('classificationVersion')==3:
+                    try:
+                        checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
+                        if checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                            continue
+                    except (ValueError,TypeError):pass
+                # Observed industry restriction is a useful scheduling signal,
+                # never an official statement of eligibility.
+                qual=item.get('bidEligibility') or {}
+                matching=any('1468' in [str(v) for v in (r.get('codes') or [])]
+                             for r in (qual.get('requirements') or [])
+                             if isinstance(r,dict))
+                service=str(item.get('kind') or '')=='servc'
+                priority=(0 if matching else 1,0 if service else 1,date)
+                seen[key]=(priority,no,order,date.isoformat())
+            if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
         print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(e).__name__,str(e)[:140])
-    # Deterministic extraction fixture, itself an official current/recent public RFP.
     fixture=('R26BK01756420','000','2000-01-01')
     seen.pop('R26BK01756420:000',None)
-    return [fixture]+sorted(seen.values(),key=lambda x:x[2])[:max(0,limit-1)]
+    candidates=[(no,order,date) for _,no,order,date in sorted(seen.values(),key=lambda x:x[0])]
+    return [fixture]+candidates[:max(0,limit-1)]
+
 def legal_file(item):
     url=str(item.get('url') or '')
     u=urllib.parse.urlsplit(url)
@@ -207,13 +240,13 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
     args=parser.parse_args()
-    limit=max(1,min(args.limit,24))
+    limit=max(1,min(args.limit,60))
     now=dt.datetime.now(dt.timezone.utc)
     old={}
     if DEST.exists():
         try:old=json.loads(DEST.read_text()).get('byNotice',{})
         except (ValueError,OSError):pass
-    selected=discover(limit)
+    selected=discover(limit,old)
     results=dict(old)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
     # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
