@@ -163,7 +163,9 @@ def query_saved_bids(limit,offset,only_sw=False):
         from_sql=' FROM bid_notices b '
         if history:
             from_sql+='LEFT JOIN recurring_projects r ON b.kind=r.kind AND b.bid_no=r.bid_no '
-        from_sql+='LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no AND b.bid_ord=q.bid_ord '
+        # Notice ordinal is sometimes stored as "0" while eligibility uses "000".
+        # Join on the normalized ordinal without mutating existing DB primary keys.
+        from_sql+="LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
         where='WHERE b.sw_candidate=1 ' if only_sw else ''
         rows=con.execute('SELECT '+sel+from_sql+where+
             'ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
@@ -277,22 +279,29 @@ class Handler(BaseHTTPRequestHandler):
                         'pageNo':page,'numOfRows':100,'inqryDiv':1,'bizno':bizno
                     })
                     industry_rows.extend(nxt['items'])
-                matching = [x for x in basic['items'] if re.sub(r'[^0-9]','',str(x.get('bizno') or '')) == bizno]
+                # Company/industry API can omit bizno in response rows even when
+                # request was filtered by bizno. Preserve explicitly mismatched rows
+                # as exclusions, but do not silently discard filtered no-bizno rows.
+                def from_requested_company(x):
+                    returned=re.sub(r'[^0-9]','',str(x.get('bizno') or x.get('bsnsRgstNo') or ''))
+                    return not returned or returned==bizno
+                matching = [x for x in basic['items'] if from_requested_company(x) and x.get('corpNm')]
                 codes = [
                     {'code':str(x.get('indstrytyCd') or ''),
                      'name':x.get('indstrytyNm') or '',
-                     'status':x.get('indstrytyStatsNm') or '',
+                     'status':x.get('indstrytyStatsNm') or x.get('indstrytySttusNm') or x.get('statusName') or '',
                      'registeredAt':x.get('rgstDt') or '',
-                     'expiresAt':x.get('vldPrdExprtDt') or '',
+                     'expiresAt':x.get('vldPrdExprtDt') or x.get('expiryDate') or '',
                      'representative':str(x.get('rprsntIndstrytyYn') or '')}
                     for x in industry_rows
-                    if re.sub(r'[^0-9]', '', str(x.get('bizno') or '')) == bizno
+                    if from_requested_company(x) and re.fullmatch(r'\d{4}',str(x.get('indstrytyCd') or ''))
                 ]
                 result = {
                     'ok':True, 'bizno':bizno, 'found':bool(matching),
                     'company':{'name':matching[0].get('corpNm') or '',
                                'registeredAt':matching[0].get('rgstDt') or ''} if matching else None,
                     'industries':codes, 'industryCount':industry_total,
+                    'unattributedResponseRows':sum(1 for x in industry_rows if not x.get('bizno') and not x.get('bsnsRgstNo')),
                     'complete':len(industry_rows) >= industry_total,
                     'has1468':any(x['code']=='1468' for x in codes),
                     'source':'나라장터 사용자정보서비스',
