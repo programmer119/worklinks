@@ -165,7 +165,7 @@ def contract_evidence_query(bid_no,bizno):
         if not isinstance(row,dict):continue
         row_no=str(row.get('bidNtceNo') or row.get('bidPblancNo') or '')
         if row_no and row_no!=bid_no:continue
-        number=next((re.sub(r'\\D','',str(row.get(k))) for k in number_fields
+        number=next((re.sub(r'\D','',str(row.get(k))) for k in number_fields
                      if row.get(k)), '')
         if not number:
             unattributed+=1
