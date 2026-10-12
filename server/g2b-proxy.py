@@ -182,8 +182,12 @@ def query_saved_bids(limit,offset,only_sw=False):
                 except (ValueError,TypeError): pass
             items.append(obj)
         checked=con.execute('SELECT COUNT(*) FROM bid_license_cache').fetchone()[0]
+        linked=con.execute("SELECT COUNT(*) FROM bid_notices b INNER JOIN bid_license_cache q "
+            "ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
+            "WHERE b.sw_candidate=1").fetchone()[0]
         return {'ok':True,'items':items,'totalCount':matching if only_sw else total,
                 'storedTotal':total,'candidateTotal':matching,'eligibilityChecked':checked,
+                'eligibilityLinked':linked,
                 'limit':limit,'offset':offset,'persisted':True}
     finally:con.close()
 
