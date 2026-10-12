@@ -1358,6 +1358,35 @@ async function loadJobEligibility(x){
 
 
 var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='';
+var rfpAiByNotice=new Map(),rfpAiCheckedAt='';
+function rfpAiForJob(x){
+ const id=jobBidIdentity(x);
+ const key=id? id.bidNo+':'+id.order:'';
+ const report=rfpAiByNotice.get(key),source=rfpSnapshotByNotice.get(key);
+ if(!report||report.analysisStatus!=='classified'||!source)return null;
+ const original=new Set((source.files||[]).filter(f=>f.readable)
+  .flatMap(f=>(f.clauseCandidates||[]).map(c=>
+   String(c.type||'')+'|'+String(c.sourceFile||f.name||'')+'|'+String(c.sourceText||'').trim().slice(0,280))));
+ const records=report.requirements||[];
+ if(!records.length||records.some(c=>c.sourceVerified!==true||c.documentFullyReviewed!==false||
+   !original.has(String(c.type||'')+'|'+String(c.sourceFile||'')+'|'+String(c.sourceText||'').trim().slice(0,280))))return null;
+ return report;
+}
+async function refreshRfpAiSnapshot(){
+ try{
+  const response=await fetch('./ai-qualification.json',{cache:'no-store'});
+  if(!response.ok)return;
+  const data=await response.json();
+  if(data.ok!==true||!data.byNotice)return;
+  rfpAiByNotice=new Map(Object.entries(data.byNotice));
+  rfpAiCheckedAt=data.generatedAt||'';
+  renderJobs();
+  if(activeDetailJobId){const x=getJobById(activeDetailJobId);if(x)renderJobDetail(x)}
+  if(partnerScopedJob)renderPartnerJobContext();
+ }catch(e){
+  // Missing AI snapshot is not evidence of eligibility or absence of conditions.
+ }
+}
 function rfpSnapshotForJob(x){
  const id=jobBidIdentity(x);
  return id?rfpSnapshotByNotice.get(id.bidNo+':'+id.order):null;
@@ -1370,6 +1399,7 @@ async function refreshRfpSnapshot(){
   if(source.ok!==true||!source.byNotice)return;
   rfpSnapshotByNotice=new Map(Object.entries(source.byNotice));
   rfpSnapshotCheckedAt=source.generatedAt||'';
+  refreshRfpAiSnapshot();
   renderJobs();
   if(activeDetailJobId){const x=getJobById(activeDetailJobId);if(x)renderJobDetail(x)}
   if(partnerScopedJob)renderPartnerJobContext();
@@ -1441,6 +1471,13 @@ const productionNames=['정보시스템개발서비스','정보시스템유지�
 function extractedRfpRequirements(x){
  const data=typeof rfpSnapshotForJob==='function'?rfpSnapshotForJob(x):null;
  if(data?.status!=='text_extracted_requires_review'||data.reviewComplete!==false)return '';
+ const ai=rfpAiForJob(x);
+ if(ai){
+  // Exclude optional/context-only clauses from mandatory requirement matching.
+  return (ai.requirements||[]).filter(c=>c.classification==='mandatory'||
+       (c.classification==='prohibited'&&c.type==='joint_participation')||
+       c.classification==='unknown').map(c=>String(c.sourceText||'')).join(' ').slice(0,9000);
+ }
  return (data.files||[]).filter(f=>f.readable).flatMap(f=>{
   const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&
    ['industry_code','direct_production','sme_certificate','staff_proof',
