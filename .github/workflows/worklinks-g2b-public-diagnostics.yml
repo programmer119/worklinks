@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/worklinks-g2b-public-diagnostics.yml'
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_direct_production.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +22,7 @@ jobs:
           set -Eeuo pipefail
           python3 -m py_compile server/g2b-proxy.py
           python3 tests/test_g2b_eligibility_join.py
+          python3 tests/test_direct_production.py
           node tests/worklinks-jobs-regression.cjs
           node tests/worklinks-live-partner-smoke.cjs
       - name: Verify public GitHub Pages content matches current main
@@ -88,6 +92,9 @@ jobs:
               'eligibilityAttached':bool(eligibility),
               'requirementsCount':len(eligibility.get('requirements') or []),
               'licenseComplete':eligibility.get('complete')},ensure_ascii=False))
+          production=get('/direct-production?bizno=1308185973')
+          if production:
+            print('PARTNER_PRODUCTION_SNAPSHOT',{'ok':production.get('ok'),'snapshot':production.get('snapshotDate'),'records':production.get('recordCount'),'found':production.get('found')})
           company=get('/company?bizno=1308185973')
           if company:
             print('PARTNER_REGISTRY',{
