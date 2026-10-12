@@ -98,6 +98,28 @@ const expiredCompany={...realCompany,industryRecords:[{code:'1468',status:'정�
 assert.equal(real.partnerRegisteredCode(expiredCompany,'1468'),false,'expired registration is not valid');
 
 
+// Real direct-production comparison: historical evidence must not imply live validity.
+const directMod=new Function('kstISO',
+ part('const productionNames=','function comparePartnerJob(x,p){')+
+ 'return {productionRequirementCheck};'
+)(()=>'2026-10-12');
+const prodP={productionCheckedAt:'2026-10-12T04:41:45Z',productionSnapshotDate:'2026-02-01',
+ productionRecords:[{product:'정보시스템개발서비스',validFrom:'2025-01-16',validTo:'2027-01-15'},
+  {product:'데이터처리서비스',validFrom:'2025-01-16',validTo:'2027-01-15'}]};
+const direct=txt=>directMod.productionRequirementCheck({condition:txt,partnerBidMode:''},prodP);
+assert.equal(direct('정보시스템개발서비스 직접생산확인증명서 필요').status,'ok');
+assert.equal(direct('직접생산확인증명서 8111159901 제출').status,'ok');
+assert.equal(direct('정보시스템유지관리서비스 직접생산확인증명서 필수').status,'pending');
+assert.equal(direct('직접생산확인증명서 제출').status,'unknown');
+assert.equal(direct('업체 등록 1468').applicable,false);
+assert.equal(directMod.productionRequirementCheck({condition:'정보시스템개발서비스 직접생산확인증명서 필요'},{}).status,'pending');
+assert.equal(directMod.productionRequirementCheck({condition:'정보시스템개발서비스 직접생산확인증명서 필요'},{
+ ...prodP,productionRecords:[{product:'정보시스템개발서비스',validTo:'2025-10-01'}]
+}).status,'pending','expired historical certificate must not mean current proof');
+assert.equal(direct('정보시스템개발서비스 및 정보시스템유지관리서비스 직접생산확인증명서 필요').status,'unknown','multiple requirements need AND/OR analysis');
+assert.ok(source.includes("공개자료 기준일 이후 취소·변경 여부는 SMPP 최신 확인 필요"));
+assert.ok(source.includes('directBadge'));
+
 // Readable card and detail copy: no opaque 1468 chip or duplicate "pending" labels.
 assert.ok(source.includes("diff===0?'D-DAY':'D-'+diff"));
 assert.ok(source.includes('업종 일치 · 추가서류 확인 필요'));
