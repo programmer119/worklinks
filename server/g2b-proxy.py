@@ -152,43 +152,80 @@ def contract_capability_query():
             'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'}
 
 
+def _contract_items(value):
+    """Flatten response wrappers only; avoid interpreting bidder/winner as contractor."""
+    if isinstance(value,str):
+        try:value=json.loads(value)
+        except (ValueError,TypeError):return []
+    if isinstance(value,list):return [x for x in value if isinstance(x,dict)][:150]
+    if isinstance(value,dict):
+        for key in ('item','items','cntrctInfo','contract','contracts','corp','corps'):
+            if key in value:return _contract_items(value[key])
+        return [value]
+    return []
+
+def _contract_business_number(row):
+    """Only explicitly named contractor/company registration fields are acceptable."""
+    fields=('cntrctCorpBizno','cntrctCorpBizNo','cntrctEntrprsBizno',
+            'cntrctEntrprsBizNo','cntrctCorpBrno','cntrctCorpBizrno',
+            'cntrctEntrprsBrno','contractorBizno','bizno',
+            'corpBizno','corpBizNo','corpBizrno','corpBrno',
+            'corpBsnsRgstNo','bsnsRgstNo','entrprsBizno','entrprsBizNo')
+    return [re.sub(r'\D','',str(row[k])) for k in fields
+            if row.get(k) and len(re.sub(r'\D','',str(row[k])))==10]
+
 def contract_evidence_query(bid_no,bizno):
-    """Check known public contract process by bid, without attributing anonymous rows."""
+    """Credit contracts ONLY after matching a contractor company registration ID.
+
+    cntrctInfoList/corpList can be nested arrays or JSON strings.
+    bidwinrInfoList proves a winning bid, not a contract, and is intentionally ignored.
+    """
     params={'pageNo':1,'numOfRows':100,'inqryDiv':1,'bidNtceNo':bid_no}
     data=request_api(CONTRACT_PROCESS_BASE,'getCntrctProcssIntgOpenServc',params)
     complete=len(data['items'])>=data['totalCount']
-    verified=[];unattributed=0;other=0
-    number_fields=('cntrctCorpBizno','cntrctCorpBizNo','cntrctEntrprsBizno',
-                   'cntrctEntrprsBizNo','cntrctCorpBrno','cntrctCorpBizrno',
-                   'cntrctEntrprsBrno','contractorBizno','bizno')
+    verified=[];unattributed=0;other=0;subrecords=0;subkeys=set()
     for row in data['items']:
         if not isinstance(row,dict):continue
         row_no=str(row.get('bidNtceNo') or row.get('bidPblancNo') or '')
         if row_no and row_no!=bid_no:continue
-        number=next((re.sub(r'\D','',str(row.get(k))) for k in number_fields
-                     if row.get(k)), '')
-        if not number:
-            unattributed+=1
-            continue
-        if number!=bizno:
-            other+=1
-            continue
-        verified.append({
-            'bidNo':bid_no,'companyBiznoMatched':True,
-            'contractNo':_pick(row,['cntrctNo','dcsnCntrctNo','cntrctRefNo']),
-            'title':_pick(row,['cntrctNm','cntrctName','bidNtceNm']),
-            'date':_pick(row,['cntrctCnclsDate','cntrctDate','cntrctDt']),
-            'amount':_pick(row,['thtmCntrctAmt','cntrctAmt','totCntrctAmt']),
-            'agency':_pick(row,['cntrctInsttNm','dminsttNm','ntceInsttNm']),
-            'performanceComplete':None,'inspectionComplete':None,'certificateAvailable':None
-        })
+        raw=row.get('cntrctInfoList')
+        entries=_contract_items(raw) if raw is not None else [row]
+        # An empty contract list proves neither a contract nor nonperformance.
+        if not entries:unattributed+=1;continue
+        for entry in entries:
+            subrecords+=1;subkeys.update(entry.keys())
+            companyrows=[entry]
+            for field in ('corpList','cntrctCorpList','cntrctEntrprsList'):
+                companyrows.extend(_contract_items(entry.get(field)))
+            ids=set(num for company in companyrows for num in _contract_business_number(company))
+            if not ids:
+                unattributed+=1
+                continue
+            if bizno not in ids:
+                other+=1
+                continue
+            verified.append({
+                'bidNo':bid_no,'companyBiznoMatched':True,
+                'contractNo':_pick(entry,['cntrctNo','dcsnCntrctNo','cntrctRefNo']) or
+                             _pick(row,['cntrctNo','dcsnCntrctNo','cntrctRefNo']),
+                'title':_pick(entry,['cntrctNm','cntrctName','bidNtceNm']) or
+                        _pick(row,['cntrctNm','cntrctName','bidNtceNm']),
+                'date':_pick(entry,['cntrctCnclsDate','cntrctDate','cntrctDt']) or
+                       _pick(row,['cntrctCnclsDate','cntrctDate','cntrctDt']),
+                'amount':_pick(entry,['thtmCntrctAmt','cntrctAmt','totCntrctAmt']) or
+                         _pick(row,['thtmCntrctAmt','cntrctAmt','totCntrctAmt']),
+                'agency':_pick(entry,['cntrctInsttNm','dminsttNm','ntceInsttNm']) or
+                         _pick(row,['cntrctInsttNm','dminsttNm','ntceInsttNm']),
+                'performanceComplete':None,'inspectionComplete':None,'certificateAvailable':None
+            })
     return {'ok':True,'bidNo':bid_no,'bizno':bizno,'totalCount':data['totalCount'],
             'complete':complete,'contracts':verified,'attributableCount':len(verified),
             'unattributedCount':unattributed,'otherCompanyCount':other,
+            'nestedContractItems':subrecords,'nestedContractFields':sorted(subkeys),
             'schemaFields':sorted(data['items'][0].keys()) if data['items'] and isinstance(data['items'][0],dict) else [],
             'source':'나라장터 계약과정통합공개서비스',
             'contractPerformanceVerified':False,
-            'limitations':'사업자번호 일치가 명시된 계약기록만 회사에 귀속. 이행완료·검수·실적증명은 별도 확인 필요.'}
+            'limitations':'계약 기업정보의 명시된 사업자번호가 정확히 일치할 때만 귀속합니다. 낙찰정보만 일치하면 계약실적으로 귀속하지 않습니다. 이행완료·검수·실적증명은 별도 확인 필요.'}
 
 
 def _bid_evidence_fetch(operation, bid_no, order):
