@@ -791,7 +791,14 @@ async function g2bLoadSaved(append){
     const data=await g2bFetch('/saved?sw=1&limit='+pageSize+'&offset='+offset);
     total=Number(data.totalCount||0);
     const records=Array.isArray(data.items)?data.items:[];
-    for(const row of records){const card=g2bCardFromServer(row);if(card)seen.set(card.id,card)}
+    for(const row of records){
+     if(row.bidEligibility?.ok&&row.bidNo){
+      const k=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
+      bidEligibilityCache.set(k,row.bidEligibility);
+     }
+     const card=g2bCardFromServer(row);
+     if(card)seen.set(card.id,card);
+    }
     if(!records.length||offset+records.length>=total)break;
    }
    g2bLiveJobs=[...seen.values()];
@@ -801,7 +808,7 @@ async function g2bLoadSaved(append){
   }
   renderJobs();
   if(!append)refreshAllPartnerRegistries().then(queueVisibleBidEligibility);
-  out.textContent='서버 DB SW 후보 '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 현재 불러온 '+g2bLiveJobs.length+'건 · 마감/진행 분리 · 정렬은 불러온 전체 기준';
+  out.textContent='서버 DB SW 후보 '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 업종요건 조회 '+bidEligibilityCache.size.toLocaleString('ko-KR')+'건 · 매칭은 확인된 업체자격만 표시 · 정렬은 불러온 전체 기준';
   return {total:g2bSavedTotal,candidateTotal:g2bSavedTotal};
  }catch(e){
   if(!append){g2bLiveJobs=g2bLocalRead();renderJobs()}
