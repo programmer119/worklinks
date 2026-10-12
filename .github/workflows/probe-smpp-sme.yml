@@ -27,19 +27,23 @@ jobs:
               try:body=raw.decode(codec);print('DECODED_AS',codec);break
               except UnicodeDecodeError:pass
             else:body=raw.decode('utf-8','replace')
-            for term in ['name="searchForm"','searchBsnmNo','searchEntrpsNm','selectMiddlSslentrSchtwrListVw.do','fn_search','fnSearch','searchMiddl','selectMiddl','searchEntrps','기업규모','유효여부','fn_getList']:
-              hits=[m.start() for m in re.finditer(re.escape(term),body,re.I)]
-              print('LOOKUP_TERM',term,'COUNT',len(hits))
-              for pos in hits[-7:]:
-                print('LOOKUP_CONTEXT',term,html.unescape(body[max(0,pos-450):min(len(body),pos+540)]).replace('\\n',' ')[:1000])
+            def compact(value,limit=1500):
+              return re.sub(r'\\s+',' ',html.unescape(value))[:limit]
             m=re.search(r'<form\\s+name="searchForm".*?</form>',body,re.S|re.I)
+            print('SEARCH_FORM_FOUND',bool(m))
             if m:
-              content=m.group(0)
-              print('SEARCH_FORM_LENGTH',len(content))
-              print('SEARCH_FORM_FIELDS',re.findall(r'name="([^"]+)"',content,re.I))
-              for match in re.finditer('onclick=|검색|사업자등록번호',content,re.I):
-                i=match.start()
-                print('FORM_ACTION',html.unescape(content[max(0,i-120):i+250]).replace('\\n',' ')[:390])
+              form=m.group(0)
+              print('SEARCH_FORM_FIELDS',re.findall(r'name="([^"]+)"',form,re.I))
+              print('SEARCH_FORM_INPUTS',re.findall(r'<input[^>]*>',form,re.I)[:18])
+              for term in ['사업자등록번호','검색','searchBsnmNo','searchNm','onclick=']:
+                for match in list(re.finditer(term,form,re.I))[:4]:
+                  print('FORM_LOOKUP',term,compact(form[max(0,match.start()-200):match.start()+330],530))
+            for marker in ['function fn_search','function fn_getList','function fn_searchData','function fn_searchList','function fn_selectList','function fn_getSearch','function fn_searchBtn']:
+              pos=body.find(marker)
+              print('JS_FN',marker,pos,compact(body[pos:pos+1900],1900) if pos>=0 else '')
+            for tag in re.findall(r'<script[^>]+src="([^"]+)"',body,re.I):
+              if 'middl' in tag.lower() or 'smppInf' in tag:
+                print('RELEVANT_SCRIPT',tag)
           except Exception as e:
             print('SMPP_PROBE_ERROR',type(e).__name__,str(e)[:250])
             raise
