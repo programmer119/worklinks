@@ -1,0 +1,43 @@
+name: WorkLinks AI inference endpoint probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-ai-provider-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  models: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Probe supported GitHub Models endpoints without logging credentials
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error
+          payload=json.dumps({"model":"openai/gpt-4o-mini","messages":[{"role":"user","content":"Reply with a JSON object containing {\"ok\":true}."}],"max_tokens":80,"response_format":{"type":"json_object"}}).encode()
+          urls=[
+            "https://models.github.ai/inference/chat/completions",
+            "https://api.github.com/inference/chat/completions",
+            "https://models.inference.ai.azure.com/chat/completions",
+            "https://models.github.ai/orgs/programmer119/inference/chat/completions",
+          ]
+          for u in urls:
+            req=urllib.request.Request(u,data=payload,headers={
+              "Authorization":"Bearer "+os.environ["GITHUB_TOKEN"],
+              "Content-Type":"application/json","Accept":"application/vnd.github+json"},method="POST")
+            try:
+              with urllib.request.urlopen(req,timeout=23) as r:
+                b=r.read()
+                print("MODEL_ENDPOINT_PROBE",u.split('/')[2:4],r.status,r.headers.get('Content-Type'),len(b),
+                      "valid_json",bool(b) and (lambda z:isinstance(z,dict) and bool(z.get('choices')))(json.loads(b)))
+            except urllib.error.HTTPError as e:
+              print("MODEL_ENDPOINT_PROBE_HTTP",u.split('/')[2:4],e.code,str(e.headers.get('Content-Type') or ''))
+            except Exception as e:
+              print("MODEL_ENDPOINT_PROBE_ERROR",u.split('/')[2:4],type(e).__name__)
+          PY
