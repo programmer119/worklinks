@@ -1,0 +1,34 @@
+name: WorkLinks G2B API safe deploy
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'server/deploy-g2b-api-only.sh'
+      - '.github/workflows/worklinks-g2b-api-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: worklinks-g2b-api-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, X64, server123, research-general]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard dedicated server123 WorkLinks runner
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          echo "Runner name: $RUNNER_NAME"
+          test "$RUNNER_NAME" = "123-research-general-06"
+          test -s /home/worklinks/g2b/data/bids.sqlite3
+          test -s /home/worklinks/g2b/g2b-proxy-docker.py
+      - name: Safe G2B API-only deployment and public smoke test
+        shell: bash
+        run: bash server/deploy-g2b-api-only.sh
