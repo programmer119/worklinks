@@ -293,6 +293,7 @@
 #jobsView .job-info-pop .bid-method h4{font-size:15px}
 #jobsView .job-info-pop .bid-method p,#jobsView .job-info-pop .bid-method .bid-method-notes{font-size:14px}
 
+#jobsView #g2bMore{font-size:16px;min-height:45px;padding:11px 17px}
 </style>
 </head>
 <body><main>
@@ -409,7 +410,7 @@
  <button type="button" class="job-vf blocked" data-verdict-filter="blocked" aria-pressed="false">지원 불가 <span data-verdict-count="blocked">0</span></button>
  <button type="button" class="job-vf checking" data-verdict-filter="checking" aria-pressed="false">검증 중 <span data-verdict-count="checking">0</span></button>
 
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
+ </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select> </div>
 
 
 
@@ -1796,8 +1797,7 @@ function renderJobs(){
  const candidateJobs=active;
  const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>participationVerdict(o.x,p).type===type)).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
- document.getElementById('partnerJobCount').textContent='(바로 '+statusTotal('ready')+' · 조건부 '+statusTotal('conditional')+
-  ' · 불가 '+statusTotal('blocked')+' · 검증 '+statusTotal('checking')+')';
+ document.getElementById('partnerJobCount').textContent='('+active.length+')';
  document.getElementById('partnerSummary').textContent=
   '미마감 '+active.length+'건 · 바로 지원 '+statusTotal('ready')+' · 조건부 '+statusTotal('conditional')+
   ' · 지원 불가 '+statusTotal('blocked')+' · 검증 중 '+statusTotal('checking')+
