@@ -29,11 +29,11 @@ try:
     assert data['region']['ok'] and data['region']['complete']
     assert data['region']['count']==2
     assert data['region']['items']==[{'name':'서울특별시','code':'11'}]
-    assert len(data['attachments']['items'])==4
+    assert len(data['attachments']['items'])==3
     assert data['attachments']['items'][0]['name']=='제안요청서.pdf'
     assert data['attachments']['items'][1]['url']==''
     assert data['attachments']['items'][2]['source']=='notice_detail'
-    assert data['attachments']['items'][3]['name']=='별도 과업지시서.pdf'
+    assert data['attachments']['items'][2]['name']=='입찰공고 제안요청서.pdf'
     assert data['attachments']['eorderCount']==2
     assert data['attachments']['noticeDetailDocumentCount']==2
     assert data['noticeDocuments']['ok']
