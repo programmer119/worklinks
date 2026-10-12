@@ -12,13 +12,17 @@ const time=new Function(
  'function kstNow(){return new Date(Date.UTC(2026,9,12,10,0))};'+
  "function kstISO(){return '2026-10-12'};"+
  part('function dayValue(value,asEnd){','function jobAmountLabel(raw){')+
- 'return {dayValue,jobTimeInfo,jobDayCounter};'
+ 'return {dayValue,jobTimeInfo,jobDayCounter,jobDeadlineStamp};'
 )();
 assert.equal(new Date(time.dayValue('2026-10-14T18:00:00+09:00')).toISOString().slice(0,16),'2026-10-14T18:00');
 assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'202610141500'})).label,'D-2');
 assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'2026-10-12 18:00'})).label,'D-0');
 assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:''})).label,'일정 미확인');
 assert.equal(time.jobTimeInfo({closes:'2026.10.10 18:00'}).key,'closed');
+assert.equal(time.jobDayCounter(time.jobTimeInfo({closes:'2026-10-15 18:00'})).label,'D-3');
+assert.equal(time.jobDeadlineStamp(time.jobTimeInfo({closes:'2026-10-15 18:00'})),'10.15 18:00');
+assert.equal(time.jobDeadlineStamp(time.jobTimeInfo({closes:''})),'');
+assert.equal(time.jobDeadlineStamp(time.jobTimeInfo({closes:'2026-10-12 13:00'})),'10.12 13:00');
 const scope=new Function(part('const hardwarePurchasePattern=','function noticeGroupKey(x){')+'return jobSoftwareScope;')();
 assert.equal(scope({kind:'thng',title:'GPU 컴퓨터 서버 구매'}),'out');
 assert.equal(scope({kind:'cnstwk',title:'CCTV 통신 공사'}),'out');
