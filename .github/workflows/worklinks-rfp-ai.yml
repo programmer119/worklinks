@@ -1,0 +1,76 @@
+name: WorkLinks automatic AI RFP qualifications
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-rfp-ai.yml'
+      - 'scripts/analyze_worklinks_rfp_ai.py'
+      - 'tests/test_rfp_ai.py'
+      - 'startup-support/rfp-clauses.json'
+  workflow_dispatch:
+  schedule:
+    - cron: '15 1,7,13,19 * * *'
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: worklinks-rfp-ai-snapshot
+  cancel-in-progress: false
+
+jobs:
+  interpret:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regression tests — evidence citation and model safety
+        run: python3 tests/test_rfp_ai.py
+      - name: Interpret a bounded set of official public RFP clauses with GitHub Models
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          WORKLINKS_AI_MODEL: openai/gpt-4o-mini
+        run: |
+          set -Eeuo pipefail
+          python3 scripts/analyze_worklinks_rfp_ai.py --limit 4
+      - name: Publish only validated AI evidence, merge-safe
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp startup-support/ai-qualification.json /tmp/worklinks-ai-qualification-new.json
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('startup-support/ai-qualification.json')
+          fresh=json.loads(pathlib.Path('/tmp/worklinks-ai-qualification-new.json').read_text())
+          previous=json.loads(p.read_text()) if p.exists() else {'byNotice':{}}
+          merged=dict(previous.get('byNotice') or {})
+          for key,v in (fresh.get('byNotice') or {}).items():
+            old=merged.get(key) or {}
+            if old.get('checkedAt','')>v.get('checkedAt',''):
+              continue
+            if v.get('analysisStatus')=='classified' and all(
+                x.get('sourceVerified') is True and x.get('documentFullyReviewed') is False
+                for x in v.get('requirements') or []):
+              merged[key]=v
+          result={'ok':True,'model':fresh.get('model'),
+                  'generatedAt':fresh.get('generatedAt'),
+                  'source':'Github Models RFP excerpt classification',
+                  'reviewComplete':False,'byNotice':dict(list(merged.items())[-300:])}
+          p.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print('WORKLINKS_AI_SNAPSHOT_MERGED',len(result['byNotice']))
+          PY
+            git add startup-support/ai-qualification.json
+            if git diff --cached --quiet; then echo 'WORKLINKS_AI_SNAPSHOT_UNCHANGED'; exit 0; fi
+            git commit -m 'data: publish citation-checked automated RFP clause classifications'
+            if git push origin HEAD:main; then echo 'WORKLINKS_AI_SNAPSHOT_PUBLISHED'; exit 0; fi
+            echo "AI_SNAPSHOT_CONFLICT_RETRY_$attempt"
+            sleep 2
+          done
+          exit 1
