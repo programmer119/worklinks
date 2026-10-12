@@ -533,6 +533,12 @@ function renderPartners(){
    p.awardEvidence.map(a=>'<div><b>'+htmlEscape(a.title)+'</b> · 낙찰금액 '+
     (a.amount?htmlEscape(a.amount.toLocaleString('ko-KR'))+'원':'금액 미표시')+
     ' · '+htmlEscape(a.awardedAt||'낙찰일 미표시')+
+    ' · <span title="낙찰 기록과 계약 이행실적은 구별합니다.">'+
+    htmlEscape(a.contractEvidence?.ok===true&&a.contractEvidence.attributableCount>0?
+     '계약기록 '+a.contractEvidence.attributableCount+'건(이행·검수 미확인)':
+     a.contractEvidence?.ok===true?
+      '계약정보 미귀속 · 확인 필요':
+      '계약정보 API '+(a.contractEvidence?.error||'확인 전'))+'</span>'+
     ' · <a target="_blank" rel="noopener noreferrer" href="https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo='+encodeURIComponent(a.bidNo)+
     '&bidPbancOrd=000">공고 원문 ↗</a></div>').join('')+
    '</div><p class="partner-foot">공식 낙찰업체 사업자번호 일치. 계약체결·수행완료·검수·실적증명 여부는 아직 미확인입니다. 전체 실적 전수조사가 아닌 확인된 공고만 표시합니다.</p></section>':'';
@@ -608,6 +614,16 @@ async function refreshPartnerAwardEvidence(p){
      amount:Number(r.sucsfbidAmt)||0,awardedAt:String(r.fnlSucsfDate||''),source:'나라장터 낙찰정보서비스'});
    }
   }
+  // Independent contract-process lookup: do NOT confuse a winning notice with
+  // executed/performed contracts. Only the API's exact bizno match is attributable.
+  const contractResults=await Promise.allSettled(verified.map(a=>
+   g2bFetch('/contract-evidence?bidNo='+encodeURIComponent(a.bidNo)+'&bizno='+encodeURIComponent(bizno))));
+  for(let i=0;i<verified.length;i++){
+   const response=contractResults[i];
+   const data=response.status==='fulfilled'?response.value:
+    {ok:false,error:String(response.reason?.message||'계약정보 조회 실패')};
+   verified[i].contractEvidence=data;
+  }
   p.awardEvidence=verified;p.awardEvidenceErrors=errors;p.awardCheckedAt=new Date().toISOString();
   setPartnerQual(p,'공식 낙찰이력',{
    state:verified.length?'confirmed':'pending',
@@ -625,14 +641,16 @@ async function refreshContractCapability(){
  if(contractCapabilityPromise)return contractCapabilityPromise;
  contractCapabilityPromise=(async function(){
   try{contractCapabilityRecord=await g2bFetch('/contract-capability')}
-  catch(e){contractCapabilityRecord={ok:false,authorized:false,error:String(e.message||e)}}
+  catch(e){contractCapabilityRecord={ok:false,authorized:null,error:String(e.message||e)}}
   for(const p of partners.filter(z=>z.businessNo)){
    p.contractCapability=contractCapabilityRecord;
    const authorized=contractCapabilityRecord.authorized===true;
    setPartnerQual(p,'공공계약·수행실적',{state:'pending',
     value:authorized?'계약 API 접근 가능 · 업체 수행실적 별도 대조':'계약 API 권한·접근 확인 필요',
     detail:authorized?'공식 계약정보 API 호출 성공. 개별 업체의 전체 계약·검수·실적증명서는 아직 확인되지 않음.':
-     '사유: '+(contractCapabilityRecord.error||'미승인')+' · 활용신청 https://www.data.go.kr/data/15129427/openapi.do'});
+     '원 서비스: '+(contractCapabilityRecord.error||'접근 실패')+
+     ' · 계약과정통합공개: '+(contractCapabilityRecord.alternative?.ok?'호출 성공':'오류 '+(contractCapabilityRecord.alternative?.error||'미확인'))+
+     ' · 기본 계약정보 활용신청: https://www.data.go.kr/data/15129427/openapi.do'});
   }
   renderPartners();renderJobs();
   if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
