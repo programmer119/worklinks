@@ -1542,6 +1542,27 @@ function comparePartnerJob(x,p){
   }
   if(!req.complete)add('partial','면허제한 일부만 조회됨','unknown','조회 페이지 누락 또는 제한 항목 누락','나라장터 API');
  }
+ const aiReport=rfpAiForJob(x);
+ if(aiReport){
+  const labelOf={industry_code:'등록업종',direct_production:'직접생산',
+   sme_certificate:'기업규모 확인서',staff_proof:'기술인력 증빙',
+   performance_proof:'수행실적',region_restriction:'지역제한',
+   joint_participation:'공동수급·하도급 제한'};
+  for(const clause of (aiReport.requirements||[])){
+   if(clause.classification==='optional'||clause.classification==='context_only')continue;
+   const codes=(clause.codes||[]).filter(c=>/^\d{4}$/.test(String(c)));
+   let status='unknown';
+   if(clause.classification==='mandatory'&&clause.type==='industry_code'&&codes.length===1&&
+      partnerRegisteredCode(p,codes[0])===true)status='ok';
+   if(clause.classification==='mandatory'&&
+      (clause.type==='staff_proof'||clause.type==='performance_proof'))status='pending';
+   add('ai-'+clause.index,'AI 분류: '+(labelOf[clause.type]||clause.type)+
+     ' · '+(clause.classification==='mandatory'?'필수':
+      clause.classification==='prohibited'?'금지·제한':'불명확'),
+     status,clause.sourceText+' · '+clause.reason+
+     ' · 전체 공고·예외 조항은 아직 미검토','공식 RFP '+clause.sourceFile+' · AI 문장 해석');
+  }
+ }
  const txt=String(x.condition||'')+' '+String(x.partnerBidMode||'')+' '+extractedRfpRequirements(x);
  const production=productionRequirementCheck(x,p);
  if(production.applicable){
@@ -1748,6 +1769,18 @@ function renderJobDetail(x){
   '<p>※ 첨부파일 메타데이터 조회 완료. 과업지시서·RFP 전체 참가조건 분석은 별도 검증 필요.</p></section>':
   '<section class="job-detail-section"><h3>공식 첨부파일</h3><p>'+htmlEscape(docs?.error||'공식 조회 대기 · 원문 확인 필요')+'</p></section>';
  const extracted=rfpSnapshotForJob(x);
+ const aiReport=rfpAiForJob(x);
+ const aiLabels={mandatory:'필수조건',optional:'선택사항',prohibited:'금지·제한',context_only:'참고 설명',unknown:'원문 재검토'};
+ const aiHTML=aiReport?'<section class="job-detail-section"><h3>AI 참가조건 자동분류 · '+aiReport.interpretedCount+'개 조항</h3>'+
+  '<p>공식 문서에서 인용한 구절의 AI 분류입니다. 전체 공고 검토나 바로 지원 가능 판정은 아닙니다.</p>'+
+  (aiReport.requirements||[]).slice(0,50).map(r=>
+   '<div class="job-match-row"><div class="job-match-main"><strong>'+
+   htmlEscape(aiLabels[r.classification]||'검토 필요')+
+   ' · '+htmlEscape(r.type)+(r.codes?.length?' · '+htmlEscape(r.codes.join(', ')):'')+
+   '</strong><small>'+htmlEscape(r.sourceText||'')+'</small>'+
+   '<small>AI 해석: '+htmlEscape(r.reason||'')+' · 파일: '+htmlEscape(r.sourceFile||'')+
+   '</small></div><span class="jobmatch-chip pending">전체 공고 미검토</span></div>').join('')+
+  '</section>':'';
  const readable=(extracted?.files||[]).filter(f=>f.readable);
  const extractHTML=readable.length?'<section class="job-detail-section"><h3>공식 RFP 텍스트 발췌 · 자동분석 참고</h3>'+
   '<p>공식 다운로드 문서 '+readable.length+'건 · 해당 문구의 필수·선택·예외 조항은 원문 재확인이 필요합니다.</p>'+
@@ -1770,7 +1803,7 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+extractHTML+variantLinks+actions;
+ document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+aiHTML+extractHTML+variantLinks+actions;
 }
 function openJobDetail(id){
  const x=getJobById(id);if(!x)return;
