@@ -459,8 +459,11 @@ class Handler(BaseHTTPRequestHandler):
                     'ok':True, 'bizno':bizno, 'found':bool(matching),
                     'company':{'name':matching[0].get('corpNm') or '',
                                'registeredAt':matching[0].get('rgstDt') or '',
-                               'address':_pick(matching[0],['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr']),
-                               'addressField':next((key for key in ['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), ''),
+                               'address':_pick(matching[0],['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr']),
+                               'addressDetail':_pick(matching[0],['dtlAdrs']),
+                               'regionName':_pick(matching[0],['rgnNm']),
+                               'regionCode':_pick(matching[0],['rgnCd']),
+                               'addressField':next((key for key in ['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), ''),
                                'availableFields':sorted(matching[0].keys())
                               } if matching else None,
                     'industries':codes, 'industryCount':industry_total,
