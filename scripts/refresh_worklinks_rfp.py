@@ -221,7 +221,7 @@ def extract_rule_candidates(text,filename):
             seen.add(key)
             out.append({'type':topic,'codes':codes[:6],'sourceFile':filename[:160],
                'sourceText':phrase,'reviewStatus':'unreviewed',
-               'explicitMust':bool(re.search(r'반드시|필수|입찰참가자격|소지하여야|제출하여야|첨부하여야',line)),
+               'explicitMust':bool(re.search(r'반드시|필수|입찰참가자격|소지하여야|제출하여야|첨부하여야|소지한\s*자|등록한\s*자|제출한\s*자|구비한\s*자',line)),
                'documentRequiresManualFullReview':True})
             if len(out)>=42:return out
     return out
