@@ -20,6 +20,7 @@ jobs:
           python3 -m py_compile server/g2b-proxy.py
           python3 tests/test_g2b_eligibility_join.py
           node tests/worklinks-jobs-regression.cjs
+          node tests/worklinks-live-partner-smoke.cjs
       - name: Verify public GitHub Pages content matches current main
         shell: bash
         run: |
