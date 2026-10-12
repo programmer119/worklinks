@@ -54,4 +54,37 @@ assert.equal(dedupe([
  {...base,id:'annual-1',noticeNumber:'R25BK00000001',posted:'2025-10-01'},
  {...base,id:'annual-2',noticeNumber:'R26BK00000002',posted:'2026-10-01'}
 ]).length,2,'annual reprocurement must remain separate');
-console.log('Worklinks job regression: deadline, scope, AND/OR, correction, yearly bids PASS');
+
+// Partner selector is sourced from the registry and filters by *confirmed* match IDs.
+const filterSection=part('var jobFilter="all",jobRenderLimit=100','function jobEntryLabel(v){');
+const filterSelect={
+ value:'all',innerHTML:'',closest:()=>({classList:{toggle:()=>{}}})
+};
+const companies=[{id:'changcom',name:'창컴정보통신(주)'}];
+const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob',
+ filterSection+
+ 'return {syncPartnerFilterChoices,jobMatchesSelectedPartner,getSelected:()=>selectedPartnerId,setSelected:v=>{selectedPartnerId=v}};'
+)(
+ companies,{getElementById:id=>id==='partnerFilter'?filterSelect:null},
+ value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
+ {setItem:()=>{}},x=>x.matches||[]
+);
+filterFns.syncPartnerFilterChoices();
+assert.ok(filterSelect.innerHTML.includes('value="all">모두'));
+assert.ok(filterSelect.innerHTML.includes('value="changcom">창컴정보통신(주)'));
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:['changcom']},'all'),true);
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:[]},'all'),false);
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:['changcom']},'changcom'),true);
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:['other']},'changcom'),false);
+companies.push({id:'newpartner',name:'신규 파트너'});
+filterFns.syncPartnerFilterChoices();
+assert.ok(filterSelect.innerHTML.includes('value="newpartner">신규 파트너'));
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:['newpartner']},'newpartner'),true);
+filterFns.setSelected('newpartner');
+filterFns.syncPartnerFilterChoices();
+assert.equal(filterSelect.value,'newpartner');
+companies.pop();
+filterFns.syncPartnerFilterChoices();
+assert.equal(filterSelect.value,'all','removed partner safely resets to all');
+
+console.log('Worklinks job regression: deadlines, scope, AND/OR, corrections, partner dropdown PASS');
