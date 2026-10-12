@@ -18,8 +18,8 @@ import urllib.error
 import urllib.request
 
 VERSION = 1
-DEFAULT_MODEL = "openai/gpt-4o-mini"
-ENDPOINT = "https://models.github.ai/inference/chat/completions"
+DEFAULT_MODEL = "gpt-4.1-mini"
+ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
                  "staff_proof", "performance_proof", "region_restriction",
                  "joint_participation"}
@@ -70,7 +70,7 @@ def evidence_hash(clauses):
 
 def model_infer(token, model, clauses):
     if not token:
-        raise RuntimeError("github_models_token_not_available")
+        raise RuntimeError("llm_provider_not_configured")
     payload = {
         "model": model,
         "messages": [
@@ -88,32 +88,32 @@ def model_infer(token, model, clauses):
         ENDPOINT, method="POST",
         data=json.dumps(payload, ensure_ascii=False).encode("utf8"),
         headers={"Authorization":"Bearer "+token,"Content-Type":"application/json",
-                 "Accept":"application/vnd.github+json"})
+                 "Accept":"application/json"})
     try:
         with urllib.request.urlopen(request,timeout=65) as f:
             raw=f.read()
             if not raw:
-                raise RuntimeError("github_models_empty_http_body_"+str(f.status))
+                raise RuntimeError("llm_empty_http_body_"+str(f.status))
             try:
                 r=json.loads(raw)
             except (ValueError,TypeError):
                 # Debug only safe HTTP metadata, never raw model content or tokens.
                 content_type=str(f.headers.get("Content-Type") or "missing").split(";")[0]
-                raise RuntimeError("github_models_non_json_http_"+str(f.status)+
+                raise RuntimeError("llm_non_json_http_"+str(f.status)+
                                    "_bytes_"+str(len(raw))+"_type_"+content_type[:45]) from None
     except urllib.error.HTTPError as e:
         # Do not log raw HTTP body, which may include request echoes or IDs.
-        raise RuntimeError("github_models_http_"+str(e.code)) from None
+        raise RuntimeError("llm_http_"+str(e.code)) from None
     except (urllib.error.URLError, TimeoutError):
-        raise RuntimeError("github_models_network_error") from None
+        raise RuntimeError("llm_network_error") from None
     choices = r.get("choices") or []
     body = choices[0].get("message", {}).get("content") if choices else None
     if not isinstance(body, str):
-        raise RuntimeError("github_models_empty_response")
+        raise RuntimeError("llm_empty_response")
     try:
         return json.loads(body)
     except (ValueError, TypeError):
-        raise RuntimeError("github_models_invalid_json") from None
+        raise RuntimeError("llm_invalid_json") from None
 
 def validate_inference(raw, clauses):
     """Never accept a model-written quote/code or a made-up clause as source evidence."""
@@ -146,12 +146,34 @@ def validate_inference(raw, clauses):
         raise ValueError("model_did_not_interpret_every_clause")
     return [parsed[i] for i in range(len(clauses))]
 
-def process_one(notice_id, notice, existing, infer_fn):
+def rule_based_interpret(clauses):
+    """A deterministic offline fallback; explicitly NOT GPT or final eligibility."""
+    result=[]
+    for c in clauses:
+        t=c.get("sourceText") or ""
+        required=bool(re.search(r"반드시|소지하여야|등록하여야|제출하여야|첨부하여야|소지한 자|입찰참가자격|참가자격으로 등록",t))
+        prohibited=bool(re.search(r"공동\s*수급.{0,22}(?:금지|불허|불가)|대기업.{0,40}참여.{0,10}불가|하도급.{0,15}(?:금지|불허|불가)",t))
+        optional=bool(re.search(r"선택사항|권장|제출할 수 있|참여할 수 있|허용할 수 있",t))
+        classification=("prohibited" if prohibited else "mandatory" if required else
+                        "optional" if optional else "unknown")
+        relation=("not_allowed" if prohibited else
+                  "any" if required and bool(re.search(r"또는|중\s*하나|택\s*일",t)) else
+                  "all" if required else "unknown")
+        reason=("명시적 금지·불허 표현 발견" if prohibited else
+                "원문에 제출·등록·소지 의무 표현 발견" if required else
+                "원문에 선택·권장 표현 발견" if optional else
+                "명확한 필수·선택 여부 표현 없음")
+        result.append({"index":c["index"],"classification":classification,
+                       "relation":relation,"reason":reason})
+    return {"items":result}
+
+
+def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
     clauses=source_candidates(notice)
     if not clauses:
         return None
     hash_value=evidence_hash(clauses)
-    if existing and existing.get("sourceSha256")==hash_value and existing.get("analysisStatus")=="classified":
+    if existing and existing.get("sourceSha256")==hash_value and existing.get("analysisStatus")==mode:
         return None
     # Partition into small batches for model context and predictable response size.
     batches=[clauses[i:i+18] for i in range(0,len(clauses),18)]
@@ -165,7 +187,7 @@ def process_one(notice_id, notice, existing, infer_fn):
             entry["index"]=original["index"]
             output.append(entry)
     return {
-        "analysisStatus":"classified","sourceSha256":hash_value,"classifierVersion":VERSION,
+        "analysisStatus":mode,"sourceSha256":hash_value,"classifierVersion":VERSION,
         "reviewComplete":False,"requiredConditionsComplete":False,
         "automaticEligibilityApproved":False,
         "interpretedCount":len(output),
@@ -189,46 +211,48 @@ def main():
     old=json.loads(path.read_text(encoding="utf8")) if path.exists() else {"byNotice":{}}
     existing=old.get("byNotice") or {}
     updated=dict(existing)
+    token=os.environ.get("OPENAI_API_KEY") or ""
+    use_model=bool(token)
+    mode="classified" if use_model else "rule_based"
     candidates=[]
     for key,notice in (source.get("byNotice") or {}).items():
         clauses=source_candidates(notice)
         if not clauses:continue
         prior=existing.get(key) or {}
-        if prior.get("analysisStatus")=="classified" and prior.get("sourceSha256")==evidence_hash(clauses):
+        if prior.get("sourceSha256")==evidence_hash(clauses) and (
+           prior.get("analysisStatus")=="classified" or prior.get("analysisStatus")==mode):
             continue
         candidates.append((key,notice,len(clauses)))
-    # Higher value: documentation with many actual source clauses, then stable bid id.
     candidates.sort(key=lambda x:(-x[2],x[0]))
     successes=0;errors=0
-    token=os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
-    for key,notice,_ in candidates[:max(0,min(args.limit,12))]:
+    limit=max(0,min(args.limit if use_model else 100,100))
+    for key,notice,_ in candidates[:limit]:
         try:
-            item=process_one(key,notice,existing.get(key),
-                             lambda clauses:model_infer(token,args.model,clauses))
+            infer=(lambda clauses:model_infer(token,args.model,clauses)) if use_model else rule_based_interpret
+            item=process_one(key,notice,existing.get(key),infer,mode=mode)
             if item is None:continue
-            item["model"]=args.model
+            item["model"]=args.model if use_model else "rule-based-v1"
             updated[key]=item
             successes+=1
-            print("AI_CLAUSES_CLASSIFIED",key,len(item["requirements"]))
+            print("CLAUSES_CLASSIFIED",key,len(item["requirements"]),mode)
         except (ValueError,RuntimeError) as exc:
             errors+=1
-            # No implicit success, and never discard previously checked evidence.
-            print("AI_CLAUSES_RETRY_LATER",key,str(exc)[:100],flush=True)
+            print("CLAUSES_RETRY_LATER",key,str(exc)[:100],flush=True)
             if "http_401" in str(exc) or "http_403" in str(exc) or "http_429" in str(exc):
                 break
-        time.sleep(0.75)
+        if use_model:time.sleep(0.75)
     result={"ok":True,"generatedAt":dt.datetime.now(dt.timezone.utc).isoformat(),
-            "model":args.model,"source":"GitHub Models × 나라장터 공고 RFP",
+            "model":args.model if use_model else "rule-based-v1",
+            "source":"OpenAI API public RFP classification" if use_model else "Deterministic official RFP evidence tagging",
             "reviewComplete":False,"byNotice":dict(list(updated.items())[-300:])}
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
     print("WORKLINKS_AI_ANALYSIS",json.dumps({
-        "available":bool(token),"candidates":len(candidates),"successes":successes,
-        "failures":errors,"totalClassifiedNotices":sum(
-            x.get("analysisStatus")=="classified" for x in updated.values())
+        "providerConfigured":use_model,"mode":mode,"candidates":len(candidates),
+        "successes":successes,"failures":errors,
+        "modelClassified":sum(x.get("analysisStatus")=="classified" for x in updated.values()),
+        "ruleOnlyClassified":sum(x.get("analysisStatus")=="rule_based" for x in updated.values())
     }))
-    if errors and successes==0:
-        # Diagnostics should fail visibly, but previous verified results are retained.
-        sys.exit(2)
+    if errors and successes==0:sys.exit(2)
 if __name__=="__main__":
     main()
