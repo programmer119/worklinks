@@ -27,6 +27,30 @@ try:
     assert r['contracts'][0]['performanceComplete'] is None
     assert r['contracts'][0]['inspectionComplete'] is None
     assert r['contractPerformanceVerified'] is False
+    # Nested JSON arrays must be scanned for the CONTRACTOR, not the winning bidder.
+    import json
+    def nested(base,op,params):
+        return {'totalCount':2,'items':[
+            {'bidNtceNo':BID,'bidwinrInfoList':[{'bidwinnrBizno':'1308185973'}],
+             'cntrctInfoList':json.dumps([
+               {'dcsnCntrctNo':'C-NEST','cntrctNm':'용역계약',
+                'corpList':[{'corpBizno':'130-81-85973'}]},
+               {'dcsnCntrctNo':'C-OTHER',
+                'corpList':[{'corpBizno':'9999999999'}]}])},
+            {'bidNtceNo':BID,'bidwinrInfoList':[{'bidwinnrBizno':'1308185973'}],
+             'cntrctInfoList':[]}]}
+    g['request_api']=nested
+    nr=p['contract_evidence_query'](BID,'1308185973')
+    assert nr['attributableCount']==1 and nr['contracts'][0]['contractNo']=='C-NEST'
+    assert nr['otherCompanyCount']==1
+    assert nr['unattributedCount']==1
+    assert nr['nestedContractItems']==2
+    def only_winning(base,op,params):
+        return {'totalCount':1,'items':[{'bidNtceNo':BID,
+          'bidwinrInfoList':[{'bidwinnrBizno':'1308185973'}]}]}
+    g['request_api']=only_winning
+    nw=p['contract_evidence_query'](BID,'1308185973')
+    assert nw['attributableCount']==0
     def denied(base,op,params):raise p['ApiError']('upstream_http_403_SERVICE_ACCESS_DENIED_ERROR')
     g['request_api']=denied
     r2=p['contract_capability_query']()
