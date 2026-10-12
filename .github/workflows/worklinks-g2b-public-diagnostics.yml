@@ -31,7 +31,29 @@ jobs:
           if not d:raise SystemExit('PUBLIC_SAVED_UNAVAILABLE')
           print('PUBLIC_SAVED_COUNTS',{k:d.get(k) for k in
             ['storedTotal','candidateTotal','totalCount','eligibilityChecked','eligibilityLinked']})
-          rows=d.get('items') or []
+          pages=[d]
+          for offset in [40,140,240,340,440]:
+            p=get('/saved?sw=1&limit=100&offset='+str(offset))
+            if p:pages.append(p)
+          rows=[v for p in pages for v in p.get('items') or []]
+          bykind=collections.Counter(str(x.get('kind')) for x in rows)
+          eligibility=collections.Counter(
+            'no-cache' if not x.get('bidEligibility') else
+            'no-req' if not x['bidEligibility'].get('requirements') else
+            'has-req' for x in rows)
+          print('SAMPLED_KIND_DISTRIBUTION',dict(bykind))
+          print('SAMPLED_ELIGIBILITY_DISTRIBUTION',dict(eligibility))
+          for row in [x for x in rows if x.get('kind')=='servc'][:12]:
+            e=row.get('bidEligibility') or {}
+            print('SERVICE_ELIGIBILITY',json.dumps({
+              'number':row.get('bidNo'),'order':row.get('order'),
+              'title':str(row.get('title') or '')[:45],
+              'closes':row.get('closes'),'cached':bool(e),
+              'requirementCodes':[r.get('codes') for r in (e.get('requirements') or [])],
+              'totalCount':e.get('totalCount')},ensure_ascii=False))
+          for term in ['DGIST 산학협력단','정보통신인프라 구축 용역','2026년 건설공사 안전관리']:
+            hits=[x for x in rows if term in str(x.get('title') or '')]
+            print('SCREENSHOT_DATE_MATCH',term,[{'closes':x.get('closes'),'posted':x.get('posted')} for x in hits[:2]])
           for row in rows[:10]:
             eligibility=row.get('bidEligibility') or {}
             print('SAMPLE_BID',json.dumps({
