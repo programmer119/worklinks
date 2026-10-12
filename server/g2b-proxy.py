@@ -129,6 +129,7 @@ def open_bid_db():
                 con.execute('UPDATE bid_notices SET sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',
                             (int(found),kind,no,order))
     con.execute('CREATE INDEX IF NOT EXISTS bid_notices_sw_seen_idx ON bid_notices(sw_candidate,last_seen DESC)')
+    con.execute('CREATE TABLE IF NOT EXISTS bid_license_cache (bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
     return con
 
 def persist_bids(items):
@@ -157,29 +158,33 @@ def query_saved_bids(limit,offset,only_sw=False):
     try:
         total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
         matching=con.execute('SELECT COUNT(*) FROM bid_notices WHERE sw_candidate=1').fetchone()[0]
-        where='WHERE sw_candidate=1' if only_sw else ''
-        history=con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='recurring_projects'").fetchone()
+        history=bool(con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='recurring_projects'").fetchone())
+        sel='b.payload'+(',r.history_json,r.repeat_years' if history else ',NULL,0')+',q.payload'
+        from_sql=' FROM bid_notices b '
         if history:
-            rows=con.execute('SELECT b.payload,r.history_json,r.repeat_years FROM bid_notices b '+
-                'LEFT JOIN recurring_projects r ON b.kind=r.kind AND b.bid_no=r.bid_no '+
-                (('WHERE b.sw_candidate=1 ') if only_sw else '')+
-                'ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
-        else:
-            rows=[(v[0],None,0) for v in con.execute('SELECT payload FROM bid_notices '+where+
-                    ' ORDER BY last_seen DESC,kind,bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()]
+            from_sql+='LEFT JOIN recurring_projects r ON b.kind=r.kind AND b.bid_no=r.bid_no '
+        from_sql+='LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no AND b.bid_ord=q.bid_ord '
+        where='WHERE b.sw_candidate=1 ' if only_sw else ''
+        rows=con.execute('SELECT '+sel+from_sql+where+
+            'ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
         items=[]
-        for payload,series,years in rows:
+        for payload,series,years,qualification in rows:
             obj=json.loads(payload)
             if series and (years or 0)>=2:
                 try:
                     obj['repeatHistory']=json.loads(series)
                     obj['repeatYears']=int(years)
                 except (ValueError,TypeError): pass
+            if qualification:
+                try: obj['bidEligibility']=json.loads(qualification)
+                except (ValueError,TypeError): pass
             items.append(obj)
+        checked=con.execute('SELECT COUNT(*) FROM bid_license_cache').fetchone()[0]
         return {'ok':True,'items':items,'totalCount':matching if only_sw else total,
-                'storedTotal':total,'candidateTotal':matching,
+                'storedTotal':total,'candidateTotal':matching,'eligibilityChecked':checked,
                 'limit':limit,'offset':offset,'persisted':True}
     finally:con.close()
+
 
 def crawler_state():
     con=open_bid_db()
@@ -293,6 +298,17 @@ class Handler(BaseHTTPRequestHandler):
                 if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
                     raise ApiError('invalid_bid_identifier',400)
                 ck=('eligibility',bid_no,order)
+                con=open_bid_db()
+                try:
+                    prev=con.execute('SELECT payload,checked_at FROM bid_license_cache WHERE bid_no=? AND bid_ord=?',(bid_no,order)).fetchone()
+                    if prev:
+                        try:
+                            checked=datetime.datetime.fromisoformat(prev[1].replace('Z','+00:00'))
+                            age=(datetime.datetime.now(datetime.timezone.utc)-checked).total_seconds()
+                            if age<7*86400:
+                                return self.reply(200,json.loads(prev[0]))
+                        except (ValueError,TypeError,OverflowError): pass
+                finally: con.close()
                 with lock: saved=cache.get(ck)
                 if saved and saved[0]>time.time():
                     return self.reply(200,saved[1])
@@ -329,6 +345,12 @@ class Handler(BaseHTTPRequestHandler):
                         'source':'나라장터 입찰공고정보서비스 면허제한',
                         'limitations':'면허제한 항목만 포함. 직접생산·중소기업확인·실적·지역·원문 추가조건은 별도 확인 필요',
                         'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'}
+                con=open_bid_db()
+                try:
+                    with con:
+                        con.execute('INSERT OR REPLACE INTO bid_license_cache(bid_no,bid_ord,payload,checked_at) VALUES(?,?,?,?)',
+                            (bid_no,order,json.dumps(result,ensure_ascii=False,separators=(',',':')),result['checkedAt']))
+                finally:con.close()
                 with lock: cache[ck]=(time.time()+3600,result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/awards':
