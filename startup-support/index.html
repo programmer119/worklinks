@@ -191,6 +191,8 @@
 #jobCards .job-mini .job-partners a{font-size:10px}
 #jobCards .job-mini .job-partners.empty{display:none}
 #jobCards .job-mini .jobmatch-chip{font-size:10px;padding:3px 5px;margin-left:auto;white-space:nowrap;max-width:43%;overflow:hidden;text-overflow:ellipsis}
+#jobCards .job-mini .jobmatch-chip.pending{color:#854d0e;background:#fef9c3;border:1px solid #fde68a;border-radius:6px}
+#jobCards .job-mini .job-partner-pending{color:#92400e;font-size:10px;font-weight:750}
 #jobCards .job-mini .job-source-link{flex:none;border:1px solid #dbe2e9;background:#fff;border-radius:7px;padding:5px 7px;color:#475569;font-size:10px}
 #jobCards .job-mini .job-source-link:focus-visible,#jobCards .job-mini .job-card-title:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 @media(max-width:1150px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -668,7 +670,15 @@ function jobPartnerMatches(x){
  return partners.map(p=>({p,result:jobQualificationVerdict(x,p)}))
    .filter(y=>y.result.type==='industry_match');
 }
+// A plausible software-service assignment is NOT a confirmed bidder match.
+// Keep candidates visible separately while company/notice requirements are pending.
+function jobPartnerCandidates(x){
+ if(jobSoftwareScope(x)!=='candidate')return [];
+ return partners.map(p=>({p,result:jobQualificationVerdict(x,p)}))
+   .filter(y=>y.result.type==='unverified');
+}
 function partnerIdsOfJob(x){return jobPartnerMatches(x).map(y=>y.p.id)}
+function partnerCandidateIdsOfJob(x){return jobPartnerCandidates(x).map(y=>y.p.id)}
 var partnerFetchStarted=false,partnerRefreshPromise=null;
 function refreshAllPartnerRegistries(){
  if(partnerRefreshPromise)return partnerRefreshPromise;
@@ -828,7 +838,14 @@ async function g2bLoadSaved(append){
   }
   renderJobs();
   if(!append)refreshAllPartnerRegistries().then(queueVisibleBidEligibility);
-  out.textContent='서버 DB SW 후보 '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 업종요건 조회 '+bidEligibilityCache.size.toLocaleString('ko-KR')+'건 · 매칭은 확인된 업체자격만 표시 · 정렬은 불러온 전체 기준';
+  const checked=[...bidEligibilityCache.values()];
+  const ok=checked.filter(v=>v?.ok&&v?.complete);
+  const failed=checked.filter(v=>!v?.ok);
+  const empty=ok.filter(v=>!Array.isArray(v.requirements)||v.requirements.length===0);
+  out.textContent='서버 DB SW 후보 '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 업종요건 조회 성공 '+ok.length.toLocaleString('ko-KR')+
+   '건 (면허제한 없음 '+empty.length.toLocaleString('ko-KR')+'건) · 조회 오류 '+failed.length.toLocaleString('ko-KR')+
+   '건 · 미조회 '+Math.max(0,g2bSavedTotal-checked.length).toLocaleString('ko-KR')+
+   '건 · 업종 일치는 전체 입찰자격 확인이 아닙니다.';
   return {total:g2bSavedTotal,candidateTotal:g2bSavedTotal};
  }catch(e){
   if(!append){g2bLiveJobs=g2bLocalRead();renderJobs()}
@@ -1181,8 +1198,8 @@ function syncPartnerFilterChoices(){
  if(label)label.classList.toggle('active',jobFilter==='partner');
 }
 function jobMatchesSelectedPartner(x,id){
- const matched=partnerIdsOfJob(x);
- return id==='all'?matched.length>0:matched.includes(id);
+ const ids=[...new Set(partnerIdsOfJob(x).concat(partnerCandidateIdsOfJob(x)))];
+ return id==='all'?ids.length>0:ids.includes(id);
 }
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
 function renderJobs(){
@@ -1194,9 +1211,15 @@ function renderJobs(){
  const active=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key!=='closed'});
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
- document.getElementById('partnerJobCount').textContent='('+active.filter(function(o){return partnerIdsOfJob(o.x).length>0}).length+')';
+ const confirmedCount=active.filter(o=>partnerIdsOfJob(o.x).length>0).length;
+ const candidateCount=active.filter(o=>partnerIdsOfJob(o.x).length===0&&partnerCandidateIdsOfJob(o.x).length>0).length;
+ const partnerCount=confirmedCount+candidateCount;
+ const registryFailures=partners.filter(p=>p.registryError).length;
+ document.getElementById('partnerJobCount').textContent='('+partnerCount+')';
  document.getElementById('partnerSummary').textContent=
-   '미마감 '+active.length+'건 · 업종 매칭 확인 '+active.filter(o=>partnerIdsOfJob(o.x).length>0).length+'건 · HW/시공 등 SW 분담 미확인 '+rejected+'건은 목록 제외 (DB 보존)';
+   '미마감 '+active.length+'건 · 업종 일치 확인 '+confirmedCount+'건 · 검증 대기 후보 '+candidateCount+'건'+
+   (registryFailures?' · 업체등록 조회 오류 '+registryFailures+'개사':'')+
+   ' · HW/시공 등 SW 분담 미확인 '+rejected+'건 제외 (DB 보존)';
  const filter=jobFilter;
  if(filter==='sources'){
   document.getElementById('g2bMore').style.display='none';
@@ -1234,22 +1257,39 @@ function renderJobs(){
   });
   if(filter==='partner'){
    const selected=partners.find(p=>p.id===selectedPartnerId);
+   const confirmed=list.filter(o=>selected?
+    partnerIdsOfJob(o.x).includes(selected.id):partnerIdsOfJob(o.x).length>0).length;
+   const awaiting=list.length-confirmed;
    document.getElementById('partnerSummary').textContent=
-    '파트너 '+(selected?selected.name:'모두')+' · 확인된 업종 매칭 '+list.length+'건 (전체 입찰자격 충족 확정 아님)';
+    '파트너 '+(selected?selected.name:'모두')+' · 업종 일치 확인 '+confirmed+'건 · 검증 대기 후보 '+awaiting+'건'+
+    (selected?.registryError?' · 업체등록 API 오류: '+selected.registryError:'')+
+    ' · 검증 대기는 지원 가능 판정이 아닙니다.';
   }
   document.getElementById('g2bMore').style.display=list.length>jobRenderLimit?'inline-block':'none';
   document.getElementById('g2bMore').textContent='일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
-    const partnerList=partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)});
+    const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
+    const scoped=selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
+    const partnerList=confirmed.concat(pending).filter(y=>!scoped||y.p.id===scoped.id);
     const partner=partnerList.length?'<div class="job-partners">파트너 '+
-      partnerList.map(function(p){return '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>'}).join(' · ')+
+      partnerList.map(function(y){
+       const p=y.p,isPending=y.result.type==='unverified';
+       return (isPending?'<span class="job-partner-pending">검증 대기 </span>':'')+
+        '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>';
+      }).join(' · ')+
       '</div>':'<div class="job-partners empty"></div>';
-    const p=partners[0],eligibility=p?jobQualificationVerdict(x,p):{type:'unverified'};
-    const knownMatch=eligibility.type==='industry_match';
-    const matchCode=knownMatch?eligibility.codes.filter(c=>partnerIndustryKnownCodes.has(c))[0]:'';
+    const relevant=partnerList.length?partnerList:
+     (scoped?[{p:scoped,result:jobQualificationVerdict(x,scoped)}]:[]);
+    const chosen=relevant.find(y=>y.result.type==='industry_match')||
+     relevant.find(y=>y.result.type==='unverified')||relevant[0];
+    const eligibility=chosen?chosen.result:{type:'not_applicable',missing:[]};
+    const matchCode=eligibility.type==='industry_match'?
+     eligibility.codes.filter(c=>partnerIndustryKnownCodes.has(c))[0]:'';
     const matchBadge=eligibility.type==='industry_match'?
       '<span class="jobmatch-chip ok" title="업종 일치만 확인 · 전체 입찰 적격 아님">'+htmlEscape(matchCode?matchCode+' 일치 · 증빙 필요':'업종 일치 · 증빙 필요')+'</span>':
+      eligibility.type==='unverified'?
+      '<span class="jobmatch-chip pending" title="'+htmlEscape(eligibility.reason)+'">조건 검증 대기</span>':
       eligibility.type==='missing'?
       '<span class="jobmatch-chip missing" title="'+htmlEscape(eligibility.reason)+'">업종 '+eligibility.missing.length+'개 부족</span>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
