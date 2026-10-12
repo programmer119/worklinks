@@ -174,7 +174,8 @@
 #jobCards .job-mini h3{font-size:14px;line-height:1.4;min-height:0;margin:0;display:block;overflow:hidden}
 #jobCards .job-mini h3{flex:1;min-width:0}
 #jobCards .job-mini .job-card-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.42}
-#jobCards .job-day{background:#f1f5f9;border-right:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;color:#334155;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.5px;white-space:nowrap}
+#jobCards .job-day{background:#f1f5f9;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;color:#334155;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.5px;white-space:nowrap}
+#jobCards .job-day .job-date{font-size:10px;font-weight:750;letter-spacing:0;color:inherit;opacity:.85}
 #jobCards .job-day.soon{background:#fff7ed;color:#c2410c;border-right-color:#fed7aa}
 #jobCards .job-day.today{background:#fef2f2;color:#b91c1c;border-right-color:#fecaca}
 #jobCards .job-day.closed{background:#f1f5f9;color:#94a3b8}
@@ -935,9 +936,16 @@ function jobDayCounter(time){
  if(time.end===null)return {label:'일정 미확인',kind:'unknown'};
  const today=Math.floor(kstNow().getTime()/86400000);
  const last=Math.floor(time.end/86400000);
- const day=Math.max(0,last-today);
- return {label:'D-'+day,kind:time.key==='upcoming'?'upcoming':
-  day===0?'today':day<=2?'soon':'normal'};
+ const diff=last-today;
+ // Never render a future/open state as "D-0" when its underlying date is past.
+ if(diff<0)return {label:'마감 확인',kind:'closed'};
+ return {label:'D-'+diff,kind:time.key==='upcoming'?'upcoming':
+  diff===0?'today':diff<=2?'soon':'normal'};
+}
+function jobDeadlineStamp(time){
+ if(time.end===null)return '';
+ const iso=new Date(time.end).toISOString(); // KST wall-clock axis
+ return iso.slice(5,10).replace('-','.')+' '+iso.slice(11,16);
 }
 function jobAmountLabel(raw){
  const t=String(raw||'').trim();
@@ -1295,7 +1303,8 @@ function renderJobs(){
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
-      '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+'">'+htmlEscape(day.label)+'</div>'+
+      '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
+      '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
        '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
