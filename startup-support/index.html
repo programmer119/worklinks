@@ -485,6 +485,7 @@ var partners=[
    {label:"SW사업자 일반현황 관리확인서",state:"pending",value:"최근 신고 서류 미검증",detail:"최근년도 결산신고 확인서 원본 또는 공공 SW사업자 확인자료 대조 필요."},
    {label:"중소기업확인서 · 공공입찰용",state:"pending",value:"유효기간 미검증",detail:"SMPP 중·소기업 확인서에서 입찰용 발급 현황 및 유효기간 확인 필요."},
    {label:"나라장터 업체 등록",state:"pending",value:"업체정보 API 조회 대기",detail:"나라장터 사용자정보 API에서 사업자번호 일치 및 등록일을 검증합니다."},
+   {label:"직원 수(참고)",state:"pending",value:"나라장터 업체정보 조회 대기",detail:"직원 수는 개별 기술인력의 자격·투입가능성 증명이 아닙니다."},
    {label:"본점 소재지·지역코드",state:"pending",value:"나라장터 업체정보 주소 조회 대기",detail:"본점 주소 및 등록 지역코드를 공식 API에서 대조합니다."},
    {label:"공공계약·수행실적",state:"pending",value:"조달청 계약정보 API 접근 검사 대기",detail:"계약·이행·검수실적은 공개 계약정보와 실적증명서를 구분하여 확인해야 합니다."},
    {label:"한전 SRM 입찰등록",state:"pending",value:"SRM 개별 등록 미검증",detail:"나라장터 등록과 별개로 한전 SRM의 등록상태 및 해당 입찰 신청 가능 여부는 확인해야 합니다."}
@@ -643,6 +644,12 @@ async function refreshPartnerRegistry(p){
   p.registeredAddress=[data.company.address,data.company.addressDetail].filter(Boolean).join(' ').trim();
   p.registeredRegionName=String(data.company.regionName||'').trim();
   p.registeredRegionCode=String(data.company.regionCode||'').trim();
+  p.publicEmployeeCount=String(data.company.employeeCount||'').trim();
+  setPartnerQual(p,'직원 수(참고)',{
+   state:p.publicEmployeeCount?'snapshot':'pending',
+   value:p.publicEmployeeCount?(p.publicEmployeeCount+'명 · 나라장터 등록정보'):'공식 자료에 직원 수 미표시',
+   detail:'공식 업체정보서비스 emplyeNum 항목. 현재 인원 및 실제 투입 가능 인력·경력·자격의 증거로 사용할 수 없습니다.'
+  });
   p.registeredAddressField=String(data.company.addressField||'').trim();
   setPartnerQual(p,'본점 소재지·지역코드',{
    state:p.registeredAddress||p.registeredRegionName?'confirmed':'pending',
@@ -1346,7 +1353,9 @@ function comparePartnerJob(x,p){
  ];
  for(const [id,label,re] of certRules){
   if(!re.test(txt))continue;
-  const reason=id==='experience'?
+  const reason=id==='staff'&&p.publicEmployeeCount?
+    ('공식 업체정보 직원 수 '+p.publicEmployeeCount+'명(참고) · 공고의 필수 경력·자격·재직·실제 투입인력은 별도 증빙 필요'):
+    id==='experience'?
    (p.contractCapability?.authorized===true?
     '조달청 계약정보서비스 접근 성공 · 업체별 계약내역·수행완료/검수·유사분야 실적증명서 별도 대조 필요':
     '조달청 계약정보 API 조회권한 확인 필요 · https://www.data.go.kr/data/15129427/openapi.do'):
