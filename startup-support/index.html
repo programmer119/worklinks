@@ -220,6 +220,20 @@
 #jobCards .job-verdict-why{flex:1 1 130px;min-width:0;color:#64748b;font-size:10px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 #jobCards .job-mini .job-footer>.job-partners{max-width:68%}
 @media(max-width:680px){#jobCards .job-verdict-why{flex-basis:100%;font-size:10px}#jobCards .job-verdict-row{gap:4px 7px}}
+
+.job-verdict-filter{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0 9px}
+.job-verdict-filter[hidden]{display:none!important}
+.job-verdict-filter>strong{font-size:12px;color:#334155;margin-right:3px}
+.job-vf{appearance:none;display:inline-flex;align-items:center;gap:5px;padding:7px 10px;font-size:12px;font-weight:750;border-radius:9px;border:1px solid #dbe2e9;color:#475569;background:#fff;cursor:pointer}
+.job-vf [data-verdict-count]{font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;opacity:.84}
+.job-vf.on{border-color:#334155;background:#0f172a;color:#fff}
+.job-vf.ready:not(.on){border-color:#86efac;color:#166534;background:#f0fdf4}
+.job-vf.conditional:not(.on){border-color:#fcd34d;color:#92400e;background:#fffbeb}
+.job-vf.blocked:not(.on){border-color:#fca5a5;color:#991b1b;background:#fff1f2}
+.job-vf.checking:not(.on){border-color:#cbd5e1;color:#334155;background:#f1f5f9}
+.job-vf:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+.job-vf-note{font-size:10px;color:#64748b;margin-left:3px}
+@media(max-width:680px){.job-verdict-filter{gap:5px}.job-vf{padding:7px 8px;font-size:11px}.job-vf-note{width:100%;margin-top:2px}}
 </style>
 </head>
 <body><main>
@@ -315,6 +329,7 @@
  <button type="button" class="job-vf conditional" data-verdict-filter="conditional" aria-pressed="false">조건부 <span data-verdict-count="conditional">0</span></button>
  <button type="button" class="job-vf blocked" data-verdict-filter="blocked" aria-pressed="false">지원 불가 <span data-verdict-count="blocked">0</span></button>
  <button type="button" class="job-vf checking" data-verdict-filter="checking" aria-pressed="false">검증 중 <span data-verdict-count="checking">0</span></button>
+ <small class="job-vf-note">선택한 업체의 자격·증빙 기준 · 미검증 조건은 합격 처리하지 않음</small>
  </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
     <div class="g2b-panel" id="g2bPanel">
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
@@ -1471,6 +1486,7 @@ function renderJobs(){
   ' · SW 수행범위 불명확 '+rejected+'건 별도 제외';
  const filter=jobFilter;
  if(filter==='sources'){
+  document.getElementById('jobVerdictFilter').hidden=true;
   document.getElementById('g2bMore').style.display='none';
   el.innerHTML=jobSources.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag">탐색경로</span></div><h3><a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.name)+'</a></h3><p>'+htmlEscape(x.note)+'</p></article>'}).join('');
  }else{
@@ -1544,13 +1560,17 @@ function renderJobs(){
        '<div class="job-footer">'+partner+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
        '</div></div></article>';
-  }).join(''):'<div class="emptycard">이 조건에 해당하는 일감이 없습니다.</div>';
+  }).join(''):'<div class="emptycard">이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.</div>';
  }
  document.querySelectorAll('.jobf').forEach(function(b){b.classList.toggle('on',b.dataset.jobf===filter)});
 }
 function renderSales(){var el=document.getElementById("salesCards");if(!el)return;el.innerHTML=salesAgencies.length?salesAgencies.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag hot">'+x.kind+'</span><span class="tag">'+x.grade+'</span></div><h3><a href="'+x.url+'" target="_blank" rel="noopener">'+x.name+'</a></h3><div class="why"><b>선별 이유</b><br>'+x.why+'</div><p><b>상담 때 확인:</b> '+x.check+'</p></article>'}).join(""):'<div class="emptycard">현재 선별된 영업대행사가 없습니다.</div>'}
 function setWorkspaceView(view){document.querySelectorAll(".workspace-tab").forEach(function(b){b.classList.toggle("on",b.dataset.view===view)});document.querySelectorAll(".workspace-view").forEach(function(v){v.classList.remove("on")});var target=document.getElementById(view+"View");if(target)target.classList.add("on");localStorage.setItem("worklinks_workspace_view_v1",view)}
-document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});document.getElementById("jobSort").addEventListener("change",renderJobs);
+document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
+document.querySelectorAll('[data-verdict-filter]').forEach(function(b){b.addEventListener('click',function(){
+ jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=100;renderJobs();
+})});
+document.getElementById("jobSort").addEventListener("change",renderJobs);
 document.getElementById("partnerFilter").addEventListener("change",function(){
  selectedPartnerId=this.value;jobFilter='partner';jobRenderLimit=100;
  localStorage.setItem("worklinks_job_filter_v1","partner");
