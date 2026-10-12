@@ -212,6 +212,78 @@ def crawler_state():
                 'storedTotal':count,'candidateTotal':candidates}
     finally:con.close()
 
+
+# Direct-production confirmation dataset snapshot (NOT current SMPP status).
+PROD_API = 'https://api.odcloud.kr/api/3061008/v1/uddi:98e7ddf2-e720-43af-b2eb-b92f4f65b0b5'
+PROD_SNAPSHOT = '2026-02-01'
+
+def prod_field(row,*names):
+    fields=dict((re.sub(r'\s+','',str(k)),v) for k,v in row.items())
+    for name in names:
+        value=fields.get(re.sub(r'\s+','',name))
+        if value is not None and str(value).strip():return str(value).strip()
+    return ''
+
+def prod_date(value):
+    value=str(value or '').strip()
+    if not value:return ''
+    numbers=re.sub(r'\D','',value)
+    if len(numbers)!=8:return value
+    try:return datetime.datetime.strptime(numbers,'%Y%m%d').strftime('%Y-%m-%d')
+    except ValueError:return value
+
+def prod_normalize(rows,bizno):
+    result=[]
+    for row in rows:
+        if not isinstance(row,dict):raise ApiError('production_invalid_row',502)
+        number=re.sub(r'\D','',prod_field(row,'사업자번호','사업자등록번호','사업자 등록번호'))
+        if not number:raise ApiError('production_missing_business_number',502)
+        if number!=bizno:raise ApiError('production_filter_mismatch',502)
+        product=prod_field(row,'세부품목','세부품목명','세부품명')
+        code=prod_field(row,'세부품명번호','세부품목번호','세부품명코드')
+        if not code:
+            m=re.search(r'(?<!\d)\d{10}(?!\d)',product)
+            code=m.group(0) if m else ''
+        result.append({
+            'company':prod_field(row,'업체명','기업명'),
+            'product':product,'productCode':code,
+            'validFrom':prod_date(prod_field(row,'유효기간 시작일','유효기간시작일')),
+            'validTo':prod_date(prod_field(row,'유효기간 종료일','유효기간종료일'))
+        })
+    return result
+
+def prod_query(bizno):
+    key=get_key()
+    if not key:raise ApiError('secret_not_configured',503)
+    rows=[]
+    match_count=None
+    for page in range(1,21):
+        url=PROD_API+'?'+urlencode({'serviceKey':key,'page':page,'perPage':1000,
+                                     'cond['+u'사업자번호'+'::EQ]':bizno})
+        try:
+            response=urlopen(Request(url,headers={'Accept':'application/json',
+                                      'User-Agent':'WorkLinksProduction/1.0'}),timeout=18)
+            doc=json.loads(response.read().decode('utf-8'))
+        except HTTPError as e:raise ApiError('production_upstream_http_'+str(e.code),502)
+        except (URLError,IOError,ValueError,UnicodeError):
+            raise ApiError('production_upstream_unavailable_or_invalid',502)
+        if not isinstance(doc,dict) or not isinstance(doc.get('data'),list):
+            raise ApiError('production_upstream_unexpected_response',502)
+        batch=doc['data']
+        if match_count is None:
+            try:match_count=int(doc.get('matchCount',len(batch)))
+            except (TypeError,ValueError):raise ApiError('production_invalid_match_count',502)
+            if match_count<0:raise ApiError('production_invalid_match_count',502)
+        rows.extend(prod_normalize(batch,bizno))
+        if len(rows)>=match_count:break
+        if not batch:raise ApiError('production_incomplete_result',502)
+    if len(rows)<match_count:raise ApiError('production_exceeded_page_limit',502)
+    return {'ok':True,'bizno':bizno,'found':bool(rows),'recordCount':len(rows),
+            'complete':True,'records':rows,'snapshotDate':PROD_SNAPSHOT,
+            'checkedAt':datetime.datetime.utcnow().isoformat()+'Z',
+            'source':'중소벤처기업부 직접생산확인증명서 발급현황',
+            'limitations':'2026-02-01 스냅샷. 현재 인증 유효상태는 SMPP에서 확인 필요.'}
+
 class ThreadedServer(ThreadingMixIn,HTTPServer):
     daemon_threads = True
 
@@ -261,6 +333,15 @@ class Handler(BaseHTTPRequestHandler):
                 if not isinstance(report, dict) or not isinstance(report.get('counts'), list):
                     raise ApiError('annual_report_invalid', 503)
                 return self.reply(200, {'ok':True, 'report':report})
+            if u.path == '/api/g2b/direct-production':
+                bizno=re.sub(r'\D','',get('bizno'))
+                if len(bizno)!=10:raise ApiError('invalid_bizno',400)
+                ck=('direct-production',bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=prod_query(bizno)
+                with lock:cache[ck]=(time.time()+6*3600,result)
+                return self.reply(200,result)
             if u.path == '/api/g2b/company':
                 bizno = re.sub(r'[^0-9]', '', get('bizno'))
                 if len(bizno) != 10:
