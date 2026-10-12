@@ -27,6 +27,7 @@ jobs:
           python3 tests/test_g2b_eligibility_join.py
           python3 tests/test_direct_production.py
           python3 tests/test_bid_evidence.py
+          python3 tests/test_contract_evidence.py
           node tests/worklinks-jobs-regression.cjs
           node tests/worklinks-live-partner-smoke.cjs
       - name: Verify public GitHub Pages content matches current main
@@ -162,7 +163,19 @@ jobs:
               'error':contract.get('error'),
               'sampleCount':contract.get('sampleCount'),
               'fields':contract.get('schemaFields'),
-              'companyHistoryVerified':contract.get('companyHistoryVerified')})
+              'companyHistoryVerified':contract.get('companyHistoryVerified'),
+              'alternative':contract.get('alternative'),
+              'contractPerformanceVerified':contract.get('contractPerformanceVerified')})
+          for notice in ['R25BK00826083','20221204854']:
+            evidence=get('/contract-evidence?bidNo='+notice+'&bizno=1308185973')
+            if evidence:
+              print('OFFICIAL_CONTRACT_PROCESS_BY_BID',notice,{
+                'ok':evidence.get('ok'),'error':evidence.get('error'),
+                'totalCount':evidence.get('totalCount'),
+                'attributableCount':evidence.get('attributableCount'),
+                'unattributedCount':evidence.get('unattributedCount'),
+                'schemaFields':evidence.get('schemaFields'),
+                'contractPerformanceVerified':evidence.get('contractPerformanceVerified')})
           company=get('/company?bizno=1308185973')
           if company:
             print('PARTNER_REGISTRY',{
