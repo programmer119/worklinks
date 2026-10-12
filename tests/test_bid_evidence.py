@@ -54,4 +54,31 @@ try:
     assert cap['contractPerformanceVerified'] is False
 finally:
     g['request_api']=original
+# Contract fallback must never treat winning a bid as completed project performance.
+def process_mock(base,operation,params):
+    assert operation=='getCntrctProcssIntgOpenServc'
+    assert 'CntrctProcssIntgOpenService' in base
+    assert params['bidNtceNo']=='R25BK00826083'
+    return {'items':[
+        {'bidNtceNo':'R25BK00826083','cntrctNo':'C1','cntrctCorpBizno':'130-81-85973','cntrctAmt':'123456789'},
+        {'bidNtceNo':'R25BK00826083','cntrctNo':'C2','cntrctCorpBizno':'1111111111'},
+        {'bidNtceNo':'R25BK00826083','cntrctNo':'C3'}
+    ],'totalCount':3}
+g['request_api']=process_mock
+try:
+    contracts=p['contract_evidence_query']('R25BK00826083','1308185973')
+    assert contracts['attributableCount']==1
+    assert contracts['otherCompanyCount']==1
+    assert contracts['unattributedCount']==1
+    assert contracts['contracts'][0]['contractNo']=='C1'
+    assert contracts['contracts'][0]['performanceComplete'] is None
+    assert contracts['contractPerformanceVerified'] is False
+finally:g['request_api']=original
+class Fake403:
+    code=403
+    def read(self,size):
+        return b'SERVICE_ACCESS_DENIED_ERROR?serviceKey=SECRET_TOKEN'
+classified=p['classify_upstream_http_error'](Fake403())
+assert classified=='upstream_http_403_SERVICE_ACCESS_DENIED_ERROR'
+assert 'SECRET_TOKEN' not in classified
 print('G2B_BID_EVIDENCE_PREFLIGHT=PASS')
