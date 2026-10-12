@@ -1097,6 +1097,29 @@ function partnerRegisteredCode(p,code){
  // Missing/unknown official status must not be silently treated as an active license.
  return null;
 }
+
+const productionNames=['정보시스템개발서비스','정보시스템유지관리서비스','소프트웨어유지및지원서비스','패키지소프트웨어개발및도입서비스','정보인프라구축서비스','빅데이터분석서비스','데이터처리서비스','운영위탁서비스','인터넷지원개발서비스'];
+// A dated publication is evidence of past issuance, NOT live SMPP verification.
+function productionRequirementCheck(x,p){
+ const txt=[x.condition||'',x.partnerBidMode||''].join(' ');
+ if(!/직접\s*생산\s*(?:확인|증명)/.test(txt))return {applicable:false};
+ const products=productionNames.filter(name=>txt.includes(name));
+ if(/(?:^|\D)8111159901(?:\D|$)/.test(txt)&&!products.includes('정보시스템개발서비스'))products.push('정보시스템개발서비스');
+ const records=Array.isArray(p.productionRecords)?p.productionRecords:[],snapshot=p.productionSnapshotDate||'날짜 미확인';
+ if(!p.productionCheckedAt)return {applicable:true,status:'pending',snapshot,reason:'직접생산 발급현황 조회 전·실패'};
+ if(!products.length)return {applicable:true,status:'unknown',snapshot,reason:'공고 요약에 필수 직접생산 세부품명 없음 · 원문 확인 필요'};
+ const matched=products.filter(name=>records.some(r=>String(r.product||'').replace(/\s/g,'')===name&&
+  (!r.validFrom||String(r.validFrom).slice(0,10)<=kstISO())&&
+  r.validTo&&String(r.validTo).slice(0,10)>=kstISO()));
+ if(products.length>1)return {applicable:true,status:'unknown',snapshot,
+  reason:'복수 요구 품목 '+products.join(' / ')+' · 기재 종료일 미경과 '+(matched.join(', ')||'없음')+' · 필수/대체 관계 원문 확인'};
+ if(matched.length)return {applicable:true,status:'ok',snapshot,
+  reason:snapshot+' 발급현황 '+matched[0]+' 일치 · 기재 종료일 미경과. 현재 취소·변경 여부 SMPP 확인 필요'};
+ const historical=records.some(r=>String(r.product||'').replace(/\s/g,'')===products[0]);
+ return {applicable:true,status:'pending',snapshot,reason:historical?
+   '요구 품목 발급이력은 있으나 기재 유효기간 경과·불명확. 재발급 확인 필요':
+   snapshot+' 자료에 요구 품목 없음. 이후 신규 발급 가능하므로 미보유 단정 금지'};
+}
 function comparePartnerJob(x,p){
  const rows=[],req=jobEligibilityData(x);
  const add=(id,label,status,reason,source)=>{
@@ -1130,15 +1153,21 @@ function comparePartnerJob(x,p){
   if(!req.complete)add('partial','면허제한 일부만 조회됨','unknown','조회 페이지 누락 또는 제한 항목 누락','나라장터 API');
  }
  const txt=String(x.condition||'')+' '+String(x.partnerBidMode||'');
+ const production=productionRequirementCheck(x,p);
+ if(production.applicable){
+  add('direct','직접생산 요구품목 대조',production.status==='ok'?'ok':production.status==='unknown'?'unknown':'pending',
+      production.reason,'공고 참가조건 요약 × 중소벤처기업부 직접생산 발급현황');
+  if(production.status==='ok')add('direct-current','현재 증명서 상태','pending',
+      '공개자료 기준일 이후 취소·변경 여부는 SMPP 최신 확인 필요','SMPP');
+ }
  const certRules=[
-  ['direct','직접생산확인증명서',/직접생산|8111159901|8111189901|8111200201/],
   ['smecert','공공입찰용 중소기업확인서',/중소기업.?확인|소상공인.?확인/],
   ['swstatus','SW사업자 일반현황 관리확인서',/일반현황.?관리확인|SW사업자.?신고/],
-  ['experience','수행실적·인력',/실적/],
+  ['experience','수행실적',/실적/],
+  ['staff','기술인력·자격',/기술인력|투입인력|상주인력|전담인력|자격증/],
  ];
- // Proof requirements may exist in attachments even when not present in the summary.
  for(const [id,label,re] of certRules){
-  if(re.test(txt))add('proof-'+id,label,'pending','업체 원본 증빙의 보유·유효기간 별도 확인 필요','공고 조건 요약');
+  if(re.test(txt))add('proof-'+id,label,'pending','업체 증빙과 공고 원문 요구기준 대조 필요','공고 조건 요약');
  }
  if(/지역.?제한|본점.?소재/.test(txt))add('region','지역제한','pending','업체 본점 소재지와 공고의 허용 지역 대조 필요','공고 조건 요약');
  if(/공동수급.*불허|공동수급.*불가|공동수급\s*금지/.test(txt)){
