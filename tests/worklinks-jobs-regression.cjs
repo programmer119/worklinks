@@ -173,6 +173,32 @@ assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 assert.ok(source.includes('function participationVerdict(x,p)'));
 assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all notices as ready');
 
+// Status filters must be interactive, cover all currently displayed items, and
+// show a reason even when the notice is outside the software candidate scope.
+const filterView=new Function('partners','participationVerdict','document','htmlEscape',
+ part('function partnerVerdictTypes(x,selected){','function jobEntryLabel(v){')+
+ 'return {partnerVerdictTypes,matchesVerdictFilter,refreshVerdictFilters};'
+)([bidder],(x,p)=>({type:x.verdict||'checking'}),{
+ querySelectorAll:()=>[],
+ getElementById:()=>({hidden:false})
+},value=>String(value));
+for(const [verdict,type] of [['ready','ready'],['conditional','conditional'],['blocked','blocked'],['checking','checking']]){
+ assert.equal(filterView.matchesVerdictFilter({verdict},null,type),true);
+ assert.equal(filterView.matchesVerdictFilter({verdict},null,'all'),true);
+ assert.equal(filterView.matchesVerdictFilter({verdict},null,type==='ready'?'blocked':'ready'),false);
+}
+assert.ok(source.includes('data-verdict-filter="ready"'));
+assert.ok(source.includes('data-verdict-filter="conditional"'));
+assert.ok(source.includes('data-verdict-filter="blocked"'));
+assert.ok(source.includes('data-verdict-filter="checking"'));
+assert.ok(source.includes("document.querySelectorAll('[data-verdict-filter]')"));
+assert.ok(source.includes("scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter))"));
+assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
+assert.ok(!source.includes("if(jobSoftwareScope(x)!=='candidate')return '';"),'cannot leave thumbnail without bidder status');
+const unscoped=verdictMod.participationVerdict({kind:'thng'},bidder);
+assert.ok(['blocked','checking'].includes(unscoped.type));
+assert.ok(unscoped.reason.length>9);
+
 // Readable card and detail copy: no opaque 1468 chip or duplicate "pending" labels.
 assert.ok(source.includes("diff===0?'D-DAY':'D-'+diff"));
 assert.ok(source.includes('업종 일치 · 추가서류 확인 필요'));
@@ -209,7 +235,7 @@ assert.equal(filterFns.jobMatchesSelectedPartner({matches:['other']},'changcom')
 assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['changcom']},'all'),true);
 assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['changcom']},'changcom'),true);
 assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['another']},'changcom'),true,'filter should not hide bid failures');
-assert.equal(filterFns.jobMatchesSelectedPartner({kind:'thng',matches:['changcom']},'changcom'),false);
+assert.equal(filterFns.jobMatchesSelectedPartner({kind:'thng',matches:['changcom']},'changcom'),true,'visible hardware/unknown jobs must show an explicit blocked or checking verdict');
 companies.push({id:'newpartner',name:'신규 파트너'});
 filterFns.syncPartnerFilterChoices();
 assert.ok(filterSelect.innerHTML.includes('value="newpartner">신규 파트너'));
