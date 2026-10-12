@@ -303,7 +303,7 @@
       <button class="jobf" data-jobf="sources">수요처 탐색경로</button>
     </div>
     <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
-    <div class="partner-summary" id="partnerSummary"></div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
+    <div class="partner-summary" id="partnerSummary"></div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="qualified">업종 일치 우선 (기본)</option><option value="deadline">마감 임박순</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select><span>마감된 일감은 ‘마감’ 탭에서만 표시</span></div>
     <div class="g2b-panel" id="g2bPanel">
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
       <p class="g2b-status" id="g2bApiStatus" role="status" aria-live="polite">서버 연결상태 확인 중…</p>
@@ -574,16 +574,48 @@ const partnerIndustryKnownCodes=new Set(['1169','1426','1468','1469','1470','003
 const hardwarePurchasePattern=/(GPU|그래픽.?카드|컴퓨터.?서버|고성능.?서버|워크스테이션|시험.?장비|실험.?장비|계측기|센서|위성.?통신.?장비|디스플레이|스캐너|프린터|광학.?장비|무선.?통신|하드웨어|드론|레이더|CCTV|방범|카메라|기자재|통신.?공사|네트워크.?공사|시공|시설.?공사|공사비|기계.?설비|모델.?시제품|비전.?시스템.?구매)/i;
 const softwareServicePattern=/(개발|고도화|구축|유지.?보수|유지.?관리|기능.?개선|SW|소프트웨어|웹|홈페이지|플랫폼|데이터베이스|데이터.?처리|AI|인공지능|정보시스템|DB|클라우드|시스템.?운영)/i;
 function jobSoftwareScope(x){
- const title=String(x.title||'');
- const kind=String(x.kind||'');
+ const title=String(x.title||''),kind=String(x.kind||'');
+ const hw=hardwarePurchasePattern.test(title);
  if(kind==='cnstwk'||kind==='frgcpt')return 'out';
- if(hardwarePurchasePattern.test(title)){
-   // Explicit HW purchasing or installation cannot by itself qualify as a
-   // software work package, even if "ICT" or "system" appears in the title.
-   return 'out';
+ if(kind==='thng'){
+  if(hw)return /(SW개발|소프트웨어.?개발|소프트웨어.?구축|별도.?소프트웨어.?개발)/i.test(title)?'mixed':'out';
+  return /(SW|소프트웨어|S\/W|라이선스|정보시스템.?개발|솔루션)/i.test(title)?'candidate':'out';
  }
- if(kind==='thng'&&!/(상용.?SW|소프트웨어|S\/W|라이선스|솔루션|정보시스템.?개발)/i.test(title))return 'out';
+ if(hw){
+  if(kind==='servc'&&/데이터.?수집|데이터.?분석|DB.?구축|SW.?개발|플랫폼.?개발|웹.?개발|소프트웨어.?개발/i.test(title))return 'candidate';
+  return 'out';
+ }
  return softwareServicePattern.test(title)?'candidate':'unknown';
+}
+function noticeGroupKey(x){
+ const title=String(x.title||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'').replace(/[\[\](){}·]/g,'').replace(/(?:재공고|긴급공고|정정공고)/g,'');
+ const org=String(x.org||'').normalize('NFKC').toLowerCase().replace(/\s+/g,'');
+ const cost=String(x.amount||'').replace(/[^0-9]/g,'');
+ return (x.kind||'curated')+'|'+org+'|'+title+'|'+cost;
+}
+function collapseSimilarNotices(all){
+ const groups=new Map();
+ for(const x of all){
+  if(!x.noticeNumber&&!x.kind){groups.set(x.id,[x]);continue}
+  const key=noticeGroupKey(x);
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(x);
+ }
+ const collapsed=[];
+ for(const list of groups.values()){
+  if(list.length===1){collapsed.push(list[0]);continue}
+  list.sort(function(a,b){
+   const aa=jobTimeInfo(a),bb=jobTimeInfo(b);
+   const stat=x=>x.key==='closed'?1:0;
+   return stat(aa)-stat(bb)||(bb.start||0)-(aa.start||0)||String(b.noticeOrder||'').localeCompare(String(a.noticeOrder||''));
+  });
+  const winner={...list[0],variants:list.map(x=>({
+   id:x.id,noticeNumber:x.noticeNumber,noticeOrder:x.noticeOrder,
+   url:jobOriginUrl(x),posted:x.startAt||x.posted||'',closes:x.endAt||x.closes||''
+  }))};
+  collapsed.push(winner);
+ }
+ return collapsed;
 }
 function jobQualificationVerdict(x,p){
  if(!p || jobSoftwareScope(x)!=='candidate')return {type:'not_applicable',codes:[],reason:'해당 사업의 독립 SW 수행범위가 검증되지 않음'};
@@ -1073,9 +1105,12 @@ function renderJobDetail(x){
        '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">회사별 보유자격 자세히 ↗</a></div>';
    }).join('')+'</section>':
    '<section class="job-detail-section"><h3>파트너 검토</h3><p>현재 확인된 독립 소프트웨어 수행범위가 없어 SW 파트너를 자동 추천하지 않습니다. HW·시공 사업이면 별도 SW 분담 범위와 참여 허용 여부를 확인해야 합니다.</p></section>';
+ const variantLinks=Array.isArray(x.variants)&&x.variants.length>1?
+ '<section class="job-detail-section"><h3>같은 제목·기관·금액의 공고 '+x.variants.length+'건</h3><p>정정·재공고 또는 별도 발주인지 각 원문에서 확인하세요.</p>'+
+ x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+m+actions;
+ document.getElementById('jobDetailBody').innerHTML=base+m+variantLinks+actions;
 }
 function openJobDetail(id){
  const x=getJobById(id);if(!x)return;
@@ -1107,13 +1142,15 @@ var jobFilter="all",jobRenderLimit=100;localStorage.setItem("worklinks_job_filte
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
 function renderJobs(){
  const el=document.getElementById('jobCards');if(!el)return;
- const all=jobs.concat(g2bLiveJobs);
+ const raw=jobs.concat(g2bLiveJobs);
+ const rejected=raw.filter(x=>x.kind&&jobSoftwareScope(x)==='out').length;
+ const all=collapseSimilarNotices(raw.filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')));
  const active=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key!=='closed'});
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
  document.getElementById('partnerJobCount').textContent='('+active.filter(function(o){return partnerIdsOfJob(o.x).length>0}).length+')';
  document.getElementById('partnerSummary').textContent=
-   '미마감 '+active.length+'건 · 파트너 업종 매칭 확인 '+active.filter(o=>partnerIdsOfJob(o.x).length>0).length+'건 · 별도 확인이 필요한 일감은 파트너명 미표시';
+   '미마감 '+active.length+'건 · 업종 매칭 확인 '+active.filter(o=>partnerIdsOfJob(o.x).length>0).length+'건 · HW/시공 등 SW 분담 미확인 '+rejected+'건은 목록 제외 (DB 보존)';
  const filter=jobFilter;
  if(filter==='sources'){
   document.getElementById('g2bMore').style.display='none';
@@ -1128,6 +1165,14 @@ function renderJobs(){
   });
   list.sort(function(a,b){
     if(filter==='closed')return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
+    if(sort==='qualified'){
+     const rank=function(x){
+      const p=partners[0],v=p?jobQualificationVerdict(x,p).type:'unverified';
+      return v==='industry_match'?0:v==='unverified'?1:v==='missing'?2:3;
+     };
+     const diff=rank(a.x)-rank(b.x);
+     if(diff)return diff;
+    }
     const priority=function(t){return ({closing:0,open:1,upcoming:2,unknown:3})[t.key]??4};
     const cmp=priority(a.time)-priority(b.time);
     if(sort==='recent'){
@@ -1156,10 +1201,11 @@ function renderJobs(){
       eligibility.type==='missing'?
       '<span class="jobmatch-chip missing" title="'+htmlEscape(eligibility.reason)+'">업종 '+eligibility.missing.length+'개 부족</span>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
+    const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+'">'+htmlEscape(day.label)+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
+       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        '<div class="job-footer">'+partner+matchBadge+
