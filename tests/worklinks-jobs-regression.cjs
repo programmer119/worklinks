@@ -138,6 +138,39 @@ assert.equal(smeCmp(smeBid,{}).rows.find(q=>q.id==='sme-issuance').status,'pendi
 assert.ok(source.includes("refreshPartnerSme(p)"));
 assert.ok(source.includes("sme-cert-snapshot.json"));
 
+
+// Each thumbnail must show the COMPLETE 4-state result per company, not
+// interpret an industry-only match as bid-ready.
+const resultsById={
+ industry_match:'industry_match', unverified:'unverified', missing:'missing'
+};
+const verdictMod=new Function('jobTimeInfo','jobSoftwareScope','jobQualificationVerdict','comparePartnerJob','htmlEscape',
+ part('function participationVerdict(x,p){','function matchRowsHTML(x,p){')+
+ 'return {participationVerdict,participationStrip};'
+)(x=>({key:x.closed?'closed':'open'}),x=>x.kind==='thng'?'out':'candidate',
+ x=>({type:x.industry||'unverified',reason:'면허검증 대기'}),
+ (x,p)=>({complete:!!x.full,counts:{ok:x.ok??2,pending:x.pending??1,unknown:x.unknown??1,missing:0},
+    rows:x.missing?[{id:'license-1',status:'missing',reason:'등록업종 불일치'}]:[]}),
+ x=>String(x));
+const bidder={id:'changcom',short:'창컴',name:'창컴정보통신(주)',smeRecord:{size:'소기업',validState:'valid'}};
+const verdict=(x,p=bidder)=>verdictMod.participationVerdict({kind:'servc',...x},p);
+assert.equal(verdict({industry:'industry_match'}).type,'conditional');
+assert.equal(verdict({industry:'unverified'}).type,'checking');
+assert.equal(verdict({industry:'missing'}).type,'blocked');
+assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked');
+assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked');
+assert.equal(verdict({industry:'industry_match',full:false,ok:6,pending:0,unknown:0}).type,'conditional','all available API matches alone cannot certify attachments');
+assert.equal(verdict({industry:'industry_match',full:true,ok:7,pending:0,unknown:0}).type,'ready','only explicit verified full evidence can be ready');
+assert.equal(verdict({industry:'industry_match',condition:'소상공인만 입찰'}).type,'blocked','small enterprise is not necessarily micro enterprise');
+assert.equal(verdict({industry:'industry_match',condition:'공동수급 불허'}).type,'conditional','joint-venture prohibition does not prohibit solo bidding');
+const html=verdictMod.participationStrip({id:'test-bid',condition:'',industry:'industry_match'},
+  [bidder,{id:'other',short:'다른 업체',smeRecord:{size:'소기업',validState:'valid'}}]);
+assert.ok(html.includes('data-partner-id="changcom"')&&html.includes('data-partner-id="other"'));
+assert.ok(html.includes('조건부 가능'));
+assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
+assert.ok(source.includes('function participationVerdict(x,p)'));
+assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all notices as ready');
+
 // Readable card and detail copy: no opaque 1468 chip or duplicate "pending" labels.
 assert.ok(source.includes("diff===0?'D-DAY':'D-'+diff"));
 assert.ok(source.includes('업종 일치 · 추가서류 확인 필요'));
@@ -156,24 +189,25 @@ const filterSelect={
  value:'all',innerHTML:'',closest:()=>({classList:{toggle:()=>{}}})
 };
 const companies=[{id:'changcom',name:'창컴정보통신(주)'}];
-const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob',
+const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob','jobSoftwareScope',
  filterSection+
  'return {syncPartnerFilterChoices,jobMatchesSelectedPartner,getSelected:()=>selectedPartnerId,setSelected:v=>{selectedPartnerId=v}};'
 )(
  companies,{getElementById:id=>id==='partnerFilter'?filterSelect:null},
  value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
- {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[]
+ {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[],x=>x.kind==='thng'?'out':'candidate'
 );
 filterFns.syncPartnerFilterChoices();
 assert.ok(filterSelect.innerHTML.includes('value="all">모두'));
 assert.ok(filterSelect.innerHTML.includes('value="changcom">창컴정보통신(주)'));
 assert.equal(filterFns.jobMatchesSelectedPartner({matches:['changcom']},'all'),true);
-assert.equal(filterFns.jobMatchesSelectedPartner({matches:[]},'all'),false);
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:[]},'all'),true,'unverified bids stay visible');
 assert.equal(filterFns.jobMatchesSelectedPartner({matches:['changcom']},'changcom'),true);
-assert.equal(filterFns.jobMatchesSelectedPartner({matches:['other']},'changcom'),false);
+assert.equal(filterFns.jobMatchesSelectedPartner({matches:['other']},'changcom'),true,'show blocked or unverified partner jobs');
 assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['changcom']},'all'),true);
 assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['changcom']},'changcom'),true);
-assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['another']},'changcom'),false);
+assert.equal(filterFns.jobMatchesSelectedPartner({candidates:['another']},'changcom'),true,'filter should not hide bid failures');
+assert.equal(filterFns.jobMatchesSelectedPartner({kind:'thng',matches:['changcom']},'changcom'),false);
 companies.push({id:'newpartner',name:'신규 파트너'});
 filterFns.syncPartnerFilterChoices();
 assert.ok(filterSelect.innerHTML.includes('value="newpartner">신규 파트너'));
