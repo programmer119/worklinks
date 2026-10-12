@@ -140,6 +140,14 @@ assert.equal(regional(seoulBid,{}).status,'pending','no company address must not
 assert.equal(regional({regionEvidence:{region:{ok:false,error:'upstream_http_403'}}},seoulCompany).status,'unknown');
 assert.ok(source.includes('data.company.regionCode'));
 
+// Provenance: only exact G2B bidNo + official winner business number are accepted.
+assert.ok(source.includes('awardBidNos:["R25BK00826083","20221204854"]'));
+assert.ok(source.includes("String(r.bidwinnrBizno||'').replace(/\\D/g,'')!==bizno"));
+assert.ok(source.includes("String(r.bidNtceNo||'')!==bids[i]"));
+assert.ok(source.includes("if(id==='experience'&&p.awardEvidence?.length)"));
+assert.ok(source.includes("낙찰은 계약이행 실적증명의 대체 자료가 아님"));
+assert.ok(source.includes("나라장터 공식 낙찰"));
+
 // Official SMPP SME validity must be compared, not left generically pending.
 const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck',
  part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
