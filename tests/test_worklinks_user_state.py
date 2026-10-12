@@ -8,7 +8,7 @@ import tempfile
 from unittest import mock
 
 os.environ['WORKLINKS_STATE_DB']=os.path.join(tempfile.mkdtemp(prefix='worklinks-state-'),'status.sqlite3')
-mod=runpy.run_path('/app/g2b-proxy.py',run_name='worklinks_state_tests')
+mod=runpy.run_path(os.environ.get('WORKLINKS_G2B_SOURCE','/app/g2b-proxy.py'),run_name='worklinks_state_tests')
 put=mod['worklinks_state_put']
 get=mod['worklinks_state_get']
 ApiError=mod['ApiError']
