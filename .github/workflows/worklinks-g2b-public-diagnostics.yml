@@ -7,6 +7,7 @@ on:
       - 'server/g2b-proxy.py'
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
+      - 'tests/test_bid_evidence.py'
       - 'tests/worklinks-jobs-regression.cjs'
       - 'startup-support/direct-production-snapshot.json'
   workflow_dispatch:
@@ -25,6 +26,7 @@ jobs:
           python3 -m py_compile server/g2b-proxy.py
           python3 tests/test_g2b_eligibility_join.py
           python3 tests/test_direct_production.py
+          python3 tests/test_bid_evidence.py
           node tests/worklinks-jobs-regression.cjs
           node tests/worklinks-live-partner-smoke.cjs
       - name: Verify public GitHub Pages content matches current main
