@@ -249,6 +249,35 @@ def _bid_evidence_fetch(operation, bid_no, order):
     except ApiError as e:
         return {'ok':False,'complete':False,'error':e.msg,'count':None,'items':[]}
 
+def _notice_document_query(bid_no, order):
+    """Second official path: notice detail's ntceSpecDocUrl1..10, not e-order files.
+
+    This only fetches public metadata from a documented G2B notice-detail operation.
+    Links are untrusted until download-time host, path and file-type validation.
+    """
+    result=_bid_evidence_fetch('getBidPblancListInfoServc',bid_no,order)
+    items=[];seen=set();found_fields=set()
+    if result['ok'] and result['complete']:
+        for row in result['items']:
+            if not isinstance(row,dict):continue
+            for i in range(1,11):
+                url=str(row.get('ntceSpecDocUrl'+str(i)) or '').strip()
+                name=str(row.get('ntceSpecFileNm'+str(i)) or '').strip()
+                if not url and not name:continue
+                found_fields.add('ntceSpecDocUrl'+str(i))
+                if not url or url in seen:continue
+                seen.add(url)
+                items.append({'name':name[:160] or ('입찰공고 첨부 '+str(i)),
+                              'url':url,'source':'notice_detail',
+                              'officialNoticeField':'ntceSpecDocUrl'+str(i)})
+    return {'ok':result['ok'],'complete':result['complete'],
+            'error':result.get('error',''),'noticeRows':result.get('count'),
+            'items':items,'source':'나라장터 입찰공고 상세정보',
+            'foundDocumentFields':sorted(found_fields),
+            'returnedRawFields':sorted(result['items'][0].keys())
+               if result['items'] and isinstance(result['items'][0],dict) else []}
+
+
 def _pick(row, names):
     for key in names:
         value=row.get(key)
@@ -259,6 +288,9 @@ def _pick(row, names):
 def bid_evidence_query(bid_no, order):
     regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn',bid_no,order)
     attachments=_bid_evidence_fetch('getBidPblancListInfoEorderAtchFileInfo',bid_no,order)
+    # Keep the two official origins distinct; a zero result from either is not
+    # proof that the public notice has no RFP/statement of work.
+    notice_docs=_notice_document_query(bid_no,order)
     normalized_regions=[]
     for row in regions['items']:
         name=_pick(row,['prtcptPsblRgnNm','prtcptPsblRgnCdNm','rgnNm','rgnName'])
@@ -271,16 +303,24 @@ def bid_evidence_query(bid_no, order):
         # Links must remain official HTTPS URLs; never convert arbitrary API strings into a link.
         if url and not re.match(r'^https://',url,re.I):url=''
         if name or url:normalized_attachments.append({'name':name,'url':url})
+    for item in notice_docs['items']:
+        url=item.get('url') or ''
+        if url and url not in set(x.get('url') or '' for x in normalized_attachments):
+            normalized_attachments.append(item)
     return {
-        'ok':regions['ok'] or attachments['ok'],'bidNo':bid_no,'order':order,
+        'ok':regions['ok'] or attachments['ok'] or notice_docs['ok'],'bidNo':bid_no,'order':order,
         'region':{'ok':regions['ok'],'complete':regions['complete'],
                   'count':regions['count'],'items':normalized_regions,
                   'rawFields':sorted(regions['items'][0].keys()) if regions['items'] else [],
                   'error':regions.get('error','')},
-        'attachments':{'ok':attachments['ok'],'complete':attachments['complete'],
-                       'count':attachments['count'],'items':normalized_attachments,
+        'attachments':{'ok':attachments['ok'] or notice_docs['ok'],
+                       'complete':attachments['complete'] or notice_docs['complete'],
+                       'count':len(normalized_attachments),'items':normalized_attachments,
+                       'eorderCount':attachments['count'],
+                       'noticeDetailDocumentCount':len(notice_docs['items']),
                        'rawFields':sorted(attachments['items'][0].keys()) if attachments['items'] else [],
-                       'error':attachments.get('error','')},
+                       'error':attachments.get('error','') if not notice_docs['ok'] else ''},
+        'noticeDocuments':notice_docs,
         'checkedAt':datetime.datetime.utcnow().isoformat()+'Z',
         'limitations':'공고 원문 첨부 미열람. 지역조회 0건은 전국 허용 증명이 아님.'
     }
