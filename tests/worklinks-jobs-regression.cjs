@@ -118,7 +118,8 @@ assert.equal(directMod.productionRequirementCheck({condition:'정보시스템개
 }).status,'pending','expired historical certificate must not mean current proof');
 assert.equal(direct('정보시스템개발서비스 및 정보시스템유지관리서비스 직접생산확인증명서 필요').status,'unknown','multiple requirements need AND/OR analysis');
 assert.ok(source.includes("공개자료 기준일 이후 취소·변경 여부는 SMPP 최신 확인 필요"));
-assert.ok(source.includes('directBadge'));
+assert.ok(source.includes('productionRequirementCheck(x,p)'));
+assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 
 // Official SMPP SME validity must be compared, not left generically pending.
 const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
@@ -159,6 +160,7 @@ assert.equal(verdict({industry:'unverified'}).type,'checking');
 assert.equal(verdict({industry:'missing'}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked');
+assert.ok(source.includes("t.key==='upcoming'"));
 assert.equal(verdict({industry:'industry_match',full:false,ok:6,pending:0,unknown:0}).type,'conditional','all available API matches alone cannot certify attachments');
 assert.equal(verdict({industry:'industry_match',full:true,ok:7,pending:0,unknown:0}).type,'ready','only explicit verified full evidence can be ready');
 assert.equal(verdict({industry:'industry_match',condition:'소상공인만 입찰'}).type,'blocked','small enterprise is not necessarily micro enterprise');
