@@ -175,6 +175,12 @@ jobs:
                 'totalCount':evidence.get('totalCount'),
                 'attributableCount':evidence.get('attributableCount'),
                 'unattributedCount':evidence.get('unattributedCount'),
+                'nestedContractItems':evidence.get('nestedContractItems'),
+                'nestedContractFields':evidence.get('nestedContractFields'),
+                'contracts':[{'contractNo':c.get('contractNo'),'title':c.get('title'),
+                              'date':c.get('date'),'amount':c.get('amount'),
+                              'performanceComplete':c.get('performanceComplete')}
+                             for c in (evidence.get('contracts') or [])[:3]],
                 'schemaFields':evidence.get('schemaFields'),
                 'contractPerformanceVerified':evidence.get('contractPerformanceVerified')})
           company=get('/company?bizno=1308185973')
