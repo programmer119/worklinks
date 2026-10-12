@@ -1,0 +1,25 @@
+name: WorkLinks AuthHub account-state tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'tests/test_worklinks_user_state.py'
+      - '.github/workflows/worklinks-user-state-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python syntax
+        run: python3 -m py_compile server/g2b-proxy.py tests/test_worklinks_user_state.py
+      - name: Account isolation and AuthHub identity checks
+        env:
+          WORKLINKS_G2B_SOURCE: server/g2b-proxy.py
+        run: python3 tests/test_worklinks_user_state.py
