@@ -174,7 +174,7 @@
 #jobCards .job-day.soon{background:#fff7ed;color:#c2410c;border-right-color:#fed7aa}
 #jobCards .job-day.today{background:#fef2f2;color:#b91c1c;border-right-color:#fecaca}
 #jobCards .job-day.closed{background:#f1f5f9;color:#94a3b8}
-#jobCards .job-day.unknown{background:#f8fafc;color:#64748b;font-size:16px}
+#jobCards .job-day.unknown{background:#f8fafc;color:#64748b;font-size:11px;white-space:normal;text-align:center;padding:4px}
 #jobCards .job-day.upcoming{background:#eef2ff;color:#4338ca}
 #jobCards .job-core{padding:11px 12px 9px;display:flex;flex-direction:column;gap:7px;min-width:0}
 #jobCards .job-core .job-headline{display:flex;gap:6px;align-items:flex-start;justify-content:space-between;min-width:0}
@@ -610,8 +610,8 @@ function licenseLogic(line){
  const declared=String(line.logic||'').toUpperCase();
  if(declared==='OR'||declared==='AND')return declared;
  const t=[line.name,line.permittedIndustries,line.fieldRestrictions].join(' ');
- if(/또는|택일|중\\s*(?:한\\s*가지|하나|1종)|\\bOR\\b/i.test(t))return 'OR';
- if(/모두|동시\\s*보유|각각\\s*보유|\\bAND\\b/i.test(t))return 'AND';
+ if(/또는|택일|중\s*(?:한\s*가지|하나|1종)|\bOR\b/i.test(t))return 'OR';
+ if(/모두|동시\s*보유|각각\s*보유|\bAND\b/i.test(t))return 'AND';
  return 'UNKNOWN';
 }
 function licenseLineResult(line,p){
@@ -904,7 +904,7 @@ function jobTimeInfo(x){
 }
 
 /* Deadline: KST calendar day, not 24-hour rounding.
-   D-0 is always the calendar date of closing; no date => D-? */
+   D-0 is only the calendar date of closing; no date => 일정 미확인 */
 function jobDayCounter(time){
  if(time.key==='closed')return {label:/취소|철회/.test(time.label)?'취소':'마감',kind:'closed'};
  if(time.end===null)return {label:'일정 미확인',kind:'unknown'};
@@ -1053,14 +1053,14 @@ function comparePartnerJob(x,p){
   ['direct','직접생산확인증명서',/직접생산|8111159901|8111189901|8111200201/],
   ['smecert','공공입찰용 중소기업확인서',/중소기업.?확인|소상공인.?확인/],
   ['swstatus','SW사업자 일반현황 관리확인서',/일반현황.?관리확인|SW사업자.?신고/],
-  ['experience','수행실적·인력','실적'],
+  ['experience','수행실적·인력',/실적/],
  ];
  // Proof requirements may exist in attachments even when not present in the summary.
  for(const [id,label,re] of certRules){
   if(re.test(txt))add('proof-'+id,label,'pending','업체 원본 증빙의 보유·유효기간 별도 확인 필요','공고 조건 요약');
  }
  if(/지역.?제한|본점.?소재/.test(txt))add('region','지역제한','pending','업체 본점 소재지와 공고의 허용 지역 대조 필요','공고 조건 요약');
- if(/공동수급.*불허|공동수급.*불가|공동수급\\s*금지/.test(txt)){
+ if(/공동수급.*불허|공동수급.*불가|공동수급\s*금지/.test(txt)){
   add('joint','공동수급 금지','missing','공동수급 입찰 불가. 단독 가능 여부는 별도 자격 검토','공고 조건 요약');
  }else if(/공동수급/.test(txt)){
   add('joint','공동수급·분담이행','pending','허용 방식·분담 범위 원문 확인 필요','공고 조건 요약');
