@@ -207,6 +207,19 @@
 
 .src-status-panel{border:1px solid #dbe3ef;border-radius:14px;padding:14px;margin:14px 0;background:#fff}.src-status-heading{display:flex;justify-content:space-between;gap:12px;align-items:center}.src-status-heading strong{font-size:13px}.src-status-heading small{display:block;color:#64748b;font-size:10px;margin-top:3px}.src-toggle{display:flex;gap:2px;background:#e2e8f0;padding:3px;border-radius:9px;flex:none}.src-toggle button{border:0;border-radius:7px;padding:7px 9px;background:transparent;color:#475569;font-size:11px;font-weight:800;cursor:pointer}.src-toggle button.on{background:#0f172a;color:#fff}.src-status-numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}.src-status-numbers>div{border:1px solid #e2e8f0;border-radius:9px;padding:9px}.src-status-numbers small{display:block;font-size:10px;color:#64748b}.src-status-numbers strong{font-size:23px;font-variant-numeric:tabular-nums}.src-status-stackbar{display:flex;height:10px;overflow:hidden;border-radius:99px;background:#e2e8f0}.src-status-stackbar i{display:block;height:100%}.src-status-note{font-size:11px!important;margin:9px 0 0!important;color:#64748b!important}@media(max-width:640px){.src-status-heading{align-items:stretch;flex-direction:column}.src-toggle{align-self:flex-start}.src-status-numbers{gap:4px}.src-status-numbers>div{padding:6px}.src-status-numbers strong{font-size:19px}.src-status-numbers small{font-size:9px}}
 .srcdirectory-links a,.srcdirectory-links>span{position:relative;display:flex!important;flex-direction:column;align-items:flex-start;overflow:hidden;min-width:95px}.srcdirectory-links .src-share{font-size:10px;color:#475569;margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap}.srcdirectory-links .src-share-bar{height:3px;background:#2563eb;max-width:100%;border-radius:4px;margin-top:3px;min-width:0}.srcdirectory-links .src-no-attribution .src-share{color:#94a3b8}
+
+/* Thumb-level bid decision, one line per partner and readable on mobile. */
+#jobCards .job-verdicts{display:grid;gap:5px;margin:2px 0 1px}
+#jobCards .job-verdict-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+#jobCards .job-verdict-partner{font-size:11px;font-weight:850;color:#1d4ed8;text-decoration:underline;text-underline-offset:2px;flex:none}
+.job-verdict{display:inline-flex;align-items:center;border-radius:7px;font-size:11px;font-weight:850;padding:4px 8px;line-height:1.3;white-space:nowrap;border:1px solid transparent}
+.job-verdict.ready{background:#dcfce7;color:#166534;border-color:#86efac}
+.job-verdict.conditional{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.job-verdict.blocked{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.job-verdict.checking{background:#e2e8f0;color:#334155;border-color:#cbd5e1}
+#jobCards .job-verdict-why{flex:1 1 130px;min-width:0;color:#64748b;font-size:10px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#jobCards .job-mini .job-footer>.job-partners{max-width:68%}
+@media(max-width:680px){#jobCards .job-verdict-why{flex-basis:100%;font-size:10px}#jobCards .job-verdict-row{gap:4px 7px}}
 </style>
 </head>
 <body><main>
@@ -1303,7 +1316,9 @@ function matchRowsHTML(x,p){
   'SW 업무를 별도로 맡을 수 있는 공고인지 확인되지 않았습니다.';
  const direct=productionRequirementCheck(x,p);
  const productionSummary=direct.applicable?'<div style="margin-top:5px"><b>직접생산:</b> '+htmlEscape(direct.reason)+'</div>':'';
- const summary='<div class="job-match-summary"><b>'+htmlEscape(p.name)+'</b> · <strong>'+htmlEscape(verdict)+'</strong>'+
+ const screening=participationVerdict(x,p);
+ const summary='<div class="job-match-summary"><b>'+htmlEscape(p.name)+'</b> · <span class="job-verdict '+screening.type+'">'+htmlEscape(screening.label)+'</span> · <strong>'+htmlEscape(verdict)+'</strong>'+
+  '<div style="margin-top:5px">'+htmlEscape(screening.reason)+'</div>'+
   '<div style="margin-top:5px">'+htmlEscape(why)+'</div>'+productionSummary+
   '<div style="margin-top:6px">세부 확인: 일치 <b>'+c.ok+'</b> · 불일치·참여제한 <b>'+c.missing+'</b> · 서류 확인 필요 <b>'+c.pending+'</b> · 원문 확인 <b>'+c.unknown+'</b></div></div>';
  const caption={ok:'일치',missing:'부족',pending:'증빙 필요',unknown:'미확인'};
@@ -1395,8 +1410,8 @@ function syncPartnerFilterChoices(){
  if(label)label.classList.toggle('active',jobFilter==='partner');
 }
 function jobMatchesSelectedPartner(x,id){
- const ids=[...new Set(partnerIdsOfJob(x).concat(partnerCandidateIdsOfJob(x)))];
- return id==='all'?ids.length>0:ids.includes(id);
+ if(jobSoftwareScope(x)!=='candidate')return false;
+ return id==='all'?partners.length>0:partners.some(p=>p.id===id);
 }
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
 function renderJobs(){
@@ -1434,8 +1449,8 @@ function renderJobs(){
     if(sort==='qualified'){
      const rank=function(x){
       const list=selectedPartnerId==='all'?partners:partners.filter(p=>p.id===selectedPartnerId);
-      const types=list.map(p=>jobQualificationVerdict(x,p).type);
-      return types.includes('industry_match')?0:types.includes('unverified')?1:types.includes('missing')?2:3;
+      const types=list.map(p=>participationVerdict(x,p).type);
+      return types.includes('ready')?0:types.includes('conditional')?1:types.includes('checking')?2:types.includes('blocked')?3:4;
      };
      const diff=rank(a.x)-rank(b.x);
      if(diff)return diff;
@@ -1454,13 +1469,13 @@ function renderJobs(){
   });
   if(filter==='partner'){
    const selected=partners.find(p=>p.id===selectedPartnerId);
-   const confirmed=list.filter(o=>selected?
-    partnerIdsOfJob(o.x).includes(selected.id):partnerIdsOfJob(o.x).length>0).length;
-   const awaiting=list.length-confirmed;
+   const companyList=selected?[selected]:partners;
+   const countByType=type=>list.filter(o=>companyList.some(p=>participationVerdict(o.x,p).type===type)).length;
    document.getElementById('partnerSummary').textContent=
-    '파트너 '+(selected?selected.name:'모두')+' · 업종 일치 확인 '+confirmed+'건 · 입찰자격 확인 중 '+awaiting+'건'+
-    (selected?.registryError?' · 업체등록 API 오류: '+selected.registryError:'')+
-    ' · 업종 일치만으로 바로 입찰할 수 있는 것은 아닙니다.';
+    '파트너 '+(selected?selected.name:'모두')+' · 바로 지원 '+countByType('ready')+
+    ' · 조건부 '+countByType('conditional')+' · 지원 불가 '+countByType('blocked')+
+    ' · 검증 중 '+countByType('checking')+'건'+
+    (selected?.registryError?' · 업체등록 오류: '+selected.registryError:'');
   }
   document.getElementById('g2bMore').style.display=list.length>jobRenderLimit?'inline-block':'none';
   document.getElementById('g2bMore').textContent='일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기';
@@ -1468,6 +1483,7 @@ function renderJobs(){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
     const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
+    const comparisonCompanies=scoped?[scoped]:partners;
     const partnerList=confirmed.concat(pending).filter(y=>!scoped||y.p.id===scoped.id);
     const partner=partnerList.length?'<div class="job-partners">파트너 '+
       partnerList.map(function(y){
@@ -1498,7 +1514,8 @@ function renderJobs(){
        '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
-       '<div class="job-footer">'+partner+matchBadge+directBadge+
+       participationStrip(x,comparisonCompanies)+
+       '<div class="job-footer">'+partner+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
        '</div></div></article>';
   }).join(''):'<div class="emptycard">이 조건에 해당하는 일감이 없습니다.</div>';
