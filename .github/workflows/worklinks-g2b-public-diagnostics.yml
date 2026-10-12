@@ -146,6 +146,15 @@ jobs:
               if matches:
                 print('OFFICIAL_AWARD_MATCH',notice,{k:v for k,v in matches[0].items()
                   if k in ['bidNtceNo','bidNtceNm','bidwinnrNm','bidwinnrBizno','bidwinnrBizNo','sucsfBidAmt','sucsfBidRate','opengDt','scsbidDt','bidwinnrBizNo','fnlSucsfBidAmt']})
+          if evidence:
+            import urllib.parse
+            files=(evidence.get('attachments') or {}).get('items') or []
+            for file in files[:2]:
+              address=file.get('url') or ''
+              parsed=urllib.parse.urlparse(address)
+              print('OFFICIAL_ATTACHMENT_FILE',{'name':str(file.get('name') or '')[:120],
+                'scheme':parsed.scheme,'host':parsed.netloc,'path':parsed.path[:140],
+                'isHttps':address.startswith('https://')})
           contract=get('/contract-capability')
           if contract:
             print('OFFICIAL_CONTRACT_API_CAPABILITY',{
