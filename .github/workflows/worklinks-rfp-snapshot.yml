@@ -1,0 +1,37 @@
+name: WorkLinks official RFP eligibility snippets
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-rfp-snapshot.yml'
+      - 'scripts/refresh_worklinks_rfp.py'
+  workflow_dispatch:
+  schedule:
+    - cron: '44 2 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-official-rfp-snapshot
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install document readers
+        run: python3 -m pip install --break-system-packages -q pyhwp pypdf
+      - name: Extract limited official RFP eligibility text
+        run: python3 scripts/refresh_worklinks_rfp.py --limit 12
+      - name: Publish verified RFP snippets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add startup-support/rfp-clauses.json
+          if git diff --cached --quiet; then echo 'RFP_SNAPSHOT_UNCHANGED'; exit 0; fi
+          git commit -m 'data: refresh official G2B RFP qualification snippets'
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
