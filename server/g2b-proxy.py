@@ -25,6 +25,7 @@ TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
 SECRET_PATH = os.environ.get('G2B_SECRET_PATH', '/home/worklinks/g2b/secrets/g2b.env')
 API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService'
 AWARD_BASE = 'https://apis.data.go.kr/1230000/as/ScsbidInfoService'
+CONTRACT_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctInfoService'
 COMPANY_BASE = 'https://apis.data.go.kr/1230000/ao/UsrInfoService02'
 BID_OPS = {
     'servc':'getBidPblancListInfoServcPPSSrch',
@@ -96,6 +97,21 @@ def date(s):
     except ValueError: raise ApiError('invalid_date',400)
 
 
+
+def contract_capability_query():
+    """Discover key authorization/schema only; NOT a company performance record."""
+    result=request_api(CONTRACT_BASE,'getCntrctInfoListServc',{
+        'pageNo':1,'numOfRows':1,'inqryDiv':1,
+        'inqryBgnDt':'202610010000','inqryEndDt':'202610012359'})
+    first=result['items'][0] if result['items'] else {}
+    return {
+        'ok':True,'authorized':True,'operation':'getCntrctInfoListServc',
+        'schemaFields':sorted(first.keys()) if isinstance(first,dict) else [],
+        'sampleCount':result['totalCount'],
+        'companyHistoryVerified':False,
+        'limitations':'인증·호출 가능 여부 검사. 개별 업체 실적·계약완료·검수·실적증명서 확인 아님.',
+        'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
+    }
 
 def _bid_evidence_fetch(operation, bid_no, order):
     """Public notice metadata. Missing API rows NEVER means unrestricted/qualified."""
@@ -444,7 +460,8 @@ class Handler(BaseHTTPRequestHandler):
                     'company':{'name':matching[0].get('corpNm') or '',
                                'registeredAt':matching[0].get('rgstDt') or '',
                                'address':_pick(matching[0],['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr']),
-                               'addressField':next((key for key in ['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), '')
+                               'addressField':next((key for key in ['corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), ''),
+                               'availableFields':sorted(matching[0].keys())
                               } if matching else None,
                     'industries':codes, 'industryCount':industry_total,
                     'unattributedResponseRows':sum(1 for x in industry_rows if not x.get('bizno') and not x.get('bsnsRgstNo')),
@@ -454,6 +471,18 @@ class Handler(BaseHTTPRequestHandler):
                     'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
                 }
                 with lock: cache[ck] = (time.time()+3600, result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-capability':
+                ck=('contract-capability',)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                try:result=contract_capability_query()
+                except ApiError as e:
+                    result={'ok':False,'authorized':False,'error':e.msg,
+                            'service':'조달청 나라장터 계약정보서비스',
+                            'applicationUrl':'https://www.data.go.kr/data/15129427/openapi.do',
+                            'companyHistoryVerified':False}
+                with lock:cache[ck]=(time.time()+3600,result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/bid-evidence':
                 bid_no=get('bidNo').strip()
