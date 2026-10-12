@@ -1233,7 +1233,7 @@ function comparePartnerJob(x,p){
  }
  if(/지역.?제한|본점.?소재/.test(txt))add('region','지역제한','pending','업체 본점 소재지와 공고의 허용 지역 대조 필요','공고 조건 요약');
  if(/공동수급.*불허|공동수급.*불가|공동수급\s*금지/.test(txt)){
-  add('joint','공동수급 금지','missing','공동수급 입찰 불가. 단독 가능 여부는 별도 자격 검토','공고 조건 요약');
+  add('joint','공동수급 금지','unknown','공동수급 불가. 단독 입찰 적격 여부는 별도 판단','공고 조건 요약');
  }else if(/공동수급/.test(txt)){
   add('joint','공동수급·분담이행','pending','허용 방식·분담 범위 원문 확인 필요','공고 조건 요약');
  }
@@ -1244,6 +1244,49 @@ function comparePartnerJob(x,p){
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  return {rows,counts,complete:false};
+}
+/* Evidence-based bid screening. The completed-status branch is deliberately
+ * strict: no partial G2B/SMPP/attachment evidence is called "ready". */
+function participationVerdict(x,p){
+ const t=jobTimeInfo(x);
+ if(t.key==='closed')return {type:'blocked',label:'지원 불가',reason:'접수 마감',confirmed:0,pending:0,unknown:0,missing:1};
+ if(jobSoftwareScope(x)!=='candidate')return {type:'blocked',label:'지원 불가',reason:'별도 SW 수행범위 확인되지 않음',confirmed:0,pending:0,unknown:0,missing:1};
+ const industry=jobQualificationVerdict(x,p);
+ const proof=comparePartnerJob(x,p),c=proof.counts;
+ const text=[x.condition||'',x.partnerBidMode||''].join(' ');
+ const size=String(p.smeRecord?.size||'');
+ const valid=p.smeRecord?.validState==='valid';
+ const smallOnly=/소기업\s*(?:또는|및|·|\/)\s*소상공인|소기업\s*이하|소기업\s*만/.test(text);
+ const microOnly=/소상공인\s*만|소상공인에\s*한정/.test(text);
+ const sizeMismatch=valid&&((smallOnly&&!['소기업','소상공인'].includes(size))||(microOnly&&size!=='소상공인'));
+ const definitive=proof.rows.find(v=>v.status==='missing'&&v.id!=='joint'&&v.id!=='scope');
+ if(industry.type==='missing'||sizeMismatch||definitive)return {
+  type:'blocked',label:'지원 불가',
+  reason:sizeMismatch?'공고 기업규모 제한과 SMPP 공식 분류 불일치':industry.type==='missing'?'필수 등록업종 불일치':definitive.reason,
+  confirmed:c.ok,pending:c.pending,unknown:c.unknown,missing:c.missing
+ };
+ if(proof.complete===true&&c.missing===0&&c.pending===0&&c.unknown===0&&industry.type==='industry_match')
+  return {type:'ready',label:'바로 지원 가능',reason:'모든 필수조건 및 첨부원문 확인 완료',confirmed:c.ok,pending:0,unknown:0,missing:0};
+ if(industry.type==='industry_match'&&c.ok>0){
+  const detail=[];
+  if(/공동수급.*(?:불허|불가|금지)|공동수급\s*금지/.test(text))detail.push('단독만 검토 · 공동수급 불허');
+  if(c.pending)detail.push('추가 증빙 '+c.pending+'건');
+  if(c.unknown)detail.push('원문 미확인 '+c.unknown+'건');
+  return {type:'conditional',label:'조건부 가능',reason:detail.join(' · ')||'최종 조건 확인 필요',
+   confirmed:c.ok,pending:c.pending,unknown:c.unknown,missing:0};
+ }
+ return {type:'checking',label:'검증 중',reason:industry.reason||'공고·업체 정보 대조 중',
+  confirmed:c.ok,pending:c.pending,unknown:c.unknown,missing:0};
+}
+function participationStrip(x,companies){
+ if(jobSoftwareScope(x)!=='candidate')return '';
+ return '<div class="job-verdicts">'+companies.map(function(p){
+  const v=participationVerdict(x,p);
+  return '<div class="job-verdict-row" title="'+htmlEscape(v.reason)+'">'+
+   '<a class="job-verdict-partner" href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.short||p.name)+'</a>'+
+   '<span class="job-verdict '+v.type+'">'+htmlEscape(v.label)+'</span>'+
+   '<small class="job-verdict-why">'+htmlEscape(v.reason)+'</small></div>';
+ }).join('')+'</div>';
 }
 function matchRowsHTML(x,p){
  const result=comparePartnerJob(x,p),c=result.counts,status=jobQualificationVerdict(x,p);
