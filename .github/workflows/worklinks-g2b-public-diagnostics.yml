@@ -1,0 +1,53 @@
+name: WorkLinks G2B public API diagnostics
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-g2b-public-diagnostics.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Check public backend without exposing secrets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error,collections,datetime
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b'
+          def get(path):
+            try:
+              req=urllib.request.Request(base+path,headers={'User-Agent':'WorkLinks-CI-Diagnostics/1.0'})
+              with urllib.request.urlopen(req,timeout=26) as f:
+                return json.load(f)
+            except Exception as e:
+              print('PUBLIC_API_ERROR',path,type(e).__name__,str(e)[:120])
+              return None
+          d=get('/saved?sw=1&limit=40&offset=0')
+          if not d:raise SystemExit('PUBLIC_SAVED_UNAVAILABLE')
+          print('PUBLIC_SAVED_COUNTS',{k:d.get(k) for k in
+            ['storedTotal','candidateTotal','totalCount','eligibilityChecked','eligibilityLinked']})
+          rows=d.get('items') or []
+          for row in rows[:10]:
+            eligibility=row.get('bidEligibility') or {}
+            print('SAMPLE_BID',json.dumps({
+              'kind':row.get('kind'),'number':row.get('bidNo'),'order':row.get('order'),
+              'posted':row.get('posted'),'closes':row.get('closes'),
+              'eligibilityAttached':bool(eligibility),
+              'requirementsCount':len(eligibility.get('requirements') or []),
+              'licenseComplete':eligibility.get('complete')},ensure_ascii=False))
+          company=get('/company?bizno=1308185973')
+          if company:
+            print('PARTNER_REGISTRY',{
+              'found':company.get('found'),'complete':company.get('complete'),
+              'industryCount':company.get('industryCount'),'returnedRows':len(company.get('industries') or []),
+              'unattributedResponseRows':company.get('unattributedResponseRows')})
+            print('PARTNER_REGISTRY_CODES',[
+              {'code':i.get('code'),'status':i.get('status'),'expiresAt':i.get('expiresAt')}
+              for i in company.get('industries') or []
+              if i.get('code') in ('1468','1426','1469','1470','1169','9999')])
+          PY
