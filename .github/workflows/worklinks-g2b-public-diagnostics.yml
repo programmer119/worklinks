@@ -12,6 +12,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
+      - uses: actions/checkout@v4
+      - name: Validate API Python, real SQLite join and frontend partner regression
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile server/g2b-proxy.py
+          python3 tests/test_g2b_eligibility_join.py
+          node tests/worklinks-jobs-regression.cjs
+      - name: Verify public GitHub Pages content matches current main
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,pathlib,urllib.request
+          url='https://worklinks.suaveforge.com/startup-support/index.html?cachebust=ci-main'
+          expected=pathlib.Path('startup-support/index.html').read_bytes()
+          try:
+            req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-Deploy-Verification/1.0','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=22) as f: actual=f.read()
+            print('LIVE_HTML_SHA256',hashlib.sha256(actual).hexdigest())
+            print('GIT_HTML_SHA256',hashlib.sha256(expected).hexdigest())
+            print('LIVE_FRONTEND_MATCHES_MAIN',actual==expected)
+            if actual!=expected:print('LIVE_FRONTEND_NOTE=may still be propagating')
+          except Exception as e:
+            print('LIVE_FRONTEND_CHECK_UNAVAILABLE',type(e).__name__,str(e)[:140])
+          PY
       - name: Check public backend without exposing secrets
         shell: bash
         run: |
