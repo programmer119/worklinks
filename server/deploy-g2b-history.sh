@@ -14,7 +14,7 @@ REPEAT=worklinks-g2b-history
 SERVICE=worklinks-g2b-api
 test -s "$API" && test -s "$SECRET" && test -s "$DATA/bids.sqlite3"
 dk image inspect "$IMG" >/dev/null
-curl -fsSL --max-time 35 "https://raw.githubusercontent.com/programmer119/worklinks/838fdc6bc009944fff638ae16ceb996f7ce877db/server/g2b-proxy.py" -o "$API.next"
+curl -fsSL --max-time 35 "https://raw.githubusercontent.com/programmer119/worklinks/111b9822499127bd530ade1d37169422deeb8154/server/g2b-proxy.py" -o "$API.next"
 curl -fsSL --max-time 35 "https://raw.githubusercontent.com/programmer119/worklinks/ba4372ff5cc3477acdcb00c1666045780e8df4a6/server/g2b-repeat-history.py" -o "$HISTORY.next"
 dk run --rm \
  -v "$API.next:/work/api.py:ro" \
