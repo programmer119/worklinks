@@ -8,6 +8,7 @@ on:
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
       - 'tests/test_bid_evidence.py'
+      - 'tests/test_rfp_failures.py'
       - 'tests/test_contract_evidence.py'
       - 'tests/worklinks-jobs-regression.cjs'
       - 'startup-support/direct-production-snapshot.json'
@@ -28,6 +29,7 @@ jobs:
           python3 tests/test_g2b_eligibility_join.py
           python3 tests/test_direct_production.py
           python3 tests/test_bid_evidence.py
+          python3 tests/test_rfp_failures.py
           python3 tests/test_contract_evidence.py
           node tests/worklinks-jobs-regression.cjs
           node tests/worklinks-live-partner-smoke.cjs
