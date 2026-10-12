@@ -162,6 +162,34 @@
 .job-match-company{background:#f8fafc;padding:10px 12px;margin-top:9px;border-radius:10px}
 @media(max-width:1120px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){#jobCards.cards{grid-template-columns:1fr}#jobCards .job-mini{min-height:0}#jobCards .job-mini h3{min-height:0}}
+
+/* JOB CARD DESIGN RULE v2: one fixed deadline column, two content rows,
+   one separate source action; all long fields are inside job detail. */
+#jobCards.cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:stretch}
+#jobCards .job-mini{padding:0;min-height:114px;display:grid;grid-template-columns:76px minmax(0,1fr);overflow:hidden;border:1px solid #e1e7ef;border-radius:12px}
+#jobCards .job-mini h3{font-size:14px;line-height:1.4;min-height:0;margin:0;display:block;overflow:hidden}
+#jobCards .job-mini .job-card-title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.42}
+#jobCards .job-day{background:#f1f5f9;border-right:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;color:#334155;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.5px;white-space:nowrap}
+#jobCards .job-day.soon{background:#fff7ed;color:#c2410c;border-right-color:#fed7aa}
+#jobCards .job-day.today{background:#fef2f2;color:#b91c1c;border-right-color:#fecaca}
+#jobCards .job-day.closed{background:#f1f5f9;color:#94a3b8}
+#jobCards .job-day.unknown{background:#f8fafc;color:#64748b;font-size:16px}
+#jobCards .job-day.upcoming{background:#eef2ff;color:#4338ca}
+#jobCards .job-core{padding:11px 12px 9px;display:flex;flex-direction:column;gap:7px;min-width:0}
+#jobCards .job-core .job-headline{display:flex;gap:6px;align-items:flex-start;justify-content:space-between;min-width:0}
+#jobCards .job-mini .job-repeat{border-radius:6px;padding:3px 5px;font-size:10px;flex:none}
+#jobCards .job-mini .job-meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#64748b;font-size:11px;white-space:nowrap;min-width:0}
+#jobCards .job-mini .job-agency{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#jobCards .job-mini .job-amount{font-weight:850;color:#334155;flex:none;max-width:46%;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+#jobCards .job-mini .job-footer{border-top:1px solid #eef2f6;margin-top:auto;padding:7px 0 0;display:flex;justify-content:space-between;gap:6px;align-items:center;min-width:0}
+#jobCards .job-mini .job-partners{flex:0 1 auto;margin:0;min-width:0;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:10px}
+#jobCards .job-mini .job-partners a{font-size:10px}
+#jobCards .job-mini .job-partners.empty{display:none}
+#jobCards .job-mini .jobmatch-chip{font-size:10px;padding:3px 5px;margin-left:auto;white-space:nowrap;max-width:43%;overflow:hidden;text-overflow:ellipsis}
+#jobCards .job-mini .job-source-link{flex:none;border:1px solid #dbe2e9;background:#fff;border-radius:7px;padding:5px 7px;color:#475569;font-size:10px}
+#jobCards .job-mini .job-source-link:focus-visible,#jobCards .job-mini .job-card-title:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+@media(max-width:1150px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){#jobCards.cards{grid-template-columns:1fr}#jobCards .job-mini{min-height:103px;grid-template-columns:70px minmax(0,1fr)}}
 </style>
 </head>
 <body><main>
@@ -728,6 +756,18 @@ function jobTimeInfo(x){
  const dateLabel=function(t){return t===null?'미확인':new Date(t).toISOString().slice(0,16).replace('T',' ').replace(/-/g,'.')};
  return {start,end,key,label,text:'공고일 '+dateLabel(start)+' ~ 마감 '+dateLabel(end)};
 }
+
+/* Deadline: KST calendar day, not 24-hour rounding.
+   D-0 is always the calendar date of closing; no date => D-? */
+function jobDayCounter(time){
+ if(time.key==='closed')return {label:/취소|철회/.test(time.label)?'취소':'마감',kind:'closed'};
+ if(time.end===null)return {label:'D-?',kind:'unknown'};
+ const today=Math.floor(kstNow().getTime()/86400000);
+ const last=Math.floor(time.end/86400000);
+ const day=Math.max(0,last-today);
+ return {label:'D-'+day,kind:time.key==='upcoming'?'upcoming':
+  day===0?'today':day<=2?'soon':'normal'};
+}
 function jobAmountLabel(raw){
  const t=String(raw||'').trim();
  if(/^\d{6,}$/.test(t)){
@@ -1010,27 +1050,27 @@ function renderJobs(){
   document.getElementById('g2bMore').style.display=list.length>jobRenderLimit?'inline-block':'none';
   document.getElementById('g2bMore').textContent='일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
-    const x=o.x,t=o.time,n=repeatYears(x);
-    const badges='<span class="job-status '+(t.key==='closed'?'closed':t.key==='closing'?'closing':t.key==='unknown'?'unknown':'')+'">'+htmlEscape(t.label)+'</span>'+
-      (n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+n+'년 연속</button>':'');
+    const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
     const partnerList=partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)});
-    const partner=partnerList.length?'<div class="job-partners">파트너: '+
-       partnerList.map(function(p){return '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>'}).join(' · ')+
-       '</div>':'<div class="job-partners"></div>';
+    const partner=partnerList.length?'<div class="job-partners">파트너 '+
+      partnerList.map(function(p){return '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>'}).join(' · ')+
+      '</div>':'<div class="job-partners empty"></div>';
     const match=partnerList.length?comparePartnerJob(x,partnerList[0]):null;
     const matchCode=match?.rows.find(function(row){return row.status==='ok'&&row.source==='나라장터 면허제한 API'});
     const matchName=matchCode?.label?.match(/\b(1468|1426|1469|1470|1169|0036)\b/)?.[1]||'업종';
-    const matchBadge=match&&match.counts.missing?'<span class="jobmatch-chip missing" title="자세한 부족 조건은 카드를 눌러 확인">업종 부족 '+match.counts.missing+'</span>':
-      match&&match.counts.ok?'<span class="jobmatch-chip ok" title="전체 입찰 적격 확정 아님">'+htmlEscape(matchName)+' 일치</span>':
-      partnerList.length?'<span class="jobmatch-chip pending">자격 확인 중</span>':'';
-    return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기" >'+
-      '<div class="cardtop">'+badges+'<span class="tag">'+htmlEscape(x.type||'일감')+'</span></div>'+
-      '<h3><button class="job-card-title" type="button" data-job-detail="'+htmlEscape(x.id)+'">'+htmlEscape(x.title)+'</button></h3>'+
-      '<div class="meta">'+htmlEscape(x.org||'기관 미확인')+' · '+htmlEscape(jobAmountLabel(x.amount))+'</div>'+
-      '<div class="job-timeline">'+htmlEscape(t.text)+'</div>'+
-      '<div class="job-footer">'+partner+matchBadge+
-      '<a class="job-source-link" data-external-source="1" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" aria-label="'+htmlEscape(x.title)+' 원문 공고 보기">원문 공고 ↗</a>'+
-      '</div></article>';
+    const matchBadge=match&&match.counts.missing?'<span class="jobmatch-chip missing" title="부족한 조건은 카드 상세에서 확인">업종 부족 '+match.counts.missing+'</span>':
+      match&&match.counts.ok?'<span class="jobmatch-chip ok" title="업종 일치 · 전체 입찰 적격 확정 아님">'+htmlEscape(matchName)+' 일치</span>':
+      partnerList.length?'<span class="jobmatch-chip pending">자격 미확인</span>':'';
+    const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
+    return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
+      '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+'">'+htmlEscape(day.label)+'</div>'+
+      '<div class="job-core">'+
+       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
+       '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
+        '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
+       '<div class="job-footer">'+partner+matchBadge+
+         '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
+       '</div></div></article>';
   }).join(''):'<div class="emptycard">이 조건에 해당하는 일감이 없습니다.</div>';
  }
  document.querySelectorAll('.jobf').forEach(function(b){b.classList.toggle('on',b.dataset.jobf===filter)});
