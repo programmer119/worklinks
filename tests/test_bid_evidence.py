@@ -37,15 +37,21 @@ finally:
     g['request_api']=original
 # Authorization discovery is separate from a company's proven performance.
 def contract_mock(base,operation,params):
-    assert operation=='getCntrctInfoListServc'
-    assert 'CntrctInfoService' in base
-    return {'items':[{'cntrctNo':'T-123','cntrctNm':'Test only'}],'totalCount':1}
+    if operation=='getCntrctInfoListServc':
+        assert 'CntrctInfoService' in base
+        return {'items':[{'cntrctNo':'T-123','cntrctNm':'Test only'}],'totalCount':1}
+    assert operation=='getCntrctProcssIntgOpenServc'
+    assert 'CntrctProcssIntgOpenService' in base
+    assert params['bidNtceNo']=='R25BK00826083'
+    return {'items':[], 'totalCount':0}
 g['request_api']=contract_mock
 try:
     cap=p['contract_capability_query']()
     assert cap['authorized'] and cap['ok']
     assert cap['companyHistoryVerified'] is False
     assert 'cntrctNo' in cap['schemaFields']
+    assert cap['alternative']['ok']
+    assert cap['contractPerformanceVerified'] is False
 finally:
     g['request_api']=original
 print('G2B_BID_EVIDENCE_PREFLIGHT=PASS')
