@@ -661,7 +661,7 @@ function openPartnerModal(partnerId,jobId){
  if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
   if(p&&!p.productionCheckedAt&&!p.productionPromise)refreshPartnerProduction(p);
   if(p&&!p.smeCheckedAt&&!p.smePromise)refreshPartnerSme(p);
- if(job)loadJobEligibility(job);
+ if(job){loadJobEligibility(job);loadJobEvidence(job)}
 }
 function closePartnerModal(){partnerModal.classList.remove("open");partnerModal.setAttribute("aria-hidden","true");document.body.style.overflow="";partnerScopedCompany=null;partnerScopedJob=null;if(partnerLastFocus&&partnerLastFocus.focus)partnerLastFocus.focus()}
 document.getElementById("partnersOpen").addEventListener("click",function(){openPartnerModal(null,null)});
@@ -826,7 +826,7 @@ async function queueVisibleBidEligibility(){
   // Bound load to currently active, software-service relevant notices.
   // Hardware purchases and construction are excluded from industry matching.
   const list=jobs.concat(g2bLiveJobs).filter(function(x){
-   return jobSoftwareScope(x)==='candidate'&&jobTimeInfo(x).key!=='closed'&&jobBidIdentity(x)&&!jobEligibilityData(x);
+   return jobSoftwareScope(x)==='candidate'&&jobTimeInfo(x).key!=='closed'&&jobBidIdentity(x)&&(!jobEligibilityData(x)||!jobEvidenceData(x));
   });
   list.sort(function(a,b){return (jobTimeInfo(a).end||Infinity)-(jobTimeInfo(b).end||Infinity)});
   const picked=list.slice(0,60);
@@ -834,7 +834,7 @@ async function queueVisibleBidEligibility(){
   async function worker(){
    while(index<picked.length){
     const x=picked[index++];
-    await loadJobEligibility(x);
+    await Promise.allSettled([loadJobEligibility(x),loadJobEvidence(x)]);
     await new Promise(r=>setTimeout(r,230));
    }
   }
@@ -1307,7 +1307,11 @@ function comparePartnerJob(x,p){
  for(const [id,label,re] of certRules){
   if(re.test(txt))add('proof-'+id,label,'pending','업체 증빙과 공고 원문 요구기준 대조 필요','공고 조건 요약');
  }
- if(/지역.?제한|본점.?소재/.test(txt))add('region','지역제한','pending','업체 본점 소재지와 공고의 허용 지역 대조 필요','공고 조건 요약');
+ const evidence=jobEvidenceData(x);
+ if(/지역.?제한|본점.?소재/.test(txt)||evidence?.region?.items?.length){
+  const r=regionRequirementCheck(x,p);
+  add('region','참가가능지역·업체 주소',r.status,r.reason,'나라장터 참가가능지역 API × 업체정보 API');
+ }
  if(/공동수급.*불허|공동수급.*불가|공동수급\s*금지/.test(txt)){
   add('joint','공동수급 금지','unknown','공동수급 불가. 단독 입찰 적격 여부는 별도 판단','공고 조건 요약');
  }else if(/공동수급/.test(txt)){
@@ -1315,8 +1319,13 @@ function comparePartnerJob(x,p){
  }
  if(!req?.ok)add('license-unavailable','공식 면허제한 자료','unknown',
   '공고별 공식 면허제한 데이터 확인 전. 업종 추정으로 적격 판정 금지','나라장터 API');
- add('attachment','첨부원문 추가 참가조건','unknown',
-  '공고 요약에 안 나온 추가 조건이 있을 수 있어 첨부문서와 최신 증빙의 전수대조 전에는 최종 적격을 확정하지 않습니다.','첨부원문 미대조');
+ const doc=evidence?.attachments;
+ const attachmentSummary=doc?.ok?
+   ((doc.items?.length||0)+'개 e발주 첨부파일 메타데이터 조회'+
+    (doc.items?.length?' · '+doc.items.slice(0,2).map(z=>z.name).filter(Boolean).join(' / '):' · 0건은 원문 없음의 증명이 아님')):
+   ('e발주 첨부파일 API '+(doc?.error||evidence?.error||'조회 전'));
+ add('attachment','공고·과업지시서 전체 참가조건','unknown',
+  attachmentSummary+' · 첨부파일 내용 전수 분석·최신 공고원문 확인 전에는 최종 적격 판정 불가','나라장터 e발주 첨부파일 API');
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  return {rows,counts,complete:false};
@@ -1445,6 +1454,7 @@ function openJobDetail(id){
  const p=partners.find(function(p){return partnerIdsOfJob(x).includes(p.id)});
  if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
  loadJobEligibility(x);
+ loadJobEvidence(x);
 }
 function closeJobDetail(){
  const m=document.getElementById('jobDetailModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');
