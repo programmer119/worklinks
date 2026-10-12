@@ -120,10 +120,26 @@ jobs:
           production=get('/direct-production?bizno=1308185973')
           if production:
             print('PARTNER_PRODUCTION_SNAPSHOT',{'ok':production.get('ok'),'snapshot':production.get('snapshotDate'),'records':production.get('recordCount'),'found':production.get('found')})
+          evidence=get('/bid-evidence?bidNo=R26BK01756420&order=000')
+          if evidence:
+            print('OFFICIAL_BID_EVIDENCE',{
+              'ok':evidence.get('ok'),
+              'region':{'ok':(evidence.get('region') or {}).get('ok'),
+                        'count':(evidence.get('region') or {}).get('count'),
+                        'rawFields':(evidence.get('region') or {}).get('rawFields'),
+                        'items':(evidence.get('region') or {}).get('items'),
+                        'error':(evidence.get('region') or {}).get('error')},
+              'attachments':{'ok':(evidence.get('attachments') or {}).get('ok'),
+                             'count':(evidence.get('attachments') or {}).get('count'),
+                             'rawFields':(evidence.get('attachments') or {}).get('rawFields'),
+                             'items':len((evidence.get('attachments') or {}).get('items') or []),
+                             'error':(evidence.get('attachments') or {}).get('error')}})
           company=get('/company?bizno=1308185973')
           if company:
             print('PARTNER_REGISTRY',{
               'found':company.get('found'),'complete':company.get('complete'),
+              'companyAddressField':(company.get('company') or {}).get('addressField'),
+              'companyAddressAvailable':bool((company.get('company') or {}).get('address')),
               'industryCount':company.get('industryCount'),'returnedRows':len(company.get('industries') or []),
               'unattributedResponseRows':company.get('unattributedResponseRows')})
             print('PARTNER_REGISTRY_CODES',[
