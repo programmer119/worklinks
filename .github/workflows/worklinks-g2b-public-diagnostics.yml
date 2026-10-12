@@ -156,7 +156,7 @@ jobs:
               print('OFFICIAL_ATTACHMENT_FILE',{'name':str(file.get('name') or '')[:120],
                 'scheme':parsed.scheme,'host':parsed.netloc,'path':parsed.path[:140],
                 'isHttps':address.startswith('https://')})
-          contract=get('/contract-capability')
+          contract=get('/contract-capability?refresh=1')
           if contract:
             print('OFFICIAL_CONTRACT_API_CAPABILITY',{
               'ok':contract.get('ok'),'authorized':contract.get('authorized'),
@@ -167,7 +167,7 @@ jobs:
               'alternative':contract.get('alternative'),
               'contractPerformanceVerified':contract.get('contractPerformanceVerified')})
           for notice in ['R25BK00826083','20221204854']:
-            evidence=get('/contract-evidence?bidNo='+notice+'&bizno=1308185973')
+            evidence=get('/contract-evidence?bidNo='+notice+'&bizno=1308185973&refresh=1')
             if evidence:
               print('OFFICIAL_CONTRACT_PROCESS_BY_BID',notice,{
                 'ok':evidence.get('ok'),'error':evidence.get('error'),
