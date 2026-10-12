@@ -115,6 +115,21 @@ const prodP={productionCheckedAt:'2026-10-12T04:41:45Z',productionSnapshotDate:'
 const direct=txt=>directMod.productionRequirementCheck({condition:txt,partnerBidMode:''},prodP);
 assert.equal(direct('정보시스템개발서비스 직접생산확인증명서 필요').status,'ok');
 assert.equal(direct('직접생산확인증명서 8111159901 제출').status,'ok');
+const rfpDoc=JSON.parse(fs.readFileSync(path.join(__dirname,'../startup-support/rfp-clauses.json'),'utf8'));
+const rfpSample=rfpDoc.byNotice['R26BK01756420:000'];
+assert.equal(rfpSample.status,'text_extracted_requires_review');
+assert.ok(rfpSample.files.some(f=>f.readable&&f.snippets.some(x=>x.text.includes('8111189901'))));
+const rfpProductChecker=new Function('kstISO','rfpSnapshotForJob',
+ part('const productionNames=','function comparePartnerJob(x,p){')+
+ 'return productionRequirementCheck;'
+)(()=>'2026-10-12',()=>rfpSample);
+assert.equal(rfpProductChecker({condition:'',partnerBidMode:''},{
+ ...prodP,productionRecords:[...prodP.productionRecords,
+  {product:'정보시스템유지관리서비스',validFrom:'2025-01-16',validTo:'2027-01-15'}]
+}).status,'ok','official RFP code 8111189901 must match partner production certificate history');
+assert.equal(rfpProductChecker({condition:'',partnerBidMode:''},prodP).status,'pending',
+ 'missing matching product in dated certificate registry remains unverified');
+
 assert.equal(direct('정보시스템유지관리서비스 직접생산확인증명서 필수').status,'pending');
 assert.equal(direct('직접생산확인증명서 제출').status,'unknown');
 assert.equal(direct('업체 등록 1468').applicable,false);
@@ -153,10 +168,10 @@ assert.ok(source.includes("낙찰은 계약이행 실적증명의 대체 자료�
 assert.ok(source.includes("나라장터 공식 낙찰"));
 
 // Official SMPP SME validity must be compared, not left generically pending.
-const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
+const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
  part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
  'return comparePartnerJob;'
-)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}),()=>null);
+)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}),()=>null,()=>'' );
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
 const smePartner={smeRecord:{size:'소기업',issuedAt:'2026-04-01',validState:'valid'},
  smeCheckedAt:'2026-10-12T05:04:00Z'};
