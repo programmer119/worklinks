@@ -162,10 +162,18 @@ def process(no,ordn):
         return {'status':'metadata_not_confirmed','reasonCode':'metadata_api_error' if not docs.get('ok') else 'metadata_page_incomplete',
                 'sourceError':str(docs.get('error') or '')[:120],
                 'count':docs.get('count'),'source':'나라장터 e발주 첨부파일 API'}
-    if docs.get('count')==0 or not docs.get('items'):
-        return {'status':'no_eorder_files','reasonCode':'eorder_api_returned_zero',
-                'source':'나라장터 e발주 첨부파일 API','count':docs.get('count'),'files':[],
-                'reviewComplete':False,'contractPerformanceVerified':False}
+    if not docs.get('items'):
+        notice=data.get('noticeDocuments') or {}
+        ecount=docs.get('eorderCount')
+        detail_status='notice_detail_'+('api_error' if not notice.get('ok') else
+           'zero_files' if notice.get('complete') else 'partial_response')
+        return {'status':'no_official_attachment_metadata',
+                'reasonCode':'eorder_api_zero__'+detail_status,
+                'source':'나라장터 e발주 + 공식 입찰공고 상세',
+                'count':0,'eorderCount':ecount,'noticeDetailDocumentCount':0,
+                'noticeDetailError':notice.get('error') or '',
+                'files':[],'reviewComplete':False,
+                'contractPerformanceVerified':False}
     saved=[]
     for item in docs.get('items',[])[:8]:
         public=legal_file(item)
@@ -185,10 +193,15 @@ def process(no,ordn):
             record['error']=type(ex).__name__+': '+str(ex)[:90]
         saved.append(record)
     readable=any(x.get('readable') for x in saved)
+    notice=data.get('noticeDocuments') or {}
     return {'status':'text_extracted_requires_review' if readable else 'text_unavailable',
             'reasonCode':'readable_text_requires_full_review' if readable else
                          'download_or_format_failure',
-            'source':'나라장터 e발주 첨부파일 API','count':docs.get('count'),'files':saved,
+            'source':'나라장터 e발주 + 입찰공고 상세',
+            'count':docs.get('count'),'eorderCount':docs.get('eorderCount'),
+            'noticeDetailDocumentCount':docs.get('noticeDetailDocumentCount'),
+            'noticeDetailError':notice.get('error') or '',
+            'files':saved,
             'reviewComplete':False,'contractPerformanceVerified':False}
 def main():
     parser=argparse.ArgumentParser()
@@ -217,13 +230,13 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==2 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                if cached.get('classificationVersion')==3 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
                     print('RFP_CACHE_HIT',key);continue
             except ValueError:pass
         try:
             data=process(no,ordn)
             data['checkedAt']=now.isoformat()
-            data['classificationVersion']=2
+            data['classificationVersion']=3
             results[key]=data
             print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])))
             success+=int(data['status']=='text_extracted_requires_review')
