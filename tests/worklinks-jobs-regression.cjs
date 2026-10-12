@@ -127,6 +127,10 @@ assert.ok(source.includes("공개자료 기준일 이후 취소·변경 여부�
 assert.ok(source.includes('productionRequirementCheck(x,p)'));
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 
+assert.ok(source.includes('async function refreshRfpSnapshot()'));
+assert.ok(source.includes('const extractHTML=readable.length?'));
+assert.ok(source.includes('rfpSnapshotForJob(x)'));
+assert.ok(source.includes("files.length+'개 문서 텍스트 추출"));
 // Region lookup: one proved region match, and two fail-closed unknown cases.
 const regional=new Function('jobEvidenceData',
  part('function normalizedRegion(x){','function partnerRegisteredCode(p,code){')+
@@ -149,10 +153,10 @@ assert.ok(source.includes("낙찰은 계약이행 실적증명의 대체 자료�
 assert.ok(source.includes("나라장터 공식 낙찰"));
 
 // Official SMPP SME validity must be compared, not left generically pending.
-const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck',
+const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
  part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
  'return comparePartnerJob;'
-)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}));
+)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}),()=>null);
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
 const smePartner={smeRecord:{size:'소기업',issuedAt:'2026-04-01',validState:'valid'},
  smeCheckedAt:'2026-10-12T05:04:00Z'};
