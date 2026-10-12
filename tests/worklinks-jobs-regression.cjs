@@ -122,10 +122,10 @@ assert.ok(source.includes('productionRequirementCheck(x,p)'));
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 
 // Official SMPP SME validity must be compared, not left generically pending.
-const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
+const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck',
  part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
  'return comparePartnerJob;'
-)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}));
+)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}));
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
 const smePartner={smeRecord:{size:'소기업',issuedAt:'2026-04-01',validState:'valid'},
  smeCheckedAt:'2026-10-12T05:04:00Z'};
