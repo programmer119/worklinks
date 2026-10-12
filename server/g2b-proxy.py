@@ -290,9 +290,50 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == '/api/g2b/eligibility':
                 bid_no=get('bidNo').strip()
                 order=get('order','000').strip()
-                if not re.match(r'^[a-zA-Z0-9-]{8,40}
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('eligibility',bid_no,order)
+                with lock: saved=cache.get(ck)
+                if saved and saved[0]>time.time():
+                    return self.reply(200,saved[1])
+                data=request_api(API_BASE,'getBidPblancListInfoLicenseLimit',{
+                    'pageNo':1,'numOfRows':100,'inqryDiv':2,'bidNtceNo':bid_no,'bidNtceOrd':order
+                })
+                rows=list(data['items'])
+                total=data['totalCount']
+                for page in range(2,min((total+99)//100,10)+1):
+                    nxt=request_api(API_BASE,'getBidPblancListInfoLicenseLimit',{
+                        'pageNo':page,'numOfRows':100,'inqryDiv':2,
+                        'bidNtceNo':bid_no,'bidNtceOrd':order})
+                    rows.extend(nxt['items'])
+                requirements=[]
+                for row in rows:
+                    if row.get('bidNtceNo') and str(row.get('bidNtceNo'))!=bid_no:
+                        continue
+                    if row.get('bidNtceOrd') and str(row.get('bidNtceOrd'))!=order:
+                        continue
+                    name=str(row.get('lcnsLmtNm') or '').strip()
+                    industry=str(row.get('permsnIndstrytyList') or '').strip()
+                    codes=re.findall(r'(?<!\d)\d{4}(?!\d)',name+' '+industry)
+                    requirements.append({
+                        'name':name or '면허 제한 내용 확인 필요',
+                        'codes':list(dict.fromkeys(codes)),
+                        'group':str(row.get('lmtGrpNo') or ''),
+                        'sequence':str(row.get('lmtSno') or ''),
+                        'permittedIndustries':industry,
+                        'fieldRestrictions':str(row.get('indstrytyMfrcFldList') or '')
+                    })
+                result={'ok':True,'bidNo':bid_no,'order':order,'requirements':requirements,
+                        'count':len(requirements),'totalCount':total,
+                        'complete':len(rows)>=total,
+                        'source':'나라장터 입찰공고정보서비스 면허제한',
+                        'limitations':'면허제한 항목만 포함. 직접생산·중소기업확인·실적·지역·원문 추가조건은 별도 확인 필요',
+                        'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'}
+                with lock: cache[ck]=(time.time()+3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/awards':
                 bid_no = get('bidNo').strip()
-                if not re.match(r'^[a-zA-Z0-9-]{8,40}$',bid_no):
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no):
                     raise ApiError('invalid_bid_no',400)
                 data = request_api(AWARD_BASE,'getScsbidListSttusServc',{
                     'pageNo':1,'numOfRows':50,'inqryDiv':4,'bidNtceNo':bid_no})
