@@ -13,7 +13,6 @@ on:
 
 permissions:
   contents: write
-  models: read
 
 concurrency:
   group: worklinks-rfp-ai-snapshot
@@ -27,11 +26,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Regression tests — evidence citation and model safety
         run: python3 tests/test_rfp_ai.py
-      - name: Interpret a bounded set of official public RFP clauses with GitHub Models
+      - name: Classify official RFP clauses (OpenAI if configured; conservative local fallback otherwise)
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          WORKLINKS_AI_MODEL: openai/gpt-4o-mini
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          WORKLINKS_AI_MODEL: gpt-4.1-mini
         run: |
           set -Eeuo pipefail
           python3 scripts/analyze_worklinks_rfp_ai.py --limit 4
@@ -53,15 +52,17 @@ jobs:
           merged=dict(previous.get('byNotice') or {})
           for key,v in (fresh.get('byNotice') or {}).items():
             old=merged.get(key) or {}
+            if old.get('analysisStatus')=='classified' and v.get('analysisStatus')=='rule_based':
+              continue
             if old.get('checkedAt','')>v.get('checkedAt',''):
               continue
-            if v.get('analysisStatus')=='classified' and all(
+            if v.get('analysisStatus') in ('classified','rule_based') and all(
                 x.get('sourceVerified') is True and x.get('documentFullyReviewed') is False
                 for x in v.get('requirements') or []):
               merged[key]=v
           result={'ok':True,'model':fresh.get('model'),
                   'generatedAt':fresh.get('generatedAt'),
-                  'source':'Github Models RFP excerpt classification',
+                  'source':'Citation-checked RFP classification; model or conservative rules',
                   'reviewComplete':False,'byNotice':dict(list(merged.items())[-300:])}
           p.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
           print('WORKLINKS_AI_SNAPSHOT_MERGED',len(result['byNotice']))
