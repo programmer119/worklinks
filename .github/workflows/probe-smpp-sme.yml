@@ -27,15 +27,19 @@ jobs:
               try:body=raw.decode(codec);print('DECODED_AS',codec);break
               except UnicodeDecodeError:pass
             else:body=raw.decode('utf-8','replace')
-            for pattern in [r'<form[^>]*>',r'<input[^>]*>',r'<select[^>]*>',r'<button[^>]*>',r'\b(?:selectMiddl|search|fn_search|goSearch|srch|ajax|\.do)\b']:
-              matches=list(re.finditer(pattern,body,re.I))
-              print('PATTERN',pattern,'COUNT',len(matches))
-              for match in matches[:45]:
-                start,end=match.span()
-                print('TAG',html.unescape(body[max(0,start-90):min(len(body),end+140)]).replace('\n',' ')[:370])
-            for match in re.finditer('사업자등록번호|업체명|중·소기업|기업규모',body):
-              i=match.start()
-              print('TEXT_CONTEXT',html.unescape(body[max(0,i-240):i+230]).replace('\n',' ')[:500])
+            for term in ['name="searchForm"','searchBsnmNo','searchEntrpsNm','selectMiddlSslentrSchtwrListVw.do','fn_search','fnSearch','searchMiddl','selectMiddl','searchEntrps','기업규모','유효여부','fn_getList']:
+              hits=[m.start() for m in re.finditer(re.escape(term),body,re.I)]
+              print('LOOKUP_TERM',term,'COUNT',len(hits))
+              for pos in hits[-7:]:
+                print('LOOKUP_CONTEXT',term,html.unescape(body[max(0,pos-450):min(len(body),pos+540)]).replace('\\n',' ')[:1000])
+            m=re.search(r'<form\\s+name="searchForm".*?</form>',body,re.S|re.I)
+            if m:
+              content=m.group(0)
+              print('SEARCH_FORM_LENGTH',len(content))
+              print('SEARCH_FORM_FIELDS',re.findall(r'name="([^"]+)"',content,re.I))
+              for match in re.finditer('onclick=|검색|사업자등록번호',content,re.I):
+                i=match.start()
+                print('FORM_ACTION',html.unescape(content[max(0,i-120):i+250]).replace('\\n',' ')[:390])
           except Exception as e:
             print('SMPP_PROBE_ERROR',type(e).__name__,str(e)[:250])
             raise
