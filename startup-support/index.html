@@ -1495,8 +1495,24 @@ function productionRequirementCheck(x,p){
  const txt=[x.condition||'',x.partnerBidMode||'',rfpText].join(' ');
  if(!/직접\s*생산\s*(?:확인|증명)/.test(txt))return {applicable:false};
  const products=productionNames.filter(name=>txt.includes(name));
- if(/(?:^|\D)8111159901(?:\D|$)/.test(txt)&&!products.includes('정보시스템개발서비스'))products.push('정보시스템개발서비스');
- if(/(?:^|\D)8111189901(?:\D|$)/.test(txt)&&!products.includes('정보시스템유지관리서비스'))products.push('정보시스템유지관리서비스');
+ // Official detailed product numbers in the RFP are stronger than a
+ // product-name guess. These nine code-to-name mappings are only identifier
+ // normalization, NOT proof of possession or certificate's current standing.
+ const productCodes={
+  '8111159901':'정보시스템개발서비스',
+  '8111189901':'정보시스템유지관리서비스',
+  '8111229901':'소프트웨어유지및지원서비스',
+  '8111159801':'패키지소프트웨어개발및도입서비스',
+  '8111179901':'정보인프라구축서비스',
+  '8111200202':'빅데이터분석서비스',
+  '8111200201':'데이터처리서비스',
+  '8111181101':'운영위탁서비스',
+  '8111219901':'인터넷지원개발서비스'
+ };
+ for(const [code,name] of Object.entries(productCodes)){
+  if(new RegExp('(?:^|\\D)'+code+'(?:\\D|$)').test(txt)&&!products.includes(name))
+   products.push(name);
+ }
  const records=Array.isArray(p.productionRecords)?p.productionRecords:[],snapshot=p.productionSnapshotDate||'날짜 미확인';
  if(!p.productionCheckedAt)return {applicable:true,status:'pending',snapshot,reason:'직접생산 발급현황 조회 전·실패'};
  if(!products.length)return {applicable:true,status:'unknown',snapshot,reason:'공고 요약 및 RFP 추출 문구에 필수 직접생산 세부품명 없음 · 원문 확인 필요'};
