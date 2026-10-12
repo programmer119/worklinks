@@ -14,10 +14,19 @@ try:
                 'count':count,'error':error}}
     rfp.fetch_json=lambda _:response([],0)
     zero=rfp.process('R26BK12345678','000')
-    assert zero['status']=='no_eorder_files'
-    assert zero['reasonCode']=='eorder_api_returned_zero'
+    assert zero['status']=='no_official_attachment_metadata'
+    assert zero['reasonCode']=='eorder_api_zero__notice_detail_api_error'
     assert zero['reviewComplete'] is False
-    rfp.fetch_json=lambda _:response([],None,False,False,'upstream_http_403')
+    rfp.fetch_json=lambda _:dict(response([],0),noticeDocuments={'ok':True,'complete':True,'items':[]})
+    nofiles=rfp.process('R26BK12345678','000')
+    assert nofiles['reasonCode']=='eorder_api_zero__notice_detail_zero_files'
+    rfp.fetch_json=lambda _:dict(response([{'name':'RFP.hwp',
+      'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/document.hwp'}],1),
+      noticeDocuments={'ok':True,'complete':True,'items':[{'name':'RFP.hwp'}]})
+    rfp.download=lambda _:b'not-a-hwp'
+    detail=rfp.process('R26BK12345678','000')
+    assert detail['files'][0]['errorCategory']=='invalid_hwp'
+        rfp.fetch_json=lambda _:response([],None,False,False,'upstream_http_403')
     unauthorized=rfp.process('R26BK12345678','000')
     assert unauthorized['reasonCode']=='metadata_api_error'
     assert unauthorized['sourceError']=='upstream_http_403'
