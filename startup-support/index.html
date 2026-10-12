@@ -728,6 +728,19 @@ function jobTimeInfo(x){
  const dateLabel=function(t){return t===null?'미확인':new Date(t).toISOString().slice(0,16).replace('T',' ').replace(/-/g,'.')};
  return {start,end,key,label,text:'공고일 '+dateLabel(start)+' ~ 마감 '+dateLabel(end)};
 }
+function jobAmountLabel(raw){
+ const t=String(raw||'').trim();
+ if(/^\d{6,}$/.test(t)){
+  const n=Number(t);
+  if(!Number.isFinite(n))return t;
+  if(n>=100000000){
+   const billions=Math.floor(n/100000000),tenThousands=Math.round((n%100000000)/10000);
+   return billions+'억'+(tenThousands?(' '+tenThousands.toLocaleString('ko-KR')+'만원'):'원');
+  }
+  return Math.round(n/10000).toLocaleString('ko-KR')+'만원';
+ }
+ return t||'예산 미확인';
+}
 function extractBudget(s){
  const v=String(s||'').replace(/,/g,'');
  let m=v.match(/(\d+(?:\.\d+)?)\s*억/);
@@ -917,7 +930,7 @@ function renderJobDetail(x){
  document.getElementById('jobDetailSub').textContent=(x.org||'발주기관 미확인')+' · '+(x.type||'')+(x.noticeNumber?' · 공고번호 '+x.noticeNumber:'');
  const chips='<span class="jobmatch-chip '+(time.key==='closed'?'unknown':time.key==='closing'?'pending':'ok')+'">'+htmlEscape(time.label)+'</span>';
  const base='<div class="job-detail-context">'+chips+
-  ' <b>예산:</b> '+htmlEscape(x.amount||'확인 필요')+
+  ' <b>예산:</b> '+htmlEscape(jobAmountLabel(x.amount))+
   '<div><b>공고·모집 기간:</b> '+htmlEscape(time.text)+'</div>'+
   (x.noticeNumber?'<div><b>공고번호/차수:</b> '+htmlEscape(x.noticeNumber)+' / '+htmlEscape(x.noticeOrder||'000')+'</div>':'')+
   '</div><div class="job-detail-section"><h3>사업 내용·검토 이유</h3><p>'+htmlEscape(x.reason||'사업범위 원문 확인 필요')+'</p></div>'+
@@ -1005,13 +1018,15 @@ function renderJobs(){
        partnerList.map(function(p){return '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>'}).join(' · ')+
        '</div>':'<div class="job-partners"></div>';
     const match=partnerList.length?comparePartnerJob(x,partnerList[0]):null;
-    const matchBadge=match&&match.counts.missing?'<span class="jobmatch-chip missing">업종 부족 '+match.counts.missing+'</span>':
-      match&&match.counts.ok?'<span class="jobmatch-chip ok">업종 '+match.counts.ok+' 일치</span>':
-      partnerList.length?'<span class="jobmatch-chip pending">자격 검토 중</span>':'';
+    const matchCode=match?.rows.find(function(row){return row.status==='ok'&&row.source==='나라장터 면허제한 API'});
+    const matchName=matchCode?.label?.match(/\\b(1468|1426|1469|1470|1169|0036)\\b/)?.[1]||'업종';
+    const matchBadge=match&&match.counts.missing?'<span class="jobmatch-chip missing" title="자세한 부족 조건은 카드를 눌러 확인">업종 부족 '+match.counts.missing+'</span>':
+      match&&match.counts.ok?'<span class="jobmatch-chip ok" title="전체 입찰 적격 확정 아님">'+htmlEscape(matchName)+' 일치</span>':
+      partnerList.length?'<span class="jobmatch-chip pending">자격 확인 중</span>':'';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기" >'+
       '<div class="cardtop">'+badges+'<span class="tag">'+htmlEscape(x.type||'일감')+'</span></div>'+
       '<h3><button class="job-card-title" type="button" data-job-detail="'+htmlEscape(x.id)+'">'+htmlEscape(x.title)+'</button></h3>'+
-      '<div class="meta">'+htmlEscape(x.org||'기관 미확인')+' · '+htmlEscape(x.amount||'예산 미확인')+'</div>'+
+      '<div class="meta">'+htmlEscape(x.org||'기관 미확인')+' · '+htmlEscape(jobAmountLabel(x.amount))+'</div>'+
       '<div class="job-timeline">'+htmlEscape(t.text)+'</div>'+
       '<div class="job-footer">'+partner+matchBadge+
       '<a class="job-source-link" data-external-source="1" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" aria-label="'+htmlEscape(x.title)+' 원문 공고 보기">원문 공고 ↗</a>'+
