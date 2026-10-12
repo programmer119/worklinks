@@ -91,7 +91,16 @@ def model_infer(token, model, clauses):
                  "Accept":"application/vnd.github+json"})
     try:
         with urllib.request.urlopen(request,timeout=65) as f:
-            r = json.load(f)
+            raw=f.read()
+            if not raw:
+                raise RuntimeError("github_models_empty_http_body_"+str(f.status))
+            try:
+                r=json.loads(raw)
+            except (ValueError,TypeError):
+                # Debug only safe HTTP metadata, never raw model content or tokens.
+                content_type=str(f.headers.get("Content-Type") or "missing").split(";")[0]
+                raise RuntimeError("github_models_non_json_http_"+str(f.status)+
+                                   "_bytes_"+str(len(raw))+"_type_"+content_type[:45]) from None
     except urllib.error.HTTPError as e:
         # Do not log raw HTTP body, which may include request echoes or IDs.
         raise RuntimeError("github_models_http_"+str(e.code)) from None
