@@ -470,7 +470,7 @@ function renderPartners(){
    if(/나라장터 업체 등록/.test(name))return true;
    return false;
   }).map(function(y){
-   var stateText=y.state==="snapshot"?"2026-02-01 자료 확인":y.state==="confirmed"?"공식 조회 확인":y.state==="expired"?"만료·상태 확인":y.state==="checking"?"조회 중":"추가 증빙 필요";
+   var stateText=y.state==="sme-record"?"공식 발급현황 · 효력 확인 필요":y.state==="snapshot"?"2026-02-01 자료 확인":y.state==="confirmed"?"공식 조회 확인":y.state==="expired"?"만료·상태 확인":y.state==="checking"?"조회 중":"추가 증빙 필요";
    return '<div class="partner-qual"><b>'+htmlEscape(y.label)+'</b><span class="partner-state '+(y.state==="confirmed"?"confirmed":"")+'">'+stateText+'</span> <strong>'+htmlEscape(y.value)+'</strong><p>'+htmlEscape(y.detail)+'</p></div>'
   }).join("");
   var sources=p.sources.map(function(x){return '<a href="'+htmlEscape(x.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.name)+' ↗</a>'}).join("");
@@ -528,6 +528,50 @@ async function refreshPartnerProduction(p){
  })();
  try{return await p.productionPromise}finally{p.productionPromise=null}
 }
+
+async function refreshPartnerSme(p){
+ if(!p||!p.businessNo)return;
+ if(p.smePromise)return p.smePromise;
+ p.smePromise=(async function(){
+  try{
+   const res=await fetch('./sme-cert-snapshot.json',{cache:'no-store'});
+   if(!res.ok)throw Error('SMPP 공개조회 자료 HTTP '+res.status);
+   const data=await res.json();
+   const bizno=p.businessNo.replace(/\D/g,'');
+   if(data.ok!==true||!data.recordsByBizno||
+       !Object.prototype.hasOwnProperty.call(data.recordsByBizno,bizno))throw Error('파트너 사업자번호 조회 결과 누락');
+   p.smeRecord=data.recordsByBizno[bizno]||null;
+   p.smeCheckedAt=data.checkedAt||'';
+   p.smeSource=data.sourceUrl||'';
+   if(p.smeRecord){
+    p.type=p.smeRecord.size+' (SMPP 공식 발급현황)';
+    setPartnerQual(p,"법인·중소기업 분류",{
+     state:"confirmed",value:p.smeRecord.size+' · 공식 조회',
+     detail:'SMPP 공공입찰용 확인서 목록 · 인증일 '+(p.smeRecord.issuedAt||'미표시')+' · 조회 '+p.smeCheckedAt
+    });
+    setPartnerQual(p,"중소기업확인서 · 공공입찰용",{
+     state:"sme-record",value:p.smeRecord.size+' · 인증일 '+p.smeRecord.issuedAt,
+     detail:'SMPP 공개조회 목록에서 발급현황 등재 확인. 유효기간 종료일은 공개 목록에 없어 현행 효력 추가 검증 필요. 조회 '+p.smeCheckedAt
+    });
+   }else{
+    setPartnerQual(p,"중소기업확인서 · 공공입찰용",{
+     state:"pending",value:"공식 공개목록에서 미발견",
+     detail:"조회 기준 "+p.smeCheckedAt+" · 목록 미등재가 곧 미보유 또는 만료를 뜻하지는 않습니다."
+    });
+   }
+  }catch(e){
+   p.smeError=String(e.message||e);
+   setPartnerQual(p,"중소기업확인서 · 공공입찰용",{
+    state:"pending",value:"공식 조회 실패",detail:p.smeError
+   });
+  }
+  renderPartners();
+  if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
+  if(partnerScopedJob)renderPartnerJobContext();
+  renderJobs();
+ })();
+ try{return await p.smePromise}finally{p.smePromise=null}
+}
 async function refreshPartnerRegistry(p){
  if(!p || !p.businessNo)return;
  setPartnerQual(p,"SW사업자 · 컴퓨터관련서비스사업 1468",{state:"checking",value:"나라장터 공식 API 조회 중"});
@@ -579,6 +623,7 @@ function openPartnerModal(partnerId,jobId){
  partnerModal.classList.add('open');partnerModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';document.getElementById('partnersClose').focus();
  if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
   if(p&&!p.productionCheckedAt&&!p.productionPromise)refreshPartnerProduction(p);
+  if(p&&!p.smeCheckedAt&&!p.smePromise)refreshPartnerSme(p);
  if(job)loadJobEligibility(job);
 }
 function closePartnerModal(){partnerModal.classList.remove("open");partnerModal.setAttribute("aria-hidden","true");document.body.style.overflow="";partnerScopedCompany=null;partnerScopedJob=null;if(partnerLastFocus&&partnerLastFocus.focus)partnerLastFocus.focus()}
@@ -601,7 +646,7 @@ document.getElementById("jobCards").addEventListener("keydown",function(e){
  }
 });
 renderPartners();
-document.getElementById('partnerCompanyCards').addEventListener('click',function(e){var b=e.target.closest('[data-partner-refresh]');if(b){var p=partners.find(function(x){return x.id===b.dataset.partnerRefresh});if(p){refreshPartnerRegistry(p);refreshPartnerProduction(p)}}});
+document.getElementById('partnerCompanyCards').addEventListener('click',function(e){var b=e.target.closest('[data-partner-refresh]');if(b){var p=partners.find(function(x){return x.id===b.dataset.partnerRefresh});if(p){refreshPartnerRegistry(p);refreshPartnerProduction(p);refreshPartnerSme(p)}}});
 /* Partner association is intentionally fail-closed. A software-looking title is not
  * evidence that a company may bid. The official notice industry restrictions and
  * current company registrations must match, before linking the company on a card.
@@ -732,7 +777,7 @@ function refreshAllPartnerRegistries(){
  if(partnerRefreshPromise)return partnerRefreshPromise;
  if(partnerFetchStarted)return Promise.resolve();
  partnerFetchStarted=true;
- partnerRefreshPromise=Promise.allSettled(partners.filter(p=>p.businessNo).map(p=>Promise.allSettled([refreshPartnerRegistry(p),refreshPartnerProduction(p)])))
+ partnerRefreshPromise=Promise.allSettled(partners.filter(p=>p.businessNo).map(p=>Promise.allSettled([refreshPartnerRegistry(p),refreshPartnerProduction(p),refreshPartnerSme(p)])))
   .then(function(){renderJobs()}).finally(function(){partnerRefreshPromise=null});
  return partnerRefreshPromise;
 }
@@ -1161,8 +1206,21 @@ function comparePartnerJob(x,p){
   if(production.status==='ok')add('direct-current','현재 증명서 상태','pending',
       '공개자료 기준일 이후 취소·변경 여부는 SMPP 최신 확인 필요','SMPP');
  }
+ const requiresSme=/중소기업.?확인|소기업|소상공인|중기업/.test(txt);
+ if(requiresSme){
+  const record=p.smeRecord||null;
+  add('sme-issuance','공공입찰용 중소기업확인서 공식 발급현황',
+    record?'ok':'pending',
+    record?'SMPP 공식 목록: '+record.size+' · 인증일 '+record.issuedAt+' · 조회 '+(p.smeCheckedAt||'날짜 미확인'):
+      'SMPP 공식 발급현황 조회 전·실패 또는 해당 사업자번호 미발견',
+    'SMPP 사업자번호 공개조회');
+  if(record&&/소기업/.test(txt)&&record.size==='소기업'){
+   add('sme-scale','소기업 규모 조건','ok','공식 목록에 소기업으로 등재','SMPP');
+  }
+  add('sme-validity','중소기업확인서 현재 유효기간','pending',
+    '공개 목록은 인증일만 표시하며 종료일은 제공되지 않음. 최신 증명서 효력 별도 확인 필요','SMPP/SMINFO');
+ }
  const certRules=[
-  ['smecert','공공입찰용 중소기업확인서',/중소기업.?확인|소상공인.?확인/],
   ['swstatus','SW사업자 일반현황 관리확인서',/일반현황.?관리확인|SW사업자.?신고/],
   ['experience','수행실적',/실적/],
   ['staff','기술인력·자격',/기술인력|투입인력|상주인력|전담인력|자격증/],
