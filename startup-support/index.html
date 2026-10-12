@@ -1482,7 +1482,7 @@ function extractedRfpRequirements(x){
        (c.classification==='prohibited'&&c.type==='joint_participation')).map(c=>String(c.sourceText||'')).join(' ').slice(0,9000);
  }
  return (data.files||[]).filter(f=>f.readable).flatMap(f=>{
-  const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&v.explicitMust===true&&
+  const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&(v.explicitMust===true||/소지한\s*자|등록한\s*자|제출한\s*자|구비한\s*자/.test(v.sourceText||''))&&
    ['industry_code','direct_production','sme_certificate','staff_proof',
     'performance_proof','region_restriction','joint_participation'].includes(v.type))
    .map(v=>String(v.sourceText||''));
