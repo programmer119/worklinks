@@ -27,6 +27,16 @@ jobs:
             "https://models.inference.ai.azure.com/chat/completions",
             "https://models.github.ai/orgs/programmer119/inference/chat/completions",
           ]
+          for u in ["https://models.github.ai/catalog/models", "https://api.github.com/models/catalog"]:
+            request=urllib.request.Request(u,headers={"Authorization":"Bearer "+os.environ["GITHUB_TOKEN"],"Accept":"application/vnd.github+json"})
+            try:
+              with urllib.request.urlopen(request,timeout=20) as r:
+                body=r.read()
+                print("MODEL_CATALOG_PROBE",u.split('/')[2:4],r.status,r.headers.get("Content-Type"),len(body))
+            except urllib.error.HTTPError as e:
+              print("MODEL_CATALOG_HTTP",u.split('/')[2:4],e.code)
+            except Exception as e:
+              print("MODEL_CATALOG_ERROR",u.split('/')[2:4],type(e).__name__)
           for u in urls:
             req=urllib.request.Request(u,data=payload,headers={
               "Authorization":"Bearer "+os.environ["GITHUB_TOKEN"],
