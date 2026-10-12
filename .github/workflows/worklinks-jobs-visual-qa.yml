@@ -50,7 +50,7 @@ jobs:
               assert evidence is not None,'must match a live stored notice to its citation-verified snapshot'
               assert evidence['status'] in ('classified','rule_based')
               print('WORKLINKS_LIVE_RFP_AUTO_CLASSIFICATION',json.dumps(evidence,ensure_ascii=False))
-                            help=page.locator('#jobInfoFold')
+              help=page.locator('#jobInfoFold')
               assert help.count()==1
               assert not help.evaluate('(e)=>e.open'),'diagnostics must be hidden by default'
               assert not page.locator('#g2bPanel').is_visible(),'API debug panel must be collapsed'
