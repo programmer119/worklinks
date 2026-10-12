@@ -13,6 +13,7 @@ import subprocess
 import tempfile
 import urllib.parse
 import urllib.request
+import urllib.error
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -75,6 +76,32 @@ def legal_file(item):
     lower=name.lower()
     if not lower.endswith(('.hwp','.hwpx','.pdf')):return None
     return name,url
+def classify_failure(error):
+    if isinstance(error,urllib.error.HTTPError):
+        return 'file_download_http_'+str(error.code)
+    if isinstance(error,(TimeoutError,ConnectionError,urllib.error.URLError)):
+        return 'file_download_connection_error'
+    detail=str(error)
+    known=('large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
+           'pdf_over_100_pages','no_searchable_text','unsupported_format',
+           'redirect_forbidden','oversize_json')
+    return next((v for v in known if v in detail),'file_extract_failure')
+
+
+def invalid_file_reason(item):
+    url=str(item.get('url') or '')
+    if not url:return 'download_url_missing'
+    u=urllib.parse.urlsplit(url)
+    if u.scheme!='https' or u.hostname!='www.g2b.go.kr' or u.port not in (None,443):
+        return 'not_approved_official_host'
+    if not u.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
+        return 'unsupported_download_path'
+    name=str(item.get('name') or '')
+    if not name.lower().endswith(('.hwp','.hwpx','.pdf')):
+        return 'unsupported_attachment_format'
+    return 'unrecognized_file_error'
+
+
 def download(url):
     request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
     with OPENER.open(request,timeout=35) as r:
@@ -132,11 +159,20 @@ def process(no,ordn):
     data=fetch_json(BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn}))
     docs=data.get('attachments') or {}
     if not docs.get('ok') or not docs.get('complete'):
-        return {'status':'metadata_not_confirmed','count':docs.get('count'),'source':'나라장터 e발주 첨부파일 API'}
+        return {'status':'metadata_not_confirmed','reasonCode':'metadata_api_error' if not docs.get('ok') else 'metadata_page_incomplete',
+                'sourceError':str(docs.get('error') or '')[:120],
+                'count':docs.get('count'),'source':'나라장터 e발주 첨부파일 API'}
+    if docs.get('count')==0 or not docs.get('items'):
+        return {'status':'no_eorder_files','reasonCode':'eorder_api_returned_zero',
+                'source':'나라장터 e발주 첨부파일 API','count':docs.get('count'),'files':[],
+                'reviewComplete':False,'contractPerformanceVerified':False}
     saved=[]
     for item in docs.get('items',[])[:8]:
         public=legal_file(item)
-        if not public:continue
+        if not public:
+            saved.append({'name':str(item.get('name') or '')[:160],'readable':False,
+                          'errorCategory':invalid_file_reason(item)})
+            continue
         name,url=public
         record={'name':name,'sourceUrl':url,'readable':False}
         try:
@@ -145,9 +181,13 @@ def process(no,ordn):
             triggers,snippets=parse_clauses(content)
             record.update({'readable':True,'textChars':len(content),'topics':triggers,'snippets':snippets})
         except Exception as ex:
+            record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
         saved.append(record)
-    return {'status':'text_extracted_requires_review' if any(x.get('readable') for x in saved) else ('no_eorder_files' if not docs.get('items') else 'text_unavailable'),
+    readable=any(x.get('readable') for x in saved)
+    return {'status':'text_extracted_requires_review' if readable else 'text_unavailable',
+            'reasonCode':'readable_text_requires_full_review' if readable else
+                         'download_or_format_failure',
             'source':'나라장터 e발주 첨부파일 API','count':docs.get('count'),'files':saved,
             'reviewComplete':False,'contractPerformanceVerified':False}
 def main():
@@ -169,17 +209,25 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                if cached.get('classificationVersion')==2 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
                     print('RFP_CACHE_HIT',key);continue
             except ValueError:pass
         try:
             data=process(no,ordn)
             data['checkedAt']=now.isoformat()
+            data['classificationVersion']=2
             results[key]=data
             print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])))
             success+=int(data['status']=='text_extracted_requires_review')
         except Exception as e:
-            print('RFP_SCAN_ERROR',key,type(e).__name__,str(e)[:110])
+            reason=classify_failure(e)
+            results[key]={'status':'metadata_fetch_failed','reasonCode':reason,
+                          'source':'나라장터 e발주 첨부파일 API',
+                          'sourceError':type(e).__name__+': '+str(e)[:100],
+                          'files':[],'reviewComplete':False,
+                          'contractPerformanceVerified':False,
+                          'checkedAt':now.isoformat(),'classificationVersion':2}
+            print('RFP_SCAN_ERROR',key,reason)
     if not results:raise SystemExit('NO_RFP_RESULT')
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
             'reviewComplete':False,'byNotice':dict(list(results.items())[-150:])}
