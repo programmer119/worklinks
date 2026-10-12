@@ -26,7 +26,7 @@ try:
     rfp.download=lambda _:b'not-a-hwp'
     detail=rfp.process('R26BK12345678','000')
     assert detail['files'][0]['errorCategory']=='invalid_hwp'
-        rfp.fetch_json=lambda _:response([],None,False,False,'upstream_http_403')
+    rfp.fetch_json=lambda _:response([],None,False,False,'upstream_http_403')
     unauthorized=rfp.process('R26BK12345678','000')
     assert unauthorized['reasonCode']=='metadata_api_error'
     assert unauthorized['sourceError']=='upstream_http_403'
