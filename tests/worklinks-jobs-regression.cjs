@@ -119,6 +119,12 @@ const prodP={productionCheckedAt:'2026-10-12T04:41:45Z',productionSnapshotDate:'
 const direct=txt=>directMod.productionRequirementCheck({condition:txt,partnerBidMode:''},prodP);
 assert.equal(direct('정보시스템개발서비스 직접생산확인증명서 필요').status,'ok');
 assert.equal(direct('직접생산확인증명서 8111159901 제출').status,'ok');
+assert.equal(direct('직접생산확인증명서 세부품명번호 8111200201').status,'ok',
+ 'data processing production certificate must match solely by detailed numeric code');
+assert.equal(direct('직접생산확인증명서 세부품명번호 8111179901').status,'pending',
+ 'unissued infrastructure code cannot be mistaken for existing data processing certificate');
+assert.equal(direct('직접생산확인증명서 8111200201 또는 8111159901').status,'unknown',
+ 'multiple production codes need mandatory-vs-alternative determination');
 const rfpDoc=JSON.parse(fs.readFileSync(path.join(__dirname,'../startup-support/rfp-clauses.json'),'utf8'));
 const rfpSample=rfpDoc.byNotice['R26BK01756420:000'];
 assert.equal(rfpSample.status,'text_extracted_requires_review');
