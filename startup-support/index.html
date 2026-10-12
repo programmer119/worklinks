@@ -193,7 +193,10 @@
 #jobCards .job-mini .job-partners.empty{display:none}
 #jobCards .job-mini .jobmatch-chip{font-size:10px;padding:3px 5px;margin-left:auto;white-space:nowrap;max-width:43%;overflow:hidden;text-overflow:ellipsis}
 #jobCards .job-mini .jobmatch-chip.pending{color:#854d0e;background:#fef9c3;border:1px solid #fde68a;border-radius:6px}
-#jobCards .job-mini .job-partner-pending{color:#92400e;font-size:10px;font-weight:750}
+#jobCards .job-mini .job-partners{max-width:38%;flex-wrap:nowrap}
+#jobCards .job-mini .jobmatch-chip{max-width:calc(100% - 125px);flex-shrink:0;white-space:normal;text-align:center;line-height:1.3;overflow-wrap:keep-all}
+#jobCards .job-mini .job-partners a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:680px){#jobCards .job-mini .jobmatch-chip{max-width:calc(100% - 100px)}}
 #jobCards .job-mini .job-source-link{flex:none;border:1px solid #dbe2e9;background:#fff;border-radius:7px;padding:5px 7px;color:#475569;font-size:10px}
 #jobCards .job-mini .job-source-link:focus-visible,#jobCards .job-mini .job-card-title:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 @media(max-width:1150px){#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -932,16 +935,16 @@ function jobTimeInfo(x){
 }
 
 /* Deadline: KST calendar day, not 24-hour rounding.
-   D-0 is only the calendar date of closing; no date => 일정 미확인 */
+   Same-day closing is D-DAY; no date => 일정 미확인. */
 function jobDayCounter(time){
  if(time.key==='closed')return {label:/취소|철회/.test(time.label)?'취소':'마감',kind:'closed'};
  if(time.end===null)return {label:'일정 미확인',kind:'unknown'};
  const today=Math.floor(kstNow().getTime()/86400000);
  const last=Math.floor(time.end/86400000);
  const diff=last-today;
- // Never render a future/open state as "D-0" when its underlying date is past.
+ // Never mark an already expired deadline as the current day.
  if(diff<0)return {label:'마감 확인',kind:'closed'};
- return {label:'D-'+diff,kind:time.key==='upcoming'?'upcoming':
+ return {label:diff===0?'D-DAY':'D-'+diff,kind:time.key==='upcoming'?'upcoming':
   diff===0?'today':diff<=2?'soon':'normal'};
 }
 function jobDeadlineStamp(time){
@@ -1150,9 +1153,9 @@ function renderJobDetail(x){
  const m=compareList.length?'<section class="job-detail-section"><h3>파트너 업체 적격성 대조</h3>'+
    compareList.map(function(p){
      const status=jobQualificationVerdict(x,p);
-     const banner=status.type==='industry_match'?'<span class="jobmatch-chip ok">업종 일치 · 서류 확인 필요</span>':
-       status.type==='missing'?'<span class="jobmatch-chip missing">등록업종 부족 · '+status.missing.length+'개 그룹</span>':
-       '<span class="jobmatch-chip pending">입찰자격 검증 전</span>';
+     const banner=status.type==='industry_match'?'<span class="jobmatch-chip ok">업종 일치 · 추가서류 확인 필요</span>':
+       status.type==='missing'?'<span class="jobmatch-chip missing">필수 업종 불일치 · 원문 재확인</span>':
+       '<span class="jobmatch-chip pending">입찰자격 확인 중</span>';
      return '<div class="job-match-company">'+banner+matchRowsHTML(x,p)+
        '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">회사별 보유자격 자세히 ↗</a></div>';
    }).join('')+'</section>':
@@ -1227,7 +1230,7 @@ function renderJobs(){
  const registryFailures=partners.filter(p=>p.registryError).length;
  document.getElementById('partnerJobCount').textContent='(확인 '+confirmedCount+' · 대기 '+candidateCount+')';
  document.getElementById('partnerSummary').textContent=
-   '미마감 '+active.length+'건 · 업종 일치 확인 '+confirmedCount+'건 · 검증 대기 후보 '+candidateCount+'건'+
+   '미마감 '+active.length+'건 · 업종 일치 확인 '+confirmedCount+'건 · 입찰자격 확인 중 '+candidateCount+'건'+
    (registryFailures?' · 업체등록 조회 오류 '+registryFailures+'개사':'')+
    ' · HW/시공 등 SW 분담 미확인 '+rejected+'건 제외 (DB 보존)';
  const filter=jobFilter;
@@ -1271,22 +1274,21 @@ function renderJobs(){
     partnerIdsOfJob(o.x).includes(selected.id):partnerIdsOfJob(o.x).length>0).length;
    const awaiting=list.length-confirmed;
    document.getElementById('partnerSummary').textContent=
-    '파트너 '+(selected?selected.name:'모두')+' · 업종 일치 확인 '+confirmed+'건 · 검증 대기 후보 '+awaiting+'건'+
+    '파트너 '+(selected?selected.name:'모두')+' · 업종 일치 확인 '+confirmed+'건 · 입찰자격 확인 중 '+awaiting+'건'+
     (selected?.registryError?' · 업체등록 API 오류: '+selected.registryError:'')+
-    ' · 검증 대기는 지원 가능 판정이 아닙니다.';
+    ' · 업종 일치만으로 바로 입찰할 수 있는 것은 아닙니다.';
   }
   document.getElementById('g2bMore').style.display=list.length>jobRenderLimit?'inline-block':'none';
   document.getElementById('g2bMore').textContent='일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
     const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
-    const scoped=selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
+    const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const partnerList=confirmed.concat(pending).filter(y=>!scoped||y.p.id===scoped.id);
     const partner=partnerList.length?'<div class="job-partners">파트너 '+
       partnerList.map(function(y){
-       const p=y.p,isPending=y.result.type==='unverified';
-       return (isPending?'<span class="job-partner-pending">검증 대기 </span>':'')+
-        '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.name)+'</a>';
+       const p=y.p;
+       return '<a href="#partner-'+htmlEscape(p.id)+'" title="'+htmlEscape(p.name)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.short||p.name)+'</a>';
       }).join(' · ')+
       '</div>':'<div class="job-partners empty"></div>';
     const relevant=partnerList.length?partnerList:
@@ -1294,14 +1296,12 @@ function renderJobs(){
     const chosen=relevant.find(y=>y.result.type==='industry_match')||
      relevant.find(y=>y.result.type==='unverified')||relevant[0];
     const eligibility=chosen?chosen.result:{type:'not_applicable',missing:[]};
-    const matchCode=eligibility.type==='industry_match'?
-     eligibility.codes.filter(c=>partnerIndustryKnownCodes.has(c))[0]:'';
     const matchBadge=eligibility.type==='industry_match'?
-      '<span class="jobmatch-chip ok" title="업종 일치만 확인 · 전체 입찰 적격 아님">'+htmlEscape(matchCode?matchCode+' 일치 · 증빙 필요':'업종 일치 · 증빙 필요')+'</span>':
+      '<span class="jobmatch-chip ok" title="나라장터 등록업종은 일치합니다. 직접생산확인서·중소기업확인서·실적·인력·지역·공동수급 조건은 아직 검증하지 않았습니다. 바로 입찰 가능 판정이 아닙니다.">업종 일치 · 추가서류 확인 필요</span>':
       eligibility.type==='unverified'?
-      '<span class="jobmatch-chip pending" title="'+htmlEscape(eligibility.reason)+'">조건 검증 대기</span>':
+      '<span class="jobmatch-chip pending" title="'+htmlEscape(eligibility.reason)+' · 아직 참여 가능 여부를 판단할 수 없습니다.">입찰자격 확인 중</span>':
       eligibility.type==='missing'?
-      '<span class="jobmatch-chip missing" title="'+htmlEscape(eligibility.reason)+'">업종 '+eligibility.missing.length+'개 부족</span>':'';
+      '<span class="jobmatch-chip missing" title="'+htmlEscape(eligibility.reason)+' · 공고 원문의 대체업종 가능 여부 확인 필요">필수 업종 불일치</span>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
