@@ -1,0 +1,33 @@
+name: Inspect public production CSV route
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/inspect-production-download.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Inspect public data.go.kr download page
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,re,html
+          u='https://www.data.go.kr/data/3061008/fileData.do'
+          req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0'})
+          try:
+            with urllib.request.urlopen(req,timeout=25) as r:
+              body=r.read().decode('utf-8','replace')
+              print('PAGE_STATUS',r.status,'LENGTH',len(body),'URL',r.url)
+            for term in ['fileDownload','download','fileDataId','atchFileId','dataId','파일데이터','3061008','btn-down','fileDwnld','fileDown','csv']:
+              hits=[m.start() for m in re.finditer(re.escape(term),body,re.I)]
+              print('TERM',term,'COUNT',len(hits))
+              for pos in hits[-5:]:
+                print('MATCH',term,repr(html.unescape(body[max(0,pos-220):pos+300]).replace('\n',' ')))
+          except Exception as e:
+            print('PAGE_ERROR',str(e))
+          PY
