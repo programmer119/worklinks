@@ -1042,8 +1042,8 @@ function partnerRegisteredCode(p,code){
  if(!p||!p.registryCheckedAt||!Array.isArray(p.industryRecords))return null;
  const found=p.industryRecords.find(function(q){return String(q.code)===String(code)});
  if(!found)return p.registryComplete===true?false:null;
- const expiry=String(found.expiresAt||'').replace(/\\//g,'-');
- const end=expiry.match(/\\d{4}-\\d{2}-\\d{2}/);
+ const expiry=String(found.expiresAt||'').replace(/\//g,'-');
+ const end=expiry.match(/\d{4}-\d{2}-\d{2}/);
  if(end&&end[0]<kstISO())return false;
  const status=String(found.status||'').trim();
  if(status==='정상'||status==='유효')return true;
@@ -1457,8 +1457,8 @@ document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){categ
 
 /* Per-source share of registered opportunities, excluding/including expired. */
 (function(){var root=document.querySelector('.sourcebox');if(!root)return;var links=[].slice.call(root.querySelectorAll('.srcdirectory-links a,.srcdirectory-links span'));var itemsList=(typeof items!=='undefined'&&Array.isArray(items))?items:[];var today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).replace(/[^0-9]/g,'');
- function expired(x){var m=String(x.deadline||'').match(/(20\\d{2})[.\\/-](\\d{1,2})[.\\/-](\\d{1,2})/);return m&&(m[1]+m[2].padStart(2,'0')+m[3].padStart(2,'0'))<today;}
- function domain(u){try{return new URL(u).hostname.replace(/^www\\./,'').toLowerCase()}catch(e){return ''}}
+ function expired(x){var m=String(x.deadline||'').match(/(20\d{2})[.\/-](\d{1,2})[.\/-](\d{1,2})/);return m&&(m[1]+m[2].padStart(2,'0')+m[3].padStart(2,'0'))<today;}
+ function domain(u){try{return new URL(u).hostname.replace(/^www\./,'').toLowerCase()}catch(e){return ''}}
  var domains=links.map(function(el){return domain(el.href||'')});
  /* Attribute only when an original URL belongs to a unique, explicit source domain. */
  var assigned=itemsList.map(function(x){var d=domain(x.url||'');if(!d)return -1;var matches=[];domains.forEach(function(src,i){if(src&&(d===src||d.endsWith('.'+src)))matches.push(i)});return matches.length===1?matches[0]:-1});
