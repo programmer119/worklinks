@@ -202,6 +202,14 @@ def main():
         except (ValueError,OSError):pass
     selected=discover(limit)
     results=dict(old)
+    # Preserve historical evidence while normalizing old ambiguous "unavailable"
+    # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
+    for key,prior in results.items():
+        if (prior.get('status')=='text_unavailable' and prior.get('count')==0
+                and not prior.get('files')):
+            prior['status']='no_eorder_files'
+            prior['reasonCode']='eorder_api_returned_zero'
+            prior['classificationVersion']=2
     success=0
     for no,ordn,_ in selected:
         key=no+':'+ordn
