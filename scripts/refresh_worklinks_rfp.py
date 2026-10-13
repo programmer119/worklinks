@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=10
+CLASSIFICATION_VERSION=11
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -449,7 +449,7 @@ def audit_qualification_scan(text, candidates):
     return {'sourceTextScanComplete':complete,
             'qualificationAnchorCount':len(anchor_lines),
             'unmatchedQualificationAnchorCount':len(missing),
-            'unmatchedAnchorSamples':missing[:4]}
+            'unmatchedAnchorSamples':missing[:30]}
 
 
 def process(no,ordn):
