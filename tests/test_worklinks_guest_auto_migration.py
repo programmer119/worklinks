@@ -85,6 +85,21 @@ with sync_playwright() as p:
     check(len(requests)==first_count,'re-login duplicated an already persisted import')
     print('MIGRATION_IDEMPOTENT_ON_RELOAD=PASS',flush=True)
 
+    # A member's later explicit uncheck must never be reversed by old guest=true.
+    page.evaluate("""()=>{
+      window.saved['yangcheon-school']=false;
+      localStorage.setItem(window.statusKey,JSON.stringify(window.saved));
+      window.worklinksStatusChanged('applied','yangcheon-school',false);
+    }""")
+    page.wait_for_function("""()=>Object.keys(JSON.parse(localStorage.getItem('worklinks_support_pending_v2:worklinks-qa-account-a')||'{}')).length===0""",timeout=30000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is False,'member uncheck was not saved')
+    page.reload(wait_until='domcontentloaded')
+    page.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('동기화')""",timeout=30000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is False,'guest data re-enabled a member-unchecked entry on re-login')
+    check(page.evaluate("""()=>JSON.parse(localStorage.getItem('worklinks_support_applied_v2:worklinks-qa-account-a'))['yangcheon-school']===false"""),'guest data resurrected a member-unchecked local value')
+    check(page.evaluate("""()=>JSON.parse(localStorage.getItem('externaltools_startup_support_status_v1'))['yangcheon-school']===true"""),'guest original was unexpectedly deleted')
+    print('GUEST_HISTORY_NOT_RESURRECTED_AFTER_UNCHECK=PASS',flush=True)
+
     # Prevent an unrelated AuthHub user from inheriting this browser's original guest state.
     who[0]='worklinks-qa-account-b'
     page.reload(wait_until='domcontentloaded')
@@ -142,4 +157,55 @@ with sync_playwright() as p:
     check(page3.evaluate("""()=>!!JSON.parse(localStorage.getItem('authhub:p47:production:session')||'null')?.accessToken"""),'AuthHub callback session not retained')
     print('SIGNUP_CALLBACK_AUTO_MIGRATION=PASS',flush=True)
     ctx3.close()
+
+    # On the first login to an existing member, remote=false wins a conflict
+    # with guest=true without deleting the guest's original browser history.
+    ctx4=browser.new_context()
+    page4=ctx4.new_page()
+    who[0]='worklinks-qa-account-a'
+    remote[who[0]]={'applied:yangcheon-school':{'kind':'applied','id':'yangcheon-school','value':False,'title':'prior member choice'}}
+    page4.route('**/api/g2b/worklinks-auth-config',config)
+    page4.route('**/v1/me*',me)
+    page4.route('**/api/g2b/worklinks-state',state)
+    page4.goto(SITE,wait_until='domcontentloaded')
+    page4.evaluate("""()=>{
+      localStorage.setItem('externaltools_startup_support_status_v1',JSON.stringify({'yangcheon-school':true}));
+      localStorage.setItem('authhub:p47:production:session',JSON.stringify({accessToken:'qa.mock.session'}));
+    }""")
+    page4.reload(wait_until='domcontentloaded')
+    page4.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('동기화')""",timeout=30000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is False,'existing remote=false overwritten by guest=true')
+    check(page4.evaluate("""()=>JSON.parse(localStorage.getItem('worklinks_support_applied_v2:worklinks-qa-account-a'))['yangcheon-school']===false"""),'member remote=false not rendered')
+    print('SERVER_FALSE_CONFLICT_PRESERVED=PASS',flush=True)
+    ctx4.close()
+
+    # GET outages must not be interpreted as an empty member DB, and must not
+    # transmit a guest import before remote data has been reconciled.
+    ctx5=browser.new_context()
+    page5=ctx5.new_page()
+    remote[who[0]]={}
+    fail_get=[True]
+    writes_before=len(requests)
+    def failing_get(route):
+        if route.request.method=='GET' and fail_get[0]:
+            return json_reply(route,{'ok':False,'error':'temporary_server_read_failure'},503)
+        return state(route)
+    page5.route('**/api/g2b/worklinks-auth-config',config)
+    page5.route('**/v1/me*',me)
+    page5.route('**/api/g2b/worklinks-state',failing_get)
+    page5.goto(SITE,wait_until='domcontentloaded')
+    page5.evaluate("""()=>{
+      localStorage.setItem('externaltools_startup_support_status_v1',JSON.stringify({'yangcheon-school':true}));
+      localStorage.setItem('authhub:p47:production:session',JSON.stringify({accessToken:'qa.mock.session'}));
+    }""")
+    page5.reload(wait_until='domcontentloaded')
+    page5.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('서버 기록 조회 실패')""",timeout=30000)
+    check(len(requests)==writes_before,'uploaded without reading existing member state')
+    check(page5.evaluate("""()=>JSON.parse(localStorage.getItem('externaltools_startup_support_status_v1'))['yangcheon-school']===true"""),'outage deleted original guest history')
+    fail_get[0]=False
+    page5.evaluate("()=>window.dispatchEvent(new Event('online'))")
+    page5.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('서버 저장 완료')""",timeout=30000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is True,'online retry did not finish automatic migration')
+    print('SERVER_READ_FAILURE_PRESERVES_AND_RETRIES=PASS',flush=True)
+    ctx5.close()
     browser.close()
