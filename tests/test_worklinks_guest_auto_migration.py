@@ -116,4 +116,30 @@ with sync_playwright() as p:
     check(remote[who[0]].get('applied:yangcheon-school',{}).get('value') is True,'pending guest record not uploaded after retry')
     print('MIGRATION_OFFLINE_QUEUE_AND_RETRY=PASS',flush=True)
     ctx2.close()
+
+    # The hosted signup/login handoff comes back to auth-callback.html with a
+    # one-use code. The callback must save AuthHub session on WorkLinks' origin,
+    # redirect home and automatically merge the prior guest status.
+    ctx3=browser.new_context()
+    page3=ctx3.new_page()
+    who[0]='worklinks-qa-account-a'
+    remote[who[0]]={}
+    page3.route('**/api/g2b/worklinks-auth-config',config)
+    page3.route('**/v1/me*',me)
+    page3.route('**/api/g2b/worklinks-state',state)
+    def exchange(route):
+        if route.request.method=='OPTIONS':return json_reply(route,{},204)
+        payload=json.loads(route.request.post_data or '{}')
+        check(payload.get('code')=='qa-signup-code','OAuth callback code not exchanged')
+        json_reply(route,{'accessToken':'qa.mock.session','refreshToken':'qa-refresh','onboarding':{'isNewUser':True,'isNewMembership':True}})
+    page3.route('**/v1/auth/p47/exchange*',exchange)
+    page3.goto(SITE,wait_until='domcontentloaded')
+    page3.evaluate("""()=>localStorage.setItem('externaltools_startup_support_status_v1',JSON.stringify({'yangcheon-school':true}))""")
+    page3.goto(SITE+'auth-callback.html?code=qa-signup-code&state=%2Fstartup-support%2F',wait_until='domcontentloaded')
+    page3.wait_for_url(SITE,timeout=30000)
+    page3.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('서버 저장 완료')""",timeout=30000)
+    check(remote[who[0]].get('applied:yangcheon-school',{}).get('value') is True,'signup callback did not auto-migrate guest submission')
+    check(page3.evaluate("""()=>!!JSON.parse(localStorage.getItem('authhub:p47:production:session')||'null')?.accessToken"""),'AuthHub callback session not retained')
+    print('SIGNUP_CALLBACK_AUTO_MIGRATION=PASS',flush=True)
+    ctx3.close()
     browser.close()
