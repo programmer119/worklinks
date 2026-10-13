@@ -1,0 +1,31 @@
+name: WorkLinks AuthHub live readiness probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-authhub-readiness.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Verify public services without credentials
+        shell: bash
+        run: |
+          set -u
+          for url in             'https://api-authhub.suaveforge.com/health'             'https://api-suaveforge.suaveforge.com:18458/api/g2b/worklinks-auth-config'             'https://api-monitor.suaveforge.com/api/integration/projects'
+          do
+            echo "ENDPOINT=${url}"
+            status="$(curl --max-time 12 -sS -o /tmp/wl_status.json -w '%{http_code}' "${url}" || true)"
+            echo "HTTP=${status}"
+            if [[ "${url}" == *worklinks-auth-config ]]; then
+              python3 -c "import json; x=json.load(open('/tmp/wl_status.json')); print('WORKLINKS_AUTH_ENABLED=',x.get('enabled'),'PROJECT=',x.get('project'),'ERROR=',x.get('error'))" 2>/dev/null || echo "WORKLINKS_AUTH_CONFIG_UNREADABLE"
+            elif [[ "${url}" == *'/health' ]]; then
+              python3 -c "import json; x=json.load(open('/tmp/wl_status.json')); print('AUTHHUB_HEALTH=',x.get('ok'))" 2>/dev/null || echo "AUTHHUB_HEALTH_UNREADABLE"
+            else
+              echo "MONITOR_CATALOG_AUTH_REQUIRED_OR_NOT_OPEN"
+            fi
+          done
