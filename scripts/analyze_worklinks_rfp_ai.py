@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 7
+VERSION = 8
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -188,13 +188,37 @@ def rule_based_interpret(clauses):
             r"(?:주요\s*)?사업\s*실적\s*증명서?\s*(?:서식|양식)|"
             r"투입\s*인력.{0,70}(?:소요되는\s*일체의\s*경비|사업에\s*포함)|"
             r"제안서\s*(?:평가|목차|작성|서식)|정량\s*평가",t)))
-        if after_award and not bidder:
+        # Generic platform registration, section headings, score sheets, and
+        # conditional consortium documents are not *additional* credentials.
+        # Never apply this shortcut where the same excerpt specifies a real
+        # bidder qualification, region, registration code or certificate.
+        heading=bool(re.fullmatch(
+            r"\s*(?:\d+(?:\.\d+)*[\).]?\s*)?(?:입찰\s*참가\s*자격|"
+            r"참가\s*자격|입찰참가자격)\s*[:：.]?\s*",t))
+        platform_guide=bool(re.search(
+            r"나라장터.{0,50}(?:이용|전자\s*입찰|이용자\s*등록)|"
+            r"입찰참가자격등록규정|(?:입찰\s*참가\s*자격\s*등록).{0,50}"
+            r"(?:나라장터|조달청|전자입찰|입찰공고일)",t))
+        concrete=bool((c.get("codes") or []) or re.search(
+            r"소프트웨어사업자|직접\s*생산|세부\s*품명|소기업|소상공인|"
+            r"중소기업\s*확인|지역\s*제한|본점\s*소재|주된\s*영업소|"
+            r"실적.{0,30}(?:이상|억원|원\s*이상|필수)|"
+            r"(?:전담|전문)\s*인력.{0,30}(?:명|이상|필수)",t))
+        consortium_context=(typ=="joint_participation" and bool(re.search(
+            r"공동\s*수급.{0,60}(?:평가|배점|점수|계산|산식|서식|양식|협정서|작성|구성원별|지분율)|"
+            r"공동\s*수급.{0,40}(?:시|경우|에는|하고자)",t)))
+        proposal_context=(typ in {"performance_proof","staff_proof"} and bool(re.search(
+            r"제안서|평가표|배점|정량|정성|점수|양식|서식|붙임|별지|"
+            r"기재\s*사항|평가\s*기준|작성\s*방법",t)))
+        if heading or (platform_guide and not concrete and not regional):
+            classification="context_only"
+        elif after_award and not bidder:
             classification="context_only"
         elif prohibited:
             classification="prohibited"
-        elif consortium_form and not required:
+        elif (consortium_form or consortium_context) and not prohibited and not (concrete and required):
             classification="context_only"
-        elif proposal_form and not bidder:
+        elif (proposal_form or proposal_context) and not (bidder and required):
             classification="context_only"
         elif optional:
             classification="optional"
