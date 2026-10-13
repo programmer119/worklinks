@@ -84,6 +84,20 @@ assert v["reviewComplete"] is True and v["automaticEligibilityApproved"] is Fals
 missing=dict(valid,files=[dict(valid["files"][0],sourceTextScanComplete=False)])
 assert m.process_one("R26BK01700002:000",missing,None,
  lambda c:m.rule_based_interpret(c))["reviewComplete"] is False
+# The interpreter must not silently drop clause 121 onward.
+# Fully extracted files and fully interpreted clauses should remain auditable
+# even when a notice contains more than 120 unique cited paragraphs.
+large_notice=dict(valid,files=[dict(valid["files"][0],clauseCandidates=[
+ {"type":"industry_code","codes":["1468"],"sourceFile":"입찰공고문.hwp",
+  "sourceText":good_text+" 제"+str(i)+"항"} for i in range(135)
+])])
+assert len(m.source_candidates(large_notice))==135
+large_result=m.process_one("R26BK01700003:000",large_notice,None,
+ lambda c:m.rule_based_interpret(c))
+assert large_result["interpretedCount"]==135
+assert large_result["sourceTruncated"] is False
+assert large_result["reviewComplete"] is True
+assert len(large_result["requirements"])==135
 # Never fabricate a matching company qualification from a model statement.
 assert all(x["sourceVerified"] and not x["documentFullyReviewed"] for x in a["requirements"])
 # Persisted artifacts must not contain a copy of the GitHub auth token.
