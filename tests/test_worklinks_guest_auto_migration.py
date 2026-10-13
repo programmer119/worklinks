@@ -239,4 +239,29 @@ with sync_playwright() as p:
     check(page6.evaluate("""()=>JSON.parse(localStorage.getItem('authhub:p47:production:session'))?.accessToken==='qa.renewed'"""),'renewed session not persisted')
     print('EXPIRED_AUTHHUB_TOKEN_AUTO_REFRESH_AND_RETRY=PASS',flush=True)
     ctx6.close()
+
+    # A completely fresh browser has no guest migration or account-local history.
+    # It must reconstruct all three kinds from authenticated server records alone.
+    ctx7=browser.new_context()
+    page7=ctx7.new_page()
+    who[0]='worklinks-qa-account-a'
+    remote[who[0]]={
+        'applied:yangcheon-school':{'kind':'applied','id':'yangcheon-school','value':True,'title':'양천 창업학교','url':'https://example.org/a'},
+        'hidden:archived-hidden-demo':{'kind':'hidden','id':'archived-hidden-demo','value':True,'title':'숨김 공고','url':'https://example.org/b'},
+        'business:business-track-demo':{'kind':'business','id':'business-track-demo','value':True,'title':'사업자 공고','url':'https://example.org/c'}
+    }
+    page7.route('**/api/g2b/worklinks-auth-config',config)
+    page7.route('**/v1/me*',me)
+    page7.route('**/api/g2b/worklinks-state',state)
+    page7.goto(SITE,wait_until='domcontentloaded')
+    check(page7.evaluate("""()=>localStorage.getItem('worklinks_support_guest_migration_owner_v1')===null"""),'new browser was not blank')
+    page7.evaluate("""()=>localStorage.setItem('authhub:p47:production:session',JSON.stringify({accessToken:'qa.other.device'}))""")
+    page7.reload(wait_until='domcontentloaded')
+    page7.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('브라우저+서버 동기화')""",timeout=30000)
+    for kind, id in [('applied','yangcheon-school'),('hidden','archived-hidden-demo'),('business','business-track-demo')]:
+        local=page7.evaluate("""([kind,id])=>JSON.parse(localStorage.getItem('worklinks_support_'+kind+'_v2:worklinks-qa-account-a')||'{}')[id]===true""",[kind,id])
+        check(local,'server '+kind+' missing on a fresh browser')
+    check(page7.evaluate("""()=>localStorage.getItem('worklinks_support_guest_migration_owner_v1')===null"""),'cross-device restoration unexpectedly claimed guest migration')
+    print('FRESH_BROWSER_SERVER_RESTORE_ALL_3_KINDS=PASS',flush=True)
+    ctx7.close()
     browser.close()
