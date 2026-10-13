@@ -220,3 +220,27 @@ assert any(c["type"]=="sme_certificate" for c in rfp.extract_rule_candidates(
     "※ 중소기업자만 입찰참가 가능","입찰공고문.hwp"))
 
 
+
+
+# Fully quoted bidder certificate must remain mandatory, while later
+# conditional certificate paperwork and future contract penalties are context.
+postaward=[
+ {"index":0,"type":"sme_certificate","sourceText":
+  "입찰참가자격으로 소기업 소상공인확인서를 소지한 업체"},
+ {"index":1,"type":"sme_certificate","sourceText":
+  "소기업·소상공인확인서 신청을 증빙할 수 있는 서류 1부"},
+ {"index":2,"type":"direct_production","sourceText":
+  "계약상대자가 직접생산 확인기준을 위반한 사실을 확인한 경우 계약해지"},
+ {"index":3,"type":"staff_proof","sourceText":
+  "주4) 상기내용을 증명할 수 있는 재직·경력·학력·자격증명서 서류 제출"},
+ {"index":4,"type":"joint_participation","sourceText":"11. 하도급에 관한 사항"},
+ {"index":5,"type":"joint_participation","sourceText":
+  "하도급거래 공정화에 관한 법률 시행절차 안내"}
+]
+presult=m.rule_based_interpret(postaward)["items"]
+assert [x["classification"] for x in presult]==[
+    "mandatory","context_only","context_only","context_only","context_only","context_only"],presult
+# Unknown certificate paperwork without a cited mandatory certificate clause
+# stays unknown; do not invent a complete eligibility audit.
+unanchored=m.rule_based_interpret(postaward[1:2])["items"]
+assert unanchored[0]["classification"]=="unknown",unanchored
