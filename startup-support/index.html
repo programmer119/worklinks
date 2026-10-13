@@ -1015,19 +1015,30 @@ async function queueVisibleBidEligibility(){
  if(eligibilityQueueRunning)return;
  eligibilityQueueRunning=true;
  try{
-  // Bound load to currently active, software-service relevant notices.
-  // Hardware purchases and construction are excluded from industry matching.
-  const list=jobs.concat(g2bLiveJobs).filter(function(x){
-   return jobSoftwareScope(x)==='candidate'&&jobTimeInfo(x).key!=='closed'&&jobBidIdentity(x)&&(!jobEligibilityData(x)||!jobEvidenceData(x));
-  });
-  list.sort(function(a,b){return (jobTimeInfo(a).end||Infinity)-(jobTimeInfo(b).end||Infinity)});
-  const picked=list.slice(0,60);
+  // Server worker backfills license data; rotate browser evidence enrichment
+  // across ALL unchecked open SW notices, not just the first 60 deadlines.
+  const byNotice=new Map();
+  for(const x of jobs.concat(g2bLiveJobs)){
+   const id=jobBidIdentity(x);
+   if(!id||jobSoftwareScope(x)!=='candidate'||jobTimeInfo(x).key==='closed')continue;
+   if(jobEligibilityData(x)&&jobEvidenceData(x))continue;
+   byNotice.set(id.bidNo+':'+id.order,x);
+  }
+  const pending=[...byNotice.values()].sort((a,b)=>
+   (jobTimeInfo(a).end||Infinity)-(jobTimeInfo(b).end||Infinity));
+  if(!pending.length)return;
+  let cursor=0;
+  try{cursor=Math.max(0,Number(localStorage.getItem('worklinks_bid_review_cursor_v2'))||0)}catch(e){}
+  const start=cursor%pending.length;
+  const picked=Array.from({length:Math.min(60,pending.length)},(_,i)=>
+   pending[(start+i)%pending.length]);
+  try{localStorage.setItem('worklinks_bid_review_cursor_v2',String((start+picked.length)%pending.length))}catch(e){}
   let index=0;
   async function worker(){
    while(index<picked.length){
     const x=picked[index++];
     await Promise.allSettled([loadJobEligibility(x),loadJobEvidence(x)]);
-    await new Promise(r=>setTimeout(r,230));
+    await new Promise(resolve=>setTimeout(resolve,230));
    }
   }
   await Promise.all([worker(),worker(),worker()]);
@@ -1474,7 +1485,7 @@ const productionNames=['정보시스템개발서비스','정보시스템유지�
 // A dated publication is evidence of past issuance, NOT live SMPP verification.
 function extractedRfpRequirements(x){
  const data=typeof rfpSnapshotForJob==='function'?rfpSnapshotForJob(x):null;
- if(data?.status!=='text_extracted_requires_review'||data.reviewComplete!==false)return '';
+ if(!data||!Array.isArray(data.files))return '';
  const ai=typeof rfpAiForJob==='function'?rfpAiForJob(x):null;
  if(ai){
   // Exclude optional/context-only clauses from mandatory requirement matching.
@@ -1527,6 +1538,22 @@ function productionRequirementCheck(x,p){
  return {applicable:true,status:'pending',snapshot,reason:historical?
    '요구 품목 발급이력은 있으나 기재 유효기간 경과·불명확. 재발급 확인 필요':
    snapshot+' 자료에 요구 품목 없음. 이후 신규 발급 가능하므로 미보유 단정 금지'};
+}
+/* A successful API request or zero attachment rows never prove full review.
+ * Compare the official attachment manifest to every reviewed file. No-file
+ * notices require independent, source-hashed review of the full notice.
+ */
+function officialReviewCoverage(rfp,evidence){
+ const files=Array.isArray(rfp?.files)?rfp.files:null;
+ const meta=evidence?.attachments;
+ if(!files||rfp?.reviewComplete!==true||rfp?.requiredConditionsComplete!==true)return false;
+ if(meta?.ok!==true||meta?.complete!==true||!Array.isArray(meta.items))return false;
+ if(meta.items.length!==files.length)return false;
+ if(files.length)return files.every(file=>file.readable===true&&file.reviewComplete===true);
+ const notice=evidence?.noticeDocuments;
+ return rfp.noticeTextReviewed===true&&rfp.noticeConditionsVerified===true&&
+  Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&notice?.ok===true&&
+  notice?.complete===true&&Number(notice.count||0)===0;
 }
 function comparePartnerJob(x,p){
  const rows=[],req=jobEligibilityData(x);
@@ -1599,7 +1626,8 @@ function comparePartnerJob(x,p){
      ' · 전체 공고·예외 조항은 아직 미검토','공식 RFP '+clause.sourceFile+' · '+(aiReport.analysisStatus==='classified'?'AI 문장 해석':'명시적 문구 규칙분류'));
   }
  }
- const txt=String(x.condition||'')+' '+String(x.partnerBidMode||'')+' '+extractedRfpRequirements(x);
+ const summaryText=String(x.condition||'')+' '+String(x.partnerBidMode||'');
+ const txt=summaryText+' '+extractedRfpRequirements(x);
  const production=productionRequirementCheck(x,p);
  if(production.applicable){
   add('direct','직접생산 요구품목 대조',production.status==='ok'?'ok':production.status==='unknown'?'unknown':'pending',
@@ -1621,16 +1649,20 @@ function comparePartnerJob(x,p){
   add('sme-validity','중소기업확인서 유효여부',record?.validState==='valid'?'ok':'pending',
     record?.validState==='valid'?'SMPP 유효여부=Y 조건으로 조회 확인 · 정확한 종료일은 공개 목록에 미표시':
       'SMPP 유효 확인 결과 없음. 별도 확인 필요','SMPP 공식 공개조회');
-  if(record?.validState==='valid')add('sme-expiry','정확한 종료일','unknown',
-    '공개 목록에서 종료일을 제공하지 않음. 확인서 원본에 표시된 만료일은 별도 확인','SMINFO');
+  if(record?.validState==='valid')add('sme-expiry','확인서 최신 유효상태','ok',
+    'SMPP 유효(Y) 조회 확인. 종료일 비공개만으로 미충족 처리하지 않음. 원본에 표시된 종료일은 필요시 확인','SMPP');
  }
  const certRules=[
   ['swstatus','SW사업자 일반현황 관리확인서',/일반현황.?관리확인|SW사업자.?신고/],
-  ['experience','수행실적',/실적\s*증명|실적증명서|최근\s*\d.{0,20}실적|유사\s*용역\s*실적|실적\s*보유|수행실적\s*제출/],
-  ['staff','기술인력·자격',/기술인력|투입인력|상주인력|전담인력|자격증/],
+  ['experience','수행실적',/(?:입찰|참가자격).{0,65}(?:실적증명|수행실적|유사용역실적)|(?:실적증명서|실적증명).{0,16}(?:제출|필수|요구)|(?:수행|유사).{0,12}실적.{0,18}(?:입찰참가|필수자격)/],
+  ['staff','기술인력·자격',/(?:입찰|참가자격).{0,65}(?:기술인력|전담인력|재직증명|자격증)|(?:기술인력|재직증명|자격증).{0,20}(?:입찰참가|필수자격)/],
  ];
  for(const [id,label,re] of certRules){
-  if(!re.test(txt))continue;
+  // RFP clauses were already classified individually; do not treat a
+  // proposal scoring item or post-award delivery staffing as bidder proof.
+  if(!re.test(summaryText))continue;
+  const structuredType=id==='experience'?'performance_proof':id==='staff'?'staff_proof':null;
+  if(structuredType&&(aiReport?.requirements||[]).some(q=>q.type===structuredType))continue;
   const reason=id==='staff'&&p.publicEmployeeCount?
     ('공식 업체정보 직원 수 '+p.publicEmployeeCount+'명(참고) · 공고의 필수 경력·자격·재직·실제 투입인력은 별도 증빙 필요'):
     id==='experience'?
@@ -1646,9 +1678,7 @@ function comparePartnerJob(x,p){
   add('proof-'+id,label,'pending',reason,id==='experience'?'나라장터 계약정보·수행실적증명서':'공고 조건 요약');
  }
  const rfp=rfpSnapshotForJob(x);
- const rfpFullyReviewed=rfp?.reviewComplete===true&&rfp?.requiredConditionsComplete===true&&
-  Array.isArray(rfp.files)&&rfp.files.length>0&&
-  rfp.files.every(file=>file.readable===true&&file.reviewComplete===true);
+ const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x));
  if(rfp?.status==='text_extracted_requires_review'||rfpFullyReviewed){
   const files=(rfp.files||[]).filter(q=>q.readable);
   const categories=[...new Set(files.flatMap(q=>Object.entries(q.topics||{}).filter(([k,n])=>n>0).map(([k])=>k)))];
@@ -1684,9 +1714,7 @@ function comparePartnerJob(x,p){
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  // Require explicit full official-document review before any ready verdict.
- const fullyReviewed=rfp?.reviewComplete===true&&rfp?.requiredConditionsComplete===true&&
-  Array.isArray(rfp.files)&&rfp.files.length>0&&
-  rfp.files.every(file=>file.readable===true&&file.reviewComplete===true);
+ const fullyReviewed=officialReviewCoverage(rfp,evidence);
  const complete=fullyReviewed&&req?.ok===true&&req.complete===true&&
   counts.missing===0&&counts.pending===0&&counts.unknown===0;
  return {rows,counts,complete,reviewStatus:fullyReviewed?'fully_reviewed':'full_notice_review_pending'};
@@ -1716,7 +1744,8 @@ function participationVerdict(x,p){
   reason:sizeMismatch?'공고 기업규모 제한과 SMPP 공식 분류 불일치':industry.type==='missing'?'필수 등록업종 불일치':definitive.reason,
   confirmed:c.ok,pending:c.pending,unknown:c.unknown,missing:c.missing
  };
- if(proof.complete===true&&c.missing===0&&c.pending===0&&c.unknown===0&&industry.type==='industry_match')
+ if(proof.complete===true&&c.missing===0&&c.pending===0&&c.unknown===0&&
+    (industry.type==='industry_match'||industry.type==='no_restriction'))
   return {type:'ready',label:'바로 지원 가능',reason:'모든 필수조건 및 첨부원문 확인 완료',confirmed:c.ok,pending:0,unknown:0,missing:0};
  if((industry.type==='industry_match'||industry.type==='no_restriction')&&
     (c.ok>0||industry.type==='no_restriction')){

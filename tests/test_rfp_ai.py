@@ -43,6 +43,17 @@ for wrong in [
   m.validate_inference(wrong,c)
   raise AssertionError("model output accepted without complete source validation")
  except ValueError:pass
+# Exclude proposal/delivery language from bidder prerequisites in rule-only mode.
+samples=[
+ {"index":0,"type":"industry_code","sourceText":"입찰참가자격으로 소프트웨어사업자 업종코드 1468 등록하여야 한다"},
+ {"index":1,"type":"staff_proof","sourceText":"계약체결 후 사업 수행 중 투입인력 배치계획을 제출하여야 한다"},
+ {"index":2,"type":"performance_proof","sourceText":"정보시스템의 과거 수행실적 통계 조회 기능 개선"},
+ {"index":3,"type":"joint_participation","sourceText":"공동수급 불가하며 단독 참가"},
+ {"index":4,"type":"performance_proof","sourceText":"입찰참가자격으로 유사용역 실적증명서를 제출하여야 한다"}
+]
+classified=m.rule_based_interpret(samples)["items"]
+assert [q["classification"] for q in classified]==[
+ "mandatory","context_only","unknown","prohibited","mandatory"]
 # Never fabricate a matching company qualification from a model statement.
 assert all(x["sourceVerified"] and not x["documentFullyReviewed"] for x in a["requirements"])
 # Persisted artifacts must not contain a copy of the GitHub auth token.

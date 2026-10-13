@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 1
+VERSION = 2
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -147,33 +147,51 @@ def validate_inference(raw, clauses):
     return [parsed[i] for i in range(len(clauses))]
 
 def rule_based_interpret(clauses):
-    """A deterministic offline fallback; explicitly NOT GPT or final eligibility."""
+    """Offline bidder-specific rules: proposal evaluation and contracted staffing
+    are not prerequisites. No model is called by this classification."""
     result=[]
     for c in clauses:
         t=c.get("sourceText") or ""
-        required=bool(re.search(r"반드시|소지하여야|등록하여야|제출하여야|첨부하여야|소지한 자|입찰참가자격|참가자격으로 등록",t))
-        prohibited=bool(re.search(r"공동\s*수급.{0,22}(?:금지|불허|불가)|대기업.{0,40}참여.{0,10}불가|하도급.{0,15}(?:금지|불허|불가)",t))
+        typ=c.get("type") or ""
+        prohibited=bool(re.search(
+            r"공동\s*수급.{0,22}(?:금지|불허|불가)|대기업.{0,40}참여.{0,10}불가|하도급.{0,15}(?:금지|불허|불가)",t))
         optional=bool(re.search(r"선택사항|권장|제출할 수 있|참여할 수 있|허용할 수 있",t))
-        classification=("prohibited" if prohibited else "mandatory" if required else
-                        "optional" if optional else "unknown")
-        relation=("not_allowed" if prohibited else
-                  "any" if required and bool(re.search(r"또는|중\s*하나|택\s*일",t)) else
-                  "all" if required else "unknown")
-        reason=("명시적 금지·불허 표현 발견" if prohibited else
-                "원문에 제출·등록·소지 의무 표현 발견" if required else
-                "원문에 선택·권장 표현 발견" if optional else
-                "명확한 필수·선택 여부 표현 없음")
+        bidder=bool(re.search(r"입찰\s*참가\s*자격|입찰에\s*참가|참가업체|참가자격으로|입찰참가자는|입찰자격",t))
+        explicit=bool(re.search(
+            r"소지한\s*자|등록한\s*자|소지하여야|등록하여야|필수로\s*소지|참가자격으로\s*등록",t))
+        restricted=typ in {"industry_code","direct_production","sme_certificate"}
+        obligation=bool(re.search(r"반드시|필수|제출하여야|첨부하여야|소지하여야|등록하여야",t))
+        after_award=bool(re.search(
+            r"계약\s*(?:체결|이행)\s*후|착수\s*후|사업\s*수행\s*중|계약상대자|평가\s*항목|제안서\s*평가|정량\s*평가|사업\s*완료\s*후",t))
+        required=(bidder and (obligation or explicit)) or (restricted and explicit)
+        if after_award and not bidder:
+            classification="context_only"
+        elif prohibited:
+            classification="prohibited"
+        elif optional:
+            classification="optional"
+        elif required:
+            classification="mandatory"
+        else:
+            classification="unknown"
+        relation=("not_allowed" if classification=="prohibited" else
+                  "any" if classification=="mandatory" and bool(re.search(r"또는|중\s*하나|택\s*일",t)) else
+                  "all" if classification=="mandatory" else "unknown")
+        reason=("계약 이후 의무·제안서 평가 문맥" if classification=="context_only" else
+                "명시적 금지·불허 표현 발견" if classification=="prohibited" else
+                "원문에 선택·권장 표현 발견" if classification=="optional" else
+                "입찰 참가자격의 명시적 등록·소지 의무" if classification=="mandatory" else
+                "입찰 참가자격인지 문장만으로 불명확")
         result.append({"index":c["index"],"classification":classification,
                        "relation":relation,"reason":reason})
     return {"items":result}
-
 
 def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
     clauses=source_candidates(notice)
     if not clauses:
         return None
     hash_value=evidence_hash(clauses)
-    if existing and existing.get("sourceSha256")==hash_value and existing.get("analysisStatus")==mode:
+    if existing and existing.get("sourceSha256")==hash_value and existing.get("analysisStatus")==mode and existing.get("classifierVersion")==VERSION:
         return None
     # Partition into small batches for model context and predictable response size.
     batches=[clauses[i:i+18] for i in range(0,len(clauses),18)]
@@ -220,7 +238,8 @@ def main():
         if not clauses:continue
         prior=existing.get(key) or {}
         if prior.get("sourceSha256")==evidence_hash(clauses) and (
-           prior.get("analysisStatus")=="classified" or prior.get("analysisStatus")==mode):
+           prior.get("analysisStatus")=="classified" or
+           (prior.get("analysisStatus")==mode and prior.get("classifierVersion")==VERSION)):
             continue
         candidates.append((key,notice,len(clauses)))
     candidates.sort(key=lambda x:(-x[2],x[0]))

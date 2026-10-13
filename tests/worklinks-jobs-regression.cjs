@@ -179,7 +179,7 @@ assert.ok(source.includes("나라장터 공식 낙찰"));
 
 // Official SMPP SME validity must be compared, not left generically pending.
 const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
- part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+
+ part('function officialReviewCoverage(rfp,evidence){','function matchRowsHTML(x,p){')+
  'return comparePartnerJob;'
 )(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}),()=>null,()=>'' );
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
@@ -189,7 +189,7 @@ const smeRows=smeCmp(smeBid,smePartner).rows;
 assert.equal(smeRows.find(q=>q.id==='sme-issuance').status,'ok');
 assert.equal(smeRows.find(q=>q.id==='sme-validity').status,'ok');
 assert.equal(smeRows.find(q=>q.id==='sme-scale').status,'ok');
-assert.equal(smeRows.find(q=>q.id==='sme-expiry').status,'unknown');
+assert.equal(smeRows.find(q=>q.id==='sme-expiry').status,'ok','current SMPP valid(Y) is not nullified by unpublished expiry');
 assert.equal(smeCmp(smeBid,{smeRecord:{...smePartner.smeRecord,validState:'unknown'},smeCheckedAt:'2026-10-12'}).rows.find(q=>q.id==='sme-validity').status,'pending');
 assert.equal(smeCmp(smeBid,{}).rows.find(q=>q.id==='sme-issuance').status,'pending');
 assert.ok(source.includes("refreshPartnerSme(p)"));
@@ -198,14 +198,27 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 
 // Verify the actual comparePartnerJob complete flag is evidence dependent.
 const completion=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
- part('function comparePartnerJob(x,p){','function matchRowsHTML(x,p){')+'return comparePartnerJob;'
+ part('function officialReviewCoverage(rfp,evidence){','function matchRowsHTML(x,p){')+'return comparePartnerJob;'
 )(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
- ()=>({applicable:false}),()=>({attachments:{ok:true,items:[]}}),
+ ()=>({applicable:false}),()=>({attachments:{ok:true,complete:true,items:[{name:'공식 공고'}]}}),
  ()=>({status:'unknown'}),
  x=>x.reviewed?{status:'fully_reviewed',reviewComplete:true,requiredConditionsComplete:true,
    files:[{readable:true,reviewComplete:true,topics:{},name:'공식 공고'}]}:
    {status:'text_extracted_requires_review',reviewComplete:false,files:[{readable:true,reviewComplete:false,topics:{},name:'RFP'}]},
  ()=> '');
+const noFilesCoverage=new Function(
+ part('function officialReviewCoverage(rfp,evidence){','function comparePartnerJob(x,p){')+
+ 'return officialReviewCoverage;'
+)();
+const noFiles={reviewComplete:true,requiredConditionsComplete:true,files:[],
+ noticeTextReviewed:true,noticeConditionsVerified:true,
+ noticeSourceUrl:'https://www.g2b.go.kr/notice',noticeSha256:'verified-sha'};
+const noFilesEvidence={attachments:{ok:true,complete:true,items:[]},
+ noticeDocuments:{ok:true,complete:true,count:0}};
+assert.equal(noFilesCoverage(noFiles,noFilesEvidence),true,'fully checked official notice can qualify without separate attachment');
+assert.equal(noFilesCoverage({...noFiles,noticeSha256:''},noFilesEvidence),false);
+assert.equal(noFilesCoverage(noFiles,{attachments:{ok:true,complete:true,items:[]}}),false,
+ 'zero attachment list must never waive notice review');
 assert.equal(completion({reviewed:false},{}).complete,false,'snippets cannot certify a bid');
 assert.equal(completion({reviewed:true},{}).complete,true,'fully verified and no outstanding requirements is achievable');
 assert.equal(completion({reviewed:true},{}).rows.find(q=>q.id==='attachment').status,'ok');
@@ -240,8 +253,8 @@ assert.equal(verdict({industry:'industry_match'}).type,'conditional');
 assert.equal(verdict({industry:'unverified'}).type,'checking');
 assert.equal(verdict({industry:'no_restriction'}).type,'conditional','official 0 industry restrictions are a positive check but not ready');
 assert.equal(verdict({industry:'no_restriction',full:false,ok:2,pending:0,unknown:1}).type,'conditional');
-assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'conditional',
- 'zero industry restrictions is not sufficient for final ready under the full-document gate');
+assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'ready',
+ 'zero industry restrictions and independently verified complete notice can qualify');
 assert.equal(verdict({industry:'missing'}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked');
 assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked');
