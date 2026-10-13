@@ -248,6 +248,23 @@ assert.equal(clustered.filter(q=>q.id==='ai-ambiguous').length,1);
 assert.equal(clustered.filter(q=>q.id.startsWith('ai-')).length,1,
  '150 ambiguous snippets must not be rendered as 150 company disqualifications');
 
+// A legally required production certificate may be identified by official
+// product name without a numerical code; it must still match dated issuance.
+const namedDirect={...citedDirect,index:1,codes:[],
+ sourceText:'입찰참가자격: 직접생산확인증명서 정보시스템유지관리서비스 소지한 업체'};
+assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
+ requirements:[namedDirect]}},partnerHasMaintenance).rows.find(q=>q.id==='ai-1').status,'ok');
+assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
+ requirements:[namedDirect]}},prodP).rows.find(q=>q.id==='ai-1').status,'pending');
+const bigCompanyBlocked={...citedDirect,index:2,type:'industry_code',codes:[],
+ classification:'prohibited',sourceText:'대기업은 입찰에 참여할 수 없음'};
+assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
+ requirements:[bigCompanyBlocked]}},
+ {...partnerHasMaintenance,smeRecord:{validState:'valid',size:'소기업'}}).rows.find(q=>q.id==='ai-2').status,'ok');
+assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
+ requirements:[bigCompanyBlocked]}},
+ partnerHasMaintenance).rows.find(q=>q.id==='ai-2').status,'unknown');
+
 // Verify the actual comparePartnerJob complete flag is evidence dependent.
 const completeSha='a'.repeat(64);
 const completeDoc={name:'입찰공고문.hwp',readable:true,sourceSha256:completeSha,
