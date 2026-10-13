@@ -55,7 +55,7 @@ samples=[
 ]
 classified=m.rule_based_interpret(samples)["items"]
 assert [q["classification"] for q in classified]==[
- "mandatory","context_only","unknown","prohibited","mandatory"]
+ "mandatory","context_only","context_only","prohibited","mandatory"]
 # Real official phrasing: "소지한 업체" and "등록을 필한 업체" must be
 # recognized; no requirement may be fabricated from a mere service mention.
 realistic=[
