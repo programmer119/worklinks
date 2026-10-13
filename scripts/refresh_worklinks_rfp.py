@@ -433,7 +433,7 @@ def audit_qualification_scan(text, candidates):
     source=[str(x.get('sourceText') or '') for x in candidates]
     # Long paragraphs are split into overlapping evidence windows. Comparing
     # the entire paragraph to one window falsely reports coverage missing.
-    normalized_sources=[re.sub(r"\\s+","",s) for s in source]
+    normalized_sources=[re.sub(r"\s+","",s) for s in source]
     anchor_lines=[line for line in lines if EXTRA_QUALIFICATION_ANCHORS.search(line)]
     missing=[]
     for line in anchor_lines:
@@ -445,7 +445,7 @@ def audit_qualification_scan(text, candidates):
         for anchor in EXTRA_QUALIFICATION_ANCHORS.finditer(line):
             a=max(0,anchor.start()-45)
             b=min(len(line),anchor.end()+100)
-            span=re.sub(r"\\s+","",line[a:b])
+            span=re.sub(r"\s+","",line[a:b])
             if span:anchored.append(span)
         matched=bool(anchored) and all(any(
             span in evidence or (evidence in span and len(evidence)>=35)
