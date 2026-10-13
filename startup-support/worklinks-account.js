@@ -9,7 +9,7 @@ const GUEST = {
 };
 const KIND = {applied:true,hidden:true,business:true};
 const GUEST_OWNER_KEY = 'worklinks_support_guest_migration_owner_v1';
-const state = {client:null,token:'',account:'',project:'',busy:false,records:[],imported:0};
+const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,records:[],imported:0};
 const $ = (id)=>document.getElementById(id);
 const decode = (key)=>{try{const r=JSON.parse(localStorage.getItem(key)||'{}');return r&&typeof r==='object'&&!Array.isArray(r)?r:{}}catch{return {}}};
 const accountKeys = (user)=>({
@@ -72,7 +72,8 @@ function applyAccount(records){
   if(typeof window.draw==='function')window.draw();
 }
 async function flush(){
-  if(!state.account||state.busy)return;
+  // Never upload a guest import or claim sync before existing server data is read.
+  if(!state.account||!state.serverReady||state.busy)return;
   const account=state.account, keys=accountKeys(account);
   state.busy=true;
   try{
@@ -123,23 +124,31 @@ function importGuestAutomatically(){
     return 0;
   }
   if(!owner)localStorage.setItem(GUEST_OWNER_KEY,state.account);
+  if(!state.serverReady)return 0;
   const keys=accountKeys(state.account);
   const maps={applied:decode(keys.applied),hidden:decode(keys.hidden),business:decode(keys.business)};
   const pending=decode(keys.pending);
-  const remote=new Set(state.records.filter(r=>r.value===true).map(r=>r.kind+':'+r.id));
+  const migratedKey='worklinks_support_guest_migrated_v1:'+state.account;
+  const migrated=decode(migratedKey);
+  // False is an explicit member decision, not an empty value. Never resurrect it.
+  const remote=new Set(state.records.map(r=>r.kind+':'+r.id));
   let imported=0;
   for(const entry of entries){
     if(!(/^[A-Za-z0-9_.:-]{1,160}$/.test(entry.id)))continue;
     const key=entry.kind+':'+entry.id;
-    const details=itemDetails(entry.id);
-    if(!remote.has(key)&&!(pending[key]?.value===true)){
-      pending[key]={...entry,...details};
+    if(migrated[key])continue;
+    const memberAlreadyHasValue=Object.prototype.hasOwnProperty.call(maps[entry.kind],entry.id);
+    if(!remote.has(key)&&!Object.prototype.hasOwnProperty.call(pending,key)&&!memberAlreadyHasValue){
+      pending[key]={...entry,...itemDetails(entry.id)};
+      maps[entry.kind][entry.id]=true;
       imported++;
     }
-    maps[entry.kind][entry.id]=true;
+    // An existing server value (including false) takes precedence; guest original remains intact.
+    migrated[key]=true;
   }
   Object.entries(maps).forEach(([kind,map])=>localStorage.setItem(keys[kind],JSON.stringify(map)));
   localStorage.setItem(keys.pending,JSON.stringify(pending));
+  localStorage.setItem(migratedKey,JSON.stringify(migrated));
   state.imported=imported;
   // Account-side maps + pending must be re-rendered before background upload.
   applyAccount(state.records);
@@ -153,16 +162,36 @@ window.worklinksStatusChanged=(kind,id,value)=>{
   const pending=decode(keys.pending);
   pending[kind+':'+id]={kind,id,value:!!value,...item};
   localStorage.setItem(keys.pending,JSON.stringify(pending));
+  if(!state.serverReady)show('브라우저 기록 보존됨 · 서버 기록 확인 후 자동 동기화');
   flush().catch(()=>show('브라우저 저장됨 · 서버 동기화 대기'));
 };
 function guestRestore(){
-  state.account='';state.token='';state.records=[];state.imported=0;
+  state.account='';state.token='';state.records=[];state.imported=0;state.serverReady=false;
   window.statusKey=GUEST.applied;window.hiddenKey=GUEST.hidden;window.businessKey=GUEST.business;
   window.saved=decode(GUEST.applied);window.hidden=decode(GUEST.hidden);window.business=decode(GUEST.business);
   window.worklinksArchivedStatuses=[];
   if(typeof window.draw==='function')window.draw();
 }
 
+async function reconcileServer(){
+  if(!state.account||state.loading)return;
+  const account=state.account;
+  state.loading=true;
+  try{
+    const remote=await api('/worklinks-state');
+    if(account!==state.account)return;
+    if(!Array.isArray(remote.records))throw Error('invalid_server_records');
+    state.serverReady=true;
+    applyAccount(remote.records);
+    importGuestAutomatically();
+    await flush();
+  }catch(error){
+    if(account===state.account){
+      state.serverReady=false;
+      show('로그인됨 · 서버 기록 조회 실패, 브라우저 기록 보존 · 연결 복구 시 재시도');
+    }
+  }finally{state.loading=false;}
+}
 function hosted(mode){
   const u=new URL('https://authhub.suaveforge.com/login/');
   u.searchParams.set('project',state.project);
@@ -215,23 +244,15 @@ async function bootstrap(){
   try{
     const session=await validSession(state.client);
     if(!session){buttons(null);show('비회원 · 이 브라우저에만 저장');return}
-    state.account=session.identity;state.token=session.token;
-    try{
-      const remote=await api('/worklinks-state');
-      applyAccount(remote.records||[]);
-      importGuestAutomatically();
-      await flush();
-    }catch(error){
-      applyAccount([]);
-      importGuestAutomatically();
-      show('로그인됨 · 브라우저 기록 보존, 서버 동기화 대기');
-      await flush();
-    }
+    state.account=session.identity;state.token=session.token;state.serverReady=false;
+    // Show preserved account-local data while waiting, but do not overwrite server truth.
+    applyAccount([]);
+    await reconcileServer();
     buttons(session);
   }catch(error){
     guestRestore();buttons(null);show('비회원 · 브라우저 저장 (AuthHub 확인 지연)');
   }
 }
-window.addEventListener('online',()=>flush().catch(()=>{}));
-window.addEventListener('focus',()=>{if(state.account&&!state.busy&&Object.keys(decode(accountKeys(state.account).pending)).length)flush().catch(()=>{})});
+window.addEventListener('online',()=>{if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}});
+window.addEventListener('focus',()=>{if(!state.account)return;if(!state.serverReady)reconcileServer().catch(()=>{});else if(!state.busy&&Object.keys(decode(accountKeys(state.account).pending)).length)flush().catch(()=>{})});
 bootstrap().catch(error=>{console.warn('WorkLinks AuthHub bootstrap',error);show('브라우저 저장 유지 · 인증 서버 확인 필요')});
