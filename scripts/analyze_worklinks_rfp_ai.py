@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 9
+VERSION = 10
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -183,7 +183,10 @@ def rule_based_interpret(clauses):
             r"(?:소재|제한|있는\s*업체)",t)))
         region_unrestricted=(typ=="region_restriction" and bool(re.search(
             r"지역\s*제한.{0,14}(?:두지\s*아니|없음|없다)|전국\s*(?:허용|대상)",t)))
-        required=(bidder and (obligation or explicit)) or (restricted and explicit) or regional
+        size_only=(typ=="sme_certificate" and bool(re.search(
+            r"(?:중소기업자|소기업|소상공인|중기업)\s*만.{0,30}(?:입찰|참가)|"
+            r"(?:입찰|참가).{0,30}(?:소기업|소상공인)\s*(?:한정|제한)",t)))
+        required=(bidder and (obligation or explicit)) or (restricted and explicit) or regional or size_only
         # Consortium paperwork is a conditional participation method; its
         # scoring forms are not standalone bidder credentials.
         consortium_form=(typ=="joint_participation" and bool(re.search(
