@@ -69,7 +69,7 @@ try:
              for _ in range(3)]}
         raise AssertionError(url)
     rfp.fetch_json=pages
-    prior={'R26BK12345601:000':{'classificationVersion':6,'checkedAt':
+    prior={'R26BK12345601:000':{'classificationVersion':7,'checkedAt':
        rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
     result=rfp.discover(10,prior)
     assert len(calls)==2,'discovery must request the next 500 notice page'
