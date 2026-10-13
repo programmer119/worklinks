@@ -81,7 +81,7 @@ conditional=[
  {"index":4,"type":"industry_code","codes":["1468"],
   "sourceText":"소프트웨어사업자(컴퓨터관련서비스사업 업종코드 1468)로 입찰참가 등록 되어 있어야 합니다."},
  {"index":5,"type":"industry_code","codes":["1468"],
-  "sourceText":"업종코드 1468)로 입찰참가 등록 되어 있어야 합니다."},
+  "sourceText":"소프트웨어사업자(컴퓨터관련서비스사업 업종코드 1468)로 입찰참가"},
  {"index":6,"type":"direct_production","codes":["8111159901"],
   "sourceText":"직접생산확인증명서(정보시스템개발서비스 8111159901)를 소지한 업체"},
  {"index":7,"type":"direct_production","codes":["9999999999"],
