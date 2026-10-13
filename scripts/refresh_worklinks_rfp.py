@@ -331,7 +331,7 @@ def extract_rule_candidates(text,filename):
     rules={
       'industry_code':r'업종\s*코드|업종코드|업종으로\s*입찰|소프트웨어사업자|학술.?연구용역|정보통신공사업',
       'direct_production':r'직접\s*생산|세부\s*품명\s*번호|공간정보\s*DB\s*구축',
-      'sme_certificate':r'소기업.?소상공인\s*확인서|중소기업\s*확인서|소기업\s*확인서|소기업.?소상공인.*소지',
+      'sme_certificate':r'소기업.?소상공인\s*확인서|중소기업\s*확인서|소기업\s*확인서|소기업.?소상공인.*소지|중소기업자\s*만|소기업\s*만|소상공인\s*만|중소기업자.{0,22}입찰',
       'staff_proof':r'재직.{0,12}경력|경력.{0,12}학력|자격.?증명서|투입\s*인력',
       'performance_proof':r'실적\s*증명|수행\s*실적|유사\s*용역\s*실적',
       'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소|소재지',
@@ -388,6 +388,10 @@ def nonqualification_context(line):
         r"직접\s*생산|소기업\s*확인|중소기업\s*확인|"
         r"지역\s*제한|본점\s*소재|주된\s*영업소",line))
     if strong:return False
+    if re.search(r'입찰.{0,30}등록하고.{0,70}(?:납품|수행)\s*가능한\s*업체|규격서.{0,35}납품\s*가능',line):
+        return False
+    if re.fullmatch(r'\s*(?:입찰\s*참가\s*신청서|입찰\s*참가\s*서류|입찰\s*유의사항)\s*',line):
+        return True
     if re.search(r"제안서|평가\s*(?:항목|기준|점수|배점|표)|붙임|별지|서식|양식",line):
         if re.search(r"수행\s*실적|실적\s*증명|투입\s*인력|재직\s*증명|공동\s*수급",line):
             if not re.search(r"(?:입찰\s*참가|참가\s*자격).{0,45}(?:필수|실적|경력|인력)|"
