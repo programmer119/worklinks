@@ -1,15 +1,15 @@
 {
   "ok": true,
-  "workflowRunId": "38362556152",
+  "workflowRunId": "38362678443",
   "model": "rule-based-v1",
-  "generatedAt": "2026-10-13T07:25:38.398236+00:00",
+  "generatedAt": "2026-10-13T07:26:50.071967+00:00",
   "source": "Citation-checked RFP classification; model or conservative rules",
   "reviewComplete": false,
   "byNotice": {
     "R26BK01749170:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7361c669fedada12722a706121880a4d1b3f1d2e20f3dd55491506fe68f154ad",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -750,14 +750,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.693689+00:00",
+      "checkedAt": "2026-10-13T07:26:50.053471+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751053:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "54f0ed5d3ef1361b55f8193af771f0333b880b246b5bbec2476f8064c4924b76",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -1354,7 +1354,7 @@
           "sourceFile": "00. 입찰공고문.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -1366,7 +1366,7 @@
           "sourceFile": "00. 입찰공고문.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -1659,22 +1659,21 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.666534+00:00",
+      "checkedAt": "2026-10-13T07:26:50.026414+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01756420:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5156e04bd1cec54a952a5438f7a21351bf779e5adb278d60ca85f1c09a31cfb4",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
       "fullDocumentAudit": {
         "complete": false,
         "blockers": [
-          "uncertain_full_text_coverage",
-          "ambiguous_qualification_clause"
+          "uncertain_full_text_coverage"
         ],
         "reviewedDocuments": 3,
         "manifestDocuments": 3,
@@ -2788,9 +2787,9 @@
           "codes": [],
           "sourceText": "소기업ㆍ소상공인확인서 및 직접생산확인증명서 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고문(전자입찰26-021호)_변환본.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -2800,9 +2799,9 @@
           "codes": [],
           "sourceText": "소기업ㆍ소상공인확인서 및 직접생산확인증명서 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고문(전자입찰26-021호)_변환본.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -2814,7 +2813,7 @@
           "sourceFile": "입찰공고문(전자입찰26-021호)_변환본.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -2826,7 +2825,7 @@
           "sourceFile": "입찰공고문(전자입찰26-021호)_변환본.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -2836,9 +2835,9 @@
           "codes": [],
           "sourceText": "한 자 소기업ㆍ소상공인확인서 및 직접생산확인증명서 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고문(전자입찰26-021호)_변환본.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -2848,9 +2847,9 @@
           "codes": [],
           "sourceText": "한 자 소기업ㆍ소상공인확인서 및 직접생산확인증명서 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고문(전자입찰26-021호)_변환본.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -3791,7 +3790,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.484887+00:00",
+      "checkedAt": "2026-10-13T07:26:49.844141+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -5144,7 +5143,7 @@
     "R26BK01743168:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6cc9fb7b8daaae4fd60aae4e2b8c8e34870501bd5f1aaafb368bb47bc2a9fbd6",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -6058,7 +6057,7 @@
           "sourceFile": "공고서(AI 수사자료 표준화 시스템 유지관리)(수정).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -6070,7 +6069,7 @@
           "sourceFile": "공고서(AI 수사자료 표준화 시스템 유지관리)(수정).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -6082,7 +6081,7 @@
           "sourceFile": "공고서(AI 수사자료 표준화 시스템 유지관리)(수정).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -6094,7 +6093,7 @@
           "sourceFile": "공고서(AI 수사자료 표준화 시스템 유지관리)(수정).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -6675,14 +6674,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.586700+00:00",
+      "checkedAt": "2026-10-13T07:26:49.944879+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746665:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5a4bae24c819d58ba987cbcb5ce099dbfd108d429f2a3326d8acaf216bfc7f62",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -7170,7 +7169,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.711296+00:00",
+      "checkedAt": "2026-10-13T07:26:50.071954+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -13065,7 +13064,7 @@
     "R26BK01738722:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0885fbfcf08223a40ed6b06dc3b81a03fbe544a5ae5d75b695dd7b77fadf2ea8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -14569,7 +14568,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -14629,7 +14628,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -14641,7 +14640,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -14677,7 +14676,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -15925,9 +15924,9 @@
           "codes": [],
           "sourceText": "발급된 중 · 소기업 · 소상공인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -15939,7 +15938,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -15949,9 +15948,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -15961,9 +15960,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -15975,7 +15974,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -15987,7 +15986,7 @@
           "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -17828,14 +17827,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.080654+00:00",
+      "checkedAt": "2026-10-13T07:26:49.440544+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01740563:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "35a71806109eca2f05319d9e3ebdb51966d9ae62ac33633abc28b50847c86ae4",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -20688,14 +20687,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.375120+00:00",
+      "checkedAt": "2026-10-13T07:26:49.735014+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745578:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a5eb81422124568e37ec624edf3f56128d15714a3a66b6a6ce74c30c2486fe74",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -21901,7 +21900,7 @@
           "sourceFile": "입찰공고문(BK21 클라우드전환감리).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -22752,7 +22751,7 @@
           "sourceFile": "입찰공고문(BK21 클라우드전환감리).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -23801,14 +23800,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.310072+00:00",
+      "checkedAt": "2026-10-13T07:26:49.672151+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746816:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "ddb0aa9e58ccf962f79a344f3d857aff196f15eef20d2fdf2c621588667f0dad",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -24034,7 +24033,7 @@
           "sourceFile": "'27년 제안요청서(민군작전모의모델 수정).hwp",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -24046,7 +24045,7 @@
           "sourceFile": "'27년 제안요청서(민군작전모의모델 수정).hwp",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -24618,7 +24617,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -24678,7 +24677,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -24690,7 +24689,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -24726,7 +24725,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -25506,7 +25505,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -25518,7 +25517,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -25530,7 +25529,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -25542,7 +25541,7 @@
           "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -26411,14 +26410,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.406820+00:00",
+      "checkedAt": "2026-10-13T07:26:49.766550+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747556:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "68cc5e8e273a54b13faf6c6380c758f5b905459f48869f97bf323f0faf0baee6",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -27329,7 +27328,7 @@
           "sourceFile": "공고서(지방, 협상,중기간, 단기, sw사업, 소프트웨어사업자, 지역제한,서면,고시미만,공동불허).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -27341,7 +27340,7 @@
           "sourceFile": "공고서(지방, 협상,중기간, 단기, sw사업, 소프트웨어사업자, 지역제한,서면,고시미만,공동불허).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -27353,7 +27352,7 @@
           "sourceFile": "공고서(지방, 협상,중기간, 단기, sw사업, 소프트웨어사업자, 지역제한,서면,고시미만,공동불허).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -27365,7 +27364,7 @@
           "sourceFile": "공고서(지방, 협상,중기간, 단기, sw사업, 소프트웨어사업자, 지역제한,서면,고시미만,공동불허).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -28714,14 +28713,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.463528+00:00",
+      "checkedAt": "2026-10-13T07:26:49.823263+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750115:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a3dd283f313486a7b1fa927eb261ac6eb915cb6b59fd0e475eed650c5d09b6e1",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -31624,14 +31623,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.362677+00:00",
+      "checkedAt": "2026-10-13T07:26:49.722633+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750306:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "02f49dad126d604802fb2a2c758d3cf67607380bde1270569e6cf2d38629e683",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -32557,14 +32556,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.664129+00:00",
+      "checkedAt": "2026-10-13T07:26:50.024000+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751678:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "010009db379839a18f6b8da531f21b3b1bcdf8ce7fd19d3baba6ff29cf488ac8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -35009,14 +35008,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.422449+00:00",
+      "checkedAt": "2026-10-13T07:26:49.782219+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751960:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c8b94082387ff61f935a5a7f7f0eca7df34c286f070bc4f777eb95f2414dd753",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -35737,7 +35736,7 @@
           "sourceFile": "재공고서_국가_제한_국내_개발_1468_20억미만_공동이행_하도급사전승인_수요기관평가.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -35749,7 +35748,7 @@
           "sourceFile": "재공고서_국가_제한_국내_개발_1468_20억미만_공동이행_하도급사전승인_수요기관평가.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -35761,7 +35760,7 @@
           "sourceFile": "재공고서_국가_제한_국내_개발_1468_20억미만_공동이행_하도급사전승인_수요기관평가.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -35773,7 +35772,7 @@
           "sourceFile": "재공고서_국가_제한_국내_개발_1468_20억미만_공동이행_하도급사전승인_수요기관평가.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -37434,14 +37433,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.429876+00:00",
+      "checkedAt": "2026-10-13T07:26:49.789646+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752568:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f9f189455b83d57561b789288d9b8ea5f41210d0e8b9a33f2caf0aef34eb32ac",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -39467,7 +39466,7 @@
           "sourceFile": "입찰공고서(제2026-095호).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -39479,7 +39478,7 @@
           "sourceFile": "입찰공고서(제2026-095호).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -39491,7 +39490,7 @@
           "sourceFile": "입찰공고서(제2026-095호).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -40744,14 +40743,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.272220+00:00",
+      "checkedAt": "2026-10-13T07:26:49.634113+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753970:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2374b3c3baf56a0c2c5d07ba490483741d179bb4e07e5fbb94ea542d8564baf8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -43583,14 +43582,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.386027+00:00",
+      "checkedAt": "2026-10-13T07:26:49.745852+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754210:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b7e3b496f5ae9f4dbefa9abea091b5024af4197743249a491ac1b1ee7fda9ba8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -45665,9 +45664,9 @@
           "codes": [],
           "sourceText": "포함하고 있으므로 전자입찰서 제출로 서약서 제출을 갈음합니다 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "R26BK01754210-00 입찰공고서 유지관리(국가(긴급)+1468+직생(20억 미만)+조평(온서)+공동+확약).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -45677,9 +45676,9 @@
           "codes": [],
           "sourceText": "포함하고 있으므로 전자입찰서 제출로 서약서 제출을 갈음합니다 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "R26BK01754210-00 입찰공고서 유지관리(국가(긴급)+1468+직생(20억 미만)+조평(온서)+공동+확약).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -45689,9 +45688,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "R26BK01754210-00 입찰공고서 유지관리(국가(긴급)+1468+직생(20억 미만)+조평(온서)+공동+확약).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -45701,9 +45700,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "R26BK01754210-00 입찰공고서 유지관리(국가(긴급)+1468+직생(20억 미만)+조평(온서)+공동+확약).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -45715,7 +45714,7 @@
           "sourceFile": "R26BK01754210-00 입찰공고서 유지관리(국가(긴급)+1468+직생(20억 미만)+조평(온서)+공동+확약).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -45727,7 +45726,7 @@
           "sourceFile": "R26BK01754210-00 입찰공고서 유지관리(국가(긴급)+1468+직생(20억 미만)+조평(온서)+공동+확약).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -47604,14 +47603,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.202896+00:00",
+      "checkedAt": "2026-10-13T07:26:49.563829+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754392:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b8c2b92afbd691ed040bad68015a79f7f0fba670575396a6f657a6d43ab49ad8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -51064,14 +51063,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.222722+00:00",
+      "checkedAt": "2026-10-13T07:26:49.584045+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754897:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "038a4628e2bdccd90174debdb0cffd26b8f4f2716351417422939b1f53221d7f",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -51313,7 +51312,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -51325,7 +51324,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -51337,7 +51336,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -51349,7 +51348,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -51361,7 +51360,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -51373,7 +51372,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -52553,7 +52552,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -52613,7 +52612,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -52625,7 +52624,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -52661,7 +52660,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -54442,14 +54441,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.260234+00:00",
+      "checkedAt": "2026-10-13T07:26:49.622136+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01757573:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6ade4c7c29d8397e521371d9400c4bd6b117faa8ee9be7cf8d362c37c2649a8a",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -58784,14 +58783,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.148264+00:00",
+      "checkedAt": "2026-10-13T07:26:49.508195+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752384:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b3e2ffd92b1c46fe015802fc8556bb9f0ab163d66f41ba88524f410994eddeb8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -60495,14 +60494,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.558992+00:00",
+      "checkedAt": "2026-10-13T07:26:49.917356+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755537:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "335967e6ac1c82a0b5b1cb8d1a9bb2bcd134de9757b1950ec97c47eaa5da9344",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -62221,14 +62220,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.547239+00:00",
+      "checkedAt": "2026-10-13T07:26:49.905634+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754877:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "37fdc20dea8805d191ad02669e1ade7ceb016a638557c2bbd24e8c51a49d1fe1",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -63505,14 +63504,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.600757+00:00",
+      "checkedAt": "2026-10-13T07:26:49.958908+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745450:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b943d5c195ff4bd038d87fecad8a0fc1c6abb476be1c3b66a23b037a10aaee00",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -67518,14 +67517,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.188996+00:00",
+      "checkedAt": "2026-10-13T07:26:49.549914+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745969:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0c630032401cedee7c38aa27fd69455e961c832f24709042d8e5991e3c6a01bb",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -70038,7 +70037,7 @@
           "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -70050,7 +70049,7 @@
           "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -70086,7 +70085,7 @@
           "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -71504,7 +71503,7 @@
           "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -71516,7 +71515,7 @@
           "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -71528,7 +71527,7 @@
           "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -73237,14 +73236,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.000413+00:00",
+      "checkedAt": "2026-10-13T07:26:49.360555+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01741767:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "79dd1462d383aed817b0662a662d040f402a5d7f72cf0f7d11c2a1861b7afad1",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -73387,7 +73386,7 @@
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -73411,7 +73410,7 @@
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -73423,7 +73422,7 @@
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -73459,7 +73458,7 @@
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -74849,9 +74848,9 @@
           "codes": [],
           "sourceText": "포함하고 있으므로 전자입찰서 제출로 서약서 제출을 갈음합니다 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -74861,9 +74860,9 @@
           "codes": [],
           "sourceText": "포함하고 있으므로 전자입찰서 제출로 서약서 제출을 갈음합니다 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -74873,9 +74872,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -74885,9 +74884,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -74899,7 +74898,7 @@
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -74911,7 +74910,7 @@
           "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -76716,14 +76715,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.213879+00:00",
+      "checkedAt": "2026-10-13T07:26:49.574819+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745215:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d7e07abcddfda6cf4a90b5a18284f7ddcb49e983efddf461dcd70050d5008bd8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -79258,14 +79257,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.414362+00:00",
+      "checkedAt": "2026-10-13T07:26:49.774099+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747506:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b3e54e598d227cfc6b94194f211a4bee66fa0d2fa2c95cd496a31326978a7ae3",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -82270,14 +82269,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.341856+00:00",
+      "checkedAt": "2026-10-13T07:26:49.702666+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747540:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "228dc5045f5de51a9485a0d801f746d85c1df843031a70fc85892f4fb6e235cb",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -84769,7 +84768,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -84841,9 +84840,9 @@
           "codes": [],
           "sourceText": "※ ‘중소기업ㆍ소상공인확인서’ 및 ‘직접생산확인증명서’가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).hwpx",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -84853,9 +84852,9 @@
           "codes": [],
           "sourceText": "※ ‘중소기업ㆍ소상공인확인서’ 및 ‘직접생산확인증명서’가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).hwpx",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -84867,7 +84866,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -84879,7 +84878,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -85981,9 +85980,9 @@
           "codes": [],
           "sourceText": "중 · 소기업 · 소상공인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -85995,7 +85994,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -86005,9 +86004,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -86017,9 +86016,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -86031,7 +86030,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -86043,7 +86042,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468_직생(개발)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -87368,14 +87367,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.042715+00:00",
+      "checkedAt": "2026-10-13T07:26:49.402257+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747549:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1c3b95d6bf8f643e01d1f1ea1a251b7064e6725a386f966a0fa7e70c083323b8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -88513,7 +88512,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -88573,7 +88572,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -88585,7 +88584,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -88621,7 +88620,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -89935,9 +89934,9 @@
           "codes": [],
           "sourceText": "발급된 중 · 소기업 · 소상공인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -89949,7 +89948,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -89959,9 +89958,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -89971,9 +89970,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -89985,7 +89984,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -89997,7 +89996,7 @@
           "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -91778,14 +91777,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.128624+00:00",
+      "checkedAt": "2026-10-13T07:26:49.488459+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747750:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8ebd8af5acbcb93c34a57aa8b45e5f57ae27aca1922ff81d7c25f22b4961499c",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -93857,14 +93856,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.490057+00:00",
+      "checkedAt": "2026-10-13T07:26:49.849251+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748897:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3d462bd36e52d0579c91cc4e633a6464842a760f8537574f0872b3aa41c6e2aa",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -95950,14 +95949,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.496073+00:00",
+      "checkedAt": "2026-10-13T07:26:49.855324+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01749714:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c2ab990d9776076657ebae17041daee9cd3a7584ced476b8b5bc71f74947fc06",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -99146,14 +99145,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.285311+00:00",
+      "checkedAt": "2026-10-13T07:26:49.647343+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750163:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a1a1af2ae88d7aaeae7ea439d8659740c082cdfa0d5f58b8a905673f3f998d1f",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -102578,14 +102577,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.247645+00:00",
+      "checkedAt": "2026-10-13T07:26:49.609427+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750325:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8fba1819ad8f2cb53dddd727bf6f392627a7b0b1ea8fa6ae0d121d33d761782a",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -105543,7 +105542,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -105615,9 +105614,9 @@
           "codes": [],
           "sourceText": "※ ‘중소기업ㆍ소상공인확인서’ 및 ‘직접생산확인증명서’가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -105627,9 +105626,9 @@
           "codes": [],
           "sourceText": "※ ‘중소기업ㆍ소상공인확인서’ 및 ‘직접생산확인증명서’가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -105641,7 +105640,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -105653,7 +105652,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -106839,9 +106838,9 @@
           "codes": [],
           "sourceText": "확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -106853,7 +106852,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -106863,9 +106862,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -106875,9 +106874,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -106889,7 +106888,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -106901,7 +106900,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -108346,14 +108345,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:53.975933+00:00",
+      "checkedAt": "2026-10-13T07:26:49.336207+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750367:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9cc433d11f697a7c8621d2ac37a0eb268aea0ec5069e46e5f4b4cbc5ed37d333",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -110565,7 +110564,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -110577,7 +110576,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -111879,7 +111878,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -111891,7 +111890,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -111903,7 +111902,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -111915,7 +111914,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -111927,7 +111926,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -111939,7 +111938,7 @@
           "sourceFile": "재공고서(지방SW, 중기간, 고시금액 미만, 온라인평가(서면))_노하처리분구 하수관로 정비사업(GIS DB구축).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -113360,14 +113359,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.065226+00:00",
+      "checkedAt": "2026-10-13T07:26:49.425191+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751115:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5e20a2e074b750d98038b1f070845829eb70da03df6d388f82eb908d20d1dbb9",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -113887,7 +113886,7 @@
           "sourceFile": "재공고문_188.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -113899,7 +113898,7 @@
           "sourceFile": "재공고문_188.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -114961,7 +114960,7 @@
           "sourceFile": "재공고문_188.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -114973,7 +114972,7 @@
           "sourceFile": "재공고문_188.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -114985,7 +114984,7 @@
           "sourceFile": "재공고문_188.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -114997,7 +114996,7 @@
           "sourceFile": "재공고문_188.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -115009,7 +115008,7 @@
           "sourceFile": "재공고문_188.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -115021,7 +115020,7 @@
           "sourceFile": "재공고문_188.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -119232,14 +119231,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:53.955666+00:00",
+      "checkedAt": "2026-10-13T07:26:49.316176+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751193:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f480977235ab7ba020f20bf5a9380e251bb92106f442e77c9b6e9bed6c9715da",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -121001,7 +121000,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -121061,7 +121060,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -121073,7 +121072,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -121109,7 +121108,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -122249,9 +122248,9 @@
           "codes": [],
           "sourceText": "2 - 4 - 1 . 등록장소 : 조달청 조달등록팀 또는 각 지방조달청 경영관리과 ( 팀 ) . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -122261,9 +122260,9 @@
           "codes": [],
           "sourceText": "2 - 4 - 1 . 등록장소 : 조달청 조달등록팀 또는 각 지방조달청 경영관리과 ( 팀 ) . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -122273,9 +122272,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -122285,9 +122284,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -122299,7 +122298,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -122311,7 +122310,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -123756,14 +123755,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.113171+00:00",
+      "checkedAt": "2026-10-13T07:26:49.472727+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752261:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "458f31cd72db01fa6f4e4c15ea7ad70ce10003f5fe105bf14a863e6530ac972d",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -124330,7 +124329,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -124342,7 +124341,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -125446,7 +125445,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -125458,7 +125457,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -125470,7 +125469,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -125482,7 +125481,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -125494,7 +125493,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -125506,7 +125505,7 @@
           "sourceFile": "재공고서(국가SW, 중기간, 고시금액미만, 자체평가)_토지 및 주택가격비준표 관리시스템 고도화 용역.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -126879,14 +126878,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.297885+00:00",
+      "checkedAt": "2026-10-13T07:26:49.659750+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752290:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "415d51bbe2d38c84f622f419df4c94b3176fab7fa0319f70ec903ed8be92d494",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -129016,14 +129015,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.479354+00:00",
+      "checkedAt": "2026-10-13T07:26:49.838945+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753092:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "fddb61a571c3a6f3c37725436788c4ea16fd881eda9b8eb62e68c80fb53e16cd",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -129161,7 +129160,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -129221,7 +129220,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -129233,7 +129232,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -129269,7 +129268,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -130397,9 +130396,9 @@
           "codes": [],
           "sourceText": "발급된 중 · 소기업 · 소상공인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -130411,7 +130410,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -130421,9 +130420,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -130433,9 +130432,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -130447,7 +130446,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -130459,7 +130458,7 @@
           "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -131928,14 +131927,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.350495+00:00",
+      "checkedAt": "2026-10-13T07:26:49.710866+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753911:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "acb973dae4635708347a329c257ea475c3dbbda7340226614a94a13f733c4b1c",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -133975,14 +133974,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.510099+00:00",
+      "checkedAt": "2026-10-13T07:26:49.869229+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754010:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "505232c14bacd12d369aa10a9373b266c13325ca3302b4d31005e29757d38065",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -135361,7 +135360,7 @@
           "sourceFile": "재공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_장기계속계약_차등점수제_수요기관평가 - 복사본.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -135373,7 +135372,7 @@
           "sourceFile": "재공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_장기계속계약_차등점수제_수요기관평가 - 복사본.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -135385,7 +135384,7 @@
           "sourceFile": "재공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_장기계속계약_차등점수제_수요기관평가 - 복사본.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -135397,7 +135396,7 @@
           "sourceFile": "재공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_장기계속계약_차등점수제_수요기관평가 - 복사본.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -137046,14 +137045,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.320232+00:00",
+      "checkedAt": "2026-10-13T07:26:49.681577+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754934:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2bbbe03759b042d543fae713849ecb0e1e69c669c4fa6cc60c4137cfe3e3c3b3",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -140492,14 +140491,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.235083+00:00",
+      "checkedAt": "2026-10-13T07:26:49.596722+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755108:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8b2f099eb613e5446b4950be7981a9f0b7c10da68a3a86d9f95c15197047aaac",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -143515,7 +143514,7 @@
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -143575,7 +143574,7 @@
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -143587,7 +143586,7 @@
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -143623,7 +143622,7 @@
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -144737,9 +144736,9 @@
           "codes": [],
           "sourceText": "2 - 4 - 1 . 등록장소 : 조달청 조달등록팀 또는 각 지방조달청 경영관리과 ( 팀 ) . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -144749,9 +144748,9 @@
           "codes": [],
           "sourceText": "2 - 4 - 1 . 등록장소 : 조달청 조달등록팀 또는 각 지방조달청 경영관리과 ( 팀 ) . ※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -144761,9 +144760,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -144773,9 +144772,9 @@
           "codes": [],
           "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 및 ‘ 직접생산확인증명서 ’ 가 중소기업제품 공공구매",
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -144787,7 +144786,7 @@
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -144799,7 +144798,7 @@
           "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -146220,14 +146219,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.023692+00:00",
+      "checkedAt": "2026-10-13T07:26:49.383390+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745141:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "757251c76e4d9b6380976e79e4dcbd79bf987662e119d0bdcbc7451b348e7b68",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -148271,14 +148270,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.502350+00:00",
+      "checkedAt": "2026-10-13T07:26:49.861643+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754530:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "69e809afbd4af9cbf21f94b5ac03e449a943976ee39d7b8e8179dd116f4168d2",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -150237,14 +150236,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.530141+00:00",
+      "checkedAt": "2026-10-13T07:26:49.888879+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01749404:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b3a849442d57927fbeb0a992727ba1f336f906e7c7129c701b404548874bfd58",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -151466,14 +151465,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.618147+00:00",
+      "checkedAt": "2026-10-13T07:26:49.977077+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755826:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d57dd1365bd204b564028f5fa7b2fefe6c82515b1fe3ae487d2ea4c879a3be72",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -152678,14 +152677,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.609059+00:00",
+      "checkedAt": "2026-10-13T07:26:49.967159+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751013:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8988147c9a13494f7c9d1d909a64e44a45b3e5c2a93b31b4e9bf6c4a70a7ff2b",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -154538,14 +154537,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.536047+00:00",
+      "checkedAt": "2026-10-13T07:26:49.894597+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01749508:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f8fe92a5e3759c4e0dc21497d783ab0b3b325f8728077b63cc5d5782de5aa19a",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -158671,14 +158670,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.172093+00:00",
+      "checkedAt": "2026-10-13T07:26:49.532190+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751690:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8612588dddd4cc7778703dccb39eee0a21be5e21a7ec48ac6469ee1e5dbe730a",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -159613,14 +159612,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.657450+00:00",
+      "checkedAt": "2026-10-13T07:26:50.016734+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748119:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "aba1d83937cb69628dfa51a5a855ce538af2f4970e05d1ea942c3d5de526df2f",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -162010,14 +162009,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.455892+00:00",
+      "checkedAt": "2026-10-13T07:26:49.815768+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758104:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "88465932a0ceb62f8b615ac4cdb55a1511a49e281474dc385184298602b0273d",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -162726,14 +162725,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.701602+00:00",
+      "checkedAt": "2026-10-13T07:26:50.062180+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752431:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b462d14c66dad0909132137b3e22a934fb1496df7f2ff6ba02d366eb715b20f2",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -163808,7 +163807,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.647429+00:00",
+      "checkedAt": "2026-10-13T07:26:50.006619+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -164555,7 +164554,7 @@
     "R26BK01744989:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "09afc8d6f1bc8e94985f2856a7ae5a54c7844c3b76cf751271f5ac03575814c2",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -165072,14 +165071,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.710091+00:00",
+      "checkedAt": "2026-10-13T07:26:50.070757+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754338:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8b69be51028ce80cf7dbb54300d26c30edb47b969d253abc0a1fe182d7079687",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -166038,14 +166037,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.661320+00:00",
+      "checkedAt": "2026-10-13T07:26:50.020682+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758208:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "21eddabdcda64101a2ee3aecfa2022323fd4e1cbf6c3dc1571b72361a9a692d7",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -166806,14 +166805,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.691879+00:00",
+      "checkedAt": "2026-10-13T07:26:50.051664+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760115:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1dbb186f46697963aa4decca56a86e7856c636e65f24c32486bfb9bfdc7fa7d5",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -167024,7 +167023,7 @@
           "sourceFile": "공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -167036,7 +167035,7 @@
           "sourceFile": "공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -167377,9 +167376,9 @@
           "codes": [],
           "sourceText": "※ ‘ 소기업 · 소상공인 확인서 ’ 및 ‘ 직접생산확인증명서 ’ 는 입찰서 제출 마감일 전일까지 발급된 것으로 입찰서 제출 마감 일까지 유효기간 내에 있어야 하며 , ‘ 중소기업제품 공공구매 종",
           "sourceFile": "공고문.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -167654,7 +167653,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.689425+00:00",
+      "checkedAt": "2026-10-13T07:26:50.049207+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -167923,7 +167922,7 @@
     "R26BK01747543:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a639c5d1059ba3259ff04ee464959209503f588d759ba4e017d1f2077bc3af60",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -169036,7 +169035,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.628196+00:00",
+      "checkedAt": "2026-10-13T07:26:49.987335+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -169545,7 +169544,7 @@
     "R26BK01762520:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4ff42bcee96e645855d399d8c8f14d58b82a9128ea397f12d9637a43aa5d35fd",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -174278,14 +174277,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.098604+00:00",
+      "checkedAt": "2026-10-13T07:26:49.458637+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760595:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "35ed564e73375ff4464037406524d9b4d993ec876127d2d6f27fe83b551410d0",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -177315,14 +177314,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.330716+00:00",
+      "checkedAt": "2026-10-13T07:26:49.692070+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752317:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "54bf5ccefb257e47f23ed4bc4193409e9092b83e7f7d8972e1fe76c7f6962239",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -178299,7 +178298,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -178311,7 +178310,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -179088,7 +179087,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -179100,7 +179099,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -179112,7 +179111,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -179124,7 +179123,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -179136,7 +179135,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -179148,7 +179147,7 @@
           "sourceFile": "공고서(국가, 협상, SW, 자체평가, 디지털콘텐츠개발서비스).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -180125,14 +180124,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.395736+00:00",
+      "checkedAt": "2026-10-13T07:26:49.755586+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754263:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "80cbaf2632816a184575042032a56a832c613b6b674ed60501f5a6229d693b9c",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -182553,14 +182552,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.437277+00:00",
+      "checkedAt": "2026-10-13T07:26:49.797106+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01763750:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "25deba474ca743d4cff061e5c80b4add9539c411bdd0a9dd213cac55d6ae9e3f",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -184957,14 +184956,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.446586+00:00",
+      "checkedAt": "2026-10-13T07:26:49.806371+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01757959:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a1931fdaaddfff5d2db6c49e7967f5f3dffc48b732976287c400c06e36446091",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -185232,7 +185231,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -185244,7 +185243,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -185256,7 +185255,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -185268,7 +185267,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -185280,7 +185279,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -185292,7 +185291,7 @@
           "sourceFile": "2-1. 입찰공고문(사본).pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -186125,7 +186124,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -186185,7 +186184,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -186197,7 +186196,7 @@
           "sourceFile": "2-1. 입찰공고문.hwpx",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -187297,14 +187296,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.473149+00:00",
+      "checkedAt": "2026-10-13T07:26:49.832701+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758927:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "44964a665454af26275bf5686c5ca0450af84bd8c882d3d512f346f7f4417d76",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -189297,14 +189296,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.516412+00:00",
+      "checkedAt": "2026-10-13T07:26:49.875429+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758927:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "44964a665454af26275bf5686c5ca0450af84bd8c882d3d512f346f7f4417d76",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -191297,14 +191296,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.522724+00:00",
+      "checkedAt": "2026-10-13T07:26:49.881677+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01757816:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6b039574b515d48c316b48a650614f68991a7eb851abce998d0140df5a552f0b",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -193079,14 +193078,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.542368+00:00",
+      "checkedAt": "2026-10-13T07:26:49.900830+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755481:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c3a46137014d394842215d437e4439bc096e71044e575c066bf9273a1a3450bc",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -194734,14 +194733,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.564362+00:00",
+      "checkedAt": "2026-10-13T07:26:49.922781+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758442:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1462cca0f2116d9cfdd69c159a5149bb6714cf1119608c61c6571f56997cab94",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -196405,14 +196404,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.570159+00:00",
+      "checkedAt": "2026-10-13T07:26:49.928580+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01759430:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0b43bdcc6bd89cd054261dbc93ae6f639fa0c4133fb2603d7f9fb28ff84d3a25",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -198080,14 +198079,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.576045+00:00",
+      "checkedAt": "2026-10-13T07:26:49.934498+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01763728:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f5fc21b517aa00b18b86c4b4ee0904369ab77b9b99a5c401a36c0ace906f0fc6",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -199612,14 +199611,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.581069+00:00",
+      "checkedAt": "2026-10-13T07:26:49.939423+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753370:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f0ed099995b7057780d45fbd05dc9de44a5bd15cd3930efb95f10ab1f1792b78",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -201041,14 +201040,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.591487+00:00",
+      "checkedAt": "2026-10-13T07:26:49.949342+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01759439:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "412ebd38101a227ea3e4fa738a7c7a354894bfb35c400633a4925de115bc121c",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -202472,14 +202471,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.596837+00:00",
+      "checkedAt": "2026-10-13T07:26:49.954844+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755652:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a118bc9bbaf2c8e5c99ff54ce876da63b4ee4ffcd31117a9582400de5c2803ab",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -203718,14 +203717,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.604236+00:00",
+      "checkedAt": "2026-10-13T07:26:49.962347+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760198:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f4534fca1fe357d814cb8d13bcad77b39e3be54aa719b3f6a9944cfb725b41da",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -204958,14 +204957,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.613716+00:00",
+      "checkedAt": "2026-10-13T07:26:49.972362+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755827:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f6840d7911062405b6b88adba283fff4346af72349c3b262c9ecebbd7899ca40",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -206116,14 +206115,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.622067+00:00",
+      "checkedAt": "2026-10-13T07:26:49.981128+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01762350:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f5fe2b3e3066d8ee268760171ec0d8ad09981a03952869d15bf55412dc23bd23",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -207264,14 +207263,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.624645+00:00",
+      "checkedAt": "2026-10-13T07:26:49.983755+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01759644:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1e47ad1b61bf9bd4ef4737a90a4335bbe404d5ef11b9479b2390d66db99db4fe",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -208370,14 +208369,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.631755+00:00",
+      "checkedAt": "2026-10-13T07:26:49.990903+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01763233:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "bd622ac87f8505e324f44ace2e02238119d8300f52da9a8abaa7bb5948f33401",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -209491,14 +209490,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.635910+00:00",
+      "checkedAt": "2026-10-13T07:26:49.995081+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755808:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "bced3d13d5b5348d4b4f402adbe26d0ad79b2ad0e0012520105dcbbca96db3c8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -210571,14 +210570,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.639070+00:00",
+      "checkedAt": "2026-10-13T07:26:49.998226+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01762086:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b0e0faab74861250751536ab502239da5873abb05c59ff3f4cc074eb633313c7",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -211645,14 +211644,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.642597+00:00",
+      "checkedAt": "2026-10-13T07:26:50.001767+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01759839:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3acb5f34e4e22938acdf0a2f9d6d9c9f17cc0af5ab9591f7c0b27dfe1f20692c",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -212656,14 +212655,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.651439+00:00",
+      "checkedAt": "2026-10-13T07:26:50.010650+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760463:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cc54eb5af4aba9fc86627dfa9c3cfb8c0c2aa4c09fc452a34cdaec5486d64d06",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -212963,7 +212962,7 @@
           "sourceFile": "09. G2B 전자입찰공고(협상)_재공고_159.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -212975,7 +212974,7 @@
           "sourceFile": "09. G2B 전자입찰공고(협상)_재공고_159.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
+          "reason": "두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -213646,14 +213645,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.654583+00:00",
+      "checkedAt": "2026-10-13T07:26:50.013841+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01763728:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "831c4da159635b5dec9da1a16f1c697abad62ac2f1d953920d91064ea1acb65c",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -214545,14 +214544,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.669461+00:00",
+      "checkedAt": "2026-10-13T07:26:50.029270+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753732:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0f22e482db847ebfbbaa41e8e30b50df577b829d1bd3ef6f38cacbbaf0bbd2a8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -215435,14 +215434,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.671528+00:00",
+      "checkedAt": "2026-10-13T07:26:50.031288+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753732:002": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0f22e482db847ebfbbaa41e8e30b50df577b829d1bd3ef6f38cacbbaf0bbd2a8",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -216325,14 +216324,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.673533+00:00",
+      "checkedAt": "2026-10-13T07:26:50.033307+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01744296:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "67d58c749180fb9c95c5936d0d3394ac8f9cdc4ab4b25346bae0b03908d071c7",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -217190,14 +217189,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.675812+00:00",
+      "checkedAt": "2026-10-13T07:26:50.035567+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754476:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "67d58c749180fb9c95c5936d0d3394ac8f9cdc4ab4b25346bae0b03908d071c7",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -218055,14 +218054,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.678108+00:00",
+      "checkedAt": "2026-10-13T07:26:50.037884+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754607:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b83b23e7aefde58a3a9c96358e5ac01483bf700efc356a79606eadf71f6e6242",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -218924,14 +218923,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.680556+00:00",
+      "checkedAt": "2026-10-13T07:26:50.040302+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760212:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7ab6f38ba5aa694e0947fb3d25e5e1dc3f71dc34c3c708483d716a5e1da89f82",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -219756,14 +219755,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.683015+00:00",
+      "checkedAt": "2026-10-13T07:26:50.042793+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754506:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8b06503598cf992a2cbec738b058f779299e7355857f3c70d4f74056957394b7",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -220550,14 +220549,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.686452+00:00",
+      "checkedAt": "2026-10-13T07:26:50.046244+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01757980:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "891e53eac6f4d228ffc5593eb0f7170937a6bfd103712f5e523a37185d591aa2",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -221313,14 +221312,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.696132+00:00",
+      "checkedAt": "2026-10-13T07:26:50.055940+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753200:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9cad7929e642173b7ec1c9a68bb215dedfbfd9e6734db88e503c09fe14e648ed",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -222045,14 +222044,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.698741+00:00",
+      "checkedAt": "2026-10-13T07:26:50.059251+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754241:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "733f2266e35574ae1b3260bc8c9223a3369106852a95176abb8d0078452b9ffa",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -222703,14 +222702,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.703088+00:00",
+      "checkedAt": "2026-10-13T07:26:50.063661+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758057:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e709500759a1097ab295fef7bb0a0193ffb8dab4cd9764ee98667071a474720f",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -223345,14 +223344,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.705726+00:00",
+      "checkedAt": "2026-10-13T07:26:50.066340+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01763196:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "ba5a699604c563bad8388eff210b85ddb1bc9d3c7885e98fa7474eed1bfb6dfd",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -223935,14 +223934,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.707426+00:00",
+      "checkedAt": "2026-10-13T07:26:50.068044+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754093:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6ca835b8b93b43016390f8138eaf635b5098cff1cd3f2f5a11e9b69ea1932434",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -224492,7 +224491,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.709065+00:00",
+      "checkedAt": "2026-10-13T07:26:50.069721+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -229461,7 +229460,7 @@
     "R26BK01755422:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8be73e3ae8610b9f061870620f3832fe367c8f53c5f932ef6b12265e6ec88871",
-      "classifierVersion": 16,
+      "classifierVersion": 17,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -231129,7 +231128,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:24:54.553169+00:00",
+      "checkedAt": "2026-10-13T07:26:49.911604+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     }
