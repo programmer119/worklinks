@@ -7,8 +7,9 @@ const GUEST = {
   hidden: 'worklinks_startup_support_hidden_v1',
   business: 'worklinks_startup_support_business_v1'
 };
-const KIND = {applied:'saved',hidden:'hidden',business:'business'};
-const state = {client:null,token:'',account:'',project:'',busy:false,records:[]};
+const KIND = {applied:true,hidden:true,business:true};
+const GUEST_OWNER_KEY = 'worklinks_support_guest_migration_owner_v1';
+const state = {client:null,token:'',account:'',project:'',busy:false,records:[],imported:0};
 const $ = (id)=>document.getElementById(id);
 const decode = (key)=>{try{const r=JSON.parse(localStorage.getItem(key)||'{}');return r&&typeof r==='object'&&!Array.isArray(r)?r:{}}catch{return {}}};
 const accountKeys = (user)=>({
@@ -72,22 +73,78 @@ function applyAccount(records){
 }
 async function flush(){
   if(!state.account||state.busy)return;
+  const account=state.account, keys=accountKeys(account);
   state.busy=true;
-  const keys=accountKeys(state.account);
   try{
-    const pending=decode(keys.pending);
-    for(const key of Object.keys(pending)){
-      const entry=pending[key];if(!entry)continue;
-      try{
-        await api('/worklinks-state',{method:'POST',body:JSON.stringify(entry)});
-        const latest=decode(keys.pending);
-        if(JSON.stringify(latest[key])===JSON.stringify(entry)){
-          delete latest[key];localStorage.setItem(keys.pending,JSON.stringify(latest));
-        }
-      }catch(error){show('브라우저 저장됨 · 서버 동기화 대기');return}
+    // Preserve every pending change until the API has acknowledged that exact value.
+    // Bounded batches avoid a large legacy history requiring serial network calls.
+    while(state.account===account){
+      const batch=Object.entries(decode(keys.pending)).slice(0,4);
+      if(!batch.length){
+        show(state.imported
+          ? 'AuthHub 로그인 · 비회원 기록 '+state.imported+'건 자동 이전 및 서버 저장 완료'
+          : 'AuthHub 로그인 · 브라우저+서버 동기화');
+        return;
+      }
+      const results=await Promise.all(batch.map(async ([key,entry])=>{
+        try{
+          await api('/worklinks-state',{method:'POST',body:JSON.stringify(entry)});
+          return {key,entry,ok:true};
+        }catch{return {key,entry,ok:false}}
+      }));
+      if(state.account!==account)return;
+      let failed=false;
+      const latest=decode(keys.pending);
+      for(const r of results){
+        if(!r.ok){failed=true;continue}
+        // Never discard newer changes made while the request was in flight.
+        if(JSON.stringify(latest[r.key])===JSON.stringify(r.entry))delete latest[r.key];
+      }
+      localStorage.setItem(keys.pending,JSON.stringify(latest));
+      if(failed){
+        show('비회원 기록·변경사항 브라우저에 보존됨 · 서버 동기화 재시도 대기');
+        return;
+      }
     }
-    show('AuthHub 로그인 · 브라우저+서버 동기화');
-  }finally{state.busy=false}
+  }finally{
+    state.busy=false;
+  }
+}
+function importGuestAutomatically(){
+  if(!state.account)return 0;
+  const guest={applied:decode(GUEST.applied),hidden:decode(GUEST.hidden),business:decode(GUEST.business)};
+  const entries=Object.entries(guest).flatMap(([kind,map])=>
+    Object.entries(map).filter(([,v])=>v===true).map(([id])=>({kind,id,value:true})));
+  if(!entries.length)return 0;
+  const owner=localStorage.getItem(GUEST_OWNER_KEY);
+  // A guest history must never be silently copied into someone else's account.
+  if(owner&&owner!==state.account){
+    show('다른 계정에 귀속된 이전 비회원 기록은 자동으로 가져오지 않음');
+    return 0;
+  }
+  if(!owner)localStorage.setItem(GUEST_OWNER_KEY,state.account);
+  const keys=accountKeys(state.account);
+  const maps={applied:decode(keys.applied),hidden:decode(keys.hidden),business:decode(keys.business)};
+  const pending=decode(keys.pending);
+  const remote=new Set(state.records.filter(r=>r.value===true).map(r=>r.kind+':'+r.id));
+  let imported=0;
+  for(const entry of entries){
+    if(!(/^[A-Za-z0-9_.:-]{1,160}$/.test(entry.id)))continue;
+    const key=entry.kind+':'+entry.id;
+    const details=itemDetails(entry.id);
+    if(!remote.has(key)&&!(pending[key]?.value===true)){
+      pending[key]={...entry,...details};
+      imported++;
+    }
+    maps[entry.kind][entry.id]=true;
+  }
+  Object.entries(maps).forEach(([kind,map])=>localStorage.setItem(keys[kind],JSON.stringify(map)));
+  localStorage.setItem(keys.pending,JSON.stringify(pending));
+  state.imported=imported;
+  // Account-side maps + pending must be re-rendered before background upload.
+  applyAccount(state.records);
+  if(imported)show('비회원 기록 '+imported+'건 계정으로 자동 이전 중 · 서버 저장 진행');
+  return imported;
 }
 window.worklinksStatusChanged=(kind,id,value)=>{
   if(!state.account||!Object.prototype.hasOwnProperty.call(KIND,kind))return;
@@ -99,32 +156,13 @@ window.worklinksStatusChanged=(kind,id,value)=>{
   flush().catch(()=>show('브라우저 저장됨 · 서버 동기화 대기'));
 };
 function guestRestore(){
-  state.account='';state.token='';state.records=[];
+  state.account='';state.token='';state.records=[];state.imported=0;
   window.statusKey=GUEST.applied;window.hiddenKey=GUEST.hidden;window.businessKey=GUEST.business;
   window.saved=decode(GUEST.applied);window.hidden=decode(GUEST.hidden);window.business=decode(GUEST.business);
   window.worklinksArchivedStatuses=[];
   if(typeof window.draw==='function')window.draw();
 }
-async function importGuest(){
-  if(!state.account)return;
-  const maps={applied:decode(GUEST.applied),hidden:decode(GUEST.hidden),business:decode(GUEST.business)};
-  const keys=accountKeys(state.account);
-  let count=0;
-  for(const [kind,guestMap] of Object.entries(maps)){
-    const current=decode(keys[kind]);
-    for(const [id,value] of Object.entries(guestMap)){
-      // Only import affirmative choices: old guest defaults may contain 'false'.
-      if(value!==true||current[id]===true)continue;
-      current[id]=true;count++;
-      window.worklinksStatusChanged(kind,id,true);
-    }
-    localStorage.setItem(keys[kind],JSON.stringify(current));
-  }
-  applyAccount(state.records);
-  show(count+'건 가져옴 · 서버 동기화 중');
-  await flush();
-  const b=$('worklinks-import');if(b)b.hidden=true;
-}
+
 function hosted(mode){
   const u=new URL('https://authhub.suaveforge.com/login/');
   u.searchParams.set('project',state.project);
@@ -140,13 +178,7 @@ function buttons(session){
   if(session){
     const label=document.createElement('span');label.textContent=session.email||'AuthHub 회원';
     label.className='worklinks-auth-user';box.append(label);
-    const importable=Object.values(GUEST).some(key=>Object.values(decode(key)).some(x=>x===true));
-    if(importable){
-      const merge=document.createElement('button');merge.type='button';merge.id='worklinks-import';
-      merge.className='worklinks-auth-button';merge.textContent='이 브라우저 기록 가져오기';
-      merge.addEventListener('click',()=>importGuest().catch(()=>show('가져오기 실패 · 브라우저 기록 유지')));
-      box.append(merge);
-    }
+
     const logout=document.createElement('button');logout.type='button';logout.className='worklinks-auth-button';
     logout.textContent='로그아웃';logout.addEventListener('click',async()=>{
       try{await state.client.logout()}catch{}
@@ -187,15 +219,19 @@ async function bootstrap(){
     try{
       const remote=await api('/worklinks-state');
       applyAccount(remote.records||[]);
-      show('AuthHub 로그인 · 브라우저+서버 동기화');
+      importGuestAutomatically();
       await flush();
     }catch(error){
       applyAccount([]);
-      show('로그인됨 · 브라우저 저장, 서버 동기화 대기');
+      importGuestAutomatically();
+      show('로그인됨 · 브라우저 기록 보존, 서버 동기화 대기');
+      await flush();
     }
     buttons(session);
   }catch(error){
     guestRestore();buttons(null);show('비회원 · 브라우저 저장 (AuthHub 확인 지연)');
   }
 }
+window.addEventListener('online',()=>flush().catch(()=>{}));
+window.addEventListener('focus',()=>{if(state.account&&!state.busy&&Object.keys(decode(accountKeys(state.account).pending)).length)flush().catch(()=>{})});
 bootstrap().catch(error=>{console.warn('WorkLinks AuthHub bootstrap',error);show('브라우저 저장 유지 · 인증 서버 확인 필요')});
