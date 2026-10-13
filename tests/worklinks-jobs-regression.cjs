@@ -140,6 +140,10 @@ assert.equal(rfpProductChecker({condition:'',partnerBidMode:''},{
 assert.equal(rfpProductChecker({condition:'',partnerBidMode:''},prodP).status,'pending',
  'missing matching product in dated certificate registry remains unverified');
 
+assert.equal(direct('직접생산확인증명서 공간정보 DB 구축 서비스(8115169901)를 소지한 업체').status,'pending',
+ 'unverified GIS direct-production product is NOT held in dated nine-product snapshot');
+assert.equal(direct('직접생산확인증명서 공간정보 DB 구축 서비스를 소지한 업체').status,'pending',
+ 'whitespace inside product name must not hide an unsupported GIS certificate');
 assert.equal(direct('정보시스템유지관리서비스 직접생산확인증명서 필수').status,'pending');
 assert.equal(direct('직접생산확인증명서 제출').status,'unknown');
 assert.equal(direct('업체 등록 1468').applicable,false);
@@ -175,6 +179,8 @@ assert.ok(source.includes("String(r.bidwinnrBizno||'').replace(/\\D/g,'')!==bizn
 assert.ok(source.includes("String(r.bidNtceNo||'')!==bids[i]"));
 assert.ok(source.includes("if(id==='experience'&&p.awardEvidence?.length)"));
 assert.ok(source.includes("낙찰은 계약이행 실적증명의 대체 자료가 아님"));
+assert.ok(source.includes("clause.classification==='prohibited'&&clause.type==='joint_participation'"),
+ 'standalone applicants must not be blocked by no-consortium rules');
 assert.ok(source.includes("나라장터 공식 낙찰"));
 
 // Official SMPP SME validity must be compared, not left generically pending.

@@ -1505,7 +1505,8 @@ function productionRequirementCheck(x,p){
  const rfpText=extractedRfpRequirements(x);
  const txt=[x.condition||'',x.partnerBidMode||'',rfpText].join(' ');
  if(!/직접\s*생산\s*(?:확인|증명)/.test(txt))return {applicable:false};
- const products=productionNames.filter(name=>txt.includes(name));
+ const normalizedText=txt.replace(/\s/g,'');
+ const products=productionNames.filter(name=>normalizedText.includes(name));
  // Official detailed product numbers in the RFP are stronger than a
  // product-name guess. These nine code-to-name mappings are only identifier
  // normalization, NOT proof of possession or certificate's current standing.
@@ -1604,6 +1605,12 @@ function comparePartnerJob(x,p){
        (clause.relation==='any'&&states.some(v=>v===true))){
      status='ok';matchReason='공식 나라장터 등록업종 요건 충족: '+codes.filter((c,i)=>states[i]===true).join(', ');
     }
+   }
+   if(clause.classification==='prohibited'&&clause.type==='joint_participation'){
+    // A no-consortium / no-subcontract restriction does not disqualify
+    // a standalone bidder. Delivery capability must still be checked.
+    status='ok';
+    matchReason='단독 참가 기준 공동수급·하도급 제한과 충돌 없음 · 수행범위는 별도 확인';
    }
    if(clause.classification==='mandatory'&&clause.type==='sme_certificate'){
     if(p.smeRecord?.validState==='valid'&&/소기업|소상공인|중소기업/.test(clause.sourceText||'')){

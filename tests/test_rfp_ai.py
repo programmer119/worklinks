@@ -64,7 +64,7 @@ realistic=[
  {"index":4,"type":"joint_participation","sourceText":"공동수급 및 하도급을 일체 허용하지 않음"}
 ]
 assert [x["classification"] for x in m.rule_based_interpret(realistic)["items"]]==[
- "mandatory","mandatory","mandatory","mandatory","unknown"]
+ "mandatory","mandatory","mandatory","mandatory","prohibited"]
 # Never fabricate a matching company qualification from a model statement.
 assert all(x["sourceVerified"] and not x["documentFullyReviewed"] for x in a["requirements"])
 # Persisted artifacts must not contain a copy of the GitHub auth token.

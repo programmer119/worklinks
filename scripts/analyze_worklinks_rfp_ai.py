@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 3
+VERSION = 4
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -154,7 +154,9 @@ def rule_based_interpret(clauses):
         t=c.get("sourceText") or ""
         typ=c.get("type") or ""
         prohibited=bool(re.search(
-            r"공동\s*수급.{0,22}(?:금지|불허|불가)|대기업.{0,40}참여.{0,10}불가|하도급.{0,15}(?:금지|불허|불가)",t))
+            r"공동\s*수급.{0,30}(?:금지|불허|불가|허용하지\s*않|적용되지\s*않)|"
+            r"하도급.{0,22}(?:금지|불허|불가|허용하지\s*않)|"
+            r"대기업.{0,40}참여.{0,10}불가",t))
         optional=bool(re.search(r"선택사항|권장|제출할 수 있|참여할 수 있|허용할 수 있",t))
         bidder=bool(re.search(r"입찰\s*참가\s*자격|입찰에\s*참가|참가업체|참가자격으로|입찰참가자는|입찰자격",t))
         explicit=bool(re.search(
