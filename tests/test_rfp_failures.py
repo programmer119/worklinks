@@ -68,7 +68,7 @@ try:
              for _ in range(3)]}
         raise AssertionError(url)
     rfp.fetch_json=pages
-    prior={'R26BK12345601:000':{'classificationVersion':4,'checkedAt':
+    prior={'R26BK12345601:000':{'classificationVersion':5,'checkedAt':
        rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
     result=rfp.discover(10,prior)
     assert len(calls)==2,'discovery must request the next 500 notice page'
@@ -88,5 +88,31 @@ assert any(x['type']=='industry_code' and '1468' in x['codes'] for x in c)
 assert any(x['type']=='direct_production' and '8111189901' in x['codes'] for x in c)
 assert any(x['type']=='staff_proof' and x['reviewStatus']=='unreviewed' for x in c)
 assert all(x['documentRequiresManualFullReview'] for x in c)
+# Real HWPX paragraphs must stay split; a one-line 15k XML string used to yield
+# zero candidates because of the former line-length filter.
+import io,zipfile
+test_xml=('<root xmlns:hp="urn:hp">'+
+ '<hp:p><hp:t>등록해야 하는 입찰참가자격으로 소프트웨어사업자 업종코드 1468</hp:t></hp:p>'+
+ '<hp:p><hp:t>직접생산확인증명서 정보시스템개발서비스 8111159901 소지한 업체</hp:t></hp:p>'+
+ '</root>').encode()
+mem=io.BytesIO()
+with zipfile.ZipFile(mem,'w') as archive:
+ archive.writestr('Contents/section0.xml',test_xml)
+split=rfp.extract('sample.hwpx',mem.getvalue())
+assert '\n' in split and '1468' in split and '8111159901' in split
+assert len(rfp.extract_rule_candidates(split,'sample.hwpx'))>=2
+# All manifest documents are represented, even if the bounded downloader is
+# unable to extract an unsupported attachment.
+try:
+ rfp.fetch_json=lambda _:dict(response([{'name':'RFP.pdf','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/a.pdf'},
+    {'name':'견적.xlsx','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/a.xlsx'}],2),
+    noticeDocuments={'ok':True,'complete':True,'items':[]})
+ rfp.download=lambda _:b'not-a-pdf'
+ coverage=rfp.process('R26BK12345678','000')
+ assert len(coverage['files'])==2 and coverage['unreadableDocumentCount']==2
+ assert coverage['reviewComplete'] is False and coverage['requiredConditionsComplete'] is False
+finally:
+ rfp.fetch_json=orig_fetch
+ rfp.download=orig_download
 
 print('WORKLINKS_RFP_FAILURE_CLASSIFICATION=PASS')

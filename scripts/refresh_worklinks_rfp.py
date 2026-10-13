@@ -4,6 +4,7 @@ Never classify final bid eligibility from a keyword or omit review of attachment
 """
 import argparse
 import datetime as dt
+import hashlib
 import io
 import json
 import os
@@ -21,6 +22,11 @@ BASE='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
 ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
 MAX_FILE=12_000_000
+MAX_DOCUMENTS=24
+PRIORITY_NOTICE_IDS=(
+    'R26BK01747588', 'R26BK01753188', 'R26BK01747543', 'R26BK01755651',
+    'R26BK01753150', 'R26BK01748179', 'R26BK01753451', 'R26BK01755213',
+)
 SIGNALS={
  '입찰참가자격':r'입찰\s*참가\s*자격|참가\s*자격',
  '직접생산':r'직접\s*생산|세부품명번호',
@@ -75,7 +81,7 @@ def discover(limit,prior=None):
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 if cached.get('reviewComplete') is True:continue
-                if cached.get('classificationVersion')==4:
+                if cached.get('classificationVersion')==5:
                     try:
                         checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                         if checked.tzinfo and (now-checked).total_seconds()<36*3600:
@@ -88,7 +94,7 @@ def discover(limit,prior=None):
                              for r in (qual.get('requirements') or [])
                              if isinstance(r,dict))
                 service=str(item.get('kind') or '')=='servc'
-                priority=(0 if matching else 1,0 if service else 1,date)
+                priority=(0 if no in PRIORITY_NOTICE_IDS else 1,0 if matching else 1,0 if service else 1,date)
                 seen[key]=(priority,no,order,date.isoformat())
             if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
@@ -157,12 +163,25 @@ def extract(name,raw):
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             data=[]
             members=[x for x in archive.namelist() if x.startswith('Contents/') and x.endswith('.xml')]
-            if len(members)>200:raise ValueError('archive_many_xml_files')
-            for member in members[:80]:
+            # No silent XML member or paragraph truncation: it would hide
+            # eligibility clauses in a document reported as readable.
+            if len(members)>80:raise ValueError('archive_many_xml_files')
+            for member in members:
                 info=archive.getinfo(member)
-                if info.file_size>3_000_000:continue
+                if info.file_size>3_000_000:raise ValueError('large_xml_section')
                 tree=ET.fromstring(archive.read(member))
-                data.append(' '.join(x.text or '' for x in tree.iter() if x.tag.endswith('}t')))
+                # HWPX uses hp:p paragraphs containing hp:t spans. Joining all
+                # text spans into one line hid qualification clauses completely.
+                paragraphs=[]
+                for p in tree.iter():
+                    if p.tag.rsplit('}',1)[-1]!='p':continue
+                    segments=[t.text or '' for t in p.iter() if t.tag.rsplit('}',1)[-1]=='t']
+                    value=''.join(segments).strip()
+                    if value:paragraphs.append(value)
+                if not paragraphs:
+                    paragraphs=[''.join(x.text or '' for x in tree.iter()
+                                if x.tag.rsplit('}',1)[-1]=='t')]
+                data.extend(paragraphs)
             return '\n'.join(data)
     if n.endswith('.pdf'):
         from pypdf import PdfReader
@@ -189,41 +208,52 @@ def parse_clauses(text):
         if len(snippets)>=16:break
     return triggers,snippets
 def extract_rule_candidates(text,filename):
-    """Bounded evidence candidates, not final required/fulfilled qualifications.
+    """Capture cited clauses without silently truncating long HWPX paragraphs.
 
-    Every item points to a literal official-document phrase; mandatory status
-    stays unreviewed until the complete notice and appendices are validated.
+    Candidates are evidence, not an authoritative exhaustive list. Adjacent PDF
+    wrapped lines are included to retain their registration/certificate verbs.
     """
     raw_lines=[' '.join(line.split()) for line in re.split(r'\n+',text[:350_000])]
     rules={
-      'industry_code':r'업종\s*코드|업종코드|업종으로\s*입찰|소프트웨어사업자',
-      'direct_production':r'직접\s*생산|세부\s*품명\s*번호',
-      'sme_certificate':r'소기업.?소상공인\s*확인서|중소기업\s*확인서|소기업\s*확인서',
+      'industry_code':r'업종\s*코드|업종코드|업종으로\s*입찰|소프트웨어사업자|학술.?연구용역|정보통신공사업',
+      'direct_production':r'직접\s*생산|세부\s*품명\s*번호|공간정보\s*DB\s*구축',
+      'sme_certificate':r'소기업.?소상공인\s*확인서|중소기업\s*확인서|소기업\s*확인서|소기업.?소상공인.*소지',
       'staff_proof':r'재직.{0,12}경력|경력.{0,12}학력|자격.?증명서|투입\s*인력',
       'performance_proof':r'실적\s*증명|수행\s*실적|유사\s*용역\s*실적',
-      'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소',
+      'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소|소재지',
       'joint_participation':r'공동\s*수급|분담\s*이행|하도급'
     }
     out=[];seen=set()
-    for line in raw_lines:
-        if not 14<=len(line)<=800:continue
-        for topic,rx in rules.items():
-            if not re.search(rx,line,re.I):continue
-            if topic=='industry_code':
-                codes=re.findall(r'(?<!\d)\d{4}(?!\d)',line)
-                codes=[c for c in codes if not c.startswith('20')]
-            elif topic=='direct_production':
-                codes=re.findall(r'(?<!\d)\d{10}(?!\d)',line)
-            else:codes=[]
-            phrase=line[:270]
-            key=(topic,phrase)
-            if key in seen:continue
-            seen.add(key)
-            out.append({'type':topic,'codes':codes[:6],'sourceFile':filename[:160],
-               'sourceText':phrase,'reviewStatus':'unreviewed',
-               'explicitMust':bool(re.search(r'반드시|필수|입찰참가자격|소지하여야|제출하여야|첨부하여야|소지한\s*자|등록한\s*자|제출한\s*자|구비한\s*자',line)),
-               'documentRequiresManualFullReview':True})
-            if len(out)>=42:return out
+    for index,line in enumerate(raw_lines):
+        if len(line)<12:continue
+        # Prefer one extracted paragraph; for visually wrapped PDF lines include
+        # the following short line, never the entire neighbouring section.
+        if len(line)>800:
+            windows=[line[i:i+500] for i in range(0,len(line),400)]
+        else:
+            windows=[line]
+        if len(line)<100 and index+1<len(raw_lines):
+            next_line=raw_lines[index+1]
+            if 0<len(next_line)<=170:windows.append((line+' '+next_line)[:270])
+        for window in windows:
+            for topic,rx in rules.items():
+                if not re.search(rx,window,re.I):continue
+                if topic=='industry_code':
+                    codes=re.findall(r'(?<!\d)\d{4}(?!\d)',window)
+                    codes=[c for c in codes if not c.startswith('20')]
+                elif topic=='direct_production':
+                    codes=re.findall(r'(?<!\d)\d{10}(?!\d)',window)
+                else:codes=[]
+                phrase=window[:270]
+                key=(topic,phrase)
+                if key in seen:continue
+                seen.add(key)
+                out.append({'type':topic,'codes':codes[:6],'sourceFile':filename[:160],
+                   'sourceText':phrase,'reviewStatus':'unreviewed',
+                   'explicitMust':bool(re.search(
+                    r'반드시|필수|입찰참가자격|소지하여야|제출하여야|등록한\s*자|소지한\s*(?:자|업체)|등록을?\s*필한\s*업체|업체이어야',phrase)),
+                   'documentRequiresManualFullReview':True})
+                if len(out)>=240:return out
     return out
 
 
@@ -247,7 +277,8 @@ def process(no,ordn):
                 'files':[],'reviewComplete':False,
                 'contractPerformanceVerified':False}
     saved=[]
-    for item in docs.get('items',[])[:8]:
+    manifest=docs.get('items') or []
+    for item in manifest[:MAX_DOCUMENTS]:
         public=legal_file(item)
         if not public:
             saved.append({'name':str(item.get('name') or '')[:160],'readable':False,
@@ -256,17 +287,26 @@ def process(no,ordn):
         name,url=public
         record={'name':name,'sourceUrl':url,'readable':False}
         try:
-            content=extract(name,download(url))
+            raw=download(url)
+            content=extract(name,raw)
             if len(content.strip())<100:raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
-            record.update({'readable':True,'textChars':len(content),'topics':triggers,
-                           'snippets':snippets,'clauseCandidates':candidate_rules,
+            record.update({'readable':True,'textChars':len(content),
+                           'sourceSha256':hashlib.sha256(raw).hexdigest(),
+                           'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
+                           'qualificationScanTruncated':len(content)>350_000,
+                           'clauseCandidatesTruncated':len(candidate_rules)>=240,
+                           'topics':triggers,'snippets':snippets,
+                           'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
         except Exception as ex:
             record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
         saved.append(record)
+    for item in manifest[MAX_DOCUMENTS:]:
+        saved.append({'name':str(item.get('name') or '')[:160], 'readable':False,
+                      'errorCategory':'manifest_documents_over_limit'})
     readable=any(x.get('readable') for x in saved)
     notice=data.get('noticeDocuments') or {}
     return {'status':'text_extracted_requires_review' if readable else 'text_unavailable',
@@ -276,8 +316,14 @@ def process(no,ordn):
             'count':docs.get('count'),'eorderCount':docs.get('eorderCount'),
             'noticeDetailDocumentCount':docs.get('noticeDetailDocumentCount'),
             'noticeDetailError':notice.get('error') or '',
+            'attachmentManifestCount':len(manifest),
+            'manifestComplete':docs.get('complete') is True and
+                               notice.get('ok') is True and notice.get('complete') is True,
+            'readableDocumentCount':sum(int(f.get('readable') is True) for f in saved),
+            'unreadableDocumentCount':sum(int(f.get('readable') is not True) for f in saved),
             'files':saved,
-            'reviewComplete':False,'contractPerformanceVerified':False}
+            'reviewComplete':False,'requiredConditionsComplete':False,
+            'contractPerformanceVerified':False}
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
@@ -305,13 +351,13 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==4 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                if cached.get('classificationVersion')==5 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
                     print('RFP_CACHE_HIT',key);continue
             except ValueError:pass
         try:
             data=process(no,ordn)
             data['checkedAt']=now.isoformat()
-            data['classificationVersion']=4
+            data['classificationVersion']=5
             results[key]=data
             print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])))
             success+=int(data['status']=='text_extracted_requires_review')

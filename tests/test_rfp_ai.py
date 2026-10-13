@@ -54,6 +54,17 @@ samples=[
 classified=m.rule_based_interpret(samples)["items"]
 assert [q["classification"] for q in classified]==[
  "mandatory","context_only","unknown","prohibited","mandatory"]
+# Real official phrasing: "소지한 업체" and "등록을 필한 업체" must be
+# recognized; no requirement may be fabricated from a mere service mention.
+realistic=[
+ {"index":0,"type":"direct_production","sourceText":"규정에 의한 직접 생산 확인 증명서[공간정보 DB 구축 서비스(8115169901)]를 소지한 업체"},
+ {"index":1,"type":"sme_certificate","sourceText":"규정에 따라 발급된 소기업 소상공인 확인서를 소지한 업체"},
+ {"index":2,"type":"industry_code","sourceText":"소프트웨어사업자(컴퓨터관련서비스사업, 업종코드: 1468) 면허 등록을 필한 업체이어야 합니다"},
+ {"index":3,"type":"region_restriction","sourceText":"2.2. 지역제한(제주특별자치도) 대상 용역입니다."},
+ {"index":4,"type":"joint_participation","sourceText":"공동수급 및 하도급을 일체 허용하지 않음"}
+]
+assert [x["classification"] for x in m.rule_based_interpret(realistic)["items"]]==[
+ "mandatory","mandatory","mandatory","mandatory","unknown"]
 # Never fabricate a matching company qualification from a model statement.
 assert all(x["sourceVerified"] and not x["documentFullyReviewed"] for x in a["requirements"])
 # Persisted artifacts must not contain a copy of the GitHub auth token.

@@ -1481,7 +1481,7 @@ function partnerRegisteredCode(p,code){
  return null;
 }
 
-const productionNames=['정보시스템개발서비스','정보시스템유지관리서비스','소프트웨어유지및지원서비스','패키지소프트웨어개발및도입서비스','정보인프라구축서비스','빅데이터분석서비스','데이터처리서비스','운영위탁서비스','인터넷지원개발서비스'];
+const productionNames=['정보시스템개발서비스','정보시스템유지관리서비스','소프트웨어유지및지원서비스','패키지소프트웨어개발및도입서비스','정보인프라구축서비스','빅데이터분석서비스','데이터처리서비스','운영위탁서비스','인터넷지원개발서비스','공간정보DB구축서비스'];
 // A dated publication is evidence of past issuance, NOT live SMPP verification.
 function extractedRfpRequirements(x){
  const data=typeof rfpSnapshotForJob==='function'?rfpSnapshotForJob(x):null;
@@ -1518,7 +1518,8 @@ function productionRequirementCheck(x,p){
   '8111200202':'빅데이터분석서비스',
   '8111200201':'데이터처리서비스',
   '8111181101':'운영위탁서비스',
-  '8111219901':'인터넷지원개발서비스'
+  '8111219901':'인터넷지원개발서비스',
+  '8115169901':'공간정보DB구축서비스'
  };
  for(const [code,name] of Object.entries(productCodes)){
   if(new RegExp('(?:^|\\D)'+code+'(?:\\D|$)').test(txt)&&!products.includes(name))

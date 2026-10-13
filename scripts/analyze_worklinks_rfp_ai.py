@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 2
+VERSION = 3
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -62,7 +62,7 @@ def source_candidates(notice):
             out.append({"index":len(out), "type":typ, "codes":codes[:6],
                         "sourceText":phrase[:280],
                         "sourceFile":str(v.get("sourceFile") or f.get("name") or "")[:160]})
-    return out[:56]
+    return out[:120]
 
 def evidence_hash(clauses):
     b = json.dumps(clauses, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -158,12 +158,16 @@ def rule_based_interpret(clauses):
         optional=bool(re.search(r"선택사항|권장|제출할 수 있|참여할 수 있|허용할 수 있",t))
         bidder=bool(re.search(r"입찰\s*참가\s*자격|입찰에\s*참가|참가업체|참가자격으로|입찰참가자는|입찰자격",t))
         explicit=bool(re.search(
-            r"소지한\s*자|등록한\s*자|소지하여야|등록하여야|필수로\s*소지|참가자격으로\s*등록",t))
+            r"소지한\s*(?:자|업체|사업자)|등록한\s*(?:자|업체)|소지하여야|등록하여야|"
+            r"등록을?\s*(?:필한|마친)\s*(?:업체|사업자|자)|등록을?\s*필한|"
+            r"업체이어야\s*합니다|소지한\s*사업자|참가자격으로\s*등록",t))
         restricted=typ in {"industry_code","direct_production","sme_certificate"}
         obligation=bool(re.search(r"반드시|필수|제출하여야|첨부하여야|소지하여야|등록하여야",t))
         after_award=bool(re.search(
             r"계약\s*(?:체결|이행)\s*후|착수\s*후|사업\s*수행\s*중|계약상대자|평가\s*항목|제안서\s*평가|정량\s*평가|사업\s*완료\s*후",t))
-        required=(bidder and (obligation or explicit)) or (restricted and explicit)
+        regional=(typ=="region_restriction" and bool(re.search(
+            r"지역\s*제한.{0,35}대상|주된\s*영업소.{0,80}(?:소재|위치)",t)))
+        required=(bidder and (obligation or explicit)) or (restricted and explicit) or regional
         if after_award and not bidder:
             classification="context_only"
         elif prohibited:
@@ -211,7 +215,10 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
         "interpretedCount":len(output),
         "totalSourceCandidates":len(clauses),
         "sourceTruncated":sum(len(f.get("clauseCandidates") or []) for f in
-                           notice.get("files") or [] if f.get("readable"))>56,
+                           notice.get("files") or [] if f.get("readable"))>120 or
+                           any(f.get("clauseCandidatesTruncated") or
+                               f.get("qualificationScanTruncated") for f in
+                               notice.get("files") or []),
         "requirements":output,
         "checkedAt":dt.datetime.now(dt.timezone.utc).isoformat(),
         "limitations":"원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님"
