@@ -1568,16 +1568,34 @@ function comparePartnerJob(x,p){
    joint_participation:'공동수급·하도급 제한'};
   for(const clause of (aiReport.requirements||[])){
    if(clause.classification==='optional'||clause.classification==='context_only')continue;
-   const codes=(clause.codes||[]).filter(c=>/^\d{4}$/.test(String(c)));
-   let status='unknown';
-   if(clause.classification==='mandatory'&&clause.type==='industry_code'&&codes.length===1&&
-      partnerRegisteredCode(p,codes[0])===true)status='ok';
+   const codes=(clause.codes||[]).map(String).filter(c=>/^\d{4}$/.test(c));
+   let status='unknown',matchReason=clause.reason||'';
+   if(clause.classification==='mandatory'&&clause.type==='industry_code'&&codes.length){
+    const states=codes.map(c=>partnerRegisteredCode(p,c));
+    if((clause.relation==='all'&&states.every(v=>v===true))||
+       (clause.relation==='any'&&states.some(v=>v===true))){
+     status='ok';matchReason='공식 나라장터 등록업종 요건 충족: '+codes.filter((c,i)=>states[i]===true).join(', ');
+    }
+   }
+   if(clause.classification==='mandatory'&&clause.type==='sme_certificate'){
+    if(p.smeRecord?.validState==='valid'&&/소기업|소상공인|중소기업/.test(clause.sourceText||'')){
+     status='ok';matchReason='사업자번호 일치 SMPP 유효 발급현황 확인 · 만료일 추가 확인 필요';
+    }else{status='pending';matchReason='SMPP 공공 입찰용 유효 확인서 대조 필요';}
+   }
+   if(clause.classification==='mandatory'&&clause.type==='direct_production'){
+    const productCodes=(clause.codes||[]).map(String).filter(c=>/^\d{10}$/.test(c));
+    const owned=(p.productionRecords||[]).filter(v=>productCodes.includes(String(v.productCode||v.code||''))&&
+      String(v.validTo||'').slice(0,10)>=kstISO());
+    if(productCodes.length&&owned.length){
+     status='pending';matchReason='발급기록 품목번호 일치 · 현재 취소·변경 여부 확인 필요';
+    }else{status='pending';matchReason='직접생산 필수 품목 현재 발급기록 대조 필요';}
+   }
    if(clause.classification==='mandatory'&&
       (clause.type==='staff_proof'||clause.type==='performance_proof'))status='pending';
    add('ai-'+clause.index,(aiReport.analysisStatus==='classified'?'AI 분류: ':'규칙 분류: ')+(labelOf[clause.type]||clause.type)+
      ' · '+(clause.classification==='mandatory'?'필수':
       clause.classification==='prohibited'?'금지·제한':'불명확'),
-     status,clause.sourceText+' · '+clause.reason+
+     status,clause.sourceText+' · '+matchReason+
      ' · 전체 공고·예외 조항은 아직 미검토','공식 RFP '+clause.sourceFile+' · '+(aiReport.analysisStatus==='classified'?'AI 문장 해석':'명시적 문구 규칙분류'));
   }
  }
