@@ -287,7 +287,9 @@ def extract_rule_candidates(text,filename):
     }
     out=[];seen=set()
     for index,line in enumerate(raw_lines):
-        if len(line)<12:continue
+        if len(line)<12 and not re.search(
+            r"공동\s*수급.{0,4}(?:불허|금지|불가)|하도급.{0,4}(?:불허|금지|불가)",line):
+            continue
         # Prefer one extracted paragraph; for visually wrapped PDF lines include
         # the following short line, never the entire neighbouring section.
         if len(line)>800:
@@ -330,9 +332,19 @@ def audit_qualification_scan(text, candidates):
     anchor_lines=[line for line in lines if EXTRA_QUALIFICATION_ANCHORS.search(line)]
     missing=[]
     for line in anchor_lines:
-        if len(line)<12 or not any(
+        # Heading labels alone contain no bidder condition. Never exclude a
+        # numbered condition with a predicate or an unaccounted credential.
+        if re.fullmatch(
+            r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
+            r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)"
+            r"\s*[:：.]?\s*",line):
+            continue
+        compact=re.sub(r"\s+","",line)
+        matched=any(
             phrase in line or (len(phrase)>=32 and phrase[:32] in line)
-            for phrase in source):
+            or (len(compact)>=15 and compact in re.sub(r"\s+","",phrase))
+            for phrase in source)
+        if not matched:
             missing.append(line[:180])
     complete=(len(text)<=350_000 and len(candidates)<240 and not missing)
     return {'sourceTextScanComplete':complete,
