@@ -1,14 +1,14 @@
 {
   "ok": true,
   "model": "rule-based-v1",
-  "generatedAt": "2026-10-13T00:41:12.968425+00:00",
+  "generatedAt": "2026-10-13T00:44:25.444627+00:00",
   "source": "Citation-checked RFP classification; model or conservative rules",
   "reviewComplete": false,
   "byNotice": {
     "R26BK01749170:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7361c669fedada12722a706121880a4d1b3f1d2e20f3dd55491506fe68f154ad",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -734,14 +734,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.940667+00:00",
+      "checkedAt": "2026-10-13T00:44:25.414829+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751053:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "54f0ed5d3ef1361b55f8193af771f0333b880b246b5bbec2476f8064c4924b76",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -1628,14 +1628,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.932091+00:00",
+      "checkedAt": "2026-10-13T00:44:25.405900+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01756420:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "28b9003bebd86e5dfec76a5e352bb5de30c2be794501468aec0865714a906604",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -2468,14 +2468,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.934863+00:00",
+      "checkedAt": "2026-10-13T00:44:25.408966+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753455:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c6717ce9cb282e77b971bc6c4a79064356f0f7ddd712f5ed97395fbd678317e0",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -2675,9 +2675,9 @@
           "codes": [],
           "sourceText": "○ 본 용역의 핵심적인 과업수행을 제3자에게 일괄하여 하도급하는 것은 허용하지 않으며, 관계 법령 및 계약조건에 따라 발주기관의 승인을 받아야 하는 사항은 사전 승인을 받아야 함",
           "sourceFile": "2026 대한민국 문화도시 충주_데이터 기반 성과분석 용역_제안요청서_0922.hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -3130,14 +3130,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.944225+00:00",
+      "checkedAt": "2026-10-13T00:44:25.418599+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753757:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c487a5df4c7bf61b398cb6cfb54b714b8aaf607c3ae69ba5657f82d485b3bd80",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -3784,14 +3784,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.944923+00:00",
+      "checkedAt": "2026-10-13T00:44:25.419385+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01743168:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "da68f956f9537c48f205d45e731d645c042dbe04f1f0444934b31ae062f345ff",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -4376,14 +4376,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.946165+00:00",
+      "checkedAt": "2026-10-13T00:44:25.420727+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01746665:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5a4bae24c819d58ba987cbcb5ce099dbfd108d429f2a3326d8acaf216bfc7f62",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -4856,14 +4856,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.959841+00:00",
+      "checkedAt": "2026-10-13T00:44:25.435401+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751970:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e3dce821fb18341be97ebd6470d1c57bea738163b1ffd59e49c2b2999ea8c002",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -5258,14 +5258,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.962368+00:00",
+      "checkedAt": "2026-10-13T00:44:25.438126+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752850:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "25a03dc0a83bf8012f48db7db4be423f7fbafcb3eb222f62ed70896908fe6283",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -5630,14 +5630,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.962725+00:00",
+      "checkedAt": "2026-10-13T00:44:25.438538+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752716:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2e33fbcd0418158151532ea1580761d18f4fb7aa42420af754848d203a51c8b9",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -5775,9 +5775,9 @@
           "codes": [],
           "sourceText": "※ 본 사업은 하도급을 허용하지 않음",
           "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -5787,9 +5787,9 @@
           "codes": [],
           "sourceText": "❍ 본 사업은 공동수급 및 하도급을 허용하지 않는 사업입니다.",
           "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -5990,14 +5990,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.963135+00:00",
+      "checkedAt": "2026-10-13T00:44:25.438970+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753373:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1c60e6d1a52d59e7c0d020e8898b8f5ba1782ed5c01da9b0f1a233e7a47462c6",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -6348,14 +6348,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.963475+00:00",
+      "checkedAt": "2026-10-13T00:44:25.439355+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747636:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "491e96cff3ee6428f1ed70d44d75fbc0e519189c498bdf67d44d88a9ea911012",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -6369,9 +6369,9 @@
           "codes": [],
           "sourceText": "- 본 입찰은 하도급을 허용하지 않습니다.",
           "sourceFile": "1. (재공고)입찰공고문(2026년 동아보건대학교 수요자 맞춤형 AI 기반 통합 디지털 캠퍼스 포털 구축 입찰).hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -6592,14 +6592,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.964548+00:00",
+      "checkedAt": "2026-10-13T00:44:25.440549+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01748836:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "343719870786b535bf09f0db6c9d697ff4009db8ce72c0f6cff18f318b1b4330",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -6840,14 +6840,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.964769+00:00",
+      "checkedAt": "2026-10-13T00:44:25.440793+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01745574:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9ded4f340fd4a1ee73d9a5ab9d9d02df2f1a336acf2a79194787d43837c3fa59",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7074,14 +7074,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.965227+00:00",
+      "checkedAt": "2026-10-13T00:44:25.441269+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01746720:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e5fc116e02aa003a65eac28bb3dd093961e78b4f54175b9d45f1c9a221a930aa",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7248,14 +7248,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.965970+00:00",
+      "checkedAt": "2026-10-13T00:44:25.442108+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01746812:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "317acfdb23960c666ee625fa1026e9fbbd913ec53ea4cb43cc73ba3ac6e5093f",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7422,14 +7422,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.966166+00:00",
+      "checkedAt": "2026-10-13T00:44:25.442305+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01746850:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "373423f51437c94e545dec0bbe4224558c0ad1193220805fc34ca46b4d5b762b",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7596,14 +7596,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.966350+00:00",
+      "checkedAt": "2026-10-13T00:44:25.442520+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01746881:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8a8dd4db7dc9dd83343c4d20bb08f315c2eff9e936d5d04306e315d282038a89",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7770,14 +7770,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.966537+00:00",
+      "checkedAt": "2026-10-13T00:44:25.442715+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01748276:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c776f147883c6b0a534a8662726ca40280165025e3e547b3a5c37b8fb199adba",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7896,14 +7896,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967019+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443203+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747983:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9039e375a9ce5a69c51f47e2b0733c67b960c7bc1530c0c74108b2e4d166c855",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -7941,9 +7941,9 @@
           "codes": [],
           "sourceText": "○ 공동수급 및 공동이행은 허용하지 않는다.",
           "sourceFile": "02_제안요청서_NMS_소프트웨어_개발_용역_초거대제조AI(수정).pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -8008,14 +8008,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967276+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443460+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01749948:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3680c066bae8842021b758f7de25df1fc93666e694d7641d1297a8279e3d5bb5",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8126,14 +8126,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967399+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443588+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750016:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3680c066bae8842021b758f7de25df1fc93666e694d7641d1297a8279e3d5bb5",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8244,14 +8244,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967566+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443750+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754567:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4d8a3056b0f5cc1c9c052e2c79d1cff0b4a4a2104419d71462136f9d43b10dcf",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8360,14 +8360,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967681+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443867+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01748179:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "60f237ddb723054c4d65905a73c81033867c74431091a0dc5226f31bb87d72df",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8464,14 +8464,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967816+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444005+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750103:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "51dc0bdbbdebbb9f43de4e91691e6b0795e7e41c6a600e8283977dda7c246d92",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8525,9 +8525,9 @@
           "codes": [],
           "sourceText": "마 . 공동수급 : 허용하지 않음",
           "sourceFile": "(입찰공고서_재공고) 실시간 탐지를 위한 도로손상 7종 학습데이터 전처리 용역.pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -8568,14 +8568,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967914+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444102+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753451:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6c4de3c951162c6b476dbcfe730edee36440e955a33ec2bd304726891c41afce",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8662,14 +8662,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968010+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444198+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747588:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9b4925e074490fa2f0918e08e2da638969a147798cc328888b60c8801a76a238",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8721,21 +8721,21 @@
           "codes": [],
           "sourceText": "○ 본 사업은 공동수급 및 하도급을 일체 허용하지 않음",
           "sourceFile": "과업지시서.pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968284+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444476+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753150:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d68d17e88c955a2f6c11c0dc04c53a4640fc9874353e3a9f70caf5c37811257b",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8773,21 +8773,21 @@
           "codes": [],
           "sourceText": "본 용역은 공동 수급이 적용되지 않습니다 .",
           "sourceFile": "[공고문] 좌연지구(월곡마을) 지방상수도 확장사업 GIS DB 구축 용역.pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968337+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444533+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01755651:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b185d4521d2d3aff0c2cd1260af8e8a765e394f54afcd14a467a8daf66d4aa93",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -8822,14 +8822,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968420+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444622+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01738722:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c9e96f0b2d748c7fdfd4927ec426b62af7508872ea289b907a6b0c9b849d090e",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -9848,14 +9848,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.930072+00:00",
+      "checkedAt": "2026-10-13T00:44:25.403740+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01740563:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f2919064dcc610bb17c2cc018b4f00240d029dc58bfbbcd0e759bfa240a47143",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -10612,14 +10612,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.938276+00:00",
+      "checkedAt": "2026-10-13T00:44:25.412401+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01745578:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "bd5ade6484ba91168fad5e7dfe4da4df1947f226670c31f3c31a5591ee9f6295",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -11344,14 +11344,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.939870+00:00",
+      "checkedAt": "2026-10-13T00:44:25.414021+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01746816:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5b543028ac3ddb57d72714ad761f24d333adeb63cb70f48b5186c1d7dc2e69f6",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -12122,14 +12122,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.937433+00:00",
+      "checkedAt": "2026-10-13T00:44:25.411549+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747556:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6c18a207dd128ec77fe740caa3d2241499027d93586dc4a51426f5413f89d8f8",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -12926,14 +12926,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.936649+00:00",
+      "checkedAt": "2026-10-13T00:44:25.410774+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750115:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5e9016183eb3cde4082ebe3be06771170dca7223ea6234b918c9aa16129a3f8b",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -13011,9 +13011,9 @@
           "codes": [],
           "sourceText": "⑦ 하도급은 허용하지 않음",
           "sourceFile": "1. 입찰공고문_2026년 평가정보 자동수집·활용을 위한 AI 모델 개발 용역.hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -13668,14 +13668,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.939119+00:00",
+      "checkedAt": "2026-10-13T00:44:25.413243+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750306:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b47290f807be567c95923a20424ba067bd24ca1c87088ea9a5bd34ecd22cb072",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -14378,14 +14378,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.942269+00:00",
+      "checkedAt": "2026-10-13T00:44:25.416441+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751678:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2a5a9b60f3be994be10f46e7097fdad63eff54359ded978e9733ae7ff69295bc",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -15360,14 +15360,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.931152+00:00",
+      "checkedAt": "2026-10-13T00:44:25.404938+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751960:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "679c1699521782dbf87435875d931da4e321369fbb2e6e3544e5a7bd759f0fd0",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -16092,14 +16092,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.941482+00:00",
+      "checkedAt": "2026-10-13T00:44:25.415648+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752568:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3a22b70f77af2e670ff6da7327ee58374f22b9bb7625875b5a1e86c1aa0d3d50",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -17390,14 +17390,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.929066+00:00",
+      "checkedAt": "2026-10-13T00:44:25.402639+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753970:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7ea586b0e4de36ac9b3548920cf6240b5fa24a242dfa14f378d65fa6511e47b0",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -18278,14 +18278,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.933021+00:00",
+      "checkedAt": "2026-10-13T00:44:25.406927+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754210:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4d595f94a46f222b17617a9d197b31fc92df1810afb582fc225cec047b4a3e51",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -19620,14 +19620,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.927706+00:00",
+      "checkedAt": "2026-10-13T00:44:25.401135+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754392:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4afb810c41e8b707872bf7f29c0b070bf6b2e4da3058a05ca61a5ffd0ea82c31",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -20308,14 +20308,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.942890+00:00",
+      "checkedAt": "2026-10-13T00:44:25.417124+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754897:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "701c6b495b4a4aabbcfe3c90e4feee0f2a342de814bb59d3e12bea1841643940",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -21184,14 +21184,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.934007+00:00",
+      "checkedAt": "2026-10-13T00:44:25.408027+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01757573:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "bdae0c153c11f528bf227dfada1ed5feef115d3de69cbce34285a219c8898a04",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -22012,14 +22012,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.935749+00:00",
+      "checkedAt": "2026-10-13T00:44:25.409871+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752384:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "048386da46897778298ffdcac32ea4240f10a4a5a7137959deb6e88c62991cdc",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -22688,14 +22688,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.943571+00:00",
+      "checkedAt": "2026-10-13T00:44:25.417875+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01755537:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0c8e5da8b2525ea66c89af3972452e0192a2e4bec7e7eae50e24e19471aef11e",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -23316,14 +23316,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.945563+00:00",
+      "checkedAt": "2026-10-13T00:44:25.420073+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754877:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1239adcd5a888e4a5238074a59fa613c1e59966fbfa9c845d060a2924c385f62",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -23884,14 +23884,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.946700+00:00",
+      "checkedAt": "2026-10-13T00:44:25.421325+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01745450:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9e643c7fd29c7c5a5e3dea40a162de8589e1fce3690513b8448ec5456b4c7177",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -24416,14 +24416,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.947188+00:00",
+      "checkedAt": "2026-10-13T00:44:25.421857+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01745969:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4dcb9ba937dbeb36cfb20407354dba066064bfcb7cec9b3c9f09c7aacb5370f7",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -24948,14 +24948,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.947662+00:00",
+      "checkedAt": "2026-10-13T00:44:25.422378+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01741767:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6fa0ee0c0c4b6f9c8c821c7fca64e8be5178582577145eb79c45a37c9c6c327b",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -25468,14 +25468,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.948122+00:00",
+      "checkedAt": "2026-10-13T00:44:25.422859+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01745215:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "517b23277c71f068ed03df2309396b4df29fd8a7115cd4ae0850c0e1f8d01f12",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -25993,14 +25993,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.948617+00:00",
+      "checkedAt": "2026-10-13T00:44:25.423411+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747506:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c97907c2b5a812c9eb8d9a0ee1ec5abbe0196dd1aea5690dae8d87ffd8908b17",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -26516,14 +26516,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.949122+00:00",
+      "checkedAt": "2026-10-13T00:44:25.423948+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747540:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a236bf15e30e28fe1f6c84199dd442752b1d8848839ad77bea45a7d420120b0a",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -27036,14 +27036,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.949601+00:00",
+      "checkedAt": "2026-10-13T00:44:25.424483+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747549:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "ddf1208a69fa3bfb918d95baa88d2177b706574714ed6d7dcfbff9428a64167b",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -27558,14 +27558,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.950058+00:00",
+      "checkedAt": "2026-10-13T00:44:25.424971+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747750:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "ad102b5642011da544c218f5ccb0ba1fd2ca5dec42b41051adb591b0e5281cdd",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -28078,14 +28078,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.950506+00:00",
+      "checkedAt": "2026-10-13T00:44:25.425470+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01748897:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7c9c2f7408c36a7b8b09dbb4d3379261a36e2704f27abb360832380728071ff5",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -28602,14 +28602,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.951011+00:00",
+      "checkedAt": "2026-10-13T00:44:25.425980+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01749714:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a93cb54fdaeb3632415587b36022f8df6223423a1d88512e9dc0c3210467fb55",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -29125,14 +29125,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.951558+00:00",
+      "checkedAt": "2026-10-13T00:44:25.426529+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750163:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d2c90bba813b6636a7a4fd4f1e9caf1bc8d00121d2c3e3df0d2f8ad4b1c717fe",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -29648,14 +29648,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.952100+00:00",
+      "checkedAt": "2026-10-13T00:44:25.427068+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750325:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2016058303d4e9576794e4d2ecea0519d4514e5f3df3d9011228cc93dfda4c1e",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -30168,14 +30168,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.952577+00:00",
+      "checkedAt": "2026-10-13T00:44:25.427566+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01750367:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "bc2f229d8ec76902e18310a8aaa6b0b8d2c8f5e23e713a517a629a6ccde9a6b5",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -30699,14 +30699,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.953123+00:00",
+      "checkedAt": "2026-10-13T00:44:25.428101+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751115:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e6a6996fdcc7f3533ed60a458e689f1aee470fad5c99198131134f61d65c649a",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -31221,14 +31221,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.953677+00:00",
+      "checkedAt": "2026-10-13T00:44:25.428687+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751193:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3f51d41fe776afe37678d8bcdb53d3b365d30868be99e6ec3a3068b0f89264f6",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -31741,14 +31741,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.954176+00:00",
+      "checkedAt": "2026-10-13T00:44:25.429185+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752261:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e073552e456eda3db565260b90899ccf4f7c6ae4975812ec26773a9602954007",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -32265,14 +32265,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.954717+00:00",
+      "checkedAt": "2026-10-13T00:44:25.429745+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752290:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6b7def582daa05ec730e61cbb75cb710c52ed0031b32840953d965072ccf41d8",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -32791,14 +32791,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.955233+00:00",
+      "checkedAt": "2026-10-13T00:44:25.430257+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753092:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b52a87cb2e4e5a1ee39916f41fddf8d1306f90b307025a6824391b8efa8b54b2",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -33311,14 +33311,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.955709+00:00",
+      "checkedAt": "2026-10-13T00:44:25.430766+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753911:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "08b399169b6184f867b928fbd96997ce10d427b18b8bf724faa9d229441f5138",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -33835,14 +33835,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.956262+00:00",
+      "checkedAt": "2026-10-13T00:44:25.431297+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754010:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4cf6bac896ad1b855a18d8150da3ca843157badd718bcba98a65aeb40a05ece6",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -34359,14 +34359,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.956748+00:00",
+      "checkedAt": "2026-10-13T00:44:25.431845+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754934:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9190ad0ba4d0ee3edaf2dcad1b4851bd38c50e9695316a9701a6fcad72c637bb",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -34632,9 +34632,9 @@
           "codes": [],
           "sourceText": "5. 공동계약 : 동 입찰건은 공동수급을 허용하지 않습니다 .",
           "sourceFile": "입찰공고서-(국가_협상_1468_직생(개발)+수평).pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -34879,14 +34879,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.957208+00:00",
+      "checkedAt": "2026-10-13T00:44:25.432324+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01755108:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7804a4451f247e6873f6df55ba74e28e0745806066a04d6ad850bafbe2e65c82",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -35399,14 +35399,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.958945+00:00",
+      "checkedAt": "2026-10-13T00:44:25.434443+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01745141:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5ad121844efb8b9029e3e0bcb5e6d2d13449c33353e58bcec395132c9bfa649c",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -35875,14 +35875,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.959383+00:00",
+      "checkedAt": "2026-10-13T00:44:25.434889+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754530:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0e500ba47368160077ccf9eaa4e372ed3b82a87fda1962f698d91cbaa9e82c7a",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -36315,14 +36315,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.960309+00:00",
+      "checkedAt": "2026-10-13T00:44:25.435895+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01749404:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f944fef53602c40b94c4956f328e942b9b953118d9d57523503ec5eba90f7abb",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -36474,9 +36474,9 @@
           "codes": [],
           "sourceText": "- 사업 추진 시 효율적인 알고리즘 모델 및 서비스 개발을 위해서 공동수급 및 하도급을 허용하지 않음",
           "sourceFile": "붙임 2. 제안요청서.hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -36730,9 +36730,9 @@
           "codes": [],
           "sourceText": "및 하도급을 허용하지 않음",
           "sourceFile": "붙임 1. 입찰재공고문.pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -36749,14 +36749,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.960730+00:00",
+      "checkedAt": "2026-10-13T00:44:25.436364+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01755826:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "949954f37e80ff5e119b84548d4d1c991ab9f871896f559f972bc341bcc5ca7f",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -37173,14 +37173,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.961180+00:00",
+      "checkedAt": "2026-10-13T00:44:25.436843+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751013:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "4039ff06cddef926027543ab6e2bdf65d9eac6236060c3b5ef6a50da6539e3d2",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -37589,14 +37589,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.961601+00:00",
+      "checkedAt": "2026-10-13T00:44:25.437296+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01749508:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "bd834aa39e55223f69fbd449ab9721f792f739d98eaf840b632d5fe4ee681fe1",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -37979,14 +37979,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.961959+00:00",
+      "checkedAt": "2026-10-13T00:44:25.437701+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01751690:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "16c0285e97120cc2682916dda3af652cb596245acd7bdb3d233ae64e521804c4",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -38283,14 +38283,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.963747+00:00",
+      "checkedAt": "2026-10-13T00:44:25.439664+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01748119:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "90a29a89a26410c214f0144d2a3808af5bc160333c0256cac32d436d897abf7b",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -38579,14 +38579,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.964056+00:00",
+      "checkedAt": "2026-10-13T00:44:25.439994+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01758104:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "50df1399bbbe8e24fb2ceef1ebddb61d4be6d5245aae077a11bab73d7abfef19",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -38688,9 +38688,9 @@
           "codes": [],
           "sourceText": "자. 공동수급 및 하도급은 허용하지 않음",
           "sourceFile": "01. 입찰(재)공고문(ANSYS HPC PACK SW 유지보수).hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -38762,9 +38762,9 @@
           "codes": [],
           "sourceText": "자 . 공동수급 및 하도급은 허용하지 않음",
           "sourceFile": "01. 입찰(재)공고문(ANSYS HPC PACK SW 유지보수).pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -38841,14 +38841,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.964338+00:00",
+      "checkedAt": "2026-10-13T00:44:25.440294+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752431:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "653ef6804b7c88146100c2416fbc533df4a454ede67b4db07a8f13e71798a18d",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -39089,14 +39089,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.964998+00:00",
+      "checkedAt": "2026-10-13T00:44:25.441043+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01761468:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d65ec8fd4078571e2a0812e862215e5b2a38b5cf99b51c8eaa6146a1e8cab908",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -39307,14 +39307,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.965470+00:00",
+      "checkedAt": "2026-10-13T00:44:25.441553+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01752002:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b42496f9339504cd3fdf67d31f3434e5454504583f8c0a1348350584f5790b69",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -39505,14 +39505,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.965648+00:00",
+      "checkedAt": "2026-10-13T00:44:25.441749+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01744989:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a4e7539b74b257eb945fdaf3d24d3b399ea4321148f21be4d75a45293f96a32a",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -39679,14 +39679,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.965789+00:00",
+      "checkedAt": "2026-10-13T00:44:25.441904+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01754338:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0c209407c08fc0e0e5bea14886e0c826aac55b3f58bc07b9524dc61fd4bd70f9",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -39857,14 +39857,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.966747+00:00",
+      "checkedAt": "2026-10-13T00:44:25.442930+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01758208:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "ac5295951a7c28535cb5a5d23a89917ed1cff38b5e36ba48374dc208f57419f8",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -40017,14 +40017,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.966901+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443086+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01760115:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "0bd4ccd91de38a390e2a1e3362abb5c57d0ca915315d06af365237164da4cdc7",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -40152,14 +40152,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.967170+00:00",
+      "checkedAt": "2026-10-13T00:44:25.443352+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01755213:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "45981ef716838cc1c74c3a2b9ddb979bb74a664fa2dbde8e074621d3ccb39117",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -40237,21 +40237,21 @@
           "codes": [],
           "sourceText": "3.10. 본 사업은 하도급 및 공동수급제 구성(공동이행, 분담이행)을 허용하지 않습니다.",
           "sourceFile": "공고서(2026-7)_2026 통합정보시스템 기능개선 사업(최종).pdf",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
           "sourceVerified": true,
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968139+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444293+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01747543:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cad0442144655b938cf65f7971eaa175b6fba56c17428f019b86d4e24408d574",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -40320,14 +40320,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968216+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444391+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     },
     "R26BK01753188:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e28bab2593b646a01fc3a0b8b12fccce90c39f806c6038a03bc6fc0c3db264b5",
-      "classifierVersion": 3,
+      "classifierVersion": 4,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "automaticEligibilityApproved": false,
@@ -40360,7 +40360,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T00:41:12.968375+00:00",
+      "checkedAt": "2026-10-13T00:44:25.444577+00:00",
       "limitations": "원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님",
       "model": "rule-based-v1"
     }
