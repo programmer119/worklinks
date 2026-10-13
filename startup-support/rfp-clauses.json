@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-13T07:27:20.375467+00:00",
+  "generatedAt": "2026-10-13T07:30:02.515123+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -5335,8 +5335,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01747983:000": {
       "status": "text_extracted_requires_review",
@@ -7697,8 +7697,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01755651:000": {
       "status": "text_extracted_requires_review",
@@ -8209,8 +8209,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01754567:000": {
       "status": "text_extracted_requires_review",
@@ -8823,8 +8823,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01758104:000": {
       "status": "text_extracted_requires_review",
@@ -9626,8 +9626,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01755213:001": {
       "status": "no_official_attachment_metadata",
@@ -9640,8 +9640,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01755826:000": {
       "status": "text_extracted_requires_review",
@@ -10914,8 +10914,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01755213:000": {
       "status": "text_extracted_requires_review",
@@ -11211,8 +11211,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01754897:000": {
       "status": "text_extracted_requires_review",
@@ -12305,12 +12305,14 @@
           "textChars": 26501,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 73,
-          "unmatchedQualificationAnchorCount": 19,
+          "unmatchedQualificationAnchorCount": 21,
           "unmatchedAnchorSamples": [
             "이 입찰설명서는 한국원자력환경공단이 집행하는 입찰에서 입찰자와 낙찰자가 숙지하고 준수하여야 할 사항을 기재한 것으로써 모든 입찰 희망자는 이를 열람하여야 합니다. 이 입찰과 관련하여 추가 문의사항이 있을 경우, 하단의 담당자에게 연락주시기 바랍니다.① 입찰참가자격 등록, 나라장터 시스템정부조달 콜센터(☎ 1588-0800",
             "① 입찰참가자격 등록, 나라장터 시스템정부조달 콜센터(☎ 1588-0800)② 사업담당자(사업내용, 평가방법)RI관리팀 김영승 과장 (☎ 042-601-5331 /  kys0049@korad.or.kr)③ 계약담당자(입찰공고, 계약방법)ESG상생팀 이용주 대리(☎ 054-750-4075 /  didyr00123@kor",
+            "관리번호한국원자력환경공단 2026-154사 업 명방폐물인수관리시스템(WTS/RI-UTIOPIA) 고도화 및 연계체계 구축 용역사업내용제안요청서 및 용역설계서(또는 과업지시서) 참고계약방법제한경쟁입찰방법협상에 의한 계약사업예산495,019,640원(부가세 포함)추정가격450,017,855원계약/납품기간착수일로부터 약 3개월",
             "1) 이 입찰은 「중소기업제품구매촉진 및 판로지원에 관한 법률」 및 「국가를 당사자로 하는 계약에 관한 법률」에 따라 중·소기업/소상공인 대상의 제한입찰입니다.",
             "1) 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제12조 및 같은 법 시행규칙 제14조에 따라 경쟁입찰 참가자격을 갖추고 같은 법 시행령 제76조에 따라 제한받지 아니한 자",
+            "※ ‘중소기업 확인서’ 및 ‘직접생산확인증명서’가 중소기업제품 공공구매 종합정보망(https:// www.smpp.go.kr)에서 확인(전자입찰서 제출 마감일 전일까지 발급된 것으로서 전자입찰서 제출 마감일까지 계속 유지되어야 함)이 안 될 경우 입찰참가자격이 없습니다.※ ‘중소기업 확인서’를 전자입찰서 제출 마감일 전일",
             "나. 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없습니다.",
             "1) 「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자",
             "다. 입찰참가자격 등록 관련 안내",
@@ -14421,8 +14423,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01754877:000": {
       "status": "text_extracted_requires_review",
@@ -35057,8 +35059,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01753092:000": {
       "status": "text_extracted_requires_review",
@@ -47700,13 +47702,14 @@
           "textChars": 109464,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 40,
-          "unmatchedQualificationAnchorCount": 7,
+          "unmatchedQualificationAnchorCount": 8,
           "unmatchedAnchorSamples": [
             "ㅇ 제안내용에 관한 확인을 위하여 추가자료 요청 또는 현지실사를 할 수 있으며, 입찰참가자는 이에 응하여야 함",
             "ㅇ 제안사는 평가결과에 대해 일체의 이의를 제기할 수 없으며 평가결과는 입찰참가업체에 한하여 공개할 수 있음(행정기관 및 공공기관 정보 시스템 구축·운영 지침 제34조 준용)",
             "ㅇ 입찰에 참가하고자 하는 자는 본 입찰 유의서 및 국가를 당사자로 하는 계약에 관한 법률 등을 입찰 전에 완전히 숙지하였다고 간주하며 이를 숙지하지 못함으로 발생하는 책임은 입찰참가자에게 있음",
             "◦ 우리 기관에서는 아래와 같이 누출금지정보를 지정하며, 입찰 및 사업 수행과정에서 무단으로 누출할 경우 관련 법령에 따라 부정당업자로 입찰참가자격을 제한함",
             "◦ A급은 국가계약법 시행령 제76조에 따라 부정당업자로 지정하여 입찰참가를 제한",
+            "구분항 목법률ｏ 지능정보화 기본법ｏ 공공기관의 정보공개에 관한 법률ｏ 개인정보 보호법ｏ 소프트웨어 진흥법ｏ 인터넷주소자원에 관한 법률ｏ 전자서명법ｏ 전자정부법ｏ 국가정보원법ｏ 정보통신기반 보호법ｏ 정보통신망 이용촉진 및 정보보호 등에 관한 법률ｏ 통신비밀보호법ｏ 국가를 당사자로 하는 계약에 관한 법률ｏ 하도급거래 공정화에",
             "ㅇ 경쟁 입찰에 있어서 입찰자간에 서로 상의하여 미리 입찰가격을 협정 하거나 특정인의 낙찰을 위하여 담합을 한 사실이 드러날 경우 한국고용노동교육원이 시행하는 입찰에 입찰참가자격 제한 처분을 받은 날로부터 6월 이상 1년 미만 동안 참여하지 않고",
             "2. 입찰․계약체결 및 계약이행 과정에서 관계 임․직원에게 직․간접적으로 금품․향응 등의 부당한 이익을 제공하지 않겠으며, 이를 위반하여 입찰, 낙찰, 계약체결 및 계약이행과 관련하여 관계 임․직원에게 금품, 향응 등을 제공한 사실이 드러날 경우에는 한국고용노동교육원이 시행하는 입찰에 입찰참가자격제한 처분을 받은 날로부터"
           ],
@@ -48631,7 +48634,7 @@
           "textChars": 109994,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 42,
-          "unmatchedQualificationAnchorCount": 8,
+          "unmatchedQualificationAnchorCount": 9,
           "unmatchedAnchorSamples": [
             "ㅇ 제안내용에 관한 확인을 위하여 추가자료 요청 또는 현지실사를 할 수 있으며, 입찰참가자는 이에 응하여야 함",
             "ㅇ 제안사는 평가결과에 대해 일체의 이의를 제기할 수 없으며 평가결과는 입찰참가업체에 한하여 공개할 수 있음(행정기관 및 공공기관 정보 시스템 구축·운영 지침 제34조 준용)",
@@ -48639,6 +48642,7 @@
             "- 발주기관은 공급자가 제공받은 SW산출물을 무단으로 유출하거나 누출되는 경우 및 누출금지정보를 삭제하지 않고 활용하는 경우에는 「국가계약법」제76조제1항제3호에 따라 입찰참가자격을 제한함",
             "◦ 우리 기관에서는 아래와 같이 누출금지정보를 지정하며, 입찰 및 사업 수행과정에서 무단으로 누출할 경우 관련 법령에 따라 부정당업자로 입찰참가자격을 제한함",
             "◦ A급은 국가계약법 시행령 제76조에 따라 부정당업자로 지정하여 입찰참가를 제한",
+            "구분항 목법률ｏ 지능정보화 기본법ｏ 공공기관의 정보공개에 관한 법률ｏ 개인정보 보호법ｏ 소프트웨어 진흥법ｏ 인터넷주소자원에 관한 법률ｏ 전자서명법ｏ 전자정부법ｏ 국가정보원법ｏ 정보통신기반 보호법ｏ 정보통신망 이용촉진 및 정보보호 등에 관한 법률ｏ 통신비밀보호법ｏ 국가를 당사자로 하는 계약에 관한 법률ｏ 하도급거래 공정화에",
             "ㅇ 경쟁 입찰에 있어서 입찰자간에 서로 상의하여 미리 입찰가격을 협정 하거나 특정인의 낙찰을 위하여 담합을 한 사실이 드러날 경우 한국고용노동교육원이 시행하는 입찰에 입찰참가자격 제한 처분을 받은 날로부터 6월 이상 1년 미만 동안 참여하지 않고",
             "2. 입찰․계약체결 및 계약이행 과정에서 관계 임․직원에게 직․간접적으로 금품․향응 등의 부당한 이익을 제공하지 않겠으며, 이를 위반하여 입찰, 낙찰, 계약체결 및 계약이행과 관련하여 관계 임․직원에게 금품, 향응 등을 제공한 사실이 드러날 경우에는 한국고용노동교육원이 시행하는 입찰에 입찰참가자격제한 처분을 받은 날로부터"
           ],
@@ -49364,8 +49368,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01745141:000": {
       "status": "text_extracted_requires_review",
@@ -73426,8 +73430,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01751013:000": {
       "status": "text_extracted_requires_review",
@@ -219445,8 +219449,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01747588:000": {
       "status": "text_extracted_requires_review",
@@ -219809,8 +219813,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01753451:000": {
       "status": "text_extracted_requires_review",
@@ -220096,8 +220100,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01756420:000": {
       "status": "text_extracted_requires_review",
@@ -220576,13 +220580,14 @@
           "textChars": 10993,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 38,
-          "unmatchedQualificationAnchorCount": 6,
+          "unmatchedQualificationAnchorCount": 7,
           "unmatchedAnchorSamples": [
             "(3)「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 따라 소기업자로 간주되는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1부",
             "2) 입찰공고일 이전 1년 이내에 ｢국가를 당사자로 하는 계약에 관한 법률 시행령｣ 제76조 제2항 제2호 가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.)",
             "다만, 등기관청에 상호 또는 대표자 변경신고 후 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다.",
             "9-3. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
             "10-2. 입찰자 등은 ‘10-1’ 각 호에 따른 행위가 「국가를 당사자로 하는 계약에 관한 법률」제5조의3 등 관계 법령에 위반되는 경우 해당 입찰ㆍ낙찰이 취소되거나 계약이 해지ㆍ해제될 수 있고, 입찰참가자격 제한 대상에 해당되는 경우 「국가를 당사자로 하는 계약에 관한 법률」제27조 등 관계 법령에 따라 부정당업자로 ",
+            "12-1. 입찰에 참여하는 자는 「국가를 당사자로 하는 계약에 관한 법률」제27조의4에 의거하여 각 중앙관서의 장으로부터 「건설산업기본법」제34조제1항 또는 「하도급거래 공정화에 관한 법률」제13조제1항이나 제3항을 위반한 사실이 통보된 자로서 당해 입찰공고일이 위반사실 통보일로부터 1년 이내인 것으로 확인된 때에는 「국",
             "14-4. 입찰참가희망업체가 전산장비 준비 부족 등의 사유로 전자입찰등록 및 투찰이 곤란한 경우에는 입찰마감 24시간 이전에 조달청 정부조달콜센터(1588-0800)로 장애해결을 위해 문의하시기 바라며 장애발생에도 불구하고 조달청 정부조달콜센터로 문의하지 않아 발생되는 모든 책임은 입찰참가자에 있습니다."
           ],
           "sourceSha256": "97441e0e8840d75cc36fbcda9d8119165113568cca45c322f10819fb0927049d",
@@ -222006,8 +222011,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:27:20.375467+00:00",
-      "classificationVersion": 11
+      "checkedAt": "2026-10-13T07:30:02.515123+00:00",
+      "classificationVersion": 12
     },
     "R26BK01752850:000": {
       "status": "text_extracted_requires_review",
@@ -225023,5 +225028,5 @@
       "classificationVersion": 8
     }
   },
-  "workflowRunId": "38362720261"
+  "workflowRunId": "38363004416"
 }
