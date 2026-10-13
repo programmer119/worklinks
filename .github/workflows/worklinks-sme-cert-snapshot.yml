@@ -75,9 +75,28 @@ jobs:
           set -Eeuo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add startup-support/sme-cert-snapshot.json
-          if git diff --cached --quiet; then echo SME_SNAPSHOT_UNCHANGED; exit 0; fi
-          git commit -m 'data: update official SMPP partner SME lookup'
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
+          cp startup-support/sme-cert-snapshot.json /tmp/worklinks-sme-new.json
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 - <<'PY'
+          import json,pathlib
+          dest=pathlib.Path('startup-support/sme-cert-snapshot.json')
+          incoming=json.loads(pathlib.Path('/tmp/worklinks-sme-new.json').read_text())
+          current=json.loads(dest.read_text()) if dest.exists() else {}
+          # Concurrent jobs must never replace fresher official status with a
+          # snapshot checked before the currently published version.
+          if str(current.get('checkedAt') or '')>str(incoming.get('checkedAt') or ''):
+              print('SMPP_NEWER_RECORD_ALREADY_PUBLISHED')
+          else:
+              dest.write_text(json.dumps(incoming,ensure_ascii=False,indent=2)+'\n')
+          PY
+            git add startup-support/sme-cert-snapshot.json
+            if git diff --cached --quiet; then echo SME_SNAPSHOT_UP_TO_DATE; exit 0; fi
+            git commit -m 'data: update official SMPP partner SME lookup'
+            if git push origin HEAD:main; then echo SME_SNAPSHOT_PUBLISHED; exit 0; fi
+            echo SME_SNAPSHOT_PUSH_RETRY_$attempt
+            sleep 2
+          done
+          echo SME_SNAPSHOT_PUBLISH_RETRIES_EXHAUSTED
+          exit 1
