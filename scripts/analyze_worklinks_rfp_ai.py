@@ -181,7 +181,7 @@ def rule_based_interpret(clauses):
         # scoring forms are not standalone bidder credentials.
         consortium_form=(typ=="joint_participation" and bool(re.search(
             r"공동\s*수급(?:체|인)?(?:의)?\s*경우|공동\s*수급체\s*(?:구성원|지분|평가)|"
-            r"공동\s*수급(?:을)?\s*허용|분담이행\s*방식",t)))
+            r"공동\s*수급(?:을)?\s*허용|공동\s*수급체는?\s*\d+개\s*이하|분담이행\s*방식",t)))
         proposal_form=(typ in {"staff_proof","performance_proof"} and bool(re.search(
             r"(?:붙임|별지)\s*\d+.{0,22}서식|"
             r"수행\s*실적\s*(?:이력서|통계|조회)|"
