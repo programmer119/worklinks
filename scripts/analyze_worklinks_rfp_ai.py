@@ -51,7 +51,10 @@ def source_candidates(notice):
         for v in f.get("clauseCandidates") or []:
             typ = v.get("type")
             phrase = str(v.get("sourceText") or "").strip()
-            if typ not in ALLOWED_TYPES or len(phrase) < 12:
+            short_prohibition=(typ=="joint_participation" and len(phrase)>=5 and
+                               re.search(r"공동\s*수급|하도급",phrase) and
+                               re.search(r"금지|불허|불가",phrase))
+            if typ not in ALLOWED_TYPES or (len(phrase)<12 and not short_prohibition):
                 continue
             key = (typ, phrase)
             if key in seen:
