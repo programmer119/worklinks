@@ -23,6 +23,12 @@ ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
+EXTRA_QUALIFICATION_ANCHORS=re.compile(
+    r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
+    r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
+    r'수행\s*실적|실적\s*증명|재직\s*증명|공동\s*수급|분담\s*이행|'
+    r'하도급|기술\s*인력|등록\s*업체|정보통신공사업|제안\s*자격', re.I)
+
 PRIORITY_NOTICE_IDS=(
     'R26BK01747588', 'R26BK01753188', 'R26BK01747543', 'R26BK01755651',
     'R26BK01753150', 'R26BK01748179', 'R26BK01753451', 'R26BK01755213',
@@ -81,7 +87,7 @@ def discover(limit,prior=None):
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 if cached.get('reviewComplete') is True:continue
-                if cached.get('classificationVersion')==5:
+                if cached.get('classificationVersion')==6:
                     try:
                         checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                         if checked.tzinfo and (now-checked).total_seconds()<36*3600:
@@ -122,7 +128,7 @@ def classify_failure(error):
         return 'file_download_connection_error'
     detail=str(error)
     known=('large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
-           'pdf_over_100_pages','no_searchable_text','unsupported_format',
+           'pdf_over_100_pages','pdf_unreadable_page','no_searchable_text','unsupported_format',
            'redirect_forbidden','oversize_json')
     return next((v for v in known if v in detail),'file_extract_failure')
 
@@ -187,7 +193,9 @@ def extract(name,raw):
         from pypdf import PdfReader
         pdf=PdfReader(io.BytesIO(raw))
         if len(pdf.pages)>100:raise ValueError('pdf_over_100_pages')
-        return '\n'.join(page.extract_text() or '' for page in pdf.pages[:100])
+        pages=[page.extract_text() or '' for page in pdf.pages]
+        if any(not p.strip() for p in pages):raise ValueError('pdf_unreadable_page')
+        return '\n'.join(pages)
     raise ValueError('unsupported_format')
 def parse_clauses(text):
     text=re.sub(r'[\u200b\ufeff\x00]','',text)
@@ -257,6 +265,28 @@ def extract_rule_candidates(text,filename):
     return out
 
 
+def audit_qualification_scan(text, candidates):
+    """Count every eligibility-looking paragraph, not only extracted snippets.
+
+    This is *coverage evidence*, not proof that a bidder satisfies the text.
+    Unrecognized qualification wording must prevent automatic full review.
+    """
+    lines=[' '.join(line.split()) for line in re.split(r'\n+',text)]
+    source=[str(x.get('sourceText') or '') for x in candidates]
+    anchor_lines=[line for line in lines if EXTRA_QUALIFICATION_ANCHORS.search(line)]
+    missing=[]
+    for line in anchor_lines:
+        if len(line)<12 or not any(
+            phrase in line or (len(phrase)>=32 and phrase[:32] in line)
+            for phrase in source):
+            missing.append(line[:180])
+    complete=(len(text)<=350_000 and len(candidates)<240 and not missing)
+    return {'sourceTextScanComplete':complete,
+            'qualificationAnchorCount':len(anchor_lines),
+            'unmatchedQualificationAnchorCount':len(missing),
+            'unmatchedAnchorSamples':missing[:4]}
+
+
 def process(no,ordn):
     data=fetch_json(BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn}))
     docs=data.get('attachments') or {}
@@ -292,7 +322,9 @@ def process(no,ordn):
             if len(content.strip())<100:raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
+            scan=audit_qualification_scan(content,candidate_rules)
             record.update({'readable':True,'textChars':len(content),
+                           **scan,
                            'sourceSha256':hashlib.sha256(raw).hexdigest(),
                            'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
                            'qualificationScanTruncated':len(content)>350_000,
@@ -351,13 +383,13 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==5 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                if cached.get('classificationVersion')==6 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
                     print('RFP_CACHE_HIT',key);continue
             except ValueError:pass
         try:
             data=process(no,ordn)
             data['checkedAt']=now.isoformat()
-            data['classificationVersion']=5
+            data['classificationVersion']=6
             results[key]=data
             print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])))
             success+=int(data['status']=='text_extracted_requires_review')

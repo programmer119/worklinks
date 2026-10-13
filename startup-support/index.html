@@ -1545,17 +1545,25 @@ function productionRequirementCheck(x,p){
  * Compare the official attachment manifest to every reviewed file. No-file
  * notices require independent, source-hashed review of the full notice.
  */
-function officialReviewCoverage(rfp,evidence){
+function officialReviewCoverage(rfp,evidence,ai){
  const files=Array.isArray(rfp?.files)?rfp.files:null;
  const meta=evidence?.attachments;
- if(!files||rfp?.reviewComplete!==true||rfp?.requiredConditionsComplete!==true)return false;
- if(meta?.ok!==true||meta?.complete!==true||!Array.isArray(meta.items))return false;
- if(meta.items.length!==files.length)return false;
- if(files.length)return files.every(file=>file.readable===true&&file.reviewComplete===true);
- const notice=evidence?.noticeDocuments;
- return rfp.noticeTextReviewed===true&&rfp.noticeConditionsVerified===true&&
-  Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&notice?.ok===true&&
-  notice?.complete===true&&Number(notice.count||0)===0;
+ if(!files||!ai||ai.documentInterpretationReviewed!==true||
+    ai.reviewComplete!==true||ai.requiredConditionsComplete!==true||
+    ai.sourceTruncated===true)return false;
+ if(meta?.ok!==true||meta?.complete!==true||!Array.isArray(meta.items)||
+    rfp.manifestComplete!==true||meta.items.length!==files.length||
+    ai.fullDocumentAudit?.manifestDocuments!==files.length)return false;
+ if(!files.length||!files.some(f=>/입찰\s*공고|공고\s*(?:문|서)/.test(f.name||'')))return false;
+ const audit=ai.fullDocumentAudit;
+ if(audit?.complete!==true||!Array.isArray(audit.sourceHashes)||
+    audit.sourceHashes.length!==files.length)return false;
+ const hashes=new Set(audit.sourceHashes.map(x=>String(x.file)+'|'+String(x.sha256)));
+ return files.every(file=>file.readable===true&&file.sourceTextScanComplete===true&&
+  file.unmatchedQualificationAnchorCount===0&&
+  !file.qualificationScanTruncated&&!file.clauseCandidatesTruncated&&
+  /^[a-f0-9]{64}$/.test(file.sourceSha256||'')&&
+  hashes.has(String(file.name)+'|'+String(file.sourceSha256))); 
 }
 function comparePartnerJob(x,p){
  const rows=[],req=jobEligibilityData(x);
@@ -1686,7 +1694,7 @@ function comparePartnerJob(x,p){
   add('proof-'+id,label,'pending',reason,id==='experience'?'나라장터 계약정보·수행실적증명서':'공고 조건 요약');
  }
  const rfp=rfpSnapshotForJob(x);
- const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x));
+ const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x),aiReport);
  if(rfp?.status==='text_extracted_requires_review'||rfpFullyReviewed){
   const files=(rfp.files||[]).filter(q=>q.readable);
   const categories=[...new Set(files.flatMap(q=>Object.entries(q.topics||{}).filter(([k,n])=>n>0).map(([k])=>k)))];
@@ -1722,7 +1730,7 @@ function comparePartnerJob(x,p){
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  // Require explicit full official-document review before any ready verdict.
- const fullyReviewed=officialReviewCoverage(rfp,evidence);
+ const fullyReviewed=officialReviewCoverage(rfp,evidence,aiReport);
  const complete=fullyReviewed&&req?.ok===true&&req.complete===true&&
   counts.missing===0&&counts.pending===0&&counts.unknown===0;
  return {rows,counts,complete,reviewStatus:fullyReviewed?'fully_reviewed':'full_notice_review_pending'};
@@ -1992,8 +2000,7 @@ function renderJobs(){
  const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
  const fullReviewCount=considered.filter(o=>{
   const r=rfpSnapshotForJob(o.x);
-  return r?.reviewComplete===true&&r?.requiredConditionsComplete===true&&
-   Array.isArray(r.files)&&r.files.length>0&&r.files.every(z=>z.readable&&z.reviewComplete);
+  return officialReviewCoverage(r,jobEvidenceData(o.x),rfpAiForJob(o.x));
  }).length;
  const summaryEl=document.getElementById('jobDecisionSummary');
  if(summaryEl)summaryEl.textContent=readyCount?

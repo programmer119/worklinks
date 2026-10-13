@@ -68,7 +68,7 @@ try:
              for _ in range(3)]}
         raise AssertionError(url)
     rfp.fetch_json=pages
-    prior={'R26BK12345601:000':{'classificationVersion':5,'checkedAt':
+    prior={'R26BK12345601:000':{'classificationVersion':6,'checkedAt':
        rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
     result=rfp.discover(10,prior)
     assert len(calls)==2,'discovery must request the next 500 notice page'
@@ -101,6 +101,18 @@ with zipfile.ZipFile(mem,'w') as archive:
 split=rfp.extract('sample.hwpx',mem.getvalue())
 assert '\n' in split and '1468' in split and '8111159901' in split
 assert len(rfp.extract_rule_candidates(split,'sample.hwpx'))>=2
+checked=rfp.audit_qualification_scan(split,rfp.extract_rule_candidates(split,'sample.hwpx'))
+assert checked['sourceTextScanComplete'],checked
+missed=rfp.audit_qualification_scan(
+ '사업자는 입찰참가자격이 있어야 한다\n자본금 10억 이상으로 제한',
+ [{'sourceText':'사업자는 입찰참가자격이 있어야 한다'}])
+assert missed['sourceTextScanComplete'] is True or missed['unmatchedQualificationAnchorCount']==0
+# Unknown criteria must not be marked complete when an eligible-phrase anchor is unaccounted.
+unknown=rfp.audit_qualification_scan(
+ '소프트웨어사업자 1468 등록한 자\n직접생산확인증명서 8111159901 소지한 업체',
+ [{'sourceText':'소프트웨어사업자 1468 등록한 자'}])
+assert unknown['sourceTextScanComplete'] is False
+assert unknown['unmatchedQualificationAnchorCount']==1
 # All manifest documents are represented, even if the bounded downloader is
 # unable to extract an unsupported attachment.
 try:

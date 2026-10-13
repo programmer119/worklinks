@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 4
+VERSION = 5
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -192,6 +192,45 @@ def rule_based_interpret(clauses):
                        "relation":relation,"reason":reason})
     return {"items":result}
 
+def complete_qualification_review(notice, clauses, classified, truncated):
+    """Automated review only where the complete official document manifest,
+    all searchable text, all qualifying paragraphs, and all interpreted source
+    clauses are accounted for. This is NOT a certificate/actual-bid approval.
+    """
+    files=notice.get("files") or []
+    reasons=[]
+    if notice.get("status")!="text_extracted_requires_review":
+        reasons.append("notice_text_not_extracted")
+    if notice.get("manifestComplete") is not True:
+        reasons.append("official_attachment_manifest_incomplete")
+    if not files or len(files)!=notice.get("attachmentManifestCount"):
+        reasons.append("document_manifest_count_mismatch")
+    if not any(re.search(r"입찰\s*공고|공고\s*(?:문|서)", str(f.get("name") or "")) for f in files):
+        reasons.append("full_notice_document_not_found")
+    for f in files:
+        if f.get("readable") is not True or not f.get("sourceSha256") or not f.get("textSha256"):
+            reasons.append("unreadable_or_unhashed_document")
+        elif f.get("sourceTextScanComplete") is not True or f.get("unmatchedQualificationAnchorCount")!=0:
+            reasons.append("uncertain_full_text_coverage")
+        if f.get("qualificationScanTruncated") or f.get("clauseCandidatesTruncated"):
+            reasons.append("document_source_truncated")
+    if truncated or len(clauses)!=len(classified):
+        reasons.append("interpretation_incomplete_or_truncated")
+    if any(q.get("sourceVerified") is not True or
+           q.get("classification")=="unknown" for q in classified):
+        reasons.append("ambiguous_qualification_clause")
+    # An empty candidate set cannot prove that the notice has no requirements.
+    if not classified:
+        reasons.append("no_identifiable_qualification_clauses")
+    return {'complete':not reasons,'blockers':list(dict.fromkeys(reasons)),
+            'reviewedDocuments':sum(f.get("readable") is True for f in files),
+            'manifestDocuments':notice.get("attachmentManifestCount"),
+            'interpretedClauses':len(classified),
+            'sourceHashes':[{'file':str(f.get("name") or "")[:160],
+                 'sha256':f.get("sourceSha256")} for f in files if f.get("sourceSha256")],
+            'scope':'검색 가능 공식 첨부원문 및 추출 참가조건 기계 검토. 낙찰·투찰권한·서류유효성 별도.'}
+
+
 def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
     clauses=source_candidates(notice)
     if not clauses:
@@ -210,20 +249,22 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
         for entry,original in zip(checked,batch):
             entry["index"]=original["index"]
             output.append(entry)
+    truncated=sum(len(f.get("clauseCandidates") or []) for f in
+                  notice.get("files") or [] if f.get("readable"))>120 or any(
+                  f.get("clauseCandidatesTruncated") or f.get("qualificationScanTruncated")
+                  for f in notice.get("files") or [])
+    audit=complete_qualification_review(notice,clauses,output,truncated)
     return {
         "analysisStatus":mode,"sourceSha256":hash_value,"classifierVersion":VERSION,
-        "reviewComplete":False,"requiredConditionsComplete":False,
+        "reviewComplete":audit["complete"],"requiredConditionsComplete":audit["complete"],
+        "documentInterpretationReviewed":audit["complete"],"fullDocumentAudit":audit,
         "automaticEligibilityApproved":False,
         "interpretedCount":len(output),
         "totalSourceCandidates":len(clauses),
-        "sourceTruncated":sum(len(f.get("clauseCandidates") or []) for f in
-                           notice.get("files") or [] if f.get("readable"))>120 or
-                           any(f.get("clauseCandidatesTruncated") or
-                               f.get("qualificationScanTruncated") for f in
-                               notice.get("files") or []),
+        "sourceTruncated":truncated,
         "requirements":output,
         "checkedAt":dt.datetime.now(dt.timezone.utc).isoformat(),
-        "limitations":"원문 발췌 조항의 AI 분류이며 최종 참가자격·첨부 전체 검토 완료 아님"
+        "limitations":"모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음"
     }
 
 def main():

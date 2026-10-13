@@ -29,6 +29,8 @@ def mock(rows):
 a=m.process_one("R26BK01756420:000",notice,None,mock)
 assert a["analysisStatus"]=="classified" and a["interpretedCount"]==3
 assert a["reviewComplete"] is False and a["automaticEligibilityApproved"] is False
+assert a["fullDocumentAudit"]["complete"] is False
+assert "official_attachment_manifest_incomplete" in a["fullDocumentAudit"]["blockers"]
 assert a["requirements"][0]["sourceText"]==c[0]["sourceText"]
 assert a["requirements"][1]["codes"]==["8111189901"]
 assert m.process_one("R26BK01756420:000",notice,a,mock) is None
@@ -65,6 +67,23 @@ realistic=[
 ]
 assert [x["classification"] for x in m.rule_based_interpret(realistic)["items"]]==[
  "mandatory","mandatory","mandatory","mandatory","prohibited"]
+# Automated machine review may complete only when every official file, quote,
+# hash and bidder-condition classification can be reconciled.
+import hashlib
+good_text="소프트웨어사업자 1468 업종코드 등록한 업체"
+sha=hashlib.sha256(good_text.encode()).hexdigest()
+valid={"status":"text_extracted_requires_review","manifestComplete":True,
+ "attachmentManifestCount":1,"files":[{"name":"입찰공고문.hwp","readable":True,
+ "sourceSha256":sha,"textSha256":sha,"sourceTextScanComplete":True,
+ "unmatchedQualificationAnchorCount":0,"clauseCandidates":[
+ {"type":"industry_code","codes":["1468"],"sourceFile":"입찰공고문.hwp",
+  "sourceText":good_text}]}]}
+v=m.process_one("R26BK01700001:000",valid,None,lambda c:m.rule_based_interpret(c))
+assert v["fullDocumentAudit"]["complete"] is True
+assert v["reviewComplete"] is True and v["automaticEligibilityApproved"] is False
+missing=dict(valid,files=[dict(valid["files"][0],sourceTextScanComplete=False)])
+assert m.process_one("R26BK01700002:000",missing,None,
+ lambda c:m.rule_based_interpret(c))["reviewComplete"] is False
 # Never fabricate a matching company qualification from a model statement.
 assert all(x["sourceVerified"] and not x["documentFullyReviewed"] for x in a["requirements"])
 # Persisted artifacts must not contain a copy of the GitHub auth token.
