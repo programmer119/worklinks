@@ -1472,7 +1472,10 @@ function regionRequirementCheck(x,p){
   return r.length>=2&&a.includes(r);
  });
  if(match)return {status:'ok',reason:'나라장터 허용지역 '+names.join(', ')+' · 업체 주소 '+addr+' 일치 (공고 기준시점 주소는 추가 확인)'};
- return {status:'unknown',reason:'허용지역 '+names.join(', ')+' · 공식 주소 '+addr+' · 기준시점 및 지역관계 추가 대조 필요'};
+ // An authoritative complete region list and a known company registration
+ // address are definitive negative evidence when there is no overlap.
+ // Do not mark a Jeju-only tender eligible for a mainland bidder.
+ return {status:'missing',reason:'공식 허용지역 '+names.join(', ')+'에 등록 본점 '+addr+'이(가) 포함되지 않음 · 공고시점 주소 변경/예외가 있다면 재검증 필요'};
 }
 function partnerRegisteredCode(p,code){
  if(!p||!p.registryCheckedAt||!Array.isArray(p.industryRecords))return null;
@@ -1648,6 +1651,11 @@ function comparePartnerJob(x,p){
     // a standalone bidder. Delivery capability must still be checked.
     status='ok';
     matchReason='단독 참가 기준 공동수급·하도급 제한과 충돌 없음 · 수행범위는 별도 확인';
+   }
+   if(clause.classification==='mandatory'&&clause.type==='region_restriction'){
+    const allowed=regionRequirementCheck(x,p);
+    status=allowed.status;
+    matchReason=allowed.reason;
    }
    if(clause.classification==='mandatory'&&clause.type==='sme_certificate'){
     if(p.smeRecord?.validState==='valid'&&/소기업|소상공인|중소기업/.test(clause.sourceText||'')){
