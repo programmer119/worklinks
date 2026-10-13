@@ -25,6 +25,7 @@ DEST=ROOT/'startup-support/rfp-clauses.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
+TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx')
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -120,7 +121,7 @@ def legal_file(item):
         return None
     name=str(item.get('name') or '')[:160]
     lower=name.lower()
-    if not lower.endswith(('.hwp','.hwpx','.pdf')):return None
+    if not lower.endswith(TEXT_FORMATS):return None
     return name,url
 def classify_failure(error):
     if isinstance(error,urllib.error.HTTPError):
@@ -129,7 +130,7 @@ def classify_failure(error):
         return 'file_download_connection_error'
     detail=str(error)
     known=('large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
-           'pdf_over_100_pages','pdf_unreadable_page','no_searchable_text','unsupported_format',
+           'pdf_over_100_pages','pdf_over_page_limit','pdf_unreadable_page','no_searchable_text','unsupported_format',
            'redirect_forbidden','oversize_json')
     return next((v for v in known if v in detail),'file_extract_failure')
 
@@ -143,7 +144,7 @@ def invalid_file_reason(item):
     if not u.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
         return 'unsupported_download_path'
     name=str(item.get('name') or '')
-    if not name.lower().endswith(('.hwp','.hwpx','.pdf')):
+    if not name.lower().endswith(TEXT_FORMATS):
         return 'unsupported_attachment_format'
     return 'unrecognized_file_error'
 
@@ -158,6 +159,58 @@ def download(url):
         return raw
 def extract(name,raw):
     n=name.lower()
+    if n.endswith(('.docx','.xlsx','.pptx')):
+        # OOXML text is accessible without external dependencies. Only bounded
+        # declared members are read, so decompression bombs cannot exhaust CI.
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            names=archive.namelist()
+            if len(names)>1000:raise ValueError('archive_many_xml_files')
+            total=sum(archive.getinfo(m).file_size for m in names)
+            if total>45_000_000:raise ValueError('large_xml_section')
+            pieces=[]
+            shared=[]
+            if n.endswith('.xlsx') and 'xl/sharedStrings.xml' in names:
+                info=archive.getinfo('xl/sharedStrings.xml')
+                if info.file_size>10_000_000:raise ValueError('large_xml_section')
+                tree=ET.fromstring(archive.read('xl/sharedStrings.xml'))
+                for si in tree.iter():
+                    if si.tag.rsplit('}',1)[-1]=='si':
+                        shared.append(''.join((z.text or '') for z in si.iter()
+                                              if z.tag.rsplit('}',1)[-1]=='t'))
+            if n.endswith('.docx'):
+                chosen=[m for m in names if m=='word/document.xml' or
+                        re.fullmatch(r'word/(?:header|footer)\d+\.xml',m)]
+            elif n.endswith('.xlsx'):
+                chosen=[m for m in names if re.fullmatch(r'xl/worksheets/sheet\d+\.xml',m)]
+            else:
+                chosen=[m for m in names if re.fullmatch(r'ppt/slides/slide\d+\.xml',m)]
+            if len(chosen)>150:raise ValueError('archive_many_xml_files')
+            for member in chosen:
+                info=archive.getinfo(member)
+                if info.file_size>6_000_000:raise ValueError('large_xml_section')
+                tree=ET.fromstring(archive.read(member))
+                if n.endswith('.xlsx'):
+                    for row in tree.iter():
+                        if row.tag.rsplit('}',1)[-1]!='row':continue
+                        cells=[]
+                        for cell in row:
+                            if cell.tag.rsplit('}',1)[-1]!='c':continue
+                            v=next((z.text or '' for z in cell.iter()
+                                    if z.tag.rsplit('}',1)[-1]=='v'),'')
+                            if cell.get('t')=='s' and v.isdigit() and int(v)<len(shared):
+                                v=shared[int(v)]
+                            elif cell.get('t')=='inlineStr':
+                                v=''.join(z.text or '' for z in cell.iter()
+                                          if z.tag.rsplit('}',1)[-1]=='t')
+                            if v.strip():cells.append(v.strip())
+                        if cells:pieces.append(' '.join(cells))
+                else:
+                    for paragraph in tree.iter():
+                        if paragraph.tag.rsplit('}',1)[-1]!='p':continue
+                        value=''.join(z.text or '' for z in paragraph.iter()
+                                      if z.tag.rsplit('}',1)[-1]=='t')
+                        if value.strip():pieces.append(value.strip())
+            return '\n'.join(pieces)
     if n.endswith('.hwp'):
         if not raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):raise ValueError('invalid_hwp')
         with tempfile.TemporaryDirectory() as directory:
@@ -193,7 +246,7 @@ def extract(name,raw):
     if n.endswith('.pdf'):
         from pypdf import PdfReader
         pdf=PdfReader(io.BytesIO(raw))
-        if len(pdf.pages)>100:raise ValueError('pdf_over_100_pages')
+        if len(pdf.pages)>220:raise ValueError('pdf_over_page_limit')
         pages=[page.extract_text() or '' for page in pdf.pages]
         if any(not p.strip() for p in pages):raise ValueError('pdf_unreadable_page')
         return '\n'.join(pages)
@@ -320,7 +373,8 @@ def process(no,ordn):
         try:
             raw=download(url)
             content=extract(name,raw)
-            if len(content.strip())<100:raise ValueError('no_searchable_text')
+            if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx')) else 100):
+                raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
             scan=audit_qualification_scan(content,candidate_rules)
