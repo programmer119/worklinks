@@ -114,6 +114,17 @@ unknown=rfp.audit_qualification_scan(
  [{'sourceText':'소프트웨어사업자 1468 등록한 자'}])
 assert unknown['sourceTextScanComplete'] is False
 assert unknown['unmatchedQualificationAnchorCount']==1
+# Reconciled PDF-wrapped evidence must not look like an unexamined rule.
+wrapped='입찰 참가 자격\n소프트웨어사업자 1468 등록한 업체\n○ 공동수급 불허'
+wrapped_rules=rfp.extract_rule_candidates(wrapped,'공고서.pdf')
+assert any(q['type']=='joint_participation' for q in wrapped_rules)
+wrapped_scan=rfp.audit_qualification_scan(wrapped,wrapped_rules)
+assert wrapped_scan['unmatchedQualificationAnchorCount']==0,wrapped_scan
+# A substantive clause not in the extracted citation set still blocks review.
+uncovered=rfp.audit_qualification_scan('직접생산확인증명서 8111159901 소지한 업체',
+ [{'sourceText':'소프트웨어사업자 1468 등록한 업체'}])
+assert uncovered['unmatchedQualificationAnchorCount']==1
+
 # All manifest documents are represented, even if the bounded downloader is
 # unable to extract an unsupported attachment.
 try:
