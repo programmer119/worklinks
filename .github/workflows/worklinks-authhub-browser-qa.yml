@@ -1,0 +1,51 @@
+name: WorkLinks AuthHub live login browser QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-authhub-browser-qa.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Install Chromium
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Verify visible login, canonical AuthHub and guest state
+        run: |
+          python3 - <<'PY'
+          import json
+          from urllib.parse import urlparse,parse_qs
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as pw:
+            b=pw.chromium.launch(headless=True)
+            page=b.new_page(viewport={'width':1440,'height':900})
+            page.goto('https://worklinks.suaveforge.com/startup-support/',wait_until='domcontentloaded',timeout=60000)
+            page.get_by_text('지원내역 저장',exact=True).wait_for(timeout=25000)
+            page.locator('#worklinks-auth-controls button').first.wait_for(timeout=25000)
+            names=page.locator('#worklinks-auth-controls button').all_text_contents()
+            status=page.locator('#worklinks-auth-info').inner_text()
+            assert '로그인' in names and '회원가입' in names, (status,names)
+            assert '등록 대기' not in status, status
+            print('WORKLINKS_LOGIN_BUTTONS_VISIBLE=PASS')
+            print('WORKLINKS_LOGIN_STATUS='+status)
+            assert page.locator('[data-f="applied"]').count()==1
+            # Guest state stays usable before login.
+            page.evaluate("localStorage.setItem('externaltools_startup_support_status_v1',JSON.stringify({'qa-check-history':true}))")
+            page.reload(wait_until='domcontentloaded')
+            page.locator('#worklinks-auth-controls button').first.wait_for(timeout=25000)
+            assert page.evaluate("JSON.parse(localStorage.getItem('externaltools_startup_support_status_v1'))['qa-check-history']") is True
+            print('WORKLINKS_GUEST_LOCAL_PRESERVED=PASS')
+            page.get_by_role('button',name='로그인',exact=True).click()
+            page.wait_for_url('https://authhub.suaveforge.com/login/**',timeout=25000)
+            url=urlparse(page.url)
+            query=parse_qs(url.query)
+            assert query.get('project')==['p47'],query
+            assert query.get('redirect_uri')==['https://worklinks.suaveforge.com/startup-support/auth-callback.html'],query
+            print('WORKLINKS_HOSTED_AUTHHUB_REDIRECT=PASS')
+            b.close()
+          PY
