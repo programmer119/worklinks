@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 15
+VERSION = 16
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -423,7 +423,11 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
     if existing and existing.get("sourceSha256")==hash_value and existing.get("analysisStatus")==mode and existing.get("classifierVersion")==VERSION:
         return None
     # Partition into small batches for model context and predictable response size.
-    batches=[clauses[i:i+18] for i in range(0,len(clauses),18)]
+    # Deterministic rules need notice-wide context to reconcile a wrapped PDF
+    # fragment with the fully stated credential in another official attachment.
+    # Only remote model calls need 18-clause context-size partitions.
+    batches=[clauses] if mode=='rule_based' else [
+        clauses[i:i+18] for i in range(0,len(clauses),18)]
     output=[]
     for batch in batches:
         # Each model call uses local indices; globally recorded source index remains unchanged.
