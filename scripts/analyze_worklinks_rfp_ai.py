@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 16
+VERSION = 17
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -328,6 +328,13 @@ def rule_based_interpret(clauses):
                 "정보시스템유지관리서비스" in ptext and not q.get("codes")):
             v["classification"]="context_only"
             v["reason"]="8111189901 공식 완전 조항과 동일 품목의 코드 없는 PDF 발췌"
+            continue
+        if qt in {"direct_production","sme_certificate"} and (
+                {"direct_production","sme_certificate"}.issubset(authoritative_types)) and (
+                "직접생산확인증명서" in ptext and "소기업" in ptext and
+                "중소기업제품공공구매" in ptext) and not q.get("codes"):
+            v["classification"]="context_only"
+            v["reason"]="두 증명서 모두 명시된 공식 자격조항과 대조된 공공구매망 조회안내의 PDF 일부"
             continue
         if qt in {"direct_production","sme_certificate"} and same_type_mandatory and (
                 "직접생산확인증명서" in ptext and
