@@ -1660,7 +1660,7 @@ function comparePartnerJob(x,p){
     const named=required.map(code=>productionProductCodeNames[code]).filter(Boolean);
     if(!required.length){
      const normalized=String(clause.sourceText||'').replace(/\s/g,'');
-     named.push(...productionNames.filter(name=>normalized.includes(name)));
+     named.push(...Object.values(productionProductCodeNames).filter(name=>normalized.includes(name)));
     }
     const uniqueNames=[...new Set(named)];
     const matches=uniqueNames.filter(name=>records.some(v=>
