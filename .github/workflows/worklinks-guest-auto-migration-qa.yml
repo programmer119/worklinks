@@ -5,6 +5,7 @@ on:
     paths:
       - 'startup-support/worklinks-account.js'
       - 'tests/test_worklinks_guest_auto_migration.py'
+      - 'tests/test_worklinks_live_auth_state_api.py'
       - '.github/workflows/worklinks-guest-auto-migration-qa.yml'
   workflow_dispatch:
 permissions:
@@ -15,6 +16,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Verify real production AuthHub project and server API auth boundary
+        run: python3 tests/test_worklinks_live_auth_state_api.py
       - name: Browser module syntax
         run: |
           node --check startup-support/worklinks-account.js
