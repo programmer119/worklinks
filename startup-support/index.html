@@ -417,7 +417,7 @@
  <button type="button" class="job-vf" data-verdict-filter="registered" aria-pressed="false" title="업종등록에 한해 공식 조건과 일치 · 다른 입찰자격 미확정">등록업종 일치 <span data-verdict-count="registered">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="no-restriction" aria-pressed="false" title="공식 면허제한 API 정상조회 0건 · 다른 공고 참가조건 미확정">업종 제한 0건 <span data-verdict-count="no-restriction">0</span></button>
 
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline" selected>마감 임박순 (기본)</option><option value="qualified">업종 일치 우선</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select> </div>
+ </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>참가 가능 후보 우선 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option></select> </div>
 
 
 
@@ -2074,9 +2074,12 @@ function renderJobs(){
       const types=list.map(p=>participationVerdict(x,p).type);
       const industry=list.map(p=>jobQualificationVerdict(x,p).type);
       return types.includes('ready')?0:
-       industry.includes('industry_match')?1:
-       industry.includes('no_restriction')?2:
-       types.includes('conditional')?3:types.includes('checking')?4:types.includes('blocked')?5:6;
+       types.includes('conditional')&&industry.includes('industry_match')?1:
+       types.includes('conditional')&&industry.includes('no_restriction')?2:
+       types.includes('conditional')?3:
+       types.includes('checking')&&industry.includes('industry_match')?4:
+       types.includes('checking')&&industry.includes('no_restriction')?5:
+       types.includes('checking')?6:types.includes('blocked')?7:8;
      };
      const diff=rank(a.x)-rank(b.x);
      if(diff)return diff;

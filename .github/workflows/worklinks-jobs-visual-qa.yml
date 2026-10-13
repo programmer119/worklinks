@@ -68,6 +68,43 @@ jobs:
               assert page.locator('#jobCards .job-mini').count()>0
               page.locator('[data-verdict-filter="all"]').click()
               print('WORKLINKS_LIVE_INDUSTRY_FILTERS=PASS',json.dumps(industry_counts,ensure_ascii=False))
+              # Independently list actual open, citation-linked, closest-to-ready
+              # notices; never print "ready" based on an industry-code match.
+              candidates=page.evaluate("""() => {
+                const seen=new Set();
+                return jobs.concat(g2bLiveJobs).filter(x=>{
+                  const id=jobBidIdentity(x);
+                  if(!id||seen.has(id.bidNo+':'+id.order))return false;
+                  seen.add(id.bidNo+':'+id.order);
+                  return jobSoftwareScope(x)==='candidate' &&
+                    ['open','closing'].includes(jobTimeInfo(x).key);
+                }).map(x=>{
+                  const p=partners[0],q=jobQualificationVerdict(x,p);
+                  const result=comparePartnerJob(x,p),rfp=rfpSnapshotForJob(x);
+                  const verdict=participationVerdict(x,p);
+                  const id=jobBidIdentity(x);
+                  return {bidNo:id.bidNo,order:id.order,title:x.title,
+                    deadline:x.closes||x.deadline||x.endAt||'',
+                    license:q.type,verdict:verdict.type,
+                    reviewed:officialReviewCoverage(rfp,jobEvidenceData(x),rfpAiForJob(x)),
+                    documents:rfp?.files?.length||0,
+                    pending:result.rows.filter(y=>y.status==='pending').slice(0,3)
+                      .map(y=>y.label),
+                    unknown:result.rows.filter(y=>y.status==='unknown').slice(0,3)
+                      .map(y=>y.label),
+                    missing:result.rows.filter(y=>y.status==='missing').slice(0,3)
+                      .map(y=>y.label)};
+                }).filter(x=>x.license==='industry_match'||x.license==='no_restriction')
+                  .sort((a,b)=>{
+                    const rank=x=>x.verdict==='ready'?0:x.verdict==='conditional'?1:
+                      x.verdict==='checking'?2:3;
+                    return rank(a)-rank(b) ||
+                      (a.pending.length+a.unknown.length+a.missing.length)-
+                      (b.pending.length+b.unknown.length+b.missing.length) ||
+                      String(a.deadline).localeCompare(String(b.deadline));
+                  }).slice(0,15);
+              }""")
+              print('WORKLINKS_LIVE_QUALIFIED_CANDIDATES',json.dumps(candidates,ensure_ascii=False))
               help=page.locator('#jobInfoFold')
               assert help.count()==1
               assert not help.evaluate('(e)=>e.open'),'diagnostics must be hidden by default'
