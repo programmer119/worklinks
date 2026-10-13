@@ -262,3 +262,38 @@ fragmented=[
 ]
 fclasses=[x["classification"] for x in m.rule_based_interpret(fragmented)["items"]]
 assert fclasses==["mandatory","context_only","unknown","context_only","mandatory"],fclasses
+
+
+# Regression for the actual cause: 18-item classification slices hid the full
+# HWP requirement from a later broken PDF quote. The deterministic classifier
+# must use all official citations before declaring that a late fragment is
+# an unidentified company obligation.
+cross_doc=[{
+ "type":"direct_production","codes":["8111189901"],
+ "sourceFile":"입찰공고문.hwp",
+ "sourceText":"직접생산확인증명서 세부품명 정보시스템유지관리서비스 8111189901 소지한 업체"
+}]
+cross_doc += [{
+ "type":"joint_participation","sourceFile":"제안요청서.hwp",
+ "sourceText":"공동수급체 구성원별 평가점수는 지분율에 따라 계산함 "+str(i)
+} for i in range(24)]
+cross_doc += [{
+ "type":"direct_production","codes":[],
+ "sourceFile":"입찰공고문_변환본.pdf",
+ "sourceText":"직접생산확인증명서 세부품명 정보시스템유지관리서비스 세부품명번호 자리"
+}]
+cross_notice=dict(valid,files=[dict(valid["files"][0],clauseCandidates=cross_doc)])
+cross_interpret=m.process_one("R26BK01756420:000",cross_notice,None,
+                             m.rule_based_interpret,mode="rule_based")
+assert cross_interpret["totalSourceCandidates"]==26
+assert cross_interpret["interpretedCount"]==26
+assert cross_interpret["requirements"][0]["classification"]=="mandatory"
+assert cross_interpret["requirements"][-1]["classification"]=="context_only",cross_interpret["requirements"][-1]
+assert cross_interpret["sourceTruncated"] is False
+# Without the matching full official clause, a clipped certificate cannot be
+# marked covered just because the category name is familiar.
+clipped_only=dict(valid,files=[dict(valid["files"][0],clauseCandidates=cross_doc[1:])])
+missing_anchor=m.process_one("R26BK01756420:001",clipped_only,None,
+                             m.rule_based_interpret,mode="rule_based")
+assert missing_anchor["requirements"][-1]["classification"]=="unknown"
+assert missing_anchor["reviewComplete"] is False
