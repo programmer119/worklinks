@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-13T07:11:07.684087+00:00",
+  "generatedAt": "2026-10-13T07:20:10.059114+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -4861,10 +4861,9 @@
           "textChars": 2618,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 5,
-          "unmatchedQualificationAnchorCount": 2,
+          "unmatchedQualificationAnchorCount": 1,
           "unmatchedAnchorSamples": [
-            "이를 위반하여 경쟁입찰에 있어서 입찰가격을 서로 상의하여 미리 입찰가격협정을 주도하여 낙찰을 받은 자는 주식회사 긴트(이하 긴트)에서 발주하는 입찰에 입찰참가자격제한 처분을 받는 날부터 2년 동안 참가하지 않겠으며, 경쟁입찰에 있어서 특정인의 낙찰을 위하여 담합을 주도한 자는 긴트에서 발주하는 입찰에 입찰참가자격제한 처분",
-            "위 청렴계약이행서약은 상호신뢰를 바탕으로 한 약속으로써 반드시 지킬 것이며, 낙찰자로 결정될시 본 서약내용을 그대로 계약특수조건으로 계약하여 이행하고, 입찰참가자격제한, 계약해지 등 긴트의 조치와 관련하여 당사가 긴트를 상대로 손해배상을 청구하거나 당사를 배제하는 입찰에 관하여 민․형사상 이의를 제기하지 않을 것을 서약합"
+            "이를 위반하여 경쟁입찰에 있어서 입찰가격을 서로 상의하여 미리 입찰가격협정을 주도하여 낙찰을 받은 자는 주식회사 긴트(이하 긴트)에서 발주하는 입찰에 입찰참가자격제한 처분을 받는 날부터 2년 동안 참가하지 않겠으며, 경쟁입찰에 있어서 특정인의 낙찰을 위하여 담합을 주도한 자는 긴트에서 발주하는 입찰에 입찰참가자격제한 처분"
           ],
           "sourceSha256": "06edc8f57ab2e80143194ce4648d7e7e6c34481b7c2a19dfc58d447462b6af2d",
           "textSha256": "a1b30ef7af71cd40adaa74fc2bfaad2eea58f705f5d12efb83942f0e47ab52c8",
@@ -5336,8 +5335,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01747983:000": {
       "status": "text_extracted_requires_review",
@@ -6226,12 +6225,12 @@
           "textChars": 9028,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 26,
-          "unmatchedQualificationAnchorCount": 5,
+          "unmatchedQualificationAnchorCount": 4,
           "unmatchedAnchorSamples": [
-            "2-3. 조달청 입찰참가자격 등록관련 안내",
             "2-3-2. 조달청의 경쟁입찰 참가자격등록은 수시로 가능하며, 입찰참가를 위하여는 입찰서 제출 마감일 전일까지 등록을 하여야 합니다. 등록절차와 나라장터(G2B) 이용안내는 정부조달콜센터(☎지역번호없이 1588-0800)로 문의하시기 바랍니다.",
             "9-4. 입찰참가자격이 있는 자로서 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제37조제3항 각 호에 해당되거나 아래 ‘9-5.’의 각 호에 해당되지 않는 자는 입찰보증금을 면제합니다.",
-            "11-2. 입찰자 등은 ‘11-1’ 각 호에 따른 행위가 「국가를 당사자로 하는 계약에 관한 법률」제5조의3 등 관계 법령에 위반되는 경우 해당 입찰․낙찰이 취소되거나 계약이 해지․해제될 수 있고, 입찰참가자격 제한 대상에 해당되는 경우 「국가를 당사자로 하는 계약에 관한 법률」제27조 등 관계 법령에 따라 부정당업자로 "
+            "11-2. 입찰자 등은 ‘11-1’ 각 호에 따른 행위가 「국가를 당사자로 하는 계약에 관한 법률」제5조의3 등 관계 법령에 위반되는 경우 해당 입찰․낙찰이 취소되거나 계약이 해지․해제될 수 있고, 입찰참가자격 제한 대상에 해당되는 경우 「국가를 당사자로 하는 계약에 관한 법률」제27조 등 관계 법령에 따라 부정당업자로 ",
+            "12-4. 입찰참가희망업체가 전산장비 준비 부족 등의 사유로 전자입찰등록 및 투찰이 곤란한 경우에는 입찰마감 24시간 이전에 조달청 정부조달콜센터(1588-0800)로 장애해결을 위해 문의하시기 바라며 장애발생에도 불구하고 조달청 정부조달콜센터로 문의하지 않아 발생되는 모든 책임은 입찰참가자에 있습니다."
           ],
           "sourceSha256": "4ddac96c22a62065b8b5cbd00522959ec172431912eca283b13dfddf63e08494",
           "textSha256": "75f8ffa42968de4a00eb7c5486d2aa87ae00dea818ca4184ff261e458c5143f5",
@@ -6642,12 +6641,12 @@
           "textChars": 12571,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 49,
-          "unmatchedQualificationAnchorCount": 15,
+          "unmatchedQualificationAnchorCount": 14,
           "unmatchedAnchorSamples": [
             "○ 입찰 참가 자격 등록, 나라장터 시스템 : 정부조달 콜센터(☎ 1588-0800)",
             "당할 수 있고, 부정당업자 입찰참가자격제한처분을 받을 수 있습니다. 다",
-            "2-3. 조달청 입찰참가자격 등록관련 안내",
-            "2-3-2. 조달청의 경쟁입찰 참가자격등록은 수시로 가능하며, 입찰참가를 위하"
+            "2-3-2. 조달청의 경쟁입찰 참가자격등록은 수시로 가능하며, 입찰참가를 위하",
+            "※「중 소 기 업 협 동 조 합 법」제3조 에 따 른 중 소 기 업 협 동 조 합 으 로 서 적 격 조 합 확 인 서 를 소 지 한 자 는 입찰참가가"
           ],
           "sourceSha256": "a617dcf716ba2276ba8230f51e5d082d37a127a11aef5e395a7bf455d476a92e",
           "textSha256": "3b7b9376972cc4b80790a8f858bb8ab3878de0c1482bc68e0cf250ea8812414b",
@@ -7682,8 +7681,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01755651:000": {
       "status": "text_extracted_requires_review",
@@ -8175,8 +8174,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01754567:000": {
       "status": "text_extracted_requires_review",
@@ -8786,8 +8785,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01758104:000": {
       "status": "text_extracted_requires_review",
@@ -8809,12 +8808,12 @@
           "textChars": 4103,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 20,
-          "unmatchedQualificationAnchorCount": 7,
+          "unmatchedQualificationAnchorCount": 6,
           "unmatchedAnchorSamples": [
             "나. 본 입찰은 지정된 기간 내에 국가종합전자조달시스템을 통하여 입찰서를 송신함으로써 완료되며, 입찰서 제출 외 별도의 입찰참가 신청은 없습니다.",
             "- 입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.)",
-            "마. 입찰보증금의 귀속에 관하여는 연구소 계약요령 제26조의 규정(연구소 계약요령에 명시되지 아니한 사항에 대해서는 국가계약법 시행령 제38조를 따름)에 의하며, 낙찰자가 정해진 기일 내에 계약을 체결하지 아니할 경우에는 입찰보증금은 연구소로 귀속되며, 향후 연구소 입찰 참가에 제한이 있을 수 있습니다.",
-            "가. 예정가격 이하 입찰자 중 제한적 최저가(낙찰하한율 89.995%)로 입찰한 자를 적격심사 1순위 대상자로 선정하고, 조달청 일반용역 적격심사 세부기준의 소프트웨어용역 평가기준(중소기업자간 경쟁제품 대상, 추정가격 5억원 미만)에 의거 심사결과 종합평점이 88점 이상이면 낙찰자로 결정합니다."
+            "가. 예정가격 이하 입찰자 중 제한적 최저가(낙찰하한율 89.995%)로 입찰한 자를 적격심사 1순위 대상자로 선정하고, 조달청 일반용역 적격심사 세부기준의 소프트웨어용역 평가기준(중소기업자간 경쟁제품 대상, 추정가격 5억원 미만)에 의거 심사결과 종합평점이 88점 이상이면 낙찰자로 결정합니다.",
+            "나. 입찰참가자격등록상의 상호 및 대표자(수인대표인 경우 대표자 전원의 성명을 모두 등재, 각자 대표도 해당)가 법인등기부등본상의 상호, 대표자와 다른 경우에는 입찰 참가자격등록증을 변경등록하고 입찰에 참여하여야 하며, 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의하시기 바랍니다."
           ],
           "sourceSha256": "474d8d5d6b00051e4d15e190d790d4ffbb09aeecb89e8cbe612c2ef66af2ee13",
           "textSha256": "3cf30ec0266d749b41178f993b02ba4f44b78377a756b3e23b5e07ded038c565",
@@ -9577,8 +9576,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01755213:001": {
       "status": "no_official_attachment_metadata",
@@ -9591,8 +9590,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01755826:000": {
       "status": "text_extracted_requires_review",
@@ -10085,7 +10084,7 @@
           "textChars": 50361,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 46,
-          "unmatchedQualificationAnchorCount": 36,
+          "unmatchedQualificationAnchorCount": 32,
           "unmatchedAnchorSamples": [
             "제3조 (입찰참가 신청) ① 입찰에 참가하고자 하는 자는 입찰공고 등에 지정된 입찰참가신청 마감 시까지 다음 각 호의 서류를 연구원에 제출하여 입찰참가 신청을 하여야 한다.",
             "1. 입찰참가신청서 (Ⅳ.입찰에 필요한 양식의 별지 제1~7호) 각 1부",
@@ -10832,8 +10831,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01755213:000": {
       "status": "text_extracted_requires_review",
@@ -11123,8 +11122,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01754897:000": {
       "status": "text_extracted_requires_review",
@@ -11146,7 +11145,7 @@
           "textChars": 19667,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 88,
-          "unmatchedQualificationAnchorCount": 32,
+          "unmatchedQualificationAnchorCount": 31,
           "unmatchedAnchorSamples": [
             "① 입찰참가자격 등록, 나라장터 시스템 정부조달 콜센터(☎ 1588-0800)",
             "1) 이 입찰은 「중소기업제품구매촉진 및 판로지원에 관한 법률」 및 「국가를",
@@ -12191,7 +12190,7 @@
           "textChars": 26501,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 73,
-          "unmatchedQualificationAnchorCount": 22,
+          "unmatchedQualificationAnchorCount": 19,
           "unmatchedAnchorSamples": [
             "이 입찰설명서는 한국원자력환경공단이 집행하는 입찰에서 입찰자와 낙찰자가 숙지하고 준수하여야 할 사항을 기재한 것으로써 모든 입찰 희망자는 이를 열람하여야 합니다. 이 입찰과 관련하여 추가 문의사항이 있을 경우, 하단의 담당자에게 연락주시기 바랍니다.① 입찰참가자격 등록, 나라장터 시스템정부조달 콜센터(☎ 1588-0800",
             "① 입찰참가자격 등록, 나라장터 시스템정부조달 콜센터(☎ 1588-0800)② 사업담당자(사업내용, 평가방법)RI관리팀 김영승 과장 (☎ 042-601-5331 /  kys0049@korad.or.kr)③ 계약담당자(입찰공고, 계약방법)ESG상생팀 이용주 대리(☎ 054-750-4075 /  didyr00123@kor",
@@ -13972,9 +13971,8 @@
           "textChars": 45163,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 15,
-          "unmatchedQualificationAnchorCount": 4,
+          "unmatchedQualificationAnchorCount": 3,
           "unmatchedAnchorSamples": [
-            "제34조(부정당업자의 입찰참가자격 제한) ①계약상대자가 시행령 제76조에 해당하는 경우에는 공단으로부터 일정기간 동안의 입찰참가자격제한 조치를 받게 된다.",
             "제35조의4(비밀유지계약 체결 및 기술자료 임치)①공단은 「대중소기업 상생협력 촉진에 관한 법률」(이하, ‘상생협력법’이라 한다.) 제2조제9호에 해당하는 기술자료 중 계약상대자가 비밀로 관리하는 기술자료를 제공받을 경우 별지 제3호의 비밀유지계약서를 계약상대자와 체결하여야 한다.",
             "③입찰참가자격사전심사에 의해 건설사업관리용역업자로 선정된 경우에 있어 제2항제4호의 건설사업관리기술자는 입찰참가제안서에 명시된 자로 하여야 한다. 다만, 부득이한 사유로 교체가 필요한 경우에는 기술자격, 학·경력 등을 종합적으로 검토하여 건설사업관리업무수행 능력이 저하되지 않는 범위 내에서 공단의 사전승인을 받아야 한다.",
             "③임치기관은 「저작권법시행령」 제39조의2 및 「대중소기업 상생협력 촉진에 관한 법률 시행령」제15조의2에 의한 기관 중에서 계약상대자가 선정하며, 임치수수료는 계약상대자가 부담한다."
@@ -14291,8 +14289,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01754877:000": {
       "status": "text_extracted_requires_review",
@@ -34734,11 +34732,9 @@
           "textChars": 5919,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 5,
-          "unmatchedQualificationAnchorCount": 3,
+          "unmatchedQualificationAnchorCount": 1,
           "unmatchedAnchorSamples": [
-            "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제12 및 동법 시행규칙 제14조의 규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 국가종합전자조달시스템(나라장터)에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
-            "마. 입찰참가작격 등을 확인하기 위하여 협상대상자에게 필요한 서류 제출을 요구할 수 있으며,낙찰자로 처리(결정)된 후에는 계약체결 대상 업체로 부적합한 하자 발견시 계약대상 선 순위에서 배제될 수 있으며,이 경우 차순위자와 계약을 진행할 수 있음.",
-            "나. 입찰 참가시 희망업체의 전산장비 준비 부족 등의 사유로 인하여 전자입찰 등록 및 투찰이 곤란한 경우에는 투찰시간 마감 24시간 이전에 전자입찰시스템에 장애가 발생하였을 경우에는 G2B 전자조달콜센터 (☏1588-0800)로 문의하시기 바라며, 장애발생에도 불구하고 문의하지 않아 발생되는 모든 책임은 입찰참가자에게 있"
+            "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제12 및 동법 시행규칙 제14조의 규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 국가종합전자조달시스템(나라장터)에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체"
           ],
           "sourceSha256": "877ed09fd82268ee363692c4dc183f7a4f9fd15750fc7cce98c3c8d9951b090a",
           "textSha256": "b4681cca357ffa701d4fcda3ed87de194edbe663348b481fbececa18289ab587",
@@ -34929,8 +34925,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01753092:000": {
       "status": "text_extracted_requires_review",
@@ -47572,7 +47568,7 @@
           "textChars": 109464,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 40,
-          "unmatchedQualificationAnchorCount": 8,
+          "unmatchedQualificationAnchorCount": 7,
           "unmatchedAnchorSamples": [
             "ㅇ 제안내용에 관한 확인을 위하여 추가자료 요청 또는 현지실사를 할 수 있으며, 입찰참가자는 이에 응하여야 함",
             "ㅇ 제안사는 평가결과에 대해 일체의 이의를 제기할 수 없으며 평가결과는 입찰참가업체에 한하여 공개할 수 있음(행정기관 및 공공기관 정보 시스템 구축·운영 지침 제34조 준용)",
@@ -48498,7 +48494,7 @@
           "textChars": 109994,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 42,
-          "unmatchedQualificationAnchorCount": 9,
+          "unmatchedQualificationAnchorCount": 8,
           "unmatchedAnchorSamples": [
             "ㅇ 제안내용에 관한 확인을 위하여 추가자료 요청 또는 현지실사를 할 수 있으며, 입찰참가자는 이에 응하여야 함",
             "ㅇ 제안사는 평가결과에 대해 일체의 이의를 제기할 수 없으며 평가결과는 입찰참가업체에 한하여 공개할 수 있음(행정기관 및 공공기관 정보 시스템 구축·운영 지침 제34조 준용)",
@@ -49227,8 +49223,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01745141:000": {
       "status": "text_extracted_requires_review",
@@ -73289,8 +73285,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01751013:000": {
       "status": "text_extracted_requires_review",
@@ -219288,8 +219284,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01747588:000": {
       "status": "text_extracted_requires_review",
@@ -219634,8 +219630,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01753451:000": {
       "status": "text_extracted_requires_review",
@@ -219918,8 +219914,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01756420:000": {
       "status": "text_extracted_requires_review",
@@ -219941,12 +219937,12 @@
           "textChars": 24764,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 33,
-          "unmatchedQualificationAnchorCount": 17,
+          "unmatchedQualificationAnchorCount": 14,
           "unmatchedAnchorSamples": [
             "※ 행정기관 및 공공기관 정보시스템 구축·운영 지침(행안부 고시 제2025-1호, 2025.1.2.)에 의거 상세 전산자원 구성은 보안상 비공개 하며, 필요시 입찰참가업체에 한해 진흥원에 방문하여 보안각서 제출 후 담당자 입회하에 가능한 범위에서 열람 가능",
             "· 진흥원은 사업자가 제공받은 SW산출물을 무단으로 유출하거나 누출되는 경우 및 누출정보를 삭제하지 않고 활용하는 경우에는 ｢국가계약법｣ 제76조제1항제3호에 따라 입찰참가자격을 제한함",
-            "○ 낙찰자는 제안 및 협상한 내용에 따라 계약불이행시 부정당업자로 입찰참가자격제한을 받게 될 수 있음",
-            "○ 입찰자 또는 낙찰자가 국가를 당사자로 하는 계약에 관한 법률 시행령 제76조에 해당하는 경우, 내부규정에 따라 일정기간 동안의 입찰참가자격을 제한할 수 있음"
+            "○ 입찰자 또는 낙찰자가 국가를 당사자로 하는 계약에 관한 법률 시행령 제76조에 해당하는 경우, 내부규정에 따라 일정기간 동안의 입찰참가자격을 제한할 수 있음",
+            "○ 제안내용에 대한 확인을 위하여 추가 자료요청을 할 수 있으며, 이에 대하여 입찰 참가자는 응하여야 함"
           ],
           "sourceSha256": "4b650121380d62c793eaa4ca977b80523e304b56720a7caa40e426f5cdafc8f3",
           "textSha256": "df4ee811994099ce1a7a554c9ad3ed39c89bac24061dbfe3c7f89f7f139eb549",
@@ -220388,12 +220384,12 @@
           "textChars": 10993,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 38,
-          "unmatchedQualificationAnchorCount": 9,
+          "unmatchedQualificationAnchorCount": 6,
           "unmatchedAnchorSamples": [
-            "2-3. 조달청 입찰참가자격 등록관련 안내",
-            "2-3-2. 조달청 경쟁입찰참가자격 등록은 수시로 가능하며, 입찰참가를 위해서는 전자입찰서 제출마감일 전 근무일 18:00까지 등록을 하여야 합니다. 등록절차와 나라장터(G2B) 이용안내는 정부조달콜센터(☎ 지역번호없이 1588-0800, FAX: 042-472-2297)로 문의하시기 바랍니다.",
-            "④ 기타서류(입찰참가자격 확인서류)",
-            "(3)「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 따라 소기업자로 간주되는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1부"
+            "(3)「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 따라 소기업자로 간주되는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1부",
+            "2) 입찰공고일 이전 1년 이내에 ｢국가를 당사자로 하는 계약에 관한 법률 시행령｣ 제76조 제2항 제2호 가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.)",
+            "다만, 등기관청에 상호 또는 대표자 변경신고 후 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다.",
+            "9-3. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다."
           ],
           "sourceSha256": "97441e0e8840d75cc36fbcda9d8119165113568cca45c322f10819fb0927049d",
           "textSha256": "de30fd6420d6143ff4978c018c7de7526115f1d58dee9f8fe0ca8765ec1a71d4",
@@ -220869,7 +220865,7 @@
           "textChars": 12647,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 74,
-          "unmatchedQualificationAnchorCount": 23,
+          "unmatchedQualificationAnchorCount": 20,
           "unmatchedAnchorSamples": [
             "중소기업제품 구매촉진 및 판로지원에 관한 법률 제 조 및 같은 법 시행령",
             "중소기업기본법 제조에 따른",
@@ -221800,8 +221796,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T07:11:07.684087+00:00",
-      "classificationVersion": 9
+      "checkedAt": "2026-10-13T07:20:10.059114+00:00",
+      "classificationVersion": 10
     },
     "R26BK01752850:000": {
       "status": "text_extracted_requires_review",
@@ -224817,5 +224813,5 @@
       "classificationVersion": 8
     }
   },
-  "workflowRunId": "38361061522"
+  "workflowRunId": "38361983499"
 }
