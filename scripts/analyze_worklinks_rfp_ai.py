@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 8
+VERSION = 9
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -161,7 +161,8 @@ def rule_based_interpret(clauses):
         prohibited=bool(re.search(
             r"공동\s*수급.{0,30}(?:금지|불허|불가|허용하지\s*않|적용되지\s*않)|"
             r"하도급.{0,22}(?:금지|불허|불가|허용하지\s*않)|"
-            r"대기업.{0,40}참여.{0,10}불가",t))
+            r"대기업.{0,85}참여.{0,12}(?:불가|할\s*수\s*없)|"
+            r"중견기업.{0,80}참여.{0,12}(?:불가|할\s*수\s*없)",t))
         optional=bool(re.search(r"선택사항|권장|제출할 수 있|참여할 수 있|허용할 수 있",t))
         bidder=bool(re.search(r"입찰\s*참가\s*자격|입찰에\s*참가|참가업체|참가자격으로|입찰참가자는|입찰자격",t))
         explicit=bool(re.search(
@@ -175,7 +176,13 @@ def rule_based_interpret(clauses):
         after_award=bool(re.search(
             r"계약\s*(?:체결|이행)\s*후|착수\s*후|사업\s*수행\s*중|계약상대자|평가\s*항목|제안서\s*평가|정량\s*평가|사업\s*완료\s*후",t))
         regional=(typ=="region_restriction" and bool(re.search(
-            r"지역\s*제한.{0,35}대상|주된\s*영업소.{0,80}(?:소재|위치)",t)))
+            r"지역\s*제한.{0,35}대상|주된\s*영업소.{0,80}(?:소재|위치)|"
+            r"본점.{0,30}소재.{0,120}(?:제한|둔\s*업체|있는\s*업체)|"
+            r"(?:참여\s*지역|참가\s*가능\s*지역).{0,85}제한|"
+            r"(?:서울특별시|경기도|제주특별자치도|전라남도|경상남도).{0,30}"
+            r"(?:소재|제한|있는\s*업체)",t)))
+        region_unrestricted=(typ=="region_restriction" and bool(re.search(
+            r"지역\s*제한.{0,14}(?:두지\s*아니|없음|없다)|전국\s*(?:허용|대상)",t)))
         required=(bidder and (obligation or explicit)) or (restricted and explicit) or regional
         # Consortium paperwork is a conditional participation method; its
         # scoring forms are not standalone bidder credentials.
@@ -207,16 +214,21 @@ def rule_based_interpret(clauses):
         consortium_context=(typ=="joint_participation" and bool(re.search(
             r"공동\s*수급.{0,60}(?:평가|배점|점수|계산|산식|서식|양식|협정서|작성|구성원별|지분율)|"
             r"공동\s*수급.{0,40}(?:시|경우|에는|하고자)",t)))
+        contract_subcontract=(typ=="joint_participation" and bool(re.search(
+            r"하도급.{0,70}(?:승인|계획서|대금|계약|보안|하수급|이행|서약|업체|과업)|"
+            r"(?:낙찰|계약\s*체결)\s*(?:후|이후).{0,75}공동\s*수급|"
+            r"공동\s*수급.{0,55}(?:지분율|구성원별|협정서|상기의\s*입찰|"
+            r"구성원.*변경|입찰\s*절차)",t)))
         proposal_context=(typ in {"performance_proof","staff_proof"} and bool(re.search(
             r"제안서|평가표|배점|정량|정성|점수|양식|서식|붙임|별지|"
             r"기재\s*사항|평가\s*기준|작성\s*방법",t)))
-        if heading or (platform_guide and not concrete and not regional):
+        if heading or region_unrestricted or (platform_guide and not concrete and not regional):
             classification="context_only"
         elif after_award and not bidder:
             classification="context_only"
         elif prohibited:
             classification="prohibited"
-        elif (consortium_form or consortium_context) and not prohibited and not (concrete and required):
+        elif (consortium_form or consortium_context or contract_subcontract) and not prohibited and not (concrete and required):
             classification="context_only"
         elif (proposal_form or proposal_context) and not (bidder and required):
             classification="context_only"
