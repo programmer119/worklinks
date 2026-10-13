@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 14
+VERSION = 15
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -304,6 +304,65 @@ def rule_based_interpret(clauses):
             r"(?:경력|인력|자격증)",phrase)):
             v["classification"]="context_only"
             v["reason"]="투입인력 제출 양식·재직증명 안내, 참가자격의 경력 최소치 아님"
+            continue
+        # Reconcile PDF line-wrap fragments only against an explicitly cited
+        # full requirement from the same notice and of the same qualification
+        # type. Never infer a *new* license or certificate from the fragment.
+        same_type_mandatory=[z for z,d in authoritative
+                             if z.get("type")==qt and d["classification"]=="mandatory"]
+        full_texts=[compact(z.get("sourceText")) for z in same_type_mandatory]
+        ptext=compact(phrase)
+        if qt=="industry_code" and not q.get("codes") and full_texts and (
+                "소프트웨어사업자" in ptext and
+                "컴퓨터관련서비스사업" in ptext and "업종코드" in ptext) and any(
+                    "1468" in compact(z.get("sourceText")) and
+                    "소프트웨어사업자" in compact(z.get("sourceText"))
+                    for z in same_type_mandatory):
+            v["classification"]="context_only"
+            v["reason"]="1468이 확인된 공식 조항의 PDF 줄바꿈·코드 누락 중복 발췌"
+            continue
+        if qt=="direct_production" and same_type_mandatory and any(
+                "정보시스템유지관리서비스" in compact(z.get("sourceText")) and
+                "8111189901" in compact(z.get("sourceText"))
+                for z in same_type_mandatory) and (
+                "정보시스템유지관리서비스" in ptext and not q.get("codes")):
+            v["classification"]="context_only"
+            v["reason"]="8111189901 공식 완전 조항과 동일 품목의 코드 없는 PDF 발췌"
+            continue
+        if qt in {"direct_production","sme_certificate"} and same_type_mandatory and (
+                "직접생산확인증명서" in ptext and
+                "소기업" in ptext and ("정보망" in ptext or "종합정보망" in ptext)):
+            v["classification"]="context_only"
+            v["reason"]="동일 증명서의 공공구매정보망 조회안내 문단"
+            continue
+        if qt=="sme_certificate" and same_type_mandatory and (
+                "확인서" in ptext and "소지" in ptext and
+                "소기업" in ptext and "소상공인" in ptext) and any(
+                "소기업" in text and "소상공인" in text and "소지" in text
+                for text in full_texts):
+            v["classification"]="context_only"
+            v["reason"]="소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌"
+            continue
+        if qt=="sme_certificate" and same_type_mandatory and any(
+                x in ptext for x in ("신청한사항","확인되지않는경우",
+                                    "발급받지","기업구분과다른","신청하지않은",
+                                    "유효기간시작일","신청을증빙")):
+            v["classification"]="context_only"
+            v["reason"]="이미 필수로 분류한 확인서의 유효상태·신청 예외에 관한 반복 안내"
+            continue
+        if qt=="joint_participation" and (
+                ("공동수급구성원" in ptext and ("전원" in ptext or "해당" in ptext))
+                or ("하도급" in ptext and "수요기관의승인" in ptext)
+                or ("공동행위고발요청기준" in ptext and "불이익" in ptext)):
+            if not re.search(r"공동\s*수급.{0,20}(?:불허|금지|불가)",phrase):
+                v["classification"]="context_only"
+                v["reason"]="단독참가에는 해당하지 않는 공동수급·하도급 절차문맥"
+                continue
+        if qt=="direct_production" and same_type_mandatory and (
+                "직접생산확인기준" in ptext and
+                any(x in ptext for x in ("계약해지","위반","국고귀속"))):
+            v["classification"]="context_only"
+            v["reason"]="직접생산 소지 자격과 구분되는 계약 이후 기준 위반 제재"
             continue
         short=compact(q.get("sourceText"))
         if len(short)<25:continue
