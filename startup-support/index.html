@@ -887,6 +887,8 @@ function jobSoftwareScope(x){
  // Purchases of a vendor's finished licenses are not standalone SW development.
  if(/폐목재|폐합성수지|폐기물.{0,6}(?:처리|운반)|건설폐기물|건물\s*청소|청소\s*용역/i.test(title)&&
    !/정보.?시스템|소프트웨어|플랫폼.?개발|데이터.?처리|전산.?개발/i.test(title))return 'out';
+ if(/상용\s*SW\s*제3자단가|제3자\s*단가|(?:3D|CAD)\s*모델링용\s*SW|(?:EDR|백신)\s*솔루션\s*도입|소프트웨어\s*(?:단품|라이선스|구매)/i.test(title)&&
+   !/프로그램\s*개발|소프트웨어\s*개발|시스템\s*구축|연동\s*개발|커스터마이징/i.test(title))return 'out';
  const hw=hardwarePurchasePattern.test(title);
  if(kind==='cnstwk'||kind==='frgcpt')return 'out';
  if(kind==='thng'){

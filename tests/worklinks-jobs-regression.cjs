@@ -37,6 +37,10 @@ assert.equal(scope({kind:'servc',title:'AI타워 지하주차장 폐목재 및 �
 assert.equal(scope({kind:'thng',title:'상용SW 제3자단가 제품 라이선스 도입'}),'out',
  'third-party off-the-shelf licenses without development are not standalone SW deliverables');
 assert.equal(scope({kind:'thng',title:'보안 SW 개발 및 시스템 구축'}),'candidate');
+assert.equal(scope({kind:'servc',title:'상용SW 제3자단가(CertBear V2.0_위베어소프트)'}),'out');
+assert.equal(scope({kind:'servc',title:'3D 모델링용 SW'}),'out');
+assert.equal(scope({kind:'servc',title:'EDR 솔루션 도입'}),'out');
+assert.equal(scope({kind:'servc',title:'SW 솔루션 개발 및 구축'}),'candidate');
 const match=new Function(
  'function partnerRegisteredCode(p,c){return Object.hasOwn(p,c)?p[c]:null};'+
  "function jobSoftwareScope(x){return x.kind==='thng'?'out':'candidate'};"+
