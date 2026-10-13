@@ -1,0 +1,27 @@
+name: WorkLinks guest auto-migration live browser QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'startup-support/worklinks-account.js'
+      - 'tests/test_worklinks_guest_auto_migration.py'
+      - '.github/workflows/worklinks-guest-auto-migration-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Browser module syntax
+        run: |
+          node --check startup-support/worklinks-account.js
+          node --check startup-support/authhub-client.js
+      - name: Install Playwright and Chromium
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Exercise guest to member auto-migration in real WorkLinks page
+        run: python3 tests/test_worklinks_guest_auto_migration.py
