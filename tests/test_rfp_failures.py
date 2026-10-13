@@ -34,7 +34,8 @@ try:
          'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/invalid.docx'}],1)
     unsupported=rfp.process('R26BK12345678','000')
     assert unsupported['status']=='text_unavailable'
-    assert unsupported['files'][0]['errorCategory']=='unsupported_attachment_format'
+    assert unsupported['files'][0]['errorCategory']=='file_extract_failure' # non-ZIP test fixture
+    assert rfp.legal_file({'name':'제안서.docx','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/a.docx'})
     rfp.fetch_json=lambda _:response([{'name':'제안서.hwp',
          'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do'}],1)
     rfp.download=lambda _:b'not-a-hwp'
@@ -126,5 +127,24 @@ try:
 finally:
  rfp.fetch_json=orig_fetch
  rfp.download=orig_download
+
+# Verify official OOXML text extraction, including numeric sheet cell codes.
+import io,zipfile
+def office_xml(name,member,xml,extra=None):
+ m=io.BytesIO()
+ with zipfile.ZipFile(m,'w') as z:
+  z.writestr(member,xml)
+  for k,v in (extra or {}).items():z.writestr(k,v)
+ return rfp.extract(name,m.getvalue())
+doc=office_xml('notice.docx','word/document.xml',
+ '<w:document xmlns:w="urn:w"><w:body><w:p><w:r><w:t>입찰참가자격 업종코드 1468 등록한 사업자</w:t></w:r></w:p></w:body></w:document>')
+assert '1468' in doc and '\n' not in doc
+sheet=office_xml('conditions.xlsx','xl/worksheets/sheet1.xml',
+ '<worksheet><sheetData><row><c t="s"><v>0</v></c><c><v>8111189901</v></c></row></sheetData></worksheet>',
+ {'xl/sharedStrings.xml':'<sst><si><t>직접생산확인증명서 정보시스템유지관리서비스</t></si></sst>'})
+assert '직접생산확인증명서 정보시스템유지관리서비스 8111189901' in sheet
+slide=office_xml('requirements.pptx','ppt/slides/slide1.xml',
+ '<p:sld xmlns:p="urn:p" xmlns:a="urn:a"><a:p><a:r><a:t>중소기업확인서 소지 필수</a:t></a:r></a:p></p:sld>')
+assert '중소기업확인서 소지 필수' in slide
 
 print('WORKLINKS_RFP_FAILURE_CLASSIFICATION=PASS')
