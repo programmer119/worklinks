@@ -90,10 +90,10 @@ def discover(limit,prior=None):
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 if cached.get('reviewComplete') is True:continue
-                if cached.get('classificationVersion')==6:
+                if cached.get('classificationVersion')==7:
                     try:
                         checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                        if checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                        if checked.tzinfo and (now-checked).total_seconds()<24*3600:
                             continue
                     except (ValueError,TypeError):pass
                 # Observed industry restriction is a useful scheduling signal,
@@ -104,7 +104,7 @@ def discover(limit,prior=None):
                              for row in (qual.get('requirements') or [])
                              if isinstance(row,dict))
                 service=str(item.get('kind') or '')=='servc'
-                priority=(0 if no in PRIORITY_NOTICE_IDS else 1,0 if matching else 1,0 if service else 1,date)
+                priority=(date,0 if matching else 1,0 if no in PRIORITY_NOTICE_IDS else 1,0 if service else 1)
                 seen[key]=(priority,no,order,date.isoformat())
             if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
@@ -427,7 +427,7 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
     args=parser.parse_args()
-    limit=max(1,min(args.limit,60))
+    limit=max(1,min(args.limit,100))
     now=dt.datetime.now(dt.timezone.utc)
     old={}
     if DEST.exists():
@@ -451,7 +451,7 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==6 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
+                if cached.get('classificationVersion')==7 and checked.tzinfo and (now-checked).total_seconds()<24*3600:
                     print('RFP_CACHE_HIT',key)
                     continue
             except (ValueError,TypeError):pass
@@ -466,7 +466,7 @@ def main():
             try:
                 data=future.result()
                 data['checkedAt']=now.isoformat()
-                data['classificationVersion']=6
+                data['classificationVersion']=7
                 results[key]=data
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
@@ -477,7 +477,7 @@ def main():
                               'sourceError':type(e).__name__+': '+str(e)[:100],
                               'files':[],'reviewComplete':False,
                               'contractPerformanceVerified':False,
-                              'checkedAt':now.isoformat(),'classificationVersion':6}
+                              'checkedAt':now.isoformat(),'classificationVersion':7}
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
