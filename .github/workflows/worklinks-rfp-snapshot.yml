@@ -26,6 +26,7 @@ jobs:
         run: |
           python3 tests/test_rfp_failures.py
           python3 tests/test_rfp_ai.py
+          python3 tests/test_worklinks_rfp_coverage.py
       - name: Extract limited official RFP eligibility text
         run: python3 scripts/refresh_worklinks_rfp.py --limit 16
       - name: Publish verified RFP snippets
