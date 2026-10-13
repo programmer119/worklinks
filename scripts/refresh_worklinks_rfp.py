@@ -3,6 +3,7 @@
 Never classify final bid eligibility from a keyword or omit review of attachments.
 """
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import datetime as dt
 import hashlib
 import io
@@ -23,6 +24,7 @@ ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
+PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -96,19 +98,18 @@ def discover(limit,prior=None):
                 # Observed industry restriction is a useful scheduling signal,
                 # never an official statement of eligibility.
                 qual=item.get('bidEligibility') or {}
-                matching=any('1468' in [str(v) for v in (r.get('codes') or [])]
-                             for r in (qual.get('requirements') or [])
-                             if isinstance(r,dict))
+                matching=any(PARTNER_VERIFIED_CODES.intersection(
+                                 str(v) for v in (row.get('codes') or []))
+                             for row in (qual.get('requirements') or [])
+                             if isinstance(row,dict))
                 service=str(item.get('kind') or '')=='servc'
                 priority=(0 if no in PRIORITY_NOTICE_IDS else 1,0 if matching else 1,0 if service else 1,date)
                 seen[key]=(priority,no,order,date.isoformat())
             if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
         print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(e).__name__,str(e)[:140])
-    fixture=('R26BK01756420','000','2000-01-01')
-    seen.pop('R26BK01756420:000',None)
     candidates=[(no,order,date) for _,no,order,date in sorted(seen.values(),key=lambda x:x[0])]
-    return [fixture]+candidates[:max(0,limit-1)]
+    return candidates[:limit]
 
 def legal_file(item):
     url=str(item.get('url') or '')
@@ -377,6 +378,7 @@ def main():
             prior['reasonCode']='eorder_api_returned_zero'
             prior['classificationVersion']=2
     success=0
+    uncached=[]
     for no,ordn,_ in selected:
         key=no+':'+ordn
         cached=old.get(key)
@@ -384,24 +386,33 @@ def main():
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                 if cached.get('classificationVersion')==6 and checked.tzinfo and (now-checked).total_seconds()<36*3600:
-                    print('RFP_CACHE_HIT',key);continue
-            except ValueError:pass
-        try:
-            data=process(no,ordn)
-            data['checkedAt']=now.isoformat()
-            data['classificationVersion']=6
-            results[key]=data
-            print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])))
-            success+=int(data['status']=='text_extracted_requires_review')
-        except Exception as e:
-            reason=classify_failure(e)
-            results[key]={'status':'metadata_fetch_failed','reasonCode':reason,
-                          'source':'나라장터 e발주 첨부파일 API',
-                          'sourceError':type(e).__name__+': '+str(e)[:100],
-                          'files':[],'reviewComplete':False,
-                          'contractPerformanceVerified':False,
-                          'checkedAt':now.isoformat(),'classificationVersion':2}
-            print('RFP_SCAN_ERROR',key,reason)
+                    print('RFP_CACHE_HIT',key)
+                    continue
+            except (ValueError,TypeError):pass
+        uncached.append((no,ordn))
+    # Official requests are bounded; four independent notices run concurrently
+    # so one unavailable PDF does not starve the entire 16-minute job.
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        tasks={pool.submit(process,no,ordn):(no,ordn) for no,ordn in uncached}
+        for future in as_completed(tasks):
+            no,ordn=tasks[future]
+            key=no+':'+ordn
+            try:
+                data=future.result()
+                data['checkedAt']=now.isoformat()
+                data['classificationVersion']=6
+                results[key]=data
+                print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
+                success+=int(data['status']=='text_extracted_requires_review')
+            except Exception as e:
+                reason=classify_failure(e)
+                results[key]={'status':'metadata_fetch_failed','reasonCode':reason,
+                              'source':'나라장터 e발주 첨부파일 API',
+                              'sourceError':type(e).__name__+': '+str(e)[:100],
+                              'files':[],'reviewComplete':False,
+                              'contractPerformanceVerified':False,
+                              'checkedAt':now.isoformat(),'classificationVersion':6}
+                print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
             'reviewComplete':False,'byNotice':dict(list(results.items())[-150:])}

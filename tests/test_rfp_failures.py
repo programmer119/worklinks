@@ -64,7 +64,7 @@ try:
         if 'offset=500' in url:
             return {'ok':True,'totalCount':503,'items':[
              {'bidNo':'R26BK12345604','order':'000','kind':'servc','closes':deadline,
-              'bidEligibility':{'requirements':[{'codes':['1468']}]}}
+              'bidEligibility':{'requirements':[{'codes':['1426']}]}}
              for _ in range(3)]}
         raise AssertionError(url)
     rfp.fetch_json=pages
@@ -72,8 +72,8 @@ try:
        rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
     result=rfp.discover(10,prior)
     assert len(calls)==2,'discovery must request the next 500 notice page'
-    assert result[0][0]=='R26BK01756420','fixture must remain for regression'
-    assert result[1][0]=='R26BK12345604','new matching code 1468 should be prioritized'
+    assert result[0][0]=='R26BK12345604','new matching code 1468 should be prioritized'
+    assert all(v[0]!='R26BK01756420' for v in result),'historical fixture must not enter live notices'
     assert all(v[0]!='R26BK12345601' for v in result)
 finally:
     rfp.fetch_json=orig_discovery
