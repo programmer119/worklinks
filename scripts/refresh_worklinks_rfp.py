@@ -86,9 +86,10 @@ def discover(limit,prior=None):
                 if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11})',no):continue
                 order=str(item.get('order') or '0').zfill(3)
                 end=datestr(item.get('closes'))
-                if not end:continue
-                date=dt.datetime.strptime(end,'%Y%m%d').date()
-                if date<today or date>today+dt.timedelta(days=18):continue
+                priority_case=no in PRIORITY_NOTICE_IDS
+                if not end and not priority_case:continue
+                date=dt.datetime.strptime(end,'%Y%m%d').date() if end else today
+                if not priority_case and (date<today or date>today+dt.timedelta(days=18)):continue
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 if cached.get('reviewComplete') is True:continue
@@ -557,7 +558,7 @@ def main():
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
-            'reviewComplete':False,'byNotice':dict(list(results.items())[-150:])}
+            'reviewComplete':False,'byNotice':dict(list(results.items())[-240:])}
     DEST.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('RFP_SNAPSHOT_READY','NOTICES',len(output['byNotice']),'NEW_READABLE',success)
 if __name__=='__main__':main()
