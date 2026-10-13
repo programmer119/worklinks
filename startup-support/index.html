@@ -2036,19 +2036,23 @@ function renderJobs(){
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
  const candidateJobs=active;
  const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>participationVerdict(o.x,p).type===type)).length;
- const registryFailures=partners.filter(p=>p.registryError).length;
- document.getElementById('partnerJobCount').textContent='('+active.length+')';
- document.getElementById('partnerSummary').textContent=
-  '미마감 '+active.length+'건 · 바로 지원 '+statusTotal('ready')+' · 조건부 '+statusTotal('conditional')+
-  ' · 지원 불가 '+statusTotal('blocked')+' · 검증 중 '+statusTotal('checking')+
-  (registryFailures?' · 업체등록 API 오류 '+registryFailures+'개사':'')+
-  ' · SW 수행범위 불명확 '+rejected+'건 별도 제외';
- // Explain why a "ready: 0" count is not a blanket company disqualification.
- // Only request company-owned documents when the specific notice references that requirement.
- const readyCount=statusTotal('ready');
  const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
  const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
  const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
+ const registryFailures=partners.filter(p=>p.registryError).length;
+ document.getElementById('partnerJobCount').textContent='('+active.length+')';
+ // Always show nonzero officially verified BASIC qualifications outside the
+ // collapsed diagnostics. Neither count is a full-document bid approval.
+ document.getElementById('partnerSummary').textContent=
+  '미마감 '+active.length+'건 · 등록업종 일치 '+industryMatched+
+  ' · 면허제한 미검출 '+industryUnrestricted+
+  ' · 바로 지원 '+statusTotal('ready')+' · 조건부 '+statusTotal('conditional')+
+  ' · 지원 불가 '+statusTotal('blocked')+' · 검증 중 '+statusTotal('checking')+
+  (registryFailures?' · 업체등록 API 오류 '+registryFailures+'개사':'')+
+  ' · SW 수행범위 불명확 '+rejected+'건 별도 제외';
+ // Source-backed registered candidates cannot be mislabeled as zero merely
+ // because final attachment verification remains incomplete.
+ const readyCount=statusTotal('ready');
  const fullReviewCount=considered.filter(o=>{
   const r=rfpSnapshotForJob(o.x);
   return officialReviewCoverage(r,jobEvidenceData(o.x),rfpAiForJob(o.x));
