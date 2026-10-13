@@ -208,4 +208,35 @@ with sync_playwright() as p:
     check(remote[who[0]]['applied:yangcheon-school']['value'] is True,'online retry did not finish automatic migration')
     print('SERVER_READ_FAILURE_PRESERVES_AND_RETRIES=PASS',flush=True)
     ctx5.close()
+
+    # After the member identity has been verified, an expired API token must
+    # refresh only within the same AuthHub identity and retry the queued write.
+    ctx6=browser.new_context()
+    page6=ctx6.new_page()
+    who[0]='worklinks-qa-account-a'
+    remote[who[0]]={}
+    refresh_count=[0]
+    def expired_api(route):
+        if route.request.method=='POST' and route.request.headers.get('authorization')=='Bearer qa.expired':
+            return json_reply(route,{'ok':False,'error':'invalid_authhub_session'},401)
+        return state(route)
+    def renew(route):
+        refresh_count[0]+=1
+        return json_reply(route,{'accessToken':'qa.renewed','refreshToken':'qa.new.refresh','expiresIn':3600})
+    page6.route('**/api/g2b/worklinks-auth-config',config)
+    page6.route('**/v1/me*',me)
+    page6.route('**/v1/auth/p47/refresh*',renew)
+    page6.route('**/api/g2b/worklinks-state',expired_api)
+    page6.goto(SITE,wait_until='domcontentloaded')
+    page6.evaluate("""()=>{
+      localStorage.setItem('externaltools_startup_support_status_v1',JSON.stringify({'yangcheon-school':true}));
+      localStorage.setItem('authhub:p47:production:session',JSON.stringify({accessToken:'qa.expired',refreshToken:'qa.old.refresh'}));
+    }""")
+    page6.reload(wait_until='domcontentloaded')
+    page6.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('서버 저장 완료')""",timeout=30000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is True,'expired token did not retry the pending record')
+    check(refresh_count[0]==1,'AuthHub refresh unexpectedly repeated')
+    check(page6.evaluate("""()=>JSON.parse(localStorage.getItem('authhub:p47:production:session'))?.accessToken==='qa.renewed'"""),'renewed session not persisted')
+    print('EXPIRED_AUTHHUB_TOKEN_AUTO_REFRESH_AND_RETRY=PASS',flush=True)
+    ctx6.close()
     browser.close()
