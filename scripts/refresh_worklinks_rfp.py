@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=11
+CLASSIFICATION_VERSION=12
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -372,7 +372,6 @@ def extract_rule_candidates(text,filename):
                    'explicitMust':bool(re.search(
                     r'반드시|필수|입찰참가자격|소지하여야|제출하여야|등록한\s*자|소지한\s*(?:자|업체)|등록을?\s*필한\s*업체|업체이어야',phrase)),
                    'documentRequiresManualFullReview':True})
-                if len(out)>=240:return out
     return out
 
 
@@ -432,20 +431,28 @@ def audit_qualification_scan(text, candidates):
     """
     lines=[' '.join(line.split()) for line in re.split(r'\n+',text)]
     source=[str(x.get('sourceText') or '') for x in candidates]
+    # Long paragraphs are split into overlapping evidence windows. Comparing
+    # the entire paragraph to one window falsely reports coverage missing.
+    normalized_sources=[re.sub(r"\\s+","",s) for s in source]
     anchor_lines=[line for line in lines if EXTRA_QUALIFICATION_ANCHORS.search(line)]
     missing=[]
     for line in anchor_lines:
         if nonqualification_context(line):
             continue
-        compact=re.sub(r"\s+","",line)
-        matched=any(
-            compact in re.sub(r"\s+","",phrase) or
-            (len(compact)>=32 and len(phrase)>=32 and
-             re.sub(r"\s+","",phrase) in compact)
-            for phrase in source)
+        # Require each eligibility-looking local span in the original to
+        # be covered by a cited candidate, not just a shared keyword.
+        anchored=[]
+        for anchor in EXTRA_QUALIFICATION_ANCHORS.finditer(line):
+            a=max(0,anchor.start()-45)
+            b=min(len(line),anchor.end()+100)
+            span=re.sub(r"\\s+","",line[a:b])
+            if span:anchored.append(span)
+        matched=bool(anchored) and all(any(
+            span in evidence or (evidence in span and len(evidence)>=35)
+            for evidence in normalized_sources) for span in anchored)
         if not matched:
             missing.append(line[:180])
-    complete=(len(text)<=350_000 and len(candidates)<240 and not missing)
+    complete=(len(text)<=350_000 and not missing)
     return {'sourceTextScanComplete':complete,
             'qualificationAnchorCount':len(anchor_lines),
             'unmatchedQualificationAnchorCount':len(missing),
@@ -494,7 +501,7 @@ def process(no,ordn):
                            'sourceSha256':hashlib.sha256(raw).hexdigest(),
                            'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
                            'qualificationScanTruncated':len(content)>350_000,
-                           'clauseCandidatesTruncated':len(candidate_rules)>=240,
+                           'clauseCandidatesTruncated':False,
                            'topics':triggers,'snippets':snippets,
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
