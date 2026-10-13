@@ -445,8 +445,8 @@ def audit_qualification_scan(text, candidates):
         for anchor in EXTRA_QUALIFICATION_ANCHORS.finditer(line):
             a=max(0,anchor.start()-25)
             b=min(len(line),anchor.end()+45)
-            span=re.sub(r"\\s+","",line[a:b])
-            key=re.sub(r"\\s+","",anchor.group())
+            span=re.sub(r"\s+","",line[a:b])
+            key=re.sub(r"\s+","",anchor.group())
             if span:anchored.append((key,span))
         # Source excerpts have 50-character overlaps; a qualification
         # anchor can straddle an excerpt boundary. Require *every* short
