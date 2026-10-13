@@ -73,7 +73,7 @@ try:
        rfp.dt.datetime.now(rfp.dt.timezone.utc).isoformat(),'reviewComplete':False}}
     result=rfp.discover(10,prior)
     assert len(calls)==2,'discovery must request the next 500 notice page'
-    assert result[0][0]=='R26BK12345604','new matching code 1468 should be prioritized'
+    assert result[0][0]=='R26BK12345604',('new matching 1426 registration should be prioritized; observed '+repr(result[:5]))
     assert all(v[0]!='R26BK01756420' for v in result),'historical fixture must not enter live notices'
     assert all(v[0]!='R26BK12345601' for v in result)
 finally:
