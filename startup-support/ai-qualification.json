@@ -1,8 +1,8 @@
 {
   "ok": true,
-  "workflowRunId": "38362293144",
+  "workflowRunId": "38362342151",
   "model": "rule-based-v1",
-  "generatedAt": "2026-10-13T07:23:05.751101+00:00",
+  "generatedAt": "2026-10-13T07:23:32.095683+00:00",
   "source": "Citation-checked RFP classification; model or conservative rules",
   "reviewComplete": false,
   "byNotice": {
@@ -7177,7 +7177,7 @@
     "R26BK01751970:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e3dce821fb18341be97ebd6470d1c57bea738163b1ffd59e49c2b2999ea8c002",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -7408,9 +7408,9 @@
           "codes": [],
           "sourceText": "주의하시기 바랍니다.(공동수급 구성원 전원해당)",
           "sourceFile": "(협상에의한 계약)_입찰공고(제2026-1-0578호)_국내 COTS DB 사이트 구축 용역.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "단독참가에는 해당하지 않는 공동수급·하도급 절차문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -7587,14 +7587,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.815626+00:00",
+      "checkedAt": "2026-10-13T07:23:32.082203+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752850:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "25a03dc0a83bf8012f48db7db4be423f7fbafcb3eb222f62ed70896908fe6283",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -7974,14 +7974,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.817327+00:00",
+      "checkedAt": "2026-10-13T07:23:32.084353+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752716:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2e33fbcd0418158151532ea1580761d18f4fb7aa42420af754848d203a51c8b9",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -8112,7 +8112,7 @@
           "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "8111189901 공식 완전 조항과 동일 품목의 코드 없는 PDF 발췌",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -8349,7 +8349,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.818768+00:00",
+      "checkedAt": "2026-10-13T07:23:32.086165+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -8729,7 +8729,7 @@
     "R26BK01747636:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "491e96cff3ee6428f1ed70d44d75fbc0e519189c498bdf67d44d88a9ea911012",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -8981,14 +8981,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.821850+00:00",
+      "checkedAt": "2026-10-13T07:23:32.090175+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748836:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "343719870786b535bf09f0db6c9d697ff4009db8ce72c0f6cff18f318b1b4330",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9244,14 +9244,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.822112+00:00",
+      "checkedAt": "2026-10-13T07:23:32.090505+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745574:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9ded4f340fd4a1ee73d9a5ab9d9d02df2f1a336acf2a79194787d43837c3fa59",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9493,14 +9493,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.822411+00:00",
+      "checkedAt": "2026-10-13T07:23:32.090839+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746720:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e5fc116e02aa003a65eac28bb3dd093961e78b4f54175b9d45f1c9a221a930aa",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9682,14 +9682,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.823981+00:00",
+      "checkedAt": "2026-10-13T07:23:32.092831+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746812:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "317acfdb23960c666ee625fa1026e9fbbd913ec53ea4cb43cc73ba3ac6e5093f",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9871,14 +9871,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.824214+00:00",
+      "checkedAt": "2026-10-13T07:23:32.093119+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746850:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "373423f51437c94e545dec0bbe4224558c0ad1193220805fc34ca46b4d5b762b",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10060,14 +10060,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.824434+00:00",
+      "checkedAt": "2026-10-13T07:23:32.093408+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746881:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8a8dd4db7dc9dd83343c4d20bb08f315c2eff9e936d5d04306e315d282038a89",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10249,14 +10249,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.824653+00:00",
+      "checkedAt": "2026-10-13T07:23:32.093685+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748276:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c776f147883c6b0a534a8662726ca40280165025e3e547b3a5c37b8fb199adba",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10323,9 +10323,9 @@
           "codes": [],
           "sourceText": "‘중소기업·소상공인확인서’를 미소지하여도 입찰참가 가능하며,",
           "sourceFile": "1.입찰공고문(GIS분석).pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "소기업·소상공인 확인서 완전 참가조건의 코드 없는 PDF 발췌",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10390,14 +10390,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825339+00:00",
+      "checkedAt": "2026-10-13T07:23:32.094560+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747983:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9039e375a9ce5a69c51f47e2b0733c67b960c7bc1530c0c74108b2e4d166c855",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10517,14 +10517,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825611+00:00",
+      "checkedAt": "2026-10-13T07:23:32.094936+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01749948:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3680c066bae8842021b758f7de25df1fc93666e694d7641d1297a8279e3d5bb5",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10650,14 +10650,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825754+00:00",
+      "checkedAt": "2026-10-13T07:23:32.095102+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750016:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3680c066bae8842021b758f7de25df1fc93666e694d7641d1297a8279e3d5bb5",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10783,14 +10783,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825879+00:00",
+      "checkedAt": "2026-10-13T07:23:32.095271+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754567:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d3596062c883a63ea82477407d2a119c88ac44996f86fcba0f7d48a4f42402b7",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -11239,7 +11239,7 @@
           "sourceFile": "삼호읍 용앙지구 하수도 중점관리지역 정비사업 GIS DB 구축 용역 공고문.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -11251,7 +11251,7 @@
           "sourceFile": "삼호읍 용앙지구 하수도 중점관리지역 정비사업 GIS DB 구축 용역 공고문.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -11304,14 +11304,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.812232+00:00",
+      "checkedAt": "2026-10-13T07:23:32.077648+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748179:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cb3519f0dd14178ab4b976b5c561232e59cc5a2c8b53a8090a731664af14d009",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -11719,14 +11719,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.816691+00:00",
+      "checkedAt": "2026-10-13T07:23:32.083572+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750103:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "51dc0bdbbdebbb9f43de4e91691e6b0795e7e41c6a600e8283977dda7c246d92",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -11838,14 +11838,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.826092+00:00",
+      "checkedAt": "2026-10-13T07:23:32.095527+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753451:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cee566c68011b9694d14731d352eccd3fe887205a2e29695b60ca18d59fc5456",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -12082,14 +12082,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.823526+00:00",
+      "checkedAt": "2026-10-13T07:23:32.092289+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747588:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "579ed587523946629a52234022e5ebd758a0c8e0a6ba1df8a69cbaf6ba13f8ee",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -12196,7 +12196,7 @@
           "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "1468이 확인된 공식 조항의 PDF 줄바꿈·코드 누락 중복 발췌",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -12208,7 +12208,7 @@
           "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "1468이 확인된 공식 조항의 PDF 줄바꿈·코드 누락 중복 발췌",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -12263,14 +12263,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.824834+00:00",
+      "checkedAt": "2026-10-13T07:23:32.093933+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753150:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "31834fb5263f32200274949a5171e3c45b800b3231072f57d1514b89eb992092",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -12729,14 +12729,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.814577+00:00",
+      "checkedAt": "2026-10-13T07:23:32.080806+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755651:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cbde68f7351f494d26761336857c39e014302773e2a3499c7734017164782bc7",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -13059,7 +13059,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.820064+00:00",
+      "checkedAt": "2026-10-13T07:23:32.087860+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -163816,7 +163816,7 @@
     "R26BK01761468:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f6ddd7b524b1fbd94ab3daa83f6abbf846c16d6bae75988497a16d5f2002442e",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -164336,14 +164336,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.814103+00:00",
+      "checkedAt": "2026-10-13T07:23:32.080170+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752002:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b42496f9339504cd3fdf67d31f3434e5454504583f8c0a1348350584f5790b69",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -164549,7 +164549,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.823741+00:00",
+      "checkedAt": "2026-10-13T07:23:32.092541+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -167662,7 +167662,7 @@
     "R26BK01755213:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6d09b9303063036e488b6d8fdf17231bff6c3c5d1a2ebf7dbd985aa76bbe2a97",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -167917,7 +167917,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.822688+00:00",
+      "checkedAt": "2026-10-13T07:23:32.091212+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -169044,7 +169044,7 @@
     "R26BK01753188:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "be7bd1275a2307e8adb5a7d2ef9f6d1708894bfd2492b122f5e55cc6d93c7859",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -169194,14 +169194,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825498+00:00",
+      "checkedAt": "2026-10-13T07:23:32.094796+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01762567:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "02bf75fc427d545315581b2e88976d34ed277cb3039cca7c613740e614f2d703",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -169539,7 +169539,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.819620+00:00",
+      "checkedAt": "2026-10-13T07:23:32.087204+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -224500,7 +224500,7 @@
     "R26BK01754639:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e51e54fdf22e45e1b75e70382f2129131d6a6b23d15f126f37f8f600cf59fbbf",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -224691,9 +224691,9 @@
           "codes": [],
           "sourceText": "중소기업·소상공인 확인서’ 및 ‘직접생산확인증명서’의 경우 제안서와 함께 제출하며, 구매정보망(www.smpp.go.kr)에서 정상등록 및 발급여부 확인이 가능합니다. 입찰참가신청 전 구매정보망에서 해당 확인서의 용도가 ‘공공기관 입찰용’으로 발급된 것이 맞는지 확인바라며, 입찰마감시점에 구매정보망에서 조회되지 않을 경우 입찰참가자격이 없는 무효입찰로 처리되오니 직접 확인하지 않아 발생하는 불이익은 입찰자에게 있음을 유의바랍니다.",
           "sourceFile": "[레벨나인] LED_입찰공고문_261002.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -225007,14 +225007,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.813373+00:00",
+      "checkedAt": "2026-10-13T07:23:32.079078+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760335:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "daa7d9114ebf1ea7eebeeec548eb59f3489b1d09d4062c805b674894d96c2a48",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -225455,14 +225455,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.815097+00:00",
+      "checkedAt": "2026-10-13T07:23:32.081494+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754686:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8bbc44eced5381aa26e563898d53c4a8098bfb1ceea5356445090c7fe96c237f",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -225869,14 +225869,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.816127+00:00",
+      "checkedAt": "2026-10-13T07:23:32.082899+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758442:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "dc798e75e344d88f79feba1b7184bf6ceb14586931bfab117f84864ed1c7ea44",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -226256,14 +226256,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.817923+00:00",
+      "checkedAt": "2026-10-13T07:23:32.085076+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01759098:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7da699a8eecfbeb60b688f36c8c628b3926f22e0582b1a9a3def52490bdd6165",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -226656,14 +226656,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.818304+00:00",
+      "checkedAt": "2026-10-13T07:23:32.085570+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01761868:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cb9803805f64aac59f75cd12d8729e99954be4aa18265ccfd6b0850c382446fb",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227061,14 +227061,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.819236+00:00",
+      "checkedAt": "2026-10-13T07:23:32.086735+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760911:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "fd626840eff7bbd0b3c724a72d2ce747b6e2647d3e9a01ef80af7398ff9bfbe7",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227383,14 +227383,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.820555+00:00",
+      "checkedAt": "2026-10-13T07:23:32.088510+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747983:002": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a4a00c67b890eb21d7fe32887d89f4562a41bdaf5c4d203dc84417bdba1f4331",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227685,14 +227685,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.820861+00:00",
+      "checkedAt": "2026-10-13T07:23:32.088903+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751281:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f8332cff6b25ebb9333543cf8f00c1ecd21baeb1fa5e2807e5a45453227095c0",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227913,7 +227913,7 @@
           "sourceFile": "삼호읍 용앙지구 하수도 중점관리지역 정비사업 수밀시험 및 CCTV조사용역 공고문.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -227925,7 +227925,7 @@
           "sourceFile": "삼호읍 용앙지구 하수도 중점관리지역 정비사업 수밀시험 및 CCTV조사용역 공고문.pdf",
           "classification": "context_only",
           "relation": "unknown",
-          "reason": "동일 유형의 완전한 원문 조항에 포함된 중복 발췌",
+          "reason": "동일 증명서의 공공구매정보망 조회안내 문단",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -227978,14 +227978,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.821280+00:00",
+      "checkedAt": "2026-10-13T07:23:32.089494+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01764518:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2dfa919d353e8e8e50ecd892409d7bc71eefefb34c43b94fa74a281a53c0ca89",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228259,14 +228259,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.821597+00:00",
+      "checkedAt": "2026-10-13T07:23:32.089881+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758863:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3e1b81304caceb2f20315bdabd46778ee4d4a606d0a3ec471af1fc854ec2aa9f",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228530,14 +228530,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.823036+00:00",
+      "checkedAt": "2026-10-13T07:23:32.091639+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755004:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7c71ed3be79db12fa0efa117159ada1dc0eddb282da3b77beb2fe9032db6164e",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228792,14 +228792,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.823299+00:00",
+      "checkedAt": "2026-10-13T07:23:32.091950+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753955:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b5b96d9d1fabb3baf92ef1ab8964e592af26a2ad79504f87b60d3917a7d842dc",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228975,14 +228975,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825011+00:00",
+      "checkedAt": "2026-10-13T07:23:32.094143+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754868:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c1a5a125b40a1c6c4069c9005812e1b6a7fd0f8c5da7a67eccdd9976d8da6506",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229149,14 +229149,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825212+00:00",
+      "checkedAt": "2026-10-13T07:23:32.094400+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01764527:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1aae56a78ab32ff619c37df7501ecf25876ed9f8b1f452e33535408bffac0e1a",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229300,14 +229300,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.825994+00:00",
+      "checkedAt": "2026-10-13T07:23:32.095401+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755090:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5ff5ccc1682c4beb86f81257ac02bc05500b47ffb02930b47fd1f913df357542",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229386,14 +229386,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.826158+00:00",
+      "checkedAt": "2026-10-13T07:23:32.095607+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01764805:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "648915672c32100dd5653b0a5528ba042bc239836b051262b17b75102d3e39e5",
-      "classifierVersion": 14,
+      "classifierVersion": 15,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229455,7 +229455,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:18:24.826227+00:00",
+      "checkedAt": "2026-10-13T07:23:32.095679+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
