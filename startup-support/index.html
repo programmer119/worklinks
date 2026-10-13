@@ -883,11 +883,16 @@ const hardwarePurchasePattern=/(GPU|그래픽.?카드|컴퓨터.?서버|고성�
 const softwareServicePattern=/(개발|고도화|구축|유지.?보수|유지.?관리|기능.?개선|SW|소프트웨어|웹|홈페이지|플랫폼|데이터베이스|데이터.?처리|AI|인공지능|정보시스템|DB|클라우드|시스템.?운영)/i;
 function jobSoftwareScope(x){
  const title=String(x.title||''),kind=String(x.kind||'');
+ // "AI타워" in a construction-site name is not an artificial intelligence job.
+ // Purchases of a vendor's finished licenses are not standalone SW development.
+ if(/폐목재|폐합성수지|폐기물.{0,6}(?:처리|운반)|건설폐기물|건물\s*청소|청소\s*용역/i.test(title)&&
+   !/정보.?시스템|소프트웨어|플랫폼.?개발|데이터.?처리|전산.?개발/i.test(title))return 'out';
  const hw=hardwarePurchasePattern.test(title);
  if(kind==='cnstwk'||kind==='frgcpt')return 'out';
  if(kind==='thng'){
   if(hw)return /(SW개발|소프트웨어.?개발|소프트웨어.?구축|별도.?소프트웨어.?개발)/i.test(title)?'mixed':'out';
-  return /(SW|소프트웨어|S\/W|라이선스|정보시스템.?개발|솔루션)/i.test(title)?'candidate':'out';
+  return /(SW|소프트웨어|S\/W|정보시스템|솔루션)/i.test(title)&&
+   /개발|구축|고도화|연동|커스터마이징|기능\s*개선/i.test(title)?'candidate':'out';
  }
  if(hw){
   if(kind==='servc'&&/데이터.?수집|데이터.?분석|DB.?구축|SW.?개발|플랫폼.?개발|웹.?개발|소프트웨어.?개발/i.test(title))return 'candidate';

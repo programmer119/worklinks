@@ -72,10 +72,12 @@ jobs:
               # notices; never print "ready" based on an industry-code match.
               candidates=page.evaluate("""() => {
                 const seen=new Set();
-                return jobs.concat(g2bLiveJobs).filter(x=>{
+                return jobs.concat(g2bLiveJobs)
+                  .sort((x,y)=>(Number(y.noticeOrder)||0)-(Number(x.noticeOrder)||0))
+                  .filter(x=>{
                   const id=jobBidIdentity(x);
-                  if(!id||seen.has(id.bidNo+':'+id.order))return false;
-                  seen.add(id.bidNo+':'+id.order);
+                  if(!id||seen.has(id.bidNo))return false;
+                  seen.add(id.bidNo);
                   return jobSoftwareScope(x)==='candidate' &&
                     ['open','closing'].includes(jobTimeInfo(x).key);
                 }).map(x=>{

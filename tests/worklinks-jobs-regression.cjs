@@ -32,6 +32,11 @@ assert.equal(time.jobDeadlineStamp(time.jobTimeInfo({closes:'2026-10-12 13:00'})
 const scope=new Function(part('const hardwarePurchasePattern=','function noticeGroupKey(x){')+'return jobSoftwareScope;')();
 assert.equal(scope({kind:'thng',title:'GPU 컴퓨터 서버 구매'}),'out');
 assert.equal(scope({kind:'cnstwk',title:'CCTV 통신 공사'}),'out');
+assert.equal(scope({kind:'servc',title:'AI타워 지하주차장 폐목재 및 폐합성수지 처리 용역'}),'out',
+ 'a construction complex named AI tower is not SW work');
+assert.equal(scope({kind:'thng',title:'상용SW 제3자단가 제품 라이선스 도입'}),'out',
+ 'third-party off-the-shelf licenses without development are not standalone SW deliverables');
+assert.equal(scope({kind:'thng',title:'보안 SW 개발 및 시스템 구축'}),'candidate');
 const match=new Function(
  'function partnerRegisteredCode(p,c){return Object.hasOwn(p,c)?p[c]:null};'+
  "function jobSoftwareScope(x){return x.kind==='thng'?'out':'candidate'};"+
