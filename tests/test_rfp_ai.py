@@ -201,3 +201,22 @@ except ValueError as ex:
     assert "requires_review" in str(ex)
 print("WORKLINKS_RFP_COVERAGE_AND_ARCHIVE=PASS")
 
+# Explicit small-business-only bids and official local restrictions are bidder
+# prerequisites; generic evaluation documents and post-award subcontract
+# administration are not.
+adversarial=[
+ {"index":0,"type":"sme_certificate","sourceText":"※ 중소기업자만 입찰참가 가능"},
+ {"index":1,"type":"region_restriction","sourceText":"참여지역(입찰참가자의 본점 소재)을 서울특별시 또는 경기도로 제한"},
+ {"index":2,"type":"region_restriction","sourceText":"지역 제한은 두지 아니함"},
+ {"index":3,"type":"joint_participation","sourceText":"하도급계약 승인을 신청하는 경우 하도급 계약승인 신청서 제출"},
+ {"index":4,"type":"joint_participation","sourceText":"공동수급체 구성원별 평가점수는 지분율로 계산"},
+ {"index":5,"type":"industry_code","sourceText":"대기업 및 중견기업인 소프트웨어사업자는 본 입찰에 참여할 수 없음"},
+ {"index":6,"type":"joint_participation","sourceText":"공동수급체 전원 입찰참가자격을 구비하여야 한다"}
+]
+states=[v["classification"] for v in m.rule_based_interpret(adversarial)["items"]]
+assert states==["mandatory","mandatory","context_only","context_only",
+                "context_only","prohibited","context_only"],states
+assert any(c["type"]=="sme_certificate" for c in rfp.extract_rule_candidates(
+    "※ 중소기업자만 입찰참가 가능","입찰공고문.hwp"))
+
+
