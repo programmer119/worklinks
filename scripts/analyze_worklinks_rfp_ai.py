@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 5
+VERSION = 6
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -62,7 +62,9 @@ def source_candidates(notice):
             out.append({"index":len(out), "type":typ, "codes":codes[:6],
                         "sourceText":phrase[:280],
                         "sourceFile":str(v.get("sourceFile") or f.get("name") or "")[:160]})
-    return out[:120]
+    # All source-cited candidates must be interpreted; silent 120-item clipping
+    # made full-document review unreachable even for fully extracted notices.
+    return out
 
 def evidence_hash(clauses):
     b = json.dumps(clauses, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -249,9 +251,10 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
         for entry,original in zip(checked,batch):
             entry["index"]=original["index"]
             output.append(entry)
-    truncated=sum(len(f.get("clauseCandidates") or []) for f in
-                  notice.get("files") or [] if f.get("readable"))>120 or any(
-                  f.get("clauseCandidatesTruncated") or f.get("qualificationScanTruncated")
+    # Truncation now means the *source extractor* actually truncated a file,
+    # not that the classification set happened to exceed an arbitrary count.
+    truncated=any(f.get("clauseCandidatesTruncated") or
+                  f.get("qualificationScanTruncated")
                   for f in notice.get("files") or [])
     audit=complete_qualification_review(notice,clauses,output,truncated)
     return {
