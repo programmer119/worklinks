@@ -211,6 +211,43 @@ assert.ok(source.includes("refreshPartnerSme(p)"));
 assert.ok(source.includes("sme-cert-snapshot.json"));
 
 
+// A real RFP detailed-product code must match the certificate registry's
+// *name-based* record, not an absent productCode property.
+const productNamesMap=new Function(
+ part('const productionNames=','function comparePartnerJob(x,p){')+
+ 'return productionProductCodeNames;'
+)();
+const citedDirect={index:0,type:'direct_production',classification:'mandatory',
+ relation:'all',codes:['8111189901'],sourceText:'입찰 참가 업체는 직접생산확인증명서 8111189901 소지',
+ sourceFile:'입찰공고문.hwp'};
+const withRfpClause=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
+ 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
+ 'extractedRfpRequirements','rfpAiForJob','kstISO','productionProductCodeNames',
+ part('function officialReviewCoverage(rfp,evidence,ai){','function matchRowsHTML(x,p){')+
+ 'return comparePartnerJob;'
+)(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
+ ()=>({applicable:false}),()=>null,()=>({status:'unknown'}),
+ ()=>null,()=>'',x=>x.report,()=> '2026-10-12',productNamesMap);
+const partnerHasMaintenance={...prodP,productionRecords:[...prodP.productionRecords,
+ {product:'정보시스템유지관리서비스',validFrom:'2025-01-16',validTo:'2027-01-15'}]};
+const directReport={analysisStatus:'rule_based',requirements:[citedDirect]};
+const verifiedClause=withRfpClause({condition:'',report:directReport},partnerHasMaintenance).rows
+ .find(q=>q.id==='ai-0');
+assert.equal(verifiedClause.status,'ok',
+ 'exact detailed product code maps to officially issued product-name certificate');
+assert.match(verifiedClause.reason,/2026-02-01/,
+ 'dated issuance must be disclosed rather than presented as a live check');
+assert.equal(withRfpClause({condition:'',report:directReport},prodP).rows
+ .find(q=>q.id==='ai-0').status,'pending',
+ 'missing direct-production certificate may not be manufactured');
+const contextUnknown={analysisStatus:'rule_based',requirements:Array.from({length:150},(_,i)=>({
+ index:i,type:'joint_participation',classification:'unknown',sourceText:'공동수급체의 경우 평가서식 '+i
+}))};
+const clustered=withRfpClause({condition:'',report:contextUnknown},prodP).rows;
+assert.equal(clustered.filter(q=>q.id==='ai-ambiguous').length,1);
+assert.equal(clustered.filter(q=>q.id.startsWith('ai-')).length,1,
+ '150 ambiguous snippets must not be rendered as 150 company disqualifications');
+
 // Verify the actual comparePartnerJob complete flag is evidence dependent.
 const completeSha='a'.repeat(64);
 const completeDoc={name:'입찰공고문.hwp',readable:true,sourceSha256:completeSha,
