@@ -9,7 +9,7 @@ const GUEST = {
 };
 const KIND = {applied:true,hidden:true,business:true};
 const GUEST_OWNER_KEY = 'worklinks_support_guest_migration_owner_v1';
-const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,records:[],imported:0};
+const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
 const $ = (id)=>document.getElementById(id);
 const decode = (key)=>{try{const r=JSON.parse(localStorage.getItem(key)||'{}');return r&&typeof r==='object'&&!Array.isArray(r)?r:{}}catch{return {}}};
 const accountKeys = (user)=>({
@@ -26,12 +26,33 @@ function show(message){
   const target=$('worklinks-auth-info');
   if(target)target.textContent=message;
 }
-async function api(path,options={}){
+async function renewApiSession(account,oldToken){
+  if(state.account!==account||!state.client)throw Error('account_changed');
+  if(state.token!==oldToken)return; // Another concurrent request already renewed it.
+  if(!state.refreshing){
+    state.refreshing=(async()=>{
+      const refreshed=await state.client.refresh();
+      if(!refreshed?.accessToken)throw Error('refresh_without_token');
+      const me=await state.client.me();
+      if(String(me?.user?.id||'')!==account||me?.membership?.status!=='active'||state.account!==account)
+        throw Error('authhub_identity_changed');
+      state.token=refreshed.accessToken;
+    })().finally(()=>{state.refreshing=null});
+  }
+  await state.refreshing;
+}
+async function api(path,options={},retryAuth=true){
+  const account=state.account, token=state.token;
   const response=await fetch(API_BASE+path,{
-    ...options,headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...(state.token?{Authorization:'Bearer '+state.token}:{}),...(options.headers||{})},
+    ...options,headers:{Accept:'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{}),...(options.headers||{})},
     cache:'no-store',signal:AbortSignal.timeout(12000)
   });
   const data=await response.json().catch(()=>({}));
+  if(response.status===401&&retryAuth&&account&&state.client&&path==='/worklinks-state'){
+    await renewApiSession(account,token);
+    if(state.account!==account)throw Error('account_changed');
+    return api(path,options,false);
+  }
   if(!response.ok||!data.ok)throw Error(data.error||'HTTP '+response.status);
   return data;
 }
