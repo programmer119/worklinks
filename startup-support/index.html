@@ -1548,11 +1548,18 @@ function productionRequirementCheck(x,p){
 function officialReviewCoverage(rfp,evidence,ai){
  const files=Array.isArray(rfp?.files)?rfp.files:null;
  const meta=evidence?.attachments;
- if(!files||!ai||ai.documentInterpretationReviewed!==true||
+ if(!files||meta?.ok!==true||meta?.complete!==true||
+    !Array.isArray(meta.items)||meta.items.length!==files.length)return false;
+ if(!files.length){
+  const notice=evidence?.noticeDocuments;
+  return rfp.reviewComplete===true&&rfp.requiredConditionsComplete===true&&
+   rfp.noticeTextReviewed===true&&rfp.noticeConditionsVerified===true&&
+   Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&notice?.ok===true&&
+   notice?.complete===true&&Number(notice.count||0)===0;
+ }
+ if(!ai||ai.documentInterpretationReviewed!==true||
     ai.reviewComplete!==true||ai.requiredConditionsComplete!==true||
-    ai.sourceTruncated===true)return false;
- if(meta?.ok!==true||meta?.complete!==true||!Array.isArray(meta.items)||
-    rfp.manifestComplete!==true||meta.items.length!==files.length||
+    ai.sourceTruncated===true||rfp.manifestComplete!==true||
     ai.fullDocumentAudit?.manifestDocuments!==files.length)return false;
  if(!files.length||!files.some(f=>/입찰\s*공고|공고\s*(?:문|서)/.test(f.name||'')))return false;
  const audit=ai.fullDocumentAudit;

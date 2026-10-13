@@ -185,7 +185,7 @@ assert.ok(source.includes("나라장터 공식 낙찰"));
 
 // Official SMPP SME validity must be compared, not left generically pending.
 const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
- part('function officialReviewCoverage(rfp,evidence){','function matchRowsHTML(x,p){')+
+ part('function officialReviewCoverage(rfp,evidence,ai){','function matchRowsHTML(x,p){')+
  'return comparePartnerJob;'
 )(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}),()=>null,()=>'' );
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
@@ -203,17 +203,30 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 
 
 // Verify the actual comparePartnerJob complete flag is evidence dependent.
-const completion=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
- part('function officialReviewCoverage(rfp,evidence){','function matchRowsHTML(x,p){')+'return comparePartnerJob;'
+const completeSha='a'.repeat(64);
+const completeDoc={name:'입찰공고문.hwp',readable:true,sourceSha256:completeSha,
+ textSha256:completeSha,sourceTextScanComplete:true,
+ unmatchedQualificationAnchorCount:0,topics:{}};
+const reviewedNotice={status:'text_extracted_requires_review',
+ manifestComplete:true,attachmentManifestCount:1,files:[completeDoc]};
+const reviewedAi={documentInterpretationReviewed:true,reviewComplete:true,
+ requiredConditionsComplete:true,sourceTruncated:false,requirements:[],
+ fullDocumentAudit:{complete:true,manifestDocuments:1,
+ sourceHashes:[{file:'입찰공고문.hwp',sha256:completeSha}]}};
+const completion=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
+ 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
+ 'extractedRfpRequirements','rfpAiForJob',
+ part('function officialReviewCoverage(rfp,evidence,ai){','function matchRowsHTML(x,p){')+'return comparePartnerJob;'
 )(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
- ()=>({applicable:false}),()=>({attachments:{ok:true,complete:true,items:[{name:'공식 공고'}]}}),
+ ()=>({applicable:false}),
+ ()=>({attachments:{ok:true,complete:true,items:[{name:'입찰공고문.hwp'}]}}),
  ()=>({status:'unknown'}),
- x=>x.reviewed?{status:'fully_reviewed',reviewComplete:true,requiredConditionsComplete:true,
-   files:[{readable:true,reviewComplete:true,topics:{},name:'공식 공고'}]}:
-   {status:'text_extracted_requires_review',reviewComplete:false,files:[{readable:true,reviewComplete:false,topics:{},name:'RFP'}]},
- ()=> '');
+ x=>x.reviewed?reviewedNotice:
+   {status:'text_extracted_requires_review',reviewComplete:false,
+     files:[{readable:true,reviewComplete:false,topics:{},name:'RFP'}]},
+ ()=>'',x=>x.reviewed?reviewedAi:null);
 const noFilesCoverage=new Function(
- part('function officialReviewCoverage(rfp,evidence){','function comparePartnerJob(x,p){')+
+ part('function officialReviewCoverage(rfp,evidence,ai){','function comparePartnerJob(x,p){')+
  'return officialReviewCoverage;'
 )();
 const noFiles={reviewComplete:true,requiredConditionsComplete:true,files:[],
@@ -228,6 +241,11 @@ assert.equal(noFilesCoverage(noFiles,{attachments:{ok:true,complete:true,items:[
 assert.equal(completion({reviewed:false},{}).complete,false,'snippets cannot certify a bid');
 assert.equal(completion({reviewed:true},{}).complete,true,'fully verified and no outstanding requirements is achievable');
 assert.equal(completion({reviewed:true},{}).rows.find(q=>q.id==='attachment').status,'ok');
+const fails=Object.assign({},reviewedAi,{fullDocumentAudit:{...reviewedAi.fullDocumentAudit,
+ sourceHashes:[{file:'입찰공고문.hwp',sha256:'b'.repeat(64)}]}});
+assert.equal(noFilesCoverage(reviewedNotice,
+ {attachments:{ok:true,complete:true,items:[{name:'입찰공고문.hwp'}]}},fails),false,
+ 'a mismatched official document sha may not count as full review');
 assert.equal(completion({reviewed:false},{}).rows.find(q=>q.id==='attachment').status,'unknown');
 assert.ok(source.includes('id="jobInfoFold"'));
 assert.ok(source.includes('id="jobMissingInfo"'));
