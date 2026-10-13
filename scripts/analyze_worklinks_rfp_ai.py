@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 6
+VERSION = 7
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -164,7 +164,9 @@ def rule_based_interpret(clauses):
         explicit=bool(re.search(
             r"소지한\s*(?:자|업체|사업자)|등록한\s*(?:자|업체)|소지하여야|등록하여야|"
             r"등록을?\s*(?:필한|마친)\s*(?:업체|사업자|자)|등록을?\s*필한|"
-            r"업체이어야\s*합니다|소지한\s*사업자|참가자격으로\s*등록",t))
+            r"업체이어야\s*합니다|소지한\s*사업자|참가자격으로\s*등록|"
+            r"입찰참가\s*등록.{0,18}되어\s*있어야|"
+            r"등록(?:을)?\s*필한\s*업체|입찰참가(?:자격)?\s*등록",t))
         restricted=typ in {"industry_code","direct_production","sme_certificate"}
         obligation=bool(re.search(r"반드시|필수|제출하여야|첨부하여야|소지하여야|등록하여야",t))
         after_award=bool(re.search(
@@ -172,10 +174,25 @@ def rule_based_interpret(clauses):
         regional=(typ=="region_restriction" and bool(re.search(
             r"지역\s*제한.{0,35}대상|주된\s*영업소.{0,80}(?:소재|위치)",t)))
         required=(bidder and (obligation or explicit)) or (restricted and explicit) or regional
+        # Consortium paperwork is a conditional participation method; its
+        # scoring forms are not standalone bidder credentials.
+        consortium_form=(typ=="joint_participation" and bool(re.search(
+            r"공동\s*수급(?:체|인)?(?:의)?\s*경우|공동\s*수급체\s*(?:구성원|지분|평가)|"
+            r"공동\s*수급(?:을)?\s*허용|분담이행\s*방식",t)))
+        proposal_form=(typ in {"staff_proof","performance_proof"} and bool(re.search(
+            r"(?:붙임|별지)\s*\d+.{0,22}서식|"
+            r"수행\s*실적\s*(?:이력서|통계|조회)|"
+            r"(?:주요\s*)?사업\s*실적\s*증명서?\s*(?:서식|양식)|"
+            r"투입\s*인력.{0,70}(?:소요되는\s*일체의\s*경비|사업에\s*포함)|"
+            r"제안서\s*(?:평가|목차|작성|서식)|정량\s*평가",t)))
         if after_award and not bidder:
             classification="context_only"
         elif prohibited:
             classification="prohibited"
+        elif consortium_form and not required:
+            classification="context_only"
+        elif proposal_form and not bidder:
+            classification="context_only"
         elif optional:
             classification="optional"
         elif required:
@@ -192,6 +209,28 @@ def rule_based_interpret(clauses):
                 "입찰 참가자격인지 문장만으로 불명확")
         result.append({"index":c["index"],"classification":classification,
                        "relation":relation,"reason":reason})
+    # A wrapped fragment adds no additional eligibility requirement when
+    # it is strictly contained in a complete cited interpretation of the
+    # same type, with the same original cited registration identifiers.
+    def compact(s):
+        return re.sub(r"\s+","",str(s or ""))
+    authoritative=[
+        (clauses[i],v) for i,v in enumerate(result)
+        if v["classification"] in {"mandatory","prohibited"}
+    ]
+    for index,v in enumerate(result):
+        if v["classification"]!="unknown":continue
+        q=clauses[index]
+        short=compact(q.get("sourceText"))
+        if len(short)<25:continue
+        source_codes=set(map(str,q.get("codes") or []))
+        for other,decoded in authoritative:
+            if q.get("type")!=other.get("type"):continue
+            if not source_codes.issubset(set(map(str,other.get("codes") or []))):continue
+            if short in compact(other.get("sourceText")):
+                v["classification"]="context_only"
+                v["reason"]="동일 유형의 완전한 원문 조항에 포함된 중복 발췌"
+                break
     return {"items":result}
 
 def complete_qualification_review(notice, clauses, classified, truncated):
