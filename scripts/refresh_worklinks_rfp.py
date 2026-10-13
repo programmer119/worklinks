@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=9
+CLASSIFICATION_VERSION=10
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -383,6 +383,24 @@ def nonqualification_context(line):
     if re.fullmatch(
         r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
         r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)\s*[:：.]?\s*",line):
+        return True
+    # Administrative instructions and future penalties are not *new* bidder
+    # certificates. Guard against their containing actual codes or conditions.
+    if re.search(r"(?:낙찰자|계약상대자).{0,140}"
+                 r"(?:계약불이행|계약해지|보증금|직접생산\s*확인기준|"
+                 r"입찰참가자격\s*제한|부정당업자\s*제재)",line):
+        if not re.search(r"등록\s*(?:하여야|한\s*자)|소지한\s*(?:자|업체)|"
+                         r"자격을\s*갖춘\s*자",line):
+            return True
+    if re.search(r"조달청.{0,25}입찰참가자격\s*등록.{0,12}안내|"
+                 r"경쟁입찰참가자격\s*등록은?\s*수시|"
+                 r"입찰\s*참가\s*시.{0,80}(?:전산장비|투찰이\s*곤란)|"
+                 r"협상대상자.{0,50}서류\s*제출.{0,25}요구할\s*수",line):
+        if not re.search(r"(?:업종코드|세부품명번호|직접생산확인증명서|"
+                         r"소기업.{0,8}확인서|주된\s*영업소|지역제한)",line):
+            return True
+    if re.fullmatch(r"\s*(?:[①-⑳]|[\d\-]+[\.\)]?)?\s*"
+                    r"(?:기타\s*서류)?\s*\(?입찰\s*참가\s*자격\s*확인\s*서류\)?",line):
         return True
     strong=bool(re.search(r"(?<!\d)\d{4}(?!\d)|(?<!\d)\d{10}(?!\d)|"
         r"직접\s*생산|소기업\s*확인|중소기업\s*확인|"
