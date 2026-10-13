@@ -1,8 +1,8 @@
 {
   "ok": true,
-  "workflowRunId": "38361784225",
+  "workflowRunId": "38361821044",
   "model": "rule-based-v1",
-  "generatedAt": "2026-10-13T07:18:06.718229+00:00",
+  "generatedAt": "2026-10-13T07:18:24.826230+00:00",
   "source": "Citation-checked RFP classification; model or conservative rules",
   "reviewComplete": false,
   "byNotice": {
@@ -7177,7 +7177,7 @@
     "R26BK01751970:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e3dce821fb18341be97ebd6470d1c57bea738163b1ffd59e49c2b2999ea8c002",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -7396,9 +7396,9 @@
           "codes": [],
           "sourceText": "o 다만 중소기업·소상공인 확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체는",
           "sourceFile": "(협상에의한 계약)_입찰공고(제2026-1-0578호)_국내 COTS DB 사이트 구축 용역.pdf",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "확인서 필수조항 외 신청·유효기간의 조건부 안내",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -7587,14 +7587,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.350716+00:00",
+      "checkedAt": "2026-10-13T07:18:24.815626+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752850:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "25a03dc0a83bf8012f48db7db4be423f7fbafcb3eb222f62ed70896908fe6283",
-      "classifierVersion": 8,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -7967,21 +7967,21 @@
           "codes": [],
           "sourceText": "본인은 사업 수행 시 본사 및 하도급 업체로 인해 발생하는 위반사항에 대하여 모든 책임을 부담한다.",
           "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T06:52:36.701305+00:00",
+      "checkedAt": "2026-10-13T07:18:24.817327+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752716:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2e33fbcd0418158151532ea1580761d18f4fb7aa42420af754848d203a51c8b9",
-      "classifierVersion": 8,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -8222,9 +8222,9 @@
           "codes": [],
           "sourceText": "❍ 낙찰자로 결정된 이후에 공동수급 구성원을 변경할 수 없습니다.",
           "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -8258,9 +8258,9 @@
           "codes": [],
           "sourceText": "❍ 공동계약의 경우, 공동수급 구성원 중 정당한 이유 없이 공동계약이행계획서에 따라 실제 계약에 참여하지 아니하는 구성원에 대해 부정당업자로 제재조치 등 입찰참가자격을 제한합니다.",
           "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -8270,9 +8270,9 @@
           "codes": [],
           "sourceText": "※ 하도급은 발주처가 승인한 경우에 한하여 작성하며 비고란에 원도급회사를 기재한다.",
           "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -8342,14 +8342,14 @@
           "codes": [],
           "sourceText": "※ 입찰자가 하도급 계약할 경우는 하도급 예정자의 기술자 등급별 인원 현황만 제출하고 하도급 예정자에 대한 증빙서류는 제출하지 않음",
           "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T06:52:36.703118+00:00",
+      "checkedAt": "2026-10-13T07:18:24.818768+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -8729,7 +8729,7 @@
     "R26BK01747636:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "491e96cff3ee6428f1ed70d44d75fbc0e519189c498bdf67d44d88a9ea911012",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -8981,14 +8981,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.357038+00:00",
+      "checkedAt": "2026-10-13T07:18:24.821850+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748836:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "343719870786b535bf09f0db6c9d697ff4009db8ce72c0f6cff18f318b1b4330",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9244,14 +9244,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.357360+00:00",
+      "checkedAt": "2026-10-13T07:18:24.822112+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01745574:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9ded4f340fd4a1ee73d9a5ab9d9d02df2f1a336acf2a79194787d43837c3fa59",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9493,14 +9493,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.357653+00:00",
+      "checkedAt": "2026-10-13T07:18:24.822411+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746720:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e5fc116e02aa003a65eac28bb3dd093961e78b4f54175b9d45f1c9a221a930aa",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9682,14 +9682,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.359725+00:00",
+      "checkedAt": "2026-10-13T07:18:24.823981+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746812:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "317acfdb23960c666ee625fa1026e9fbbd913ec53ea4cb43cc73ba3ac6e5093f",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -9871,14 +9871,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.360021+00:00",
+      "checkedAt": "2026-10-13T07:18:24.824214+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746850:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "373423f51437c94e545dec0bbe4224558c0ad1193220805fc34ca46b4d5b762b",
-      "classifierVersion": 8,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10005,9 +10005,9 @@
           "codes": [],
           "sourceText": "1) 본 사업의 하도급의 경우「소프트웨어산업 진흥법」 제조 및「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호)의 규정에 의하여 반드시 하도급계약 전에 발주기관으로부터 사전승인을 받아야 함",
           "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10029,9 +10029,9 @@
           "codes": [],
           "sourceText": "3) 본 사업 과업의 일부를 하도급하려는 경우 입찰 시 및 계약체결 시 「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호) 의 별지 서식 제2호 및 제3호의 소프트웨어사업 하도급계획서를 제출하여야 함",
           "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10041,9 +10041,9 @@
           "codes": [],
           "sourceText": "4) 하도급계약의 승인을 신청하는 경우,「소프트웨어사업의 하도급 승인 및 관리 지침」에 따른 [하도급계약의 적정성 판단 세부기준]에 따라 적정성여부를 판단하며, 평가점수가 85점 이상인 경우에 한하여 하도급계약을 승인함. 다만, 85점 이상인 경우라 하더라도 하도급 계약의 세부 조건 등으로 인하여 사업의 원활한 수행이 불가능하다고 인정되는 경우 그 사유를 기재하여 하도급 승인 거절을 통보할 수 있음.",
           "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10060,14 +10060,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T06:52:36.709582+00:00",
+      "checkedAt": "2026-10-13T07:18:24.824434+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01746881:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8a8dd4db7dc9dd83343c4d20bb08f315c2eff9e936d5d04306e315d282038a89",
-      "classifierVersion": 8,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10194,9 +10194,9 @@
           "codes": [],
           "sourceText": "1) 본 사업의 하도급의 경우「소프트웨어산업 진흥법」 제조 및「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호)의 규정에 의하여 반드시 하도급계약 전에 발주기관으로부터 사전승인을 받아야 함",
           "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10218,9 +10218,9 @@
           "codes": [],
           "sourceText": "3) 본 사업 과업의 일부를 하도급하려는 경우 입찰 시 및 계약체결 시 「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호) 의 별지 서식 제2호 및 제3호의 소프트웨어사업 하도급계획서를 제출하여야 함",
           "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10230,9 +10230,9 @@
           "codes": [],
           "sourceText": "4) 하도급계약의 승인을 신청하는 경우,「소프트웨어사업의 하도급 승인 및 관리 지침」에 따른 [하도급계약의 적정성 판단 세부기준]에 따라 적정성여부를 판단하며, 평가점수가 85점 이상인 경우에 한하여 하도급계약을 승인함. 다만, 85점 이상인 경우라 하더라도 하도급 계약의 세부 조건 등으로 인하여 사업의 원활한 수행이 불가능하다고 인정되는 경우 그 사유를 기재하여 하도급 승인 거절을 통보할 수 있음.",
           "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -10249,14 +10249,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T06:52:36.709884+00:00",
+      "checkedAt": "2026-10-13T07:18:24.824653+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748276:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c776f147883c6b0a534a8662726ca40280165025e3e547b3a5c37b8fb199adba",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10390,14 +10390,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.360832+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825339+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747983:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "9039e375a9ce5a69c51f47e2b0733c67b960c7bc1530c0c74108b2e4d166c855",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10517,14 +10517,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361155+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825611+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01749948:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3680c066bae8842021b758f7de25df1fc93666e694d7641d1297a8279e3d5bb5",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10650,14 +10650,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361308+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825754+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750016:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3680c066bae8842021b758f7de25df1fc93666e694d7641d1297a8279e3d5bb5",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -10783,14 +10783,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361450+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825879+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754567:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "d3596062c883a63ea82477407d2a119c88ac44996f86fcba0f7d48a4f42402b7",
-      "classifierVersion": 12,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -11304,14 +11304,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:06:32.352484+00:00",
+      "checkedAt": "2026-10-13T07:18:24.812232+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01748179:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cb3519f0dd14178ab4b976b5c561232e59cc5a2c8b53a8090a731664af14d009",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -11719,14 +11719,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.351995+00:00",
+      "checkedAt": "2026-10-13T07:18:24.816691+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01750103:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "51dc0bdbbdebbb9f43de4e91691e6b0795e7e41c6a600e8283977dda7c246d92",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -11838,14 +11838,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361697+00:00",
+      "checkedAt": "2026-10-13T07:18:24.826092+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753451:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cee566c68011b9694d14731d352eccd3fe887205a2e29695b60ca18d59fc5456",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -12082,14 +12082,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.359005+00:00",
+      "checkedAt": "2026-10-13T07:18:24.823526+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747588:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "579ed587523946629a52234022e5ebd758a0c8e0a6ba1df8a69cbaf6ba13f8ee",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -12263,14 +12263,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.360244+00:00",
+      "checkedAt": "2026-10-13T07:18:24.824834+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753150:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "31834fb5263f32200274949a5171e3c45b800b3231072f57d1514b89eb992092",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -12729,14 +12729,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.349485+00:00",
+      "checkedAt": "2026-10-13T07:18:24.814577+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755651:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cbde68f7351f494d26761336857c39e014302773e2a3499c7734017164782bc7",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -13059,7 +13059,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.354775+00:00",
+      "checkedAt": "2026-10-13T07:18:24.820064+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -163815,8 +163815,8 @@
     },
     "R26BK01761468:000": {
       "analysisStatus": "rule_based",
-      "sourceSha256": "8fc5e63c795c7427063b6fc2d737fc707c3110248b170400bf40bbf79406d3a7",
-      "classifierVersion": 10,
+      "sourceSha256": "f6ddd7b524b1fbd94ab3daa83f6abbf846c16d6bae75988497a16d5f2002442e",
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -163829,7 +163829,7 @@
         ],
         "reviewedDocuments": 3,
         "manifestDocuments": 3,
-        "interpretedClauses": 34,
+        "interpretedClauses": 38,
         "sourceHashes": [
           {
             "file": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
@@ -163847,8 +163847,8 @@
         "scope": "검색 가능 공식 첨부원문 및 추출 참가조건 기계 검토. 낙찰·투찰권한·서류유효성 별도."
       },
       "automaticEligibilityApproved": false,
-      "interpretedCount": 34,
-      "totalSourceCandidates": 34,
+      "interpretedCount": 38,
+      "totalSourceCandidates": 38,
       "sourceTruncated": false,
       "requirements": [
         {
@@ -163919,6 +163919,20 @@
         },
         {
           "index": 5,
+          "type": "direct_production",
+          "codes": [
+            "8111189901"
+          ],
+          "sourceText": "나.「중소기업제품 구매촉진 및 판로지원에 관한 법률」제9조 및 같은 법 시행령 제10조에 의한 직접생산확인증명서(세부품명“정보시스템유지관리서비스”, 세부품명번호:8111189901)를 소지한 자이어야 합니다. ※ 직접생산확인증명서는 전자 견적서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함",
+          "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
+          "classification": "mandatory",
+          "relation": "all",
+          "reason": "입찰 참가자격의 명시적 등록·소지 의무",
+          "sourceVerified": true,
+          "documentFullyReviewed": false
+        },
+        {
+          "index": 6,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -163932,7 +163946,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 6,
+          "index": 7,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "라.「중소기업기본법」제2조에 따른 중·소기업 또는 「소상공인 보호 및 지원에 관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서(용도: 공공기관 입찰용)를 소지한 자이어야 합니다.",
@@ -163944,31 +163958,43 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 7,
+          "index": 8,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ <중·소기업·소상공인확인서>는 전자입찰서 제출 마감일 전일까지 신청한 것으로 유효기간 내에 있어야 합니다.",
           "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
-          "sourceVerified": true,
-          "documentFullyReviewed": false
-        },
-        {
-          "index": 8,
-          "type": "sme_certificate",
-          "codes": [],
-          "sourceText": "※ <중·소기업·소상공인확인서>는 전자입찰서 제출 마감일 전일까지 신청한 것으로 유효기간 내에 있어야 합니다. ※ <중·소기업·소상공인확인서>가 중소기업제품 공공구매종합정보망(http://www.smpp.go.kr)에서 확인이 안 될 경우 입찰 참가자격이 없습니다.",
-          "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
-          "classification": "unknown",
-          "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "확인서 필수조항 외 신청·유효기간의 조건부 안내",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
         {
           "index": 9,
+          "type": "sme_certificate",
+          "codes": [],
+          "sourceText": "※ <중·소기업·소상공인확인서>는 전자입찰서 제출 마감일 전일까지 신청한 것으로 유효기간 내에 있어야 합니다. ※ <중·소기업·소상공인확인서>가 중소기업제품 공공구매종합정보망(http://www.smpp.go.kr)에서 확인이 안 될 경우 입찰 참가자격이 없습니다.",
+          "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
+          "classification": "context_only",
+          "relation": "unknown",
+          "reason": "확인서 필수조항 외 신청·유효기간의 조건부 안내",
+          "sourceVerified": true,
+          "documentFullyReviewed": false
+        },
+        {
+          "index": 10,
+          "type": "sme_certificate",
+          "codes": [],
+          "sourceText": "라.「중소기업기본법」제2조에 따른 중·소기업 또는 「소상공인 보호 및 지원에 관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서(용도: 공공기관 입찰용)를 소지한 자이어야 합니다. ※ <중·소기업·소상공인확인서>는 전자입찰서 제출 마감일 전일까지 신청한 것으로 유효기간 내에 있어야 합니다.",
+          "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
+          "classification": "mandatory",
+          "relation": "any",
+          "reason": "입찰 참가자격의 명시적 등록·소지 의무",
+          "sourceVerified": true,
+          "documentFullyReviewed": false
+        },
+        {
+          "index": 11,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ <중·소기업·소상공인확인서>가 중소기업제품 공공구매종합정보망(http://www.smpp.go.kr)에서 확인이 안 될 경우 입찰 참가자격이 없습니다.",
@@ -163980,31 +164006,31 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 10,
+          "index": 12,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ <중·소기업·소상공인확인서>가 중소기업제품 공공구매종합정보망(http://www.smpp.go.kr)에서 확인이 안 될 경우 입찰 참가자격이 없습니다. ※ 다만, <중·소기업·소상공인확인서>를 전자입찰서 제출 마감일 전일까지 신청한 업체는 입찰참가가 가능하나, 제안서 제출일로부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않거나 입찰참가자격상 기업구분이 다른 경우에는 참가자격이 없습니다.",
           "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "확인서 필수조항 외 신청·유효기간의 조건부 안내",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
         {
-          "index": 11,
+          "index": 13,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ 다만, <중·소기업·소상공인확인서>를 전자입찰서 제출 마감일 전일까지 신청한 업체는 입찰참가가 가능하나, 제안서 제출일로부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않거나 입찰참가자격상 기업구분이 다른 경우에는 참가자격이 없습니다.",
           "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
-          "classification": "unknown",
+          "classification": "context_only",
           "relation": "unknown",
-          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "reason": "확인서 필수조항 외 신청·유효기간의 조건부 안내",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
         {
-          "index": 12,
+          "index": 14,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ 비영리법인은 중소기업확인서가 없어도 입찰 참가 가능합니다.",
@@ -164016,7 +164042,19 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 13,
+          "index": 15,
+          "type": "sme_certificate",
+          "codes": [],
+          "sourceText": "※ 다만, <중·소기업·소상공인확인서>를 전자입찰서 제출 마감일 전일까지 신청한 업체는 입찰참가가 가능하나, 제안서 제출일로부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않거나 입찰참가자격상 기업구분이 다른 경우에는 참가자격이 없습니다. ※ 비영리법인은 중소기업확인서가 없어도 입찰 참가 가능합니다.",
+          "sourceFile": "수의계약 견적제출 안내 공고_인천광역시교육청 설계공모 심사시스템 기능개선 및 유지관리 용역.hwp",
+          "classification": "context_only",
+          "relation": "unknown",
+          "reason": "확인서 필수조항 외 신청·유효기간의 조건부 안내",
+          "sourceVerified": true,
+          "documentFullyReviewed": false
+        },
+        {
+          "index": 16,
           "type": "industry_code",
           "codes": [],
           "sourceText": "마. 본 사업은 사업금액이 20억원 미만인 사업으로 「소프트웨어 진흥법」 제48조제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부 고시)」에 의거 대기업 및 중견기업의 참여를 제한하며, 「소프트웨어 진흥법」 제48조제4항에 따라 상호출자제한기업집단에 속하는 기업도 입찰에 참여할 수 없습니다.",
@@ -164028,7 +164066,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 14,
+          "index": 17,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -164042,7 +164080,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 15,
+          "index": 18,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -164056,7 +164094,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 16,
+          "index": 19,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -164070,7 +164108,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 17,
+          "index": 20,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "󰏅 「소프트웨어 진흥법」 제58조에 의하여 소프트웨어사업자(컴퓨터 관련 서비스 사업, 업종코드 1468)로 입찰 참가 자격을 등록한 업체 󰏅 「중ㆍ소기업ㆍ소상공인 및 장애인기업 확인 요령」에 따라 발급된 중ㆍ소기업ㆍ소상공인 확인서(전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
@@ -164082,7 +164120,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 18,
+          "index": 21,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "󰏅 「중ㆍ소기업ㆍ소상공인 및 장애인기업 확인 요령」에 따라 발급된 중ㆍ소기업ㆍ소상공인 확인서(전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
@@ -164094,7 +164132,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 19,
+          "index": 22,
           "type": "industry_code",
           "codes": [],
           "sourceText": "󰏅 본 사업은 20억 원 미만 사업으로 「소프트웨어 진흥법」 제48조 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부 고시)에 의거 대기업 및 중견기업 사업자는 입찰에 참여할 수 없음",
@@ -164106,7 +164144,19 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 20,
+          "index": 23,
+          "type": "industry_code",
+          "codes": [],
+          "sourceText": "󰏅 본 사업은 20억 원 미만 사업으로 「소프트웨어 진흥법」 제48조 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부 고시)에 의거 대기업 및 중견기업 사업자는 입찰에 참여할 수 없음 󰏅 「소프트웨어 진흥법」 제48조 제4항 따라 상호 출자 제한 기업집단에 속하는 회사는 입찰에 참여할 수 없음",
+          "sourceFile": "2. 인천광역시교육청 교육시설과_ 과업지시서.hwp",
+          "classification": "prohibited",
+          "relation": "not_allowed",
+          "reason": "명시적 금지·불허 표현 발견",
+          "sourceVerified": true,
+          "documentFullyReviewed": false
+        },
+        {
+          "index": 24,
           "type": "direct_production",
           "codes": [
             "8111189901"
@@ -164120,7 +164170,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 21,
+          "index": 25,
           "type": "direct_production",
           "codes": [
             "8111189901"
@@ -164134,7 +164184,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 22,
+          "index": 26,
           "type": "direct_production",
           "codes": [
             "8111189901"
@@ -164148,7 +164198,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 23,
+          "index": 27,
           "type": "direct_production",
           "codes": [],
           "sourceText": "소지한 자이어야 합니다 . ※ 직접생산확인증명서는 전자 견적서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함",
@@ -164160,7 +164210,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 24,
+          "index": 28,
           "type": "direct_production",
           "codes": [],
           "sourceText": "※ 직접생산확인증명서는 전자 견적서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 다 . 「 국가종합전자조달시스템 입찰참가자격등록규정 」 에 의하여 반드시 나라장터 (G2B) 에 견적서",
@@ -164172,7 +164222,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 25,
+          "index": 29,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -164186,7 +164236,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 26,
+          "index": 30,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -164200,7 +164250,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 27,
+          "index": 31,
           "type": "industry_code",
           "codes": [
             "1468"
@@ -164214,7 +164264,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 28,
+          "index": 32,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "확인이 되지 않거나 입찰참가자격상 기업구분이 다른 경우에는 참가자격이 없습니다 . ※ 비영리법인 은 중소기업확인서가 없어도 입찰 참가 가능합니다 .",
@@ -164226,7 +164276,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 29,
+          "index": 33,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ 비영리법인 은 중소기업확인서가 없어도 입찰 참가 가능합니다 .",
@@ -164238,7 +164288,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 30,
+          "index": 34,
           "type": "sme_certificate",
           "codes": [],
           "sourceText": "※ 비영리법인 은 중소기업확인서가 없어도 입찰 참가 가능합니다 . 마 . 본 사업은 사업금액이 20 억원 미만인 사업으로 「 소프트웨어 진흥법 」 제 48 조제 2 항 및 「 중",
@@ -164250,7 +164300,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 31,
+          "index": 35,
           "type": "industry_code",
           "codes": [],
           "sourceText": "마 . 본 사업은 사업금액이 20 억원 미만인 사업으로 「 소프트웨어 진흥법 」 제 48 조제 2 항 및 「 중 소 소프트웨어사업자의 사업 참여 지원에 관한 지침 ( 과학기술정보통신부 고시 ) 」 에 의거 대기",
@@ -164262,7 +164312,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 32,
+          "index": 36,
           "type": "industry_code",
           "codes": [],
           "sourceText": "소 소프트웨어사업자의 사업 참여 지원에 관한 지침 ( 과학기술정보통신부 고시 ) 」 에 의거 대기",
@@ -164274,7 +164324,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 33,
+          "index": 37,
           "type": "industry_code",
           "codes": [],
           "sourceText": "소 소프트웨어사업자의 사업 참여 지원에 관한 지침 ( 과학기술정보통신부 고시 ) 」 에 의거 대기 업 및 중견기업의 참여를 제한하며 , 「 소프트웨어 진흥법 」 제 48 조제 4 항에 따라 상호출자제",
@@ -164286,14 +164336,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:03:29.035810+00:00",
+      "checkedAt": "2026-10-13T07:18:24.814103+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01752002:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b42496f9339504cd3fdf67d31f3434e5454504583f8c0a1348350584f5790b69",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -164499,7 +164549,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.359397+00:00",
+      "checkedAt": "2026-10-13T07:18:24.823741+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -167612,7 +167662,7 @@
     "R26BK01755213:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "6d09b9303063036e488b6d8fdf17231bff6c3c5d1a2ebf7dbd985aa76bbe2a97",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -167860,14 +167910,14 @@
           "codes": [],
           "sourceText": "3.10. 본 사업은 하도급 및 공동수급제 구성(공동이행, 분담이행)을 허용하지 않습니다. 4. 입찰서 제출",
           "sourceFile": "공고서(2026-7)_2026 통합정보시스템 기능개선 사업(최종).pdf",
-          "classification": "prohibited",
-          "relation": "not_allowed",
-          "reason": "명시적 금지·불허 표현 발견",
+          "classification": "context_only",
+          "relation": "unknown",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.357988+00:00",
+      "checkedAt": "2026-10-13T07:18:24.822688+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -168994,7 +169044,7 @@
     "R26BK01753188:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "be7bd1275a2307e8adb5a7d2ef9f6d1708894bfd2492b122f5e55cc6d93c7859",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -169144,14 +169194,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361029+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825498+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01762567:000": {
       "analysisStatus": "rule_based",
-      "sourceSha256": "b2831c77a76282e6bf42219b03e3ece8ef6be26c1a81718dc953a4b89eb9100c",
-      "classifierVersion": 10,
+      "sourceSha256": "02bf75fc427d545315581b2e88976d34ed277cb3039cca7c613740e614f2d703",
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -169163,7 +169213,7 @@
         ],
         "reviewedDocuments": 2,
         "manifestDocuments": 2,
-        "interpretedClauses": 24,
+        "interpretedClauses": 25,
         "sourceHashes": [
           {
             "file": "입찰공고서(혁신AI원격콘텐츠).pdf",
@@ -169177,8 +169227,8 @@
         "scope": "검색 가능 공식 첨부원문 및 추출 참가조건 기계 검토. 낙찰·투찰권한·서류유효성 별도."
       },
       "automaticEligibilityApproved": false,
-      "interpretedCount": 24,
-      "totalSourceCandidates": 24,
+      "interpretedCount": 25,
+      "totalSourceCandidates": 25,
       "sourceTruncated": false,
       "requirements": [
         {
@@ -169322,9 +169372,9 @@
         },
         {
           "index": 11,
-          "type": "joint_participation",
+          "type": "performance_proof",
           "codes": [],
-          "sourceText": "완료한 유사용역(온라인콘텐츠 개발, 교육콘텐츠 제작, 이러닝 콘텐츠 개발, 영상 기반 교육콘텐츠 제작 등) 실적에 한해 인정(공동수급 불인정). 인정서류는 1. 발주기관에서 발급한 용역이행 실적",
+          "sourceText": "제시해야 함 Ⅴ. 사업 수행 실적 1. 최근 3년간 유사 용역 이행 실적",
           "sourceFile": "제안요청서(혁신AI원격콘텐츠).pdf",
           "classification": "unknown",
           "relation": "unknown",
@@ -169336,7 +169386,7 @@
           "index": 12,
           "type": "joint_participation",
           "codes": [],
-          "sourceText": "제작 등) 실적에 한해 인정(공동수급 불인정). 인정서류는 1. 발주기관에서 발급한 용역이행 실적",
+          "sourceText": "완료한 유사용역(온라인콘텐츠 개발, 교육콘텐츠 제작, 이러닝 콘텐츠 개발, 영상 기반 교육콘텐츠 제작 등) 실적에 한해 인정(공동수급 불인정). 인정서류는 1. 발주기관에서 발급한 용역이행 실적",
           "sourceFile": "제안요청서(혁신AI원격콘텐츠).pdf",
           "classification": "unknown",
           "relation": "unknown",
@@ -169346,6 +169396,18 @@
         },
         {
           "index": 13,
+          "type": "joint_participation",
+          "codes": [],
+          "sourceText": "제작 등) 실적에 한해 인정(공동수급 불인정). 인정서류는 1. 발주기관에서 발급한 용역이행 실적",
+          "sourceFile": "제안요청서(혁신AI원격콘텐츠).pdf",
+          "classification": "unknown",
+          "relation": "unknown",
+          "reason": "입찰 참가자격인지 문장만으로 불명확",
+          "sourceVerified": true,
+          "documentFullyReviewed": false
+        },
+        {
+          "index": 14,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "제작 등) 실적에 한해 인정(공동수급 불인정). 인정서류는 1. 발주기관에서 발급한 용역이행 실적 증명서 또는 2. 세금계산서(계산서)가 첨부된 계약서 중 입찰참가자가 선택. 단, 반드시 유사용역",
@@ -169357,7 +169419,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 14,
+          "index": 15,
           "type": "joint_participation",
           "codes": [],
           "sourceText": "제작 등) 실적에 한해 인정(공동수급 불인정). 인정서류는 1. 발주기관에서 발급한 용역이행 실적 증명서 또는 2. 세금계산서(계산서)가 첨부된 계약서 중 입찰참가자가 선택. 단, 반드시 유사용역",
@@ -169369,7 +169431,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 15,
+          "index": 16,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 확인결과 기재된 내용 중 허위사실이 발견된 경우 심사탈락 또는 낙찰, 계약 무효 처리됨 【서식 4】용역이행 실적증명서",
@@ -169381,7 +169443,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 16,
+          "index": 17,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "【서식 4】용역이행 실적증명서",
@@ -169393,7 +169455,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 17,
+          "index": 18,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "【서식 4】용역이행 실적증명서 신 청 인",
@@ -169405,7 +169467,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 18,
+          "index": 19,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 용역이행실적은 입찰공고시에 제시한 기준 조건에 부합되는 실적에 한함 ※ 1개 기관(발주처)에 2건 이상의 실적이 있을 경우 각각 실적증명서를 발급 첨부하여야 함",
@@ -169417,7 +169479,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 19,
+          "index": 20,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 1개 기관(발주처)에 2건 이상의 실적이 있을 경우 각각 실적증명서를 발급 첨부하여야 함",
@@ -169429,7 +169491,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 20,
+          "index": 21,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 1개 기관(발주처)에 2건 이상의 실적이 있을 경우 각각 실적증명서를 발급 첨부하여야 함 ※ 증명서 발급기관의 서식을 사용해도 무방함",
@@ -169441,7 +169503,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 21,
+          "index": 22,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 증명서 발급기관의 서식을 사용해도 무방함 ※ 사업수행 실적내용은 투명 테이프를 부착할 것",
@@ -169453,7 +169515,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 22,
+          "index": 23,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 사업수행 실적내용은 투명 테이프를 부착할 것",
@@ -169465,7 +169527,7 @@
           "documentFullyReviewed": false
         },
         {
-          "index": 23,
+          "index": 24,
           "type": "performance_proof",
           "codes": [],
           "sourceText": "※ 사업수행 실적내용은 투명 테이프를 부착할 것 【서식 5】",
@@ -169477,7 +169539,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.354229+00:00",
+      "checkedAt": "2026-10-13T07:18:24.819620+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
@@ -224438,7 +224500,7 @@
     "R26BK01754639:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "e51e54fdf22e45e1b75e70382f2129131d6a6b23d15f126f37f8f600cf59fbbf",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -224945,14 +225007,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:03:29.033905+00:00",
+      "checkedAt": "2026-10-13T07:18:24.813373+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760335:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "daa7d9114ebf1ea7eebeeec548eb59f3489b1d09d4062c805b674894d96c2a48",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -225393,14 +225455,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.350133+00:00",
+      "checkedAt": "2026-10-13T07:18:24.815097+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754686:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "8bbc44eced5381aa26e563898d53c4a8098bfb1ceea5356445090c7fe96c237f",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -225807,14 +225869,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.351337+00:00",
+      "checkedAt": "2026-10-13T07:18:24.816127+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758442:001": {
       "analysisStatus": "rule_based",
       "sourceSha256": "dc798e75e344d88f79feba1b7184bf6ceb14586931bfab117f84864ed1c7ea44",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -226194,14 +226256,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.352718+00:00",
+      "checkedAt": "2026-10-13T07:18:24.817923+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01759098:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7da699a8eecfbeb60b688f36c8c628b3926f22e0582b1a9a3def52490bdd6165",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -226594,14 +226656,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.353168+00:00",
+      "checkedAt": "2026-10-13T07:18:24.818304+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01761868:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "cb9803805f64aac59f75cd12d8729e99954be4aa18265ccfd6b0850c382446fb",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -226999,14 +227061,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.353760+00:00",
+      "checkedAt": "2026-10-13T07:18:24.819236+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01760911:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "fd626840eff7bbd0b3c724a72d2ce747b6e2647d3e9a01ef80af7398ff9bfbe7",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227321,14 +227383,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.355417+00:00",
+      "checkedAt": "2026-10-13T07:18:24.820555+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01747983:002": {
       "analysisStatus": "rule_based",
       "sourceSha256": "a4a00c67b890eb21d7fe32887d89f4562a41bdaf5c4d203dc84417bdba1f4331",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227623,14 +227685,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.355801+00:00",
+      "checkedAt": "2026-10-13T07:18:24.820861+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01751281:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "f8332cff6b25ebb9333543cf8f00c1ecd21baeb1fa5e2807e5a45453227095c0",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -227916,14 +227978,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.356336+00:00",
+      "checkedAt": "2026-10-13T07:18:24.821280+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01764518:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "2dfa919d353e8e8e50ecd892409d7bc71eefefb34c43b94fa74a281a53c0ca89",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228197,14 +228259,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.356708+00:00",
+      "checkedAt": "2026-10-13T07:18:24.821597+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01758863:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "3e1b81304caceb2f20315bdabd46778ee4d4a606d0a3ec471af1fc854ec2aa9f",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228468,14 +228530,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.358408+00:00",
+      "checkedAt": "2026-10-13T07:18:24.823036+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755004:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "7c71ed3be79db12fa0efa117159ada1dc0eddb282da3b77beb2fe9032db6164e",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228730,14 +228792,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.358710+00:00",
+      "checkedAt": "2026-10-13T07:18:24.823299+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01753955:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "b5b96d9d1fabb3baf92ef1ab8964e592af26a2ad79504f87b60d3917a7d842dc",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -228913,14 +228975,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.360449+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825011+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01754868:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "c1a5a125b40a1c6c4069c9005812e1b6a7fd0f8c5da7a67eccdd9976d8da6506",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229087,14 +229149,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.360688+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825212+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01764527:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "1aae56a78ab32ff619c37df7501ecf25876ed9f8b1f452e33535408bffac0e1a",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229238,14 +229300,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361584+00:00",
+      "checkedAt": "2026-10-13T07:18:24.825994+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01755090:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "5ff5ccc1682c4beb86f81257ac02bc05500b47ffb02930b47fd1f913df357542",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229293,9 +229355,9 @@
           "codes": [],
           "sourceText": "본 계약은 하도급 및 공동계약을 허용하지 않음 제안서 제출",
           "sourceFile": "AI더빙_K-FAST_음성편집및믹싱_입찰공고서_2026.docx",
-          "classification": "prohibited",
-          "relation": "not_allowed",
-          "reason": "명시적 금지·불허 표현 발견",
+          "classification": "context_only",
+          "relation": "unknown",
+          "reason": "계약 이후 의무·제안서 평가 문맥",
           "sourceVerified": true,
           "documentFullyReviewed": false
         },
@@ -229324,14 +229386,14 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361767+00:00",
+      "checkedAt": "2026-10-13T07:18:24.826158+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
     "R26BK01764805:000": {
       "analysisStatus": "rule_based",
       "sourceSha256": "648915672c32100dd5653b0a5528ba042bc239836b051262b17b75102d3e39e5",
-      "classifierVersion": 10,
+      "classifierVersion": 14,
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "documentInterpretationReviewed": false,
@@ -229393,7 +229455,7 @@
           "documentFullyReviewed": false
         }
       ],
-      "checkedAt": "2026-10-13T07:04:23.361835+00:00",
+      "checkedAt": "2026-10-13T07:18:24.826227+00:00",
       "limitations": "모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음",
       "model": "rule-based-v1"
     },
