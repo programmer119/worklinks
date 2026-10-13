@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 13
+VERSION = 14
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -234,7 +234,7 @@ def rule_based_interpret(clauses):
             r"(?:본\s*사업|계약).{0,90}하도급.{0,65}(?:승인|신청|대금|보안|제출)|"
             r"하도급.{0,60}수요기관.{0,35}승인",t))
         pure_heading=bool(re.fullmatch(
-            r"\s*(?:\d+[\.\-]\d+\.?\s*)?(?:하도급에\s*관한\s*사항|"
+            r"\s*(?:\d+(?:[\.\-]\d+)*\.?\s*)?(?:하도급에\s*관한\s*사항|"
             r"공동\s*수급에\s*관한\s*사항)\s*",t))
         sworn_law_guide=(typ=="joint_participation" and bool(re.search(
             r"부당한\s*공동행위.{0,40}(?:고발|기준)|"
