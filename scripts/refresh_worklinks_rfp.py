@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+import time
 import urllib.parse
 import urllib.request
 import urllib.error
@@ -25,7 +26,8 @@ DEST=ROOT/'startup-support/rfp-clauses.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
-TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx')
+TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
+CLASSIFICATION_VERSION=8
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -33,7 +35,7 @@ EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'하도급|기술\s*인력|등록\s*업체|정보통신공사업|제안\s*자격', re.I)
 
 PRIORITY_NOTICE_IDS=(
-    'R26BK01747588', 'R26BK01753188', 'R26BK01747543', 'R26BK01755651',
+    'R26BK01756420', 'R26BK01747588', 'R26BK01753188', 'R26BK01747543', 'R26BK01755651',
     'R26BK01753150', 'R26BK01748179', 'R26BK01753451', 'R26BK01755213',
 )
 SIGNALS={
@@ -90,7 +92,7 @@ def discover(limit,prior=None):
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 if cached.get('reviewComplete') is True:continue
-                if cached.get('classificationVersion')==7:
+                if cached.get('classificationVersion')==CLASSIFICATION_VERSION:
                     try:
                         checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                         if checked.tzinfo and (now-checked).total_seconds()<24*3600:
@@ -104,7 +106,7 @@ def discover(limit,prior=None):
                              for row in (qual.get('requirements') or [])
                              if isinstance(row,dict))
                 service=str(item.get('kind') or '')=='servc'
-                priority=(date,0 if matching else 1,0 if no in PRIORITY_NOTICE_IDS else 1,0 if service else 1)
+                priority=(0 if no in PRIORITY_NOTICE_IDS else 1,0 if matching else 1,date,0 if service else 1)
                 seen[key]=(priority,no,order,date.isoformat())
             if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
@@ -121,7 +123,6 @@ def legal_file(item):
         return None
     name=str(item.get('name') or '')[:160]
     lower=name.lower()
-    if not lower.endswith(TEXT_FORMATS):return None
     return name,url
 def classify_failure(error):
     if isinstance(error,urllib.error.HTTPError):
@@ -131,7 +132,9 @@ def classify_failure(error):
     detail=str(error)
     known=('large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
            'pdf_over_100_pages','pdf_over_page_limit','pdf_unreadable_page','no_searchable_text','unsupported_format',
-           'redirect_forbidden','oversize_json')
+           'redirect_forbidden','oversize_json','egg_archive_requires_converter',
+           'nested_archive_requires_review','unknown_archive_member_requires_review',
+           'archive_no_searchable_documents','unsafe_archive_path','large_xml_section')
     return next((v for v in known if v in detail),'file_extract_failure')
 
 
@@ -144,21 +147,69 @@ def invalid_file_reason(item):
     if not u.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
         return 'unsupported_download_path'
     name=str(item.get('name') or '')
-    if not name.lower().endswith(TEXT_FORMATS):
-        return 'unsupported_attachment_format'
     return 'unrecognized_file_error'
 
 
 def download(url):
     request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
-    with OPENER.open(request,timeout=35) as r:
-        size=int(r.headers.get('Content-Length') or '0')
-        if size>MAX_FILE:raise ValueError('large_file')
-        raw=r.read(MAX_FILE+1)
-        if len(raw)>MAX_FILE:raise ValueError('large_file')
-        return raw
+    for attempt in range(3):
+        try:
+            with OPENER.open(request,timeout=35) as r:
+                size=int(r.headers.get('Content-Length') or '0')
+                if size>MAX_FILE:raise ValueError('large_file')
+                raw=r.read(MAX_FILE+1)
+                if len(raw)>MAX_FILE:raise ValueError('large_file')
+                return raw
+        except urllib.error.HTTPError as ex:
+            if ex.code not in (429,500,502,503,504) or attempt==2:raise
+        except (TimeoutError,ConnectionError,urllib.error.URLError):
+            if attempt==2:raise
+        time.sleep(1.5*(attempt+1))
 def extract(name,raw):
     n=name.lower()
+    # Official downloads occasionally have no extension; inspect bounded
+    # file signatures instead of falsely treating them as unreadable.
+    if not n.endswith(TEXT_FORMATS):
+        if raw.startswith(b'%PDF-'):n+='.pdf'
+        elif raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):n+='.hwp'
+        elif raw.startswith(b'PK\x03\x04'):
+            with zipfile.ZipFile(io.BytesIO(raw)) as probe:
+                members=set(probe.namelist())
+            n+=('.docx' if 'word/document.xml' in members else
+                '.xlsx' if 'xl/workbook.xml' in members else
+                '.pptx' if 'ppt/presentation.xml' in members else
+                '.hwpx' if any(x.startswith('Contents/') and x.endswith('.xml') for x in members)
+                else '.zip')
+    if n.endswith('.egg'):
+        raise ValueError('egg_archive_requires_converter')
+    if n.endswith('.zip'):
+        parts=[]
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            members=archive.infolist()
+            if len(members)>250 or sum(m.file_size for m in members)>45_000_000:
+                raise ValueError('archive_many_xml_files')
+            for entry in members:
+                if entry.is_dir():continue
+                inner=entry.filename
+                if inner.startswith('/') or '..' in Path(inner).parts:
+                    raise ValueError('unsafe_archive_path')
+                suffix=Path(inner).suffix.lower()
+                if suffix in {'.pdf','.hwp','.hwpx','.docx','.xlsx','.pptx'}:
+                    if entry.file_size>MAX_FILE:raise ValueError('large_file')
+                    value=extract(Path(inner).name,archive.read(entry))
+                    if not value.strip():raise ValueError('no_searchable_text')
+                    parts.append('FILE '+inner+'\n'+value)
+                elif suffix in {'.zip','.egg','.7z','.rar'}:
+                    raise ValueError('nested_archive_requires_review')
+                elif suffix in {'.txt','.csv'}:
+                    if entry.file_size>MAX_FILE:raise ValueError('large_file')
+                    data=archive.read(entry)
+                    parts.append('FILE '+inner+'\n'+data.decode('utf-8','replace'))
+                elif suffix not in {'.png','.jpg','.jpeg','.gif','.bmp','.webp','.xml',
+                                     '.rels','.DS_Store','.md'}:
+                    raise ValueError('unknown_archive_member_requires_review')
+        if not parts:raise ValueError('archive_no_searchable_documents')
+        return '\n'.join(parts)
     if n.endswith(('.docx','.xlsx','.pptx')):
         # OOXML text is accessible without external dependencies. Only bounded
         # declared members are read, so decompression bombs cannot exhaust CI.
@@ -293,12 +344,15 @@ def extract_rule_candidates(text,filename):
         # Prefer one extracted paragraph; for visually wrapped PDF lines include
         # the following short line, never the entire neighbouring section.
         if len(line)>800:
-            windows=[line[i:i+500] for i in range(0,len(line),400)]
+            windows=[line[i:i+270] for i in range(0,len(line),220)]
         else:
             windows=[line]
         if len(line)<100 and index+1<len(raw_lines):
             next_line=raw_lines[index+1]
             if 0<len(next_line)<=170:windows.append((line+' '+next_line)[:270])
+        if len(line)<100 and index>0:
+            prev=raw_lines[index-1]
+            if 0<len(prev)<=170:windows.append((prev+' '+line)[:270])
         for window in windows:
             for topic,rx in rules.items():
                 if not re.search(rx,window,re.I):continue
@@ -321,6 +375,32 @@ def extract_rule_candidates(text,filename):
     return out
 
 
+def nonqualification_context(line):
+    """Ignore only unambiguous headings/administration/evaluation context.
+    Explicit bidder requirements, prohibitions and regional restrictions
+    always need a cited candidate and interpretation."""
+    if re.fullmatch(
+        r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
+        r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)\s*[:：.]?\s*",line):
+        return True
+    strong=bool(re.search(r"(?<!\d)\d{4}(?!\d)|(?<!\d)\d{10}(?!\d)|"
+        r"직접\s*생산|소기업\s*확인|중소기업\s*확인|"
+        r"지역\s*제한|본점\s*소재|주된\s*영업소",line))
+    if strong:return False
+    if re.search(r"제안서|평가\s*(?:항목|기준|점수|배점|표)|붙임|별지|서식|양식",line):
+        if re.search(r"수행\s*실적|실적\s*증명|투입\s*인력|재직\s*증명|공동\s*수급",line):
+            if not re.search(r"(?:입찰\s*참가|참가\s*자격).{0,45}(?:필수|실적|경력|인력)|"
+                             r"(?:실적|인력).{0,35}(?:이상|입찰\s*참가\s*자격)",line):
+                return True
+    if re.search(r"나라장터|전자\s*입찰|조달청\s*이용|입찰참가자격등록규정",line):
+        if not re.search(r"소지한\s*(?:업체|자)|등록(?:하여야|을?\s*필한)|"
+                         r"(?:입찰\s*참가\s*자격).{0,45}(?:갖춘|있어야)",line):
+            return True
+    if re.search(r"계약\s*체결\s*후|낙찰\s*후|착수\s*후",line):
+        return not re.search(r"입찰\s*참가\s*자격.{0,40}(?:있어야|필수)",line)
+    return False
+
+
 def audit_qualification_scan(text, candidates):
     """Count every eligibility-looking paragraph, not only extracted snippets.
 
@@ -332,17 +412,13 @@ def audit_qualification_scan(text, candidates):
     anchor_lines=[line for line in lines if EXTRA_QUALIFICATION_ANCHORS.search(line)]
     missing=[]
     for line in anchor_lines:
-        # Heading labels alone contain no bidder condition. Never exclude a
-        # numbered condition with a predicate or an unaccounted credential.
-        if re.fullmatch(
-            r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
-            r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)"
-            r"\s*[:：.]?\s*",line):
+        if nonqualification_context(line):
             continue
         compact=re.sub(r"\s+","",line)
         matched=any(
-            phrase in line or (len(phrase)>=32 and phrase[:32] in line)
-            or (len(compact)>=15 and compact in re.sub(r"\s+","",phrase))
+            compact in re.sub(r"\s+","",phrase) or
+            (len(compact)>=32 and len(phrase)>=32 and
+             re.sub(r"\s+","",phrase) in compact)
             for phrase in source)
         if not matched:
             missing.append(line[:180])
@@ -451,7 +527,7 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==7 and checked.tzinfo and (now-checked).total_seconds()<24*3600:
+                if cached.get('classificationVersion')==CLASSIFICATION_VERSION and checked.tzinfo and (now-checked).total_seconds()<6*3600:
                     print('RFP_CACHE_HIT',key)
                     continue
             except (ValueError,TypeError):pass
@@ -466,7 +542,7 @@ def main():
             try:
                 data=future.result()
                 data['checkedAt']=now.isoformat()
-                data['classificationVersion']=7
+                data['classificationVersion']=CLASSIFICATION_VERSION
                 results[key]=data
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
@@ -477,7 +553,7 @@ def main():
                               'sourceError':type(e).__name__+': '+str(e)[:100],
                               'files':[],'reviewComplete':False,
                               'contractPerformanceVerified':False,
-                              'checkedAt':now.isoformat(),'classificationVersion':7}
+                              'checkedAt':now.isoformat(),'classificationVersion':CLASSIFICATION_VERSION}
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
