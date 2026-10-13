@@ -67,6 +67,33 @@ realistic=[
 ]
 assert [x["classification"] for x in m.rule_based_interpret(realistic)["items"]]==[
  "mandatory","mandatory","mandatory","mandatory","prohibited"]
+# Consortium templates, proposal scoring and broken PDF-line duplicates
+# must never be counted as additional missing bidder credentials.
+conditional=[
+ {"index":0,"type":"joint_participation",
+  "sourceText":"※ 공동수급인 경우 구성원별 별지 제5호 서식 각자 작성"},
+ {"index":1,"type":"joint_participation",
+  "sourceText":"공동수급체는 5개 이하로 구성하여야 하고 지분율은 10% 이상"},
+ {"index":2,"type":"staff_proof",
+  "sourceText":"투입인력 PC 소프트웨어 설치에 소요되는 일체의 경비는 본 사업에 포함"},
+ {"index":3,"type":"performance_proof",
+  "sourceText":"[붙임 4호 서식] 사업실적증명서"},
+ {"index":4,"type":"industry_code","codes":["1468"],
+  "sourceText":"소프트웨어사업자(컴퓨터관련서비스사업 업종코드 1468)로 입찰참가 등록 되어 있어야 합니다."},
+ {"index":5,"type":"industry_code","codes":["1468"],
+  "sourceText":"업종코드 1468)로 입찰참가 등록 되어 있어야 합니다."},
+ {"index":6,"type":"direct_production","codes":["8111159901"],
+  "sourceText":"직접생산확인증명서(정보시스템개발서비스 8111159901)를 소지한 업체"},
+ {"index":7,"type":"direct_production","codes":["9999999999"],
+  "sourceText":"직접생산확인증명서(알 수 없는 품목 9999999999)"},
+]
+r=m.rule_based_interpret(conditional)["items"]
+assert [x["classification"] for x in r[:5]]==[
+ "context_only","context_only","context_only","context_only","mandatory"]
+assert r[5]["classification"]=="context_only"
+assert r[6]["classification"]=="mandatory"
+assert r[7]["classification"]=="unknown", "unmatched production item must remain unresolved"
+
 # Automated machine review may complete only when every official file, quote,
 # hash and bidder-condition classification can be reconciled.
 import hashlib
