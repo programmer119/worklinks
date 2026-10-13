@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-13T06:59:33.489797+00:00",
+  "generatedAt": "2026-10-13T07:04:17.490879+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -5336,7 +5336,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747983:000": {
@@ -6642,7 +6642,7 @@
           "textChars": 12571,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 49,
-          "unmatchedQualificationAnchorCount": 16,
+          "unmatchedQualificationAnchorCount": 15,
           "unmatchedAnchorSamples": [
             "○ 입찰 참가 자격 등록, 나라장터 시스템 : 정부조달 콜센터(☎ 1588-0800)",
             "당할 수 있고, 부정당업자 입찰참가자격제한처분을 받을 수 있습니다. 다",
@@ -6980,6 +6980,15 @@
               "codes": [],
               "sourceFile": "공고서(AI 수사자료 표준화 시스템 유지관리)(수정).pdf",
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(AI 수사자료 표준화 시스템 유지관리)(수정).pdf",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -7673,7 +7682,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01755651:000": {
@@ -8166,7 +8175,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754567:000": {
@@ -8777,7 +8786,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01758104:000": {
@@ -9568,7 +9577,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01755213:001": {
@@ -9582,7 +9591,7 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01755826:000": {
@@ -10823,7 +10832,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01755213:000": {
@@ -11114,7 +11123,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754897:000": {
@@ -11137,7 +11146,7 @@
           "textChars": 19667,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 88,
-          "unmatchedQualificationAnchorCount": 33,
+          "unmatchedQualificationAnchorCount": 32,
           "unmatchedAnchorSamples": [
             "① 입찰참가자격 등록, 나라장터 시스템 정부조달 콜센터(☎ 1588-0800)",
             "1) 이 입찰은 「중소기업제품구매촉진 및 판로지원에 관한 법률」 및 「국가를",
@@ -11511,6 +11520,15 @@
               "codes": [],
               "sourceFile": "2-1. 입찰공고문(사본).pdf",
               "sourceText": "- 입찰서 제출 마감일 이후 중소기업 확인서를 신청한 경우 ※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조제1항에 따라 중소기업자로 간주",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2-1. 입찰공고문(사본).pdf",
+              "sourceText": "※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조제1항에 따라 중소기업자로 간주 되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -12582,6 +12600,24 @@
               "sourceText": "- 입찰서 제출 마감일 이후 중소기업 확인서를 신청한 경우 ※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조제1항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2-1. 입찰공고문.hwpx",
+              "sourceText": "※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조제1항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2-1. 입찰공고문.hwpx",
+              "sourceText": "※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조제1항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -14255,7 +14291,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754877:000": {
@@ -15485,7 +15521,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754837:000": {
@@ -15512,7 +15548,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754010:000": {
@@ -18012,7 +18048,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754530:000": {
@@ -19929,7 +19965,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754338:000": {
@@ -20937,7 +20973,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01751960:000": {
@@ -22975,7 +23011,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01749404:000": {
@@ -24451,7 +24487,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01738722:001": {
@@ -25788,6 +25824,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
+              "sourceText": "를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
               "sourceText": " 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 입찰에 참여할 수 없습니다. ③「중소기업기본법」제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -25908,6 +25953,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰변경공고서-1468_유지관리(국가_온서_공동_정산).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -28302,7 +28365,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01753970:000": {
@@ -30943,7 +31006,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01753911:000": {
@@ -32922,7 +32985,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01752384:000": {
@@ -32935,8 +32998,8 @@
       "noticeDetailError": "",
       "attachmentManifestCount": 8,
       "manifestComplete": true,
-      "readableDocumentCount": 8,
-      "unreadableDocumentCount": 0,
+      "readableDocumentCount": 7,
+      "unreadableDocumentCount": 1,
       "files": [
         {
           "name": "★입찰공고문_배전자동화 신규개통 업무처리 플랫폼 개발 인력지원.pdf",
@@ -34151,203 +34214,9 @@
         {
           "name": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01752384&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
-          "readable": true,
-          "textChars": 3981,
-          "sourceTextScanComplete": false,
-          "qualificationAnchorCount": 13,
-          "unmatchedQualificationAnchorCount": 6,
-          "unmatchedAnchorSamples": [
-            "Ⅰ-1. 입찰참가방법_인력지원/자재/용역",
-            "2. 입찰참가 : 투찰 클릭",
-            "3. 입찰참가 : 투찰 클릭 > 제안서제출 바로가기 > 2차 인증 진행",
-            "- 발표자* 확인 서류 첨부 : 재직증명서, 4대 사회보험 가입자 가입내역 확인서**"
-          ],
-          "sourceSha256": "0864f4cd781b188db7c9ba1332998ae4aa7f4fa954818444ddf2bfcdd6412451",
-          "textSha256": "cb687faf620154b314d24fbf0adc3c402e0c068cb608fe9c5828251dfa21fa5b",
-          "qualificationScanTruncated": false,
-          "clauseCandidatesTruncated": false,
-          "topics": {
-            "입찰참가자격": 0,
-            "직접생산": 0,
-            "중소기업": 0,
-            "수행실적": 0,
-            "기술인력": 0,
-            "지역제한": 0,
-            "공동수급": 8
-          },
-          "snippets": [
-            {
-              "topic": "공동수급",
-              "text": "2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "3. (대표사) 공동수급협정서 작성 : 공동수급협정 구성 등록 > 행추가 > 업체명, 업종, 분담비율, 전체지분율 공고내용에 맞게 적절히 입력 > 저장 > 구성사에 공개 (※안내사항 참고)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "※ 공동수급사 각각 계약서 작성"
-            },
-            {
-              "topic": "공동수급",
-              "text": "3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부"
-            }
-          ],
-          "clauseCandidates": [
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행) <그림>",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "<그림> 2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "3. (대표사) 공동수급협정서 작성 : 공동수급협정 구성 등록 > 행추가 > 업체명, 업종, 분담비율, 전체지분율 공고내용에 맞게 적절히 입력 > 저장 > 구성사에 공개 (※안내사항 참고)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행) > 협정내역 확인 > 승인",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "<그림> 4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행) > 최종제출 > 전자서명",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "<그림> 5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "Ⅱ-2. 계약서 작성방법_공동계약 ※ 공동수급사 각각 계약서 작성",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "※ 공동수급사 각각 계약서 작성",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "※ 공동수급사 각각 계약서 작성 1. 계약서 확인 : 계약 > 계약체결관리 목록 > 계약명 클릭 (응답내역 클릭X)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "* 보증구분 : 계약보증 선택 / * 보증관리번호 : 계약번호 (계약서에서 확인) 3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부 가. (나라장터에서 구매하는 경우) 수입인지바로 구매 > 계좌이체 또는 카드결재로 납부 > 입지세 납부 결과 조회 > 납부내역 선택",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            }
-          ],
-          "fullReviewPending": true
+          "readable": false,
+          "errorCategory": "hwp5txt_failed",
+          "error": "ValueError: hwp5txt_failed"
         },
         {
           "name": "안전계약 특수조건(2026.10.01부)_공사,용역,설치조건부 자재.hwp",
@@ -34842,7 +34711,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01753188:000": {
@@ -34865,8 +34734,9 @@
           "textChars": 5919,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 5,
-          "unmatchedQualificationAnchorCount": 2,
+          "unmatchedQualificationAnchorCount": 3,
           "unmatchedAnchorSamples": [
+            "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제12 및 동법 시행규칙 제14조의 규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 국가종합전자조달시스템(나라장터)에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
             "마. 입찰참가작격 등을 확인하기 위하여 협상대상자에게 필요한 서류 제출을 요구할 수 있으며,낙찰자로 처리(결정)된 후에는 계약체결 대상 업체로 부적합한 하자 발견시 계약대상 선 순위에서 배제될 수 있으며,이 경우 차순위자와 계약을 진행할 수 있음.",
             "나. 입찰 참가시 희망업체의 전산장비 준비 부족 등의 사유로 인하여 전자입찰 등록 및 투찰이 곤란한 경우에는 투찰시간 마감 24시간 이전에 전자입찰시스템에 장애가 발생하였을 경우에는 G2B 전자조달콜센터 (☏1588-0800)로 문의하시기 바라며, 장애발생에도 불구하고 문의하지 않아 발생되는 모든 책임은 입찰참가자에게 있"
           ],
@@ -35001,12 +34871,10 @@
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01753188&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
           "readable": true,
           "textChars": 3606,
-          "sourceTextScanComplete": false,
+          "sourceTextScanComplete": true,
           "qualificationAnchorCount": 2,
-          "unmatchedQualificationAnchorCount": 1,
-          "unmatchedAnchorSamples": [
-            "입찰 참가 신청서"
-          ],
+          "unmatchedQualificationAnchorCount": 0,
+          "unmatchedAnchorSamples": [],
           "sourceSha256": "aa88d829d03731e868cb51d20fa6c19333e4fd9cbfb66d5ca976f3e0a88b3f89",
           "textSha256": "a254e055635a2189f125ee7202f59d694a581051a9f6d84d1c29b490aaacd6d9",
           "qualificationScanTruncated": false,
@@ -35061,7 +34929,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01753092:000": {
@@ -35287,6 +35155,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
+              "sourceText": "를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
               "sourceText": " 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 입찰에 참여할 수 없습니다. ③「중소기업기본법」제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -35407,6 +35284,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)0036_20억미만_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -37432,7 +37327,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01752568:000": {
@@ -40313,7 +40208,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01751115:000": {
@@ -42794,12 +42689,12 @@
           "textChars": 77986,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 128,
-          "unmatchedQualificationAnchorCount": 20,
+          "unmatchedQualificationAnchorCount": 19,
           "unmatchedAnchorSamples": [
             "(2) 입찰 참가자격",
-            "○ 본 사업은 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣ 제48조 제2항 및 대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다. (중소기업자만 입찰참가 가능)",
             "○ 입찰에 참가하고자 하는 자는 본 입찰 유의서 및 ｢국가를 당사자로 하는 계약에 관한 법률｣ 등을 입찰 전에 완전히 숙지하였다고 간주하며 이를 숙지하지 못함으로 발생되는 책임은 입찰 참가자에게 있습니다.",
-            "○ 우리 기관에서는 아래와 같이 누출금지정보를 지정하며, 입찰 및 사업 수행과정에서 무단으로 누출할 경우 관련 법령에 따라 부정당업자로 입찰참가자격을 제한합니다."
+            "○ 우리 기관에서는 아래와 같이 누출금지정보를 지정하며, 입찰 및 사업 수행과정에서 무단으로 누출할 경우 관련 법령에 따라 부정당업자로 입찰참가자격을 제한합니다.",
+            "판단항목세부 판단 항목세부 판단 기준 및 방법(재)하수급인의 자격참가제한o 「국가계약법」또는 「지방계약법」에 따라 하수급인이 부정당업자로 지정되어 입찰참가제한 중인 경우감점(-25점)"
           ],
           "sourceSha256": "ccc65db8483461e1cc346e4d72f3e49eb2850d9f8cecd3dae30d464646e28b04",
           "textSha256": "9636ba284f0a46ccfde18cc3be1aadda0d84d87dd1a82d7ac0cad201e49f78bd",
@@ -43218,6 +43113,24 @@
               "sourceText": "- 소프트웨어사업자 일반현황 관리확인서 1부 ③ ｢국가를 당사자로하는 계약에 관한 법률｣ 제27조 및 동법 시행령 제76조(부정당업자의 입찰참가자격 제한)에 해당되지 않은 업체",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서_188.hwpx",
+              "sourceText": "○ 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다. ○ 본 사업은 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣ 제48조 제2항 및 대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다. (중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서_188.hwpx",
+              "sourceText": "○ 본 사업은 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣ 제48조 제2항 및 대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다. (중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
               "documentRequiresManualFullReview": true
             },
             {
@@ -45028,24 +44941,6 @@
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서_188.hwpx",
-              "sourceText": "※ 하도급 계약금액 대비 최근 3년간 유사사업 수행실적 합산액의 비율을 기준으로 평가 100%이상100%미만∼80%이상80%미만∼60%이상60%미만∼50%이상50%미만30점28점26점25∼16점15점",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서_188.hwpx",
-              "sourceText": "※ 하도급 계약금액 대비 최근 3년간 유사사업 수행실적 합산액의 비율을 기준으로 평가 100%이상100%미만∼80%이상80%미만∼60%이상60%미만∼50%이상50%미만30점28점26점25∼16점15점",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
             }
           ],
           "fullReviewPending": true
@@ -45054,7 +44949,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747506:000": {
@@ -47654,7 +47549,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747543:000": {
@@ -47677,12 +47572,12 @@
           "textChars": 109464,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 40,
-          "unmatchedQualificationAnchorCount": 9,
+          "unmatchedQualificationAnchorCount": 8,
           "unmatchedAnchorSamples": [
             "ㅇ 제안내용에 관한 확인을 위하여 추가자료 요청 또는 현지실사를 할 수 있으며, 입찰참가자는 이에 응하여야 함",
-            "※ 중소기업자만 입찰참가 가능",
             "ㅇ 제안사는 평가결과에 대해 일체의 이의를 제기할 수 없으며 평가결과는 입찰참가업체에 한하여 공개할 수 있음(행정기관 및 공공기관 정보 시스템 구축·운영 지침 제34조 준용)",
-            "ㅇ 입찰에 참가하고자 하는 자는 본 입찰 유의서 및 국가를 당사자로 하는 계약에 관한 법률 등을 입찰 전에 완전히 숙지하였다고 간주하며 이를 숙지하지 못함으로 발생하는 책임은 입찰참가자에게 있음"
+            "ㅇ 입찰에 참가하고자 하는 자는 본 입찰 유의서 및 국가를 당사자로 하는 계약에 관한 법률 등을 입찰 전에 완전히 숙지하였다고 간주하며 이를 숙지하지 못함으로 발생하는 책임은 입찰참가자에게 있음",
+            "◦ 우리 기관에서는 아래와 같이 누출금지정보를 지정하며, 입찰 및 사업 수행과정에서 무단으로 누출할 경우 관련 법령에 따라 부정당업자로 입찰참가자격을 제한함"
           ],
           "sourceSha256": "c2182611668c9b80e1dd32fc36e0c2e2d30d1cb669d97390a0d91b17642139ec",
           "textSha256": "baf3942078972f04a128d6c699612ddb748f247052cb992b1cb94ca93d9273c0",
@@ -47879,6 +47774,24 @@
               "sourceText": "② ｢중소기업제품 구매촉진 및 판로지원에 관한 법률｣ 제9조 및 시행령 제10조에 의한 직접생산확인증명서(정보시스템개발서비스)를 소지한 사업자 ③ ｢국가를 당사자로하는 계약에 관한 법률｣ 제27조 및 동법 시행령 제 76조(부정당업자의 입찰참가자격 제한)에 해당되지 않은 업체",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "사업관리시스템 고도화 사업 제안요청서.hwpx",
+              "sourceText": "※ 중소기업자만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "사업관리시스템 고도화 사업 제안요청서.hwpx",
+              "sourceText": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여 제한 ※ 중소기업자만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
               "documentRequiresManualFullReview": true
             },
             {
@@ -48359,12 +48272,12 @@
           "textChars": 3920,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 14,
-          "unmatchedQualificationAnchorCount": 7,
+          "unmatchedQualificationAnchorCount": 6,
           "unmatchedAnchorSamples": [
             "가. 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제12조(경쟁입찰의 참가자격)에 의한 입찰참가 자격요건을 갖춘 자",
             "다. 「국가를 당사자로 하는 계약에 관한 법률」제27조의5 및 같은 법 시행령 제12조 제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰에 참여 할 수 없음. 입찰자는 같은 법 시행령 제12조 제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 함. 만일 서약내",
-            "※ 중소기업자만 입찰참가 가능",
-            "다. 입찰보증금 미납부시 부정당업자로 입찰 참가자격 제한 처분"
+            "다. 입찰보증금 미납부시 부정당업자로 입찰 참가자격 제한 처분",
+            "1. 금품·향응 등을 요구 또는 약속하거나 수수(授受)하지 않을 것이며, 관계공무원에게 금품, 향응 등을 제공한 경우에는 「국가를 당사자로 하는 계약에 관한 법률」 제27조제1항제7호에 따른 부정당업자의 입찰참가자격 제한 처분을 받겠습니다."
           ],
           "sourceSha256": "7adcc565ad431183f0a10e19aeabc1bb0f81e3e7a0989b20157ae627a24f7f7f",
           "textSha256": "a48676f0e663b06b36a83b1caf72221bbf8ab142bd2acec647e163a26148acda",
@@ -48495,6 +48408,33 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서.hwp",
+              "sourceText": "※ 중소기업자만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서.hwp",
+              "sourceText": "※ 중소기업자만 입찰참가 가능 <그림>",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서.hwp",
+              "sourceText": "- 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여 제한 ※ 중소기업자만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "입찰공고서.hwp",
@@ -48558,12 +48498,12 @@
           "textChars": 109994,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 42,
-          "unmatchedQualificationAnchorCount": 10,
+          "unmatchedQualificationAnchorCount": 9,
           "unmatchedAnchorSamples": [
             "ㅇ 제안내용에 관한 확인을 위하여 추가자료 요청 또는 현지실사를 할 수 있으며, 입찰참가자는 이에 응하여야 함",
-            "※ 중소기업자만 입찰참가 가능",
             "ㅇ 제안사는 평가결과에 대해 일체의 이의를 제기할 수 없으며 평가결과는 입찰참가업체에 한하여 공개할 수 있음(행정기관 및 공공기관 정보 시스템 구축·운영 지침 제34조 준용)",
-            "ㅇ 입찰에 참가하고자 하는 자는 본 입찰 유의서 및 국가를 당사자로 하는 계약에 관한 법률 등을 입찰 전에 완전히 숙지하였다고 간주하며 이를 숙지하지 못함으로 발생하는 책임은 입찰참가자에게 있음"
+            "ㅇ 입찰에 참가하고자 하는 자는 본 입찰 유의서 및 국가를 당사자로 하는 계약에 관한 법률 등을 입찰 전에 완전히 숙지하였다고 간주하며 이를 숙지하지 못함으로 발생하는 책임은 입찰참가자에게 있음",
+            "- 발주기관은 공급자가 제공받은 SW산출물을 무단으로 유출하거나 누출되는 경우 및 누출금지정보를 삭제하지 않고 활용하는 경우에는 「국가계약법」제76조제1항제3호에 따라 입찰참가자격을 제한함"
           ],
           "sourceSha256": "2c885abe8104601643793f668537f13b73e485c4e01830bc7ca6c34aa6025b65",
           "textSha256": "b81bf9500b64b42152d086df16c8877ed28c9053e0718affd835f3a18e12c053",
@@ -48766,6 +48706,24 @@
               "sourceText": "③ ｢중소기업제품 구매촉진 및 판로지원에 관한 법률｣ 제9조 및 시행령 제10조에 의한 직접생산확인증명서(정보시스템개발서비스)를 소지한 사업자 ④ ｢국가를 당사자로하는 계약에 관한 법률｣ 제27조 및 동법 시행령 제 76조(부정당업자의 입찰참가자격 제한)에 해당되지 않은 업체",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서.hwpx",
+              "sourceText": "※ 중소기업자만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서.hwpx",
+              "sourceText": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여 제한 ※ 중소기업자만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
               "documentRequiresManualFullReview": true
             },
             {
@@ -49269,7 +49227,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01745141:000": {
@@ -49543,6 +49501,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "1. [입찰공고서]2026년 하반기 통합홈페이지 시스템 고도화.hwpx",
+              "sourceText": "○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "1. [입찰공고서]2026년 하반기 통합홈페이지 시스템 고도화.hwpx",
+              "sourceText": "○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -50194,12 +50170,12 @@
           "textChars": 13864,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 78,
-          "unmatchedQualificationAnchorCount": 22,
+          "unmatchedQualificationAnchorCount": 21,
           "unmatchedAnchorSamples": [
             "② 「중소기업기본법」 제2조에 따른 중소기업자 및 「소상공인 보호 및 지원에 관한 법",
-            "인은 입찰참가 가능합니다.",
             "○ 「중소기업협동조합법」 제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가",
-            "가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일"
+            "가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일",
+            "○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제8조의2에 해당하는 자는 입찰에 참여할 수 없습니"
           ],
           "sourceSha256": "44e48a90821fd5d549a0d05fdb5ad4a001363e850895f4a9ec9352e4358903bb",
           "textSha256": "a873fe9dcc218973313d045c4a04dd942f4d5ca10110528e792025acaed19b04",
@@ -50460,6 +50436,15 @@
               "codes": [],
               "sourceFile": "1. [입찰공고서]2026년 하반기 통합홈페이지 시스템 고도화.pdf",
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 의거 중소기업자로 간주되는 특별법",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "1. [입찰공고서]2026년 하반기 통합홈페이지 시스템 고도화.pdf",
+              "sourceText": "○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 의거 중소기업자로 간주되는 특별법 인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -51281,7 +51266,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01748119:000": {
@@ -52567,10 +52552,28 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "3.용역붙임자료(2026).zip",
+              "sourceText": "ㆍ 공동계약방식의 입찰공고에 한하여 소기업(소상공인 포함)의 출자(분담)비율이 10% 이상인 공동수급체에 대해서만 평가한다. ㆍ 소기업(소상공인 포함) 확인은 『중소기업제품 공공구매종합정보망』에 등재된 자료에 따르며, 공동수급체의 구성원(대표자 포함)에 중소기업자간 경쟁입찰 참여제한 대상 중소기업이 있는 경우에는 “공동수급체 구성”에 대한 가점을 적용하지 않는다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "3.용역붙임자료(2026).zip",
               "sourceText": "ㆍ 공동계약방식의 입찰공고에 한하여 소기업(소상공인 포함)의 출자(분담)비율이 10% 이상인 공동수급체에 대해서만 평가한다. ㆍ 소기업(소상공인 포함) 확인은 『중소기업제품 공공구매종합정보망』에 등재된 자료에 따르며, 공동수급체의 구성원(대표자 포함)에 중소기업자간 경쟁입찰 참여제한 대상 중소기업이 있는 경우에는 “공동수급체 구성”에 대한 가점을 적용하지 않는다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "3.용역붙임자료(2026).zip",
+              "sourceText": "ㆍ 소기업(소상공인 포함) 확인은 『중소기업제품 공공구매종합정보망』에 등재된 자료에 따르며, 공동수급체의 구성원(대표자 포함)에 중소기업자간 경쟁입찰 참여제한 대상 중소기업이 있는 경우에는 “공동수급체 구성”에 대한 가점을 적용하지 않는다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -52616,6 +52619,15 @@
               "codes": [],
               "sourceFile": "3.용역붙임자료(2026).zip",
               "sourceText": "ㆍ 용역수행현장이 3개소 이상인 총액계약 또는 지역제한 경쟁입찰의 경우에는『지역업체와 공동수급체를 구성하는 경우』에 대한 가점을 적용하지 않는다. - “나. 약자기업” 평가는 다음 각 목에 따른다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "3.용역붙임자료(2026).zip",
+              "sourceText": "ㆍ 소기업(소상공인 포함) 확인은 『중소기업제품 공공구매종합정보망』에 등재된 자료에 따르며, 공동수급체의 구성원(대표자 포함)에 중소기업자간 경쟁입찰 참여제한 대상 중소기업이 있는 경우에는 “공동수급체 구성”에 대한 가점을 적용하지 않는다. ㆍ 용역수행현장이 3개소 이상인 총액계약 또는 지역제한 경쟁입찰의 경우에는『지역업체와 공동수급체를 구성하는 경우』에 대한 가점을 적용하지 않는다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -53344,7 +53356,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01744989:001": {
@@ -53556,7 +53568,7 @@
           "textChars": 27604,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 24,
-          "unmatchedQualificationAnchorCount": 13,
+          "unmatchedQualificationAnchorCount": 12,
           "unmatchedAnchorSamples": [
             "가. 입찰참가신청서 1부. (소정양식)",
             "에 의하여 참가 자격을 갖춘 사업자로 입찰 참가 등록을 필한 자",
@@ -53930,7 +53942,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01760115:000": {
@@ -54770,7 +54782,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01755108:000": {
@@ -59502,6 +59514,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
+              "sourceText": "를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
               "sourceText": " 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 입찰에 참여할 수 없습니다. ③「중소기업기본법」제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -59622,6 +59643,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_중기간_수평_1468_정보시스템유지관리서비스).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -63913,7 +63952,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01754392:000": {
@@ -66692,7 +66731,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01741767:000": {
@@ -67022,6 +67061,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -67853,7 +67910,7 @@
           "textChars": 22300,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 98,
-          "unmatchedQualificationAnchorCount": 28,
+          "unmatchedQualificationAnchorCount": 27,
           "unmatchedAnchorSamples": [
             "2 . 입찰참가자격",
             "③ 「 중소기업기본법 」 제 2 조에 따른 중 · 소기업자 또는 「 소상 공인 보호 및 지원에 관한 법률 」",
@@ -68208,6 +68265,33 @@
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 3 3 조 제 1 항에 의거",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
+              "sourceText": "※ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 3 3 조 제 1 항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
+              "sourceText": "중소기업자로 간주되는 특별법인은 입찰참가 가능합니다 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_1468_직생(개발)_온서_공동).pdf",
+              "sourceText": "중소기업자로 간주되는 특별법인은 입찰참가 가능합니다 . - 단 , 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -69495,7 +69579,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01752261:000": {
@@ -72107,7 +72191,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01752431:000": {
@@ -73191,7 +73275,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01765394:000": {
@@ -73205,7 +73289,7 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01751013:000": {
@@ -74831,7 +74915,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01752002:000": {
@@ -75297,6 +75381,24 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
+              "sourceText": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없음 ② 본 사업은 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣제48조 제2항 및 ｢대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)｣에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
+              "sourceText": "② 본 사업은 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣제48조 제2항 및 ｢대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)｣에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
@@ -75310,6 +75412,15 @@
               "codes": [],
               "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
               "sourceText": "○ 공동수급(공동이행방식)의 형태로 참가할 경우, 아래 사항을 준수하여야 함 󰠏 본 사업은 공동수급을 허용하며, 공동수급업체 구성원은 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조(경쟁입찰의 참가자격) 및 동법 시행규칙 제14조 규정에 저촉되지 않아야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
+              "sourceText": "② 본 사업은 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣제48조 제2항 및 ｢대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)｣에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한(중소기업자만 입찰참가 가능) ○ 공동수급(공동이행방식)의 형태로 참가할 경우, 아래 사항을 준수하여야 함",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -75661,6 +75772,15 @@
               "codes": [],
               "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
               "sourceText": "가.「중소기업 범위 및 확인에 관한 규정」제6조에 따른 중소기업확인서를 발급받고『중소기업제품 공공구매종합정보망』에 등재된 경우로서 평가기준일은 입찰서 제출 마감일 전일로 하며 중소기업확인서의 유효기간 내에 있어야 한다. 이 경우 제안서 평가일 전일까지 발급된 자료도 심사에 포함한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(2026년 DB 내 고유식별정보 암호화 검사) (1).hwp",
+              "sourceText": "나. 공동수급체의 구성원(대표자 포함)에「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 중소기업(중소기업자간 경쟁입찰 참여제한 대상 중소기업)에 대하여는 적용하지 아니한다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -76530,7 +76650,7 @@
           "textChars": 23069,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 107,
-          "unmatchedQualificationAnchorCount": 68,
+          "unmatchedQualificationAnchorCount": 67,
           "unmatchedAnchorSamples": [
             "○ 입찰 참가 자격 등록 , 나라장터 시스템 : 정부조달 콜센터 ( ☎ 1588-0800)",
             "「 국가를 당사자로 하는 계약에 관한 법률 시행령 」 제 12 조 ( 경쟁입찰의 참가자격 ) 및 같은 법 시행",
@@ -76739,6 +76859,15 @@
               "codes": [],
               "sourceFile": "1.공고서 (3).pdf",
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 33 조 제 1 항에 의거 중소기업자로",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "1.공고서 (3).pdf",
+              "sourceText": "※ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 33 조 제 1 항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능함",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -77179,7 +77308,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01750306:000": {
@@ -78067,7 +78196,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01751193:000": {
@@ -79599,6 +79728,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
+              "sourceText": "를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
               "sourceText": " 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 입찰에 참여할 수 없습니다. ③「중소기업기본법」제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -79719,6 +79857,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -81735,7 +81891,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01750115:000": {
@@ -84509,7 +84665,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01749508:000": {
@@ -84824,7 +84980,25 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
+              "sourceText": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다. ② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다.(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
+              "codes": [],
+              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
+              "sourceText": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다.(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
               "sourceText": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다.(중소기업자만 입찰참가 가능)",
@@ -87830,7 +88004,25 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
+              "sourceText": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다. ② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다.(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
+              "codes": [],
+              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
+              "sourceText": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다.(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
               "sourceText": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다.(중소기업자만 입찰참가 가능)",
@@ -88913,7 +89105,25 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "과업내용서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
+              "sourceText": "- 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여 불가 - 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
+              "codes": [],
+              "sourceFile": "과업내용서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
+              "sourceText": "- 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "과업내용서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
               "sourceText": "- 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한(중소기업자만 입찰참가 가능)",
@@ -89211,7 +89421,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01750367:000": {
@@ -93342,7 +93552,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01750325:000": {
@@ -94845,7 +95055,25 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "구매업무 협의 반영 제안요청서(2027년도 국립중앙도서관 업무시스템 통합유지관리).hwpx",
+              "sourceText": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없음 ② 본 사업은 연간 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣ 제48조 제2항 및 ｢중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)｣에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한함(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
+              "codes": [],
+              "sourceFile": "구매업무 협의 반영 제안요청서(2027년도 국립중앙도서관 업무시스템 통합유지관리).hwpx",
+              "sourceText": "② 본 사업은 연간 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣ 제48조 제2항 및 ｢중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)｣에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한함(중소기업자만 입찰참가 가능)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "구매업무 협의 반영 제안요청서(2027년도 국립중앙도서관 업무시스템 통합유지관리).hwpx",
               "sourceText": "② 본 사업은 연간 20억 미만의 사업으로써, ｢소프트웨어 진흥법｣ 제48조 제2항 및 ｢중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부)｣에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한함(중소기업자만 입찰참가 가능)",
@@ -95599,24 +95827,6 @@
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "구매업무 협의 반영 제안요청서(2027년도 국립중앙도서관 업무시스템 통합유지관리).hwpx",
-              "sourceText": "ｏ 국가를 당사자로 하는 계약에 관한 법률 ｏ 하도급거래 공정화에 관한 법률",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "구매업무 협의 반영 제안요청서(2027년도 국립중앙도서관 업무시스템 통합유지관리).hwpx",
-              "sourceText": "ｏ 하도급거래 공정화에 관한 법률",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
             }
           ],
           "fullReviewPending": true
@@ -95628,12 +95838,12 @@
           "textChars": 18898,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 69,
-          "unmatchedQualificationAnchorCount": 13,
+          "unmatchedQualificationAnchorCount": 12,
           "unmatchedAnchorSamples": [
             "이 입찰 설명서는 조달청이 집행하는 입찰에서 입찰자와 낙찰자가 숙지하고 준수하여야 할 사항을 기재한 것으로서 모든 입찰희망자는 이를 열람하여야 합니다. 본 입찰과 관련하여 추가로 문의할 사항이 있으시면 아래의 담당자에게 연락하시기 바랍니다. ○ 입찰참가자격등록, 나라장터 시스템: 정부조달콜센터 (☎ 1588-0800) ○",
             "○ 입찰참가자격등록, 나라장터 시스템: 정부조달콜센터 (☎ 1588-0800)",
-            "※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다.",
-            "2-4. 조달청 입찰참가자격 등록관련 안내"
+            "2-4. 조달청 입찰참가자격 등록관련 안내",
+            "2-4-2. 조달청 경쟁입찰참가자격 등록은 수시로 가능하며, 입찰참가를 위해서는 전자입찰서 제출마감일 전일 18:00까지 등록을 하여야 합니다. 등록절차와 나라장터(G2B) 이용안내는 정부조달콜센터(☎ 지역번호없이 1588-0800, FAX: 042-472-2297)로 문의하시기 바랍니다."
           ],
           "sourceSha256": "2e4037f81e416f33a6e72f1be42d0ff19ce879c84f25fc2ab94f1295b35e2d06",
           "textSha256": "62d3bc0b1db7366ef898288560ca900b7254a300c53fbf0b21ba785c373dc441",
@@ -95760,6 +95970,15 @@
               "codes": [],
               "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
               "sourceText": "중 어느 하나에 해당하는 경우에는 입찰참가자격이 없습니다. - 제안서 제출 마감일부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우 - 발급된 중소기업ㆍ소상공인확인서가 입찰참가자격의 기업 구분과 다른 경우 - 발급된 중소기업ㆍ소상공인확인서의 유효기간 시작일이 전자입찰서 제출 마감일 이후인 경우 - 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
+              "sourceText": "업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -95908,6 +96127,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "재공고서(국가_협상_수평_1468_직생(유지관리)_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -97967,7 +98204,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01750163:000": {
@@ -100799,7 +101036,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01749714:000": {
@@ -104140,7 +104377,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01740563:000": {
@@ -107357,7 +107594,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747750:000": {
@@ -109044,7 +109281,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747556:000": {
@@ -110968,7 +111205,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01745969:000": {
@@ -113148,6 +113385,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "2027년 화성시 대표홈페이지 유지관리 및 기능개선.hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -115551,7 +115806,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01745578:000": {
@@ -116294,6 +116549,15 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고문(BK21 클라우드전환감리).hwpx",
+              "sourceText": "중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능함 - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 함※ 이 외 사항은 관련 예규에 따름5. 공동수급에 관한 사항(공동수급을 허용한 경우에 해당)○ 공동수급체 구성원은 각각 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제12조(경쟁입찰의 참가자격) 및 동법 시행규칙 제14조 규정에 저촉되지 않아야 함○ 공동이행방식의 경우, 공동수급체 구성원은",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "입찰공고문(BK21 클라우드전환감리).hwpx",
@@ -116642,6 +116906,24 @@
               "codes": [],
               "sourceFile": "입찰공고문(BK21 클라우드전환감리).hwpx",
               "sourceText": "- 다만, <중·소기업·소상공인확인서>를 전자입찰서 제출 마감일 전일까지 신청한 업체는 입찰참가가 가능하나, 제안서 제출일로부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않거나 입찰참가자격상 기업구분이 다른 경우에는 참가자격이 없으며, 이 외 사항은 관련 예규에 따름",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고문(BK21 클라우드전환감리).hwpx",
+              "sourceText": "※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고문(BK21 클라우드전환감리).hwpx",
+              "sourceText": "※ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능함 - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 함",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -117124,7 +117406,7 @@
           "textChars": 16755,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 98,
-          "unmatchedQualificationAnchorCount": 44,
+          "unmatchedQualificationAnchorCount": 42,
           "unmatchedAnchorSamples": [
             "○ 조달청 입찰참가자 등록 및 나라장터 시스템 전자입찰 이용자 등록을 필한 자",
             "따라 입찰 참가자격을 갖춘 자로서 소정의 서류를 구비하여 입찰 등록을 마친 사업자",
@@ -117362,6 +117644,15 @@
               "codes": [],
               "sourceFile": "입찰공고문(BK21 클라우드전환감리).pdf",
               "sourceText": "- 해당없음 ※ < 중 · 기업 · 소상공인확인서 > 및 < 직접생산확인증명서 > 는 전자입찰서 제출마감일 전일까지",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고문(BK21 클라우드전환감리).pdf",
+              "sourceText": "※ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 33 조 제 1 항에 따라 중소기업자로 간주되는 특별법인은 입찰참가 가능함",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -118165,7 +118456,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01758208:000": {
@@ -118974,7 +119265,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01755537:000": {
@@ -120743,7 +121034,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01752290:000": {
@@ -122743,7 +123034,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01751690:000": {
@@ -123659,7 +123950,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01745450:000": {
@@ -124112,12 +124403,12 @@
           "textChars": 36446,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 74,
-          "unmatchedQualificationAnchorCount": 12,
+          "unmatchedQualificationAnchorCount": 11,
           "unmatchedAnchorSamples": [
             "○ 입찰참가자격등록, 나라장터 시스템: 정부조달콜센터 (☎ 1588-0800)",
-            "※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다.",
             "2-4. 조달청 입찰참가자격 등록관련 안내",
-            "※ 제안사는 제안서 파일 업로드(파일 추가) 전에 파일의 정상여부를 반드시 확인하여 주시기 바라며, 파일의 정상여부 미확인으로 발생되는 모든 책임은 입찰참가자에게 있습니다."
+            "※ 제안사는 제안서 파일 업로드(파일 추가) 전에 파일의 정상여부를 반드시 확인하여 주시기 바라며, 파일의 정상여부 미확인으로 발생되는 모든 책임은 입찰참가자에게 있습니다.",
+            "※ 위 질의 및 답변등록시간은 평가진행 상황에 따라 변동될 수 있으므로 입찰참가자는 평가일시에 실시간 모니터링을 통해 반드시 질의확인 및 답변을 등록해 주시기 바랍니다."
           ],
           "sourceSha256": "1a7a1b4ecfaa12ac1a36d6403e135be6b4c93d2b88b2006e4d3a26163bb8ebb6",
           "textSha256": "1962ae653f2f4819cac85a8b8707214a1ee09637288677e34ea44e722469215f",
@@ -124243,6 +124534,15 @@
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
               "sourceText": "는 입찰참가자격이 없습니다. - 제안서 제출 마감일부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우 - 발급된 중ㆍ소기업ㆍ소상공인확인서가 입찰참가자격의 기업 구분과 다른 경우 - 발급된 중ㆍ소기업ㆍ소상공인확인서의 유효기간 시작일이 전자입찰서 제출 마감일 이후인 경우 - 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
+              "sourceText": "에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -124679,6 +124979,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 이후 중소기업ㆍ소상공인확인서를 신청한 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -126954,7 +127272,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01748897:000": {
@@ -128930,7 +129248,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747549:000": {
@@ -129994,6 +130312,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
+              "sourceText": "를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
               "sourceText": " 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 입찰에 참여할 수 없습니다. ③「중소기업기본법」제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -130114,6 +130441,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국가_협상_수평_1468(유지관리)_20억미만_공동).hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -132514,7 +132859,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01746816:000": {
@@ -132685,6 +133030,15 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "'27년 제안요청서(민군작전모의모델 수정).hwp",
+              "sourceText": "5) 본 사업은 중소기업자 간 경쟁제품으로 사업 이행에 적합한 입찰참가자격(업종, 면허, 직접생산확인증명서 등)을 다음과 같이 명시하여야 한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
               "codes": [
                 "1468"
@@ -132705,7 +133059,25 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "'27년 제안요청서(민군작전모의모델 수정).hwp",
+              "sourceText": "5) 본 사업은 중소기업자 간 경쟁제품으로 사업 이행에 적합한 입찰참가자격(업종, 면허, 직접생산확인증명서 등)을 다음과 같이 명시하여야 한다. 가) 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자입찰서 제출마감일 전일까지 소프트웨어사업자(컴퓨터관련 서비스사업, 업종코드:1468)를 입찰참가자격으로 등록한 자이다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "direct_production",
+              "codes": [],
+              "sourceFile": "'27년 제안요청서(민군작전모의모델 수정).hwp",
+              "sourceText": "나) 「중소기업기본법」제2조에 따른 중 · 소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한규정」에 따라 발급된 <중 · 소기업 · 소상공인 확인서>(용도 : 공공기관 입찰용)를 소지한 자이다. 5) 본 사업은 중소기업자 간 경쟁제품으로 사업 이행에 적합한 입찰참가자격(업종, 면허, 직접생산확인증명서 등)을 다음과 같이 명시하여야 한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "'27년 제안요청서(민군작전모의모델 수정).hwp",
               "sourceText": "나) 「중소기업기본법」제2조에 따른 중 · 소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한규정」에 따라 발급된 <중 · 소기업 · 소상공인 확인서>(용도 : 공공기관 입찰용)를 소지한 자이다. 5) 본 사업은 중소기업자 간 경쟁제품으로 사업 이행에 적합한 입찰참가자격(업종, 면허, 직접생산확인증명서 등)을 다음과 같이 명시하여야 한다.",
@@ -133301,6 +133673,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
+              "sourceText": "를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다. ※「중소기업협동조합법」제3조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2개사 이상의 배정비율을 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
               "sourceText": " 확정하여 전자입찰서 제출마감일 전일까지 관련서류(적격조합확인서 1부, 배정계획서 1부)를 제출하여야 합니다. ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 입찰에 참여할 수 없습니다. ③「중소기업기본법」제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -133421,6 +133802,24 @@
               "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 ※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰공고서(국방부 합동참모본부)_국가_중기간_유지관리_수평_SW_1468_공불.hwpx",
+              "sourceText": "※「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 의거 중소기업자로 간주되는 특별법인은 입찰참가 가능합니다. - 단, 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -134844,7 +135243,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01761468:000": {
@@ -215125,7 +215524,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01747588:000": {
@@ -215471,7 +215870,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01753451:000": {
@@ -215755,7 +216154,7 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
     },
     "R26BK01756420:000": {
@@ -217637,8 +218036,1579 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-13T06:59:33.489797+00:00",
+      "checkedAt": "2026-10-13T07:04:17.490879+00:00",
       "classificationVersion": 8
+    },
+    "R26BK01752850:000": {
+      "status": "text_extracted_requires_review",
+      "reasonCode": "readable_text_requires_full_review",
+      "source": "나라장터 e발주 + 입찰공고 상세",
+      "count": 3,
+      "eorderCount": 0,
+      "noticeDetailDocumentCount": 3,
+      "noticeDetailError": "",
+      "files": [
+        {
+          "name": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01752850&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+          "readable": true,
+          "textChars": 5433,
+          "topics": {
+            "입찰참가자격": 8,
+            "직접생산": 4,
+            "중소기업": 15,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 0,
+            "공동수급": 2
+          },
+          "snippets": [
+            {
+              "topic": "입찰참가자격",
+              "text": "ㅇ 국가종합전자조달시스템 입찰참가자격등록규정에 의하여 반드시 G2B (나라장터)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "자의 입찰참가 자격제한)에 해당되지 아니해야 함"
+            },
+            {
+              "topic": "중소기업",
+              "text": "ㅇ「중소기업제품 구매촉진 및 판로지원에 관한 법률」시행령 제2조의 2에 따라 입"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "찰참가자격을 ‘중소기업’으로서 중소기업공공구매 종합정보망에 등록된 자"
+            },
+            {
+              "topic": "중소기업",
+              "text": "* 중소기업(소기업 또는 소상공인포함)업체로서<중·소기업, 소상공인확인서>를 소지한"
+            },
+            {
+              "topic": "중소기업",
+              "text": "<중·소기업, 소상공인 확인서>는 중소기업제품공공구매 종합정보망"
+            },
+            {
+              "topic": "중소기업",
+              "text": "ㅇ ｢중소기업제품 구매촉진 및 판로지원에 관한 법률｣ 제9조 및 동법 시행령 제10"
+            },
+            {
+              "topic": "직접생산",
+              "text": "조에 의한 직접생산확인증명서(세부품명 : 정보인프라구축서비스, 세부품명번호"
+            },
+            {
+              "topic": "직접생산",
+              "text": "* 직접생산확인증명서는전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "조달청 경쟁입찰참가자격등록증 1부"
+            },
+            {
+              "topic": "직접생산",
+              "text": "9 소프트웨어사업자 일반 현황 관리 확인서 및 직접생산확인증명서 원본대조필 확인"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "6 중소기업(소기업·소상공인)확인서 등 참가자격 증빙서류 1부"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가자격등록상의 상호 및 대표자가 법인등기부등본상의 상호, 대표자와 다른"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "경우에는 입찰참가자격등록증을 변경등록하고 입찰에 참여하여야 하며, 변경등록하"
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "시스템에 입찰일 전일까지 “소프트웨어사업”(컴퓨터관련서비스사업, 업종코드 :",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468",
+                "0036"
+              ],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "1468), “정보통신공사업”(업종코드 : 0036) 등록한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "* 제안업체는 「소프트웨어 진흥법」 제58조(소프트웨어사업자실적 등 관리)에 따라최",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "근년도결산신고된소프트웨어사업자일반현황관리서를제출서류에포함하여야함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "ㅇ「소프트웨어 진흥법」 제48조(중소 소프트웨어사업자의 사업참여 지원)에 따른",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "「중소 소프트웨어사업자의 사업참여 지원에 관한 지침」 준수",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "어사업자의 사업참여 지원) 및 중소 소프트웨어사업자의 사업 참여 지원에 관한",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "제한(소프트웨어사업자 일반 현황 관리확인서 상의 ‘공공 소프트웨어사업 입찰",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "- 총 사업금액 20억원 미만인 사업으로 중소 소프트웨어 사업자(소프트웨어사업자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "조에 의한 직접생산확인증명서(세부품명 : 정보인프라구축서비스, 세부품명번호",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "* 직접생산확인증명서는전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "9 소프트웨어사업자 일반 현황 관리 확인서 및 직접생산확인증명서 원본대조필 확인",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "1. (재)입찰공고문(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).pdf",
+              "sourceText": "9 소프트웨어사업자 일반 현황 관리 확인서 및 직접생산확인증명서 원본대조필 확인",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        },
+        {
+          "name": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01752850&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+          "readable": true,
+          "textChars": 31500,
+          "topics": {
+            "입찰참가자격": 13,
+            "직접생산": 3,
+            "중소기업": 12,
+            "수행실적": 0,
+            "기술인력": 3,
+            "지역제한": 0,
+            "공동수급": 14
+          },
+          "snippets": [
+            {
+              "topic": "공동수급",
+              "text": "ㅇ 본 사업은 하도급을 불허함"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "- (제재 요건) 발주기관은 계약상대자가 제공받은 SW산출물을 무단으로 유출하거나 누출되는 경우 및 누출금지정보를 삭제하지 않고 활용하는 경우에는「국가계약법」제76조제2항제3호 및 「지방계약법」제92조제2항제3호에 따라 입찰참가자격을 제한함"
+            },
+            {
+              "topic": "기술인력",
+              "text": "ㅇ 본 사업은 사업대가를 투입공수 방식의 사업(컨설팅, DB구축, 디지털 콘텐츠 개발 서비스 등), 상용SW 구매유지관리, 응용SW유지관리, 시스템운영환경 구축 사업으로 투입인력 요구 및 관리 금지 대상 사업에서 제외됨"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "입찰참가자격(각호 모두 해당되는 업체)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "ㅇ 국가종합전자조달시스템 입찰참가자격등록규정에 의하여 반드시 G2B (나라장터) 시스템에 입찰일 전일까지 “소프트웨어사업”(컴퓨터관련서비스사업, 업종코드 : 1468), “정보통신공사업”(업종코드 : 0036) 등록한 업체"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "ㅇ ｢국가를 당사자로 하는 계약에 관한 법률｣ 제27조 및 동시행령 제76조(부정당업자의 입찰참가 자격제한)에 해당되지 아니해야 함"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "ㅇ「중소기업제품 구매촉진 및 판로지원에 관한 법률」시행령 제2조의 2에 따라 입찰참가자격을 ‘중소기업’으로서 중소기업공공구매 종합정보망에 등록된 자"
+            },
+            {
+              "topic": "중소기업",
+              "text": "* 중소기업(소기업 또는 소상공인 포함)업체로서 <중·소기업, 소상공인 확인서>를 소지한 자로 제한하며, 입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함. <중·소기업, 소상공인 확인서>는 중소기업제품공공구매 종합정보망(http://www.smpp.go.kr)에서 확인 가능해야 하며, 확인되지 않을 경우 입찰참자가격 없음"
+            },
+            {
+              "topic": "직접생산",
+              "text": "ㅇ ｢중소기업제품 구매촉진 및 판로지원에 관한 법률｣ 제9조 및 동법 시행령 제10조에 의한 직접생산확인증명서(세부품명 : 정보인프라구축서비스, 세부품명번호 10자리 : 8111179901)를 소지한 자"
+            },
+            {
+              "topic": "직접생산",
+              "text": "* 직접생산확인증명서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "* 이 경우, 사업관리자(PM)는 제안업체 소속 (공동수급일 경우, 공동수급체대표자 소속) 임직원으로서, 입찰공고일 전부터 재직 중인 자로 한정한다."
+            },
+            {
+              "topic": "기술인력",
+              "text": "ㅇ 투입인력 성명 등은 특수부호를 사용하여 기재한다. 예) 김**"
+            },
+            {
+              "topic": "공동수급",
+              "text": "4.본 용역의 전부를 제3자에게 하도급 할 수 없다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "안정적인 AI 서비스 제공을 위한 콜 인프라 교체(1차) 용역제안 참가신청과 관련하여 작성된 모든 관련 증빙자료는 신의성실 원칙에 입각하여 작성 제출하며, 만일 제출한 서류가 부정한 방법으로 작성되었거나 허위기재 상황 등이 확인될 경우에는 참가자격에서 제외하여도 아무런 이의를 제기하지 않겠음을 서약합니다. 또한 상기 입찰 건에 대한 사업자"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "ㅇ이를 위반하여 경쟁입찰에 있어서 특정인의 낙찰을 위하여 담합을 주도한 것이 사실로 드러날 경우 한국관광공사에서 발주하는 입찰에 입찰참가자격제한 처분을 받은 날로부터 2년 동안 참가하지 않겠으며"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "ㅇ 경쟁입찰에 있어서 입찰자간에 서로 상의하여 미리 입찰가격을 협정하거나 특정인의 낙찰을 위하여 담합을 한 사실이 드러날 경우 한국관광공사가 시행하는 입찰에 입찰참가자격 제한 처분을 받은 날로부터 1년 동안 참여하지 않고"
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ 본 사업은 하도급을 불허함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "staff_proof",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ 본 사업은 사업대가를 투입공수 방식의 사업(컨설팅, DB구축, 디지털 콘텐츠 개발 서비스 등), 상용SW 구매유지관리, 응용SW유지관리, 시스템운영환경 구축 사업으로 투입인력 요구 및 관리 금지 대상 사업에서 제외됨",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468",
+                "0036"
+              ],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ 국가종합전자조달시스템 입찰참가자격등록규정에 의하여 반드시 G2B (나라장터) 시스템에 입찰일 전일까지 “소프트웨어사업”(컴퓨터관련서비스사업, 업종코드 : 1468), “정보통신공사업”(업종코드 : 0036) 등록한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "* 제안업체는 「소프트웨어 진흥법」 제58조(소프트웨어사업자 실적 등 관리)에 따라최근년도 결산신고된 소프트웨어사업자 일반 현황 관리서를 제출서류에 포함하여야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ「소프트웨어 진흥법」 제48조(중소 소프트웨어사업자의 사업참여 지원)에 따른 「중소 소프트웨어사업자의 사업참여 지원에 관한 지침」 준수",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ 본 사업은 20억원 미만 사업으로 「소프트웨어 진흥법」 제48조(중소 소프트웨어사업자의 사업참여 지원) 및 중소 소프트웨어사업자의 사업 참여 지원에 관한 지침 제2조, 제3조에 따라 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여 제한(소프트웨어사업자 일반 현황 관리확인서 상의 ‘공공 소프트웨어사업 입찰참여 제한금액: 없음’으로 확인)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "- 총 사업금액 20억원 미만인 사업으로 중소 소프트웨어 사업자(소프트웨어사업자 일반 현황 관리확인서 상의 ‘공공 소프트웨어 사업 입찰참여 제한금액: 없음’으로 확인)만 입찰참가 가능",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [
+                "8111179901"
+              ],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ ｢중소기업제품 구매촉진 및 판로지원에 관한 법률｣ 제9조 및 동법 시행령 제10조에 의한 직접생산확인증명서(세부품명 : 정보인프라구축서비스, 세부품명번호 10자리 : 8111179901)를 소지한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "* 직접생산확인증명서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "* 이 경우, 사업관리자(PM)는 제안업체 소속 (공동수급일 경우, 공동수급체대표자 소속) 임직원으로서, 입찰공고일 전부터 재직 중인 자로 한정한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "staff_proof",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "ㅇ 투입인력 성명 등은 특수부호를 사용하여 기재한다. 예) 김**",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "4.본 용역의 전부를 제3자에게 하도급 할 수 없다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "6. 우리 업체의 하도급업체(재하도급)에 대해 대금지급 연체 등이 없도록 관리할 것이며, 이와 관련한 귀사의 확인 및 조치에 성실히 협조하겠습니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "③ 하도급 및 재하도급의 경우 하수급인 및 재하수급인의 비밀정보의 비밀유지 의무 위반에 대해서도 계약상대자는 동일한 책임을 부담한다. 단 불가항력의 사유로 비밀정보의 비밀유지 의무를 위반한 경우 계약상대자는 불가항력의 사유를 증명함으로써 발주자의 손해배상 청구에 대한 책임을 면할 수 있다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "계약상대자는 본 계약의 권리 및 의무의 일부 또는 전부를 제3자에게 양도, 하도급, 담보제공 등 일체의 처분행위를 할 수 없다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "2. 제안요청서(안정적인 AI 서비스를 위한 콜인프라 교체(1차)).hwp",
+              "sourceText": "본인은 사업 수행 시 본사 및 하도급 업체로 인해 발생하는 위반사항에 대하여 모든 책임을 부담한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        },
+        {
+          "name": "상생결제시스템안내문.pptx",
+          "readable": false,
+          "errorCategory": "unsupported_attachment_format"
+        }
+      ],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:50:08.199721+00:00",
+      "classificationVersion": 4
+    },
+    "R26BK01752716:000": {
+      "status": "text_extracted_requires_review",
+      "reasonCode": "readable_text_requires_full_review",
+      "source": "나라장터 e발주 + 입찰공고 상세",
+      "count": 3,
+      "eorderCount": 0,
+      "noticeDetailDocumentCount": 3,
+      "noticeDetailError": "",
+      "files": [
+        {
+          "name": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01752716&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+          "readable": true,
+          "textChars": 6198,
+          "topics": {
+            "입찰참가자격": 16,
+            "직접생산": 3,
+            "중소기업": 13,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 0,
+            "공동수급": 0
+          },
+          "snippets": [
+            {
+              "topic": "입찰참가자격",
+              "text": "① 「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조의 규정에 의한 자격조건을 갖춘 사업자로서, 국가종합전자조달시스템 입찰참가자격등록규정에 의하여 반드시 G2B(나라장터) 시스템에 입찰일 전일까지 다음 분야의 입찰 참가 자격을 등록한 자"
+            },
+            {
+              "topic": "중소기업",
+              "text": "② 「중소기업기본법」제2조에 따른 중·소기업 또는「소상공인 보호 및 지원에 관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 자"
+            },
+            {
+              "topic": "중소기업",
+              "text": "※ <소기업·소상공인확인서>는 입찰서 제출 마감일 전일까지 발급된 것으로 유효기관 내에 있어야 하며, ‘중소기업제품 공공구매 종합정보망(http://www.smpp.go.kr)’에서 확인이 가능하여야함"
+            },
+            {
+              "topic": "직접생산",
+              "text": "③ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제8조 (경쟁입찰 참여자격) 및 동법 시행령 제9조에 의한 유자격자로서 개찰일 전일까지 발급받은 유효기간 내 직접생산확인증명서 「정보시스템 유지관리 서비스, 세부품명번호 : 8111189901」를 소지한 업체(전자입찰서 제출 마감일 전일까지 발급받은 것으로 유효기간 내에 있어야 함)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "④「국가를 당사자로하는 계약에 관한 법률」제27조 및 동법 시행령 제 76조(부정당업자의 입찰참가자격 제한)에 해당되지 않은 업체"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "※ 만일 서약내용이 허위로 판명될 경우 계약의 해제․해지를 당할 수 있고, 부정당업자 입찰참가자격 제한 처분을 받을 수 있음"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가자격 등록장소 : 조달청 고객지원센터 또는 각 지방조달청 경영관리과(팀)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가 자격등록 등 문의 : 나라장터 정부조달콜센터(☎ 1558-0800)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "마. 최종 낙찰자가 정당한 사유 없이 정해진 기일 내에 계약을 체결하지 아니할 경우 「국가를 당사자로 하는 계약에 관한 법률 시행령」제38조의 규정에 의하며, 입찰보증금은 우리 원에 귀속되며, 향후 각종 입찰 참가자격을 제한할 수 있습니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가자격 확인용 서류 각 1부(1개 파일로 일괄 스캔)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "- 조달청 경쟁입찰참가자격 등록증 사본 1부"
+            },
+            {
+              "topic": "중소기업",
+              "text": "- 증·소기업·소상공인 확인서 1부"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "※ 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일이며 마감일까지 참가자격을 갖추지 않은 경우 무효입찰로 처리됨"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가자격등록증상의 상호 및 대표자(수인대표인 경우 대표자 전원의 성명을 모두 등재, 각자 대표도 해당)가 법인등기부등본상의 상호, 대표자와 다른 경우에는 입찰참가자격등록증을 변경등록하고 입찰에 참여하여야 합니다. 이를 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의하시기 바랍니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰자 등은 제1항 각 호에 따른 행위가「국가를 당사자로 하는 계약에 관한 법률」제5조의3 등 관계 법령에 위반되는 경우 해당 입찰․낙찰이 취소되거나 계약이 해지․해제될 수 있고, 입찰참가자격 제한 대상에 해당되는 경우 「국가를 당사자로 하는 계약에 관한 법률」제27조 등 관계 법령에 따라 부정당업자로 입찰참가자격 제한처분을 받을 수 "
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+              "sourceText": "- 소프트웨어사업자(컴퓨터 관련 서비스사업)(업종코드 : 1468)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+              "sourceText": "② 「중소기업기본법」제2조에 따른 중·소기업 또는「소상공인 보호 및 지원에 관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+              "sourceText": "※ <소기업·소상공인확인서>는 입찰서 제출 마감일 전일까지 발급된 것으로 유효기관 내에 있어야 하며, ‘중소기업제품 공공구매 종합정보망(http://www.smpp.go.kr)’에서 확인이 가능하여야함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+              "sourceText": "③ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제8조 (경쟁입찰 참여자격) 및 동법 시행령 제9조에 의한 유자격자로서 개찰일 전일까지 발급받은 유효기간 내 직접생산확인증명서 「정보시스템 유지관리 서비스, 세부품명번호 : 8111189901」를 소지한 업체(전자입찰서 제출 마감일 전일까지 발급받은 것으로 유효기간 내에 있어야 함)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+              "sourceText": "- 증·소기업·소상공인 확인서 1부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.hwp",
+              "sourceText": "- 소프트웨어사업자 일반현황 관리확인서(최근년도 결산 자료로 제출)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        },
+        {
+          "name": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01752716&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+          "readable": true,
+          "textChars": 7889,
+          "topics": {
+            "입찰참가자격": 24,
+            "직접생산": 3,
+            "중소기업": 13,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 0,
+            "공동수급": 1
+          },
+          "snippets": [
+            {
+              "topic": "입찰참가자격",
+              "text": "령』에따른부정당업자의입찰참가자격제한처분을받겠습니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "정당업자의입찰참가자격제한처분을받겠습니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "입찰참가자격 ○ ‘입찰참가자격’을 참고하시기 바랍니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "참가자격등록규정에 의하여 반드시 G2B(나라장터) 시스템에 입찰일 전일까지"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "다음 분야의 입찰 참가 자격을 등록한 자"
+            },
+            {
+              "topic": "중소기업",
+              "text": "② 「중소기업기본법」제2조에 따른 중·소기업 또는「소상공인 보호 및 지원에"
+            },
+            {
+              "topic": "중소기업",
+              "text": "관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규"
+            },
+            {
+              "topic": "중소기업",
+              "text": "정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 자"
+            },
+            {
+              "topic": "중소기업",
+              "text": "※ <소기업·소상공인확인서>는 입찰서제출마감일전일까지발급된것으로유효기"
+            },
+            {
+              "topic": "중소기업",
+              "text": "관내에있어야하며, ‘중소기업제품공공구매종합정보망(http://www.smpp.go.kr)’에서"
+            },
+            {
+              "topic": "중소기업",
+              "text": "③ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제8조 (경쟁입찰 참여자"
+            },
+            {
+              "topic": "직접생산",
+              "text": "효기간 내 직접생산확인증명서 「정보시스템 유지관리 서비스, 세부품명번호 :"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "업자의 입찰참가자격 제한)에 해당되지 않은 업체"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "당업자 입찰참가자격 제한 처분을 받을 수 있음"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가자격 등록장소 : 조달청 고객지원센터 또는 각 지방조달청 경영관리과(팀)"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "○ 입찰참가 자격등록 등 문의 : 나라장터 정부조달콜센터(☎ 1558-0800)"
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "- 소프트웨어사업자(컴퓨터 관련 서비스사업)(업종코드 : 1468)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "※ <소기업·소상공인확인서>는 입찰서제출마감일전일까지발급된것으로유효기",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "효기간 내 직접생산확인증명서 「정보시스템 유지관리 서비스, 세부품명번호 :",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "- 증·소기업·소상공인 확인서 1부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "- 소프트웨어사업자 일반현황 관리확인서(최근년도 결산 자료로 제출)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "입찰재공고문_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리.pdf",
+              "sourceText": "10 공동계약(공동수급)에 관한 사항",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        },
+        {
+          "name": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01752716&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "readable": true,
+          "textChars": 12233,
+          "topics": {
+            "입찰참가자격": 7,
+            "직접생산": 1,
+            "중소기업": 12,
+            "수행실적": 6,
+            "기술인력": 1,
+            "지역제한": 0,
+            "공동수급": 16
+          },
+          "snippets": [
+            {
+              "topic": "공동수급",
+              "text": "※ 본 사업은 하도급을 허용하지 않음"
+            },
+            {
+              "topic": "공동수급",
+              "text": "❍ 본 사업은 공동수급 및 하도급을 허용하지 않는 사업입니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "① 경쟁입찰 참가자격을 갖추고, 조달청 입찰참가자격 등록증을 소지한 사업자"
+            },
+            {
+              "topic": "직접생산",
+              "text": "② ｢소프트웨어 진흥법 시행규칙｣ 제17조에 의한 소프트웨어사업자(컴퓨터관련서비스업[업종코드 1468])이면서, 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제10조에 의한 직접생산증명서[제품명:소프트웨어 엔지니어링업, 제품명:시스템관리, 세부품명:정보시스템 유지관리서비스(8111189901)]를 소지한 업"
+            },
+            {
+              "topic": "중소기업",
+              "text": "③ 「중소기업기본법」제2조에 따른 중⦁소기업자 또는 「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 자"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "④ 국가를 당사자로 하는 계약에 관한 법률」제27조 및 동법 시행령 제 76조(부정당업자의 입찰참가자격 제한)에 해당되지 않은 업체"
+            },
+            {
+              "topic": "중소기업",
+              "text": "② 본 사업은 20억 미만의 사업으로써, 「소프트웨어 진흥법」제48조 제2항 및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다(중소기업자만 입찰참가 가능)."
+            },
+            {
+              "topic": "중소기업",
+              "text": "4. 추정가격이 고시금액 미만인 입찰에서 입찰공고일을 기준으로 최근 7년 이내에 사업을 개시한 창업기업에 대해서는 신용평가등급 점수상의 배점 한도를 부여한다. 이 경우 창업기업에 대한 확인은 「중소기업제품공공구매 종합정보망」에 등재된 자료로 확인하며, 창업기업확인서의 유효기간 내에 있어야 한다. 다만, 제안서 평가일 전일까지 발급된 자료도"
+            },
+            {
+              "topic": "공동수급",
+              "text": "5. 공동수급체의 경우 구성원별 해당 점수에 지분율을 곱한 후 그 점수들을 합산하여 최종 평가하고, 평가 결과 소수점 이하의 숫자가 있는 경우 소수점 다섯째자리에서 반올림 한다."
+            },
+            {
+              "topic": "중소기업",
+              "text": "6. 중소기업협동조합이 입찰에 참여하는 경우 중소기업협동조합의 신용평가등급으로 평가한다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "❍ 본 사업은 제안요청 설명회를 실시하지 않으며, 입찰 참가 자격과 관련이 없습니다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "- 사업관리자(PM)는 공동수급체 대표자 소속 임직원으로서 입찰공고일 전부터 제안서 평가일 까지 계속 재직 중인 자이어야 합니다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "❍ 낙찰자로 결정된 이후에 공동수급 구성원을 변경할 수 없습니다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "❍ 제안서 인력은 단독 또는 공동수급 구성원의 자사인력으로 구성하여야 합니다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "❍ 공동수급체 소속 외의 인력은 하도급으로 간주하며, 발주기관의 승인을 얻지 못할 경우에는 공동수급체 구성원 자사인력으로 대체하여야 합니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "❍ 공동계약의 경우, 공동수급 구성원 중 정당한 이유 없이 공동계약이행계획서에 따라 실제 계약에 참여하지 아니하는 구성원에 대해 부정당업자로 제재조치 등 입찰참가자격을 제한합니다."
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 본 사업은 하도급을 허용하지 않음",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "❍ 본 사업은 공동수급 및 하도급을 허용하지 않는 사업입니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "② ｢소프트웨어 진흥법 시행규칙｣ 제17조에 의한 소프트웨어사업자(컴퓨터관련서비스업[업종코드 1468])이면서, 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제10조에 의한 직접생산증명서[제품명:소프트웨어 엔지니어링업, 제품명:시스템관리, 세부품명:정보시스템 유지관리서비스(8111189901)]를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "② ｢소프트웨어 진흥법 시행규칙｣ 제17조에 의한 소프트웨어사업자(컴퓨터관련서비스업[업종코드 1468])이면서, 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제10조에 의한 직접생산증명서[제품명:소프트웨어 엔지니어링업, 제품명:시스템관리, 세부품명:정보시스템 유지관리서비스(8111189901)]를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "③ 「중소기업기본법」제2조에 따른 중⦁소기업자 또는 「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "5. 공동수급체의 경우 구성원별 해당 점수에 지분율을 곱한 후 그 점수들을 합산하여 최종 평가하고, 평가 결과 소수점 이하의 숫자가 있는 경우 소수점 다섯째자리에서 반올림 한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "- 사업관리자(PM)는 공동수급체 대표자 소속 임직원으로서 입찰공고일 전부터 제안서 평가일 까지 계속 재직 중인 자이어야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "❍ 낙찰자로 결정된 이후에 공동수급 구성원을 변경할 수 없습니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "❍ 제안서 인력은 단독 또는 공동수급 구성원의 자사인력으로 구성하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "❍ 공동수급체 소속 외의 인력은 하도급으로 간주하며, 발주기관의 승인을 얻지 못할 경우에는 공동수급체 구성원 자사인력으로 대체하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "❍ 공동계약의 경우, 공동수급 구성원 중 정당한 이유 없이 공동계약이행계획서에 따라 실제 계약에 참여하지 아니하는 구성원에 대해 부정당업자로 제재조치 등 입찰참가자격을 제한합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 하도급은 발주처가 승인한 경우에 한하여 작성하며 비고란에 원도급회사를 기재한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 실적을 확인할 수 있는 실적증명서, 계약서, 이행실적확인서(한국소프트웨어산업협회 발행) 등의 증거서류제출, 확인이 불가능한 실적은 인정하지 않음",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 실적증명자료는 붙임으로 첨부하여야 하며 실적증명첨부서류에 페이지를 명시하여 주요사업실적 비고란에 페이지를 표시하여야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "[서식 4호] 사업 실적 증명서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 관련 평가항목이 없는 경우 제안서에 사업실적 증명 서식은 제출하지 않음",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 참여인력이 대표사 또는 공동수급업체 인원인 경우에는 재직증명서를 붙임으로 첨부하고, 그 외 인력(채용예정인력 등)은 추후 추가 협상과정에서 발주기관의 요청이 있을 시 증빙자료를 제출해야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "제안요청서_26년 정신건강전문가 긴급지원사업 시스템 운영·유지관리_0918(수정).hwp",
+              "sourceText": "※ 입찰자가 하도급 계약할 경우는 하도급 예정자의 기술자 등급별 인원 현황만 제출하고 하도급 예정자에 대한 증빙서류는 제출하지 않음",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        }
+      ],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:50:08.199721+00:00",
+      "classificationVersion": 4
+    },
+    "R26BK01746881:000": {
+      "status": "text_extracted_requires_review",
+      "reasonCode": "readable_text_requires_full_review",
+      "source": "나라장터 e발주 + 입찰공고 상세",
+      "count": 4,
+      "eorderCount": 0,
+      "noticeDetailDocumentCount": 4,
+      "noticeDetailError": "",
+      "files": [
+        {
+          "name": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.hwpx",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01746881&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=05",
+          "readable": true,
+          "textChars": 3742,
+          "topics": {
+            "입찰참가자격": 7,
+            "직접생산": 3,
+            "중소기업": 10,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 2,
+            "공동수급": 1
+          },
+          "snippets": [],
+          "clauseCandidates": [],
+          "fullReviewPending": true
+        },
+        {
+          "name": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01746881&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=05",
+          "readable": true,
+          "textChars": 3696,
+          "topics": {
+            "입찰참가자격": 7,
+            "직접생산": 4,
+            "중소기업": 10,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 1,
+            "공동수급": 1
+          },
+          "snippets": [
+            {
+              "topic": "공동수급",
+              "text": "총액견적, 수의계약(2인이상 견적), 공동수급불허, 국가종합전자조달시스템을 이용한 전자"
+            },
+            {
+              "topic": "지역제한",
+              "text": "등록․신고 등에 관련된 서류에 기재된 사업장의 소재지)를 구미시에 두고, 아래의"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "▸ 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터"
+            },
+            {
+              "topic": "중소기업",
+              "text": "▸「중소기업제품 구매촉진 및 판로지원에 관한 법률」제9조 및 같은 법 시행령 제10조에"
+            },
+            {
+              "topic": "직접생산",
+              "text": "의한 직접생산확인증명서[세부품명 : 공간정보DB구축서비스, 세부품명번호 10자리 :"
+            },
+            {
+              "topic": "직접생산",
+              "text": "※ 직접생산확인증명서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간"
+            },
+            {
+              "topic": "중소기업",
+              "text": "▸ 「중소기업기본법」제2조에 따른 중소기업자 및 「소상공인 보호 및 지원에 관한"
+            },
+            {
+              "topic": "중소기업",
+              "text": "법률」 제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따"
+            },
+            {
+              "topic": "중소기업",
+              "text": "라 발급된 소기업․소상공인확인서를 소지한 업체"
+            },
+            {
+              "topic": "직접생산",
+              "text": "위의 직접생산확인증명서 및 중소기업확인서는 전자입찰서 제출마감일 전일까지 발급된 것"
+            },
+            {
+              "topic": "중소기업",
+              "text": "으로 유효기간 내에 있어야 하며, 중소기업 공공구매 종합정보망(http://www.smpp.go.kr) 에"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "서 확인하여 확인이 되지 않을 경우 입찰참가 자격이 없습니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "나. 조달청 전자입찰 참가자격등록을 한 업체이어야 하며, 미등록 업체는 국가종합전자조"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "달시스템 입찰참가 자격등록 규정에 따라 개찰 전일까지 입찰참가 자격 등록하여야"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "「지방계약법 시행령」 제93조에 따라 부정당업자의 입찰참가자격제한 처분을 받"
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "총액견적, 수의계약(2인이상 견적), 공동수급불허, 국가종합전자조달시스템을 이용한 전자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "㉱ 소프트웨어사업자(컴퓨터관련서비스사업(1468))",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "의한 직접생산확인증명서[세부품명 : 공간정보DB구축서비스, 세부품명번호 10자리 :",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "※ 직접생산확인증명서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "라 발급된 소기업․소상공인확인서를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "위의 직접생산확인증명서 및 중소기업확인서는 전자입찰서 제출마감일 전일까지 발급된 것",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(공고문)고아읍 괴평리 외 4개소  GIS DB 구축 용역.pdf",
+              "sourceText": "위의 직접생산확인증명서 및 중소기업확인서는 전자입찰서 제출마감일 전일까지 발급된 것",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        },
+        {
+          "name": "[공내역서] 고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역.xlsx",
+          "readable": false,
+          "errorCategory": "unsupported_attachment_format"
+        },
+        {
+          "name": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01746881&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=05",
+          "readable": true,
+          "textChars": 16801,
+          "topics": {
+            "입찰참가자격": 0,
+            "직접생산": 0,
+            "중소기업": 0,
+            "수행실적": 1,
+            "기술인력": 1,
+            "지역제한": 0,
+            "공동수급": 15
+          },
+          "snippets": [
+            {
+              "topic": "기술인력",
+              "text": "다. \"을\"은 착수계 제출일로부터 7일 이내에 과업수행에 따른 세부예정공정표, 동원인원계획표, 과업수행 조직표, 참여자명단(자격증사본 첨부) 및 투입장비(안전장비 포함) 보유사실확인서, 밀폐공간프로그램 이수확인증, 사업수행계획서, 보안각서를 작성하여 \"갑\"에게 제출하여야 한다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "라. 업체별 업무분장과 일정관리를 명확히 하여 사업수행계획서 제출 시 제출하고 업무 구분이 모호함으로 인하여 문제 발생 시에는 공동수급체 모두가 연대하여 책임을 진다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "1) 본 사업의 하도급의 경우「소프트웨어산업 진흥법」 제조 및「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호)의 규정에 의하여 반드시 하도급계약 전에 발주기관으로부터 사전승인을 받아야 함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "2) 본 사업의 과업의 일부를 하도급하려는 경우 「소프트웨어산업 진흥법」 제51조에 따라 사업금액의 100분의 50을 초과할 수 없으며, 재하도급은 원칙적으로 불허함. 다만, 같은 법 제51조제3항 각 호 에 해당하는 경우 그러하지 아니함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "3) 본 사업 과업의 일부를 하도급하려는 경우 입찰 시 및 계약체결 시 「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호) 의 별지 서식 제2호 및 제3호의 소프트웨어사업 하도급계획서를 제출하여야 함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "4) 하도급계약의 승인을 신청하는 경우,「소프트웨어사업의 하도급 승인 및 관리 지침」에 따른 [하도급계약의 적정성 판단 세부기준]에 따라 적정성여부를 판단하며, 평가점수가 85점 이상인 경우에 한하여 하도급계약을 승인함. 다만, 85점 이상인 경우라 하더라도 하도급 계약의 세부 조건 등으로 인하여 사업의 원활한 수행이 불가능하다고 인정되는"
+            },
+            {
+              "topic": "수행실적",
+              "text": "가. \"을\"은 본 과업의 예정공정에 의거 효과적인 과업수행을 위하여 매주․매월말일 기준으로 과업수행 실적 및 계획을 서면으로 \"갑\"에게 제출하며, 또한 수행기간 중 \"갑\"의 요구가 있을 시에는 과업추진 전반에 걸쳐 수시 보고를 하여야 한다."
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "라. 업체별 업무분장과 일정관리를 명확히 하여 사업수행계획서 제출 시 제출하고 업무 구분이 모호함으로 인하여 문제 발생 시에는 공동수급체 모두가 연대하여 책임을 진다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "1) 본 사업의 하도급의 경우「소프트웨어산업 진흥법」 제조 및「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호)의 규정에 의하여 반드시 하도급계약 전에 발주기관으로부터 사전승인을 받아야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "2) 본 사업의 과업의 일부를 하도급하려는 경우 「소프트웨어산업 진흥법」 제51조에 따라 사업금액의 100분의 50을 초과할 수 없으며, 재하도급은 원칙적으로 불허함. 다만, 같은 법 제51조제3항 각 호 에 해당하는 경우 그러하지 아니함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "3) 본 사업 과업의 일부를 하도급하려는 경우 입찰 시 및 계약체결 시 「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호) 의 별지 서식 제2호 및 제3호의 소프트웨어사업 하도급계획서를 제출하여야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "4) 하도급계약의 승인을 신청하는 경우,「소프트웨어사업의 하도급 승인 및 관리 지침」에 따른 [하도급계약의 적정성 판단 세부기준]에 따라 적정성여부를 판단하며, 평가점수가 85점 이상인 경우에 한하여 하도급계약을 승인함. 다만, 85점 이상인 경우라 하더라도 하도급 계약의 세부 조건 등으로 인하여 사업의 원활한 수행이 불가능하다고 인정되는 경우 그 사유를 기재하여 하도급 승인 거절을 통보할 수 있음.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "과업지시서(고아읍 괴평리 외 4개소 하수도정비 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "가. \"을\"은 본 과업의 예정공정에 의거 효과적인 과업수행을 위하여 매주․매월말일 기준으로 과업수행 실적 및 계획을 서면으로 \"갑\"에게 제출하며, 또한 수행기간 중 \"갑\"의 요구가 있을 시에는 과업추진 전반에 걸쳐 수시 보고를 하여야 한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        }
+      ],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:50:08.199721+00:00",
+      "classificationVersion": 4
+    },
+    "R26BK01746850:000": {
+      "status": "text_extracted_requires_review",
+      "reasonCode": "readable_text_requires_full_review",
+      "source": "나라장터 e발주 + 입찰공고 상세",
+      "count": 4,
+      "eorderCount": 0,
+      "noticeDetailDocumentCount": 4,
+      "noticeDetailError": "",
+      "files": [
+        {
+          "name": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.hwpx",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01746850&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=05",
+          "readable": true,
+          "textChars": 3742,
+          "topics": {
+            "입찰참가자격": 7,
+            "직접생산": 3,
+            "중소기업": 10,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 2,
+            "공동수급": 1
+          },
+          "snippets": [],
+          "clauseCandidates": [],
+          "fullReviewPending": true
+        },
+        {
+          "name": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01746850&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=05",
+          "readable": true,
+          "textChars": 3696,
+          "topics": {
+            "입찰참가자격": 7,
+            "직접생산": 4,
+            "중소기업": 10,
+            "수행실적": 0,
+            "기술인력": 0,
+            "지역제한": 1,
+            "공동수급": 1
+          },
+          "snippets": [
+            {
+              "topic": "공동수급",
+              "text": "총액견적, 수의계약(2인이상 견적), 공동수급불허, 국가종합전자조달시스템을 이용한 전자"
+            },
+            {
+              "topic": "지역제한",
+              "text": "등록․신고 등에 관련된 서류에 기재된 사업장의 소재지)를 구미시에 두고, 아래의"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "▸ 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터"
+            },
+            {
+              "topic": "중소기업",
+              "text": "▸「중소기업제품 구매촉진 및 판로지원에 관한 법률」제9조 및 같은 법 시행령 제10조에"
+            },
+            {
+              "topic": "직접생산",
+              "text": "의한 직접생산확인증명서[세부품명 : 공간정보DB구축서비스, 세부품명번호 10자리 :"
+            },
+            {
+              "topic": "직접생산",
+              "text": "※ 직접생산확인증명서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간"
+            },
+            {
+              "topic": "중소기업",
+              "text": "▸ 「중소기업기본법」제2조에 따른 중소기업자 및 「소상공인 보호 및 지원에 관한"
+            },
+            {
+              "topic": "중소기업",
+              "text": "법률」 제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따"
+            },
+            {
+              "topic": "중소기업",
+              "text": "라 발급된 소기업․소상공인확인서를 소지한 업체"
+            },
+            {
+              "topic": "직접생산",
+              "text": "위의 직접생산확인증명서 및 중소기업확인서는 전자입찰서 제출마감일 전일까지 발급된 것"
+            },
+            {
+              "topic": "중소기업",
+              "text": "으로 유효기간 내에 있어야 하며, 중소기업 공공구매 종합정보망(http://www.smpp.go.kr) 에"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "서 확인하여 확인이 되지 않을 경우 입찰참가 자격이 없습니다."
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "나. 조달청 전자입찰 참가자격등록을 한 업체이어야 하며, 미등록 업체는 국가종합전자조"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "달시스템 입찰참가 자격등록 규정에 따라 개찰 전일까지 입찰참가 자격 등록하여야"
+            },
+            {
+              "topic": "입찰참가자격",
+              "text": "「지방계약법 시행령」 제93조에 따라 부정당업자의 입찰참가자격제한 처분을 받"
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "총액견적, 수의계약(2인이상 견적), 공동수급불허, 국가종합전자조달시스템을 이용한 전자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "industry_code",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "㉱ 소프트웨어사업자(컴퓨터관련서비스사업(1468))",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "의한 직접생산확인증명서[세부품명 : 공간정보DB구축서비스, 세부품명번호 10자리 :",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "※ 직접생산확인증명서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "라 발급된 소기업․소상공인확인서를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "direct_production",
+              "codes": [],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "위의 직접생산확인증명서 및 중소기업확인서는 전자입찰서 제출마감일 전일까지 발급된 것",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(공고문)선산읍 노상리 외 14개소  GIS DB 구축 용역.pdf",
+              "sourceText": "위의 직접생산확인증명서 및 중소기업확인서는 전자입찰서 제출마감일 전일까지 발급된 것",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        },
+        {
+          "name": "[공내역서] 선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역.xlsx",
+          "readable": false,
+          "errorCategory": "unsupported_attachment_format"
+        },
+        {
+          "name": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01746850&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=05",
+          "readable": true,
+          "textChars": 16806,
+          "topics": {
+            "입찰참가자격": 0,
+            "직접생산": 0,
+            "중소기업": 0,
+            "수행실적": 1,
+            "기술인력": 1,
+            "지역제한": 0,
+            "공동수급": 15
+          },
+          "snippets": [
+            {
+              "topic": "기술인력",
+              "text": "다. \"을\"은 착수계 제출일로부터 7일 이내에 과업수행에 따른 세부예정공정표, 동원인원계획표, 과업수행 조직표, 참여자명단(자격증사본 첨부) 및 투입장비(안전장비 포함) 보유사실확인서, 밀폐공간프로그램 이수확인증, 사업수행계획서, 보안각서를 작성하여 \"갑\"에게 제출하여야 한다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "라. 업체별 업무분장과 일정관리를 명확히 하여 사업수행계획서 제출 시 제출하고 업무 구분이 모호함으로 인하여 문제 발생 시에는 공동수급체 모두가 연대하여 책임을 진다."
+            },
+            {
+              "topic": "공동수급",
+              "text": "1) 본 사업의 하도급의 경우「소프트웨어산업 진흥법」 제조 및「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호)의 규정에 의하여 반드시 하도급계약 전에 발주기관으로부터 사전승인을 받아야 함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "2) 본 사업의 과업의 일부를 하도급하려는 경우 「소프트웨어산업 진흥법」 제51조에 따라 사업금액의 100분의 50을 초과할 수 없으며, 재하도급은 원칙적으로 불허함. 다만, 같은 법 제51조제3항 각 호 에 해당하는 경우 그러하지 아니함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "3) 본 사업 과업의 일부를 하도급하려는 경우 입찰 시 및 계약체결 시 「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호) 의 별지 서식 제2호 및 제3호의 소프트웨어사업 하도급계획서를 제출하여야 함"
+            },
+            {
+              "topic": "공동수급",
+              "text": "4) 하도급계약의 승인을 신청하는 경우,「소프트웨어사업의 하도급 승인 및 관리 지침」에 따른 [하도급계약의 적정성 판단 세부기준]에 따라 적정성여부를 판단하며, 평가점수가 85점 이상인 경우에 한하여 하도급계약을 승인함. 다만, 85점 이상인 경우라 하더라도 하도급 계약의 세부 조건 등으로 인하여 사업의 원활한 수행이 불가능하다고 인정되는"
+            },
+            {
+              "topic": "수행실적",
+              "text": "가. \"을\"은 본 과업의 예정공정에 의거 효과적인 과업수행을 위하여 매주․매월말일 기준으로 과업수행 실적 및 계획을 서면으로 \"갑\"에게 제출하며, 또한 수행기간 중 \"갑\"의 요구가 있을 시에는 과업추진 전반에 걸쳐 수시 보고를 하여야 한다."
+            }
+          ],
+          "clauseCandidates": [
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "라. 업체별 업무분장과 일정관리를 명확히 하여 사업수행계획서 제출 시 제출하고 업무 구분이 모호함으로 인하여 문제 발생 시에는 공동수급체 모두가 연대하여 책임을 진다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "1) 본 사업의 하도급의 경우「소프트웨어산업 진흥법」 제조 및「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호)의 규정에 의하여 반드시 하도급계약 전에 발주기관으로부터 사전승인을 받아야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "2) 본 사업의 과업의 일부를 하도급하려는 경우 「소프트웨어산업 진흥법」 제51조에 따라 사업금액의 100분의 50을 초과할 수 없으며, 재하도급은 원칙적으로 불허함. 다만, 같은 법 제51조제3항 각 호 에 해당하는 경우 그러하지 아니함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "3) 본 사업 과업의 일부를 하도급하려는 경우 입찰 시 및 계약체결 시 「소프트웨어사업의 하도급 승인 및 관리 지침」(미래창조과학부고시 제2015-114호) 의 별지 서식 제2호 및 제3호의 소프트웨어사업 하도급계획서를 제출하여야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "4) 하도급계약의 승인을 신청하는 경우,「소프트웨어사업의 하도급 승인 및 관리 지침」에 따른 [하도급계약의 적정성 판단 세부기준]에 따라 적정성여부를 판단하며, 평가점수가 85점 이상인 경우에 한하여 하도급계약을 승인함. 다만, 85점 이상인 경우라 하더라도 하도급 계약의 세부 조건 등으로 인하여 사업의 원활한 수행이 불가능하다고 인정되는 경우 그 사유를 기재하여 하도급 승인 거절을 통보할 수 있음.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "과업지시서(선산읍 노상리 외 14개소 하수도 GIS DB 구축 용역)_수정.hwp",
+              "sourceText": "가. \"을\"은 본 과업의 예정공정에 의거 효과적인 과업수행을 위하여 매주․매월말일 기준으로 과업수행 실적 및 계획을 서면으로 \"갑\"에게 제출하며, 또한 수행기간 중 \"갑\"의 요구가 있을 시에는 과업추진 전반에 걸쳐 수시 보고를 하여야 한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            }
+          ],
+          "fullReviewPending": true
+        }
+      ],
+      "reviewComplete": false,
+      "contractPerformanceVerified": false,
+      "checkedAt": "2026-10-12T08:50:08.199721+00:00",
+      "classificationVersion": 4
     }
   }
 }
