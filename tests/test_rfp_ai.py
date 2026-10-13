@@ -133,3 +133,71 @@ with tempfile.TemporaryDirectory() as tmp:
  target.write_text(json.dumps({"byNotice":{"R26BK01756420:000":a}},ensure_ascii=False))
  assert "GITHUB_TOKEN" not in target.read_text()
 print("WORKLINKS_RFP_AI_SOURCE_VALIDATION=PASS")
+
+# Regression: general procurement guidance and consortium evaluation are not
+# additional bidder credentials. Explicit mandatory/region rules remain.
+context_samples=[
+ {"index":0,"type":"industry_code","sourceText":"입찰 참가 자격"},
+ {"index":1,"type":"industry_code","sourceText":"나라장터 전자입찰 이용자는 입찰참가자격등록규정에 따라 이용자 등록을 합니다"},
+ {"index":2,"type":"joint_participation","sourceText":"공동수급체 평가점수는 지분율에 따라 계산한다"},
+ {"index":3,"type":"performance_proof","sourceText":"제안서 평가용 수행실적 증명서 별지 2호 서식"},
+ {"index":4,"type":"region_restriction","sourceText":"2.2. 지역제한(제주특별자치도) 대상 용역입니다."},
+ {"index":5,"type":"joint_participation","sourceText":"공동수급 불허 단독 참가"},
+ {"index":6,"type":"performance_proof","sourceText":"입찰참가자격으로 최근 3년 수행실적증명서를 제출하여야 한다"},
+ {"index":7,"type":"industry_code","codes":["1468"],"sourceText":"소프트웨어사업자 업종코드 1468 등록을 필한 업체"}]
+expected=["context_only","context_only","context_only","context_only",
+          "mandatory","prohibited","mandatory","mandatory"]
+actual=[x["classification"] for x in m.rule_based_interpret(context_samples)["items"]]
+assert actual==expected,(actual,expected)
+
+# Extractor coverage must not consider nonqualification headings, bidder
+# portal instructions or score templates as a missing company qualification.
+import io
+import zipfile
+rfp_path=Path(__file__).resolve().parents[1]/"scripts/refresh_worklinks_rfp.py"
+rfp_spec=importlib.util.spec_from_file_location("worklinks_rfp_extractor",rfp_path)
+rfp=importlib.util.module_from_spec(rfp_spec)
+rfp_spec.loader.exec_module(rfp)
+text_fixture=(
+ "1. 입찰 참가 자격\n"
+ "소프트웨어사업자 업종코드 1468 등록한 업체\n"
+ "직접생산확인증명서 정보시스템유지관리서비스(8111189901)를 소지한 업체\n"
+ "제안서 평가용 수행실적 별지 제3호 서식\n"
+ "공동수급체 평가점수는 구성원별 지분율로 계산한다\n"
+ "나라장터 전자입찰 이용 안내\n"
+ "공동수급 불허\n"
+)
+rules=rfp.extract_rule_candidates(text_fixture,"입찰공고문.pdf")
+scan=rfp.audit_qualification_scan(text_fixture,rules)
+assert scan["sourceTextScanComplete"] is True,scan
+assert any(x["type"]=="industry_code" for x in rules)
+assert any(x["type"]=="direct_production" and "8111189901" in x["codes"] for x in rules)
+assert any(x["type"]=="joint_participation" and "불허" in x["sourceText"] for x in rules)
+missing_text=text_fixture+"\n기술인력 5명 이상 입찰자격으로 요구함"
+failure=rfp.audit_qualification_scan(missing_text,rules)
+assert failure["sourceTextScanComplete"] is False,failure
+assert failure["unmatchedQualificationAnchorCount"]>0
+region_text="지역 제한(제주특별자치도) 대상 용역입니다."
+region_rules=rfp.extract_rule_candidates(region_text,"입찰공고문.pdf")
+assert any(q["type"]=="region_restriction" for q in region_rules)
+assert m.rule_based_interpret([dict(q,index=i) for i,q in enumerate(region_rules)])["items"][0]["classification"]=="mandatory"
+
+# Nested official ZIP contents must actually be read; do not mark a ZIP as
+# reviewed by its manifest alone or allow an unreadable executable to vanish.
+def zip_bytes(members):
+    b=io.BytesIO()
+    with zipfile.ZipFile(b,"w") as z:
+        for name,value in members.items():z.writestr(name,value)
+    return b.getvalue()
+docx=zip_bytes({"word/document.xml":
+    '<w:document xmlns:w="urn:test"><w:body><w:p><w:r><w:t>입찰참가자격 업종코드 1468 등록</w:t></w:r></w:p></w:body></w:document>'})
+archive=zip_bytes({"공고문.docx":docx})
+assert "업종코드 1468" in rfp.extract("공고첨부.zip",archive)
+assert "업종코드 1468" in rfp.extract("첨부명없음",docx)
+try:
+    rfp.extract("공고첨부.zip",zip_bytes({"unexpected.exe":b"not a document"}))
+    raise AssertionError("unparsed archive member was silently ignored")
+except ValueError as ex:
+    assert "requires_review" in str(ex)
+print("WORKLINKS_RFP_COVERAGE_AND_ARCHIVE=PASS")
+
