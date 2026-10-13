@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 12
+VERSION = 13
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -226,7 +226,26 @@ def rule_based_interpret(clauses):
         proposal_context=(typ in {"performance_proof","staff_proof"} and bool(re.search(
             r"제안서|평가표|배점|정량|정성|점수|양식|서식|붙임|별지|"
             r"기재\s*사항|평가\s*기준|작성\s*방법",t)))
-        if heading or region_unrestricted or (platform_guide and not concrete and not regional):
+        # Future breach sanctions are a contractual consequence, not evidence
+        # that this bidder has already been suspended or disqualified.
+        future_sanction=bool(re.search(
+            r"계약상대자.{0,110}(?:위반|계약해지|보증금|국고\s*귀속)|"
+            r"낙찰자.{0,100}(?:불이행|위반|제재|계약해지)|"
+            r"(?:본\s*사업|계약).{0,90}하도급.{0,65}(?:승인|신청|대금|보안|제출)|"
+            r"하도급.{0,60}수요기관.{0,35}승인",t))
+        pure_heading=bool(re.fullmatch(
+            r"\s*(?:\d+[\.\-]\d+\.?\s*)?(?:하도급에\s*관한\s*사항|"
+            r"공동\s*수급에\s*관한\s*사항)\s*",t))
+        sworn_law_guide=(typ=="joint_participation" and bool(re.search(
+            r"부당한\s*공동행위.{0,40}(?:고발|기준)|"
+            r"하도급거래\s*공정화에\s*관한\s*법률",t)) and
+            not bool(re.search(r"위반사실.{0,25}통보된\s*자|입찰.{0,25}참여할\s*수\s*없",t)))
+        if heading or pure_heading or region_unrestricted or sworn_law_guide or (
+                platform_guide and not concrete and not regional):
+            classification="context_only"
+        elif future_sanction and not bool(re.search(
+                r"(?:이미|최근|과거).{0,20}입찰참가자격\s*제한|"
+                r"부정당업자.{0,20}해당하지",t)):
             classification="context_only"
         elif after_award and not bidder:
             classification="context_only"
@@ -261,9 +280,31 @@ def rule_based_interpret(clauses):
         (clauses[i],v) for i,v in enumerate(result)
         if v["classification"] in {"mandatory","prohibited"}
     ]
+    authoritative_types={c.get("type") for c,decoded in authoritative
+                         if decoded["classification"]=="mandatory"}
     for index,v in enumerate(result):
         if v["classification"]!="unknown":continue
         q=clauses[index]
+        qt=q.get("type")
+        phrase=str(q.get("sourceText") or "")
+        # An official certificate's application/expiration *explanation*
+        # is not another certificate requirement when that same notice also
+        # contains an explicit mandatory certificate clause.
+        if qt=="sme_certificate" and qt in authoritative_types and re.search(
+            r"신청을?\s*증빙|발급받지\s*못한|유효기간\s*시작일|"
+            r"기업\s*구분과\s*다른|신청하지\s*않은|발급현황|"
+            r"전자입찰서\s*제출\s*마감일\s*전일까지\s*신청한",phrase):
+            v["classification"]="context_only"
+            v["reason"]="확인서 필수조항 외 신청·유효기간의 조건부 안내"
+            continue
+        if qt=="staff_proof" and bool(re.search(
+            r"주\s*\d+\)|별지|재직.{0,20}경력.{0,25}학력.{0,25}자격증명서",phrase)
+        ) and not bool(re.search(
+            r"(?:입찰\s*참가\s*자격|입찰참가자격|참가자격).{0,40}"
+            r"(?:경력|인력|자격증)",phrase)):
+            v["classification"]="context_only"
+            v["reason"]="투입인력 제출 양식·재직증명 안내, 참가자격의 경력 최소치 아님"
+            continue
         short=compact(q.get("sourceText"))
         if len(short)<25:continue
         source_codes=set(map(str,q.get("codes") or []))
