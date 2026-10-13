@@ -45,7 +45,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             python3 - <<'PY'
-          import json,pathlib
+          import json,pathlib,os
           p=pathlib.Path('startup-support/ai-qualification.json')
           fresh=json.loads(pathlib.Path('/tmp/worklinks-ai-qualification-new.json').read_text())
           previous=json.loads(p.read_text()) if p.exists() else {'byNotice':{}}
@@ -60,7 +60,8 @@ jobs:
                 x.get('sourceVerified') is True and x.get('documentFullyReviewed') is False
                 for x in v.get('requirements') or []):
               merged[key]=v
-          result={'ok':True,'model':fresh.get('model'),
+          result={'ok':True,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
+                  'model':fresh.get('model'),
                   'generatedAt':fresh.get('generatedAt'),
                   'source':'Citation-checked RFP classification; model or conservative rules',
                   'reviewComplete':False,'byNotice':dict(list(merged.items())[-300:])}
