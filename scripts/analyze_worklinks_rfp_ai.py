@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 10
+VERSION = 11
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -221,6 +221,7 @@ def rule_based_interpret(clauses):
             r"하도급.{0,70}(?:승인|계획서|대금|계약|보안|하수급|이행|서약|업체|과업)|"
             r"(?:낙찰|계약\s*체결)\s*(?:후|이후).{0,75}공동\s*수급|"
             r"공동\s*수급.{0,55}(?:지분율|구성원별|협정서|상기의\s*입찰|"
+            r"공동\s*수급.{0,35}(?:구성원|전원).{0,70}(?:입찰\s*참가\s*자격|자격\s*구비)|"
             r"구성원.*변경|입찰\s*절차)",t)))
         proposal_context=(typ in {"performance_proof","staff_proof"} and bool(re.search(
             r"제안서|평가표|배점|정량|정성|점수|양식|서식|붙임|별지|"
