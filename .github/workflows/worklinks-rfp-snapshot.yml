@@ -27,7 +27,7 @@ jobs:
           python3 tests/test_rfp_failures.py
           python3 tests/test_rfp_ai.py
       - name: Extract limited official RFP eligibility text
-        run: python3 scripts/refresh_worklinks_rfp.py --limit 64
+        run: python3 scripts/refresh_worklinks_rfp.py --limit 16
       - name: Publish verified RFP snippets
         shell: bash
         run: |
@@ -41,7 +41,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             python3 - <<'PY'
-          import datetime,json,pathlib
+          import datetime,json,pathlib,os
           dst=pathlib.Path('startup-support/rfp-clauses.json')
           new=json.loads(pathlib.Path('/tmp/worklinks-rfp-new.json').read_text())
           old=json.loads(dst.read_text()) if dst.exists() else {'byNotice':{}}
@@ -54,7 +54,8 @@ jobs:
               if item.get('checkedAt','') < prior.get('checkedAt',''):
                 continue
             merged[key]=item
-          result={**new,'byNotice':dict(list(merged.items())[-240:])}
+          result={**new,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
+                  'byNotice':dict(list(merged.items())[-240:])}
           dst.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
           print('RFP_MERGED_RECORDS',len(result['byNotice']))
           PY
