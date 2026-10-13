@@ -8,7 +8,7 @@ on:
       - 'tests/test_rfp_failures.py'
   workflow_dispatch:
   schedule:
-    - cron: '44 2,8,14,20 * * *'
+    - cron: '17 * * * *'
 permissions:
   contents: write
 concurrency:
@@ -17,7 +17,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 16
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - name: Install document readers
@@ -25,7 +25,7 @@ jobs:
       - name: Verify per-cause classification
         run: python3 tests/test_rfp_failures.py
       - name: Extract limited official RFP eligibility text
-        run: python3 scripts/refresh_worklinks_rfp.py --limit 32
+        run: python3 scripts/refresh_worklinks_rfp.py --limit 64
       - name: Publish verified RFP snippets
         shell: bash
         run: |
