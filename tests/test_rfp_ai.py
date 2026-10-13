@@ -244,3 +244,21 @@ assert [x["classification"] for x in presult]==[
 # stays unknown; do not invent a complete eligibility audit.
 unanchored=m.rule_based_interpret(postaward[1:2])["items"]
 assert unanchored[0]["classification"]=="unknown",unanchored
+
+
+# Corrupted PDF fragments may be reconciled only against a *full* cited
+# matching requirement. Never merge a different required production product.
+fragmented=[
+ {"index":0,"type":"direct_production","codes":["8111189901"],
+  "sourceText":"직접생산확인증명서 세부품명 정보시스템유지관리서비스 세부품명번호 8111189901 소지한 업체"},
+ {"index":1,"type":"direct_production","codes":[],
+  "sourceText":"직접생산확인증명서 세부품명 정보시스템유지관리서비스 세부품명번호 자리"},
+ {"index":2,"type":"direct_production","codes":[],
+  "sourceText":"직접생산확인증명서 세부품명 인터넷지원개발서비스 세부품명번호 자리"},
+ {"index":3,"type":"sme_certificate","codes":[],
+  "sourceText":"소기업 소상공인확인서 신청을 증빙할 수 있는 서류 부"},
+ {"index":4,"type":"sme_certificate","codes":[],
+  "sourceText":"입찰참가 자격으로 소기업 소상공인확인서를 소지한 업체"}
+]
+fclasses=[x["classification"] for x in m.rule_based_interpret(fragmented)["items"]]
+assert fclasses==["mandatory","context_only","unknown","context_only","mandatory"],fclasses
