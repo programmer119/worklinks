@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=12
+CLASSIFICATION_VERSION=13
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -443,13 +443,26 @@ def audit_qualification_scan(text, candidates):
         # be covered by a cited candidate, not just a shared keyword.
         anchored=[]
         for anchor in EXTRA_QUALIFICATION_ANCHORS.finditer(line):
-            a=max(0,anchor.start()-45)
-            b=min(len(line),anchor.end()+100)
-            span=re.sub(r"\s+","",line[a:b])
-            if span:anchored.append(span)
-        matched=bool(anchored) and all(any(
-            span in evidence or (evidence in span and len(evidence)>=35)
-            for evidence in normalized_sources) for span in anchored)
+            a=max(0,anchor.start()-25)
+            b=min(len(line),anchor.end()+45)
+            span=re.sub(r"\\s+","",line[a:b])
+            key=re.sub(r"\\s+","",anchor.group())
+            if span:anchored.append((key,span))
+        # Source excerpts have 50-character overlaps; a qualification
+        # anchor can straddle an excerpt boundary. Require *every* short
+        # context fragment to be attested by some cited excerpt, including
+        # the anchor itself. Keyword-only matches cannot prove coverage.
+        def cited(key,span):
+            if not any(key in evidence for evidence in normalized_sources):
+                return False
+            if len(span)<=32:
+                pieces=[span]
+            else:
+                pieces=[span[i:i+32] for i in range(0,len(span)-31,20)]
+                pieces.append(span[-32:])
+            return all(any(piece in evidence for evidence in normalized_sources)
+                       for piece in pieces)
+        matched=bool(anchored) and all(cited(key,span) for key,span in anchored)
         if not matched:
             missing.append(line[:180])
     complete=(len(text)<=350_000 and not missing)
