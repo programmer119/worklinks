@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 19
+VERSION = 20
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -363,6 +363,20 @@ def rule_based_interpret(clauses):
                 for full in full_texts):
             v["classification"]="context_only"
             v["reason"]="원본 HWP의 최근 제재 이력에 따른 조건부 보증금 조항과 동일한 PDF 분절"
+            continue
+        # The official HWP states the entire SME certificate condition.
+        # Some PDF lines contain only the law citation without article digits;
+        # the citation is not a *second* independent certificate condition.
+        if (qt=="sme_certificate" and
+                str(q.get("sourceFile") or "").lower().endswith(".pdf") and
+                same_type_mandatory and len(ptext)<100 and
+                ("중소기업기본법제조에따른" in ptext or
+                 "소기업자또는소상공인보호" in ptext) and
+                any("중소기업기본법" in full and "소기업" in full and
+                    "소상공인" in full and "확인서" in full
+                    for full in full_texts)):
+            v["classification"]="context_only"
+            v["reason"]="원본 HWP에서 확인서 참가조건이 명시된 법령 인용부의 PDF 단편"
             continue
         if qt=="industry_code" and not q.get("codes") and full_texts and (
                 "소프트웨어사업자" in ptext and

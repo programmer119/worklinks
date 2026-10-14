@@ -317,3 +317,17 @@ g4_result=m.rule_based_interpret(g4_security_law)["items"]
 assert [v["classification"] for v in g4_result]==[
  "mandatory","context_only","mandatory","context_only","prohibited","context_only"],g4_result
 assert m.rule_based_interpret([g4_security_law[-1]])["items"][0]["classification"]=="unknown"
+
+# PDF-only cut-off SME law text is a duplicate ONLY when the full official
+# HWP contains the actual mandatory small-business certificate condition.
+g4_sme=[
+ {"index":0,"type":"sme_certificate","sourceFile":"입찰공고 원본.hwp",
+  "sourceText":"중소기업기본법 제2조에 따른 소기업자 또는 소상공인으로서 소기업 소상공인 확인서를 소지한 자"},
+ {"index":1,"type":"sme_certificate","sourceFile":"입찰공고 변환본.pdf",
+  "sourceText":"중소기업기본법 제조에 따른 소기업자 또는 소상"},
+ {"index":2,"type":"sme_certificate","sourceFile":"입찰공고 변환본.pdf",
+  "sourceText":"소기업자 또는 소상 공인 보호 및 지원에 관한 법률 제 조에 따른"}
+]
+g4_sme_classes=[r["classification"] for r in m.rule_based_interpret(g4_sme)["items"]]
+assert g4_sme_classes==["mandatory","context_only","context_only"],g4_sme_classes
+assert m.rule_based_interpret([g4_sme[1]])["items"][0]["classification"]=="unknown"
