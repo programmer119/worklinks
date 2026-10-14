@@ -59,6 +59,22 @@ class QualificationCoverageTests(unittest.TestCase):
         result, _ = self.scan(text)
         self.assertTrue(result["sourceTextScanComplete"], result)
 
+    def test_pdf_wrapped_legal_citation_is_covered_by_neighboring_requirement(self):
+        text = ("중소기업제품 구매촉진 및 판로지원에 관한 법률 제 조 및 같은 법 시행령\n"
+                "제 조에 따라 다음 요건을 충족한 사업자여야 하며\n"
+                "직접생산확인증명서 품목번호 8111189901을 소지한 자")
+        result, clauses = self.scan(text)
+        self.assertTrue(any(c["type"] == "direct_production" for c in clauses))
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
+    def test_future_penalty_does_not_mask_current_exclusion(self):
+        text = ("정보를 누출하는 경우 입찰참가자격을 제한함\n"
+                "조세포탈 등을 한 자로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 "
+                "입찰에 참여할 수 없습니다.")
+        result, clauses = self.scan(text)
+        self.assertTrue(any(c["type"] == "legal_exclusion" for c in clauses))
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
     def test_candidate_count_is_not_silently_capped_at_240(self):
         text = "\n".join(f"직접생산 확인증명서 품목번호 8111189901 관련 등록조건 {i}번을 확인하여야 합니다."
                          for i in range(260))

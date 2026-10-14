@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=14
+CLASSIFICATION_VERSION=15
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -362,6 +362,14 @@ def extract_rule_candidates(text,filename):
         if len(line)<100 and index>0:
             prev=raw_lines[index-1]
             if 0<len(prev)<=170:windows.append((prev+' '+line)[:270])
+        # PDF line wrapping may place the legal citation two lines before
+        # the actual bidder requirement. Keep one continuous cited 270-char
+        # window; do not reclassify by shared keywords alone.
+        if filename.lower().endswith('.pdf') and len(line)<140:
+            neighbors=raw_lines[max(0,index-2):min(len(raw_lines),index+3)]
+            if all(len(v)<=175 for v in neighbors):
+                joined=' '.join(neighbors)
+                windows.extend(joined[i:i+270] for i in range(0,len(joined),220))
         for window in windows:
             for topic,rx in rules.items():
                 if not re.search(rx,window,re.I):continue
@@ -409,6 +417,19 @@ def nonqualification_context(line):
                  r"입찰.{0,40}취소되거나.{0,100}부정당업자",line):
         return True
     if re.search(r"^\s*주\s*\d+\).*재직증명서",line):
+        return True
+    # An already incurred suspension is not the same as a possible sanction
+    # for future conduct. These precise variants are from the audited RFP.
+    if re.search(r"(?:유출|누출).{0,180}입찰참가자격을\s*제한",line):
+        return True
+    if re.search(r"입찰자\s*또는\s*낙찰자가.{0,160}제76조.{0,160}"
+                 r"입찰참가자격을\s*제한할\s*수",line):
+        return True
+    if re.search(r"이를\s*위반한\s*사실.{0,260}"
+                 r"입찰참가자격제한.{0,55}처분을\s*받을\s*수",line):
+        return True
+    if re.search(r"부정당업자.{0,28}입찰참가자격제한처분을\s*받을\s*수|"
+                 r"법령에\s*따라\s*부정당업자로\s*입찰참가자격\s*제한처분을\s*받을\s*수",line):
         return True
     # Administrative instructions and future penalties are not *new* bidder
     # certificates. Guard against their containing actual codes or conditions.
