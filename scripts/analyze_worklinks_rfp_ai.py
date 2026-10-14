@@ -17,12 +17,14 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 17
+VERSION = 18
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
                  "staff_proof", "performance_proof", "region_restriction",
-                 "joint_participation"}
+                 "joint_participation", "legal_exclusion", "bid_security",
+                 "registration_identity", "eligibility_cutoff",
+                 "submission_required", "special_legal_entity"}
 CLASSES = {"mandatory", "optional", "prohibited", "context_only", "unknown"}
 RELATIONS = {"all", "any", "not_allowed", "unknown"}
 SYSTEM = (
@@ -240,7 +242,33 @@ def rule_based_interpret(clauses):
             r"부당한\s*공동행위.{0,40}(?:고발|기준)|"
             r"하도급거래\s*공정화에\s*관한\s*법률",t)) and
             not bool(re.search(r"위반사실.{0,25}통보된\s*자|입찰.{0,25}참여할\s*수\s*없",t)))
-        if heading or pure_heading or region_unrestricted or sworn_law_guide or (
+        # New non-license gates remain prohibited/pending without verified evidence.
+        if typ=="legal_exclusion":
+            classification=("prohibited" if re.search(
+                r"입찰에\s*참여할\s*수\s*없|입찰에\s*참가할\s*수\s*없|"
+                r"2년이\s*지나지\s*아니한\s*자는?\s*입찰",t) else "unknown")
+        elif typ=="bid_security":
+            classification=("mandatory" if re.search(
+                r"입찰보증금.{0,150}(?:납부하여야|납부대상|지급각서)|"
+                r"입찰공고일\s*이전\s*1년\s*이내.{0,150}입찰참가자격\s*제한",t)
+                else "unknown")
+        elif typ=="registration_identity":
+            classification=("optional" if re.search(r"다만.{0,110}유효한\s*입찰",t)
+                else "mandatory" if re.search(
+                r"등록증상의\s*상호|변경등록하고|변경등록하지\s*않고|"
+                r"변경\s*전\s*상호",t) else "unknown")
+        elif typ=="eligibility_cutoff":
+            classification=("mandatory" if re.search(
+                r"판단기준일|마감일.{0,90}참가자격을\s*갖추지",t) else "unknown")
+        elif typ=="submission_required":
+            classification=("mandatory" if re.search(
+                r"입찰업체\s*서약서|제출서류.{0,60}제출|"
+                r"입찰참가자격\s*확인을\s*위한\s*제출서류",t) else "unknown")
+        elif typ=="special_legal_entity":
+            classification=("optional" if re.search(
+                r"입찰\s*참가\s*가능|소기업자로\s*간주|특별법인임을\s*확인",t)
+                else "unknown")
+        elif heading or pure_heading or region_unrestricted or sworn_law_guide or (
                 platform_guide and not concrete and not regional):
             classification="context_only"
         elif future_sanction and not bool(re.search(

@@ -33,6 +33,32 @@ class QualificationCoverageTests(unittest.TestCase):
         self.assertTrue(any(c["type"] == "region_restriction" for c in clauses))
         self.assertTrue(any("제주특별자치도" in c["sourceText"] for c in clauses))
 
+    def test_legal_disqualifications_are_extracted(self):
+        text = ("「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 자는 "
+                "입찰에 참여할 수 없습니다.\n"
+                "조세포탈 등을 한 자로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 "
+                "입찰에 참여할 수 없습니다.")
+        result, clauses = self.scan(text)
+        self.assertTrue(any(c["type"] == "legal_exclusion" for c in clauses))
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
+    def test_original_bid_registration_cutoff_and_security(self):
+        text = ("9-2. 입찰참가자격등록증상의 상호 및 대표자가 사업자등록증의 상호와 다르면 "
+                "변경등록하고 입찰에 참여하여야 합니다.\n"
+                "9-3. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일이며 "
+                "마감일까지 참가자격을 갖추지 않은 경우 무효입찰입니다.\n"
+                "8-1. 입찰보증금을 납부하여야 합니다.")
+        result, clauses = self.scan(text)
+        kinds = {c["type"] for c in clauses}
+        self.assertTrue({"registration_identity","eligibility_cutoff","bid_security"} <= kinds)
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
+    def test_evaluation_and_future_sanction_are_not_eligibility_gates(self):
+        text = ("창업기업 신용평가등급 점수상의 배점 한도를 부여한다.\n"
+                "담합에 의한 위반이 드러날 경우 입찰참가자격 제한처분을 받을 수 있습니다.")
+        result, _ = self.scan(text)
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
     def test_candidate_count_is_not_silently_capped_at_240(self):
         text = "\n".join(f"직접생산 확인증명서 품목번호 8111189901 관련 등록조건 {i}번을 확인하여야 합니다."
                          for i in range(260))

@@ -27,12 +27,14 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=13
+CLASSIFICATION_VERSION=14
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
     r'수행\s*실적|실적\s*증명|재직\s*증명|공동\s*수급|분담\s*이행|'
-    r'하도급|기술\s*인력|등록\s*업체|정보통신공사업|제안\s*자격', re.I)
+    r'하도급|기술\s*인력|등록\s*업체|정보통신공사업|제안\s*자격|'
+    r'조세\s*포탈|제\s*8조의\s*2|특별법인|입찰보증금|'
+    r'입찰참가자격등록증상|입찰참가자격의\s*판단기준일|입찰업체\s*서약서', re.I)
 
 PRIORITY_NOTICE_IDS=(
     'R26BK01756420', 'R26BK01747588', 'R26BK01753188', 'R26BK01747543', 'R26BK01755651',
@@ -335,7 +337,13 @@ def extract_rule_candidates(text,filename):
       'staff_proof':r'재직.{0,12}경력|경력.{0,12}학력|자격.?증명서|투입\s*인력',
       'performance_proof':r'실적\s*증명|수행\s*실적|유사\s*용역\s*실적',
       'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소|소재지',
-      'joint_participation':r'공동\s*수급|분담\s*이행|하도급'
+      'joint_participation':r'공동\s*수급|분담\s*이행|하도급',
+      'legal_exclusion':r'제\s*8조의\s*2|조세\s*포탈|유죄판결이\s*확정된|입찰에\s*참여할\s*수\s*없',
+      'bid_security':r'입찰보증금|입찰공고일\s*이전\s*1년\s*이내.{0,130}입찰참가자격',
+      'registration_identity':r'입찰참가자격등록증상|상호\s*또는\s*대표자\s*변경신고|변경\s*전\s*상호',
+      'eligibility_cutoff':r'입찰참가자격의\s*판단기준일|마감일.{0,90}참가자격을\s*갖추지\s*않은',
+      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류',
+      'special_legal_entity':r'특별법인'
     }
     out=[];seen=set()
     for index,line in enumerate(raw_lines):
@@ -382,6 +390,25 @@ def nonqualification_context(line):
     if re.fullmatch(
         r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
         r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)\s*[:：.]?\s*",line):
+        return True
+    # Only documented non-credential contexts are safe to ignore.
+    if re.search(r"신용평가등급.{0,100}(?:배점|평가)|창업기업.{0,90}(?:배점|점수)|"
+                 r"중소기업협동조합.{0,90}신용평가등급",line):
+        if not re.search(r"소기업.{0,20}(?:확인서|소지하여야)|직접\s*생산.{0,20}확인",line):
+            return True
+    if re.search(r"조달콜센터|전산장비.{0,80}(?:투찰|등록)|"
+                 r"보안각서.{0,70}열람|제안내용.{0,50}추가\s*자료",line):
+        return True
+    if re.search(r"누출|유출|담합|금품|향응|청렴|근로자\s*권리|"
+                 r"계약의\s*주요조건을\s*위반|불공정행위|퇴직자",line) and re.search(
+                 r"입찰\s*참가\s*자격\s*제한|입찰참가자격제한|부정당업자",line):
+        if not re.search(r"입찰공고일\s*이전\s*1년|조세\s*포탈|"
+                         r"제\s*8조의\s*2|입찰\s*참가\s*자격.{0,40}(?:현행|현재)\s*제한",line):
+            return True
+    if re.search(r"계약이\s*해지.{0,110}입찰참가자격\s*제한|"
+                 r"입찰.{0,40}취소되거나.{0,100}부정당업자",line):
+        return True
+    if re.search(r"^\s*주\s*\d+\).*재직증명서",line):
         return True
     # Administrative instructions and future penalties are not *new* bidder
     # certificates. Guard against their containing actual codes or conditions.

@@ -1515,7 +1515,9 @@ function extractedRfpRequirements(x){
  return (data.files||[]).filter(f=>f.readable).flatMap(f=>{
   const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&(v.explicitMust===true||/소지한\s*자|등록한\s*자|제출한\s*자|구비한\s*자/.test(v.sourceText||''))&&
    ['industry_code','direct_production','sme_certificate','staff_proof',
-    'performance_proof','region_restriction','joint_participation'].includes(v.type))
+    'performance_proof','region_restriction','joint_participation',
+    'legal_exclusion','bid_security','registration_identity',
+    'eligibility_cutoff','submission_required','special_legal_entity'].includes(v.type))
    .map(v=>String(v.sourceText||''));
   // The snippets are highlights, not authoritative mandatory conditions.
   return structured;
@@ -1618,7 +1620,10 @@ function comparePartnerJob(x,p){
   const labelOf={industry_code:'등록업종',direct_production:'직접생산',
    sme_certificate:'기업규모 확인서',staff_proof:'기술인력 증빙',
    performance_proof:'수행실적',region_restriction:'지역제한',
-   joint_participation:'공동수급·하도급 제한'};
+   joint_participation:'공동수급·하도급 제한',
+   legal_exclusion:'법률상 참가 제외',bid_security:'입찰보증금',
+   registration_identity:'사업자 등록정보 일치',eligibility_cutoff:'참가자격 판단기준일',
+   submission_required:'필수 입찰서류',special_legal_entity:'특별법인 조건부 예외'};
   let ambiguousAiCount=0;
   let ambiguousAiSample='';
   for(const clause of (aiReport.requirements||[])){
@@ -1690,7 +1695,11 @@ function comparePartnerJob(x,p){
     }
    }
    if(clause.classification==='mandatory'&&
-      (clause.type==='staff_proof'||clause.type==='performance_proof'))status='pending';
+      (clause.type==='staff_proof'||clause.type==='performance_proof'||
+       ['bid_security','registration_identity','eligibility_cutoff','submission_required'].includes(clause.type))){
+     status='pending';
+     matchReason='입찰조건과 제출·자격상태 별도 확인 필요 · 자동 적격 승인 금지';
+   }
    add('ai-'+clause.index,(aiReport.analysisStatus==='classified'?'AI 분류: ':'규칙 분류: ')+(labelOf[clause.type]||clause.type)+
      ' · '+(clause.classification==='mandatory'?'필수':
       clause.classification==='prohibited'?'금지·제한':'불명확'),
