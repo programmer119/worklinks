@@ -345,6 +345,12 @@ def extract_rule_candidates(text,filename):
       'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류',
       'special_legal_entity':r'특별법인'
     }
+    # PDF extraction may drop article digits and split the SME eligibility
+    # sentence across lines. Capture the fragment as *unreviewed evidence*;
+    # do not infer that the bidder satisfies the certificate requirement.
+    if filename.lower().endswith('.pdf'):
+        rules['sme_certificate'] += (
+            r'|중소기업기본법\s*제?\s*\d*\s*조|소기업자\s*또는\s*소상')
     out=[];seen=set()
     for index,line in enumerate(raw_lines):
         if len(line)<12 and not re.search(
