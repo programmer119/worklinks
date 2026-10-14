@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 18
+VERSION = 19
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -245,13 +245,20 @@ def rule_based_interpret(clauses):
         # New non-license gates remain prohibited/pending without verified evidence.
         if typ=="legal_exclusion":
             classification=("prohibited" if re.search(
-                r"입찰에\s*참여할\s*수\s*없|입찰에\s*참가할\s*수\s*없|"
+                r"입찰에\s*참여\s*할\s*수\s*없|입찰에\s*참가\s*할\s*수\s*없|"
                 r"2년이\s*지나지\s*아니한\s*자는?\s*입찰",t) else "unknown")
         elif typ=="bid_security":
-            classification=("mandatory" if re.search(
-                r"입찰보증금.{0,150}(?:납부하여야|납부대상|지급각서)|"
-                r"입찰공고일\s*이전\s*1년\s*이내.{0,150}입찰참가자격\s*제한",t)
-                else "unknown")
+            # Conditional security/payment is a real procedural obligation.
+            # Its section headings and "read the notice" instructions are not
+            # separate company eligibility requirements.
+            payment=bool(re.search(
+                r"입찰보증금.{0,180}(?:납부\s*하여야|납부대상|지급각서)|"
+                r"입찰보증금을?\s*납부\s*하여야|"
+                r"입찰공고일\s*이전\s*1년\s*이내.{0,150}입찰참가자격\s*제한",t))
+            administrative=bool(re.search(r"입찰보증금",t)) and not bool(
+                re.search(r"신용정보|채무불이행|금융질서|제한을\s*받은\s*자",t))
+            classification=("mandatory" if payment else
+                            "context_only" if administrative else "unknown")
         elif typ=="registration_identity":
             classification=("optional" if re.search(r"다만.{0,110}유효한\s*입찰",t)
                 else "mandatory" if re.search(
@@ -340,6 +347,23 @@ def rule_based_interpret(clauses):
                              if z.get("type")==qt and d["classification"]=="mandatory"]
         full_texts=[compact(z.get("sourceText")) for z in same_type_mandatory]
         ptext=compact(phrase)
+        # PDF conversion drops law numbers and may split security clauses.
+        # Reconcile only against a *cited* authoritative HWP clause of the
+        # same legal event; a different exclusion remains unknown.
+        if qt=="legal_exclusion" and "조세포탈" in ptext and "유죄판결" in ptext and any(
+                "조세포탈" in compact(z.get("sourceText")) and
+                "유죄판결" in compact(z.get("sourceText")) and
+                d["classification"]=="prohibited"
+                for z,d in authoritative if z.get("type")=="legal_exclusion"):
+            v["classification"]="context_only"
+            v["reason"]="원본 HWP의 조세포탈 유죄확정 법정 제한과 대조된 PDF 분절"
+            continue
+        if qt=="bid_security" and "입찰공고일" in ptext and "입찰참가자격제한" in ptext and any(
+                "입찰공고일" in full and "입찰참가자격제한" in full
+                for full in full_texts):
+            v["classification"]="context_only"
+            v["reason"]="원본 HWP의 최근 제재 이력에 따른 조건부 보증금 조항과 동일한 PDF 분절"
+            continue
         if qt=="industry_code" and not q.get("codes") and full_texts and (
                 "소프트웨어사업자" in ptext and
                 "컴퓨터관련서비스사업" in ptext and "업종코드" in ptext) and any(

@@ -297,3 +297,23 @@ missing_anchor=m.process_one("R26BK01756420:001",clipped_only,None,
                              m.rule_based_interpret,mode="rule_based")
 assert missing_anchor["requirements"][-1]["classification"]=="unknown"
 assert missing_anchor["reviewComplete"] is False
+
+# Real HWP conditions and PDF fragments must remain distinct.
+g4_security_law=[
+ {"index":0,"type":"bid_security","sourceFile":"입찰공고 원본.hwp",
+  "sourceText":"8-1. 입찰보증금의 납부: 입찰보증금을 납부 하여야 합니다."},
+ {"index":1,"type":"bid_security","sourceFile":"입찰공고 원본.hwp",
+  "sourceText":"8-1. 입찰보증금의 납부"},
+ {"index":2,"type":"bid_security","sourceFile":"입찰공고 원본.hwp",
+  "sourceText":"2) 입찰공고일 이전 1년 이내에 제76조 사유로 입찰참가자격 제한을 받은 자"},
+ {"index":3,"type":"bid_security","sourceFile":"입찰공고 변환본.pdf",
+  "sourceText":"입찰공고일 이전 년 이내에 제 조 사유로 입찰참가자격 제한을 받은 자"},
+ {"index":4,"type":"legal_exclusion","sourceFile":"입찰공고 원본.hwp",
+  "sourceText":"조세포탈 등을 한 자로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰에 참여 할 수 없습니다."},
+ {"index":5,"type":"legal_exclusion","sourceFile":"입찰공고 변환본.pdf",
+  "sourceText":"조세포탈 등을 한 자 로서 유죄판결이 확정된 날부터"}
+]
+g4_result=m.rule_based_interpret(g4_security_law)["items"]
+assert [v["classification"] for v in g4_result]==[
+ "mandatory","context_only","mandatory","context_only","prohibited","context_only"],g4_result
+assert m.rule_based_interpret([g4_security_law[-1]])["items"][0]["classification"]=="unknown"

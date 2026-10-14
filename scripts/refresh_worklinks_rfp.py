@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=16
+CLASSIFICATION_VERSION=17
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -401,6 +401,10 @@ def nonqualification_context(line):
     """Ignore only unambiguous headings/administration/evaluation context.
     Explicit bidder requirements, prohibitions and regional restrictions
     always need a cited candidate and interpretation."""
+    # A standalone continuation of the official call-center responsibility
+    # warning is not an independent bidder credential.
+    if re.fullmatch(r"입찰\s*참가자에게\s*있습니다\.?\s*", line):
+        return True
     if re.fullmatch(
         r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
         r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)\s*[:：.]?\s*",line):

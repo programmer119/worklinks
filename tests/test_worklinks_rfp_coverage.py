@@ -81,6 +81,16 @@ class QualificationCoverageTests(unittest.TestCase):
         _, clauses = self.scan(text)
         self.assertGreaterEqual(len(clauses), 260)
 
+    def test_standalone_bidder_responsibility_tail_is_guidance(self):
+        text = ("정부조달콜센터에 문의하지 않아 발생한 모든 책임은\n"
+                "입찰참가자에게 있습니다.")
+        result, _ = self.scan(text)
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
+    def test_responsibility_tail_does_not_hide_eligibility(self):
+        result = mod.audit_qualification_scan(
+            "입찰참가자격의 판단기준일은 등록마감일입니다.", [])
+        self.assertFalse(result["sourceTextScanComplete"])
 
 if __name__ == "__main__":
     unittest.main()
