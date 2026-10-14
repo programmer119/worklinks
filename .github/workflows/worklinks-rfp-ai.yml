@@ -8,6 +8,11 @@ on:
       - 'tests/test_rfp_ai.py'
       - 'startup-support/rfp-clauses.json'
   workflow_dispatch:
+  # Bot-produced RFP snapshot commits do not trigger push workflows.
+  workflow_run:
+    workflows: ["WorkLinks official RFP eligibility snippets"]
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: '15 1,7,13,19 * * *'
 
@@ -20,10 +25,13 @@ concurrency:
 
 jobs:
   interpret:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 13
     steps:
       - uses: actions/checkout@v4
+      - name: Verify official RFP coverage logic
+        run: python3 tests/test_worklinks_rfp_coverage.py
       - name: Regression tests — evidence citation and model safety
         run: python3 tests/test_rfp_ai.py
       - name: Classify official RFP clauses (OpenAI if configured; conservative local fallback otherwise)
