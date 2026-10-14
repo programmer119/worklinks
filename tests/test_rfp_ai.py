@@ -111,6 +111,31 @@ assert v["reviewComplete"] is True and v["automaticEligibilityApproved"] is Fals
 missing=dict(valid,files=[dict(valid["files"][0],sourceTextScanComplete=False)])
 assert m.process_one("R26BK01700002:000",missing,None,
  lambda c:m.rule_based_interpret(c))["reviewComplete"] is False
+# A refreshed RFP may change *coverage status* but not one quoted clause.
+# An identical source hash must not keep an old unfinished AI audit.
+pending_file=dict(valid["files"][0],sourceTextScanComplete=False,
+                  unmatchedQualificationAnchorCount=1)
+pending_notice=dict(valid,files=[pending_file])
+pending=m.process_one("R26BK01700002:001",pending_notice,None,
+                      m.rule_based_interpret,mode="rule_based")
+assert pending["fullDocumentAudit"]["complete"] is False
+assert "uncertain_full_text_coverage" in pending["fullDocumentAudit"]["blockers"]
+def no_second_inference(_):
+ raise AssertionError("an unchanged cited clause must not cause another model call")
+fixed=m.process_one("R26BK01700002:001",valid,pending,
+                    no_second_inference,mode="rule_based")
+assert fixed is not None and fixed["fullDocumentAudit"]["complete"] is True
+assert fixed["reviewComplete"] and fixed["requiredConditionsComplete"]
+assert fixed["documentInterpretationReviewed"]
+assert fixed["sourceSha256"] == pending["sourceSha256"]
+assert fixed["coverageSignature"] != pending["coverageSignature"]
+assert m.process_one("R26BK01700002:001",valid,fixed,
+                     no_second_inference,mode="rule_based") is None
+reopened=m.process_one("R26BK01700002:001",pending_notice,fixed,
+                       no_second_inference,mode="rule_based")
+assert reopened["fullDocumentAudit"]["complete"] is False
+assert "uncertain_full_text_coverage" in reopened["fullDocumentAudit"]["blockers"]
+
 # The interpreter must not silently drop clause 121 onward.
 # Fully extracted files and fully interpreted clauses should remain auditable
 # even when a notice contains more than 120 unique cited paragraphs.

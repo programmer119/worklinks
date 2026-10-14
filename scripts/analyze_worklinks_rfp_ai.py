@@ -488,13 +488,70 @@ def complete_qualification_review(notice, clauses, classified, truncated):
             'scope':'검색 가능 공식 첨부원문 및 추출 참가조건 기계 검토. 낙찰·투찰권한·서류유효성 별도.'}
 
 
+
+def qualification_coverage_signature(notice):
+    """Fingerprint *audit gates* independently from unchanged cited clauses."""
+    fields = ("name", "readable", "sourceSha256", "textSha256",
+              "sourceTextScanComplete", "unmatchedQualificationAnchorCount",
+              "qualificationScanTruncated", "clauseCandidatesTruncated")
+    snapshot = {
+        "status": notice.get("status"),
+        "manifestComplete": notice.get("manifestComplete"),
+        "attachmentManifestCount": notice.get("attachmentManifestCount"),
+        "files": [{field: f.get(field) for field in fields}
+                  for f in notice.get("files") or []],
+    }
+    raw = json.dumps(snapshot, ensure_ascii=False, sort_keys=True,
+                     separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def reusable_interpretation(prior, clauses, source_hash, mode):
+    """Reuse only exact source-verified citations, never an unchecked verdict."""
+    if not prior or prior.get("sourceSha256") != source_hash:
+        return False
+    if not (prior.get("analysisStatus") == "classified" or
+            (prior.get("analysisStatus") == mode and
+             prior.get("classifierVersion") == VERSION)):
+        return False
+    old = prior.get("requirements") or []
+    if len(old) != len(clauses):
+        return False
+    return all(v.get("sourceVerified") is True and
+               v.get("index") == q["index"] and
+               v.get("type") == q["type"] and
+               v.get("sourceFile") == q["sourceFile"] and
+               v.get("sourceText") == q["sourceText"] and
+               (v.get("codes") or []) == (q.get("codes") or [])
+               for v, q in zip(old, clauses))
+
+
 def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
     clauses=source_candidates(notice)
     if not clauses:
         return None
     hash_value=evidence_hash(clauses)
-    if existing and existing.get("sourceSha256")==hash_value and existing.get("analysisStatus")==mode and existing.get("classifierVersion")==VERSION:
-        return None
+    coverage=qualification_coverage_signature(notice)
+    if reusable_interpretation(existing, clauses, hash_value, mode):
+        if existing.get("coverageSignature")==coverage:
+            return None
+        # The cited clauses were already verified. Recompute the complete
+        # document audit without another paid model call, even if the clauses
+        # did not change while the scan flags did.
+        truncated=any(f.get("clauseCandidatesTruncated") or
+                      f.get("qualificationScanTruncated")
+                      for f in notice.get("files") or [])
+        audit=complete_qualification_review(
+            notice, clauses, existing["requirements"], truncated)
+        return {**existing,
+                "coverageSignature":coverage,
+                "reviewComplete":audit["complete"],
+                "requiredConditionsComplete":audit["complete"],
+                "documentInterpretationReviewed":audit["complete"],
+                "fullDocumentAudit":audit,
+                "sourceTruncated":truncated,
+                "automaticEligibilityApproved":False,
+                "checkedAt":dt.datetime.now(dt.timezone.utc).isoformat()}
     # Partition into small batches for model context and predictable response size.
     # Deterministic rules need notice-wide context to reconcile a wrapped PDF
     # fragment with the fully stated credential in another official attachment.
@@ -518,6 +575,7 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
     audit=complete_qualification_review(notice,clauses,output,truncated)
     return {
         "analysisStatus":mode,"sourceSha256":hash_value,"classifierVersion":VERSION,
+        "coverageSignature":coverage,
         "reviewComplete":audit["complete"],"requiredConditionsComplete":audit["complete"],
         "documentInterpretationReviewed":audit["complete"],"fullDocumentAudit":audit,
         "automaticEligibilityApproved":False,
@@ -549,9 +607,8 @@ def main():
         clauses=source_candidates(notice)
         if not clauses:continue
         prior=existing.get(key) or {}
-        if prior.get("sourceSha256")==evidence_hash(clauses) and (
-           prior.get("analysisStatus")=="classified" or
-           (prior.get("analysisStatus")==mode and prior.get("classifierVersion")==VERSION)):
+        if (reusable_interpretation(prior,clauses,evidence_hash(clauses),mode)
+                and prior.get("coverageSignature")==qualification_coverage_signature(notice)):
             continue
         candidates.append((key,notice,len(clauses)))
     candidates.sort(key=lambda x:(-x[2],x[0]))
