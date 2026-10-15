@@ -1,20 +1,6 @@
-name: WorkLinks automatic AI RFP qualifications
+name: WorkLinks legacy RFP AI (manual only)
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/worklinks-rfp-ai.yml'
-      - 'scripts/analyze_worklinks_rfp_ai.py'
-      - 'tests/test_rfp_ai.py'
-      - 'startup-support/rfp-clauses.json'
   workflow_dispatch:
-  # Bot-produced RFP snapshot commits do not trigger push workflows.
-  workflow_run:
-    workflows: ["WorkLinks official RFP eligibility snippets"]
-    types: [completed]
-    branches: [main]
-  schedule:
-    - cron: '15 1,7,13,19 * * *'
 
 permissions:
   contents: write
