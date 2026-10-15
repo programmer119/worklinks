@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": null,
+  "sources": [],
+  "watchTargets": [
+    {
+      "name": "한국엔젤투자협회",
+      "type": "엔젤",
+      "url": "https://www.kban.or.kr/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "벤처투자종합포털",
+      "type": "VC",
+      "url": "https://www.vcs.go.kr/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "TIPS 공식",
+      "type": "TIPS",
+      "url": "https://www.jointips.or.kr/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "프라이머",
+      "type": "AC",
+      "url": "https://www.primer.kr/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "블루포인트파트너스",
+      "type": "AC",
+      "url": "https://bluepoint.ac/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "스파크랩",
+      "type": "AC",
+      "url": "https://www.sparklabs.co.kr/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "COMEUP",
+      "type": "IR·매칭",
+      "url": "https://www.comeup.org/",
+      "mode": "참고 링크·자동수집 아님"
+    },
+    {
+      "name": "OI마켓",
+      "type": "CVC·OI",
+      "url": "https://oimarket.kr/program",
+      "mode": "참고 링크·자동수집 아님"
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "historic-social-service-investor-exchange-third-2026",
+      "title": "2026년 제3회 사회서비스 투자교류회 참여기업 모집",
+      "url": "https://www.ema.kr/388",
+      "category": "IR·매칭",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-22T15:00:00+09:00",
+      "description": "보건복지부·중앙사회서비스원 연계 MYSC 운영. 11.17 13:30~17:30 투자·실증처 밋업, 사회서비스 분야 제품·서비스 제공기업 약 15팀 선발",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "open_by_date",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-comeup-2026-vc-precision-match",
+      "title": "COMEUP 2026 VC 투자유치 정밀 매칭 — 별도 신청",
+      "url": "https://www.comeup.org/",
+      "category": "VC·투자",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-23",
+      "description": "VC 직접 투자상담을 위한 정밀 매칭 신청 · 기존 행사 사전등록과 별도",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "open_by_date",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-comeup-2026-oi-precision-match",
+      "title": "COMEUP 2026 글로벌 기업 오픈이노베이션 정밀 매칭 — 별도 신청",
+      "url": "https://www.comeup.org/",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-23",
+      "description": "글로벌 기업 대상 기술협력·PoC/오픈이노베이션 정밀 매칭 별도 접수",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "open_by_date",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-kicxup-challenge-2nd-2026-10",
+      "title": "2026 KICXUP 챌린지 2차 산업단지 오픈이노베이션 스타트업 모집",
+      "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179496",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-23T17:00:00+09:00",
+      "description": "한국산업단지공단·신용보증기금. 산업단지 수요기업 기술과제 기반 PoC·투자/TIPS·글로벌 수요기업 연계. 챌린지 2차 최종 6개사 내외 선발",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "open_by_date",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-kicxup-local-2nd-2026-10",
+      "title": "2026 KICXUP 로컬 2차 산업단지 오픈이노베이션 컨소시엄 모집",
+      "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179496",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-23T17:00:00+09:00",
+      "description": "산업단지 수요기업과 스타트업의 지역현안 PoC; 로컬 2차 최종 1개 컨소시엄. 투자·해외수요기업 연계",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "open_by_date",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-jeju-oimarket-yearround-matching-2026",
+      "title": "제주창조경제혁신센터 2026 오픈이노베이션 상시매칭 플랫폼",
+      "url": "https://oimarket.kr/program",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-12-31",
+      "description": "수요기업 및 스타트업 매칭을 통한 PoC·기업 협업 발굴",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "open_by_date",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-seongdong-socialventure-investment-lecture-20261029",
+      "title": "성동구 소셜벤처허브 투자유치 특강: 성공 스타트업 사례로 배우는 투자 유치 성공 전략",
+      "url": "https://www.sd.go.kr/sv/selectBbsNttView.do?bbsNo=507&key=3867&nttNo=361929&pageIndex=1&pageUnit=10",
+      "category": "IR·매칭",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": null,
+      "description": "한국사회혁신금융/블루웨일인베스트 양희정 대표 강연, 성동안심상가 소셜벤처허브 6층 대회의실 · 신청 문의 02-2286-7798/7799",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-seoul-gwanak-sk-ecoplant-oi-2026",
+      "title": "SK에코플랜트 × 서울창업센터 관악 2026 오픈이노베이션 참여기업 모집",
+      "url": "https://www.k-startup.go.kr/",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": null,
+      "description": "PoC 사업화지원금 1,000만원 · 공동기술개발/PoC · 후속 사업화 연계",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-publicdata-openinnovation-2026",
+      "title": "공공데이터 활용 오픈이노베이션",
+      "url": "https://www.k-startup.go.kr/",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": null,
+      "description": "공공기관 수요과제 연계 PoC·시제품 제작 및 후속 기술개발 연계",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-yongin-oi-network-5-2026",
+      "title": "2026 용인 오픈이노베이션 교류회 5회차",
+      "url": "https://www.bizinfo.go.kr/",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": null,
+      "description": "무료 네트워킹 · 기업 매칭 자격 별도 확인",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-ictcomplex-investment-4-2026",
+      "title": "ICT콤플렉스 제4회 스타트업 투자상담회",
+      "url": "https://www.ictcoc.kr/programs/application_view.asp?idx=169",
+      "category": "IR·매칭",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": null,
+      "description": "ICT 기업 1:1 투자상담 · 무사업자 자격 확인 필요",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-oi-publicdata-topdown-2026-556",
+      "title": "민관협력 오픈이노베이션 지원 공공데이터 활용 공공기관 제안형(Top-Down) 창업기업 모집",
+      "url": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?bcIdx=1071194&cbIdx=310",
+      "category": "CVC·OI",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-06T16:00:00+09:00",
+      "description": "공공기관 데이터 기반 협업·PoC·제품/서비스 개발 · 후속 기술개발사업 연계",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "closed",
+      "freshness": "historical"
+    },
+    {
+      "id": "historic-dcamp-2026-10-officehour-venture",
+      "title": "디캠프 2026년 10월 오피스아워 — 벤처투자",
+      "url": "https://dcamp.kr/program/245451",
+      "category": "VC·투자",
+      "eligibility": "기존 판정·재확인 필요",
+      "deadline": "2026-10-12T11:59:00+09:00",
+      "description": "선릉 1:1 최대 50분 멘토링 · 국내외 VC 12곳 대상 투자 상담",
+      "source": "기존 WorkLinks 등록",
+      "sourceKind": "과거 수동 등록·현재 재검증 아님",
+      "lastSeenAt": null,
+      "review": "현재 모집 원문 확인 필요",
+      "deadlineState": "closed",
+      "freshness": "historical"
+    }
+  ],
+  "stats": {
+    "total": 13,
+    "liveDiscovered": 0,
+    "historical": 13
+  }
+}
