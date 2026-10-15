@@ -105,4 +105,40 @@ class Fake403:
 classified=p['classify_upstream_http_error'](Fake403())
 assert classified=='upstream_http_403_SERVICE_ACCESS_DENIED_ERROR'
 assert 'SECRET_TOKEN' not in classified
+# A provider-side 429 must stop futile repeated calls; no credential is inferred.
+import io
+try: from urllib2 import HTTPError as HttpRateError
+except ImportError: from urllib.error import HTTPError as HttpRateError
+globals_api=p['request_api'].__globals__
+old_open=globals_api['urlopen'];old_key=globals_api['get_key']
+api_base=p['API_BASE']
+attempts=[]
+def quota_exhausted(request,timeout):
+    attempts.append(1)
+    raise HttpRateError('https://apis.data.go.kr/1230000/example',429,
+        'Too many requests',{},io.BytesIO(b'LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR'))
+try:
+    globals_api['urlopen']=quota_exhausted
+    globals_api['get_key']=lambda:'unit-test-key'
+    globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
+    try:p['request_api'](api_base,'getBidPblancListInfoLicenseLimit',{'bidNtceNo':'R26BK01756420'})
+    except p['ApiError'] as e:
+        assert 'upstream_http_429' in e.msg
+    else:raise AssertionError('upstream quota exhaustion not detected')
+    try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn',{'bidNtceNo':'R26BK01756420'})
+    except p['ApiError'] as e:
+        assert e.msg=='upstream_temporarily_rate_limited'
+    else:raise AssertionError('quota circuit breaker absent')
+    assert len(attempts)==1,'one 429 should suppress further upstream requests'
+    globals_api['cache'][('upstream-rate-cooldown',api_base)]=0
+    try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn',{})
+    except p['ApiError'] as e:
+        assert 'upstream_http_429' in e.msg
+    else:raise AssertionError('expired cooldown did not permit retry')
+    assert len(attempts)==2,'cooldown expiry should permit one retry'
+finally:
+    globals_api['urlopen']=old_open
+    globals_api['get_key']=old_key
+    globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
+
 print('G2B_BID_EVIDENCE_PREFLIGHT=PASS')
