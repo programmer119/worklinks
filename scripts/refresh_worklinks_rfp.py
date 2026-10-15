@@ -333,7 +333,7 @@ def extract_rule_candidates(text,filename):
     rules={
       'industry_code':r'업종\s*코드|업종코드|업종으로\s*입찰|소프트웨어사업자|학술.?연구용역|정보통신공사업',
       'direct_production':r'직접\s*생산|세부\s*품명\s*번호|공간정보\s*DB\s*구축',
-      'sme_certificate':r'소기업.?소상공인\s*확인서|중소기업\s*확인서|소기업\s*확인서|소기업.?소상공인.*소지|중소기업자\s*만|소기업\s*만|소상공인\s*만|중소기업자.{0,22}입찰',
+      'sme_certificate':r'소기업[\s․·/-]*소상공인\s*확인서|소기업.{0,150}소상공인.{0,60}확인서|중소기업\s*확인서|소기업\s*확인서|소기업.?소상공인.*소지|중소기업자\s*만|소기업\s*만|소상공인\s*만|중소기업자.{0,22}입찰',
       'staff_proof':r'재직.{0,12}경력|경력.{0,12}학력|자격.?증명서|투입\s*인력',
       'performance_proof':r'실적\s*증명|수행\s*실적|유사\s*용역\s*실적',
       'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소|소재지',
@@ -342,7 +342,7 @@ def extract_rule_candidates(text,filename):
       'bid_security':r'입찰보증금|입찰공고일\s*이전\s*1년\s*이내.{0,130}입찰참가자격',
       'registration_identity':r'입찰참가자격등록증상|상호\s*또는\s*대표자\s*변경신고|변경\s*전\s*상호',
       'eligibility_cutoff':r'입찰참가자격의\s*판단기준일|마감일.{0,90}참가자격을\s*갖추지\s*않은',
-      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류',
+      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류',
       'special_legal_entity':r'특별법인'
     }
     # PDF extraction may drop article digits and split the SME eligibility
@@ -401,6 +401,12 @@ def nonqualification_context(line):
     """Ignore only unambiguous headings/administration/evaluation context.
     Explicit bidder requirements, prohibitions and regional restrictions
     always need a cited candidate and interpretation."""
+    # A qualification heading stating that rules follow is not itself an
+    # additional condition; each subsequent actual condition is still scanned.
+    if re.fullmatch(
+        r"\s*(?:\d+[.]\s*)?(?:(?:견적|입찰)\s*제출\s*)?"
+        r"(?:입찰\s*)?참가\s*자격\s*[(]?\s*(?:아래|다음)\s*조건을?\s*모두\s*충족하여야\s*함\s*[)]?\s*", line):
+        return True
     # A standalone continuation of the official call-center responsibility
     # warning is not an independent bidder credential.
     if re.fullmatch(r"입찰\s*참가자에게\s*있습니다\.?\s*", line):
@@ -414,7 +420,7 @@ def nonqualification_context(line):
                  r"중소기업협동조합.{0,90}신용평가등급",line):
         if not re.search(r"소기업.{0,20}(?:확인서|소지하여야)|직접\s*생산.{0,20}확인",line):
             return True
-    if re.search(r"조달콜센터|전산장비.{0,80}(?:투찰|등록)|"
+    if re.search(r"조달\s*콜센터.{0,140}(?:문의|책임)|전산장비.{0,80}(?:투찰|등록)|"
                  r"보안각서.{0,70}열람|제안내용.{0,50}추가\s*자료",line):
         return True
     if re.search(r"누출|유출|담합|금품|향응|청렴|근로자\s*권리|"

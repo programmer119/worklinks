@@ -106,5 +106,33 @@ class QualificationCoverageTests(unittest.TestCase):
             "입찰참가자격의 판단기준일은 등록마감일입니다.", [])
         self.assertFalse(result["sourceTextScanComplete"])
 
+    def test_official_sme_certificate_separator_is_captured(self):
+        text = ("바. 중소기업기본법에 따른 소기업 또는 소상공인으로서 "
+                "발급된 소기업․ 소상공인확인서를 소지한 업체")
+        for name in ("official.hwpx", "official.pdf"):
+            clauses = mod.extract_rule_candidates(text, name)
+            result = mod.audit_qualification_scan(text, clauses)
+            self.assertTrue(any(c["type"] == "sme_certificate" and
+                                "소지한 업체" in c["sourceText"] for c in clauses), (name, clauses))
+            self.assertTrue(result["sourceTextScanComplete"], (name, result))
+
+    def test_bidder_proof_document_list_is_retained(self):
+        text = ("※ 입찰참가자격 입증서류 : 부정당업자 제재처분확인서, "
+                "면허등록증, 사업자등록증을 제출하여야 합니다.")
+        clauses = mod.extract_rule_candidates(text, "official.hwpx")
+        result = mod.audit_qualification_scan(text, clauses)
+        self.assertTrue(any(c["type"] == "submission_required" for c in clauses))
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
+    def test_procedural_heading_and_call_center_do_not_mask_sme_condition(self):
+        text = ("4. 견적제출 참가자격(아래 조건을 모두 충족하여야 함)\n"
+                "소기업․ 소상공인확인서를 소지한 업체\n"
+                "투찰이 곤란할 경우 국가종합전자조달 콜센터 (1588-0800)에 "
+                "문의하지 않아 발생되는 책임은 입찰 참가자에게 있습니다.")
+        clauses = mod.extract_rule_candidates(text, "official.hwpx")
+        result = mod.audit_qualification_scan(text, clauses)
+        self.assertTrue(any(c["type"] == "sme_certificate" for c in clauses))
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
 if __name__ == "__main__":
     unittest.main()
