@@ -29,6 +29,7 @@ MAX_DOCUMENTS=24
 # 3MB per member was rejecting real official documents before text extraction.
 MAX_HWPX_XML_MEMBER=10_000_000
 MAX_HWPX_XML_TOTAL=45_000_000
+HWPX_READER_VERSION=2
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
 CLASSIFICATION_VERSION=20
@@ -76,7 +77,10 @@ def fetch_json(url):
             if attempt==3:raise
         time.sleep(min(8,1.5*(2**attempt)))
 def needs_hwpx_reader_retry(record):
-    return any(f.get('errorCategory')=='large_xml_section'
+    if (record or {}).get('hwpxReaderVersion',0)>=HWPX_READER_VERSION:
+        return False
+    return any(f.get('errorCategory')=='large_xml_section' and
+               (Path(f.get('name') or '').suffix.lower() in ('.hwpx',''))
                for f in (record or {}).get('files') or [])
 
 def datestr(raw):
@@ -753,6 +757,7 @@ def main():
                 data=future.result()
                 data['checkedAt']=now.isoformat()
                 data['classificationVersion']=CLASSIFICATION_VERSION
+                data['hwpxReaderVersion']=HWPX_READER_VERSION
                 results[key]=data
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
@@ -764,7 +769,8 @@ def main():
                               'sourceError':type(e).__name__+': '+str(e)[:100],
                               'files':[],'reviewComplete':False,
                               'contractPerformanceVerified':False,
-                              'checkedAt':now.isoformat(),'classificationVersion':CLASSIFICATION_VERSION}
+                              'checkedAt':now.isoformat(),'classificationVersion':CLASSIFICATION_VERSION,
+                              'hwpxReaderVersion':HWPX_READER_VERSION}
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
