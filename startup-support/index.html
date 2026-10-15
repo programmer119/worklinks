@@ -1037,18 +1037,21 @@ async function queueVisibleBidEligibility(){
   let cursor=0;
   try{cursor=Math.max(0,Number(localStorage.getItem('worklinks_bid_review_cursor_v2'))||0)}catch(e){}
   const start=cursor%pending.length;
-  const picked=Array.from({length:Math.min(60,pending.length)},(_,i)=>
+  // Limit browser enrichment: each bid can require four G2B upstream calls.
+  // The server's license cache supplies bulk results without browser bursts.
+  const picked=Array.from({length:Math.min(10,pending.length)},(_,i)=>
    pending[(start+i)%pending.length]);
-  try{localStorage.setItem('worklinks_bid_review_cursor_v2',String((start+picked.length)%pending.length))}catch(e){}
-  let index=0;
-  async function worker(){
-   while(index<picked.length){
-    const x=picked[index++];
-    await Promise.allSettled([loadJobEligibility(x),loadJobEvidence(x)]);
-    await new Promise(resolve=>setTimeout(resolve,230));
-   }
+  let completed=0;
+  for(const x of picked){
+   await Promise.allSettled([loadJobEligibility(x),loadJobEvidence(x)]);
+   completed++;
+   const evidence=jobEvidenceData(x),eligibility=jobEligibilityData(x);
+   const errors=[eligibility?.error,evidence?.error,evidence?.region?.error,
+    evidence?.attachments?.error,evidence?.noticeDocuments?.error].join(' ');
+   if(/429|LIMITED_NUMBER_OF_SERVICE_REQUESTS|upstream_temporarily_rate_limited/.test(errors))break;
+   await new Promise(resolve=>setTimeout(resolve,900));
   }
-  await Promise.all([worker(),worker(),worker()]);
+  try{localStorage.setItem('worklinks_bid_review_cursor_v2',String((start+completed)%pending.length))}catch(e){}
  }finally{eligibilityQueueRunning=false}
 }
 
@@ -1215,7 +1218,8 @@ async function g2bLoadBids(){
  document.getElementById('g2bLoad').addEventListener('click',g2bLoadBids);
  document.getElementById('g2bMore').addEventListener('click',function(){g2bLoadSaved(true)});
  g2bCheckStatus();
- g2bLoadSaved(false).then(function(){return refreshAllPartnerRegistries()}).then(function(){queueVisibleBidEligibility()});
+ // g2bLoadSaved already refreshes company data and starts ONE enrichment queue.
+ g2bLoadSaved(false);
  g2bLoadCrawlStatus();
 })();
 
