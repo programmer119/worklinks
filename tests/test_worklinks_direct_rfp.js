@@ -17,7 +17,9 @@ function section(start,end){
  assert(a>=0&&b>a,'missing direct evidence function');
  return html.slice(a,b);
 }
-const sandbox={rfpSnapshotForJob:(x)=>x.rfp};
+const sandbox={rfpSnapshotForJob:(x)=>x.rfp,
+ partnerRegisteredCode:(p,code)=>(p.registeredCodes||[]).includes(code)?true:null,
+ regionRequirementCheck:(x,p)=>x.regionTest||{status:'unknown',reason:'unverified region'}};
 vm.createContext(sandbox);
 vm.runInContext(section('const directRfpCache=new WeakMap();','function productionRequirementCheck(x,p){')+
                 section('function officialSourceCoverage(rfp,evidence){','function comparePartnerJob(x,p){'),sandbox);
@@ -79,6 +81,42 @@ assert(!distinct.some(q=>q.sourceText==='제안서 실적 점수'));
 assert(sandbox.extractedRfpRequirements({rfp:distinctConditions}).includes('특정 구에 있는 사무소 필수'));
 assert.equal(sandbox.officialReviewCoverage(distinctConditions,evidence),false,
  'retaining all candidates does not authorize an eligibility verdict');
+
+const matchedPartner={
+ registeredCodes:['1468'],
+ smeRecord:{validState:'valid',size:'소기업'},smeCheckedAt:'2026-10-16'
+};
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'industry_code',codes:['1468'],sourceText:'입찰참가자격 업종코드 1468 등록한 자'
+},{},matchedPartner).status,'ok','single official registration can pass its own basic requirement');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'industry_code',codes:['1468','1169'],sourceText:'1468 또는 1169'
+},{},matchedPartner).status,'unknown','OR clauses may not be assumed satisfied');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'industry_code',codes:['9999'],sourceText:'업종코드 9999'
+},{},matchedPartner).status,'unknown','missing company entry is not proof of an exclusive prerequisite');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'sme_certificate',codes:[],sourceText:'중소기업확인서 필수'
+},{},matchedPartner).status,'ok','valid SMPP record matches general SME condition');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'sme_certificate',codes:[],sourceText:'소상공인만 참가 가능'
+},{},matchedPartner).status,'unknown','SME must not pass a micro-only condition');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'region_restriction',codes:[],sourceText:'지역제한 서울'
+},{regionTest:{status:'ok',reason:'서울 일치'}},matchedPartner).status,'ok');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'region_restriction',codes:[],sourceText:'지역제한 제주'
+},{regionTest:{status:'missing',reason:'제주 불일치'}},matchedPartner).status,'unknown',
+ 'a source fragment alone cannot override the exact region rules');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'joint_participation',codes:[],sourceText:'공동수급 불가 단독 참가'
+},{},matchedPartner).status,'ok','no consortium does not disqualify sole bidder');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'direct_production',codes:['8111189901'],sourceText:'직접생산확인증명서 필수'
+},{},matchedPartner).status,'pending','historical certificate is not live SMPP validity');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'staff_proof',codes:[],sourceText:'자격증을 소지한 투입인력 필수'
+},{},matchedPartner).status,'unknown','staff evidence may not be fabricated');
 
 const actual=JSON.parse(fs.readFileSync('startup-support/rfp-clauses.json','utf8')).byNotice;
 for(const noticeId of [
