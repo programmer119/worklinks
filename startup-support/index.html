@@ -1380,35 +1380,7 @@ async function loadJobEligibility(x){
 
 
 var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='';
-var rfpAiByNotice=new Map(),rfpAiCheckedAt='';
-function rfpAiForJob(x){
- const id=jobBidIdentity(x);
- const key=id? id.bidNo+':'+id.order:'';
- const report=rfpAiByNotice.get(key),source=rfpSnapshotByNotice.get(key);
- if(!report||!['classified','rule_based'].includes(report.analysisStatus)||!source)return null;
- const original=new Set((source.files||[]).filter(f=>f.readable)
-  .flatMap(f=>(f.clauseCandidates||[]).map(c=>
-   String(c.type||'')+'|'+String(c.sourceFile||f.name||'')+'|'+String(c.sourceText||'').trim().slice(0,280))));
- const records=report.requirements||[];
- if(!records.length||records.some(c=>c.sourceVerified!==true||c.documentFullyReviewed!==false||
-   !original.has(String(c.type||'')+'|'+String(c.sourceFile||'')+'|'+String(c.sourceText||'').trim().slice(0,280))))return null;
- return report;
-}
-async function refreshRfpAiSnapshot(){
- try{
-  const response=await fetch('./ai-qualification.json',{cache:'no-store'});
-  if(!response.ok)return;
-  const data=await response.json();
-  if(data.ok!==true||!data.byNotice)return;
-  rfpAiByNotice=new Map(Object.entries(data.byNotice));
-  rfpAiCheckedAt=data.generatedAt||'';
-  renderJobs();
-  if(activeDetailJobId){const x=getJobById(activeDetailJobId);if(x)renderJobDetail(x)}
-  if(partnerScopedJob)renderPartnerJobContext();
- }catch(e){
-  // Missing AI snapshot is not evidence of eligibility or absence of conditions.
- }
-}
+// Qualification checking uses official G2B evidence and the RFP source snapshot, not AI classifications.
 function rfpSnapshotForJob(x){
  const id=jobBidIdentity(x);
  return id?rfpSnapshotByNotice.get(id.bidNo+':'+id.order):null;
@@ -1421,7 +1393,6 @@ async function refreshRfpSnapshot(){
   if(source.ok!==true||!source.byNotice)return;
   rfpSnapshotByNotice=new Map(Object.entries(source.byNotice));
   rfpSnapshotCheckedAt=source.generatedAt||'';
-  refreshRfpAiSnapshot();
   renderJobs();
   if(activeDetailJobId){const x=getJobById(activeDetailJobId);if(x)renderJobDetail(x)}
   if(partnerScopedJob)renderPartnerJobContext();
@@ -1503,25 +1474,30 @@ const productionProductCodeNames={
  '8111219901':'인터넷지원개발서비스','8115169901':'공간정보DB구축서비스'
 };
 // A dated publication is evidence of past issuance, NOT live SMPP verification.
-function extractedRfpRequirements(x){
- const data=typeof rfpSnapshotForJob==='function'?rfpSnapshotForJob(x):null;
- if(!data||!Array.isArray(data.files))return '';
- const ai=typeof rfpAiForJob==='function'?rfpAiForJob(x):null;
- if(ai){
-  // Exclude optional/context-only clauses from mandatory requirement matching.
-  return (ai.requirements||[]).filter(c=>c.classification==='mandatory'||
-       (c.classification==='prohibited'&&c.type==='joint_participation')).map(c=>String(c.sourceText||'')).join(' ').slice(0,9000);
+function directRfpRequirements(x){
+ const data=rfpSnapshotForJob(x);
+ if(!Array.isArray(data?.files))return [];
+ const types=new Set(['industry_code','direct_production','sme_certificate',
+  'staff_proof','performance_proof','region_restriction','joint_participation',
+  'legal_exclusion','registration_identity','eligibility_cutoff','submission_required']);
+ const unique=new Map();
+ for(const f of data.files){
+  if(f.readable!==true)continue;
+  for(const c of f.clauseCandidates||[]){
+   if(!types.has(c.type)||c.explicitMust!==true)continue;
+   const codes=(c.codes||[]).map(String).filter(v=>/^\\d{4}$|^\\d{10}$/.test(v));
+   // Keep alternative codes separate; condensed displays never assert a credential is met.
+   const key=String(c.type)+'|'+codes.slice().sort().join(',');
+   if(!unique.has(key))unique.set(key,{
+    type:c.type,codes,sourceText:String(c.sourceText||''),
+    sourceFile:String(c.sourceFile||f.name||'')
+   });
+  }
  }
- return (data.files||[]).filter(f=>f.readable).flatMap(f=>{
-  const structured=(f.clauseCandidates||[]).filter(v=>v.reviewStatus==='unreviewed'&&(v.explicitMust===true||/소지한\s*자|등록한\s*자|제출한\s*자|구비한\s*자/.test(v.sourceText||''))&&
-   ['industry_code','direct_production','sme_certificate','staff_proof',
-    'performance_proof','region_restriction','joint_participation',
-    'legal_exclusion','bid_security','registration_identity',
-    'eligibility_cutoff','submission_required','special_legal_entity'].includes(v.type))
-   .map(v=>String(v.sourceText||''));
-  // The snippets are highlights, not authoritative mandatory conditions.
-  return structured;
- }).join(' ').slice(0,9000);
+ return [...unique.values()];
+}
+function extractedRfpRequirements(x){
+ return directRfpRequirements(x).map(c=>c.sourceText).join(' ').slice(0,9000);
 }
 function productionRequirementCheck(x,p){
  const rfpText=extractedRfpRequirements(x);
@@ -1556,32 +1532,27 @@ function productionRequirementCheck(x,p){
  * Compare the official attachment manifest to every reviewed file. No-file
  * notices require independent, source-hashed review of the full notice.
  */
-function officialReviewCoverage(rfp,evidence,ai){
+function officialSourceCoverage(rfp,evidence){
  const files=Array.isArray(rfp?.files)?rfp.files:null;
  const meta=evidence?.attachments;
- if(!files||meta?.ok!==true||meta?.complete!==true||
+ if(!files||meta?.ok!==true||meta.complete!==true||
     !Array.isArray(meta.items)||meta.items.length!==files.length)return false;
  if(!files.length){
   const notice=evidence?.noticeDocuments;
-  return rfp.reviewComplete===true&&rfp.requiredConditionsComplete===true&&
-   rfp.noticeTextReviewed===true&&rfp.noticeConditionsVerified===true&&
-   Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&notice?.ok===true&&
-   notice?.complete===true&&Number(notice.count||0)===0;
+  return rfp.noticeTextReviewed===true&&Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&
+   notice?.ok===true&&notice.complete===true&&Number(notice.count||0)===0;
  }
- if(!ai||ai.documentInterpretationReviewed!==true||
-    ai.reviewComplete!==true||ai.requiredConditionsComplete!==true||
-    ai.sourceTruncated===true||rfp.manifestComplete!==true||
-    ai.fullDocumentAudit?.manifestDocuments!==files.length)return false;
- if(!files.length||!files.some(f=>/입찰\s*공고|공고\s*(?:문|서)/.test(f.name||'')))return false;
- const audit=ai.fullDocumentAudit;
- if(audit?.complete!==true||!Array.isArray(audit.sourceHashes)||
-    audit.sourceHashes.length!==files.length)return false;
- const hashes=new Set(audit.sourceHashes.map(x=>String(x.file)+'|'+String(x.sha256)));
- return files.every(file=>file.readable===true&&file.sourceTextScanComplete===true&&
-  file.unmatchedQualificationAnchorCount===0&&
-  !file.qualificationScanTruncated&&!file.clauseCandidatesTruncated&&
-  /^[a-f0-9]{64}$/.test(file.sourceSha256||'')&&
-  hashes.has(String(file.name)+'|'+String(file.sourceSha256))); 
+ if(rfp.manifestComplete!==true||rfp.attachmentManifestCount!==files.length||
+    !files.some(f=>/입찰\\s*공고|공고\\s*(?:문|서)/.test(f.name||'')))return false;
+ return files.every(f=>f.readable===true&&f.sourceTextScanComplete===true&&
+  f.unmatchedQualificationAnchorCount===0&&!f.qualificationScanTruncated&&
+  !f.clauseCandidatesTruncated&&/^[a-f0-9]{64}$/.test(f.sourceSha256||''));
+}
+function officialReviewCoverage(rfp,evidence){
+ // A complete text scan cannot prove every bid qualification was interpreted.
+ // Require an explicit, separate FULL conditions review; never trust old AI flags.
+ return officialSourceCoverage(rfp,evidence)&&
+  rfp?.reviewComplete===true&&rfp?.requiredConditionsComplete===true;
 }
 function comparePartnerJob(x,p){
  const rows=[],req=jobEligibilityData(x);
@@ -1615,101 +1586,23 @@ function comparePartnerJob(x,p){
   }
   if(!req.complete)add('partial','면허제한 일부만 조회됨','unknown','조회 페이지 누락 또는 제한 항목 누락','나라장터 API');
  }
- const aiReport=typeof rfpAiForJob==='function'?rfpAiForJob(x):null;
- if(aiReport){
-  const labelOf={industry_code:'등록업종',direct_production:'직접생산',
-   sme_certificate:'기업규모 확인서',staff_proof:'기술인력 증빙',
-   performance_proof:'수행실적',region_restriction:'지역제한',
-   joint_participation:'공동수급·하도급 제한',
-   legal_exclusion:'법률상 참가 제외',bid_security:'입찰보증금',
-   registration_identity:'사업자 등록정보 일치',eligibility_cutoff:'참가자격 판단기준일',
-   submission_required:'필수 입찰서류',special_legal_entity:'특별법인 조건부 예외'};
-  let ambiguousAiCount=0;
-  let ambiguousAiSample='';
-  for(const clause of (aiReport.requirements||[])){
-   if(clause.classification==='optional'||clause.classification==='context_only')continue;
-   // An uninterpretable excerpt is not automatically a missing company
-   // credential. Keep ONE unresolved review item, not thousands of rows.
-   if(clause.classification==='unknown'){
-    ambiguousAiCount++;
-    if(!ambiguousAiSample)ambiguousAiSample=String(clause.sourceText||'').slice(0,140);
-    continue;
-   }
-   const codes=(clause.codes||[]).map(String).filter(c=>/^\d{4}$/.test(c));
-   let status='unknown',matchReason=clause.reason||'';
-   if(clause.classification==='mandatory'&&clause.type==='industry_code'&&codes.length){
-    const states=codes.map(c=>partnerRegisteredCode(p,c));
-    if((clause.relation==='all'&&states.every(v=>v===true))||
-       (clause.relation==='any'&&states.some(v=>v===true))){
-     status='ok';matchReason='공식 나라장터 등록업종 요건 충족: '+codes.filter((c,i)=>states[i]===true).join(', ');
-    }
-   }
-   if(clause.classification==='prohibited'&&clause.type==='industry_code'&&
-      /대기업/.test(clause.sourceText||'')&&
-      /참여.{0,12}(?:불가|할\s*수\s*없|제한)/.test(clause.sourceText||'')&&
-      p.smeRecord?.validState==='valid'&&
-      ['소기업','소상공인','중기업'].includes(p.smeRecord.size)){
-    status='ok';matchReason='대기업 참여제한 · 공식 SMPP 기업규모 '+p.smeRecord.size+'으로 대기업 아님';
-   }
-   if(clause.classification==='prohibited'&&clause.type==='joint_participation'){
-    // A no-consortium / no-subcontract restriction does not disqualify
-    // a standalone bidder. Delivery capability must still be checked.
-    status='ok';
-    matchReason='단독 참가 기준 공동수급·하도급 제한과 충돌 없음 · 수행범위는 별도 확인';
-   }
-   if(clause.classification==='mandatory'&&clause.type==='region_restriction'){
-    const allowed=regionRequirementCheck(x,p);
-    status=allowed.status;
-    matchReason=allowed.reason;
-   }
-   if(clause.classification==='mandatory'&&clause.type==='sme_certificate'){
-    if(p.smeRecord?.validState==='valid'&&/소기업|소상공인|중소기업/.test(clause.sourceText||'')){
-     status='ok';matchReason='사업자번호 일치 SMPP 유효 발급현황 확인 · 만료일 추가 확인 필요';
-    }else{status='pending';matchReason='SMPP 공공 입찰용 유효 확인서 대조 필요';}
-   }
-   if(clause.classification==='mandatory'&&clause.type==='direct_production'){
-    const required=(clause.codes||[]).map(String).filter(c=>/^\d{10}$/.test(c));
-    const records=Array.isArray(p.productionRecords)?p.productionRecords:[];
-    const named=required.map(code=>productionProductCodeNames[code]).filter(Boolean);
-    if(!required.length){
-     const normalized=String(clause.sourceText||'').replace(/\s/g,'');
-     named.push(...Object.values(productionProductCodeNames).filter(name=>normalized.includes(name)));
-    }
-    const uniqueNames=[...new Set(named)];
-    const matches=uniqueNames.filter(name=>records.some(v=>
-     String(v.product||'').replace(/\s/g,'')===name&&
-     (!v.validFrom||String(v.validFrom).slice(0,10)<=kstISO())&&
-     String(v.validTo||'').slice(0,10)>=kstISO()));
-    const codeMatch=uniqueNames.length>0&&
-     ((clause.relation==='all'&&matches.length===uniqueNames.length)||
-      (clause.relation==='any'&&matches.length>0));
-    if(codeMatch){
-     status='ok';
-     matchReason='공식 직접생산 발급현황 '+(p.productionSnapshotDate||'기준일 미상')+
-      ' 기준 품목 '+matches.join(', ')+' 보유 및 기재 유효기간 확인 · 실시간 효력과는 구분';
-    }else{
-     status='pending';
-     matchReason=uniqueNames.length?
-      '직접생산 요구품목 '+uniqueNames.join(', ')+' · 발급현황 일치 또는 필수·대체 관계 확인 필요':
-      '직접생산 필수 품목명·품목번호 원문 확인 필요';
-    }
-   }
-   if(clause.classification==='mandatory'&&
-      (clause.type==='staff_proof'||clause.type==='performance_proof'||
-       ['bid_security','registration_identity','eligibility_cutoff','submission_required'].includes(clause.type))){
-     status='pending';
-     matchReason='입찰조건과 제출·자격상태 별도 확인 필요 · 자동 적격 승인 금지';
-   }
-   add('ai-'+clause.index,(aiReport.analysisStatus==='classified'?'AI 분류: ':'규칙 분류: ')+(labelOf[clause.type]||clause.type)+
-     ' · '+(clause.classification==='mandatory'?'필수':
-      clause.classification==='prohibited'?'금지·제한':'불명확'),
-     status,clause.sourceText+' · '+matchReason+
-     ' · 전체 공고·예외 조항은 아직 미검토','공식 RFP '+clause.sourceFile+' · '+(aiReport.analysisStatus==='classified'?'AI 문장 해석':'명시적 문구 규칙분류'));
-  }
-  if(ambiguousAiCount)add('ai-ambiguous','기계해석 불명확 문구 '+ambiguousAiCount+'건',
-   'unknown','원문 확인 전까지 필수조건 없음으로 단정 불가 · 예: '+ambiguousAiSample,
-   '공식 RFP 분류 보류 묶음');
- }
+ const directRequirements=directRfpRequirements(x);
+ const evidenceTypes={
+  industry_code:'업종 등록',direct_production:'직접생산',sme_certificate:'기업규모',
+  staff_proof:'필수 기술인력',performance_proof:'필수 실적',
+  region_restriction:'지역제한',joint_participation:'공동수급',
+  legal_exclusion:'법적 제한',registration_identity:'등록정보·등록기한',
+  eligibility_cutoff:'자격 기준일',submission_required:'필수 제출서류'
+ };
+ // Source snippets are only evidence candidates. Preserve one unresolved row
+ // for each distinct type/code combination, without confusing scorecards with
+ // confirmed admission rules or granting a false automatic "ready".
+ directRequirements.forEach((clause,i)=>{
+  add('source-'+i,'공식 문서: '+(evidenceTypes[clause.type]||clause.type)+
+   (clause.codes.length?' ('+clause.codes.join('/')+')':''),
+   'unknown',clause.sourceText.slice(0,220)+' · 해당 문구의 필수/예외 관계 및 현재 증빙 확인 필요',
+   '공식 문서 '+clause.sourceFile);
+ });
  const summaryText=String(x.condition||'')+' '+String(x.partnerBidMode||'');
  const txt=summaryText+' '+extractedRfpRequirements(x);
  const production=productionRequirementCheck(x,p);
@@ -1746,7 +1639,6 @@ function comparePartnerJob(x,p){
   // proposal scoring item or post-award delivery staffing as bidder proof.
   if(!re.test(summaryText))continue;
   const structuredType=id==='experience'?'performance_proof':id==='staff'?'staff_proof':null;
-  if(structuredType&&(aiReport?.requirements||[]).some(q=>q.type===structuredType))continue;
   const reason=id==='staff'&&p.publicEmployeeCount?
     ('공식 업체정보 직원 수 '+p.publicEmployeeCount+'명(참고) · 공고의 필수 경력·자격·재직·실제 투입인력은 별도 증빙 필요'):
     id==='experience'?
@@ -1762,11 +1654,12 @@ function comparePartnerJob(x,p){
   add('proof-'+id,label,'pending',reason,id==='experience'?'나라장터 계약정보·수행실적증명서':'공고 조건 요약');
  }
  const rfp=rfpSnapshotForJob(x);
- const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x),aiReport);
+ const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x));
+ const rfpSourceScanned=officialSourceCoverage(rfp,jobEvidenceData(x));
  if(rfp?.status==='text_extracted_requires_review'||rfpFullyReviewed){
   const files=(rfp.files||[]).filter(q=>q.readable);
   const categories=[...new Set(files.flatMap(q=>Object.entries(q.topics||{}).filter(([k,n])=>n>0).map(([k])=>k)))];
-  add('rfp-extracted','공식 RFP 본문 조건 검토',rfpFullyReviewed?'ok':'unknown',
+  add('rfp-extracted','공식 RFP 본문 조건 검토',rfpFullyReviewed?'ok':rfpSourceScanned?'pending':'unknown',
    files.length+'개 문서 텍스트 추출 · 확인 키워드: '+categories.join(', ')+
    ' · 문구 포함만으로 참가요건 충족/필수 여부 확정 불가. 근거를 상세 화면에 표시','나라장터 공식 RFP 원문');
  }else if(rfp?.status==='no_eorder_files'){
@@ -1798,7 +1691,7 @@ function comparePartnerJob(x,p){
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  // Require explicit full official-document review before any ready verdict.
- const fullyReviewed=officialReviewCoverage(rfp,evidence,aiReport);
+ const fullyReviewed=officialReviewCoverage(rfp,evidence);
  const complete=fullyReviewed&&req?.ok===true&&req.complete===true&&
   counts.missing===0&&counts.pending===0&&counts.unknown===0;
  return {rows,counts,complete,reviewStatus:fullyReviewed?'fully_reviewed':'full_notice_review_pending'};
@@ -1925,18 +1818,7 @@ function renderJobDetail(x){
   '<p>※ 첨부파일 메타데이터 조회 완료. 과업지시서·RFP 전체 참가조건 분석은 별도 검증 필요.</p></section>':
   '<section class="job-detail-section"><h3>공식 첨부파일</h3><p>'+htmlEscape(docs?.error||'공식 조회 대기 · 원문 확인 필요')+'</p></section>';
  const extracted=rfpSnapshotForJob(x);
- const aiReport=typeof rfpAiForJob==='function'?rfpAiForJob(x):null;
- const aiLabels={mandatory:'필수조건',optional:'선택사항',prohibited:'금지·제한',context_only:'참고 설명',unknown:'원문 재검토'};
- const aiHTML=aiReport?'<section class="job-detail-section"><h3>'+(aiReport.analysisStatus==='classified'?'AI 참가조건 해석':'참가조건 규칙분류')+' · '+aiReport.interpretedCount+'개 조항</h3>'+
-  '<p>공식 문서에서 인용한 구절의 '+(aiReport.analysisStatus==='classified'?'AI 해석':'명시적 문구 탐지')+' 결과입니다. 전체 공고 검토나 바로 지원 가능 판정은 아닙니다.</p>'+ 
-  (aiReport.requirements||[]).slice(0,50).map(r=>
-   '<div class="job-match-row"><div class="job-match-main"><strong>'+
-   htmlEscape(aiLabels[r.classification]||'검토 필요')+
-   ' · '+htmlEscape(r.type)+(r.codes?.length?' · '+htmlEscape(r.codes.join(', ')):'')+
-   '</strong><small>'+htmlEscape(r.sourceText||'')+'</small>'+
-   '<small>'+(aiReport.analysisStatus==='classified'?'AI 해석: ':'분류 근거: ')+htmlEscape(r.reason||'')+' · 파일: '+htmlEscape(r.sourceFile||'')+
-   '</small></div><span class="jobmatch-chip pending">전체 공고 미검토</span></div>').join('')+
-  '</section>':'';
+
  const readable=(extracted?.files||[]).filter(f=>f.readable);
  const extractHTML=readable.length?'<section class="job-detail-section"><h3>공식 RFP 텍스트 발췌 · 자동분석 참고</h3>'+
   '<p>공식 다운로드 문서 '+readable.length+'건 · 해당 문구의 필수·선택·예외 조항은 원문 재확인이 필요합니다.</p>'+
@@ -1959,7 +1841,7 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+aiHTML+extractHTML+variantLinks+actions;
+ document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+extractHTML+variantLinks+actions;
 }
 function openJobDetail(id){
  const x=getJobById(id);if(!x)return;
@@ -2070,14 +1952,15 @@ function renderJobs(){
  // Source-backed registered candidates cannot be mislabeled as zero merely
  // because final attachment verification remains incomplete.
  const readyCount=statusTotal('ready');
+ const sourceScanCount=considered.filter(o=>officialSourceCoverage(rfpSnapshotForJob(o.x),jobEvidenceData(o.x))).length;
  const fullReviewCount=considered.filter(o=>{
   const r=rfpSnapshotForJob(o.x);
-  return officialReviewCoverage(r,jobEvidenceData(o.x),rfpAiForJob(o.x));
+  return officialReviewCoverage(r,jobEvidenceData(o.x));
  }).length;
  const summaryEl=document.getElementById('jobDecisionSummary');
  if(summaryEl)summaryEl.textContent=readyCount?
   '바로 지원 확정 '+readyCount+'건 · 공고별 증빙 및 필수 참가조건 대조 결과':
-  '등록업종 일치 '+industryMatched+'건 · 면허제한 0건 '+industryUnrestricted+'건 · 바로 지원 확정 0건 (원문 전체 검증 '+fullReviewCount+'/'+considered.length+'건). 업종 일치만으로 모든 참가자격이 충족되는 것은 아닙니다.';
+  '등록업종 일치 '+industryMatched+'건 · 면허제한 0건 '+industryUnrestricted+'건 · 공식 원문 스캔 '+sourceScanCount+'건 · 최종 전체조건 검증 '+fullReviewCount+'건. 현재 증빙만으로 바로 지원 확정 불가.';
  const proofEl=document.getElementById('jobMissingInfo');
  if(proofEl){
   const counts={original:0,license:0,direct:0,staff:0,experience:0,sw:0,sme:0,region:0};
