@@ -14,6 +14,38 @@ class QualificationCoverageTests(unittest.TestCase):
         clauses = mod.extract_rule_candidates(text, "official.pdf")
         return mod.audit_qualification_scan(text, clauses), clauses
 
+    def test_hwpx_valid_large_xml_document_is_not_rejected(self):
+        # Real HWPX often has large layout metadata but little extracted text.
+        import io
+        import zipfile
+        phrase = "소프트웨어사업자 업종코드 1468 등록업체만 입찰할 수 있습니다."
+        xml = "<root><!--" + "X" * 3_300_000 + "--><p><t>" + phrase * 3 + "</t></p></root>"
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as z:
+            z.writestr("Contents/section0.xml", xml)
+        result = mod.extract("공고.hwpx", output.getvalue())
+        self.assertIn(phrase, result)
+        self.assertTrue(mod.audit_qualification_scan(
+            result, mod.extract_rule_candidates(result, "공고.hwpx"))["sourceTextScanComplete"])
+
+    def test_hwpx_large_xml_still_has_bounded_limits(self):
+        import io
+        import zipfile
+        output = io.BytesIO()
+        xml = "<root><!--" + "X" * (mod.MAX_HWPX_XML_MEMBER + 1) + "--></root>"
+        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as z:
+            z.writestr("Contents/section0.xml", xml)
+        with self.assertRaisesRegex(ValueError, "large_xml_section"):
+            mod.extract("공고.hwpx", output.getvalue())
+
+    def test_previous_hwpx_size_failures_are_retried_once(self):
+        old = {"files":[{"name":"입찰공고.hwpx","errorCategory":"large_xml_section"}]}
+        self.assertTrue(mod.needs_hwpx_reader_retry(old))
+        old["hwpxReaderVersion"] = mod.HWPX_READER_VERSION
+        self.assertFalse(mod.needs_hwpx_reader_retry(old))
+        self.assertFalse(mod.needs_hwpx_reader_retry({
+            "files":[{"name":"낙찰.pdf","errorCategory":"large_xml_section"}]}))
+
     def test_ordinary_bidder_administration_is_not_an_eligibility_gate(self):
         guidance = (
             "다. 입찰참가자격 : 다음 조건을 충족하는 자",
