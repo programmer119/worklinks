@@ -29,7 +29,7 @@ const file={
     {type:'industry_code',codes:['1468'],sourceFile:'입찰공고문.hwp',
       sourceText:'입찰참가자격 업종코드 1468 등록한 자',explicitMust:true},
     {type:'industry_code',codes:['1468'],sourceFile:'입찰공고문.hwp',
-      sourceText:'동일 요건 반복',explicitMust:true},
+      sourceText:'입찰참가자격 업종코드 1468 등록한 자',explicitMust:true},
     {type:'direct_production',codes:['8111189901'],
       sourceText:'직접생산확인증명서 8111189901 소지한 자',explicitMust:true},
     {type:'performance_proof',codes:[],sourceText:'제안서 실적 배점표',explicitMust:false},
@@ -59,6 +59,26 @@ const withExtra={...source,files:[{...file,clauseCandidates:[
 ]}]};
 assert.equal(sandbox.directRfpRequirements({rfp:withExtra}).length,4,
   'different mandatory code cannot disappear during dedupe');
+
+// The former type+code dedup discarded materially different mandatory rules.
+const distinctConditions={...source,files:[{...file,clauseCandidates:[
+ ...file.clauseCandidates,
+ {type:'industry_code',codes:['1468'],sourceText:'1468 등록 외에 별도 면허증도 필수',explicitMust:true},
+ {type:'region_restriction',codes:[],sourceText:'사업장 서울 소재 필수',explicitMust:true},
+ {type:'region_restriction',codes:[],sourceText:'특정 구에 있는 사무소 필수',explicitMust:true},
+ {type:'staff_proof',codes:[],sourceText:'필수 경력 3년 이상',explicitMust:true},
+ {type:'staff_proof',codes:[],sourceText:'필수 자격증 보유',explicitMust:true},
+ {type:'performance_proof',codes:[],sourceText:'제안서 실적 점수',explicitMust:false},
+]}]};
+const distinct=sandbox.directRfpRequirements({rfp:distinctConditions});
+assert.equal(distinct.length,8,'different mandatory clauses must not collapse into same type/code');
+assert.equal(distinct.filter(q=>q.type==='industry_code').length,2);
+assert.equal(distinct.filter(q=>q.type==='region_restriction').length,2);
+assert.equal(distinct.filter(q=>q.type==='staff_proof').length,2);
+assert(!distinct.some(q=>q.sourceText==='제안서 실적 점수'));
+assert(sandbox.extractedRfpRequirements({rfp:distinctConditions}).includes('특정 구에 있는 사무소 필수'));
+assert.equal(sandbox.officialReviewCoverage(distinctConditions,evidence),false,
+ 'retaining all candidates does not authorize an eligibility verdict');
 
 const actual=JSON.parse(fs.readFileSync('startup-support/rfp-clauses.json','utf8')).byNotice;
 for(const noticeId of [
