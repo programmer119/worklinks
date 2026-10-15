@@ -1485,7 +1485,7 @@ function directRfpRequirements(x){
   if(f.readable!==true)continue;
   for(const c of f.clauseCandidates||[]){
    if(!types.has(c.type)||c.explicitMust!==true)continue;
-   const codes=(c.codes||[]).map(String).filter(v=>/^\\d{4}$|^\\d{10}$/.test(v));
+   const codes=(c.codes||[]).map(String).filter(v=>/^\d{4}$|^\d{10}$/.test(v));
    // Keep alternative codes separate; condensed displays never assert a credential is met.
    const key=String(c.type)+'|'+codes.slice().sort().join(',');
    if(!unique.has(key))unique.set(key,{
@@ -1543,7 +1543,7 @@ function officialSourceCoverage(rfp,evidence){
    notice?.ok===true&&notice.complete===true&&Number(notice.count||0)===0;
  }
  if(rfp.manifestComplete!==true||rfp.attachmentManifestCount!==files.length||
-    !files.some(f=>/입찰\\s*공고|공고\\s*(?:문|서)/.test(f.name||'')))return false;
+    !files.some(f=>/입찰\s*공고|공고\s*(?:문|서)/.test(f.name||'')))return false;
  return files.every(f=>f.readable===true&&f.sourceTextScanComplete===true&&
   f.unmatchedQualificationAnchorCount===0&&!f.qualificationScanTruncated&&
   !f.clauseCandidatesTruncated&&/^[a-f0-9]{64}$/.test(f.sourceSha256||''));
