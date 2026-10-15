@@ -78,12 +78,23 @@ def request_api(base, operation, params):
     args = {'serviceKey':token, 'type':'json'}
     args.update(params)
     url = base + '/' + operation + '?' + urlencode(args)
+    # Share one circuit breaker among all requests for this upstream service.
+    # During provider quota exhaustion do not multiply futile calls across notices.
+    with lock:
+        cooldown=cache.get(('upstream-rate-cooldown',base),0)
+    if cooldown>time.time():raise ApiError('upstream_temporarily_rate_limited')
     try:
         response = urlopen(Request(url, headers={
             'Accept':'application/json', 'User-Agent':'WorkLinksG2B/1.0'
         }), timeout=14)
         raw = response.read()
-    except HTTPError as e: raise ApiError(classify_upstream_http_error(e))
+    except HTTPError as e:
+        error=classify_upstream_http_error(e)
+        if (getattr(e,'code',0)==429 or
+                'LIMITED_NUMBER_OF_SERVICE_REQUESTS' in error):
+            with lock:
+                cache[('upstream-rate-cooldown',base)]=time.time()+1800
+        raise ApiError(error)
     except (URLError, IOError, ValueError): raise ApiError('upstream_unreachable')
     try: doc = json.loads(raw.decode('utf-8'))
     except (ValueError, UnicodeError): raise ApiError('upstream_not_json')
@@ -801,7 +812,12 @@ class Handler(BaseHTTPRequestHandler):
                 with lock:saved=cache.get(ck)
                 if saved and saved[0]>time.time():return self.reply(200,saved[1])
                 result=bid_evidence_query(bid_no,order)
-                with lock:cache[ck]=(time.time()+6*3600,result)
+                # Do not retain upstream failures for six hours. A transient
+                # 429 is handled by the shared cooldown above, not a false
+                # negative qualification verdict.
+                complete=(result.get('region') or {}).get('complete') and (result.get('attachments') or {}).get('complete') and (result.get('noticeDocuments') or {}).get('complete')
+                lifetime=6*3600 if complete else 600
+                with lock:cache[ck]=(time.time()+lifetime,result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/eligibility':
                 bid_no=get('bidNo').strip()
