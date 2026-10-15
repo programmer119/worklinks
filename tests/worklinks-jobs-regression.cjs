@@ -242,7 +242,8 @@ const bidRows=cmpMod.comparePartnerJob({rfp:bidSource,evidence:bidEvidence,condi
 assert.equal(bidRows.filter(x=>x.id.startsWith('source-')).length,2,
  'display one pending group per type, not one row per snippet');
 assert.match(bidRows.find(x=>x.id==='source-region_restriction').label,/2구절/);
-assert.equal(bidRows.find(x=>x.id==='source-direct_production').status,'unknown');
+assert.equal(bidRows.find(x=>x.id==='source-direct_production').status,'pending',
+ 'source citation without a current SMPP certificate must stay pending');
 assert.equal(cmpMod.officialSourceCoverage(bidSource,bidEvidence),true);
 assert.equal(cmpMod.officialReviewCoverage(bidSource,bidEvidence),false,
  'all text scanned is not a confirmed qualification review');
