@@ -118,6 +118,28 @@ assert.equal(sandbox.officialSourceClauseResult({
  type:'staff_proof',codes:[],sourceText:'자격증을 소지한 투입인력 필수'
 },{},matchedPartner).status,'unknown','staff evidence may not be fabricated');
 
+// Full review can now be established for a genuinely simple, completely
+// scanned official source without a permanently false extraction flag.
+const simple={...source,files:[{...file,qualificationAnchorCount:1,
+ clauseCandidates:[file.clauseCandidates[0]]}]};
+const company={...matchedPartner,registryCheckedAt:'2026-10-16',registryComplete:true};
+assert.equal(sandbox.officialReviewCoverage(simple,evidence,{rfp:simple},company),true,
+ 'single fully cited registered-industry clause should have a reachable review path');
+assert.equal(sandbox.officialReviewCoverage({
+ ...simple,files:[{...simple.files[0],clauseCandidates:[
+  ...simple.files[0].clauseCandidates,
+  {type:'performance_proof',sourceText:'입찰참가자격 유사실적 증명 필수',explicitMust:true}
+ ]}]},evidence,{rfp:simple},company),false,'additional unverified qualification must veto approval');
+assert.equal(sandbox.officialReviewCoverage({
+ ...simple,files:[{...simple.files[0],clauseCandidates:[
+  {...simple.files[0].clauseCandidates[0],codes:['9999']}]}]
+},evidence,{rfp:simple},company),false,'missing industry cannot auto qualify');
+assert.equal(sandbox.officialReviewCoverage({
+ ...simple,files:[{...simple.files[0],qualificationAnchorCount:0}]
+},evidence,{rfp:simple},company),false,'empty qualification audit cannot certify a notice');
+assert.equal(sandbox.officialReviewCoverage(simple,evidence,{rfp:simple},
+ {...company,registryComplete:false}),false,'incomplete company registry must veto');
+
 const actual=JSON.parse(fs.readFileSync('startup-support/rfp-clauses.json','utf8')).byNotice;
 const preferred=['R26BK01756420:000','R26BK01753188:000',
  'R26BK01755213:000','R26BK01747543:000'];
