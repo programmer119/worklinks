@@ -1561,11 +1561,21 @@ function officialSourceCoverage(rfp,evidence){
   f.unmatchedQualificationAnchorCount===0&&!f.qualificationScanTruncated&&
   !f.clauseCandidatesTruncated&&/^[a-f0-9]{64}$/.test(f.sourceSha256||''));
 }
-function officialReviewCoverage(rfp,evidence){
- // A complete text scan cannot prove every bid qualification was interpreted.
- // Require an explicit, separate FULL conditions review; never trust old AI flags.
- return officialSourceCoverage(rfp,evidence)&&
-  rfp?.reviewComplete===true&&rfp?.requiredConditionsComplete===true;
+function officialReviewCoverage(rfp,evidence,x,p){
+ if(!officialSourceCoverage(rfp,evidence))return false;
+ // Existing independently reviewed documents remain valid when proven complete.
+ if(rfp.reviewComplete===true&&rfp.requiredConditionsComplete===true)return true;
+ // A narrow deterministic route for simple notices: EVERY original cited
+ // candidate must be a positively checked registration/SME/region requirement.
+ // Never infer full review from mere text extraction, a missing AI report,
+ // a partial attachment manifest, or a dated direct-production certificate.
+ if(!x||!p||!p.registryCheckedAt||p.registryComplete!==true)return false;
+ const supported=new Set(['industry_code','sme_certificate','region_restriction']);
+ if(!Array.isArray(rfp.files)||!rfp.files.length)return false;
+ return rfp.files.every(f=>f.qualificationAnchorCount>0&&
+   Array.isArray(f.clauseCandidates)&&f.clauseCandidates.length>0&&
+   f.clauseCandidates.every(c=>c.explicitMust===true&&supported.has(c.type)&&
+    String(c.sourceText||'').length>=12&&officialSourceClauseResult(c,x,p).status==='ok'));
 }
 function officialSourceClauseResult(clause,x,p){
  const text=String(clause.sourceText||'');
@@ -1721,7 +1731,7 @@ function comparePartnerJob(x,p){
   add('proof-'+id,label,'pending',reason,id==='experience'?'나라장터 계약정보·수행실적증명서':'공고 조건 요약');
  }
  const rfp=rfpSnapshotForJob(x);
- const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x));
+ const rfpFullyReviewed=officialReviewCoverage(rfp,jobEvidenceData(x),x,p);
  const rfpSourceScanned=officialSourceCoverage(rfp,jobEvidenceData(x));
  if(rfp?.status==='text_extracted_requires_review'||rfpFullyReviewed){
   const files=(rfp.files||[]).filter(q=>q.readable);
@@ -1758,7 +1768,7 @@ function comparePartnerJob(x,p){
  const counts={ok:rows.filter(r=>r.status==='ok').length,missing:rows.filter(r=>r.status==='missing').length,
   pending:rows.filter(r=>r.status==='pending').length,unknown:rows.filter(r=>r.status==='unknown').length};
  // Require explicit full official-document review before any ready verdict.
- const fullyReviewed=officialReviewCoverage(rfp,evidence);
+ const fullyReviewed=officialReviewCoverage(rfp,evidence,x,p);
  const complete=fullyReviewed&&req?.ok===true&&req.complete===true&&
   counts.missing===0&&counts.pending===0&&counts.unknown===0;
  return {rows,counts,complete,sourceTextVerified:rfpSourceScanned,reviewStatus:fullyReviewed?'fully_reviewed':'full_notice_review_pending'};
@@ -1789,8 +1799,12 @@ function participationVerdict(x,p){
   confirmed:c.ok,pending:c.pending,unknown:c.unknown,missing:c.missing
  };
  if(proof.complete===true&&c.missing===0&&c.pending===0&&c.unknown===0&&
-    (industry.type==='industry_match'||industry.type==='no_restriction'))
-  return {type:'ready',label:'바로 지원 가능',reason:'모든 필수조건 및 첨부원문 확인 완료',confirmed:c.ok,pending:0,unknown:0,missing:0};
+    (industry.type==='industry_match'||industry.type==='no_restriction')){
+  const manual=rfpSnapshotForJob(x)?.reviewComplete===true;
+  return {type:'ready',label:manual?'바로 지원 가능':'단순조건 자동 확인',
+   reason:manual?'모든 필수조건 및 첨부원문 검토 완료':'전체 원문 스캔 및 확인 가능한 단순 참가요건 검증 · 제출 전 원문 최종 확인',
+   confirmed:c.ok,pending:0,unknown:0,missing:0};
+ }
  if((industry.type==='industry_match'||industry.type==='no_restriction')&&
     (c.ok>0||industry.type==='no_restriction')){
   const detail=[];
@@ -2022,7 +2036,7 @@ function renderJobs(){
  const sourceScanCount=considered.filter(o=>officialSourceCoverage(rfpSnapshotForJob(o.x),jobEvidenceData(o.x))).length;
  const fullReviewCount=considered.filter(o=>{
   const r=rfpSnapshotForJob(o.x);
-  return officialReviewCoverage(r,jobEvidenceData(o.x));
+  return partners.some(p=>officialReviewCoverage(r,jobEvidenceData(o.x),o.x,p));
  }).length;
  const summaryEl=document.getElementById('jobDecisionSummary');
  if(summaryEl)summaryEl.textContent=readyCount?
