@@ -323,13 +323,11 @@ def rule_based_interpret(clauses):
                 r"입찰참가자격\s*확인을\s*위한\s*제출서류|"
                 r"입찰참가자격\s*등록\s*마감일시",t) else "unknown")
         elif typ=="special_legal_entity":
-            classification=("optional" if re.search(
+            classification=("optional" if special_legal_alternative or re.search(
                 r"입찰\s*참가\s*가능|소기업자로\s*간주|특별법인임을\s*확인",t)
                 else "unknown")
         elif regulatory_catalog or proposal_scoring or bidder_form_only:
             classification="context_only"
-        elif special_legal_alternative:
-            classification="optional"
         elif enumerated_bidder_requirement:
             classification="mandatory"
         elif heading or pure_heading or region_unrestricted or sworn_law_guide or (
