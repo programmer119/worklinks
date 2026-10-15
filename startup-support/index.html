@@ -1547,13 +1547,27 @@ function productionRequirementCheck(x,p){
  */
 function officialSourceCoverage(rfp,evidence){
  const files=Array.isArray(rfp?.files)?rfp.files:null;
+ if(!files)return false;
  const meta=evidence?.attachments;
- if(!files||meta?.ok!==true||meta.complete!==true||
-    !Array.isArray(meta.items)||meta.items.length!==files.length)return false;
+ const liveManifest=meta?.ok===true&&meta.complete===true&&Array.isArray(meta.items);
  if(!files.length){
+  // A zero-row e-order response never means zero documents elsewhere.
   const notice=evidence?.noticeDocuments;
-  return rfp.noticeTextReviewed===true&&Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&
+  return liveManifest&&meta.items.length===0&&rfp.noticeTextReviewed===true&&
+   Boolean(rfp.noticeSourceUrl&&rfp.noticeSha256)&&
    notice?.ok===true&&notice.complete===true&&Number(notice.count||0)===0;
+ }
+ const scannedAt=Date.parse(rfp.checkedAt||'');
+ const age=Date.now()-scannedAt;
+ // The official manifest was already fetched by the source scanner. Reuse
+ // its hashes for 24h when the live API is rate-limited; stale provenance
+ // or a newer contradictory live manifest must never clear eligibility.
+ const recentSnapshot=Number.isFinite(scannedAt)&&age>=0&&age<=24*3600000;
+ if(!liveManifest&&!recentSnapshot)return false;
+ if(liveManifest){
+  if(meta.items.length!==files.length)return false;
+  const names=rows=>rows.map(f=>String(f.name||'').replace(/\s+/g,' ').trim()).sort().join('|');
+  if(names(meta.items)!==names(files))return false;
  }
  if(rfp.manifestComplete!==true||rfp.attachmentManifestCount!==files.length||
     !files.some(f=>/입찰\s*공고|공고\s*(?:문|서)/.test(f.name||'')))return false;
