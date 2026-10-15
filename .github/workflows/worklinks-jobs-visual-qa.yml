@@ -5,7 +5,7 @@ on:
     paths:
       - '.github/workflows/worklinks-jobs-visual-qa.yml'
       - 'startup-support/index.html'
-      - 'startup-support/ai-qualification.json'
+      - 'startup-support/rfp-clauses.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -33,23 +33,24 @@ jobs:
               page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('바로 지원 확정')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
               print('WORKLINKS_BROWSER_LIVE_DATA',page.evaluate("({serverAvailable:g2bServerAvailable,savedTotal:g2bSavedTotal,liveRows:g2bLiveJobs.length,visibleCards:document.querySelectorAll('#jobCards .job-mini').length})"))
-              page.wait_for_function("typeof rfpAiByNotice !== 'undefined' && rfpAiByNotice.size>0",timeout=25000)
+              page.wait_for_function("typeof rfpSnapshotByNotice !== 'undefined' && rfpSnapshotByNotice.size>0",timeout=25000)
               evidence=page.evaluate("""() => {
                 const all=jobs.concat(g2bLiveJobs);
-                for(const [key,item] of rfpAiByNotice.entries()){
+                for(const [key,item] of rfpSnapshotByNotice.entries()){
+                  if(!Array.isArray(item.files)||!item.files.some(f=>f.readable))continue;
                   const x=all.find(y=>{const i=jobBidIdentity(y);return i && i.bidNo+':'+i.order===key});
                   if(!x)continue;
-                  const checked=rfpAiForJob(x);
-                  if(!checked)continue;
-                  return {notice:key,status:checked.analysisStatus,
-                    classified:checked.requirements.length,
-                    model:checked.model,verdict:participationVerdict(x,partners[0]).type};
+                  const clauses=directRfpRequirements(x);
+                  if(!clauses.length)continue;
+                  return {notice:key,sourceFiles:item.files.length,
+                    sourceConditions:clauses.length,
+                    verdict:participationVerdict(x,partners[0]).type};
                 }
                 return null;
               }""")
-              assert evidence is not None,'must match a live stored notice to its citation-verified snapshot'
-              assert evidence['status'] in ('classified','rule_based')
-              print('WORKLINKS_LIVE_RFP_AUTO_CLASSIFICATION',json.dumps(evidence,ensure_ascii=False))
+              assert evidence is not None,'official source should join at least one live notice'
+              assert evidence['sourceFiles']>0 and evidence['sourceConditions']>0
+              print('WORKLINKS_LIVE_DIRECT_RFP',json.dumps(evidence,ensure_ascii=False))
               # The client must show truly checked industry status as one-click filters,
               # while no-license-restriction must NOT be called bid-ready.
               page.wait_for_function("partners.length>0 && !!partners[0].registryCheckedAt && partners[0].registryComplete===true",timeout=45000)
@@ -88,7 +89,7 @@ jobs:
                   return {bidNo:id.bidNo,order:id.order,title:x.title,
                     deadline:x.closes||x.deadline||x.endAt||'',
                     license:q.type,verdict:verdict.type,
-                    reviewed:officialReviewCoverage(rfp,jobEvidenceData(x),rfpAiForJob(x)),
+                    reviewed:officialReviewCoverage(rfp,jobEvidenceData(x)),
                     documents:rfp?.files?.length||0,
                     pending:result.rows.filter(y=>y.status==='pending').slice(0,3)
                       .map(y=>y.label),
