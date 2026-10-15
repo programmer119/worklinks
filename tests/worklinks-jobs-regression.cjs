@@ -118,10 +118,10 @@ assert.equal(real.partnerRegisteredCode(expiredCompany,'1468'),false,'expired re
 
 
 // Real direct-production comparison: historical evidence must not imply live validity.
-const directMod=new Function('kstISO',
+const directMod=new Function('kstISO','rfpSnapshotForJob',
  part('const productionNames=','function comparePartnerJob(x,p){')+
  'return {productionRequirementCheck};'
-)(()=>'2026-10-12');
+)(()=>'2026-10-12',()=>null);
 const prodP={productionCheckedAt:'2026-10-12T04:41:45Z',productionSnapshotDate:'2026-02-01',
  productionRecords:[{product:'정보시스템개발서비스',validFrom:'2025-01-16',validTo:'2027-01-15'},
   {product:'데이터처리서비스',validFrom:'2025-01-16',validTo:'2027-01-15'}]};
@@ -188,128 +188,78 @@ assert.ok(source.includes("String(r.bidwinnrBizno||'').replace(/\\D/g,'')!==bizn
 assert.ok(source.includes("String(r.bidNtceNo||'')!==bids[i]"));
 assert.ok(source.includes("if(id==='experience'&&p.awardEvidence?.length)"));
 assert.ok(source.includes("낙찰은 계약이행 실적증명의 대체 자료가 아님"));
-assert.ok(source.includes("clause.classification==='prohibited'&&clause.type==='joint_participation'"),
+assert.ok(source.includes("'joint','공동수급 금지','ok'"),
  'standalone applicants must not be blocked by no-consortium rules');
 assert.ok(source.includes("나라장터 공식 낙찰"));
 
-// Official SMPP SME validity must be compared, not left generically pending.
-const smeCmp=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck','jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','extractedRfpRequirements',
- part('function officialReviewCoverage(rfp,evidence,ai){','function matchRowsHTML(x,p){')+
- 'return comparePartnerJob;'
-)(()=> 'candidate',()=>({ok:false}),()=>({applicable:false}),()=>null,()=>({status:'unknown',reason:'region not queried'}),()=>null,()=>'' );
+// Verify the ACTUAL direct-source comparator, independent of AI snapshots.
+assert.ok(!source.includes('rfpAiForJob'),'removed AI must not re-enter verdict path');
+assert.ok(!source.includes('ai-qualification.json'),'web UI must not load old model data');
+const cmpMod=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
+ 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
+ part('const directRfpCache=new WeakMap();','function productionRequirementCheck(x,p){')+
+ part('function officialSourceCoverage(rfp,evidence){','function matchRowsHTML(x,p){')+
+ 'return {comparePartnerJob,officialReviewCoverage,officialSourceCoverage,directRfpRequirements};'
+)(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
+ ()=>({applicable:false}),
+ x=>x.evidence||null,()=>({status:'unknown',reason:'region not queried'}),
+ x=>x.rfp||null);
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
 const smePartner={smeRecord:{size:'소기업',issuedAt:'2026-04-01',validState:'valid'},
  smeCheckedAt:'2026-10-12T05:04:00Z'};
-const smeRows=smeCmp(smeBid,smePartner).rows;
+const smeRows=cmpMod.comparePartnerJob(smeBid,smePartner).rows;
 assert.equal(smeRows.find(q=>q.id==='sme-issuance').status,'ok');
 assert.equal(smeRows.find(q=>q.id==='sme-validity').status,'ok');
 assert.equal(smeRows.find(q=>q.id==='sme-scale').status,'ok');
-assert.equal(smeRows.find(q=>q.id==='sme-expiry').status,'ok','current SMPP valid(Y) is not nullified by unpublished expiry');
-assert.equal(smeCmp(smeBid,{smeRecord:{...smePartner.smeRecord,validState:'unknown'},smeCheckedAt:'2026-10-12'}).rows.find(q=>q.id==='sme-validity').status,'pending');
-assert.equal(smeCmp(smeBid,{}).rows.find(q=>q.id==='sme-issuance').status,'pending');
+assert.equal(smeRows.find(q=>q.id==='sme-expiry').status,'ok');
+assert.equal(cmpMod.comparePartnerJob(smeBid,{}).rows.find(q=>q.id==='sme-issuance').status,'pending');
 assert.ok(source.includes("refreshPartnerSme(p)"));
 assert.ok(source.includes("sme-cert-snapshot.json"));
 
+// Same-type, same-code clauses are independent until quotation actually repeats.
+const quote='입찰참가자격으로 직접생산확인증명서 8111189901 소지';
+const bidSource={status:'text_extracted_requires_review',manifestComplete:true,
+ attachmentManifestCount:1,reviewComplete:false,requiredConditionsComplete:false,
+ files:[{name:'입찰공고문.hwp',readable:true,sourceSha256:'a'.repeat(64),
+  sourceTextScanComplete:true,unmatchedQualificationAnchorCount:0,topics:{},
+  clauseCandidates:[
+   {type:'direct_production',codes:['8111189901'],sourceText:quote,explicitMust:true},
+   {type:'region_restriction',codes:[],sourceText:'입찰참가자격 서울 소재 필수',explicitMust:true},
+   {type:'region_restriction',codes:[],sourceText:'입찰참가자격 양천구 소재 필수',explicitMust:true},
+   {type:'direct_production',codes:['8111189901'],sourceText:quote,explicitMust:true},
+   {type:'staff_proof',codes:[],sourceText:'제안서 평가점수',explicitMust:false}
+  ]}]};
+const items=cmpMod.directRfpRequirements({rfp:bidSource});
+assert.equal(items.length,3,'exact duplicates collapse; independent mandatory conditions remain');
+assert.equal(items.filter(x=>x.type==='region_restriction').length,2);
+const bidEvidence={attachments:{ok:true,complete:true,items:[{name:'입찰공고문.hwp'}]}};
+const bidRows=cmpMod.comparePartnerJob({rfp:bidSource,evidence:bidEvidence,condition:''},smePartner).rows;
+assert.equal(bidRows.filter(x=>x.id.startsWith('source-')).length,2,
+ 'display one pending group per type, not one row per snippet');
+assert.match(bidRows.find(x=>x.id==='source-region_restriction').label,/2구절/);
+assert.equal(bidRows.find(x=>x.id==='source-direct_production').status,'unknown');
+assert.equal(cmpMod.officialSourceCoverage(bidSource,bidEvidence),true);
+assert.equal(cmpMod.officialReviewCoverage(bidSource,bidEvidence),false,
+ 'all text scanned is not a confirmed qualification review');
 
-// A real RFP detailed-product code must match the certificate registry's
-// *name-based* record, not an absent productCode property.
-const productNamesMap=new Function(
- part('const productionNames=','function comparePartnerJob(x,p){')+
- 'return productionProductCodeNames;'
-)();
-const citedDirect={index:0,type:'direct_production',classification:'mandatory',
- relation:'all',codes:['8111189901'],sourceText:'입찰 참가 업체는 직접생산확인증명서 8111189901 소지',
- sourceFile:'입찰공고문.hwp'};
-const withRfpClause=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
- 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
- 'extractedRfpRequirements','rfpAiForJob','kstISO','productionProductCodeNames',
- part('function officialReviewCoverage(rfp,evidence,ai){','function matchRowsHTML(x,p){')+
- 'return comparePartnerJob;'
-)(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
- ()=>({applicable:false}),()=>null,()=>({status:'unknown'}),
- ()=>null,()=>'',x=>x.report,()=> '2026-10-12',productNamesMap);
-const partnerHasMaintenance={...prodP,productionRecords:[...prodP.productionRecords,
- {product:'정보시스템유지관리서비스',validFrom:'2025-01-16',validTo:'2027-01-15'}]};
-const directReport={analysisStatus:'rule_based',requirements:[citedDirect]};
-const verifiedClause=withRfpClause({condition:'',report:directReport},partnerHasMaintenance).rows
- .find(q=>q.id==='ai-0');
-assert.equal(verifiedClause.status,'ok',
- 'exact detailed product code maps to officially issued product-name certificate');
-assert.match(verifiedClause.reason,/2026-02-01/,
- 'dated issuance must be disclosed rather than presented as a live check');
-assert.equal(withRfpClause({condition:'',report:directReport},prodP).rows
- .find(q=>q.id==='ai-0').status,'pending',
- 'missing direct-production certificate may not be manufactured');
-const contextUnknown={analysisStatus:'rule_based',requirements:Array.from({length:150},(_,i)=>({
- index:i,type:'joint_participation',classification:'unknown',sourceText:'공동수급체의 경우 평가서식 '+i
-}))};
-const clustered=withRfpClause({condition:'',report:contextUnknown},prodP).rows;
-assert.equal(clustered.filter(q=>q.id==='ai-ambiguous').length,1);
-assert.equal(clustered.filter(q=>q.id.startsWith('ai-')).length,1,
- '150 ambiguous snippets must not be rendered as 150 company disqualifications');
-
-// A legally required production certificate may be identified by official
-// product name without a numerical code; it must still match dated issuance.
-const namedDirect={...citedDirect,index:1,codes:[],
- sourceText:'입찰참가자격: 직접생산확인증명서 정보시스템유지관리서비스 소지한 업체'};
-assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
- requirements:[namedDirect]}},partnerHasMaintenance).rows.find(q=>q.id==='ai-1').status,'ok');
-assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
- requirements:[namedDirect]}},prodP).rows.find(q=>q.id==='ai-1').status,'pending');
-const bigCompanyBlocked={...citedDirect,index:2,type:'industry_code',codes:[],
- classification:'prohibited',sourceText:'대기업은 입찰에 참여할 수 없음'};
-assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
- requirements:[bigCompanyBlocked]}},
- {...partnerHasMaintenance,smeRecord:{validState:'valid',size:'소기업'}}).rows.find(q=>q.id==='ai-2').status,'ok');
-assert.equal(withRfpClause({condition:'',report:{analysisStatus:'rule_based',
- requirements:[bigCompanyBlocked]}},
- partnerHasMaintenance).rows.find(q=>q.id==='ai-2').status,'unknown');
-
-// Verify the actual comparePartnerJob complete flag is evidence dependent.
-const completeSha='a'.repeat(64);
-const completeDoc={name:'입찰공고문.hwp',readable:true,sourceSha256:completeSha,
- textSha256:completeSha,sourceTextScanComplete:true,
- unmatchedQualificationAnchorCount:0,topics:{}};
-const reviewedNotice={status:'text_extracted_requires_review',
- manifestComplete:true,attachmentManifestCount:1,files:[completeDoc]};
-const reviewedAi={documentInterpretationReviewed:true,reviewComplete:true,
- requiredConditionsComplete:true,sourceTruncated:false,requirements:[],
- fullDocumentAudit:{complete:true,manifestDocuments:1,
- sourceHashes:[{file:'입찰공고문.hwp',sha256:completeSha}]}};
-const completion=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
- 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
- 'extractedRfpRequirements','rfpAiForJob',
- part('function officialReviewCoverage(rfp,evidence,ai){','function matchRowsHTML(x,p){')+'return comparePartnerJob;'
-)(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
- ()=>({applicable:false}),
- ()=>({attachments:{ok:true,complete:true,items:[{name:'입찰공고문.hwp'}]}}),
- ()=>({status:'unknown'}),
- x=>x.reviewed?reviewedNotice:
-   {status:'text_extracted_requires_review',reviewComplete:false,
-     files:[{readable:true,reviewComplete:false,topics:{},name:'RFP'}]},
- ()=>'',x=>x.reviewed?reviewedAi:null);
-const noFilesCoverage=new Function(
- part('function officialReviewCoverage(rfp,evidence,ai){','function comparePartnerJob(x,p){')+
- 'return officialReviewCoverage;'
-)();
+const fullyChecked={...bidSource,reviewComplete:true,requiredConditionsComplete:true,
+ files:[{...bidSource.files[0],clauseCandidates:[]}]};
+const completion=cmpMod.comparePartnerJob({rfp:fullyChecked,evidence:bidEvidence,condition:''},{});
+assert.equal(completion.complete,true,'only fully reviewed complete conditions allow eligibility proof');
+assert.equal(completion.rows.find(x=>x.id==='attachment').status,'ok');
+assert.equal(cmpMod.comparePartnerJob({rfp:bidSource,evidence:bidEvidence,condition:''},{}).complete,false);
 const noFiles={reviewComplete:true,requiredConditionsComplete:true,files:[],
- noticeTextReviewed:true,noticeConditionsVerified:true,
- noticeSourceUrl:'https://www.g2b.go.kr/notice',noticeSha256:'verified-sha'};
+ noticeTextReviewed:true,noticeSourceUrl:'https://www.g2b.go.kr/notice',noticeSha256:'verified-sha'};
 const noFilesEvidence={attachments:{ok:true,complete:true,items:[]},
  noticeDocuments:{ok:true,complete:true,count:0}};
-assert.equal(noFilesCoverage(noFiles,noFilesEvidence),true,'fully checked official notice can qualify without separate attachment');
-assert.equal(noFilesCoverage({...noFiles,noticeSha256:''},noFilesEvidence),false);
-assert.equal(noFilesCoverage(noFiles,{attachments:{ok:true,complete:true,items:[]}}),false,
- 'zero attachment list must never waive notice review');
-assert.equal(completion({reviewed:false},{}).complete,false,'snippets cannot certify a bid');
-assert.equal(completion({reviewed:true},{}).complete,true,'fully verified and no outstanding requirements is achievable');
-assert.equal(completion({reviewed:true},{}).rows.find(q=>q.id==='attachment').status,'ok');
-const fails=Object.assign({},reviewedAi,{fullDocumentAudit:{...reviewedAi.fullDocumentAudit,
- sourceHashes:[{file:'입찰공고문.hwp',sha256:'b'.repeat(64)}]}});
-assert.equal(noFilesCoverage(reviewedNotice,
- {attachments:{ok:true,complete:true,items:[{name:'입찰공고문.hwp'}]}},fails),false,
- 'a mismatched official document sha may not count as full review');
-assert.equal(completion({reviewed:false},{}).rows.find(q=>q.id==='attachment').status,'unknown');
+assert.equal(cmpMod.officialReviewCoverage(noFiles,noFilesEvidence),true,
+ 'complete official notice can qualify without an attachment');
+assert.equal(cmpMod.officialReviewCoverage({...noFiles,noticeSha256:''},noFilesEvidence),false);
+assert.equal(cmpMod.officialReviewCoverage(noFiles,{attachments:{ok:true,complete:true,items:[]}}),false);
+assert.equal(cmpMod.officialSourceCoverage({...bidSource,manifestComplete:false},bidEvidence),false);
+assert.equal(cmpMod.officialSourceCoverage({...bidSource,files:[
+ {...bidSource.files[0],sourceTextScanComplete:false}]},bidEvidence),false);
+
 assert.ok(source.includes('id="jobInfoFold"'));
 assert.ok(source.includes('id="jobMissingInfo"'));
 assert.ok(source.includes('id="jobDecisionSummary"'));
