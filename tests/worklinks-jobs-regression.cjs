@@ -254,6 +254,32 @@ const completion=cmpMod.comparePartnerJob({rfp:fullyChecked,evidence:bidEvidence
 assert.equal(completion.complete,true,'only fully reviewed complete conditions allow eligibility proof');
 assert.equal(completion.rows.find(x=>x.id==='attachment').status,'ok');
 assert.equal(cmpMod.comparePartnerJob({rfp:bidSource,evidence:bidEvidence,condition:''},{}).complete,false);
+// Actual full pipeline: complete, simple, source-cited conditions must
+// be able to reach ready WITHOUT impossible hard-coded review flags.
+const eligibleSource={...bidSource,files:[{...bidSource.files[0],
+ qualificationAnchorCount:1,clauseCandidates:[{
+ type:'industry_code',codes:['1468'],
+ sourceText:'입찰참가자격 업종코드 1468 등록한 자',explicitMust:true}]}]};
+const eligibleBid={rfp:eligibleSource,evidence:bidEvidence,condition:''};
+const eligiblePartner={...smePartner,registryCheckedAt:'2026-10-16',
+ registryComplete:true,registeredCodes:['1468']};
+const eligibleProof=cmpMod.comparePartnerJob(eligibleBid,eligiblePartner);
+assert.equal(eligibleProof.complete,true,
+ 'complete one-code public notice must no longer be structurally forced to 0');
+const realVerdict=new Function('jobTimeInfo','jobSoftwareScope','jobQualificationVerdict',
+ 'comparePartnerJob','rfpSnapshotForJob',
+ part('function participationVerdict(x,p){','function participationStrip(x,companies){')+
+ 'return participationVerdict;'
+)(()=>({key:'open'}),()=> 'candidate',
+ ()=>({type:'industry_match'}),cmpMod.comparePartnerJob,x=>x.rfp);
+assert.equal(realVerdict(eligibleBid,eligiblePartner).type,'ready',
+ 'actual UI verdict must be reachable for completely proven simple conditions');
+const disqualified={...eligibleSource,files:[{...eligibleSource.files[0],
+ clauseCandidates:[...eligibleSource.files[0].clauseCandidates,
+ {type:'staff_proof',sourceText:'기술인력 필수 자격증 증빙 요구',explicitMust:true}]}]};
+assert.notEqual(realVerdict({...eligibleBid,rfp:disqualified},eligiblePartner).type,'ready',
+ 'additional staff proof must veto full qualification');
+
 const noFiles={reviewComplete:true,requiredConditionsComplete:true,files:[],
  noticeTextReviewed:true,noticeSourceUrl:'https://www.g2b.go.kr/notice',noticeSha256:'verified-sha'};
 const noFilesEvidence={attachments:{ok:true,complete:true,items:[]},
