@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-15T04:03:01.882340+00:00",
+  "generatedAt": "2026-10-15T04:12:46.342111+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -4954,13 +4954,12 @@
           "textChars": 4447,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 10,
-          "unmatchedQualificationAnchorCount": 5,
+          "unmatchedQualificationAnchorCount": 4,
           "unmatchedAnchorSamples": [
             "다. 입찰참가자격 : 다음 조건을 충족하는 자",
             "- 제안서를 위조, 변조, 허위 등 부정한 방법으로 작성하여 제출한 경우에는 작성한 자는 관련규정에 따라 공모참가자격 제한 등의 조치를 받을 수 있음.",
             "- ㈜긴트는 필요시 입찰참가자에 대하여 추가제안이나 추가자료를 요청할 수 있으며, 이에 따라 제출된 자료는 제안서와 동일한 효력을 가짐.",
-            "- 제출된 제안서는 반환하지 않으며, 제안과 관련된 일체의 소요 비용은 입찰 참가자의 부담으로 함.",
-            "기술능력평가(90점)제안 내용의 타당성 및 이해도:과업지시서에 대한 이해도, 연구 목표 및 방향 설정의 적절성15핵심 기술 수행 방법론:- AI 기반 실시간 대리 모델 구축 방안의 기술적 우수성- 디지털 트윈 및 Sim2Real 가상 테스트베드 구축 방안의 실현 가능성- 토양 역학 모델링 및 데이터 수집 분석 방법의 전문"
+            "- 제출된 제안서는 반환하지 않으며, 제안과 관련된 일체의 소요 비용은 입찰 참가자의 부담으로 함."
           ],
           "sourceSha256": "8eff8f34bbf9f53221aee3f7ac1bc4dadf2cc09d55f0ae2e2e63b0e5869d02fb",
           "textSha256": "b2391b4bf3e70209aab0d8ff8928d12bf983b962b263ece69b415913cf74787e",
@@ -5071,6 +5070,15 @@
               "codes": [],
               "sourceFile": "[제안요청서] 스마트 로봇 방제 시스템 최적화 기술 개발.hwpx",
               "sourceText": "기술능력평가(90점)제안 내용의 타당성 및 이해도:과업지시서에 대한 이해도, 연구 목표 및 방향 설정의 적절성15핵심 기술 수행 방법론:- AI 기반 실시간 대리 모델 구축 방안의 기술적 우수성- 디지털 트윈 및 Sim2Real 가상 테스트베드 구축 방안의 실현 가능성- 토양 역학 모델링 및 데이터 수집 분석 방법의 전문성45사업 수행 역량:- 투입 인력의 전문성, 관련 분야(시뮬레이션, AI 등) 유사 사업 수행 실적20사업 관리 방안:일정 계획의 타당성, 품질 및 보안 관리 ",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "[제안요청서] 스마트 로봇 방제 시스템 최적화 기술 개발.hwpx",
+              "sourceText": "I 등) 유사 사업 수행 실적20사업 관리 방안:일정 계획의 타당성, 품질 및 보안 관리 방안, 산출물 관리 체계10입찰가격평가(10점)기획재정부 계약예규 협상에 의한 계약체결기준에 따른 가격 평가 산식 적용10",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -5334,8 +5342,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01747983:000": {
       "status": "text_extracted_requires_review",
@@ -8555,8 +8563,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01754567:000": {
       "status": "text_extracted_requires_review",
@@ -9986,8 +9994,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01755826:000": {
       "status": "text_extracted_requires_review",
@@ -11949,8 +11957,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01754897:000": {
       "status": "text_extracted_requires_review",
@@ -35601,12 +35609,10 @@
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01753188&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
           "readable": true,
           "textChars": 5919,
-          "sourceTextScanComplete": false,
+          "sourceTextScanComplete": true,
           "qualificationAnchorCount": 9,
-          "unmatchedQualificationAnchorCount": 1,
-          "unmatchedAnchorSamples": [
-            "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제12 및 동법 시행규칙 제14조의 규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 국가종합전자조달시스템(나라장터)에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체"
-          ],
+          "unmatchedQualificationAnchorCount": 0,
+          "unmatchedAnchorSamples": [],
           "sourceSha256": "877ed09fd82268ee363692c4dc183f7a4f9fd15750fc7cce98c3c8d9951b090a",
           "textSha256": "b4681cca357ffa701d4fcda3ed87de194edbe663348b481fbececa18289ab587",
           "qualificationScanTruncated": false,
@@ -35627,6 +35633,24 @@
             }
           ],
           "clauseCandidates": [
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.hwpx",
+              "sourceText": "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제12 및 동법 시행규칙 제14조의 규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 국가종합전자조달시스템(나라장터)에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.hwpx",
+              "sourceText": "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제12 및 동법 시행규칙 제14조의 규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 국가종합전자조달시스템(나라장터)에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체 ※ 납품 시 공급 업체는 규격서에 해당하는 제품(또는 동등 이상)에 제조사의 정품공급확약서를 제출하여야 한다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
             {
               "type": "industry_code",
               "codes": [
@@ -35733,10 +35757,8 @@
           "textChars": 6298,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 13,
-          "unmatchedQualificationAnchorCount": 4,
+          "unmatchedQualificationAnchorCount": 2,
           "unmatchedAnchorSamples": [
-            "규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규",
-            "까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
             "마 . 입찰참가작격 등을 확인하기 위하여 협상대상자에게 필요한 서류 제출을 요",
             "라며 , 장애발생에도 불구하고 문의하지 않아 발생되는 모든 책임은 입찰참가자에"
           ],
@@ -35764,6 +35786,96 @@
             }
           ],
           "clauseCandidates": [
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "가 . 국가를 당사자로 하는 계약에 관한 법률 시행령 제 12 및 동법 시행규칙 제 14 조의 규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "• 입찰 물품에 대한 『 물품규격 및 사양 』 은 첨부도서 참조 5. 입찰참가자격 가 . 국가를 당사자로 하는 계약에 관한 법률 시행령 제 12 및 동법 시행규칙 제 14 조의 규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규 정 」 에 의하여 국가종합전자조달시스템 ( 나라장터 ) 에 입찰참가자격등록 마감일시",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규 정 」 에 의하여 국가종합전자조달시스템 ( 나라장터 ) 에 입찰참가자격등록 마감일시",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "5. 입찰참가자격 가 . 국가를 당사자로 하는 계약에 관한 법률 시행령 제 12 및 동법 시행규칙 제 14 조의 규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규 정 」 에 의하여 국가종합전자조달시스템 ( 나라장터 ) 에 입찰참가자격등록 마감일시 까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "정 」 에 의하여 국가종합전자조달시스템 ( 나라장터 ) 에 입찰참가자격등록 마감일시 까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "가 . 국가를 당사자로 하는 계약에 관한 법률 시행령 제 12 및 동법 시행규칙 제 14 조의 규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규 정 」 에 의하여 국가종합전자조달시스템 ( 나라장터 ) 에 입찰참가자격등록 마감일시 까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체 입 찰 공 고",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체 입 찰 공 고",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "[2026년 경상남도 앵커 사업] 4-2 AI 기반 낙상예측 프로그램 개발연구 용역 입찰공고(가야대학교)2026-10.pdf",
+              "sourceText": "규정에 의한 참가자격을 갖추고 , 「 국가종합전자조달시스템 입찰참가자격등록규 정 」 에 의하여 국가종합전자조달시스템 ( 나라장터 ) 에 입찰참가자격등록 마감일시 까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체 입 찰 공 고 ",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
             {
               "type": "industry_code",
               "codes": [],
@@ -36065,8 +36177,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01753092:000": {
       "status": "text_extracted_requires_review",
@@ -48798,7 +48910,7 @@
               "type": "performance_proof",
               "codes": [],
               "sourceFile": "사업관리시스템 고도화 사업 제안요청서.hwpx",
-              "sourceText": "Ⅰ. 사업 개요 1. 개요 2. 추진배경 및 필요성 3. 사업 범위 4. 기대효과 5. 시스템 현황Ⅱ. 사업 추진방안 1. 추진방향 2. 추진전략 3. 추진체계 및 역할 4. 추진일정Ⅲ. 제안요청 내용 1. 요구사항 총괄표 2. 요구사항 목록표 4. 특수사항Ⅳ. 제안서 작성요령 1. 제안서의 효력 2. 제안서 작성지침 3. 유의사항 4. 제안서 목차 5. 제안서 세부 작성지침Ⅴ. 제안 안내사항 1. 입찰방식 2. 제안서 평가 방법 3. 제안서 평가 항목 및 배점기준 4. 제출서류",
+              "sourceText": "사업 보안사항Ⅶ. 관련 서식[붙임 1호 서식] 일반현황 및 연혁[붙임 2호 서식] 자본금 및 매출액(최근 3년) [붙임 3호 서식] 주요사업실적[붙임 4호 서식] 사업실적증명서[붙임 5호 서식] 기술적용계획표[붙임 6호 서식] 제안요청서 대비 제안사항 조견표[붙임 7호 서식] 표준 개인정보처리 위탁 계약서[붙임 8호 서식] 용역사업 계약시 정보보안 준수사항[붙임 9호 서식] 보안확약서[붙임 10호 서식] 보안서약서[붙임 11호 서식] 청렴계약이행서약서[붙임 12호 서식] 소프트웨",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -49802,7 +49914,7 @@
               "type": "performance_proof",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "sourceText": "Ⅰ. 사업 개요 1. 개요 2. 추진배경 및 필요성 3. 사업 범위 4. 기대효과 5. 시스템 현황Ⅱ. 사업 추진방안 1. 추진방향 2. 추진전략 3. 추진체계 및 역할 4. 추진일정Ⅲ. 제안요청 내용 1. 요구사항 총괄표 2. 요구사항 목록표 4. 특수사항Ⅳ. 제안서 작성요령 1. 제안서의 효력 2. 제안서 작성지침 3. 유의사항 4. 제안서 목차 5. 제안서 세부 작성지침Ⅴ. 제안 안내사항 1. 입찰방식 2. 제안서 평가 방법 3. 제안서 평가 항목 및 배점기준 4. 제출서류",
+              "sourceText": "사업 보안사항Ⅶ. 관련 서식[붙임 1호 서식] 일반현황 및 연혁[붙임 2호 서식] 자본금 및 매출액(최근 3년) [붙임 3호 서식] 주요사업실적[붙임 4호 서식] 사업실적증명서[붙임 5호 서식] 기술적용계획표[붙임 6호 서식] 제안요청서 대비 제안사항 조견표[붙임 7호 서식] 표준 개인정보처리 위탁 계약서[붙임 8호 서식] 용역사업 계약시 정보보안 준수사항[붙임 9호 서식] 보안확약서[붙임 10호 서식] 보안서약서[붙임 11호 서식] 청렴계약이행서약서[붙임 12호 서식] 소프트웨",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -50440,8 +50552,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01745141:000": {
       "status": "text_extracted_requires_review",
@@ -177564,6 +177676,15 @@
               "type": "performance_proof",
               "codes": [],
               "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).hwpx",
+              "sourceText": "등에서 발급받은 기술인 경력증명서상 금액이 확인되지 않을 시 참여기술인 이행실적증명서 등으로 해당 내용을 확인받아야 합니다.- 용역규모와 금액이 불분명한 경우에는 평가에서 제외됨",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "performance_proof",
+              "codes": [],
+              "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).hwpx",
               "sourceText": "- 유사용역의 경우 입찰공고일 기준 완료된 용역에 한하며 준공금 5천만원 이상이어야 합니다. 협회 등에서 발급받은 기술인 경력증명서상 금액이 확인되지 않을 시 참여기술인 이행실적증명서 등으로 해당 내용을 확인받아야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -178103,6 +178224,24 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).pdf",
+              "sourceText": "※ 중 · 소기업 · 소상공인 확인서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).pdf",
+              "sourceText": "※ 중 · 소기업 · 소상공인 확인서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 하며 , 중소기업 공공구매 종합정보망 (http://www.smpp.go.kr) 에서 확인되",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).pdf",
               "sourceText": "2 조에 따른 소상공인 포함 ) 로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발 급된 중 · 소기업 · 소상공인 확인서 ( 중소기업확인서 ) 를 소지한 업체 ※ 중 · 소기업 · 소상공인 확인서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 하며 , 중소기업 공공구매 종합정보망 (http://www.smpp.go.kr) 에서 확인되 지 않는 경우 입찰참가 자격이 없습니다 .",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -178113,6 +178252,15 @@
               "codes": [],
               "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).pdf",
               "sourceText": "급된 중 · 소기업 · 소상공인 확인서 ( 중소기업확인서 ) 를 소지한 업체 ※ 중 · 소기업 · 소상공인 확인서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 하며 , 중소기업 공공구매 종합정보망 (http://www.smpp.go.kr) 에서 확인되 지 않는 경우 입찰참가 자격이 없습니다 . 바 . 본 입찰은 전자입찰로만 집행하며 전자입찰서는 반드시 국가종합전자조달시스템",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(게시)용역 전자입찰 공고(용두지구 농촌생활용수 개발사업 GIS DB 구축 용역).pdf",
+              "sourceText": "※ 중 · 소기업 · 소상공인 확인서는 전자입찰서 제출마감일 전일까지 발급된 것으로 유효기간 내에 있어야 하며 , 중소기업 공공구매 종합정보망 (http://www.smpp.go.kr) 에서 확인되 지 않는 경우 입찰참가 자격이 없습니다 . 바 . 본 입찰은 전자입찰로만 집행하며 전자입찰서는 반드시 국가종합전자조달시스템 ( http://www.g2b.go.kr ) 을 이용하여 제출하여야 합니다 .",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -178853,8 +179001,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01755537:000": {
       "status": "text_extracted_requires_review",
@@ -179278,6 +179426,15 @@
             }
           ],
           "clauseCandidates": [
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "(공고문)6.25전쟁 아카이브 국외 수집자료 DB구축(재공고).pdf",
+              "sourceText": "*「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조에서 정한 자격 요건을 갖추고, 아래의 자격조건을 모두 갖춘 자 가. 「중소기업기본법」제2조의 소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조 의 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업·소상 공인 확인서를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
             {
               "type": "sme_certificate",
               "codes": [],
@@ -180969,8 +181126,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01752290:000": {
       "status": "text_extracted_requires_review",
@@ -180999,7 +181156,7 @@
           "textChars": 22533,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 81,
-          "unmatchedQualificationAnchorCount": 11,
+          "unmatchedQualificationAnchorCount": 9,
           "unmatchedAnchorSamples": [
             "이 입찰설명서는 국가데이터처가 집행하는 입찰에서 입찰자와 낙찰자가 자세히 알고 지켜야 할 사항을 기재한 것으로써 모든 입찰희망자는 이를 열람하여야 합니다. 이 입찰과 관련하여 추가 문의사항이 있으면 아래 담당자에게 연락하시기 바랍니다. ① 입찰참가자격 등록, 나라장터 시스템: 정부조달 콜센터(☎ 1588-0800, FAX",
             "① 입찰참가자격 등록, 나라장터 시스템: 정부조달 콜센터(☎ 1588-0800, FAX 042-472-2297)",
@@ -181009,9 +181166,7 @@
             "※ 기술제안서 관련 서류 일체는 동영상 실행이 불가하므로 PDF 파일에 동영상 삽입을 금합니다. 만약 동영상 삽입으로 평가 시 발생하는 모든 불이익은 입찰참가자의 책임임을 알려 드립니다",
             ". 3. 입찰자는 반드시 제안서 파일 업로드(파일 추가) 전에 파일의 정상여부를 반드시 확인하여 주시기 바라며, 파일의 정상 여부 미확인으로 발생되는 모든 책임은 입찰참가자에게 있습니다.",
             "1) 입찰보증금",
-            "10) 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호가목에 따라 계약서에 명시된 주요조건을 위반한 경우 부정당업자 입찰참가자격제한 처분을 받을 수 있습니다.",
-            "<공동수급체 전원>",
-            "<공동수급체 전원>"
+            "10) 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호가목에 따라 계약서에 명시된 주요조건을 위반한 경우 부정당업자 입찰참가자격제한 처분을 받을 수 있습니다."
           ],
           "sourceSha256": "57f565b93364cf9a5de4247015dc93a6e9db08c8e1a27c376c244ed9b8d4ce37",
           "textSha256": "1af653ff5aa833a7c5a9fba679aa52387b8afbb37356586d7b394a4704f094a9",
@@ -181149,6 +181304,15 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "느 하나에 해당하는 경우에는 입찰참가자격이 없습니다. - 제안서 제출 마감일부터 5일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우 - 발급된 중소기업ㆍ소상공인확인서가 입찰참가자격의 기업 구분과 다른 경우 - 발급된 중소기업ㆍ소상공인확인서의 유효기간 시작일이 전자입찰서 제출 마감일 이후(마감일 포함)인 경우 - 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
               "sourceText": "1) ‘중소기업ㆍ소상공인확인서’가 중소기업제품 공공구매 종합정보망(http://www.smpp.go.kr)에서 확인(전자입찰서 제출 마감일 전일까지 발급된 것으로서 전자입찰서 제출 마감일까지 계속 유지되어야 함)되지 않을 경우 입찰참가자격이 없습니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -181254,7 +181418,7 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "legal_exclusion",
+              "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.hwpx",
               "sourceText": "1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다. * 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 제출받아 확인하며 해당",
@@ -181263,10 +181427,19 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.hwpx",
-              "sourceText": "1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다. * 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 제출받아 확인하며 해당",
+              "sourceText": "간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -181350,6 +181523,15 @@
               "sourceText": "1) 공동수급체 구성 - 공동이행방식으로만 입찰참여가 가능하며 공동수급체 구성원은 각각 본 입찰에서 요구하는 입찰참가자격을 모두 갖추어야 합니다. - 공동수급체 구성원은 대표사를 포함하여 5개사 이하로 구성하여야 하며, 구성원별 계약참여 최소 지분율은 10% 이상으로 하여야 합니다. - 공동수급체를 중복 결성하여 입찰에 참여할 수 없습니다. - 기타 입찰공고에 명시되지 않은 사항은 (계약예규) 공동계약 운용요령에 따릅니다.2) 공동수급협정서 제출 - 공동수급협정서 제출마감 후에는",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": ") 공동계약 운용요령에 따릅니다.2) 공동수급협정서 제출 - 공동수급협정서 제출마감 후에는 협정서를 제출하거나 변경 할 수 없으며, 또한 공동수급협정서 제출마감 이전이더라도 입찰서를 제출한 경우에는 협정서를 제출하거나 변경 할 수 없습니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
               "documentRequiresManualFullReview": true
             },
             {
@@ -181641,7 +181823,7 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "special_legal_entity",
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.hwpx",
               "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
@@ -181653,7 +181835,34 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
               "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "special_legal_entity",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182082,6 +182291,24 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "격자 제외, 계약을 해제·해지하는 등의 불이익을감수하고 이에 민·형사상 이의를 제기하지 않을 것임을 서약합니다. 1. 제안서 및 해당 내용 발표에 있어 허위정보를 포함하지 않겠습니다. 2. 제안서 및 해당 내용 발표에 있어 경쟁업체에 대한 비방행위를 하지 않겠습니다.20 . . . <공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인) △△회사 대표 △△△ (인) 국가데이터처장 귀하입찰업체 확인서(공동수급인 경우)○ 입찰공고번호: ○ 수 요 기 관:○ 사 업 명: 본인은 본 ",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.hwpx",
+              "sourceText": "체 확인서(공동수급인 경우)○ 입찰공고번호: ○ 수 요 기 관:○ 사 업 명: 본인은 본 입찰과 관련 제안서 및 발표자료의 내용에 관하여 해당 내용을 모두 확인하였으며 공동의 책임이 있음을 확인합니다. 20 . . . <공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인) △△회사 대표 △△△ (인) 국가데이터처장 귀하",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "submission_required",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.hwpx",
@@ -182162,17 +182389,17 @@
           "readable": true,
           "textChars": 17658,
           "sourceTextScanComplete": false,
-          "qualificationAnchorCount": 99,
+          "qualificationAnchorCount": 101,
           "unmatchedQualificationAnchorCount": 5,
           "unmatchedAnchorSamples": [
             "① 입찰참가자격 등록, 나라장터 시스템: 정부조달 콜센터(☎ 1588-0800, FAX 042-472-2297)",
-            "\u0000\u0000-\u0000제안서와\u0000가격입찰서를\u0000모두\u0000제출해야\u0000합니다.\u0000둘\u0000중\u0000어느\u0000하나라도\u0000제출하지\u0000않은\u0000입찰참가는\u0000무효\u0000처리됩니다.\u0000",
+            "- 제안서와 가격입찰서를 모두 제출해야 합니다. 둘 중 어느 하나라도 제출하지 않은 입찰참가는 무효 처리됩니다.",
             "만약 동영상 삽입으로 평가 시 발생하는 모든 불이익은 입찰참가자의 책임임을 알려 드립니다",
             "입찰참가자격 제한대상에 해당되는 경우 「국가를 당사자로 하는 계약에 관한 법률」 제27조 등",
             "주요조건을 위반한 경우 부정당업자 입찰참가자격제한 처분을 받을 수 있습니다."
           ],
           "sourceSha256": "2ca641cdd02b0269ce0f2903a02766010ba6ed5123723c78c646f4f39eef7049",
-          "textSha256": "8a31c6586247f243c6d46b80a4a66cb11c3eaf6e7cb4ded5290004280605ebc0",
+          "textSha256": "402a3081c4b8371a69b4ae580a216c76dd65533169e3b0fad02a2046cd7fe6a0",
           "qualificationScanTruncated": false,
           "clauseCandidatesTruncated": false,
           "topics": {
@@ -182247,7 +182474,7 @@
             },
             {
               "topic": "중소기업",
-              "text": "1) 중소기업으로간주되는특별법인의입찰참가"
+              "text": "1) 중소기업으로 간주되는 특별법인의 입찰참가"
             }
           ],
           "clauseCandidates": [
@@ -182808,7 +183035,7 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 * 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가",
+              "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 * 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182817,7 +183044,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 * 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가",
+              "sourceText": "- 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 * 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182826,7 +183053,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가",
+              "sourceText": "※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182835,7 +183062,7 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "* 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000",
+              "sourceText": "* 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182844,7 +183071,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "* 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000",
+              "sourceText": "* 중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령 제2조의3제2호에 따라 비영리법인은 중 소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182853,7 +183080,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가",
+              "sourceText": "1) 중소기업으로 간주되는 특별법인의 입찰참가",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182862,7 +183089,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000",
+              "sourceText": "1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182871,7 +183098,7 @@
               "type": "sme_certificate",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000 중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000",
+              "sourceText": "소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182880,7 +183107,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000 중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000",
+              "sourceText": "소기업·소상공인확인서가 없어도 입찰에 참가할 수 있습니다. ※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182889,7 +183116,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000",
+              "sourceText": "- 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182898,7 +183125,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000 중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000",
+              "sourceText": "- 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182907,7 +183134,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "※ 입찰참가자격 공지사항 1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000 중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000 소상공인으로\u0000발급받은\u0000경우\u0000입찰참가\u0000자격이\u0000있으며\u0000상기\u0000각\u0000호의\u0000입찰참가자격을\u0000모두\u0000갖추어야\u0000합니다.\u0000",
+              "sourceText": "※ 입찰참가자격 공지사항 1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182916,7 +183143,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000",
+              "sourceText": "중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182925,7 +183152,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000 소상공인으로\u0000발급받은\u0000경우\u0000입찰참가\u0000자격이\u0000있으며\u0000상기\u0000각\u0000호의\u0000입찰참가자격을\u0000모두\u0000갖추어야\u0000합니다.\u0000",
+              "sourceText": "중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182934,7 +183161,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "1) 중소기업으로\u0000간주되는\u0000특별법인의\u0000입찰참가 - 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000 중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000 소상공인으로\u0000발급받은\u0000경우\u0000입찰참가\u0000자격이\u0000있으며\u0000상기\u0000각\u0000호의\u0000입찰참가자격을\u0000모두\u0000갖추어야\u0000합니다.\u0000 \u0000\u0000\u0000 *\u0000중소기업\u0000또는\u0000소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000",
+              "sourceText": "1) 중소기업으로 간주되는 특별법인의 입찰참가 - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다. * 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182943,7 +183170,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000",
+              "sourceText": "간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182952,7 +183179,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "소상공인으로\u0000발급받은\u0000경우\u0000입찰참가\u0000자격이\u0000있으며\u0000상기\u0000각\u0000호의\u0000입찰참가자격을\u0000모두\u0000갖추어야\u0000합니다.\u0000 \u0000\u0000\u0000 *\u0000중소기업\u0000또는\u0000소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000",
+              "sourceText": "소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다. * 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182961,7 +183188,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 「중소기업제품\u0000구매촉진\u0000및\u0000판로지원에\u0000관한\u0000법률」\u0000제33조\u0000제1항에\u0000따라\u0000중소기업으로\u0000간주되는\u0000특별법인으로\u0000 중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000 소상공인으로\u0000발급받은\u0000경우\u0000입찰참가\u0000자격이\u0000있으며\u0000상기\u0000각\u0000호의\u0000입찰참가자격을\u0000모두\u0000갖추어야\u0000합니다.\u0000 \u0000\u0000\u0000 *\u0000중소기업\u0000또는\u0000소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000 - 4-",
+              "sourceText": "- 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제33조 제1항에 따라 중소기업으로 간주되는 특별법인으로 중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다. * 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 - 4-",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -182970,7 +183197,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 *\u0000중소기업\u0000또는\u0000소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000",
+              "sourceText": "* 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182979,7 +183206,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 *\u0000중소기업\u0000또는\u0000소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000 - 4-",
+              "sourceText": "* 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 - 4-",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -182988,7 +183215,7 @@
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "중소기업제품\u0000「공공구매제도\u0000운영요령」\u0000제45조에\u0000따라\u0000‘특별법인\u0000중소기업\u0000간주\u0000확인서’를\u0000중소기업\u0000또는\u0000 소상공인으로\u0000발급받은\u0000경우\u0000입찰참가\u0000자격이\u0000있으며\u0000상기\u0000각\u0000호의\u0000입찰참가자격을\u0000모두\u0000갖추어야\u0000합니다.\u0000 \u0000\u0000\u0000 *\u0000중소기업\u0000또는\u0000소상공인으로\u0000간주되는\u0000특별법인\u0000해당\u0000여부는\u0000개찰\u0000후\u0000낙찰자\u0000결정\u0000전에\u0000관련서류를\u0000 - 4- ",
+              "sourceText": "중소기업제품 「공공구매제도 운영요령」 제45조에 따라 ‘특별법인 중소기업 간주 확인서’를 중소기업 또는 소상공인으로 발급받은 경우 입찰참가 자격이 있으며 상기 각 호의 입찰참가자격을 모두 갖추어야 합니다. * 중소기업 또는 소상공인으로 간주되는 특별법인 해당 여부는 개찰 후 낙찰자 결정 전에 관련서류를 - 4- ",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -183375,7 +183602,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "서류를 제출할 필요가 없습니다.(다만, 동 시스템에서 자료가 확인되지 않을 경우 입찰참가자격이 없습니다.) 2) 공동수급협정서 제출 관련 안내(공동수급체를 구성하여 참여하는 업체에 해당) - 제출기한: 기술제안서 제출마감일 전일 18:00까지 - 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 \u0000\u0000-\u0000제출방법\u0000상세\u0000",
+              "sourceText": "서류를 제출할 필요가 없습니다.(다만, 동 시스템에서 자료가 확인되지 않을 경우 입찰참가자격이 없습니다.) 2) 공동수급협정서 제출 관련 안내(공동수급체를 구성하여 참여하는 업체에 해당) - 제출기한: 기술제안서 제출마감일 전일 18:00까지 - 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 - 제출방법 상세",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -183384,7 +183611,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "2) 공동수급협정서 제출 관련 안내(공동수급체를 구성하여 참여하는 업체에 해당) - 제출기한: 기술제안서 제출마감일 전일 18:00까지 - 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 \u0000\u0000-\u0000제출방법\u0000상세\u0000 \u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000",
+              "sourceText": "2) 공동수급협정서 제출 관련 안내(공동수급체를 구성하여 참여하는 업체에 해당) - 제출기한: 기술제안서 제출마감일 전일 18:00까지 - 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 - 제출방법 상세 ① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급”",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -183393,7 +183620,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000-\u0000제출방법\u0000상세\u0000 \u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000",
+              "sourceText": "① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급”",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183402,7 +183629,25 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제출기한: 기술제안서 제출마감일 전일 18:00까지 - 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 \u0000\u0000-\u0000제출방법\u0000상세\u0000 \u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000 열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성",
+              "sourceText": "① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급” 열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출방법 상세 ① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급”",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 - 제출방법 상세 ① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급” 열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성 ② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -183411,7 +183656,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000",
+              "sourceText": "열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183420,7 +183665,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000 열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성",
+              "sourceText": "열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성 ② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183429,16 +183674,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제출방법: 반드시 국가종합전자조달시스템(나라장터)을 통해 전자문서로 제출 \u0000\u0000-\u0000제출방법\u0000상세\u0000 \u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000 열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성 \u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성",
+              "sourceText": "- 제출방법 상세 ① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급” 열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성 ② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리 ③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183447,7 +183683,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성 \u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리",
+              "sourceText": "② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183456,7 +183692,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000-\u0000제출방법\u0000상세\u0000 \u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000 열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성 \u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리 \u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출",
+              "sourceText": "② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리 ③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183465,7 +183701,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출",
+              "sourceText": "① 대표사 협정서 작성 : 나라장터 → 입찰 → 입찰진행/참가 → 해당 공고번호입력 후 검색 → “공동수급” 열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성 ② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리 ③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출 * 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 ",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183474,7 +183710,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리",
+              "sourceText": "정서 선택 후 제출 * 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183483,7 +183719,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리 \u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출",
+              "sourceText": "③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183492,7 +183728,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ①\u0000대표사\u0000협정서\u0000작성\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행/참가\u0000→\u0000해당\u0000공고번호입력\u0000후\u0000검색\u0000→\u0000“공동수급”\u0000 열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성 \u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리 \u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출 \u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정",
+              "sourceText": "③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출 * 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183501,7 +183737,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출 \u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급",
+              "sourceText": "열의 “협정”버튼 클릭 → “공동수급협정서작성”화면을 통해 협정서 작성 ② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리 ③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출 * 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급 협정서를 제출하여 주시기 바랍니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183510,7 +183746,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출",
+              "sourceText": " 유의하여 공동수급 협정서를 제출하여 주시기 바랍니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183519,7 +183755,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출 \u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급",
+              "sourceText": "* 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183528,7 +183764,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "열의\u0000“협정”버튼\u0000클릭\u0000→\u0000“공동수급협정서작성”화면을\u0000통해\u0000협정서\u0000작성 \u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리 \u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출 \u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급 \u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다.",
+              "sourceText": "* 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급 협정서를 제출하여 주시기 바랍니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183537,7 +183773,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급 \u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다.",
+              "sourceText": "② 구성사 협정서 승인 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 승인처리 ③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출 * 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급 협정서를 제출하여 주시기 바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183546,7 +183782,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급",
+              "sourceText": "협정서를 제출하여 주시기 바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183555,43 +183791,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급 \u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ②\u0000구성사\u0000협정서\u0000승인\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000승인처리 \u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출 \u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급 \u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "시기\u0000바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ③\u0000대표사\u0000협정서\u0000전자제출\u0000:\u0000나라장터\u0000→\u0000입찰\u0000→\u0000입찰진행\u0000→\u0000공동수급협정서목록조회\u0000→\u0000대상\u0000협정서\u0000선택\u0000후\u0000제출 \u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급 \u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유 의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리",
+              "sourceText": "③ 대표사 협정서 전자제출 : 나라장터 → 입찰 → 입찰진행 → 공동수급협정서목록조회 → 대상 협정서 선택 후 제출 * 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급 협정서를 제출하여 주시기 바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유 의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리하오",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183618,7 +183818,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 *\u0000대표사는\u0000구성사\u0000협정서\u0000승인\u0000후\u0000협정서\u0000제출\u0000처리하여야\u0000최종적으로\u0000제출이\u0000완료되는\u0000점을\u0000유의하여\u0000공동수급 \u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유 의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리하오 니 유의하시기 바랍니다.",
+              "sourceText": "* 대표사는 구성사 협정서 승인 후 협정서 제출 처리하여야 최종적으로 제출이 완료되는 점을 유의하여 공동수급 협정서를 제출하여 주시기 바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유 의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리하오 니 유의하시기 바랍니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183627,7 +183827,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000\u0000\u0000 협정서를\u0000제출하여\u0000주시기\u0000바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유 의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리하오 니 유의하시기 바랍니다. - 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다.",
+              "sourceText": "협정서를 제출하여 주시기 바랍니다. - 공동수급협정서를 입찰공고에 명시한 제출방법 및 제출기한을 준수하여 제출하지 않은 경우 용역입찰유 의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리하오 니 유의하시기 바랍니다. - 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183687,6 +183887,15 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "의서 제12조제8호(지방자치단체 입찰 및 계약집행기준 제8장 입찰유의서)에 의거 무효 입찰로 처리하오 니 유의하시기 바랍니다. - 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
@@ -183714,10 +183923,28 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
               "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "니 유의하시기 바랍니다. - 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183736,6 +183963,15 @@
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
               "sourceText": "니 유의하시기 바랍니다. - 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -183750,6 +183986,15 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
@@ -183759,190 +184004,334 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "joint_participation",
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000",
+              "sourceText": "- 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "special_legal_entity",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "special_legal_entity",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000 해당하는\u0000자는\u0000입찰참가자격이\u0000없음",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000 해당하는\u0000자는\u0000입찰참가자격이\u0000없음 - 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "special_legal_entity",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000 해당하는\u0000자는\u0000입찰참가자격이\u0000없음 - 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "해당하는\u0000자는\u0000입찰참가자격이\u0000없음 - 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000 해당하는\u0000자는\u0000입찰참가자격이\u0000없음 - 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000 한\u0000자’로서\u0000유죄판결이\u0000확정된\u0000날부터\u00002년이\u0000지나지\u0000아니한\u0000자",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000 한\u0000자’로서\u0000유죄판결이\u0000확정된\u0000날부터\u00002년이\u0000지나지\u0000아니한\u0000자",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "제출받아\u0000확인하며\u0000해당\u0000자격이\u0000없는\u0000경우\u0000낙찰자\u0000결정\u0000대상에서\u0000제외됩니다.2) 다음\u0000중\u0000어느\u0000하나에\u0000 해당하는\u0000자는\u0000입찰참가자격이\u0000없음 - 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000 한\u0000자’로서\u0000유죄판결이\u0000확정된\u0000날부터\u00002년이\u0000지나지\u0000아니한\u0000자 \u0000\u0000\u0000 *\u0000입찰자는\u0000같은\u0000법\u0000시행령\u0000제12조제3항\u0000각\u0000호에\u0000해당하지\u0000아니한다는\u0000서약서를\u0000입찰시\u0000제출하여야\u0000합니다.\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "해당하는\u0000자는\u0000입찰참가자격이\u0000없음 - 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000 한\u0000자’로서\u0000유죄판결이\u0000확정된\u0000날부터\u00002년이\u0000지나지\u0000아니한\u0000자 \u0000\u0000\u0000 *\u0000입찰자는\u0000같은\u0000법\u0000시행령\u0000제12조제3항\u0000각\u0000호에\u0000해당하지\u0000아니한다는\u0000서약서를\u0000입찰시\u0000제출하여야\u0000합니다.\u0000 만일\u0000서약내용이\u0000허위로\u0000판명될\u0000경우\u0000계약의\u0000해제ㆍ해지를\u0000당할\u0000수\u0000있고,\u0000부정당업자\u0000입찰참가자격제한처분을\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "legal_exclusion",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 「국가를\u0000당사자로\u0000하는\u0000계약에\u0000관한\u0000법률」\u0000제27조의5\u0000및\u0000같은\u0000법\u0000시행령\u0000제12조제3항에\u0000따라\u0000‘조세포탈\u0000등을\u0000 한\u0000자’로서\u0000유죄판결이\u0000확정된\u0000날부터\u00002년이\u0000지나지\u0000아니한\u0000자 \u0000\u0000\u0000 *\u0000입찰자는\u0000같은\u0000법\u0000시행령\u0000제12조제3항\u0000각\u0000호에\u0000해당하지\u0000아니한다는\u0000서약서를\u0000입찰시\u0000제출하여야\u0000합니다.\u0000 만일\u0000서약내용이\u0000허위로\u0000판명될\u0000경우\u0000계약의\u0000해제ㆍ해지를\u0000당할\u0000수\u0000있고,\u0000부정당업자\u0000입찰참가자격제한처분을\u0000 받을\u0000수\u0000있습니다.\u0000(서약서\u0000제출은\u0000전자입찰\u0000시\u0000정해진\u0000서식에\u0000따라\u0000송신한\u0000입찰서",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "바랍니다. - 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. \u0000\u0000-\u0000공고서에\u0000첨부된\u0000[입찰업체\u0000서약서\u0000및\u0000공동책임\u0000확인서]를\u0000반드시\u0000포함하여\u0000제출 - 입찰참가자격\u0000확인을\u0000위한\u0000제출서류:\u0000제안요청서에\u0000요구한\u0000경우\u0000등\u0000필요시\u0000기타문서에\u0000포함 \u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 입찰참가자격\u0000확인을\u0000위한\u0000제출서류:\u0000제안요청서에\u0000요구한\u0000경우\u0000등\u0000필요시\u0000기타문서에\u0000포함 \u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. \u0000\u0000-\u0000공고서에\u0000첨부된\u0000[입찰업체\u0000서약서\u0000및\u0000공동책임\u0000확인서]를\u0000반드시\u0000포함하여\u0000제출 - 입찰참가자격\u0000확인을\u0000위한\u0000제출서류:\u0000제안요청서에\u0000요구한\u0000경우\u0000등\u0000필요시\u0000기타문서에\u0000포함 \u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000 전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000 전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000-\u0000공고서에\u0000첨부된\u0000[입찰업체\u0000서약서\u0000및\u0000공동책임\u0000확인서]를\u0000반드시\u0000포함하여\u0000제출 - 입찰참가자격\u0000확인을\u0000위한\u0000제출서류:\u0000제안요청서에\u0000요구한\u0000경우\u0000등\u0000필요시\u0000기타문서에\u0000포함 \u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000 전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000 - 제출장소:\u0000국가종합전자조달시스템\u0000나라장터",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 입찰참가자격\u0000확인을\u0000위한\u0000제출서류:\u0000제안요청서에\u0000요구한\u0000경우\u0000등\u0000필요시\u0000기타문서에\u0000포함 \u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000 전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000 - 제출장소:\u0000국가종합전자조달시스템\u0000나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "sme_certificate",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000 전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000 - 제출장소:\u0000국가종합전자조달시스템\u0000나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000\u0000\u0000 중소기업ㆍ소상공인확인서를\u0000소지하고\u0000있지\u0000않으나\u0000중소기업ㆍ소상공인확인서를\u0000전자입찰서\u0000제출\u0000마감일\u0000 전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000 - 제출장소:\u0000국가종합전자조달시스템\u0000나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템",
+              "sourceText": "- 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "special_legal_entity",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 대표자는 국가종합전자조달시스템(나라장터)에서 공동수급협정서의 승인 여부를 확인하여야 합니다. 3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "special_legal_entity",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "3) 중소기업으로 간주되는 특별법인의 입찰참가 시 제출서류 안내(특별법인에 해당) - 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "special_legal_entity",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출서류: 중소기업 또는 소상공인으로 발급받은 특별법인 중소기업 간주 확인서 - 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제출기한: 개찰 후 낙찰자 결정 전에 계약담당자 요청 시까지 제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "제출받아 확인하며 해당 자격이 없는 경우 낙찰자 결정 대상에서 제외됩니다.2) 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "해당하는 자는 입찰참가자격이 없음 - 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니다. 만일 서약내용이 허위로 판명될 경우 계약의 해제ㆍ해지를 당할 수 있고, 부정당업자 입찰참가자격제한처분을",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니다. 만일 서약내용이 허위로 판명될 경우 계약의 해제ㆍ해지를 당할 수 있고, 부정당업자 입찰참가자격제한처분을 받을 수 있습니다. (서약서 제출은 전자입찰 시 정해진 서식에 따라 송신한 입찰서로 서약서 제",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "legal_exclusion",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 * 입찰자는 같은 법 시행령 제12조제3항 각 호에 해당하지 아니한다는 서약서를 입찰시 제출하여야 합니다. 만일 서약내용이 허위로 판명될 경우 계약의 해제ㆍ해지를 당할 수 있고, 부정당업자 입찰참가자격제한처분을 받을 수 있습니다. (서약서 제출은 전자입찰 시 정해진 서식에 따라 송신한 입찰서로 서약서 제출을 대신합니다.) - 5-",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. - 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "제안서 최종제출 이후 가격입찰서 제출이 가능하며, 제안서는 가급적 입찰마감일 전일까지 제출하여 주시기 바랍니다. - 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. - 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "바랍니다. - 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. - 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "바랍니다. - 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. - 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. - 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 제안서 관련 제출서류: (정성, 정량)제안서, 기타문서, 제안요약서(작성한 경우) 각 1부. - 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 공고서에 첨부된 [입찰업체 서약서 및 공동책임 확인서]를 반드시 포함하여 제출 - 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 입찰참가자격 확인을 위한 제출서류: 제안요청서에 요구한 경우 등 필요시 기타문서에 포함 중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "중소기업ㆍ소상공인확인서를 소지하고 있지 않으나 중소기업ㆍ소상공인확인서를 전자입찰서 제출 마감일 전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -183960,7 +184349,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "전일까지\u0000신청한\u0000업체의\u0000경우\u0000신청사실을\u0000확인할\u0000수\u0000있는\u0000증빙서류\u0000 - 제출장소:\u0000국가종합전자조달시스템\u0000나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템 (나라장터)를 통하여 전자적으로 제출하여야 합니다.",
+              "sourceText": "전일까지 신청한 업체의 경우 신청사실을 확인할 수 있는 증빙서류 - 제출장소: 국가종합전자조달시스템 나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템 (나라장터)를 통하여 전자적으로 제출하여야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -183987,7 +184376,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 제출장소:\u0000국가종합전자조달시스템\u0000나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템 (나라장터)를 통하여 전자적으로 제출하여야 합니다. ※ 제안서는 “조달업체 매뉴얼”을 참고하여 국가종합전자조달시스템(나라장터)를 통해 온라인으로",
+              "sourceText": "- 제출장소: 국가종합전자조달시스템 나라장터 ※ 본 사업은 「협상에 의한 계약체결기준」,「조달청 협상에 의한 계약 제안서평가 세부기준」에 따라 제안서(증빙서류 등 포함)는 반드시 입찰자(공동수급체 경우 대표자)가 국가종합전자조달시스템 (나라장터)를 통하여 전자적으로 제출하여야 합니다. ※ 제안서는 “조달업체 매뉴얼”을 참고하여 국가종합전자조달시스템(나라장터)를 통해 온라인으로",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -184320,7 +184709,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "완 및 조치 등이 필요한 경우에는 계약상대자에게 이에 대한 시정을 요구할 수 있습니다. 5. (입찰, 계약, 하자보수) 보증금 -------------------------------------------------------------------------------------------------------------- 1) 입찰보증금 ① 입찰자가\u0000아래에\u0000해당하는\u0000경우에는\u0000입찰금액의\u0000100분의\u00005이상(「국가계약법\u0000시행령」\u0000제37조\u0000제1항\u0000",
+              "sourceText": "완 및 조치 등이 필요한 경우에는 계약상대자에게 이에 대한 시정을 요구할 수 있습니다. 5. (입찰, 계약, 하자보수) 보증금 -------------------------------------------------------------------------------------------------------------- 1) 입찰보증금 ① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상(「국가계약법 시행령」 제37조 제1항",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184329,7 +184718,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "① 입찰자가\u0000아래에\u0000해당하는\u0000경우에는\u0000입찰금액의\u0000100분의\u00005이상(「국가계약법\u0000시행령」\u0000제37조\u0000제1항\u0000 단서조항에\u0000따른\u0000기획재정부장관이\u0000기간을\u0000정하여\u0000고시한\u0000경우에는\u00001천분의\u000025이상)의\u0000입찰보증금을\u0000",
+              "sourceText": "① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상(「국가계약법 시행령」 제37조 제1항 단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184338,7 +184727,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "1) 입찰보증금 ① 입찰자가\u0000아래에\u0000해당하는\u0000경우에는\u0000입찰금액의\u0000100분의\u00005이상(「국가계약법\u0000시행령」\u0000제37조\u0000제1항\u0000",
+              "sourceText": "1) 입찰보증금 ① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상(「국가계약법 시행령」 제37조 제1항",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184347,7 +184736,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "-------------------------------------------------------------------------------------------------------------- 1) 입찰보증금 ① 입찰자가\u0000아래에\u0000해당하는\u0000경우에는\u0000입찰금액의\u0000100분의\u00005이상(「국가계약법\u0000시행령」\u0000제37조\u0000제1항\u0000 단서조항에\u0000따른\u0000기획재정부장관이\u0000기간을\u0000정하여\u0000고시한\u0000경우에는\u00001천분의\u000025이상)의\u0000입찰보증금을\u0000 납부\u0000하여야\u0000합니다.",
+              "sourceText": "-------------------------------------------------------------------------------------------------------------- 1) 입찰보증금 ① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상(「국가계약법 시행령」 제37조 제1항 단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184356,7 +184745,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "5이상)의\u0000입찰보증금을\u0000 납부\u0000하여야\u0000합니다.",
+              "sourceText": "이상)의 입찰보증금을 납부 하여야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184365,7 +184754,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "단서조항에\u0000따른\u0000기획재정부장관이\u0000기간을\u0000정하여\u0000고시한\u0000경우에는\u00001천분의\u000025이상)의\u0000입찰보증금을\u0000",
+              "sourceText": "단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184374,7 +184763,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "단서조항에\u0000따른\u0000기획재정부장관이\u0000기간을\u0000정하여\u0000고시한\u0000경우에는\u00001천분의\u000025이상)의\u0000입찰보증금을\u0000 납부\u0000하여야\u0000합니다.",
+              "sourceText": "단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184383,7 +184772,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "1) 입찰보증금 ① 입찰자가\u0000아래에\u0000해당하는\u0000경우에는\u0000입찰금액의\u0000100분의\u00005이상(「국가계약법\u0000시행령」\u0000제37조\u0000제1항\u0000 단서조항에\u0000따른\u0000기획재정부장관이\u0000기간을\u0000정하여\u0000고시한\u0000경우에는\u00001천분의\u000025이상)의\u0000입찰보증금을\u0000 납부\u0000하여야\u0000합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자",
+              "sourceText": "1) 입찰보증금 ① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상(「국가계약법 시행령」 제37조 제1항 단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -184392,7 +184781,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "단서조항에\u0000따른\u0000기획재정부장관이\u0000기간을\u0000정하여\u0000고시한\u0000경우에는\u00001천분의\u000025이상)의\u0000입찰보증금을\u0000 납부\u0000하여야\u0000합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자 - 입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호 가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.)",
+              "sourceText": "단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자 - 입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호 가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.)",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -184410,7 +184799,7 @@
               "type": "bid_security",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "납부\u0000하여야\u0000합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자 - 입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호 가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.) ② (납부기한 및 장소) 입찰보증금은 반드시 입찰일 전일(공휴일인 경우 그 전일) 18:00까지 국가데",
+              "sourceText": "납부 하여야 합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자 - 입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호 가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.) ② (납부기한 및 장소) 입찰보증금은 반드시 입찰일 전일(공휴일인 경우 그 전일) 18:00까지 국가데",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -185793,10 +186182,46 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "joint_participation",
+              "type": "submission_required",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "- 12 - [첨부]\u0000입찰업체\u0000서약서\u0000및\u0000공동책임\u0000확인서 *\u0000제안서\u0000및\u0000발표자료\u0000작성\u0000시\u0000아래\u0000내용을\u0000반드시\u0000유념하시기\u0000바라며,\u0000\u0000 \u0000\u0000\u0000 ‘3-1.제출서류’\u0000내용에\u0000따라\u0000아래의\u0000서약서\u0000및\u0000확인서를\u0000제출하시기\u0000바랍니다. 입찰업체(공동수급체 포함) 서약서",
+              "sourceText": "2. 조달청 고시·지침 등: 조달청 홈페이지(http://www.pps.go.kr) → 정보제공 → 법령정보(고시, 공고 및 지침안내 등) 또는 업무별 자료(내자구매 등)에서 검색 3. 정확한 자료 검색이 되지 않을 경우 입찰공고 담당자에게 확인하시기 바랍니다. - 12 - [첨부] 입찰업체 서약서 및 공동책임 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "[첨부] 입찰업체 서약서 및 공동책임 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "[첨부] 입찰업체 서약서 및 공동책임 확인서 * 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며,",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 12 - [첨부] 입찰업체 서약서 및 공동책임 확인서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "3. 정확한 자료 검색이 되지 않을 경우 입찰공고 담당자에게 확인하시기 바랍니다. - 12 - [첨부] 입찰업체 서약서 및 공동책임 확인서 * 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며, ‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -185805,7 +186230,25 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 ‘3-1.제출서류’\u0000내용에\u0000따라\u0000아래의\u0000서약서\u0000및\u0000확인서를\u0000제출하시기\u0000바랍니다. 입찰업체(공동수급체 포함) 서약서",
+              "sourceText": "- 12 - [첨부] 입찰업체 서약서 및 공동책임 확인서 * 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며, ‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다. 입찰업체(공동수급체 포함) 서약서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "- 12 - [첨부] 입찰업체 서약서 및 공동책임 확인서 * 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며, ‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다. 입찰업체(공동수급체 포함) 서약서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다. 입찰업체(공동수급체 포함) 서약서",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185814,7 +186257,16 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "[첨부]\u0000입찰업체\u0000서약서\u0000및\u0000공동책임\u0000확인서 *\u0000제안서\u0000및\u0000발표자료\u0000작성\u0000시\u0000아래\u0000내용을\u0000반드시\u0000유념하시기\u0000바라며,\u0000\u0000 \u0000\u0000\u0000 ‘3-1.제출서류’\u0000내용에\u0000따라\u0000아래의\u0000서약서\u0000및\u0000확인서를\u0000제출하시기\u0000바랍니다. 입찰업체(공동수급체 포함) 서약서 ○\u0000입찰공고번호:\u0000\u0000",
+              "sourceText": "[첨부] 입찰업체 서약서 및 공동책임 확인서 * 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며, ‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다. 입찰업체(공동수급체 포함) 서약서 ○ 입찰공고번호:",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "submission_required",
+              "codes": [],
+              "sourceFile": "용역구매입찰공고서_2차.pdf",
+              "sourceText": "[첨부] 입찰업체 서약서 및 공동책임 확인서 * 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며, ‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다. 입찰업체(공동수급체 포함) 서약서 ○ 입찰공고번호:",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -185832,7 +186284,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "입찰업체(공동수급체 포함) 서약서 ○\u0000입찰공고번호:\u0000\u0000",
+              "sourceText": "입찰업체(공동수급체 포함) 서약서 ○ 입찰공고번호:",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185841,7 +186293,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "*\u0000제안서\u0000및\u0000발표자료\u0000작성\u0000시\u0000아래\u0000내용을\u0000반드시\u0000유념하시기\u0000바라며,\u0000\u0000 \u0000\u0000\u0000 ‘3-1.제출서류’\u0000내용에\u0000따라\u0000아래의\u0000서약서\u0000및\u0000확인서를\u0000제출하시기\u0000바랍니다. 입찰업체(공동수급체 포함) 서약서 ○\u0000입찰공고번호:\u0000\u0000 ○\u0000수\u0000요\u0000기\u0000관:",
+              "sourceText": "* 제안서 및 발표자료 작성 시 아래 내용을 반드시 유념하시기 바라며, ‘3-1.제출서류’ 내용에 따라 아래의 서약서 및 확인서를 제출하시기 바랍니다. 입찰업체(공동수급체 포함) 서약서 ○ 입찰공고번호: ○ 수 요 기 관:",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -185850,7 +186302,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "감수하고\u0000이에\u0000민·형사상\u0000이의를\u0000제기하지\u0000않을\u0000것임을\u0000서약합니다. \u0000\u0000\u00001.\u0000제안서\u0000및\u0000해당\u0000내용\u0000발표에\u0000있어\u0000허위정보를\u0000포함하지\u0000않겠습니다.\u0000 2.\u0000제안서\u0000및\u0000해당\u0000내용\u0000발표에\u0000있어\u0000경쟁업체에\u0000대한\u0000비방행위를\u0000하지\u0000\u0000않겠습니다. 20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원>",
+              "sourceText": "감수하고 이에 민·형사상 이의를 제기하지 않을 것임을 서약합니다. 1. 제안서 및 해당 내용 발표에 있어 허위정보를 포함하지 않겠습니다. 2. 제안서 및 해당 내용 발표에 있어 경쟁업체에 대한 비방행위를 하지 않겠습니다. 20 . . . <공동수급체 전원>",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185859,7 +186311,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원>",
+              "sourceText": "<공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185868,7 +186320,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u00001.\u0000제안서\u0000및\u0000해당\u0000내용\u0000발표에\u0000있어\u0000허위정보를\u0000포함하지\u0000않겠습니다.\u0000 2.\u0000제안서\u0000및\u0000해당\u0000내용\u0000발표에\u0000있어\u0000경쟁업체에\u0000대한\u0000비방행위를\u0000하지\u0000\u0000않겠습니다. 20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000",
+              "sourceText": "20 . . . <공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인) △△회사 대표 △△△ (인) 국가데이터처장 귀하",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185877,7 +186329,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 <공동수급체\u0000전원>",
+              "sourceText": "<공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인) △△회사 대표 △△△ (인) 국가데이터처장 귀하 입찰업체 확인서(공동수급인 경우)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185886,7 +186338,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000",
+              "sourceText": "입찰업체 확인서(공동수급인 경우)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185895,7 +186347,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "2.\u0000제안서\u0000및\u0000해당\u0000내용\u0000발표에\u0000있어\u0000경쟁업체에\u0000대한\u0000비방행위를\u0000하지\u0000\u0000않겠습니다. 20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000 \u0000\u0000\u0000 △△회사\u0000\u0000대표\u0000△△△\u0000(인)\u0000\u0000",
+              "sourceText": "입찰업체 확인서(공동수급인 경우) ○ 입찰공고번호:",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185904,7 +186356,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000 \u0000\u0000\u0000 △△회사\u0000\u0000대표\u0000△△△\u0000(인)\u0000\u0000 국가데이터처장\u0000귀하",
+              "sourceText": "국가데이터처장 귀하 입찰업체 확인서(공동수급인 경우)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185913,7 +186365,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000 \u0000\u0000\u0000 △△회사\u0000\u0000대표\u0000△△△\u0000(인)\u0000\u0000 국가데이터처장\u0000귀하 입찰업체\u0000확인서(공동수급인\u0000경우)",
+              "sourceText": "△△회사 대표 △△△ (인) 국가데이터처장 귀하 입찰업체 확인서(공동수급인 경우) ○ 입찰공고번호: ○ 수 요 기 관:",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185922,7 +186374,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "입찰업체\u0000확인서(공동수급인\u0000경우)",
+              "sourceText": "○ 사 업 명: 본인은 본 입찰과 관련 제안서 및 발표자료의 내용에 관하여 해당 내용을 모두 확인하였으며 공동의 책임이 있음을 확인합니다. 20 . . . <공동수급체 전원>",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185931,61 +186383,7 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "입찰업체\u0000확인서(공동수급인\u0000경우) ○\u0000입찰공고번호:\u0000\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "국가데이터처장\u0000귀하 입찰업체\u0000확인서(공동수급인\u0000경우)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 △△회사\u0000\u0000대표\u0000△△△\u0000(인)\u0000\u0000 국가데이터처장\u0000귀하 입찰업체\u0000확인서(공동수급인\u0000경우) ○\u0000입찰공고번호:\u0000\u0000 ○\u0000수\u0000요\u0000기\u0000관:",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "○\u0000사\u0000\u0000 업\u0000\u0000 명: \u0000\u0000\u0000 본인은\u0000본\u0000입찰과\u0000관련\u0000제안서\u0000및\u0000발표자료의\u0000내용에\u0000관하여\u0000해당\u0000내용을\u0000 모두\u0000확인하였으며\u0000공동의\u0000책임이\u0000있음을\u0000확인합니다.\u0000 20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원>",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 본인은\u0000본\u0000입찰과\u0000관련\u0000제안서\u0000및\u0000발표자료의\u0000내용에\u0000관하여\u0000해당\u0000내용을\u0000 모두\u0000확인하였으며\u0000공동의\u0000책임이\u0000있음을\u0000확인합니다.\u0000 20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "모두\u0000확인하였으며\u0000공동의\u0000책임이\u0000있음을\u0000확인합니다.\u0000 20\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 .\u0000\u0000\u0000\u0000 . \u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000 \u0000\u0000\u0000 △△회사\u0000\u0000대표\u0000△△△\u0000(인)\u0000\u0000",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "용역구매입찰공고서_2차.pdf",
-              "sourceText": "\u0000\u0000\u0000 <공동수급체\u0000전원> \u0000\u0000\u0000 서약자\u0000:\u0000○○회사\u0000\u0000대표\u0000○○○\u0000(인)\u0000\u0000 \u0000\u0000\u0000 △△회사\u0000\u0000대표\u0000△△△\u0000(인)\u0000\u0000 국가데이터처장\u0000귀하",
+              "sourceText": "<공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인) △△회사 대표 △△△ (인) 국가데이터처장 귀하",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -185997,8 +186395,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01751690:000": {
       "status": "text_extracted_requires_review",
@@ -187236,8 +187634,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01745450:000": {
       "status": "text_extracted_requires_review",
@@ -187708,8 +188106,9 @@
           "textChars": 36446,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 85,
-          "unmatchedQualificationAnchorCount": 4,
+          "unmatchedQualificationAnchorCount": 5,
           "unmatchedAnchorSamples": [
+            "○ 입찰참가자격등록, 나라장터 시스템: 정부조달콜센터 (☎ 1588-0800)",
             "※ 제안사는 제안서 파일 업로드(파일 추가) 전에 파일의 정상여부를 반드시 확인하여 주시기 바라며, 파일의 정상여부 미확인으로 발생되는 모든 책임은 입찰참가자에게 있습니다.",
             "※ 위 질의 및 답변등록시간은 평가진행 상황에 따라 변동될 수 있으므로 입찰참가자는 평가일시에 실시간 모니터링을 통해 반드시 질의확인 및 답변을 등록해 주시기 바랍니다.",
             "16-8.「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조 제2항 제2호에 따라 아래의 계약 주요조건을 위반한 경우 부정당업자 입찰참가자격제한 처분을 받을 수 있습니다. 다만, 아래의 계약 주요 조건 위반이 국가계약법령 상의 다른 조항에 의한 ‘부정당업자 입찰참가자격 제한 처분’ 사유에 해당하는 경우 해당 조항의",
@@ -189403,6 +189802,15 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "registration_identity",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
+              "sourceText": "업자등록증)의 상호 또는 대표자 변경신고 후 해당 기관에서 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "eligibility_cutoff",
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
@@ -189568,6 +189976,15 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
+              "sourceText": "하도급대금을 수요기관이 하수급인에게 직접 지급하는 것에 합의한다.”는 내용의 확약서를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
               "sourceText": "14-2. 위 항에 따라 확약서를 제출하여야 하는 자는 입찰서(가격제안서) 제출 시 ‘하도급대금 직불조건부 입찰참가 확약서’를 제출한 경우에 한하여 입찰참가를 허용하며, ‘하도급대금 직불조건부 입찰참가확약서’ 제출은 전자입찰 시 정해진 서식에 따라 송신한 입찰서로 ‘하도급대금 직불조건부 입찰참가확약서’ 제출을 대신합니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -189641,6 +190058,15 @@
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
               "sourceText": "입찰업체(공동수급체 포함) 서약서 본 입찰에 참여한 당사 대리인과 임직원은 아래 각 호의 사항을 준수할 것이며 이를 위반하여 허위 사실 확인 시 협상적격자 제외, 계약을 해제·해지하는 등의 불이익을 감수하고 이에 민·형사상 이의를 제기하지 않을 것임을 서약합니다. 1. 제안서 및 해당 내용 발표에 있어 허위정보를 포함하지 않겠습니다. 2. 제안서 및 해당 내용 발표에 있어 경쟁업체에 대한 비방행위를 하지 않겠습니다.20 . . . <공동수급체 전원> 서약자 : ○○회사 대표 ○○",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).hwpx",
+              "sourceText": "방행위를 하지 않겠습니다.20 . . . <공동수급체 전원> 서약자 : ○○회사 대표 ○○○ (인) △△회사 대표 △△△ (인) 인천지방조달청장 귀하",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -189914,10 +190340,73 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "㉮ 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 : 1 4 6 8 ) ㉯ 정보시스템 감리법인 ( 업종코드 : 6 1 4 6 ) ② 「 중소기 업기본법 」 제 2 조에 따른 중 · 소기업자 또는 「 소상공인 보호 및 지원에 관한 법 률 」 제 2 조에 따른 소상공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중 · 소기업 · 소상공 인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
               "sourceText": "㉯ 정보시스템 감리법인 ( 업종코드 : 6 1 4 6 ) ② 「 중소기 업기본법 」 제 2 조에 따른 중 · 소기업자 또는 「 소상공인 보호 및 지원에 관한 법 률 」 제 2 조에 따른 소상공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중 · 소기업 · 소상공 인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p ",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "㉯ 정보시스템 감리법인 ( 업종코드 : 6 1 4 6 ) ② 「 중소기 업기본법 」 제 2 조에 따른 중 · 소기업자 또는 「 소상공인 보호 및 지원에 관한 법 률 」 제 2 조에 따른 소상공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중 · 소기업 · 소상공 인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p ",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "발급된 중 · 소기업 · 소상공 인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p p . g o . k r ) 에 서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "② 「 중소기 업기본법 」 제 2 조에 따른 중 · 소기업자 또는 「 소상공인 보호 및 지원에 관한 법 률 」 제 2 조에 따른 소상공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중 · 소기업 · 소상공 인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p p . g o . k r ) 에 서 확인 ( 전자 입찰서 ",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p p . g o . k r ) 에 서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p p . g o . k r ) 에 서 확인 ( 전자 입찰서 제출 마감일 전일까지 발급된 것으로서 전자 입찰서 제출 마감일까지",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "법 률 」 제 2 조에 따른 소상공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중 · 소기업 · 소상공 인 확인서 ( 용도 : 공공기관 입찰용 ) 를 소지 한 자 . ※ < 중 · 소기업 · 소상공인확인서 > 가 중소기업제품 공공구매 종 합 정보망 ( h t t p : / / w w w . s m p p . g o . k r ) 에 서 확인 ( 전자 입찰서 제출 마감일 전일까지 발급된 것으로서 전자 입찰서 제출 마감일까지 계속 유지되어야 함 ) 이 안 될 ",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -189992,6 +190481,33 @@
               "sourceText": "※ ‘ 중소기업ㆍ소상공인확인서 ’ 를 전자입찰서 제출 마감일 전일까지 신청한 사항이 - 5 - 확인된 업체는 입찰참가가 가능하나 다음 중 어느 하나에 해당하는 경우에는 입찰참가자 격이 없습니다 . - 제안서 제출 마감일부터 5 일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "- 5 - 확인된 업체는 입찰참가가 가능하나 다음 중 어느 하나에 해당하는 경우에는 입찰참가자 격이 없습니다 . - 제안서 제출 마감일부터 5 일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우 - 발급된 중ㆍ 소 기업ㆍ소상공인확인서가 입찰참가자격의 기업 구분과 다른 경우",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "- 제안서 제출 마감일부터 5 일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우 - 발급된 중ㆍ 소 기업ㆍ소상공인확인서가 입찰참가자격의 기업 구분과 다른 경우",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "확인된 업체는 입찰참가가 가능하나 다음 중 어느 하나에 해당하는 경우에는 입찰참가자 격이 없습니다 . - 제안서 제출 마감일부터 5 일 이내에 중소기업공공구매 종합정보망에서 확인이 되지 않는 경우 - 발급된 중ㆍ 소 기업ㆍ소상공인확인서가 입찰참가자격의 기업 구분과 다른 경우 - 발급된 중 ㆍ 소 기업ㆍ소상공인확인서의 유효기간 시작일이 전자입찰서 제출 마감일 이후인 경우",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -191696,10 +192212,55 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "- 「 중소기 업제품 구매촉진 및 판로지원에 관한 법률 」 제 3 3 조 제 1 항에 따라 중소기업자로 간주 되 는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1 부 ( 중소기업협동조합의 경우 적 격조합확인서 및 배정계획서 각 1 부 ) · 해당자에 한함 - < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "special_legal_entity",
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
               "sourceText": "- 「 중소기 업제품 구매촉진 및 판로지원에 관한 법률 」 제 3 3 조 제 1 항에 따라 중소기업자로 간주 되 는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1 부 ( 중소기업협동조합의 경우 적 격조합확인서 및 배정계획서 각 1 부 ) · 해당자에 한함 - < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "- < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "- < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부 · 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "· 해당자에 한함 - < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "경우 적 격조합확인서 및 배정계획서 각 1 부 ) · 해당자에 한함 - < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부 · 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함 - 공고서에 첨부된 “ 입찰업체 서약서 및 공동책임 확인서 ” 1 부",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -191714,10 +192275,37 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "· 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "· 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함 - 공고서에 첨부된 “ 입찰업체 서약서 및 공동책임 확인서 ” 1 부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "submission_required",
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
               "sourceText": "· 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함 - 공고서에 첨부된 “ 입찰업체 서약서 및 공동책임 확인서 ” 1 부",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "· 해당자에 한함 - < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부 · 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함 - 공고서에 첨부된 “ 입찰업체 서약서 및 공동책임 확인서 ” 1 부 ※ 공동 수급의 경우 대표사가 공동수급체 구성원의 기타서류 ( 입찰 참가자격 확인서류 ) 를",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -191768,6 +192356,15 @@
               "documentRequiresManualFullReview": true
             },
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "- < 중 · 소기업 · 소상공인확인서 > 신청을 증빙할 수 있는 서류 1 부 · 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함 - 공고서에 첨부된 “ 입찰업체 서약서 및 공동책임 확인서 ” 1 부 ※ 공동 수급의 경우 대표사가 공동수급체 구성원의 기타서류 ( 입찰 참가자격 확인서류 ) 를 제출하 여야 함 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
@@ -191799,6 +192396,15 @@
               "codes": [],
               "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
               "sourceText": "※ 공동 수급의 경우 대표사가 공동수급체 구성원의 기타서류 ( 입찰 참가자격 확인서류 ) 를 제출하 여야 함 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "공고서(2026년 유역하수도 통합 정보플랫폼 구축 감리).pdf",
+              "sourceText": "· 단 , 전 자입찰서 제출 마감일 전일까지 < 중 · 소기업 · 소상공인확인서 > 를 발급받지 못한 업체에 한함 - 공고서에 첨부된 “ 입찰업체 서약서 및 공동책임 확인서 ” 1 부 ※ 공동 수급의 경우 대표사가 공동수급체 구성원의 기타서류 ( 입찰 참가자격 확인서류 ) 를 제출하 여야 함 . ※ 제안서 용지규격 / 페이지 / 제본 / 인쇄 등 형식적인 사항은 권고사항 입니다 .",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -193835,8 +194441,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01748897:000": {
       "status": "text_extracted_requires_review",
@@ -350036,8 +350642,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01747588:000": {
       "status": "text_extracted_requires_review",
@@ -350240,11 +350846,10 @@
           "textChars": 8183,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 22,
-          "unmatchedQualificationAnchorCount": 11,
+          "unmatchedQualificationAnchorCount": 10,
           "unmatchedAnchorSamples": [
             "나 . 입찰 ( 견적 ) 서에 산출내역서를 첨부하지 않는 총액입찰 , 소기업 ‧ 소상공인 제한경쟁에 의",
             "따른 부정당업자로서 입찰참가자격 제한을 받고 있지 않은 업체이어야 합니다 .",
-            "2) 「 중소기업기본법 」 제 2 조에 따른 소기업 또는 「 소상공인 보호 및 지원에 관한 법",
             "청 고객지원센터 또는 각 지방조달청에 입찰참가자격등록을 하여야 합니다 .",
             "청 이외의 관서에 입찰참가자격등록을 한 경우에는 개찰일 전일까지 국가종합전자",
             "경우에만 조달청에 입찰참가자격등록을 한 것으로 봅니다 .",
@@ -350335,7 +350940,52 @@
           ],
           "clauseCandidates": [
             {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "률 」 제 2 조에 따른 소상공인으로 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "2) 「 중소기업기본법 」 제 2 조에 따른 소기업 또는 「 소상공인 보호 및 지원에 관한 법 - 3 - 률 」 제 2 조에 따른 소상공인으로 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
               "type": "industry_code",
+              "codes": [],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "- 3 - 률 」 제 2 조에 따른 소상공인으로 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 3) 「 소프트웨어진흥법 」 제 58 조에 의한 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 :",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
               "codes": [],
               "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
               "sourceText": "- 3 - 률 」 제 2 조에 따른 소상공인으로 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 3) 「 소프트웨어진흥법 」 제 58 조에 의한 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 :",
@@ -350357,6 +351007,15 @@
               "codes": [
                 "1468"
               ],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "률 」 제 2 조에 따른 소상공인으로 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 3) 「 소프트웨어진흥법 」 제 58 조에 의한 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 : 1468) 면허 등록을 필한 업체이어야 합니다 .",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
               "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
               "sourceText": "률 」 제 2 조에 따른 소상공인으로 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 3) 「 소프트웨어진흥법 」 제 58 조에 의한 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 : 1468) 면허 등록을 필한 업체이어야 합니다 .",
               "reviewStatus": "unreviewed",
@@ -350388,6 +351047,15 @@
               "codes": [
                 "1468"
               ],
+              "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
+              "sourceText": "발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 3) 「 소프트웨어진흥법 」 제 58 조에 의한 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 : 1468) 면허 등록을 필한 업체이어야 합니다 . ※ 입찰참가자격은 입찰서 제출 마감일 현재 충족하여야 하며 , 낙찰예정자는",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
               "sourceFile": "[공고문]교수자 인공지능 활용 지원을 위한 생성형 인공지능 서비스 구독권 제공.pdf",
               "sourceText": "발급된 소기업 · 소상공인 확인서 를 소지한 업체 이어야 합니다 . ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함 3) 「 소프트웨어진흥법 」 제 58 조에 의한 소프트웨어사업자 ( 컴퓨터관련서비스사업 , 업종코드 : 1468) 면허 등록을 필한 업체이어야 합니다 . ※ 입찰참가자격은 입찰서 제출 마감일 현재 충족하여야 하며 , 낙찰예정자는",
               "reviewStatus": "unreviewed",
@@ -350651,8 +351319,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01753451:000": {
       "status": "text_extracted_requires_review",
@@ -350674,11 +351342,9 @@
           "textChars": 4344,
           "sourceTextScanComplete": false,
           "qualificationAnchorCount": 25,
-          "unmatchedQualificationAnchorCount": 3,
+          "unmatchedQualificationAnchorCount": 1,
           "unmatchedAnchorSamples": [
-            "○ 입찰참가자격 등록, 나라장터 시스템: 정부조달 콜센터(1588-0800)",
-            "따라 경쟁입찰의 참가자격을 구비한자",
-            "나. 「중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령」제2조의2에 의거「중"
+            "○ 입찰참가자격 등록, 나라장터 시스템: 정부조달 콜센터(1588-0800)"
           ],
           "sourceSha256": "2d51a32853499112ffa82d7b0603b3b888eeba50846a8ca1e70c022e8536262d",
           "textSha256": "e4dae655302f290b5cff529b5a5131f371adf90ea881765d0d58ae5d3b1a9475",
@@ -350752,6 +351418,51 @@
             }
           ],
           "clauseCandidates": [
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "붙임1_입찰공고문.pdf",
+              "sourceText": "따라 경쟁입찰의 참가자격을 구비한자 나. 「중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령」제2조의2에 의거「중 소기업기본법」제2조제2항에 따른 중·소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로 등록된 업체로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업 및 소상공인 확인서(전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "붙임1_입찰공고문.pdf",
+              "sourceText": "관한 법률」제2조에 따른 소상공인으로 등록된 업체로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업 및 소상공인 확인서(전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "붙임1_입찰공고문.pdf",
+              "sourceText": "나. 「중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령」제2조의2에 의거「중 소기업기본법」제2조제2항에 따른 중·소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로 등록된 업체로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업 및 소상공인 확인서(전자입찰서 제출 마감일 전까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "붙임1_입찰공고문.pdf",
+              "sourceText": "관한 규정」에 따라 발급된 소기업 및 소상공인 확인서(전자입찰서 제출 마감일",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "sme_certificate",
+              "codes": [],
+              "sourceFile": "붙임1_입찰공고문.pdf",
+              "sourceText": "관한 규정」에 따라 발급된 소기업 및 소상공인 확인서(전자입찰서 제출 마감일 전까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
+              "documentRequiresManualFullReview": true
+            },
             {
               "type": "sme_certificate",
               "codes": [],
@@ -351351,8 +352062,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01756420:000": {
       "status": "text_extracted_requires_review",
@@ -352487,6 +353198,15 @@
               "sourceText": "12-1. 입찰에 참여하는 자는 「국가를 당사자로 하는 계약에 관한 법률」제27조의4에 의거하여 각 중앙관서의 장으로부터 「건설산업기본법」제34조제1항 또는 「하도급거래 공정화에 관한 법률」제13조제1항이나 제3항을 위반한 사실이 통보된 자로서 당해 입찰공고일이 위반사실 통보일로부터 1년 이내인 것으로 확인된 때에는 「국가를 당사자로 하는 계약에 관한 법률」제15조제1항에 따른 대가 지급시 “하도급대금을 수요기관이 하수급인에게 직접 지급하는 것에 합의한다”는 내용의 확약서를 제출",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "joint_participation",
+              "codes": [],
+              "sourceFile": "입찰공고문(전자입찰26-021호)_원본.hwp",
+              "sourceText": "“하도급대금을 수요기관이 하수급인에게 직접 지급하는 것에 합의한다”는 내용의 확약서를 제출하여야 합니다.",
+              "reviewStatus": "unreviewed",
+              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -355522,8 +356242,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01752850:000": {
       "status": "text_extracted_requires_review",
@@ -361719,8 +362439,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T17:09:59.769598+00:00",
-      "classificationVersion": 17
+      "checkedAt": "2026-10-15T04:12:46.342111+00:00",
+      "classificationVersion": 18
     },
     "R26BK01757019:000": {
       "status": "text_extracted_requires_review",
@@ -470196,5 +470916,5 @@
       "classificationVersion": 17
     }
   },
-  "workflowRunId": "38679400718"
+  "workflowRunId": "38680254417"
 }
