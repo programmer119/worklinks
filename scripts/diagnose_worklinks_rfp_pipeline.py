@@ -111,6 +111,41 @@ emit("DIAG_TOTAL", {
     "passingBothPrerequisites": len(passing),
     "rfpGeneratedAt": RFP.get("generatedAt"), "aiGeneratedAt": AI.get("generatedAt"),
 })
+# Identify the actual lost-coverage groups before changing qualification rules.
+# Raw excerpts are short public-document diagnostics; never infer eligibility from them.
+unmatched_file_kinds = collections.Counter()
+unmatched_examples = []
+unreadable_reasons = collections.Counter()
+scan_causes = collections.Counter()
+for key, notice in source.items():
+    for file in notice.get("files") or []:
+        suffix = Path(file.get("name") or "").suffix.lower() or "(none)"
+        if file.get("readable") is not True:
+            unreadable_reasons[(suffix, file.get("errorCategory") or "unknown")] += 1
+            continue
+        if file.get("sourceTextScanComplete") is not True:
+            scan_causes["scan_false"] += 1
+            samples = file.get("unmatchedAnchorSamples") or []
+            if samples:
+                unmatched_file_kinds[suffix] += 1
+                for item in samples[:3]:
+                    # Distinguish ignored guidance, missing extraction pattern,
+                    # and long-fragment citation breakages.
+                    text = " ".join(str(item).split())
+                    if len(unmatched_examples) < 24:
+                        unmatched_examples.append({"id":key, "fileType":suffix,
+                                                  "text":text[:180]})
+            else:
+                scan_causes["no_unmatched_sample"] += 1
+        if file.get("qualificationScanTruncated"):
+            scan_causes["text_truncated"] += 1
+emit("DIAG_SCAN_FAILURE_TYPES", dict(scan_causes))
+emit("DIAG_UNMATCHED_FILE_TYPES", dict(unmatched_file_kinds))
+emit("DIAG_UNREADABLE_REASONS", [
+    {"fileType":ext, "error":reason, "count":n}
+    for (ext,reason),n in unreadable_reasons.most_common(16)])
+emit("DIAG_UNMATCHED_EXAMPLES", unmatched_examples)
+
 emit("DIAG_RFP_STATUS", dict(status))
 emit("DIAG_SOURCE_STAGE", dict(source_stages))
 emit("DIAG_AI_STAGE", dict(ai_stages))
