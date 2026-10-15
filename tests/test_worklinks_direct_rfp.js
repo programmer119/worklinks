@@ -54,6 +54,18 @@ assert.equal(sandbox.officialSourceCoverage({...source,manifestComplete:false},e
 assert.equal(sandbox.officialSourceCoverage({...source,attachmentManifestCount:2},evidence),false);
 assert.equal(sandbox.officialSourceCoverage({...source,files:[{...file,sourceSha256:''}]},evidence),false);
 assert.equal(sandbox.officialSourceCoverage(source,{attachments:{ok:true,complete:false,items:[{}]}}),false);
+// Verified official snapshot must remain usable during a temporary 429,
+// but never override a newer contradictory complete official manifest.
+const recent={...source,checkedAt:new Date().toISOString()};
+assert.equal(sandbox.officialSourceCoverage(recent,{}),true,
+ 'recent hash-checked source snapshot should survive transient API 429');
+const expiredSnapshot={...source,checkedAt:new Date(Date.now()-48*3600000).toISOString()};
+assert.equal(sandbox.officialSourceCoverage(expiredSnapshot,{}),false,
+ 'stale source may not substitute for current official manifest');
+assert.equal(sandbox.officialSourceCoverage(recent,{attachments:{
+ ok:true,complete:true,items:[{name:'변경된입찰공고문.hwp'}]
+}}),false,'newer changed official attachment list invalidates cached review');
+
 assert.equal(sandbox.officialReviewCoverage({...source,reviewComplete:true,requiredConditionsComplete:true},evidence),true,
   'only explicitly reviewed source can clear the full audit gate');
 const withExtra={...source,files:[{...file,clauseCandidates:[
