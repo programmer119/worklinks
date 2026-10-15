@@ -27,7 +27,7 @@ jobs:
   interpret:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 13
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Verify official RFP coverage logic

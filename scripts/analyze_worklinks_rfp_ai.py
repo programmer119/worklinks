@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 21
+VERSION = 22
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -242,6 +242,55 @@ def rule_based_interpret(clauses):
             r"부당한\s*공동행위.{0,40}(?:고발|기준)|"
             r"하도급거래\s*공정화에\s*관한\s*법률",t)) and
             not bool(re.search(r"위반사실.{0,25}통보된\s*자|입찰.{0,25}참여할\s*수\s*없",t)))
+        # A citation from a legislation/bidding-guideline list is not a
+        # separate registration condition. Preserve actual entry conditions.
+        regulatory_catalog = (
+            bool(re.search(r'지침|예규|고시|일반조건|계약체결기준', t))
+            and not bool(re.search(
+                r'업종\s*코드|세부\s*품명\s*번호|직접\s*생산|'
+                r'소지(?:한|하여야)|등록(?:한|하여야|을\s*필)|'
+                r'입찰\s*참가\s*자격|참가\s*자격|'
+                r'입찰에\s*참여할\s*수\s*없|사업금액의\s*하한|'
+                r'본점\s*소재|주된\s*영업소|'
+                r'실적.{0,18}(?:최소|이상|필수)', t))
+            and not obligation
+        )
+        # Weighted proposal scores and staffing capability descriptions are
+        # NOT minimum experience / headcount to enter the tender. If there is
+        # an explicit bidder proof or minimum, keep the real requirement.
+        proposal_scoring = (
+            typ in {"performance_proof", "staff_proof"}
+            and bool(re.search(
+                r'기술\s*능력\s*평가|사업\s*수행\s*역량|'
+                r'투입\s*인력의?\s*전문성|'
+                r'유사\s*사업\s*수행\s*실적\s*\d+\s*(?:점|$)|'
+                r'관련\s*분야.{0,35}수행\s*실적', t))
+            and not bidder
+            and not bool(re.search(
+                r'입찰참가자격\s*증빙|증명서|증빙서류|'
+                r'입찰참가\s*필수|실적.{0,25}(?:필수|이상)|'
+                r'기술인력.{0,22}(?:최소|명\s*이상)',t))
+        )
+        bidder_form_only = (
+            typ == "joint_participation"
+            and bool(re.search(r'제안서\s*인력.{0,65}(?:자사인력|구성원)', t))
+            and not bool(re.search(
+                r'공동\s*수급.{0,25}(?:불가|불허|금지)|'
+                r'입찰\s*참가\s*자격.{0,35}(?:구비|충족)',t))
+        )
+        special_legal_alternative = (
+            typ == "special_legal_entity"
+            and bool(re.search(r'중소\s*기업으로\s*간주되는\s*특별법인|'
+                               r'특별법인\s*중소기업\s*간주\s*확인서',t))
+            and not bool(re.search(r'특별법인.{0,40}(?:이어야|만\s*참가)',t))
+        )
+        enumerated_bidder_requirement = (
+            typ == "industry_code"
+            and bool(re.search(
+                r'다음\s*요건을\s*모두\s*갖춘\s*사업자|'
+                r'다음\s*조건을\s*모두\s*갖춘\s*사업자',t))
+            and bool(re.search(r'소프트웨어\s*사업자|업종\s*코드',t))
+        )
         # New non-license gates remain prohibited/pending without verified evidence.
         if typ=="legal_exclusion":
             classification=("prohibited" if re.search(
@@ -271,11 +320,18 @@ def rule_based_interpret(clauses):
             classification=("mandatory" if re.search(
                 r"입찰업체\s*서약서|제출서류.{0,60}제출|"
                 r"입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체|"
-                r"입찰참가자격\s*확인을\s*위한\s*제출서류",t) else "unknown")
+                r"입찰참가자격\s*확인을\s*위한\s*제출서류|"
+                r"입찰참가자격\s*등록\s*마감일시",t) else "unknown")
         elif typ=="special_legal_entity":
             classification=("optional" if re.search(
                 r"입찰\s*참가\s*가능|소기업자로\s*간주|특별법인임을\s*확인",t)
                 else "unknown")
+        elif regulatory_catalog or proposal_scoring or bidder_form_only:
+            classification="context_only"
+        elif special_legal_alternative:
+            classification="optional"
+        elif enumerated_bidder_requirement:
+            classification="mandatory"
         elif heading or pure_heading or region_unrestricted or sworn_law_guide or (
                 platform_guide and not concrete and not regional):
             classification="context_only"
@@ -627,7 +683,7 @@ def main():
         candidates.append((key,notice,len(clauses)))
     candidates.sort(key=lambda x:(-x[2],x[0]))
     successes=0;errors=0
-    limit=max(0,min(args.limit if use_model else 100,100))
+    limit=max(0,min(args.limit if use_model else 300,300))
     for key,notice,_ in candidates[:limit]:
         try:
             infer=(lambda clauses:model_infer(token,args.model,clauses)) if use_model else rule_based_interpret

@@ -385,3 +385,33 @@ gaya_registration=[
 gaya_states=[x["classification"] for x in m.rule_based_interpret(gaya_registration)["items"]]
 assert gaya_states==["mandatory","context_only","context_only"],gaya_states
 assert m.rule_based_interpret(gaya_registration[1:])["items"][0]["classification"]=="unknown"
+
+
+# Genuine qualification versus regulatory reference lists and scoring rubrics.
+batch_context=[
+ {"index":0,"type":"industry_code","sourceText":
+  "ㅇ 본 제안 사업의 수행이 가능한 업체로서 다음 요건을 모두 갖춘 사업자 ① ｢소프트웨어 진흥법｣에 의한 소프트웨어사업자(컴퓨터관련서비스업)"},
+ {"index":1,"type":"industry_code","sourceText":
+  "ｏ 소프트웨어 품질성능 평가시험 운영에 관한 지침(과학기술정보통신부고시)"},
+ {"index":2,"type":"joint_participation","sourceText":
+  "ｏ 하도급거래공정화지침(공정거래위원회예규)"},
+ {"index":3,"type":"performance_proof","sourceText":
+  "- 투입 인력의 전문성, 관련 분야(시뮬레이션, AI 등) 유사 사업 수행 실적 20"},
+ {"index":4,"type":"staff_proof","sourceText":
+  "사업 수행 역량: - 투입 인력의 전문성, 관련 분야(시뮬레이션, AI 등) 유사 사업 수행 실적"},
+ {"index":5,"type":"joint_participation","sourceText":
+  "ㅇ 제안서 인력은 단독 또는 공동수급 구성원의 자사인력으로 구성하여야 함"},
+ {"index":6,"type":"special_legal_entity","sourceText":
+  "중소기업으로 간주되는 특별법인으로 중소기업제품 공공구매제도 운영요령에 따른 특별법인 중소기업 간주 확인서"},
+ {"index":7,"type":"submission_required","sourceText":
+  "입찰참가자격 가. 국가계약법령에 의한 참가자격을 갖추고 나라장터 입찰참가자격등록 마감일시"},
+ {"index":8,"type":"performance_proof","sourceText":
+  "입찰참가자격 필수조건: 유사용역 수행실적 3건 이상 제출하여야 함"},
+ {"index":9,"type":"joint_participation","sourceText":
+  "공동수급은 불가하며 단독으로 참가해야 한다"}
+]
+result_context=[x["classification"] for x in m.rule_based_interpret(batch_context)["items"]]
+assert result_context==[
+    "mandatory","context_only","context_only","context_only","context_only",
+    "context_only","optional","mandatory","mandatory","prohibited"
+],result_context
