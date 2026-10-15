@@ -1,0 +1,22 @@
+name: WorkLinks RFP pipeline gate diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-rfp-diagnosis.yml'
+      - 'scripts/diagnose_worklinks_rfp_pipeline.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aggregate RFP gate failures without modifying data
+        run: python3 scripts/diagnose_worklinks_rfp_pipeline.py
+      - name: Existing classification regression tests
+        run: |
+          python3 tests/test_rfp_ai.py
+          python3 tests/test_worklinks_rfp_coverage.py
