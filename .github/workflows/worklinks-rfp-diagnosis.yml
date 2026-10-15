@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/worklinks-rfp-diagnosis.yml'
       - 'scripts/diagnose_worklinks_rfp_pipeline.py'
+      - 'startup-support/index.html'
+      - 'tests/test_worklinks_direct_rfp.js'
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,6 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Aggregate RFP gate failures without modifying data
         run: python3 scripts/diagnose_worklinks_rfp_pipeline.py
+      - name: Direct official qualification check (no AI)
+        run: node tests/test_worklinks_direct_rfp.js
       - name: Existing classification regression tests
         run: |
           python3 tests/test_rfp_ai.py
