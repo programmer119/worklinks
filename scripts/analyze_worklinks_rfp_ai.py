@@ -17,7 +17,7 @@ import time
 import urllib.error
 import urllib.request
 
-VERSION = 22
+VERSION = 23
 DEFAULT_MODEL = "gpt-4.1-mini"
 ENDPOINT = "https://api.openai.com/v1/chat/completions"
 ALLOWED_TYPES = {"industry_code", "direct_production", "sme_certificate",
@@ -311,8 +311,8 @@ def rule_based_interpret(clauses):
         elif typ=="registration_identity":
             classification=("optional" if re.search(r"다만.{0,110}유효한\s*입찰",t)
                 else "mandatory" if re.search(
-                r"등록증상의\s*상호|변경등록하고|변경등록하지\s*않고|"
-                r"변경\s*전\s*상호",t) else "unknown")
+                r"등록증상의\s*상호|변경등록하고|변경등록하지\s*않고|입찰\s*참가\s*자격\s*등록.{0,90}(?:변경|상호|대표자)|"
+                r"변경\s*전\s*상호|등록\s*정보.{0,70}(?:상호|대표자).{0,35}(?:일치|변경)",t) else "unknown")
         elif typ=="eligibility_cutoff":
             classification=("mandatory" if re.search(
                 r"판단기준일|마감일.{0,90}참가자격을\s*갖추지",t) else "unknown")

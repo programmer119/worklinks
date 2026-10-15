@@ -27,7 +27,7 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=19
+CLASSIFICATION_VERSION=20
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
@@ -353,11 +353,11 @@ def extract_rule_candidates(text,filename):
       'performance_proof':r'실적\s*증명|수행\s*실적|유사\s*용역\s*실적',
       'region_restriction':r'지역\s*제한|본점\s*소재|주된\s*영업소|소재지',
       'joint_participation':r'공동\s*수급|분담\s*이행|하도급',
-      'legal_exclusion':r'제\s*8조의\s*2|조세\s*포탈|유죄판결이\s*확정된|입찰에\s*참여할\s*수\s*없',
+      'legal_exclusion':r'제\s*8조의\s*2|조세\s*포탈|유죄판결이\s*확정된|입찰에\s*참여할\s*수\s*없|입찰\s*참가\s*자격\s*제한\s*기간\s*중|입찰\s*참가\s*자격\s*제한을?\s*받은\s*자',
       'bid_security':r'입찰보증금|입찰공고일\s*이전\s*1년\s*이내.{0,130}입찰참가자격',
-      'registration_identity':r'입찰참가자격등록증상|상호\s*또는\s*대표자\s*변경신고|변경\s*전\s*상호',
+      'registration_identity':r'입찰\s*참가\s*자격\s*등록\s*(?:사항|증|정보|규정|장소)|경쟁\s*입찰\s*참가\s*자격\s*등록증|상호\s*또는\s*대표자\s*변경신고|변경\s*전\s*상호|변경\s*등록(?:하여야|하지|하고|을)|등록\s*정보.{0,65}(?:상호|대표자)',
       'eligibility_cutoff':r'입찰참가자격의\s*판단기준일|마감일.{0,90}참가자격을\s*갖추지\s*않은',
-      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류|입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체|규정에\s*의한\s*참가자격을\s*갖추고',
+      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류|입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체|규정에\s*의한\s*참가자격을\s*갖추고|(?:경쟁\s*입찰\s*)?참가\s*자격을?\s*(?:갖춘|구비한|갖추어야)|입찰\s*참가\s*자격\s*등록\s*마감일시',
       'special_legal_entity':r'특별법인'
     }
     # PDF extraction may drop article digits and split the SME eligibility
@@ -370,6 +370,11 @@ def extract_rule_candidates(text,filename):
     for index,line in enumerate(raw_lines):
         if len(line)<12 and not re.search(
             r"공동\s*수급.{0,4}(?:불허|금지|불가)|하도급.{0,4}(?:불허|금지|불가)",line):
+            continue
+        # Only nonqualification guidance may be skipped. The same test is
+        # used by the coverage auditor, so this cannot silently clear an
+        # unmatched mandatory licence, registration or certificate line.
+        if nonqualification_context(line):
             continue
         # Prefer one extracted paragraph; for visually wrapped PDF lines include
         # the following short line, never the entire neighbouring section.
@@ -526,6 +531,11 @@ def nonqualification_context(line):
             if not re.search(r'현재|이미|제재\s*기간\s*중|'
                              r'입찰\s*참가\s*자격\s*제한을?\s*받은\s*자',line):
                 return True
+    if re.fullmatch(r'\s*(?:[IVXⅣⅤⅥ\d.\s]+[.]?\s*)?'
+                    r'(?:수의\s*견적\s*제출\s*)?참가\s*자격\s*(?:\d{1,3})?\s*',line):
+        return True
+    if re.search(r'참가\s*자격\s*등록\s*장소\s*:\s*조달청\s*(?:고객|정부)',line):
+        return True
     strong=bool(re.search(r"(?<!\d)\d{4}(?!\d)|(?<!\d)\d{10}(?!\d)|"
         r"직접\s*생산|소기업\s*확인|중소기업\s*확인|"
         r"지역\s*제한|본점\s*소재|주된\s*영업소",line))
@@ -676,7 +686,7 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
     args=parser.parse_args()
-    limit=max(1,min(args.limit,100))
+    limit=max(1,min(args.limit,240))
     now=dt.datetime.now(dt.timezone.utc)
     old={}
     if DEST.exists():
@@ -707,7 +717,7 @@ def main():
         uncached.append((no,ordn))
     # Official requests are bounded; four independent notices run concurrently
     # so one unavailable PDF does not starve the entire 16-minute job.
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool:
         tasks={pool.submit(process,no,ordn):(no,ordn) for no,ordn in uncached}
         for future in as_completed(tasks):
             no,ordn=tasks[future]

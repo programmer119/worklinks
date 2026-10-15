@@ -42,6 +42,22 @@ class QualificationCoverageTests(unittest.TestCase):
                 scan = mod.audit_qualification_scan(line, [])
                 self.assertFalse(scan["sourceTextScanComplete"], (line, scan))
 
+    def test_bid_registration_identity_and_general_statutory_eligibility(self):
+        text = (
+            "규칙 제14조에 따른 참가 자격을 갖춘 업체\n"
+            "사. 입찰 참가 자격 등록 사항에 변경 사항이 있는 업체는 반드시 "
+            "입찰서 제출 마감일 전일까지 변경 등록하여야 합니다.\n"
+            "입찰 참가 자격 제한기간 중에 있는 자는 참가할 수 없습니다."
+        )
+        check, clauses = self.scan(text)
+        self.assertTrue(check["sourceTextScanComplete"],check)
+        self.assertIn("registration_identity",{c["type"] for c in clauses})
+        self.assertIn("legal_exclusion",{c["type"] for c in clauses})
+        self.assertIn("submission_required",{c["type"] for c in clauses})
+        self.assertFalse(mod.audit_qualification_scan(
+            "입찰 참가 자격 등록 사항에 변경 사항이 있는 업체는 반드시 변경 등록하여야 합니다.",
+            [])["sourceTextScanComplete"])
+
     def test_wrapped_long_paragraph_with_explicit_code(self):
         filler = "과업 안내 및 세부 시행 기준을 참고합니다. " * 28
         text = filler + " 소프트웨어사업자 업종코드 1468 등록업체만 입찰할 수 있습니다. " + filler

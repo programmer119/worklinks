@@ -415,3 +415,14 @@ assert result_context==[
     "mandatory","context_only","context_only","context_only","context_only",
     "context_only","optional","mandatory","mandatory","prohibited"
 ],result_context
+
+
+registration_example=[
+ {"index":0,"type":"registration_identity","sourceText":
+  "사. 입찰 참가 자격 등록 사항에 변경 사항이 있는 업체는 반드시 입찰서 제출 마감일까지 변경 등록하여야 합니다"},
+ {"index":1,"type":"registration_identity","sourceText":
+  "나라장터 등록정보의 상호 또는 대표자 정보가 일치해야 합니다"}
+]
+assert [x["classification"] for x in m.rule_based_interpret(registration_example)["items"]]==[
+ "mandatory","mandatory"
+]
