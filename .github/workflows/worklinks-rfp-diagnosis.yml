@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/worklinks-rfp-diagnosis.yml'
       - 'scripts/diagnose_worklinks_rfp_pipeline.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_worklinks_rfp_coverage.py'
       - 'startup-support/index.html'
       - 'tests/test_worklinks_direct_rfp.js'
   workflow_dispatch:
