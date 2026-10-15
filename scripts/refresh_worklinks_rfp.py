@@ -530,6 +530,11 @@ def audit_qualification_scan(text, candidates):
             'unmatchedAnchorSamples':missing[:30]}
 
 
+def normalize_extracted_text(content):
+    """Treat embedded NUL separators as whitespace before extracting qualifications."""
+    return content.replace('\x00', ' ')
+
+
 def process(no,ordn):
     data=fetch_json(BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn}))
     docs=data.get('attachments') or {}
@@ -561,7 +566,7 @@ def process(no,ordn):
         record={'name':name,'sourceUrl':url,'readable':False}
         try:
             raw=download(url)
-            content=extract(name,raw)
+            content=normalize_extracted_text(extract(name,raw))
             if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx')) else 100):
                 raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)

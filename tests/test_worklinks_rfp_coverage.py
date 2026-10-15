@@ -81,6 +81,20 @@ class QualificationCoverageTests(unittest.TestCase):
         _, clauses = self.scan(text)
         self.assertGreaterEqual(len(clauses), 260)
 
+    def test_null_separated_official_document_preserves_bid_criteria(self):
+        raw = (
+            "입찰참가자격: 소프트웨어사업자(컴퓨터관련서비스사업)\x00업종코드\x001468 등록한 자\n"
+            "직접생산확인증명서\x00세부품명번호\x008111189901 소지한 자"
+        )
+        clean = mod.normalize_extracted_text(raw)
+        self.assertNotIn("\x00", clean)
+        result, clauses = self.scan(clean)
+        self.assertTrue(any(c["type"] == "industry_code" and
+                            "1468" in c["codes"] for c in clauses))
+        self.assertTrue(any(c["type"] == "direct_production" and
+                            "8111189901" in c["codes"] for c in clauses))
+        self.assertTrue(result["sourceTextScanComplete"], result)
+
     def test_standalone_bidder_responsibility_tail_is_guidance(self):
         text = ("정부조달콜센터에 문의하지 않아 발생한 모든 책임은\n"
                 "입찰참가자에게 있습니다.")
