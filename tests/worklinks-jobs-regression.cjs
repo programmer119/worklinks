@@ -135,9 +135,14 @@ assert.equal(direct('직접생산확인증명서 세부품명번호 8111179901')
 assert.equal(direct('직접생산확인증명서 8111200201 또는 8111159901').status,'unknown',
  'multiple production codes need mandatory-vs-alternative determination');
 const rfpDoc=JSON.parse(fs.readFileSync(path.join(__dirname,'../startup-support/rfp-clauses.json'),'utf8'));
-const rfpSample=rfpDoc.byNotice['R26BK01756420:000'];
-assert.equal(rfpSample.status,'text_extracted_requires_review');
-assert.ok(rfpSample.files.some(f=>f.readable&&f.snippets.some(x=>x.text.includes('8111189901'))));
+const retained=Object.values(rfpDoc.byNotice||{});
+assert(retained.some(r=>r.status==='text_extracted_requires_review'&&
+ (r.files||[]).some(f=>f.readable)),'latest snapshot must retain source evidence');
+// Stable isolated fixture: production snapshots rotate and old bid IDs are evicted.
+const rfpSample={status:'text_extracted_requires_review',files:[{readable:true,
+ name:'입찰공고문.hwp',clauseCandidates:[{type:'direct_production',
+ codes:['8111189901'],sourceText:'직접생산확인증명서 8111189901 소지한 자',explicitMust:true}],
+ snippets:[{text:'직접생산확인증명서 8111189901 소지한 자'}]}]};
 const rfpProductChecker=new Function('kstISO','rfpSnapshotForJob',
  part('const productionNames=','function comparePartnerJob(x,p){')+
  'return productionRequirementCheck;'
@@ -196,14 +201,14 @@ assert.ok(source.includes("나라장터 공식 낙찰"));
 assert.ok(!source.includes('rfpAiForJob'),'removed AI must not re-enter verdict path');
 assert.ok(!source.includes('ai-qualification.json'),'web UI must not load old model data');
 const cmpMod=new Function('jobSoftwareScope','jobEligibilityData','productionRequirementCheck',
- 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob',
+ 'jobEvidenceData','regionRequirementCheck','rfpSnapshotForJob','partnerRegisteredCode',
  part('const directRfpCache=new WeakMap();','function productionRequirementCheck(x,p){')+
  part('function officialSourceCoverage(rfp,evidence){','function matchRowsHTML(x,p){')+
  'return {comparePartnerJob,officialReviewCoverage,officialSourceCoverage,directRfpRequirements};'
 )(()=> 'candidate',()=>({ok:true,complete:true,requirements:[]}),
  ()=>({applicable:false}),
  x=>x.evidence||null,()=>({status:'unknown',reason:'region not queried'}),
- x=>x.rfp||null);
+ x=>x.rfp||null,(p,code)=>(p.registeredCodes||[]).includes(code)?true:null);
 const smeBid={condition:'중소기업확인서 소기업만 참여',partnerBidMode:''};
 const smePartner={smeRecord:{size:'소기업',issuedAt:'2026-04-01',validState:'valid'},
  smeCheckedAt:'2026-10-12T05:04:00Z'};
