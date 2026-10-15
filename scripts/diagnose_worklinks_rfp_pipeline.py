@@ -120,3 +120,33 @@ emit("DIAG_FIRST_BLOCKER", dict(first_blockers))
 emit("DIAG_POTENTIALLY_PASSING_BOTH", passing[:10])
 for k in samples:
     emit("DIAG_SAMPLE", digest_notice(k))
+
+rfp_only = set(source)-set(analyzed)
+rfp_text_only = [k for k in rfp_only if source[k].get("status") == "text_extracted_requires_review"]
+emit("DIAG_DISJOINT", {
+    "rfpOnlyStatuses": dict(collections.Counter((source[k] or {}).get("status") for k in rfp_only)),
+    "rfpOnlyTextExtracted": len(rfp_text_only),
+    "rfpOnlyWithClauseCandidates": sum(any(f.get("clauseCandidates") for f in source[k].get("files") or []) for k in rfp_text_only),
+})
+for k in sorted(source):
+    if source_gate(source[k]) == "rfp_preliminary_gate_pass":
+        emit("DIAG_SOURCE_PASS", {
+            "key": k, "aiPresent": k in analyzed, "aiGate": audit_gate(analyzed.get(k)),
+            "aiBlockers": ((analyzed.get(k) or {}).get("fullDocumentAudit") or {}).get("blockers") or [],
+            "unknownClassification": sum(q.get("classification") == "unknown"
+                                         for q in (analyzed.get(k) or {}).get("requirements") or []),
+        })
+for key in samples:
+    a = analyzed.get(key) or {}
+    unknown = [q for q in a.get("requirements") or []
+               if q.get("classification") == "unknown"]
+    emit("DIAG_UNKNOWN_EXAMPLES", {
+        "key": key,
+        "unknownTypeCounts": dict(collections.Counter(q.get("type") for q in unknown)),
+        "examples": [
+            {"type": q.get("type"),
+             "codes": q.get("codes"),
+             "text": " ".join(str(q.get("sourceText") or "").split())[:135]}
+            for q in unknown[:12]
+        ],
+    })
