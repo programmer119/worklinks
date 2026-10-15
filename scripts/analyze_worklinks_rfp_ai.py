@@ -270,6 +270,7 @@ def rule_based_interpret(clauses):
         elif typ=="submission_required":
             classification=("mandatory" if re.search(
                 r"입찰업체\s*서약서|제출서류.{0,60}제출|"
+                r"입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체|"
                 r"입찰참가자격\s*확인을\s*위한\s*제출서류",t) else "unknown")
         elif typ=="special_legal_entity":
             classification=("optional" if re.search(

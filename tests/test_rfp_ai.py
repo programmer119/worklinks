@@ -56,6 +56,18 @@ samples=[
 classified=m.rule_based_interpret(samples)["items"]
 assert [q["classification"] for q in classified]==[
  "mandatory","context_only","context_only","prohibited","mandatory"]
+# Bid registration plus documented ability to deliver the specification is
+# a real bidder condition, not an irrelevant e-procurement help instruction.
+registration_case=[
+ {"index":0,"type":"submission_required",
+  "sourceText":"입찰참가자격등록 마감일시까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체"},
+ {"index":1,"type":"submission_required",
+  "sourceText":"협상대상자에게 필요한 서류를 요청할 수 있습니다"}
+]
+registration_result=m.rule_based_interpret(registration_case)["items"]
+assert registration_result[0]["classification"]=="mandatory", registration_result
+assert registration_result[1]["classification"]!="mandatory", registration_result
+
 # Real official phrasing: "소지한 업체" and "등록을 필한 업체" must be
 # recognized; no requirement may be fabricated from a mere service mention.
 realistic=[

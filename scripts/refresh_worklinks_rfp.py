@@ -342,7 +342,7 @@ def extract_rule_candidates(text,filename):
       'bid_security':r'입찰보증금|입찰공고일\s*이전\s*1년\s*이내.{0,130}입찰참가자격',
       'registration_identity':r'입찰참가자격등록증상|상호\s*또는\s*대표자\s*변경신고|변경\s*전\s*상호',
       'eligibility_cutoff':r'입찰참가자격의\s*판단기준일|마감일.{0,90}참가자격을\s*갖추지\s*않은',
-      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류',
+      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류|입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체',
       'special_legal_entity':r'특별법인'
     }
     # PDF extraction may drop article digits and split the SME eligibility

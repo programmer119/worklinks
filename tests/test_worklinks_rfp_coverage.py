@@ -116,6 +116,16 @@ class QualificationCoverageTests(unittest.TestCase):
                                 "소지한 업체" in c["sourceText"] for c in clauses), (name, clauses))
             self.assertTrue(result["sourceTextScanComplete"], (name, result))
 
+    def test_registration_and_specification_eligibility_is_not_lost(self):
+        text = ("가. 법령에 따른 참가자격을 갖추고 나라장터에 "
+                "입찰참가자격등록 마감일시까지 입찰참가 등록하고 "
+                "규격서에 따라 납품 가능한 업체")
+        for name in ("official.hwpx", "official.pdf"):
+            clauses = mod.extract_rule_candidates(text, name)
+            result = mod.audit_qualification_scan(text, clauses)
+            self.assertTrue(any(c["type"] == "submission_required" for c in clauses), (name, clauses))
+            self.assertTrue(result["sourceTextScanComplete"], (name, result))
+
     def test_bidder_proof_document_list_is_retained(self):
         text = ("※ 입찰참가자격 입증서류 : 부정당업자 제재처분확인서, "
                 "면허등록증, 사업자등록증을 제출하여야 합니다.")
