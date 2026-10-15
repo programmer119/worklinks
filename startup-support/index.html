@@ -1572,7 +1572,7 @@ function officialSourceClauseResult(clause,x,p){
  const codes=clause.codes||[];
  const manual='원문 필수·대체 관계 및 공고시점 확인은 별도 필요';
  if(clause.type==='industry_code'){
-  if(codes.length!==1||/또는|택일|선택|중\\s*(?:하나|1종)|\\bOR\\b/i.test(text))
+  if(codes.length!==1||/또는|택일|선택|중\s*(?:하나|1종)|\bOR\b/i.test(text))
    return {status:'unknown',reason:'복수 업종·대체관계는 자동 확정하지 않음'};
   const state=partnerRegisteredCode(p,codes[0]);
   return state===true?
@@ -1584,9 +1584,9 @@ function officialSourceClauseResult(clause,x,p){
   if(record?.validState!=='valid'||!p.smeCheckedAt)
    return {status:'pending',reason:'SMPP 공식 중소기업확인서 유효 조회 필요'};
   const size=String(record.size||'');
-  if(/소상공인\\s*(?:만|에\\s*한정)/.test(text)&&size!=='소상공인')
+  if(/소상공인\s*(?:만|에\s*한정)/.test(text)&&size!=='소상공인')
    return {status:'unknown',reason:'소상공인 전용 조건과 업체 규모 재확인 필요'};
-  if(/소기업\\s*(?:만|에\\s*한정)/.test(text)&&!['소기업','소상공인'].includes(size))
+  if(/소기업\s*(?:만|에\s*한정)/.test(text)&&!['소기업','소상공인'].includes(size))
    return {status:'unknown',reason:'소기업 전용 조건과 업체 규모 재확인 필요'};
   return {status:'ok',reason:'SMPP 확인서 유효(Y) · '+size+' · 세부규모 및 예외요건은 원문 별도 확인'};
  }
@@ -1596,7 +1596,7 @@ function officialSourceClauseResult(clause,x,p){
     reason:result.reason+' · 공고기준일·본점요건 별도 검증'};
  }
  if(clause.type==='joint_participation'&&
-    /공동\\s*수급.{0,20}(?:불가|불허|금지)|(?:단독\\s*(?:참가|입찰)|공동\\s*수급\\s*불가)/.test(text))
+    /공동\s*수급.{0,20}(?:불가|불허|금지)|(?:단독\s*(?:참가|입찰)|공동\s*수급\s*불가)/.test(text))
   return {status:'ok',reason:'공동수급 금지 · 단독 참여 검토에는 자체 결격 아님'};
  if(clause.type==='direct_production')
   return {status:'pending',reason:'직접생산 발급이력은 현재 SMPP 증명서 확인을 대체하지 않음'};
