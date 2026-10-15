@@ -19,7 +19,7 @@ function section(start,end){
 }
 const sandbox={rfpSnapshotForJob:(x)=>x.rfp};
 vm.createContext(sandbox);
-vm.runInContext(section('function directRfpRequirements(x){','function productionRequirementCheck(x,p){')+
+vm.runInContext(section('const directRfpCache=new WeakMap();','function productionRequirementCheck(x,p){')+
                 section('function officialSourceCoverage(rfp,evidence){','function comparePartnerJob(x,p){'),sandbox);
 const file={
   name:'입찰공고문.hwp',readable:true,sourceSha256:'a'.repeat(64),
