@@ -144,5 +144,33 @@ class QualificationCoverageTests(unittest.TestCase):
         self.assertTrue(any(c["type"] == "sme_certificate" for c in clauses))
         self.assertTrue(result["sourceTextScanComplete"], result)
 
+
+    def test_long_midlength_paragraph_retains_last_qualification(self):
+        prefix = "공고 안내사항 참고. " * 23
+        text = (prefix + "가. 국가계약법령 규정에 의한 참가자격을 갖추고 "
+                "나라장터에 입찰참가자격등록 마감일시까지 입찰참가 등록하고 "
+                "규격서에 따라 납품 가능한 업체")
+        self.assertGreater(len(text), 270)
+        self.assertLess(len(text), 800)
+        for filename in ("공고.hwpx", "공고.pdf"):
+            clauses = mod.extract_rule_candidates(text, filename)
+            check = mod.audit_qualification_scan(text, clauses)
+            self.assertTrue(any(c["type"]=="submission_required" and
+                                "규격서" in c["sourceText"] for c in clauses), (filename, clauses))
+            self.assertTrue(check["sourceTextScanComplete"], (filename,check))
+
+    def test_wrapped_pdf_administrative_tail_does_not_hide_current_conditions(self):
+        text = ("규정에 의한 참가자격을 갖추고, 「국가종합전자조달시스템 입찰참가자격등록규정」에 따라\\n"
+                "까지 입찰참가 등록하고 규격서에 따라 납품 가능한 업체\\n"
+                "입찰참가작격 등을 확인하기 위하여 협상대상자에게 필요한 서류 제출을 요청함\\n"
+                "장애발생에도 불구하고 문의하지 않아 발생되는 모든 책임은 입찰참가자에 있습니다.")
+        text = text.replace("\\n", "\n")
+        clauses = mod.extract_rule_candidates(text, "공고.pdf")
+        result = mod.audit_qualification_scan(text, clauses)
+        self.assertTrue(any(c["type"]=="submission_required" for c in clauses), clauses)
+        self.assertTrue(result["sourceTextScanComplete"], result)
+        self.assertFalse(mod.audit_qualification_scan(
+            "규정에 의한 참가자격을 갖추고", [])["sourceTextScanComplete"])
+
 if __name__ == "__main__":
     unittest.main()

@@ -368,3 +368,20 @@ g4_sme=[
 g4_sme_classes=[r["classification"] for r in m.rule_based_interpret(g4_sme)["items"]]
 assert g4_sme_classes==["mandatory","context_only","context_only"],g4_sme_classes
 assert m.rule_based_interpret([g4_sme[1]])["items"][0]["classification"]=="unknown"
+
+# A PDF-wrapped 1468 user-registration fragment is a duplicate only when
+# the same notice contains the full cited HWPX condition.
+gaya_registration=[
+ {"index":0,"type":"industry_code","codes":["1468"],
+  "sourceFile":"공고원본.hwpx",
+  "sourceText":"나. 국가종합전자조달시스템(G2B)에 사용자 등록(소프트웨어사업자(컴퓨터관련 서비스사업(1468)을 필한 업체로, 미등록 업체는 국가종합 전자조달시스템 홈페이지의 이용자등록 안내에 따라 등록하여야 함"},
+ {"index":1,"type":"industry_code","codes":[],
+  "sourceFile":"공고변환.pdf",
+  "sourceText":"나 . 국가종합전자조달시스템 (G2B) 에 사용자 등록 ( 소프트웨어사업자 ( 컴퓨터관련 서비"},
+ {"index":2,"type":"industry_code","codes":["1468"],
+  "sourceFile":"공고변환.pdf",
+  "sourceText":"나 . 국가종합전자조달시스템 (G2B) 에 사용자 등록 ( 소프트웨어사업자 ( 컴퓨터관련 서비 스사업 (1468) 을 필한 업체로 , 미등록 업체는 국가종합 전자조달시스템 홈페이지"}
+]
+gaya_states=[x["classification"] for x in m.rule_based_interpret(gaya_registration)["items"]]
+assert gaya_states==["mandatory","context_only","context_only"],gaya_states
+assert m.rule_based_interpret(gaya_registration[1:])["items"][0]["classification"]=="unknown"

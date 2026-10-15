@@ -379,6 +379,19 @@ def rule_based_interpret(clauses):
             v["classification"]="context_only"
             v["reason"]="원본 HWP에서 확인서 참가조건이 명시된 법령 인용부의 PDF 단편"
             continue
+        # PDF fragments of a 1468 user-registration rule are not a second
+        # licence requirement, but only if the same notice includes the full
+        # official HWP/HWPX clause. A PDF-only notice remains unresolved.
+        if (qt=="industry_code" and
+                str(q.get("sourceFile") or "").lower().endswith(".pdf") and
+                same_type_mandatory and "국가종합전자조달시스템" in ptext and
+                "사용자등록" in ptext and "소프트웨어사업자" in ptext and
+                set(map(str,q.get("codes") or [])).issubset({"1468"}) and any(
+                    "1468" in full and "소프트웨어사업자" in full and
+                    "사용자등록" in full for full in full_texts)):
+            v["classification"]="context_only"
+            v["reason"]="동일 공고 HWP/HWPX에서 1468 등록의무를 확인한 PDF 분절"
+            continue
         if qt=="industry_code" and not q.get("codes") and full_texts and (
                 "소프트웨어사업자" in ptext and
                 "컴퓨터관련서비스사업" in ptext and "업종코드" in ptext) and any(

@@ -342,7 +342,7 @@ def extract_rule_candidates(text,filename):
       'bid_security':r'입찰보증금|입찰공고일\s*이전\s*1년\s*이내.{0,130}입찰참가자격',
       'registration_identity':r'입찰참가자격등록증상|상호\s*또는\s*대표자\s*변경신고|변경\s*전\s*상호',
       'eligibility_cutoff':r'입찰참가자격의\s*판단기준일|마감일.{0,90}참가자격을\s*갖추지\s*않은',
-      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류|입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체',
+      'submission_required':r'입찰업체\s*서약서|입찰참가자격\s*확인을\s*위한\s*제출서류|입찰\s*참가\s*자격\s*입증\s*서류|입찰\s*참가\s*등록하고\s*규격서에\s*따라\s*납품\s*가능한\s*업체|규정에\s*의한\s*참가자격을\s*갖추고',
       'special_legal_entity':r'특별법인'
     }
     # PDF extraction may drop article digits and split the SME eligibility
@@ -358,7 +358,9 @@ def extract_rule_candidates(text,filename):
             continue
         # Prefer one extracted paragraph; for visually wrapped PDF lines include
         # the following short line, never the entire neighbouring section.
-        if len(line)>800:
+        if len(line)>270:
+            # A 271-800 character official paragraph was previously truncated
+            # to the first 270 characters, silently dropping later conditions.
             windows=[line[i:i+270] for i in range(0,len(line),220)]
         else:
             windows=[line]
@@ -414,6 +416,15 @@ def nonqualification_context(line):
     if re.fullmatch(
         r"\s*(?:(?:\d+(?:[.\-]\d+)*|[가-힣])[\.\)]?\s*)?"
         r"(?:입찰\s*참가\s*자격|참가\s*자격|입찰참가자격)\s*[:：.]?\s*",line):
+        return True
+    # A post-negotiation document request is not a pre-bid licence.
+    # Only ignore this narrow, documented PDF-wrapped instruction.
+    if (re.search(r"협상대상자에게\\s*필요한\\s*서류\\s*제출을?\\s*요", line) and
+            not re.search(r"업종\\s*코드|직접\\s*생산|확인서를?\\s*소지", line)):
+        return True
+    # Electronic bidding call-centre responsibility (PDF wrapped).
+    if (re.search(r"장애발생.{0,100}문의하지\\s*않아.{0,100}책임은\\s*입찰\\s*참가자", line) and
+            not re.search(r"업종\\s*코드|직접\\s*생산|입찰참가자격등록", line)):
         return True
     # Only documented non-credential contexts are safe to ignore.
     if re.search(r"신용평가등급.{0,100}(?:배점|평가)|창업기업.{0,90}(?:배점|점수)|"
