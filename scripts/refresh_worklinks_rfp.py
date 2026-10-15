@@ -25,6 +25,10 @@ ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
+# Per-member AND total XML caps are needed for safe HWPX decompression.
+# 3MB per member was rejecting real official documents before text extraction.
+MAX_HWPX_XML_MEMBER=10_000_000
+MAX_HWPX_XML_TOTAL=45_000_000
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
 CLASSIFICATION_VERSION=20
@@ -71,6 +75,10 @@ def fetch_json(url):
         except (TimeoutError,ConnectionError,urllib.error.URLError):
             if attempt==3:raise
         time.sleep(min(8,1.5*(2**attempt)))
+def needs_hwpx_reader_retry(record):
+    return any(f.get('errorCategory')=='large_xml_section'
+               for f in (record or {}).get('files') or [])
+
 def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
     return m.group(1)+m.group(2)+m.group(3) if m else ''
@@ -105,11 +113,12 @@ def discover(limit,prior=None):
                 if not priority_case and (date<today or date>today+dt.timedelta(days=18)):continue
                 key=no+':'+order
                 cached=prior.get(key) or {}
+                reader_retry=needs_hwpx_reader_retry(cached)
                 if cached.get('reviewComplete') is True:continue
                 if cached.get('classificationVersion')==CLASSIFICATION_VERSION:
                     try:
                         checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                        if checked.tzinfo and (now-checked).total_seconds()<24*3600:
+                        if checked.tzinfo and (now-checked).total_seconds()<24*3600 and not reader_retry:
                             continue
                     except (ValueError,TypeError):pass
                 # Observed industry restriction is a useful scheduling signal,
@@ -120,7 +129,9 @@ def discover(limit,prior=None):
                              for row in (qual.get('requirements') or [])
                              if isinstance(row,dict))
                 service=str(item.get('kind') or '')=='servc'
-                priority=(0 if no in PRIORITY_NOTICE_IDS else 1,0 if matching else 1,date,0 if service else 1)
+                priority=(0 if no in PRIORITY_NOTICE_IDS else 1,
+                          0 if reader_retry else 1,0 if matching else 1,date,
+                          0 if service else 1)
                 seen[key]=(priority,no,order,date.isoformat())
             if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
@@ -131,7 +142,7 @@ def discover(limit,prior=None):
     for key, cached in prior.items():
         if not isinstance(cached, dict):
             continue
-        if cached.get('classificationVersion') == CLASSIFICATION_VERSION:
+        if cached.get('classificationVersion') == CLASSIFICATION_VERSION and not needs_hwpx_reader_retry(cached):
             continue
         m = re.fullmatch(r'(R\d{2}BK\d{8}|\d{11}):(\d{3})', key)
         if not m:
@@ -139,7 +150,8 @@ def discover(limit,prior=None):
         no, order = m.groups()
         if key in seen and seen[key][0][0] == 0:
             continue
-        seen[key] = ((1, -1, today, 0), no, order, today.isoformat())
+        seen[key] = ((1, 0 if needs_hwpx_reader_retry(cached) else 1, -1, today, 0),
+                     no, order, today.isoformat())
     candidates=[(no,order,date) for _,no,order,date in sorted(seen.values(),key=lambda x:x[0])]
     return candidates[:limit]
 
@@ -306,9 +318,10 @@ def extract(name,raw):
             # No silent XML member or paragraph truncation: it would hide
             # eligibility clauses in a document reported as readable.
             if len(members)>80:raise ValueError('archive_many_xml_files')
+            sizes=[archive.getinfo(member).file_size for member in members]
+            if any(n>MAX_HWPX_XML_MEMBER for n in sizes) or sum(sizes)>MAX_HWPX_XML_TOTAL:
+                raise ValueError('large_xml_section')
             for member in members:
-                info=archive.getinfo(member)
-                if info.file_size>3_000_000:raise ValueError('large_xml_section')
                 tree=ET.fromstring(archive.read(member))
                 # HWPX uses hp:p paragraphs containing hp:t spans. Joining all
                 # text spans into one line hid qualification clauses completely.
@@ -722,7 +735,9 @@ def main():
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                if cached.get('classificationVersion')==CLASSIFICATION_VERSION and checked.tzinfo and (now-checked).total_seconds()<6*3600:
+                if (cached.get('classificationVersion')==CLASSIFICATION_VERSION and
+                        not needs_hwpx_reader_retry(cached) and checked.tzinfo and
+                        (now-checked).total_seconds()<6*3600):
                     print('RFP_CACHE_HIT',key)
                     continue
             except (ValueError,TypeError):pass
