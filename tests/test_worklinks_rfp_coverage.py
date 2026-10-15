@@ -30,6 +30,20 @@ class QualificationCoverageTests(unittest.TestCase):
                 result, _ = self.scan(line)
                 self.assertTrue(result["sourceTextScanComplete"], (line, result))
 
+    def test_call_center_phone_number_is_not_a_bidder_credential(self):
+        contacts = (
+            "○ 입찰참가자격 등록, 나라장터 시스템: 정부조달 콜센터(☎ 1588-0800)",
+            "10.1. 전자입찰 이용, 입찰참가자격등록: 나라장터시스템 콜센터(☎1588-0800)",
+        )
+        for line in contacts:
+            with self.subTest(line=line):
+                self.assertTrue(mod.nonqualification_context(line), line)
+                result, _ = self.scan(line)
+                self.assertTrue(result["sourceTextScanComplete"], (line, result))
+        required = "소프트웨어사업자 업종코드 1468 등록업체만 입찰할 수 있습니다."
+        self.assertFalse(mod.nonqualification_context(required))
+        self.assertFalse(mod.audit_qualification_scan(required, [])["sourceTextScanComplete"])
+
     def test_real_bidder_conditions_still_block_unrepresented_evidence(self):
         required = (
             "입찰참가자격: 본점 소재지가 제주특별자치도인 업체만 참여 가능.",

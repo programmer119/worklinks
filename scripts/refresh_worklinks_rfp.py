@@ -536,7 +536,8 @@ def nonqualification_context(line):
         return True
     if re.search(r'참가\s*자격\s*등록\s*장소\s*:\s*조달청\s*(?:고객|정부)',line):
         return True
-    strong=bool(re.search(r"(?<!\d)\d{4}(?!\d)|(?<!\d)\d{10}(?!\d)|"
+    strong=bool(re.search(# A call-centre number such as 1588-0800 is not a four-digit G2B industry code.
+        r"(?<![\d-])\d{4}(?![\d-])|(?<!\d)\d{10}(?!\d)|"
         r"직접\s*생산|소기업\s*확인|중소기업\s*확인|"
         r"지역\s*제한|본점\s*소재|주된\s*영업소",line))
     if strong:return False
