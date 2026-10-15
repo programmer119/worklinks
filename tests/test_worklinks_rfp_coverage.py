@@ -14,6 +14,34 @@ class QualificationCoverageTests(unittest.TestCase):
         clauses = mod.extract_rule_candidates(text, "official.pdf")
         return mod.audit_qualification_scan(text, clauses), clauses
 
+    def test_ordinary_bidder_administration_is_not_an_eligibility_gate(self):
+        guidance = (
+            "다. 입찰참가자격 : 다음 조건을 충족하는 자",
+            "3 견적 제출 참가자격: 다음의 자격을 모두 갖춘 업체",
+            "견적 제출 참가자격",
+            "콜센터로 문의하지 않아 발생하는 모든 책임은 입찰 참가자에게 있습니다.",
+            "입찰 참가자 전원이 2개씩 추첨하여 예정가격을 결정합니다.",
+            "제안사는 평가결과에 대해 이의를 제기할 수 없으며 입찰참가업체에 한하여 공개합니다.",
+            "제안서를 위조하여 제출한 경우 공모참가자격 제한 등의 조치를 받을 수 있음.",
+        )
+        for line in guidance:
+            with self.subTest(line=line):
+                self.assertTrue(mod.nonqualification_context(line), line)
+                result, _ = self.scan(line)
+                self.assertTrue(result["sourceTextScanComplete"], (line, result))
+
+    def test_real_bidder_conditions_still_block_unrepresented_evidence(self):
+        required = (
+            "입찰참가자격: 본점 소재지가 제주특별자치도인 업체만 참여 가능.",
+            "소프트웨어사업자 업종코드 1468 등록업체만 입찰할 수 있습니다.",
+            "직접생산확인증명서 세부품명번호 8111189901 소지한 업체",
+        )
+        for line in required:
+            with self.subTest(line=line):
+                self.assertFalse(mod.nonqualification_context(line), line)
+                scan = mod.audit_qualification_scan(line, [])
+                self.assertFalse(scan["sourceTextScanComplete"], (line, scan))
+
     def test_wrapped_long_paragraph_with_explicit_code(self):
         filler = "과업 안내 및 세부 시행 기준을 참고합니다. " * 28
         text = filler + " 소프트웨어사업자 업종코드 1468 등록업체만 입찰할 수 있습니다. " + filler

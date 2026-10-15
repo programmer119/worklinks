@@ -27,9 +27,9 @@ MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=18
+CLASSIFICATION_VERSION=19
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
-    r'입찰\s*참가|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
+    r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|소기업|소상공인|지역\s*제한|본점\s*소재|'
     r'수행\s*실적|실적\s*증명|재직\s*증명|공동\s*수급|분담\s*이행|'
     r'하도급|기술\s*인력|등록\s*업체|정보통신공사업|제안\s*자격|'
@@ -114,6 +114,21 @@ def discover(limit,prior=None):
             if len(rows)<500 or offset+len(rows)>=total:break
     except Exception as e:
         print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(e).__name__,str(e)[:140])
+    # Revisit previous official notices even after they drop out of the
+    # current closing-date window. Otherwise old parser versions remain
+    # permanently unreviewed, despite later classifier improvements.
+    for key, cached in prior.items():
+        if not isinstance(cached, dict):
+            continue
+        if cached.get('classificationVersion') == CLASSIFICATION_VERSION:
+            continue
+        m = re.fullmatch(r'(R\d{2}BK\d{8}|\d{11}):(\d{3})', key)
+        if not m:
+            continue
+        no, order = m.groups()
+        if key in seen and seen[key][0][0] == 0:
+            continue
+        seen[key] = ((1, -1, today, 0), no, order, today.isoformat())
     candidates=[(no,order,date) for _,no,order,date in sorted(seen.values(),key=lambda x:x[0])]
     return candidates[:limit]
 
@@ -419,12 +434,12 @@ def nonqualification_context(line):
         return True
     # A post-negotiation document request is not a pre-bid licence.
     # Only ignore this narrow, documented PDF-wrapped instruction.
-    if (re.search(r"협상대상자에게\\s*필요한\\s*서류\\s*제출을?\\s*요", line) and
-            not re.search(r"업종\\s*코드|직접\\s*생산|확인서를?\\s*소지", line)):
+    if (re.search(r"협상대상자에게\s*필요한\s*서류\s*제출을?\s*요", line) and
+            not re.search(r"업종\s*코드|직접\s*생산|확인서를?\s*소지", line)):
         return True
     # Electronic bidding call-centre responsibility (PDF wrapped).
-    if (re.search(r"장애발생.{0,100}문의하지\\s*않아.{0,100}책임은\\s*입찰\\s*참가자", line) and
-            not re.search(r"업종\\s*코드|직접\\s*생산|입찰참가자격등록", line)):
+    if (re.search(r"장애발생.{0,100}문의하지\s*않아.{0,100}책임은\s*입찰\s*참가자", line) and
+            not re.search(r"업종\s*코드|직접\s*생산|입찰참가자격등록", line)):
         return True
     # Only documented non-credential contexts are safe to ignore.
     if re.search(r"신용평가등급.{0,100}(?:배점|평가)|창업기업.{0,90}(?:배점|점수)|"
@@ -476,6 +491,41 @@ def nonqualification_context(line):
     if re.fullmatch(r"\s*(?:[①-⑳]|[\d\-]+[\.\)]?)?\s*"
                     r"(?:기타\s*서류)?\s*\(?입찰\s*참가\s*자격\s*확인\s*서류\)?",line):
         return True
+    # A section heading announcing subsequent bidder requirements is not
+    # itself a credential. Scan the following lines for actual requirements.
+    if re.search(r'(?:입찰|견적)\s*(?:제출\s*)?참가\s*자격', line) and (
+            re.search(r'(?:아래|다음|각\s*호).{0,70}(?:조건|요건|자격)', line)
+            or re.fullmatch(
+                r'\s*(?:\d+[\.\)]?\s*)?(?:입찰|견적)\s*(?:제출\s*)?'
+                r'참가\s*자격\s*[:：]?\s*', line)):
+        if not re.search(
+                r'업종\s*코드|\b\d{10}\b|직접\s*생산|소기업|소상공인|'
+                r'본점\s*소재|주된\s*영업소|지역\s*제한|'
+                r'등록한\s*(?:자|업체)|소지한\s*(?:자|업체)', line):
+            return True
+    # These are administrative notices, not new bidder-specific entry gates.
+    # Keep any sentence with a concrete licence, certificate or restriction.
+    real_condition = re.search(
+        r'업종\s*코드|\b\d{10}\b|직접\s*생산|소기업|소상공인|'
+        r'본점\s*소재|주된\s*영업소|지역\s*제한|'
+        r'입찰참가자격의\s*판단기준일|변경\s*등록하여야', line)
+    if not real_condition:
+        if re.search(r'(?:콜\s*센터|1588-0800).{0,120}(?:문의|책임)|'
+                     r'(?:문의하지\s*않아|숙지하지\s*못).{0,90}(?:책임|부담)|'
+                     r'(?:책임|비용)은?\s*입찰\s*참가자(?:에게|의)', line):
+            return True
+        if re.search(r'(?:제안서|제안내용).{0,75}(?:추가자료|추가제안|'
+                     r'평가결과|비용\s*부담|반환하지)|'
+                     r'입찰\s*참가자.{0,60}(?:추첨|추가자료)|'
+                     r'입찰\s*참가\s*(?:업체|순).{0,60}(?:제안서|발표|평가)', line):
+            return True
+        if re.search(r'(?:부정|위조|변조|허위).{0,110}'
+                     r'(?:입찰\s*참가\s*자격\s*제한|공모참가자격\s*제한)|'
+                     r'(?:계약\s*해지|계약불이행|이행하지\s*않).{0,110}'
+                     r'입찰\s*참가\s*자격\s*제한',line):
+            if not re.search(r'현재|이미|제재\s*기간\s*중|'
+                             r'입찰\s*참가\s*자격\s*제한을?\s*받은\s*자',line):
+                return True
     strong=bool(re.search(r"(?<!\d)\d{4}(?!\d)|(?<!\d)\d{10}(?!\d)|"
         r"직접\s*생산|소기업\s*확인|중소기업\s*확인|"
         r"지역\s*제한|본점\s*소재|주된\s*영업소",line))
