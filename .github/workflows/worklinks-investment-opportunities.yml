@@ -6,9 +6,6 @@ on:
     paths:
       - '.github/workflows/worklinks-investment-opportunities.yml'
   workflow_dispatch:
-  schedule:
-    # KST 09:21 and 18:21 (GitHub scheduled jobs may be delayed)
-    - cron: '21 0,9 * * *'
 permissions:
   contents: write
 concurrency:
