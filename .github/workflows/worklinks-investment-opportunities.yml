@@ -1,0 +1,45 @@
+name: WorkLinks investment opportunities
+on:
+  push:
+    branches:
+      - feature/investment-monitor-20261015
+    paths:
+      - '.github/workflows/worklinks-investment-opportunities.yml'
+  workflow_dispatch:
+  schedule:
+    # KST 09:21 and 18:21 (GitHub scheduled jobs may be delayed)
+    - cron: '21 0,9 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-investment-opportunities
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install public HTML dependencies
+        run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
+      - name: Test parsing and cautious eligibility
+        run: python -m unittest discover -s tests -p 'test_investment_monitor.py' -v
+      - name: Read investment notices
+        id: collect
+        continue-on-error: true
+        run: python scripts/refresh_worklinks_investment.py
+      - name: Commit only investment snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add startup-support/investment-opportunities.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: refresh investment opportunity snapshot'
+            git push
+          fi
+      - name: Mark failed if all sources failed
+        if: steps.collect.outcome == 'failure'
+        run: exit 1
