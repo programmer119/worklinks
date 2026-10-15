@@ -59,4 +59,25 @@ const withExtra={...source,files:[{...file,clauseCandidates:[
 ]}]};
 assert.equal(sandbox.directRfpRequirements({rfp:withExtra}).length,4,
   'different mandatory code cannot disappear during dedupe');
+
+const actual=JSON.parse(fs.readFileSync('startup-support/rfp-clauses.json','utf8')).byNotice;
+for(const noticeId of [
+ 'R26BK01756420:000','R26BK01753188:000',
+ 'R26BK01755213:000','R26BK01747543:000'
+]){
+ const notice=actual[noticeId];
+ assert(notice&&Array.isArray(notice.files),'missing representative official snapshot '+noticeId);
+ const extracted=sandbox.directRfpRequirements({rfp:notice});
+ const meta={attachments:{
+  ok:true,complete:true,items:notice.files.map(f=>({name:f.name}))}};
+ const scan=sandbox.officialSourceCoverage(notice,meta);
+ const final=sandbox.officialReviewCoverage(notice,meta);
+ assert(!final,'historical source snapshot must not be automatically approved');
+ console.log('WORKLINKS_DIRECT_RFP_SAMPLE',JSON.stringify({
+   id:noticeId,files:notice.files.length,sourceCandidates:extracted.length,
+   codes:[...new Set(extracted.flatMap(c=>c.codes))],
+   fullSourceScan:scan,fullQualificationReview:final
+ }));
+}
+
 console.log('WORKLINKS_DIRECT_RFP_NO_AI_AND_FAIL_CLOSED=PASS scripts='+compiled);
