@@ -282,14 +282,14 @@ assert.ok(!source.includes('return {rows,counts,complete:false};'));
 const resultsById={
  industry_match:'industry_match', unverified:'unverified', missing:'missing'
 };
-const verdictMod=new Function('jobTimeInfo','jobSoftwareScope','jobQualificationVerdict','comparePartnerJob','htmlEscape',
+const verdictMod=new Function('jobTimeInfo','jobSoftwareScope','jobQualificationVerdict','comparePartnerJob','htmlEscape','rfpSnapshotForJob',
  part('function participationVerdict(x,p){','function matchRowsHTML(x,p){')+
  'return {participationVerdict,participationStrip};'
 )(x=>({key:x.closed?'closed':'open'}),x=>x.kind==='thng'?'out':'candidate',
  x=>({type:x.industry||'unverified',reason:'면허검증 대기'}),
  (x,p)=>({complete:!!x.full,counts:{ok:x.ok??2,pending:x.pending??1,unknown:x.unknown??1,missing:0},
     rows:x.missing?[{id:'license-1',status:'missing',reason:'등록업종 불일치'}]:[]}),
- x=>String(x));
+ x=>String(x),x=>x.rfp||null);
 const bidder={id:'changcom',short:'창컴',name:'창컴정보통신(주)',smeRecord:{size:'소기업',validState:'valid'}};
 const verdict=(x,p=bidder)=>verdictMod.participationVerdict({kind:'servc',...x},p);
 assert.equal(verdict({industry:'industry_match'}).type,'conditional');
