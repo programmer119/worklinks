@@ -1474,9 +1474,11 @@ const productionProductCodeNames={
  '8111219901':'인터넷지원개발서비스','8115169901':'공간정보DB구축서비스'
 };
 // A dated publication is evidence of past issuance, NOT live SMPP verification.
+const directRfpCache=new WeakMap();
 function directRfpRequirements(x){
  const data=rfpSnapshotForJob(x);
  if(!Array.isArray(data?.files))return [];
+ if(directRfpCache.has(data))return directRfpCache.get(data);
  const types=new Set(['industry_code','direct_production','sme_certificate',
   'staff_proof','performance_proof','region_restriction','joint_participation',
   'legal_exclusion','registration_identity','eligibility_cutoff','submission_required']);
@@ -1487,17 +1489,24 @@ function directRfpRequirements(x){
    if(!types.has(c.type)||c.explicitMust!==true)continue;
    const codes=(c.codes||[]).map(String).filter(v=>/^\d{4}$|^\d{10}$/.test(v));
    // Keep alternative codes separate; condensed displays never assert a credential is met.
-   const key=String(c.type)+'|'+codes.slice().sort().join(',');
+   const quote=String(c.sourceText||'').replace(/\s+/g,' ').trim();
+   if(!quote)continue;
+   // Do not silently merge different requirements simply because they share
+   // a type or a code. Only identical source clauses may be deduplicated.
+   const key=String(c.type)+'|'+codes.slice().sort().join(',')+'|'+quote;
    if(!unique.has(key))unique.set(key,{
-    type:c.type,codes,sourceText:String(c.sourceText||''),
+    type:c.type,codes,sourceText:quote,
     sourceFile:String(c.sourceFile||f.name||'')
    });
   }
  }
- return [...unique.values()];
+ const result=[...unique.values()];
+ directRfpCache.set(data,result);
+ return result;
 }
 function extractedRfpRequirements(x){
- return directRfpRequirements(x).map(c=>c.sourceText).join(' ').slice(0,9000);
+ // Never truncate the conditions used to check required certificates or regions.
+ return directRfpRequirements(x).map(c=>c.sourceText).join(' ');
 }
 function productionRequirementCheck(x,p){
  const rfpText=extractedRfpRequirements(x);
@@ -1597,12 +1606,22 @@ function comparePartnerJob(x,p){
  // Source snippets are only evidence candidates. Preserve one unresolved row
  // for each distinct type/code combination, without confusing scorecards with
  // confirmed admission rules or granting a false automatic "ready".
- directRequirements.forEach((clause,i)=>{
-  add('source-'+i,'공식 문서: '+(evidenceTypes[clause.type]||clause.type)+
-   (clause.codes.length?' ('+clause.codes.join('/')+')':''),
-   'unknown',clause.sourceText.slice(0,220)+' · 해당 문구의 필수/예외 관계 및 현재 증빙 확인 필요',
-   '공식 문서 '+clause.sourceFile);
- });
+ const byType=new Map();
+ for(const clause of directRequirements){
+  if(!byType.has(clause.type))byType.set(clause.type,[]);
+  byType.get(clause.type).push(clause);
+ }
+ // One status row per requirement kind; every distinct quotation remains
+ // in its group, so different region/staff/proof conditions are not discarded.
+ for(const [type,clauses] of byType){
+  const codes=[...new Set(clauses.flatMap(c=>c.codes))];
+  add('source-'+type,'공식 문서: '+(evidenceTypes[type]||type)+
+   ' · 원문 '+clauses.length+'구절'+(codes.length?' ('+codes.join('/')+')':''),
+   'unknown',clauses.slice(0,2).map(c=>c.sourceText.slice(0,140)).join(' / ')+
+   (clauses.length>2?' 외 '+(clauses.length-2)+'구절':'')+
+   ' · 필수/예외 관계와 업체 증빙 대조 필요',
+   '공식 문서 '+[...new Set(clauses.map(c=>c.sourceFile))].slice(0,3).join(', '));
+ }
  const summaryText=String(x.condition||'')+' '+String(x.partnerBidMode||'');
  const txt=summaryText+' '+extractedRfpRequirements(x);
  const production=productionRequirementCheck(x,p);
