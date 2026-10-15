@@ -51,6 +51,48 @@ jobs:
               assert evidence is not None,'official source should join at least one live notice'
               assert evidence['sourceFiles']>0 and evidence['sourceConditions']>0
               print('WORKLINKS_LIVE_DIRECT_RFP',json.dumps(evidence,ensure_ascii=False))
+              # Record the exact remaining reason actual open tenders cannot complete.
+              gate=page.evaluate("""() => {
+                const all=collapseSimilarNotices(jobs.concat(g2bLiveJobs))
+                  .filter(x=>jobSoftwareScope(x)==='candidate'&&
+                    ['open','closing'].includes(jobTimeInfo(x).key));
+                const counts={active:all.length,withRfpSnapshot:0,
+                  withReadableDocs:0,completeScans:0,
+                  officialSourceCoverage:0,reviewed:0,
+                  missingMetadata:0,staleSnapshots:0,nonSimpleRules:0};
+                const sample=[];
+                for(const x of all){
+                  const r=rfpSnapshotForJob(x);if(!r)continue;
+                  counts.withRfpSnapshot++;
+                  const fs=Array.isArray(r.files)?r.files:[];
+                  if(fs.some(f=>f.readable))counts.withReadableDocs++;
+                  const fullScan=fs.length>0&&r.manifestComplete===true&&
+                    fs.every(f=>f.readable&&f.sourceTextScanComplete&&
+                      f.unmatchedQualificationAnchorCount===0&&
+                      !f.qualificationScanTruncated&&!f.clauseCandidatesTruncated);
+                  if(fullScan)counts.completeScans++;
+                  if(officialSourceCoverage(r,jobEvidenceData(x)))counts.officialSourceCoverage++;
+                  else if(fullScan){
+                    const evidence=jobEvidenceData(x);
+                    const live=evidence?.attachments?.ok===true&&
+                      evidence?.attachments?.complete===true;
+                    const ts=Date.parse(r.checkedAt||'');
+                    const recent=Number.isFinite(ts)&&Date.now()-ts<=86400000&&Date.now()-ts>=0;
+                    if(!live&&!recent)counts.staleSnapshots++;
+                    else counts.missingMetadata++;
+                  }
+                  const full=officialReviewCoverage(r,jobEvidenceData(x),x,partners[0]);
+                  if(full)counts.reviewed++;
+                  if(fullScan&&!full)counts.nonSimpleRules++;
+                  if(sample.length<5&&fullScan)sample.push({
+                    id:jobBidIdentity(x)?.bidNo,sourceFiles:fs.length,
+                    autoReview:full, source:officialSourceCoverage(r,jobEvidenceData(x)),
+                    types:[...new Set(fs.flatMap(f=>(f.clauseCandidates||[]).map(c=>c.type)))].slice(0,12)
+                  });
+                }
+                return {counts,sample};
+              }""")
+              print('WORKLINKS_LIVE_SOURCE_GATES',json.dumps(gate,ensure_ascii=False))
               # The client must show truly checked industry status as one-click filters,
               # while no-license-restriction must NOT be called bid-ready.
               page.wait_for_function("partners.length>0 && !!partners[0].registryCheckedAt && partners[0].registryComplete===true",timeout=45000)
