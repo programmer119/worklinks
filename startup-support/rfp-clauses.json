@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-14T20:41:27.479472+00:00",
+  "generatedAt": "2026-10-14T23:55:21.627566+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -327545,8 +327545,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T14:43:53.133548+00:00",
-      "classificationVersion": 15
+      "checkedAt": "2026-10-14T23:55:21.627566+00:00",
+      "classificationVersion": 17
     },
     "R26BK01763375:000": {
       "status": "no_official_attachment_metadata",
@@ -327559,8 +327559,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T14:43:53.133548+00:00",
-      "classificationVersion": 15
+      "checkedAt": "2026-10-14T23:55:21.627566+00:00",
+      "classificationVersion": 17
     },
     "R26BK01767502:000": {
       "status": "text_extracted_requires_review",
@@ -329206,8 +329206,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T14:43:53.133548+00:00",
-      "classificationVersion": 15
+      "checkedAt": "2026-10-14T23:55:21.627566+00:00",
+      "classificationVersion": 17
     },
     "R26BK01752588:000": {
       "status": "no_official_attachment_metadata",
@@ -329220,8 +329220,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-14T14:43:53.133548+00:00",
-      "classificationVersion": 15
+      "checkedAt": "2026-10-14T23:55:21.627566+00:00",
+      "classificationVersion": 17
     },
     "R26BK01768590:000": {
       "status": "text_extracted_requires_review",
@@ -330731,5 +330731,5 @@
       "classificationVersion": 17
     }
   },
-  "workflowRunId": "38634161969"
+  "workflowRunId": "38656964588"
 }
