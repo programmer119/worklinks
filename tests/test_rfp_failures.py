@@ -45,6 +45,32 @@ try:
 finally:
     rfp.fetch_json=orig_fetch
     rfp.download=orig_download
+# Retry only transient evidence API errors; do not bypass persistent failures.
+from unittest.mock import patch
+class MetadataOpener:
+    def __init__(self, failures, code):
+        self.failures=failures
+        self.code=code
+        self.calls=0
+    def open(self, request, timeout):
+        self.calls+=1
+        if self.calls<=self.failures:
+            raise rfp.urllib.error.HTTPError(request.full_url,self.code,'mock',{},None)
+        return rfp.io.BytesIO(b'{"ok":true}')
+for code, fail_count, expected_calls in [(503,2,3),(429,1,2)]:
+    fake=MetadataOpener(fail_count,code)
+    with patch.object(rfp,'OPENER',fake), patch.object(rfp.time,'sleep'):
+        assert rfp.fetch_json('https://example.test/metadata')=={'ok':True}
+        assert fake.calls==expected_calls,(code,fake.calls)
+for code, expected_calls in [(403,1),(503,4)]:
+    fake=MetadataOpener(10,code)
+    with patch.object(rfp,'OPENER',fake), patch.object(rfp.time,'sleep'):
+        try:
+            rfp.fetch_json('https://example.test/metadata')
+            raise AssertionError('unexpected success for HTTP '+str(code))
+        except rfp.urllib.error.HTTPError as exc:
+            assert exc.code==code and fake.calls==expected_calls,(code,fake.calls)
+
 # Pagination, already-checked suppression, urgency and 1468 matching priority.
 orig_discovery=rfp.fetch_json
 try:

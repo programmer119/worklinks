@@ -56,10 +56,21 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 OPENER=urllib.request.build_opener(NoRedirect)
 def fetch_json(url):
-    with OPENER.open(urllib.request.Request(url,headers=AGENTS),timeout=24) as r:
-        data=r.read(2_000_000)
-        if len(data)>=2_000_000:raise ValueError('oversize_json')
-        return json.loads(data.decode('utf-8'))
+    # The evidence API occasionally responds 503 during parallel scans. Retry
+    # only transient transport failures; never reinterpret a failed fetch as
+    # confirmation that a tender has no official attachments.
+    request=urllib.request.Request(url,headers=AGENTS)
+    for attempt in range(4):
+        try:
+            with OPENER.open(request,timeout=24) as r:
+                data=r.read(2_000_000)
+                if len(data)>=2_000_000:raise ValueError('oversize_json')
+                return json.loads(data.decode('utf-8'))
+        except urllib.error.HTTPError as ex:
+            if ex.code not in (429,500,502,503,504) or attempt==3:raise
+        except (TimeoutError,ConnectionError,urllib.error.URLError):
+            if attempt==3:raise
+        time.sleep(min(8,1.5*(2**attempt)))
 def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
     return m.group(1)+m.group(2)+m.group(3) if m else ''
@@ -718,7 +729,7 @@ def main():
         uncached.append((no,ordn))
     # Official requests are bounded; four independent notices run concurrently
     # so one unavailable PDF does not starve the entire 16-minute job.
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=4) as pool:
         tasks={pool.submit(process,no,ordn):(no,ordn) for no,ordn in uncached}
         for future in as_completed(tasks):
             no,ordn=tasks[future]
@@ -731,7 +742,8 @@ def main():
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
-                reason=classify_failure(e)
+                reason=('metadata_http_'+str(e.code) if isinstance(e,urllib.error.HTTPError)
+                        else classify_failure(e))
                 results[key]={'status':'metadata_fetch_failed','reasonCode':reason,
                               'source':'나라장터 e발주 첨부파일 API',
                               'sourceError':type(e).__name__+': '+str(e)[:100],
