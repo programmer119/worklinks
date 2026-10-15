@@ -150,3 +150,36 @@ for key in samples:
             for q in unknown[:12]
         ],
     })
+
+# Frontend comparePartnerJob() unconditionally reports these mandatory types as
+# pending, regardless of whether the AI/source audit succeeded.
+hard_pending_types = {
+    "staff_proof", "performance_proof", "bid_security",
+    "registration_identity", "eligibility_cutoff", "submission_required",
+}
+affected = collections.Counter()
+pending_by_type = collections.Counter()
+any_pending = []
+for key, record in analyzed.items():
+    mand = [q for q in record.get("requirements") or []
+            if q.get("classification") == "mandatory"
+            and q.get("type") in hard_pending_types]
+    if not mand:
+        continue
+    any_pending.append(key)
+    for t in set(q.get("type") for q in mand):
+        affected[t] += 1
+    pending_by_type.update(q.get("type") for q in mand)
+emit("DIAG_HARD_PENDING", {
+    "noticesAffected": len(any_pending),
+    "affectedByType": dict(affected),
+    "clauseCountByType": dict(pending_by_type),
+    "candidateNoticesWithoutHardPending": len(analyzed)-len(any_pending),
+})
+for k in samples:
+    a = analyzed.get(k) or {}
+    counts = collections.Counter(q.get("type") for q in a.get("requirements") or []
+                                 if q.get("classification") == "mandatory"
+                                 and q.get("type") in hard_pending_types)
+    emit("DIAG_SAMPLE_HARD_PENDING", {"key": k, "hardPendingClauseTypes": dict(counts),
+                                      "hardPendingClauseTotal": sum(counts.values())})
