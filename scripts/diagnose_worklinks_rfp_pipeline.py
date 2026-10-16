@@ -146,6 +146,28 @@ emit("DIAG_UNREADABLE_REASONS", [
     for (ext,reason),n in unreadable_reasons.most_common(16)])
 emit("DIAG_UNMATCHED_EXAMPLES", unmatched_examples)
 
+# Unclassified passages are cited source text, never automatically fulfilled
+# eligibility conditions. Track them apart from raw text-scan coverage.
+unclassified_ids=set()
+unclassified_files=0
+unclassified_count=0
+unclassified_sample=[]
+for key,notice in source.items():
+    for file in notice.get("files") or []:
+        spans=[c for c in (file.get("clauseCandidates") or [])
+               if c.get("type")=="unclassified_qualification"]
+        if not spans:continue
+        unclassified_ids.add(key)
+        unclassified_files += 1
+        unclassified_count += len(spans)
+        if len(unclassified_sample)<8:
+            unclassified_sample.append({
+                "id":key,"file":str(file.get("name") or "")[:100],
+                "text":str(spans[0].get("sourceText") or "")[:150]})
+emit("DIAG_UNCLASSIFIED_REQUIRES_REVIEW", {
+    "notices":len(unclassified_ids),"files":unclassified_files,
+    "passages":unclassified_count,"examples":unclassified_sample})
+
 emit("DIAG_RFP_STATUS", dict(status))
 emit("DIAG_SOURCE_STAGE", dict(source_stages))
 emit("DIAG_AI_STAGE", dict(ai_stages))
