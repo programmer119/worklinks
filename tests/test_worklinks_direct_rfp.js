@@ -18,7 +18,8 @@ function section(start,end){
  return html.slice(a,b);
 }
 const sandbox={rfpSnapshotForJob:(x)=>x.rfp,
- partnerRegisteredCode:(p,code)=>(p.registeredCodes||[]).includes(code)?true:null,
+ partnerRegisteredCode:(p,code)=>(p.registeredCodes||[]).includes(code)?true:
+  p.registryComplete===true?false:null,
  regionRequirementCheck:(x,p)=>x.regionTest||{status:'unknown',reason:'unverified region'}};
 vm.createContext(sandbox);
 vm.runInContext(section('const directRfpCache=new WeakMap();','function productionRequirementCheck(x,p){')+
@@ -103,7 +104,7 @@ assert.equal(sandbox.officialSourceClauseResult({
 },{},matchedPartner).status,'ok','single official registration can pass its own basic requirement');
 assert.equal(sandbox.officialSourceClauseResult({
  type:'industry_code',codes:['1468','1169'],sourceText:'1468 또는 1169'
-},{},matchedPartner).status,'unknown','OR clauses may not be assumed satisfied');
+},{},matchedPartner).status,'ok','explicit OR clause passes when one verified code matches');
 assert.equal(sandbox.officialSourceClauseResult({
  type:'industry_code',codes:['9999'],sourceText:'업종코드 9999'
 },{},matchedPartner).status,'unknown','missing company entry is not proof of an exclusive prerequisite');
@@ -135,8 +136,37 @@ assert.equal(sandbox.officialSourceClauseResult({
 const simple={...source,files:[{...file,qualificationAnchorCount:1,
  clauseCandidates:[file.clauseCandidates[0]]}]};
 const company={...matchedPartner,registryCheckedAt:'2026-10-16',registryComplete:true};
+// Confirmed matching mandatory items must pass; verified mismatch must fail.
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'industry_code',codes:['1468','1169'],
+ sourceText:'입찰참가자격 업종코드 1468 또는 1169 등록한 업체'
+},{},company).status,'ok','one verified alternative is sufficient');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'industry_code',codes:['1169','9999'],
+ sourceText:'입찰참가자격 업종코드 1169 또는 9999 등록한 업체'
+},{},company).status,'missing','full official registry confirms no allowed alternative');
+assert.equal(sandbox.officialSourceClauseResult({
+ type:'industry_code',codes:['1468','1169'],
+ sourceText:'1468 및 1169 모두 등록한 업체'
+},{},company).status,'unknown','AND or ambiguous multiple requirements must not clear');
+
 assert.equal(sandbox.officialReviewCoverage(simple,evidence,{rfp:simple},company),true,
  'single fully cited registered-industry clause should have a reachable review path');
+const neutralFile={...file,name:'과업지시서.hwpx',qualificationAnchorCount:0,clauseCandidates:[]};
+const withNeutral={...simple,attachmentManifestCount:2,files:[
+ simple.files[0],neutralFile
+]};
+const neutralEvidence={attachments:{ok:true,complete:true,items:[
+ {name:file.name},{name:'과업지시서.hwpx'}
+]}};
+assert.equal(sandbox.officialReviewCoverage(withNeutral,neutralEvidence,
+ {rfp:withNeutral},company),true,
+ 'fully scanned attachment with zero bidder requirements must not block a matched condition');
+const noConditions={...withNeutral,files:[neutralFile,neutralFile]};
+assert.equal(sandbox.officialReviewCoverage(noConditions,neutralEvidence,
+ {rfp:noConditions},company),false,
+ 'an empty set of extracted conditions cannot certify entire notice');
+
 assert.equal(sandbox.officialReviewCoverage({
  ...simple,files:[{...simple.files[0],clauseCandidates:[
   ...simple.files[0].clauseCandidates,
