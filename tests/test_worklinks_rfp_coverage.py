@@ -14,6 +14,21 @@ class QualificationCoverageTests(unittest.TestCase):
         clauses = mod.extract_rule_candidates(text, "official.pdf")
         return mod.audit_qualification_scan(text, clauses), clauses
 
+    def test_sme_project_background_is_not_bidder_requirement(self):
+        background = (
+            "가. C-레벨의 AI 데이터 기반 의사결정 역량 강화를 통해 "
+            "중소기업의 성공적 AX 전환을 지원한다.\n"
+            "다. 지역 중소기업과 네트워킹을 강화한다."
+        )
+        self.assertEqual(mod.audit_qualification_scan(background, [])["qualificationAnchorCount"], 0)
+        self.assertEqual(mod.preserve_unclassified_qualification(
+            background, "official.hwp", [])["unclassifiedQualificationCount"], 0)
+        mandatory = "본 입찰은 중소기업만 참가 가능합니다."
+        self.assertFalse(mod.audit_qualification_scan(
+            mandatory, [])["sourceTextScanComplete"])
+        self.assertFalse(mod.audit_qualification_scan(
+            "소기업 확인서를 필수로 제출하여야 합니다.", [])["sourceTextScanComplete"])
+
     def test_unclassified_requirement_preserves_citation_and_never_claims_verification(self):
         text = ("입찰참가자격으로 발주기관이 지정한 보안교육 수료증을 반드시 "
                 "입찰일 이전에 발급받은 업체만 참가 가능합니다.")
