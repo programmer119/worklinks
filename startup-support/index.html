@@ -1485,12 +1485,14 @@ function directRfpRequirements(x){
  if(directRfpCache.has(data))return directRfpCache.get(data);
  const types=new Set(['industry_code','direct_production','sme_certificate',
   'staff_proof','performance_proof','region_restriction','joint_participation',
-  'legal_exclusion','registration_identity','eligibility_cutoff','submission_required']);
+  'legal_exclusion','registration_identity','eligibility_cutoff','submission_required',
+  'unclassified_qualification']);
  const unique=new Map();
  for(const f of data.files){
   if(f.readable!==true)continue;
   for(const c of f.clauseCandidates||[]){
-   if(!types.has(c.type)||c.explicitMust!==true)continue;
+   if(!types.has(c.type)||
+      (c.explicitMust!==true&&c.type!=='unclassified_qualification'))continue;
    const codes=(c.codes||[]).map(String).filter(v=>/^\d{4}$|^\d{10}$/.test(v));
    // Keep alternative codes separate; condensed displays never assert a credential is met.
    const quote=String(c.sourceText||'').replace(/\s+/g,' ').trim();
@@ -1595,6 +1597,8 @@ function officialSourceClauseResult(clause,x,p){
  const text=String(clause.sourceText||'');
  const codes=clause.codes||[];
  const manual='원문 필수·대체 관계 및 공고시점 확인은 별도 필요';
+ if(clause.type==='unclassified_qualification')
+  return {status:'unknown',reason:'원문 보존 · 별도 참가조건인지 판별 및 업체 증빙 확인 필요'};
  if(clause.type==='industry_code'){
   if(codes.length!==1||/또는|택일|선택|중\s*(?:하나|1종)|\bOR\b/i.test(text))
    return {status:'unknown',reason:'복수 업종·대체관계는 자동 확정하지 않음'};
@@ -1667,7 +1671,8 @@ function comparePartnerJob(x,p){
   staff_proof:'필수 기술인력',performance_proof:'필수 실적',
   region_restriction:'지역제한',joint_participation:'공동수급',
   legal_exclusion:'법적 제한',registration_identity:'등록정보·등록기한',
-  eligibility_cutoff:'자격 기준일',submission_required:'필수 제출서류'
+  eligibility_cutoff:'자격 기준일',submission_required:'필수 제출서류',
+  unclassified_qualification:'미분류 원문 · 참가조건 여부 확인 필요'
  };
  // Source snippets are only evidence candidates. Preserve one unresolved row
  // for each distinct type/code combination, without confusing scorecards with
