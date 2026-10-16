@@ -32,7 +32,7 @@ MAX_HWPX_XML_TOTAL=45_000_000
 HWPX_READER_VERSION=2
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=21
+CLASSIFICATION_VERSION=22
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|중소기업자|중소기업\s*(?:만|에\s*한정|이어야|이하)|'
@@ -448,10 +448,57 @@ def extract_rule_candidates(text,filename):
     return out
 
 
+def clearly_nonqualification_guidance(line):
+    """Skip narrow, unmistakable bidder *instructions*, not actual credentials.
+
+    Never discard a paragraph that also states a concrete registration,
+    certificate, location, qualification threshold or current exclusion.
+    """
+    concrete = re.search(
+        r'업종\s*코드|(?<!\d)\d{10}(?!\d)|직접\s*생산\s*(?:확인|증명)|'
+        r'(?:중소|소)기업\s*(?:자\s*)?확인서|소상공인\s*확인서|'
+        r'본점\s*소재|주된\s*영업소|지역\s*제한|'
+        r'조세\s*포탈|입찰\s*참가\s*자격\s*제한\s*기간\s*중|'
+        r'(?:(?:실적|인력|경력)\s*\d+\s*(?:년|명|건|원|억)\s*이상)|'
+        r'(?:소지|등록)한\s*(?:자|업체)\s*만\s*(?:참가|입찰)', line)
+    if concrete:
+        return False
+    # Read-the-documents instruction; "반드시" modifies "확인 바랍니다".
+    if re.search(r'(?:투찰|입찰)\s*업체.{0,45}입찰\s*참가\s*자격.{0,90}'
+                 r'(?:확인\s*(?:하(?:시기|여|도록)?|바랍니다|요망)|숙지\s*바랍니다)', line):
+        return True
+    # Presentation-only attendee IDs, employment evidence and ID cards are
+    # not prerequisites for the bidder firm. They can be required on the day
+    # of presentation, so retain these in ordinary extracted text.
+    if (re.search(r'제안(?:서)?\s*발표|발표자|발표\s*참석|참석\s*인원|'
+                  r'참석\s*입찰\s*참가자|참석자\s*전원', line) and
+            re.search(r'재직\s*증명|신분증|4대\s*보험|가입\s*증명', line) and
+            not re.search(r'입찰\s*참가\s*자격.{0,45}(?:경력|인력|재직)|'
+                          r'입찰\s*참가.{0,40}(?:직원|기술자)\s*\d+\s*명\s*이상', line)):
+        return True
+    # Score/bonus table rows do not automatically become minimum eligibility.
+    if (re.search(r'배점|가점|평가\s*점수|점수\s*배분|평가\s*항목|'
+                  r'실적\s*점수|\d+\s*점\s*만점', line) and
+            re.search(r'실적|경력|기술\s*인력|재직\s*증명', line) and
+            not re.search(r'입찰\s*참가\s*자격.{0,65}(?:실적|경력|인력)|'
+                          r'(?:실적|인력|경력).{0,30}(?:필수\s*(?:조건|자격)|'
+                          r'이상\s*보유.{0,20}(?:입찰|참가))', line)):
+        return True
+    # A warning about a *possible future* sanction is not an indication of
+    # the bidder's present suspension or a separate mandatory certificate.
+    if (re.search(r'서약\s*내용.{0,45}허위.{0,110}'
+                  r'(?:입찰\s*참가\s*자격.{0,9}제한|제재|계약\s*해[제지])', line) and
+            not re.search(r'현재|이미|제재\s*기간\s*중|조세\s*포탈', line)):
+        return True
+    return False
+
+
 def nonqualification_context(line):
     """Ignore only unambiguous headings/administration/evaluation context.
     Explicit bidder requirements, prohibitions and regional restrictions
     always need a cited candidate and interpretation."""
+    if clearly_nonqualification_guidance(line):
+        return True
     # A qualification heading stating that rules follow is not itself an
     # additional condition; each subsequent actual condition is still scanned.
     if re.fullmatch(
