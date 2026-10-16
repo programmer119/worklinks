@@ -32,7 +32,7 @@ MAX_HWPX_XML_TOTAL=45_000_000
 HWPX_READER_VERSION=2
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
-CLASSIFICATION_VERSION=20
+CLASSIFICATION_VERSION=21
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|중소기업자|중소기업\s*(?:만|에\s*한정|이어야|이하)|'
