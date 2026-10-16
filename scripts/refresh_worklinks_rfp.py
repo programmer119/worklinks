@@ -587,7 +587,7 @@ def nonqualification_context(line):
     return False
 
 
-def audit_qualification_scan(text, candidates):
+def audit_qualification_scan(text, candidates, include_missing=False):
     """Count every eligibility-looking paragraph, not only extracted snippets.
 
     This is *coverage evidence*, not proof that a bidder satisfies the text.
@@ -600,6 +600,7 @@ def audit_qualification_scan(text, candidates):
     normalized_sources=[re.sub(r"\s+","",s) for s in source]
     anchor_lines=[line for line in lines if EXTRA_QUALIFICATION_ANCHORS.search(line)]
     missing=[]
+    missing_full=[]
     for line in anchor_lines:
         if nonqualification_context(line):
             continue
@@ -629,12 +630,44 @@ def audit_qualification_scan(text, candidates):
         matched=bool(anchored) and all(cited(key,span) for key,span in anchored)
         if not matched:
             missing.append(line[:180])
+            if include_missing:missing_full.append(line)
     complete=(len(text)<=350_000 and not missing)
-    return {'sourceTextScanComplete':complete,
+    result={'sourceTextScanComplete':complete,
             'qualificationAnchorCount':len(anchor_lines),
             'unmatchedQualificationAnchorCount':len(missing),
             'unmatchedAnchorSamples':missing[:30]}
+    if include_missing:result['_uncitedLines']=missing_full
+    return result
 
+
+def preserve_unclassified_qualification(text, filename, candidates):
+    """Preserve every uncited eligibility-looking phrase without declaring it met.
+
+    This closes an extraction evidence gap, NOT an eligibility gate. Unknown
+    legal or bidder conditions are retained verbatim and force manual review.
+    """
+    before=audit_qualification_scan(text,candidates,include_missing=True)
+    missing=before.pop('_uncitedLines')
+    extras=[];seen=set()
+    for line in missing:
+        if nonqualification_context(line):continue
+        for match in EXTRA_QUALIFICATION_ANCHORS.finditer(line):
+            # The citation auditor requires 25 characters before and 45
+            # after every anchor. Preserve a wider contiguous excerpt.
+            start=max(0,match.start()-35)
+            end=min(len(line),match.end()+55)
+            quote=line[start:end]
+            if not quote or quote in seen:continue
+            seen.add(quote)
+            extras.append({'type':'unclassified_qualification','codes':[],
+                           'sourceFile':filename[:160],'sourceText':quote,
+                           'reviewStatus':'unreviewed','explicitMust':False,
+                           'documentRequiresManualFullReview':True})
+    candidates.extend(extras)
+    after=audit_qualification_scan(text,candidates)
+    after['unclassifiedQualificationCount']=len(extras)
+    after['preSupplementUnmatchedCount']=before['unmatchedQualificationAnchorCount']
+    return after
 
 def normalize_extracted_text(content):
     """Treat embedded NUL separators as whitespace before extracting qualifications."""
@@ -677,7 +710,7 @@ def process(no,ordn):
                 raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
-            scan=audit_qualification_scan(content,candidate_rules)
+            scan=preserve_unclassified_qualification(content,name,candidate_rules)
             record.update({'readable':True,'textChars':len(content),
                            **scan,
                            'sourceSha256':hashlib.sha256(raw).hexdigest(),
