@@ -14,6 +14,37 @@ class QualificationCoverageTests(unittest.TestCase):
         clauses = mod.extract_rule_candidates(text, "official.pdf")
         return mod.audit_qualification_scan(text, clauses), clauses
 
+    def test_unclassified_requirement_preserves_citation_and_never_claims_verification(self):
+        text = ("입찰참가자격으로 발주기관이 지정한 보안교육 수료증을 반드시 "
+                "입찰일 이전에 발급받은 업체만 참가 가능합니다.")
+        original = mod.extract_rule_candidates(text, "official.hwpx")
+        before = mod.audit_qualification_scan(text, original)
+        self.assertFalse(before["sourceTextScanComplete"], (before, original))
+        scan = mod.preserve_unclassified_qualification(text, "official.hwpx", original)
+        extra = [r for r in original if r["type"] == "unclassified_qualification"]
+        self.assertTrue(extra, original)
+        self.assertTrue(scan["sourceTextScanComplete"], scan)
+        self.assertEqual(scan["unmatchedQualificationAnchorCount"], 0)
+        self.assertGreater(scan["preSupplementUnmatchedCount"], 0)
+        self.assertTrue(all(c["explicitMust"] is False and
+                            c["documentRequiresManualFullReview"] is True for c in extra))
+        self.assertTrue(any("보안교육" in c["sourceText"] for c in extra))
+
+    def test_uncategorized_source_is_not_silently_deleted_even_if_guidance(self):
+        text = "투찰업체는 입찰참가자격 및 과업지시서 등을 반드시 확인 바랍니다."
+        candidates = mod.extract_rule_candidates(text, "official.pdf")
+        scan = mod.preserve_unclassified_qualification(text, "official.pdf", candidates)
+        self.assertEqual(scan["unmatchedQualificationAnchorCount"], 0)
+        self.assertTrue(any(c["type"] == "unclassified_qualification" for c in candidates))
+        self.assertFalse(any(c["type"] == "unclassified_qualification" and c["explicitMust"]
+                             for c in candidates))
+
+    def test_uncited_evidence_cannot_override_long_text_truncation(self):
+        text = "입찰참가자격 세부 규정을 검토해야 합니다.\n" + "무관한 부연설명.\n" * 21000
+        candidates = mod.extract_rule_candidates(text, "official.hwpx")
+        result = mod.preserve_unclassified_qualification(text, "official.hwpx", candidates)
+        self.assertFalse(result["sourceTextScanComplete"], result)
+
     def test_hwpx_valid_large_xml_document_is_not_rejected(self):
         # Real HWPX often has large layout metadata but little extracted text.
         import io
