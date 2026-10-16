@@ -152,6 +152,18 @@ assert.equal(sandbox.officialReviewCoverage({
 assert.equal(sandbox.officialReviewCoverage(simple,evidence,{rfp:simple},
  {...company,registryComplete:false}),false,'incomplete company registry must veto');
 
+// Unclassified verbatim clauses are visible unresolved requirements; never
+// turn a source-coverage pass into an automatic eligibility pass.
+const ambiguous={...source,files:[{...file,qualificationAnchorCount:1,
+ clauseCandidates:[
+  {type:'industry_code',codes:['1468'],sourceText:'입찰참가자격 업종코드 1468 등록한 자',explicitMust:true},
+  {type:'unclassified_qualification',codes:[],sourceText:'입찰참가자격 추가 조건 확인 필요',explicitMust:false}
+ ]}]};
+const unresolved=sandbox.directRfpRequirements({rfp:ambiguous});
+assert(unresolved.some(q=>q.type==='unclassified_qualification'),'unrecognized clause must be displayed');
+assert.equal(sandbox.officialReviewCoverage(ambiguous,evidence,{rfp:ambiguous},company),false,
+ 'unclassified requirement must prevent full-eligibility approval');
+
 const actual=JSON.parse(fs.readFileSync('startup-support/rfp-clauses.json','utf8')).byNotice;
 const preferred=['R26BK01756420:000','R26BK01753188:000',
  'R26BK01755213:000','R26BK01747543:000'];
