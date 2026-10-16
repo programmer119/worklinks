@@ -1594,7 +1594,10 @@ function officialReviewCoverage(rfp,evidence,x,p){
  let checked=0;
  for(const f of rfp.files){
   if(!Array.isArray(f.clauseCandidates))return false;
-  if(f.qualificationAnchorCount===0&&f.clauseCandidates.length===0)continue;
+  if(f.qualificationAnchorCount===0){
+   if(f.clauseCandidates.length===0)continue;
+   return false; // Contradictory audit: extracted a rule but counted no source anchors.
+  }
   if(!f.clauseCandidates.length)return false;
   for(const c of f.clauseCandidates){
    if(c.explicitMust!==true||!supported.has(c.type)||
