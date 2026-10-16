@@ -73,14 +73,13 @@ class QualificationCoverageTests(unittest.TestCase):
                             c["documentRequiresManualFullReview"] is True for c in extra))
         self.assertTrue(any("보안교육" in c["sourceText"] for c in extra))
 
-    def test_uncategorized_source_is_not_silently_deleted_even_if_guidance(self):
+    def test_document_read_instruction_is_not_a_bidder_condition(self):
         text = "투찰업체는 입찰참가자격 및 과업지시서 등을 반드시 확인 바랍니다."
         candidates = mod.extract_rule_candidates(text, "official.pdf")
         scan = mod.preserve_unclassified_qualification(text, "official.pdf", candidates)
         self.assertEqual(scan["unmatchedQualificationAnchorCount"], 0)
-        self.assertTrue(any(c["type"] == "unclassified_qualification" for c in candidates))
-        self.assertFalse(any(c["type"] == "unclassified_qualification" and c["explicitMust"]
-                             for c in candidates))
+        self.assertFalse(any(c["type"] == "unclassified_qualification" for c in candidates))
+        self.assertEqual(scan["unclassifiedQualificationCount"], 0)
 
     def test_uncited_evidence_cannot_override_long_text_truncation(self):
         text = "입찰참가자격 세부 규정을 검토해야 합니다.\n" + "무관한 부연설명.\n" * 50000
