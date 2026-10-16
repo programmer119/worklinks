@@ -14,6 +14,34 @@ class QualificationCoverageTests(unittest.TestCase):
         clauses = mod.extract_rule_candidates(text, "official.pdf")
         return mod.audit_qualification_scan(text, clauses), clauses
 
+    def test_guidance_scoring_and_future_warning_are_not_eligibility(self):
+        guidance = (
+            "투찰업체는 입찰참가자격 및 과업지시서 등 반드시 확인바랍니다.",
+            "발표 참석자 전원은 재직증명서와 신분증을 반드시 지참하여야 함.",
+            "유사사업 수행실적 평가항목 10점 만점으로 배점합니다.",
+            "서약내용이 허위로 판명될 경우 입찰 참가 자격의 제한을 받을 수 있음.",
+        )
+        for phrase in guidance:
+            with self.subTest(phrase=phrase):
+                self.assertTrue(mod.clearly_nonqualification_guidance(phrase), phrase)
+                self.assertTrue(mod.nonqualification_context(phrase), phrase)
+                self.assertFalse(mod.extract_rule_candidates(phrase, "공고.hwpx"))
+                self.assertTrue(mod.audit_qualification_scan(phrase, [])["sourceTextScanComplete"])
+
+    def test_explicit_bidder_prerequisites_are_not_hidden_by_guidance(self):
+        requirements = (
+            "투찰업체는 업종코드 1468 등록업체이어야 하며 공고를 확인 바랍니다.",
+            "입찰참가자격으로 유사실적 3건 이상 보유한 업체",
+            "본점 소재지는 경상북도이어야 하며 발표자는 신분증을 지참합니다.",
+            "직접생산확인증명서 8111189901 필수 제출이며 배점은 별도입니다.",
+            "현재 입찰참가자격 제한 기간 중인 자는 참가할 수 없습니다.",
+        )
+        for phrase in requirements:
+            with self.subTest(phrase=phrase):
+                self.assertFalse(mod.clearly_nonqualification_guidance(phrase), phrase)
+                self.assertFalse(mod.nonqualification_context(phrase), phrase)
+                self.assertFalse(mod.audit_qualification_scan(phrase, [])["sourceTextScanComplete"])
+
     def test_sme_project_background_is_not_bidder_requirement(self):
         background = (
             "가. C-레벨의 AI 데이터 기반 의사결정 역량 강화를 통해 "
