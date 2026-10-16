@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-16T05:52:18.468664+00:00",
+  "generatedAt": "2026-10-16T11:23:25.812777+00:00",
   "scope": "공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)",
   "reviewComplete": false,
   "byNotice": {
@@ -286782,74 +286782,56 @@
       "reasonCode": "eorder_api_zero__notice_detail_zero_files",
       "source": "나라장터 e발주 + 공식 입찰공고 상세",
       "count": 0,
-      "eorderCount": 0,
+      "eorderCount": null,
       "noticeDetailDocumentCount": 0,
       "noticeDetailError": "",
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763805:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763584:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763278:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763090:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
-      "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
+      "status": "metadata_fetch_failed",
+      "reasonCode": "metadata_http_503",
+      "source": "나라장터 e발주 첨부파일 API",
+      "sourceError": "HTTPError: HTTP Error 503: Service Temporarily Unavailable",
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756735:000": {
@@ -294679,18 +294661,13 @@
       "hwpxReaderVersion": 2
     },
     "R26BK01763090:001": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762841:000": {
@@ -302746,228 +302723,159 @@
       "hwpxReaderVersion": 2
     },
     "R26BK01761911:001": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
-      "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
+      "status": "metadata_fetch_failed",
+      "reasonCode": "metadata_http_503",
+      "source": "나라장터 e발주 첨부파일 API",
+      "sourceError": "HTTPError: HTTP Error 503: Service Temporarily Unavailable",
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761809:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762803:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762806:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762747:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756817:001": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
-      "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
+      "status": "metadata_fetch_failed",
+      "reasonCode": "metadata_http_503",
+      "source": "나라장터 e발주 첨부파일 API",
+      "sourceError": "HTTPError: HTTP Error 503: Service Temporarily Unavailable",
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762731:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762729:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762236:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762085:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762046:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761509:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756817:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761748:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
-      "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
+      "status": "metadata_fetch_failed",
+      "reasonCode": "metadata_http_503",
+      "source": "나라장터 e발주 첨부파일 API",
+      "sourceError": "HTTPError: HTTP Error 503: Service Temporarily Unavailable",
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760938:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764739:000": {
@@ -311466,138 +311374,93 @@
       "hwpxReaderVersion": 2
     },
     "R26BK01761911:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01757073:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761013:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760179:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758714:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759572:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759557:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759474:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759473:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T02:25:53.207098+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01753150:000": {
@@ -312686,8 +312549,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01747588:000": {
@@ -313750,8 +313613,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01755213:001": {
@@ -313765,8 +313628,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01755213:000": {
@@ -314709,8 +314572,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01753451:000": {
@@ -315507,8 +315370,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01755651:000": {
@@ -316626,8 +316489,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01748179:000": {
@@ -317163,8 +317026,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01753188:000": {
@@ -317635,8 +317498,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01747543:000": {
@@ -319226,8 +319089,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756420:000": {
@@ -323247,8 +323110,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762567:001": {
@@ -323262,8 +323125,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762567:000": {
@@ -324493,8 +324356,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761468:000": {
@@ -325968,8 +325831,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01752317:000": {
@@ -344334,8 +344197,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01767181:000": {
@@ -344349,8 +344212,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763375:000": {
@@ -344364,8 +344227,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760906:000": {
@@ -344379,8 +344242,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01752588:000": {
@@ -360192,8 +360055,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763728:000": {
@@ -363537,8 +363400,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763728:001": {
@@ -364435,8 +364298,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763750:000": {
@@ -368685,8 +368548,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763196:000": {
@@ -369535,8 +369398,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762350:000": {
@@ -371532,15 +371395,6 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "제안요청서_AI영상기반상수도관노후도분석및GIS연동_주식회사 셈즈★.pdf",
-              "sourceText": "하고, 공동도급의 경우 각 구성원별 점수를 합산함 2. 실적대상 사업이 하도급인 경우 “원도급지분율×하도급율”을 참여지분율로 인정함 3. 평가점수는 최대 배점한도를 초과할 수 없으며, 실적 없을 시 0점 - 29 - ❍ 경영상태 (2점)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서_AI영상기반상수도관노후도분석및GIS연동_주식회사 셈즈★.pdf",
               "sourceText": "하며, 창업기업확인서의 유효기간 내에 있어야 한다. 다만, 제안서 평가일 전일까지 발 급된 자료도 심사에 포함하며, 이 경우 입찰공고일 이전 창업을 확인 할 수 있는 자료(법인 인 경우 법인등기부상 법인설립등기일, 개인사업자인 경우에는 사업자등록증명서 상 사업자 등록일)를 제출하여야 한다.(이하 창업기업에 대한 확인방법은 같다) 5. 공동수급체의 경우 구성원별 해당 점수에 지분율을 곱한 후 그 점수들을 합산하여 최종",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
@@ -372120,8 +371974,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763233:000": {
@@ -374621,8 +374475,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01745215:000": {
@@ -381568,8 +381422,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761868:000": {
@@ -382907,8 +382761,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760463:000": {
@@ -385859,8 +385713,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760335:000": {
@@ -387160,8 +387014,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762520:000": {
@@ -390481,15 +390335,6 @@
               "codes": [],
               "sourceFile": "2. 제안요청서(중앙 계절근로 전문기관 홈페이지 구축).hwp",
               "sourceText": "- 발표내용이 제안서와 상이한 사항이 있는 경우 이를 별도로 명기하여야 하며, 명기하지 않을 경우 불이익이 있음. - 발표에 참여하는 인력은 투입인력 중 발표자 포함 5명 이내로 제한하며, 참가자는 신분증을 반드시 지참해야 함.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "staff_proof",
-              "codes": [],
-              "sourceFile": "2. 제안요청서(중앙 계절근로 전문기관 홈페이지 구축).hwp",
-              "sourceText": "- 발표에 참여하는 인력은 투입인력 중 발표자 포함 5명 이내로 제한하며, 참가자는 신분증을 반드시 지참해야 함.",
               "reviewStatus": "unreviewed",
               "explicitMust": true,
               "documentRequiresManualFullReview": true
@@ -395739,8 +395584,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760595:000": {
@@ -395765,8 +395610,8 @@
           "qualificationAnchorCount": 80,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 19,
-          "preSupplementUnmatchedCount": 14,
+          "unclassifiedQualificationCount": 18,
+          "preSupplementUnmatchedCount": 13,
           "sourceSha256": "9c85fe08ecf94c423fd96109477911629cd070fa36b2e52042e476b534982375",
           "textSha256": "1ba9117c3ac2bd97d615f5f1a4bb928296b972cb651a449f0234543dd0d0699d",
           "qualificationScanTruncated": false,
@@ -397230,15 +397075,6 @@
               "codes": [],
               "sourceFile": "제안요청서(청주시 업무지원포털(굿모닝시스템) 유지관리 용역).hwpx",
               "sourceText": "다. 기술인력 보유상태(4점)(지방자치단체 입찰시 낙찰자 결정기준 제7장 [별표1] 관련)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(청주시 업무지원포털(굿모닝시스템) 유지관리 용역).hwpx",
-              "sourceText": " 합산한 총점을 기준으로 평가평가항목세부평가항목평가등급평점비 고기술인력 보유상태① 사업 인력 기술 자격증8점 이상2.08점 미만 ~ 7점 이상1.87점 미만 ~ 6점 이",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -403446,8 +403282,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760212:000": {
@@ -405230,8 +405066,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760198:000": {
@@ -405574,15 +405410,6 @@
               "codes": [],
               "sourceFile": "제주대학교 통합정보시스템 기능개선사업_제안요청서(협상에 의한 계약 방식)_최종.hwpx",
               "sourceText": "3.50 - 용역사업 수행실적: 계약된 실적만 인정",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제주대학교 통합정보시스템 기능개선사업_제안요청서(협상에 의한 계약 방식)_최종.hwpx",
-              "sourceText": "평가 항목배점평가 기준평점 해당 사업규모 대비 입찰공고일 기준 최근 3년간 용역사업 수행실적*5- 76,000천원(사업예산 100%) 이상5.0- 53,200천원(사업예산 70%) 이상4.5- 30,400천원(사업예산 40%) 이상4.0- 30,400천원(사업예산 40%) 미만3.5",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -408189,8 +408016,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759839:000": {
@@ -411083,8 +410910,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759644:000": {
@@ -413097,8 +412924,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758442:001": {
@@ -413614,8 +413441,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759430:000": {
@@ -418084,8 +417911,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759098:000": {
@@ -419057,8 +418884,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759439:000": {
@@ -422219,8 +422046,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758442:000": {
@@ -426193,8 +426020,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758927:001": {
@@ -428933,8 +428760,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758927:000": {
@@ -431673,8 +431500,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01757019:000": {
@@ -432440,8 +432267,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01757980:000": {
@@ -433851,8 +433678,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01757816:000": {
@@ -438338,8 +438165,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01757959:000": {
@@ -443927,8 +443754,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756771:000": {
@@ -446721,8 +446548,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756996:000": {
@@ -448968,8 +448795,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763808:000": {
@@ -448983,8 +448810,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763110:000": {
@@ -448998,8 +448825,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766798:001": {
@@ -449013,8 +448840,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756323:000": {
@@ -452414,8 +452241,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771579:000": {
@@ -453235,8 +453062,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766798:000": {
@@ -454780,8 +454607,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764006:001": {
@@ -454795,8 +454622,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01770750:000": {
@@ -455328,8 +455155,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01770125:000": {
@@ -457110,8 +456937,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763777:001": {
@@ -457125,8 +456952,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764609:000": {
@@ -458356,8 +458183,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766180:001": {
@@ -459077,8 +458904,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766180:000": {
@@ -459798,8 +459625,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764006:000": {
@@ -461566,8 +461393,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763138:000": {
@@ -464353,8 +464180,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760436:000": {
@@ -466159,15 +465986,6 @@
               "codes": [],
               "sourceFile": "붙임_제안요청서_최종.hwpx",
               "sourceText": "3. 하도급계약금액 : (재)하도급 계약 시 계약서상의 명시된 계약금액 Ⅳ. 기타",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "붙임_제안요청서_최종.hwpx",
-              "sourceText": "기타가 점(최대 5점)① 최근 3년간 하수급인이 유효기간 내에 있는 소프트웨어 관련 인증을 획득한 경우(가점 2점) ※, 소프트웨어 품질인증(GS 1등급, 2등급), 정보보호시스템인증(CC), 국가정보원 검증/지정, 신기술인증(NET), 신제품인증(NEP) 등 국가인증 및 국제표준인증 등② 최근 3년간 하수급인의 정부ㆍ지자체ㆍ공공기관 수상경력(회당 1점)③ (재)하도급 계약 시 제20조제3항 각 호에 따른 표준계약서를 활용하는 경우(가점 1점)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -472432,8 +472250,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762854:000": {
@@ -475234,8 +475052,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763091:000": {
@@ -481595,8 +481413,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762537:000": {
@@ -488593,8 +488411,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756541:001": {
@@ -488608,8 +488426,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762467:000": {
@@ -489944,8 +489762,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761880:000": {
@@ -492110,24 +491928,6 @@
               "codes": [],
               "sourceFile": "제안요청서_천리안위성 2A호 지상국 노후시스템(SW) 개선_구매업무협의 의견 반영_최종.hwpx",
               "sourceText": "5. 공동수급체의 경우 구성원별 해당 점수에 지분율을 곱한 후 그 점수들을 합산하여 최종 평가하고, 평가 결과 소수점 이하의 숫자가 있는 경우 소수점 다섯째자리에서 반올림 한다. (예) (A사 점수×A사 지분율)+(B사 점수×B사 지분율)…",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서_천리안위성 2A호 지상국 노후시스템(SW) 개선_구매업무협의 의견 반영_최종.hwpx",
-              "sourceText": "□ 수행실적(배점 5점)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서_천리안위성 2A호 지상국 노후시스템(SW) 개선_구매업무협의 의견 반영_최종.hwpx",
-              "sourceText": "6. 중소기업협동조합이 입찰에 참여하는 경우 중소기업협동조합의 신용평가등급으로 평가한다. □ 수행실적(배점 5점)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -498157,8 +497957,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762007:000": {
@@ -501681,8 +501481,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761057:000": {
@@ -502030,15 +501830,6 @@
               "sourceText": "□ 본 사업은 하도급을 불허합니다. 나. 제안서 평가 방법",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[제안요청서]'26년도 통합정보시스템 추가 개발 사업_260928.hwp",
-              "sourceText": "- 사업관리자(PM)는 공동수급체 대표자 소속 임직원으로서 입찰공고일 전부터 제안서 평가일 까지 계속 재직 중인 자이어야 합니다. - 발표자는 제안사 직원을 입증할 수 있는 증빙 및 신분증을 반드시 지참해야 하며, 다를 경우 제안 발표를 제외하고, 서류만으로 평가합니다.(발표 점수 0점 처리)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
               "documentRequiresManualFullReview": true
             },
             {
@@ -502674,8 +502465,8 @@
           "qualificationAnchorCount": 26,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 2,
-          "preSupplementUnmatchedCount": 2,
+          "unclassifiedQualificationCount": 1,
+          "preSupplementUnmatchedCount": 1,
           "sourceSha256": "85e94e0b5e9ccbe212fbe990ba9ca241f5e3087a7db2b6777643f12418d2a254",
           "textSha256": "a6ebcb14b7392cf19a67d48fd2dc1a52244aae723a4b4020e274acaa70668a86",
           "qualificationScanTruncated": false,
@@ -503140,15 +502931,6 @@
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "공고문_통합정보시스템 추가 개발.hwp",
-              "sourceText": "접수일’이 표시된 ‘4대 사회보험 가입자 가입내역 확인서’ 및 재직증명서를 발표자 확인서류로서 제출하여 주시기 바랍니다.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
             }
           ],
           "fullReviewPending": true
@@ -503162,8 +502944,8 @@
           "qualificationAnchorCount": 59,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 2,
-          "preSupplementUnmatchedCount": 2,
+          "unclassifiedQualificationCount": 1,
+          "preSupplementUnmatchedCount": 1,
           "sourceSha256": "3fbc4bc9b26324bfaa57447a56a836d1e52d8d84a3720c373f75c503df13119f",
           "textSha256": "b99467c921859fb1e59c6de4af49962232510a2f58382a8d799447849a8685c0",
           "qualificationScanTruncated": false,
@@ -505565,15 +505347,6 @@
               "type": "unclassified_qualification",
               "codes": [],
               "sourceFile": "공고문_통합정보시스템 추가 개발.pdf",
-              "sourceText": "확인서’ 및 재직증명서를 발표자 확인서류로서 제출하여 주시기 바랍니다.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "공고문_통합정보시스템 추가 개발.pdf",
               "sourceText": "자로 입찰참가자격 제한처분을 받을 수 있습니다.",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -505586,8 +505359,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760526:000": {
@@ -511026,8 +510799,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760808:000": {
@@ -516992,8 +516765,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760234:000": {
@@ -517018,8 +516791,8 @@
           "qualificationAnchorCount": 200,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 6,
-          "preSupplementUnmatchedCount": 6,
+          "unclassifiedQualificationCount": 7,
+          "preSupplementUnmatchedCount": 7,
           "sourceSha256": "e07879d0ce0c14fcbe4ad9742074f25c9586a945e921cb119a0d30ff60c50139",
           "textSha256": "4b915839e033d0e0c43771ed2138eca471d1bcf61cac7f9778edd995310035df",
           "qualificationScanTruncated": false,
@@ -520147,24 +519920,6 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서(수정).hwpx",
-              "sourceText": "판 단 항 목배 점배점 사유 1. 하수급인의 자격 (부정당업자로 지정되어 입찰참가제한 중인지 여부)2. 하수급인의 사업수행능력 (50점)가. 사업수행실적①나. 보안유지의 적정성②소 계3. 하도급 계약방식 (50점)하도급대금지급방식의 적정성①소 계4. 기타가점①(가점사유)②(가점사유)③(가점사유)소 계합 계",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서(수정).hwpx",
-              "sourceText": "판 단 항 목배 점배점 사유 1. 하수급인의 자격 (부정당업자로 지정되어 입찰참가제한 중인지 여부)2. 하수급인의 사업수행능력 (50점)가. 사업수행실적①나. 보안유지의 적정성②소 계3. 하도급 계약방식 (50점)하도급대금지급방식의 적정성①소 계4. 기타가점①(가점사유)②(가점사유)③(가점사유)소 계합 계",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "제안요청서(수정).hwpx",
@@ -520466,6 +520221,15 @@
               "codes": [],
               "sourceFile": "제안요청서(수정).hwpx",
               "sourceText": "용역수행 실적증명서",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "unclassified_qualification",
+              "codes": [],
+              "sourceFile": "제안요청서(수정).hwpx",
+              "sourceText": "가. 사업수행실적",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -524912,8 +524676,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759987:000": {
@@ -526593,8 +526357,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758659:000": {
@@ -531629,8 +531393,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760154:000": {
@@ -535082,15 +534846,6 @@
               "type": "performance_proof",
               "codes": [],
               "sourceFile": "2. 제안요청서 - 2025년 스마트도시 데이터허브 시범솔루션 발굴사업(최종).hwpx",
-              "sourceText": "구분평가항목배점한도배점비고(평가자)합계100기술정량적평가경영상태420사업부서수행실적(단일실적, 누계실적)6기술인증4정보보호 인증4사회적 책임2정성적평가(주관적 평가)전략 및 방법론사업 이해도, 추진 전략, 적용 기술, 표준 프레임워크 적용, 개발방법론1570조달청기술 및 기능시스템, 기능, 보안, 데이터, 시스템 운영의 요구사항 및 제약사항 20성능 및 품질성능, 품질, 인터페이스의 요구사항15프로젝트 관리관리방법론, 일정계획, 개발장비10프로젝트 지원유지관리, 하자보수계획, 기",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "2. 제안요청서 - 2025년 스마트도시 데이터허브 시범솔루션 발굴사업(최종).hwpx",
               "sourceText": "수행실적(단일실적, 누계실적)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -537004,8 +536759,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01757879:000": {
@@ -538702,15 +538457,6 @@
               "type": "performance_proof",
               "codes": [],
               "sourceFile": "03-(게시용)-제안요청서_[앵커] 지역성장 인재양성체계(앵커) 사업 성과관리를 위한 SW구축 용역(2차년도).hwpx",
-              "sourceText": "평가항목평가 요소배점기술능력평가정량적평가(20)수행실적ㅇ 회사 설립 이후 사업비 7천만 원 이상 관련 사업 실적(사업비 기준, 부가세 포함)10경영상태ㅇ 기업 신용평가(최근 1년 이내)8사회적 책임ㅇ 최저임금 위반, 임금체불, 고용개선 조치미이행 유무2정성적평가(70)사업이해도ㅇ 사업 이해도- 앵커사업 운영체계 및 업무 이해도10전략 및 방법론ㅇ 추진 전략ㅇ 추진 체계ㅇ 사업 추진 방법론20기술 및 기능ㅇ 기능 요구사항20성능 및 품질ㅇ 테스트 요구사항ㅇ 품질 요구사항ㅇ 보안 요",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "03-(게시용)-제안요청서_[앵커] 지역성장 인재양성체계(앵커) 사업 성과관리를 위한 SW구축 용역(2차년도).hwpx",
               "sourceText": "수행실적 ㅇ 회사 설립 이후 사업비 7천만 원 이상 관련 사업 실적(사업비 기준, 부가세 포함)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -539036,15 +538782,6 @@
               "codes": [],
               "sourceFile": "03-(게시용)-제안요청서_[앵커] 지역성장 인재양성체계(앵커) 사업 성과관리를 위한 SW구축 용역(2차년도).hwpx",
               "sourceText": "- 성과관리를 위한 SW구축 용역 구축 - 정량적평가구분심사항목배점(점)산출 점수(점)증빙서류내용분량(건)기술능력평가1. 수행실적10(산출점수 기입)(세부내용 기입)(기입)2. 경영상태8(산출점수 기입)(세부내용 기입)(기입)3. 사회적 책임2(산출점수 기입)(세부내용 기입)(기입)계20",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "03-(게시용)-제안요청서_[앵커] 지역성장 인재양성체계(앵커) 사업 성과관리를 위한 SW구축 용역(2차년도).hwpx",
-              "sourceText": "정량적평가구분심사항목배점(점)산출 점수(점)증빙서류내용분량(건)기술능력평가1. 수행실적10(산출점수 기입)(세부내용 기입)(기입)2. 경영상태8(산출점수 기입)(세부내용 기입)(기입)3. 사회적 책임2(산출점수 기입)(세부내용 기입)(기입)계20",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -539504,8 +539241,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01775380:000": {
@@ -539519,8 +539256,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774083:001": {
@@ -539534,8 +539271,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01758598:000": {
@@ -544603,8 +544340,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774083:000": {
@@ -544618,8 +544355,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01772118:000": {
@@ -546163,8 +545900,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774288:000": {
@@ -547657,8 +547394,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01772341:000": {
@@ -549962,8 +549699,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774114:000": {
@@ -552534,8 +552271,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774098:000": {
@@ -555106,8 +554843,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774072:000": {
@@ -557322,8 +557059,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771951:000": {
@@ -557350,8 +557087,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01772829:000": {
@@ -558526,8 +558263,8 @@
           "qualificationAnchorCount": 32,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 8,
-          "preSupplementUnmatchedCount": 6,
+          "unclassifiedQualificationCount": 9,
+          "preSupplementUnmatchedCount": 7,
           "sourceSha256": "6d64e5ecce9b2f1de4712d3cdb9f4044b7229f0373a59c0845bfb6d26b3143e9",
           "textSha256": "71f5d29a6d9f719580816802b157556bc5ea13b10a093bf3aa9800d0ce87322e",
           "qualificationScanTruncated": false,
@@ -558795,15 +558532,6 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "붙임2. 제안요청서_명지녹산 AX실증산단 에코마린 소부장 특화 클라우드 인프라 구축 및 운영·유지관리.hwpx",
-              "sourceText": "평가부문평가항목평가요소배점정량적 평가(20점)사업수행 실적수행경험(실적)- 입찰 공고일 기준 최근 3년 이내 완료된 용역실적* (단일 건 3억원 부가세포함 이상) * 클라우드 인프라 구축·구성, 클라우드 자원 제공 또는 클라우드 운영·유지관리 용역구분5건 이상4건3건2건1건없음점수65.55432※ 실적 증빙 제출 시에만 인정6운영인력구성현황기술인력 보유상태 또는 핵심인력- 제안사 사업수행 전문 인력 보유 인원구분15명 초과10 ~ 15명10명 미만점수654※ 4대보험 가입자 명부",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "붙임2. 제안요청서_명지녹산 AX실증산단 에코마린 소부장 특화 클라우드 인프라 구축 및 운영·유지관리.hwpx",
@@ -558969,6 +558697,15 @@
               "type": "unclassified_qualification",
               "codes": [],
               "sourceFile": "붙임2. 제안요청서_명지녹산 AX실증산단 에코마린 소부장 특화 클라우드 인프라 구축 및 운영·유지관리.hwpx",
+              "sourceText": "기술인력 보유상태 또는 핵심인력",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "unclassified_qualification",
+              "codes": [],
+              "sourceFile": "붙임2. 제안요청서_명지녹산 AX실증산단 에코마린 소부장 특화 클라우드 인프라 구축 및 운영·유지관리.hwpx",
               "sourceText": "(별지8) 기술인력 투입 현황",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -558999,8 +558736,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774320:000": {
@@ -561529,8 +561266,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01773417:000": {
@@ -562161,8 +561898,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01768198:001": {
@@ -562883,15 +562620,6 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 연제만화도서관 스마트도서관 시스템 통합 유지관리).hwpx",
-              "sourceText": "구 분평 가 항 목배점비고배 점 총 계100정량적 평가(20)신용평가 등급에 의한 경영상태5발주기관평 가사회적 책임4사업 수행 실적6사업수행 참여인력5정성적 평가(70)전략 및 방법론(5)사업 이해도2발주기관 평 가(조달청 평가위원 선정서비스 활용)추진전략 및 체계3수행계획(20)기능개선5운영5예방 및 점검5장애대응 및 복구5수행기반(15)수행환경5보안 요구사항5제약사항5프로젝트 관리 (15)일정관리5품질관리5기밀보안 관리5프로젝트 지원(15)교육훈련5기술지원5비상대책5입찰가격 ",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "제안요청서(2027년 연제만화도서관 스마트도서관 시스템 통합 유지관리).hwpx",
@@ -562932,15 +562660,6 @@
               "codes": [],
               "sourceFile": "제안요청서(2027년 연제만화도서관 스마트도서관 시스템 통합 유지관리).hwpx",
               "sourceText": "찰공고일 기준최근 3년간사업수행 실적비율[합산 금액기준]A. 100% 이상6.0B. 70%이상 ~ 100% 미만5.4C. 40%이상 ~ 70% 미만4.8D. 40% 미만4.2 * 해당 사업금액 대비 입찰공고일 기준 최근 3년간 사업수행실적(금액 기준) 합산. 단, 입찰공고일을 기준으로 최근 7년 이내에 사업을 개시한 창업기업에 대해서는 최근 7년간 사업수행실적을 합산 적용6(4) 참여인력 평가항목평가등급평점정보통신 초급기술자 이상 또는 소프트웨어 기술자의 자격을 갖춘 인력15명 ",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 연제만화도서관 스마트도서관 시스템 통합 유지관리).hwpx",
-              "sourceText": "평가항목평가등급평점해당사업 규모 대비 입찰공고일 기준최근 3년간사업수행 실적비율[합산 금액기준]A. 100% 이상6.0B. 70%이상 ~ 100% 미만5.4C. 40%이상 ~ 70% 미만4.8D. 40% 미만4.2",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -563247,15 +562966,6 @@
               "codes": [],
               "sourceFile": "제안요청서(2027년 연제만화도서관 스마트도서관 시스템 통합 유지관리).hwpx",
               "sourceText": "2. 본 업체(단체)는 하도급업체에 대해 상기 항과 동일한 보안사항 준수 책임을 확인하고 보안확약서 징구하였으며, 하도급업체가 위의 보안사항을 위반할 경우에 주사업자로서 이에 동일한 법적책임을 지겠습니다. 3. 본 업체(단체)는 상기 보안사항을 위반할 경우에 귀 기관의 사업에 참여 제한 또는 기타 관련 법규에 따른 책임과 손해배상을 감수하겠습니다.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 연제만화도서관 스마트도서관 시스템 통합 유지관리).hwpx",
-              "sourceText": "항 목(배점)평가 요소평가경영상태(5점)신용평가등급 점업체명합계구분회사채/기업어음/기업신용회사채/기업어음/기업신용등급점수출자비율%%출자비율 적용점수점점점사회적책임(4점)사회적책임 점업체명합계임금체불고용개선 조치미이행점수행실적(6점)최근 3년 이내 사업 실적 점업체명합계실적금액원원출자비율%%출자비율 적용실적 원원원참여인력(5점)정보통신 초급기술자 이상 또는 소프트웨어 기술자의 자격을 갖춘 인력 점업체명합계인력명명참여인력적용점수점점점합 계 점",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -564037,8 +563747,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771929:000": {
@@ -564544,15 +564254,6 @@
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
               "sourceText": "책임 소재를 명확히 하여 책임감 있는 관리를 위해 하도급을 불허함 평가배점",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "sourceText": "분류대항목중항목평가요소배점합계정량적제안업체경영상태­신용 평가기관의 신용도520수행실적­최근 3년간의 유지보수분야 실적10품질(기술)인증­품질 및 정보보안 관련 인증 보유 여부5정성적 평가(70)사업수행부문추진전략 및 실행 계획­사업요청 내용의 이해도­사업목표 구성의 적정성­추진전략의 실현가능성­업무체계의 명확성1030유지보수 부문­전문 유지보수업체 관리 방안 및 구성 현황­유지보수 업무 수행의 계획 및 전문성­시스템 성능 개선 방안­관련시스템 에 대한 이해도 및 활용의 적정성20",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -569960,8 +569661,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01772660:000": {
@@ -571073,8 +570774,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01770643:000": {
@@ -571087,215 +570788,15 @@
       "noticeDetailError": "",
       "attachmentManifestCount": 10,
       "manifestComplete": true,
-      "readableDocumentCount": 10,
-      "unreadableDocumentCount": 0,
+      "readableDocumentCount": 9,
+      "unreadableDocumentCount": 1,
       "files": [
         {
           "name": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01770643&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-          "readable": true,
-          "textChars": 3981,
-          "sourceTextScanComplete": true,
-          "qualificationAnchorCount": 7,
-          "unmatchedQualificationAnchorCount": 0,
-          "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 1,
-          "preSupplementUnmatchedCount": 1,
-          "sourceSha256": "0864f4cd781b188db7c9ba1332998ae4aa7f4fa954818444ddf2bfcdd6412451",
-          "textSha256": "cb687faf620154b314d24fbf0adc3c402e0c068cb608fe9c5828251dfa21fa5b",
-          "qualificationScanTruncated": false,
-          "clauseCandidatesTruncated": false,
-          "topics": {
-            "입찰참가자격": 0,
-            "직접생산": 0,
-            "중소기업": 0,
-            "수행실적": 0,
-            "기술인력": 0,
-            "지역제한": 0,
-            "공동수급": 8
-          },
-          "snippets": [
-            {
-              "topic": "공동수급",
-              "text": "2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "3. (대표사) 공동수급협정서 작성 : 공동수급협정 구성 등록 > 행추가 > 업체명, 업종, 분담비율, 전체지분율 공고내용에 맞게 적절히 입력 > 저장 > 구성사에 공개 (※안내사항 참고)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)"
-            },
-            {
-              "topic": "공동수급",
-              "text": "※ 공동수급사 각각 계약서 작성"
-            },
-            {
-              "topic": "공동수급",
-              "text": "3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부"
-            }
-          ],
-          "clauseCandidates": [
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행) <그림>",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "<그림> 2. 공동수급협정서 작성 : 입찰공고 목록 : 공동수급 > 협정 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "3. (대표사) 공동수급협정서 작성 : 공동수급협정 구성 등록 > 행추가 > 업체명, 업종, 분담비율, 전체지분율 공고내용에 맞게 적절히 입력 > 저장 > 구성사에 공개 (※안내사항 참고)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행) > 협정내역 확인 > 승인",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "<그림> 4. (참여사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행) > 최종제출 > 전자서명",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "<그림> 5. (대표사) 입찰 > 입찰진행 > 공동수급협정서목록조회 > 입찰공고번호 클릭 (2차 인증 진행)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "Ⅱ-2. 계약서 작성방법_공동계약 ※ 공동수급사 각각 계약서 작성",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "※ 공동수급사 각각 계약서 작성",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "※ 공동수급사 각각 계약서 작성 1. 계약서 확인 : 계약 > 계약체결관리 목록 > 계약명 클릭 (응답내역 클릭X)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "* 보증구분 : 계약보증 선택 / * 보증관리번호 : 계약번호 (계약서에서 확인) 3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "3. 인지세 납부 ※ 공동수급사 중 1개 업체가 전체 납부 가. (나라장터에서 구매하는 경우) 수입인지바로 구매 > 계좌이체 또는 카드결재로 납부 > 입지세 납부 결과 조회 > 납부내역 선택",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "[업체] 입찰참가 및 계약서 작성 방법_260917.hwp",
-              "sourceText": "- 발표자* 확인 서류 첨부 : 재직증명서, 4대 사회보험 가입자 가입내역 확인서**",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            }
-          ],
-          "fullReviewPending": true
+          "readable": false,
+          "errorCategory": "hwp5txt_failed",
+          "error": "ValueError: hwp5txt_failed"
         },
         {
           "name": "★(최종)입찰공고_에너지플랫폼 HMI UIUX 개발.hwpx",
@@ -572055,15 +571556,6 @@
               "codes": [],
               "sourceFile": "★(최종)입찰공고_에너지플랫폼 HMI UIUX 개발.hwpx",
               "sourceText": "하.「국가계약법 시행령」 제35조제5항제2호 \"추정가격이 고시금액 미만인 경우\"에 해당하는 사업으로 공고기간 10일 적용합니다. 거. 발표자는 입찰자가 지정한 사람으로 입찰공고일 전일부터 제안서 발표시까지 재직한 자이어야 합니다. (공동수급체를 구성하는 경우 공동수급체 대표자 소속 임직원",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "★(최종)입찰공고_에너지플랫폼 HMI UIUX 개발.hwpx",
-              "sourceText": "거. 발표자는 입찰자가 지정한 사람으로 입찰공고일 전일부터 제안서 발표시까지 재직한 자이어야 합니다. (공동수급체를 구성하는 경우 공동수급체 대표자 소속 임직원 ○ 발표자 정보 입력 및 확인 서류 첨부 : 사진/성명/생년월일/휴대전화번호, 재직증명서, 4대 사회보험 가입자 가입내역 확인서(4대 사회보험 정보연계센터에서 발급)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -574079,15 +573571,6 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "★(최종)입찰공고_에너지플랫폼 HMI UIUX 개발.pdf",
-              "sourceText": "거. 발표자는 입찰자가 지정한 사람으로 입찰공고일 전일부터 제안서 발표시까지 재직한 자이어야 합니다. (공동수급체를 구성하는 경우 공동수급체 대표자 소속 임직원 ○ 발표자 정보 입력 및 확인 서류 첨부 : 사진/성명/생년월일/휴대전화번호, 재직증명서, 4대 사 회보험 가입자 가입내역 확인서(4대 사회보험 정보연계센터에서 발급) 9. 문의사항",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "★(최종)입찰공고_에너지플랫폼 HMI UIUX 개발.pdf",
               "sourceText": "합니다. (공동수급체를 구성하는 경우 공동수급체 대표자 소속 임직원 ○ 발표자 정보 입력 및 확인 서류 첨부 : 사진/성명/생년월일/휴대전화번호, 재직증명서, 4대 사 회보험 가입자 가입내역 확인서(4대 사회보험 정보연계센터에서 발급) 9. 문의사항 ○ 제안요청서 등 관련 문의 : AI지능형전력망부 장철호 차장(061-931-5491)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -575102,8 +574585,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01767432:000": {
@@ -580295,8 +579778,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774402:000": {
@@ -580310,8 +579793,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01772034:000": {
@@ -580350,8 +579833,8 @@
           "qualificationAnchorCount": 70,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 9,
-          "preSupplementUnmatchedCount": 6,
+          "unclassifiedQualificationCount": 5,
+          "preSupplementUnmatchedCount": 5,
           "sourceSha256": "954bf62fe3f36ed306d1bb18068930521a2567adacbc629ac66732cbbad36c1e",
           "textSha256": "ac7f023cae765225c512c4fa2a4a79326675a1f70cf5a7be2f9dc95df34f7cd1",
           "qualificationScanTruncated": false,
@@ -581617,42 +581100,6 @@
               "codes": [],
               "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
               "sourceText": "ｏ 하도급거래공정화지침(공정거래위원회예규) ｏ 정보보호조치에 관한 지침(과학기술정보통신부고시)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": ". 신용평가기관의 기업신용평가서 Ⅲ. 참여인력의 기술수준 1. 기술인력 구성비율(근무부서 포함) 2. 특급 고급기술인력 명단 및 비율 3. 유지보수 사업 전담 조직 및 ",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": "기술수준 1. 기술인력 구성비율(근무부서 포함) 2. 특급 고급기술인력 명단 및 비율 3. 유지보수 사업 전담 조직 및 전담 기술인력 Ⅳ. 기술 인력의 자격서류",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": "기술인력 명단 및 비율 3. 유지보수 사업 전담 조직 및 전담 기술인력 Ⅳ. 기술 인력의 자격서류",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": "및 비율 3. 유지보수 사업 전담 조직 및 전담 기술인력 Ⅳ. 기술 인력의 자격서류",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -585987,8 +585434,8 @@
           "qualificationAnchorCount": 70,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 9,
-          "preSupplementUnmatchedCount": 6,
+          "unclassifiedQualificationCount": 5,
+          "preSupplementUnmatchedCount": 5,
           "sourceSha256": "56c01961445a88cf09297846669e0984ccd608f327b07069f7df9fccf74deac9",
           "textSha256": "ac7f023cae765225c512c4fa2a4a79326675a1f70cf5a7be2f9dc95df34f7cd1",
           "qualificationScanTruncated": false,
@@ -587262,42 +586709,6 @@
               "type": "unclassified_qualification",
               "codes": [],
               "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": ". 신용평가기관의 기업신용평가서 Ⅲ. 참여인력의 기술수준 1. 기술인력 구성비율(근무부서 포함) 2. 특급 고급기술인력 명단 및 비율 3. 유지보수 사업 전담 조직 및 ",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": "기술수준 1. 기술인력 구성비율(근무부서 포함) 2. 특급 고급기술인력 명단 및 비율 3. 유지보수 사업 전담 조직 및 전담 기술인력 Ⅳ. 기술 인력의 자격서류",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": "기술인력 명단 및 비율 3. 유지보수 사업 전담 조직 및 전담 기술인력 Ⅳ. 기술 인력의 자격서류",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
-              "sourceText": "및 비율 3. 유지보수 사업 전담 조직 및 전담 기술인력 Ⅳ. 기술 인력의 자격서류",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "제안요청서(2027년 해양오염방제통합시스템 유지보수 용역).hwpx",
               "sourceText": "1. 기술인력 구성비율(근무부서 포함)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -587346,8 +586757,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771206:000": {
@@ -590240,8 +589651,8 @@
           "qualificationAnchorCount": 247,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 17,
-          "preSupplementUnmatchedCount": 17,
+          "unclassifiedQualificationCount": 18,
+          "preSupplementUnmatchedCount": 18,
           "sourceSha256": "1d6543ccb8ab38c244e8553e4ffb1bbce3f96a0500a978b30eee289c5216c033",
           "textSha256": "a1d56cb77804d72edaf00ffeff736d5a2b97d845d46444abacdc0e11252cf911",
           "qualificationScanTruncated": false,
@@ -591910,24 +591321,6 @@
               "type": "performance_proof",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "sourceText": "구분평가요소배점비고계100기술능력평가정량적평가참여인력기술경력상태 ∘ 사업 참여인력의 ITSQF(IT Sector Qualifications Framework)는 한국소프트웨어산업협회 홈페이지(www.sw.or.kr) 인재 지원 – IT분야 역량체계(ITSQF) 자료실에서 세부적인 직무 설명을 확인 할 수 있음ITSQF 직무에 따른 경력 평가620붙임5수행실적 금액 ∘ 최근 3년간 유사 사업 실적 금액3수행실적 건수 ∘ 최근 3년간 유사 사업 실적 건수3경영상태 ∘ 기업신용등급 평",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "sourceText": "실적 금액3수행실적 건수 ∘ 최근 3년간 유사 사업 실적 건수3경영상태 ∘ 기업신용등급 평가6기업 및 품질인증∘ 기업 및 품질인증 건수에 따른 점수2정성적평가전략 및 방법론 ∘ 대상사업의 이해도 ∘ 사업추진전략의 창의성, 타당성 ∘ 적용기술의 확장성, 실현 가능성 ∘ 표준프레임워크 적용 방안 ∘ 개발방법론의 타당성 및 적용(활용) 가능성 등1270붙임6기술 및 기능 ∘ 사업추진 내용의 적정성 ∘ 각 요구사항에 대한 제안내용의 적정성20성능 및 품질 ∘ 성능확보방안 8프로젝트 관리",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
               "sourceText": "수행실적 금액 ∘ 최근 3년간 유사 사업 실적 금액",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -592703,15 +592096,6 @@
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
               "sourceText": "3. 하도급계약금액 : (재)하도급 계약 시 계약서상의 명시된 계약금액 Ⅳ. 기타",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "sourceText": "기타가 점(최대 5점)① 최근 3년간 하수급인이 유효기간 내에 있는 소프트웨어 관련 인증을 획득한 경우(가점 2점) ※, 소프트웨어 품질인증(GS 1등급, 2등급), 정보보호시스템인증(CC), 국가정보원 검증/지정, 신기술인증(NET), 신제품인증(NEP) 등 국가인증 및 국제표준인증 등② 최근 3년간 하수급인의 정부․지자체․공공기관 수상경력(회당 1점)③ (재)하도급 계약 시 제20조제3항 각 호에 따른 표준계약서를 활용하는 경우(가점 1점)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -593702,33 +593086,6 @@
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
               "sourceText": "6. 본건 관련 하도급 계약체결 및 이행에 있어서 법령에 위반되는 하도급(일괄 하도급, 무면허 하도급, 재하도급)을 하지 않겠으며, 하도급자로부터 금품을 수수하거나 부당 또는 불공정한 행위를 하지 아니하겠습니다. 7. 경쟁입찰과 관련한 담합으로 인하여 발주처에 손해를 가했을 경우 다음 각 호의 금액을 배상토록 하겠습니다.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "sourceText": "■ 소프트웨어사업 계약 및 관리감독에 관한 지침 [별지 제8호서식]하도급계약의 적정성 판단 자기평가표(제20조제1항관련)1. 계약 내용사 업 명하 도 급 사 업 명수 급 인 (전화)하수급인 (전화)하도급예정액(A)원하도급계약금액(B)원계약기간하 도 급기 간하자담보 책임기간하자담보책임기간국가기관등과의 낙찰방식,낙찰률 방식, %부분하도급률(B/A) %※ 부분하도급률(%) = (하도급계약금액(B)/하도급예정액(A)) X 1002. 자기평가결과판 단 항 목자체 평가 점수사유 1. (재)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "sourceText": "/하도급예정액(A)) X 1002. 자기평가결과판 단 항 목자체 평가 점수사유 1. (재)하수급인의 자격(부정당업자로 지정되어 입찰참가제한 중인지 여부)2. (재)하수급인의 사업 가. 사업수행실적 ① 나. 고용안정 및 적법근로②소 계3. (재)하도급 계약 방식 가. 하도급대금 지급방식의 적정성① 나. 하도급 금액의 적정성②소 계4. 기타가점①(가점사유)②(가점사유)③(가점사유)소 계합 계210mm×297mm(백상지 80g/㎡)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "sourceText": "/하도급예정액(A)) X 1002. 자기평가결과판 단 항 목자체 평가 점수사유 1. (재)하수급인의 자격(부정당업자로 지정되어 입찰참가제한 중인지 여부)2. (재)하수급인의 사업 가. 사업수행실적 ① 나. 고용안정 및 적법근로②소 계3. (재)하도급 계약 방식 가. 하도급대금 지급방식의 적정성① 나. 하도급 금액의 적정성②소 계4. 기타가점①(가점사유)②(가점사유)③(가점사유)소 계합 계210mm×297mm(백상지 80g/㎡)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -594764,6 +594121,15 @@
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
               "sourceText": "붙임서류 : 1. 입찰참가자격을 증명하는 서류사본 1통",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "unclassified_qualification",
+              "codes": [],
+              "sourceFile": "제안요청서.hwpx",
+              "sourceText": "3. (재)하도급",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -595965,8 +595331,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01767019:000": {
@@ -595991,8 +595357,8 @@
           "qualificationAnchorCount": 144,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 10,
-          "preSupplementUnmatchedCount": 9,
+          "unclassifiedQualificationCount": 11,
+          "preSupplementUnmatchedCount": 10,
           "sourceSha256": "d0156afaa7f97f60993dd6ffae4b295711f33e313eea11dca04c402b63011c30",
           "textSha256": "dfc94a7b166aead1b1bbdb6dcf69d71336cd2782673b973ceaeac07b9db20ebf",
           "qualificationScanTruncated": false,
@@ -597748,33 +597114,6 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
-              "sourceText": "하도급계약의 적정성 판단 자기평가표(제20조제1항관련)1. 계약 내용사 업 명하 도 급 사 업 명수 급 인 (전화)하수급인 (전화)하도급예정액(A)원하도급계약금액(B)원계약기간하 도 급기 간하자담보 책임기간하자담보책임기간국가기관등과의 낙찰방식,낙찰률 방식, %부분하도급률(B/A) %※ 부분하도급률(%) = (하도급계약금액(B)/하도급예정액(A)) X 1002. 자기평가결과판 단 항 목자체 평가 점수사유 1. (재)하수급인의 자격(부정당업자로 지정되어 입찰참가제한 중인지 여부)2.",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
-              "sourceText": "가 점수사유 1. (재)하수급인의 자격(부정당업자로 지정되어 입찰참가제한 중인지 여부)2. (재)하수급인의 사업 가. 사업수행실적 ① 나. 고용안정 및 적법근로②소 계3. (재)하도급 계약 방식 가. 하도급대금 지급방식의 적정성① 나. 하도급 금액의 적정성②소 계4. 기타가점①(가점사유)②(가점사유)③(가점사유)소 계합 계210mm×297mm(백상지 80g/㎡)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
-              "sourceText": "가 점수사유 1. (재)하수급인의 자격(부정당업자로 지정되어 입찰참가제한 중인지 여부)2. (재)하수급인의 사업 가. 사업수행실적 ① 나. 고용안정 및 적법근로②소 계3. (재)하도급 계약 방식 가. 하도급대금 지급방식의 적정성① 나. 하도급 금액의 적정성②소 계4. 기타가점①(가점사유)②(가점사유)③(가점사유)소 계합 계210mm×297mm(백상지 80g/㎡)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
               "sourceText": "하도급계약의 적정성 판단 자기평가표(제20조제1항관련)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -598423,15 +597762,6 @@
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
-              "sourceText": "기타가 점(최대 5점)① 최근 3년간 하수급인이 유효기간 내에 있는 소프트웨어 관련 인증을 획득한 경우(가점 2점) ※, 소프트웨어 품질인증(GS 1등급, 2등급), 정보보호시스템인증(CC), 국가정보원 검증/지정, 신기술인증(NET), 신제품인증(NEP) 등 국가인증 및 국제표준인증 등② 최근 3년간 하수급인의 정부ㆍ지자체ㆍ공공기관 수상경력(회당 1점)③ (재)하도급 계약 시 제20조제3항 각 호에 따른 표준계약서를 활용하는 경우(가점 1점)",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
               "sourceText": "② 최근 3년간 하수급인의 정부ㆍ지자체ㆍ공공기관 수상경력(회당 1점) ③ (재)하도급 계약 시 제20조제3항 각 호에 따른 표준계약서를 활용하는 경우(가점 1점)",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
@@ -598622,6 +597952,15 @@
               "codes": [],
               "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
               "sourceText": "하도급 계약기간",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "unclassified_qualification",
+              "codes": [],
+              "sourceFile": "붙임_제안요청서_27년DB유지관리_재공고_최종(1012).hwpx",
+              "sourceText": "3. (재)하도급",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -603366,8 +602705,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01773065:000": {
@@ -607352,8 +606691,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01773310:000": {
@@ -615029,8 +614368,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759246:000": {
@@ -623864,8 +623203,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766727:000": {
@@ -630013,8 +629352,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01754276:000": {
@@ -634760,8 +634099,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771095:000": {
@@ -634793,8 +634132,8 @@
           "qualificationAnchorCount": 131,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 11,
-          "preSupplementUnmatchedCount": 11,
+          "unclassifiedQualificationCount": 13,
+          "preSupplementUnmatchedCount": 13,
           "sourceSha256": "f126143fd7408e989c0c4ef1b8adf0c81abcf48d3d919a78201b8a37524e1f93",
           "textSha256": "41c4c4945d0e5d6c6272503b6252e1b6ffa2985a9260f1fb56d83111b3ca3737",
           "qualificationScanTruncated": false,
@@ -635639,51 +634978,6 @@
               "codes": [],
               "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
               "sourceText": "∙ [정량평가] (최근 3년간) 유사용역 수행 실적 ※ 단, 유사용역은 “정보시스템 운영 및 유지관리”로 한정",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": "수행실적 평가기준(제9조제3항제2호 관련)평가등급평점100% 이상배점의 100%70% 이상～100% 미만배점의 90%40% 이상～70% 미만배점의 80%40% 미만배점의 70%* 해당 사업규모 대비 입찰공고일 기준 최근 3년간 사업수행실적(금액 기준)을 합산 적용. 단, 입찰공고일을 기준으로 최근 7년 이내에 사업을 개시한 창업기업에 대해서는 최근 7년간 사업수행실적을 합산 적용[주] 1. 수행실적은 입찰공고 또는 제안요청서 등 입찰 관계서류에 따로 정한 경우를 제외하고는 계약일",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": "수행실적은 입찰공고 또는 제안요청서 등 입찰 관계서류에 따로 정한 경우를 제외하고는 계약일자 및 납품기한에 관계없이 이행이 완료된 시점을 기준으로 평가한다. 이 경우 입찰공고일에 이행완료 된 실적도 평가에 포함하나, 입찰공고일 다음날부터 이행완료된 자료는 평가에서 제외한다. 2. 등급구간별 평점은 제9조제8항제1호에 따라 부여한다. 3. 등급구간 및 구간별 평점은 위 표에 의하며, 필요하다고 인정되는 경우 입찰공고에 달리 정할 수 있다. 4. 실적 인정 범위와 제9조제8항제3호 ",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": " 인정되는 경우 입찰공고에 달리 정할 수 있다. 4. 실적 인정 범위와 제9조제8항제3호 나목 및 다목에 따라 실적평가를 제외하는 경우 실적평가 제외기준은 제안요청서에 정하되, 수행실적은 제5호에 따라 제출된 실적을 기준으로 평가한다. 5. 입찰자는 수행실적 평가를 위하여 별지 제15호서식의 수행실적 총괄표와 다음 각 목에 따른 별지 제16호서식 또는 그에 준한 수행실적증명서 등을 제출하여야 한다. 가. 국가기관, 지방자치단체, 기획재정부장관이 지정한 공공기관 또는 지방공기업법령",
-              "reviewStatus": "unreviewed",
-              "explicitMust": true,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": " 한다. 가. 국가기관, 지방자치단체, 기획재정부장관이 지정한 공공기관 또는 지방공기업법령 적용 기관이 발급한 수행실적증명서 나. 위 가목에서 정한 이외의 기관 또는 민간이 발주한 경우 발주자가 발급한 수행실적증명서, 계약서, 세금계산서(필요시 거래명세표 포함) 등을 첨부하여야 함 다. 위 가목과 나목에도 불구하고 한국소프트웨어산업협회장이 발급하는 소프트웨어사업 수행실적 확인서 라. 국외의 공공기관, 민간기업 등이 발주한 경우 가목 및 나목을 준용하되, 공공기관 이외의 납품실적은",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": "공공기관, 민간기업 등이 발주한 경우 가목 및 나목을 준용하되, 공공기관 이외의 납품실적은 이를 공증하거나 해당국가의 상공회의소 또는 해당국가에 주재하는 대한민국 공관의 확인을 받은 경우에는 세금계산서 등 증명자료 첨부를 생략할 수 있음 마. 이행실적에 대한 입증책임은 입찰자가 부담하며 의무를 다하지 아니하여 실적확인이 어려운 경우에는 실적으로 인정하지 않는다. 6. 공동수급체의 경우 구성원별 실적에 지분율을 곱한 후 그 실적들을 합산한 실적으로 최종 평가하고, 평가 결과 소수점",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -637147,24 +636441,6 @@
               "documentRequiresManualFullReview": true
             },
             {
-              "type": "performance_proof",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": "판 단 항 목자체 평가점수사유 1. (재)하수급인의 자격 (부정당업자로 지정되어 입찰참가제한 중인지 여부)2. (재)하수급인의 사업수행능력가. 사업수행실적 ①나. 고용안정 및 적법근로②소 계3. (재)하도급 계약방식가. 하도급대금 지급방식의 적정성①나. 하도급 금액의 적정성②소 계4. 기타가점①(가점사유)②(가점사유)소 계합 계",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
-              "sourceText": "판 단 항 목자체 평가점수사유 1. (재)하수급인의 자격 (부정당업자로 지정되어 입찰참가제한 중인지 여부)2. (재)하수급인의 사업수행능력가. 사업수행실적 ①나. 고용안정 및 적법근로②소 계3. (재)하도급 계약방식가. 하도급대금 지급방식의 적정성①나. 하도급 금액의 적정성②소 계4. 기타가점①(가점사유)②(가점사유)소 계합 계",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
               "type": "joint_participation",
               "codes": [],
               "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
@@ -637340,6 +636616,24 @@
               "codes": [],
               "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
               "sourceText": "하도급액(B)",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "unclassified_qualification",
+              "codes": [],
+              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
+              "sourceText": "가. 사업수행실적",
+              "reviewStatus": "unreviewed",
+              "explicitMust": false,
+              "documentRequiresManualFullReview": true
+            },
+            {
+              "type": "unclassified_qualification",
+              "codes": [],
+              "sourceFile": "(제안요청서)2027년 한국어능력시험운영시스템 운영 및 유지관리 용역(수정완).hwpx",
+              "sourceText": "3. (재)하도급",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -642511,8 +641805,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756240:000": {
@@ -643129,24 +642423,6 @@
               "codes": [],
               "sourceFile": "제안요청서(수정).hwpx",
               "sourceText": "◦ [별지서식 3호] 재무현황 ◦ [별지서식 4호] 수행실적 총괄표",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서(수정).hwpx",
-              "sourceText": "보증 기간 및 범위 외의 향후 유지보수 조건 등 기술 3. 기밀보안∙ 기밀보안 대책과 프로젝트 참여 인원에 대한 보안 의식 고취 방안을 제시∙ 참여 인원의 이직에 대한 대처방안, 저작권 보호 방안 등 기술∙ 시스템 보안성 확보방안 및 개인정보보호 대책 등 4. 비상 대책∙ 안정적인 시스템 운영을 위한 백업 및 복구, 장애 대응 방안 제시Ⅶ. 상생협력 및 하도급 1. 하도급 계획․ 하도급 업체 개요, 하도급 수행내역, 하도급 관리방안 등 하도급 계획 제시 ․ 「조달청 협상에 의한 ",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "joint_participation",
-              "codes": [],
-              "sourceFile": "제안요청서(수정).hwpx",
-              "sourceText": " 개요, 하도급 수행내역, 하도급 관리방안 등 하도급 계획 제시 ․ 「조달청 협상에 의한 계약 제안서평가 세부기준」별지 제14호 서식의 소프트웨어사업 하도급 계획서 첨부",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -647314,8 +646590,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01761240:000": {
@@ -651798,8 +651074,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01760557:000": {
@@ -656535,8 +655811,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01752433:000": {
@@ -656561,8 +655837,8 @@
           "qualificationAnchorCount": 91,
           "unmatchedQualificationAnchorCount": 0,
           "unmatchedAnchorSamples": [],
-          "unclassifiedQualificationCount": 13,
-          "preSupplementUnmatchedCount": 13,
+          "unclassifiedQualificationCount": 11,
+          "preSupplementUnmatchedCount": 11,
           "sourceSha256": "ea52eeb22224f3c0448664d02f120d2384537dfae949e7474d35401456a2f0f1",
           "textSha256": "564c0d82ea9a7c000118de34bc4be6dd91018222282ae967c0f0987209925415",
           "qualificationScanTruncated": false,
@@ -658087,25 +657363,7 @@
               "type": "unclassified_qualification",
               "codes": [],
               "sourceFile": "(협의사항) 제안요청서(대전광역시립 공공도서관 정보시스템 통합유지보수 용역)_최종수정.hwpx",
-              "sourceText": "구분자격기준등급 점수비고기술 인력기술사5제안사 기술인력 1인당 배점기사 9년 이상4기사 6년 이상3기사 3년 이상2기사1",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "(협의사항) 제안요청서(대전광역시립 공공도서관 정보시스템 통합유지보수 용역)_최종수정.hwpx",
               "sourceText": "기술 인력",
-              "reviewStatus": "unreviewed",
-              "explicitMust": false,
-              "documentRequiresManualFullReview": true
-            },
-            {
-              "type": "unclassified_qualification",
-              "codes": [],
-              "sourceFile": "(협의사항) 제안요청서(대전광역시립 공공도서관 정보시스템 통합유지보수 용역)_최종수정.hwpx",
-              "sourceText": "제안사 기술인력 1인당 배점",
               "reviewStatus": "unreviewed",
               "explicitMust": false,
               "documentRequiresManualFullReview": true
@@ -662417,8 +661675,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774281:000": {
@@ -662529,8 +661787,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01754427:000": {
@@ -676973,8 +676231,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771991:000": {
@@ -677649,8 +676907,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01773286:000": {
@@ -677770,8 +677028,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01755090:001": {
@@ -677946,8 +677204,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01765200:000": {
@@ -678770,8 +678028,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764304:001": {
@@ -679297,8 +678555,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01765220:000": {
@@ -680839,8 +680097,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771989:000": {
@@ -681520,8 +680778,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764304:000": {
@@ -682047,8 +681305,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763046:000": {
@@ -683596,8 +682854,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01763218:000": {
@@ -685004,8 +684262,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01765668:000": {
@@ -686100,8 +685358,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01759021:000": {
@@ -690912,8 +690170,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764444:000": {
@@ -692789,8 +692047,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01752471:000": {
@@ -695866,8 +695124,8 @@
       "reviewComplete": false,
       "requiredConditionsComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01775255:000": {
@@ -695881,8 +695139,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01754977:000": {
@@ -696718,8 +695976,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01775094:000": {
@@ -696733,23 +695991,18 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01774667:000": {
-      "status": "no_official_attachment_metadata",
-      "reasonCode": "eorder_api_zero__notice_detail_zero_files",
-      "source": "나라장터 e발주 + 공식 입찰공고 상세",
+      "status": "metadata_not_confirmed",
+      "reasonCode": "metadata_api_error",
+      "sourceError": "upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
       "count": 0,
-      "eorderCount": 0,
-      "noticeDetailDocumentCount": 0,
-      "noticeDetailError": "",
-      "files": [],
-      "reviewComplete": false,
-      "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "source": "나라장터 e발주 첨부파일 API",
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01775201:000": {
@@ -696763,8 +696016,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01773713:000": {
@@ -696778,8 +696031,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01773501:000": {
@@ -696793,8 +696046,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01756277:000": {
@@ -698830,8 +698083,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01772202:000": {
@@ -698845,8 +698098,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01771291:000": {
@@ -698860,8 +698113,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01762803:001": {
@@ -698875,8 +698128,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01770587:000": {
@@ -698890,8 +698143,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01769277:000": {
@@ -698905,8 +698158,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764670:000": {
@@ -698920,8 +698173,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764862:001": {
@@ -698935,8 +698188,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01751508:000": {
@@ -699376,8 +698629,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766884:000": {
@@ -699391,8 +698644,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01766291:000": {
@@ -699406,8 +698659,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01765012:000": {
@@ -699421,8 +698674,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764480:000": {
@@ -699436,8 +698689,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764862:000": {
@@ -699451,8 +698704,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764787:000": {
@@ -699466,8 +698719,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764574:000": {
@@ -699481,8 +698734,8 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     },
     "R26BK01764574:001": {
@@ -699496,10 +698749,10 @@
       "files": [],
       "reviewComplete": false,
       "contractPerformanceVerified": false,
-      "checkedAt": "2026-10-16T05:52:18.468664+00:00",
-      "classificationVersion": 21,
+      "checkedAt": "2026-10-16T11:23:25.812777+00:00",
+      "classificationVersion": 22,
       "hwpxReaderVersion": 2
     }
   },
-  "workflowRunId": "38858014709"
+  "workflowRunId": "38893412664"
 }
