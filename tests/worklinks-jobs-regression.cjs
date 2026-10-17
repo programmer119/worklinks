@@ -277,8 +277,12 @@ assert.equal(realVerdict(eligibleBid,eligiblePartner).type,'ready',
 const disqualified={...eligibleSource,files:[{...eligibleSource.files[0],
  clauseCandidates:[...eligibleSource.files[0].clauseCandidates,
  {type:'staff_proof',sourceText:'기술인력 필수 자격증 증빙 요구',explicitMust:true}]}]};
-assert.notEqual(realVerdict({...eligibleBid,rfp:disqualified},eligiblePartner).type,'ready',
- 'additional staff proof must veto full qualification');
+assert.equal(realVerdict({...eligibleBid,rfp:disqualified},eligiblePartner).type,'ready',
+ 'unverified staff evidence stays a candidate rather than being excluded');
+assert.equal(realVerdict({...eligibleBid,rfp:disqualified},eligiblePartner).verified,false,
+ 'unverified staff evidence must never be called fully confirmed');
+assert.equal(realVerdict(eligibleBid,eligiblePartner).verified,true,
+ 'independently checked complete source conditions can be marked confirmed');
 
 const noFiles={reviewComplete:true,requiredConditionsComplete:true,files:[],
  noticeTextReviewed:true,noticeSourceUrl:'https://www.g2b.go.kr/notice',noticeSha256:'verified-sha'};
@@ -303,8 +307,8 @@ assert.ok(source.includes('#jobCards .job-mini h3{font-size:17px'));
 assert.ok(source.includes('원문·첨부 전수검토'));
 assert.ok(!source.includes('return {rows,counts,complete:false};'));
 
-// Each thumbnail must show the COMPLETE 4-state result per company, not
-// interpret an industry-only match as bid-ready.
+// Default-included screening: unknown evidence is a provisional candidate,
+// while only demonstrated disqualifications, closed notices or non-SW scope block.
 const resultsById={
  industry_match:'industry_match', unverified:'unverified', missing:'missing'
 };
@@ -318,24 +322,38 @@ const verdictMod=new Function('jobTimeInfo','jobSoftwareScope','jobQualification
  x=>String(x),x=>x.rfp||null);
 const bidder={id:'changcom',short:'창컴',name:'창컴정보통신(주)',smeRecord:{size:'소기업',validState:'valid'}};
 const verdict=(x,p=bidder)=>verdictMod.participationVerdict({kind:'servc',...x},p);
-assert.equal(verdict({industry:'industry_match'}).type,'conditional');
-assert.equal(verdict({industry:'unverified'}).type,'checking');
-assert.equal(verdict({industry:'no_restriction'}).type,'conditional','official 0 industry restrictions are a positive check but not ready');
-assert.equal(verdict({industry:'no_restriction',full:false,ok:2,pending:0,unknown:1}).type,'conditional');
-assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'ready',
- 'zero industry restrictions and independently verified complete notice can qualify');
+assert.equal(verdict({industry:'industry_match'}).type,'ready');
+assert.equal(verdict({industry:'industry_match'}).label,'적격 후보');
+assert.equal(verdict({industry:'industry_match'}).verified,false);
+assert.equal(verdict({industry:'unverified'}).type,'ready',
+ 'missing license API is not evidence of disqualification');
+assert.equal(verdict({industry:'unverified'}).verified,false);
+assert.equal(verdict({industry:'no_restriction'}).type,'ready',
+ 'zero industry restrictions produce an eligible candidate');
+assert.equal(verdict({industry:'no_restriction',full:false,ok:2,pending:0,unknown:1}).type,'ready');
+assert.equal(verdict({industry:'no_restriction',full:false,ok:2,pending:0,unknown:1}).verified,false);
+assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).type,'ready');
+assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).verified,true,
+ 'only completely verified conditions count as confirmed');
 assert.equal(verdict({industry:'missing'}).type,'blocked');
-assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked');
-assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked');
-assert.ok(source.includes("t.key==='upcoming'"));
-assert.equal(verdict({industry:'industry_match',full:false,ok:6,pending:0,unknown:0}).type,'conditional','all available API matches alone cannot certify attachments');
-assert.equal(verdict({industry:'industry_match',full:true,ok:7,pending:0,unknown:0}).type,'ready','only explicit verified full evidence can be ready');
-assert.equal(verdict({industry:'industry_match',condition:'소상공인만 입찰'}).type,'blocked','small enterprise is not necessarily micro enterprise');
-assert.equal(verdict({industry:'industry_match',condition:'공동수급 불허'}).type,'conditional','joint-venture prohibition does not prohibit solo bidding');
+assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked',
+ 'documented missing mandatory license is disqualifying');
+assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked',
+ 'a closed notice is excluded');
+assert.equal(verdict({industry:'industry_match',full:false,ok:6,pending:0,unknown:0}).type,'ready',
+ 'unknown attachments do not eliminate an otherwise plausible candidate');
+assert.equal(verdict({industry:'industry_match',full:false,ok:6,pending:0,unknown:0}).verified,false);
+assert.equal(verdict({industry:'industry_match',full:true,ok:7,pending:0,unknown:0}).verified,true);
+assert.equal(verdict({industry:'industry_match',condition:'소상공인만 입찰'}).type,'blocked',
+ 'officially verified company size does not meet a micro-only bid');
+assert.equal(verdict({industry:'industry_match',condition:'공동수급 불허'}).type,'ready',
+ 'a no-consortium rule does not forbid sole bidding');
+assert.equal(verdict({industry:'industry_match',pending:3,unknown:5,full:false}).type,'ready',
+ 'unknown clauses are not a rejection and remain individually visible');
 const html=verdictMod.participationStrip({id:'test-bid',condition:'',industry:'industry_match'},
   [bidder,{id:'other',short:'다른 업체',smeRecord:{size:'소기업',validState:'valid'}}]);
 assert.ok(html.includes('data-partner-id="changcom"')&&html.includes('data-partner-id="other"'));
-assert.ok(html.includes('조건부 가능'));
+assert.ok(html.includes('적격 후보'));
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 assert.ok(source.includes('function participationVerdict(x,p)'));
 assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all notices as ready');
