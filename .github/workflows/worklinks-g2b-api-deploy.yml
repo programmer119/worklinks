@@ -12,11 +12,54 @@ permissions:
   contents: read
 
 concurrency:
-  group: worklinks-g2b-api-production
+  # Separate the active org runner queue from obsolete research-only runs.
+  group: worklinks-g2b-api-production-org-20261017
   cancel-in-progress: false
 
 jobs:
+  retire_legacy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Cancel only two obsolete stalled G2B deployment runs
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json,os,urllib.error,urllib.request
+          base='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+          auth={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                'Accept':'application/vnd.github+json',
+                'X-GitHub-Api-Version':'2022-11-28'}
+          # These run IDs were confirmed queued/pending with the old runner
+          # or held by its original concurrency group. Never cancel an active
+          # production deployment or an unrelated workflow.
+          for run_id in (39000706357,39005220657):
+              req=urllib.request.Request(base+'/actions/runs/'+str(run_id),headers=auth)
+              with urllib.request.urlopen(req,timeout=15) as stream:
+                  info=json.load(stream)
+              if info.get('name')!='WorkLinks G2B API safe deploy':
+                  raise SystemExit('UNEXPECTED_G2B_RUN_ID')
+              state=info.get('status')
+              if state not in ('queued','pending','waiting','requested'):
+                  print('LEGACY_RUN_NOT_PENDING',run_id,state)
+                  continue
+              req=urllib.request.Request(base+'/actions/runs/'+str(run_id)+'/cancel',
+                                         data=b'',headers=auth,method='POST')
+              with urllib.request.urlopen(req,timeout=15) as stream:
+                  status=stream.status
+              if status!=202:
+                  raise SystemExit('LEGACY_G2B_CANCEL_NOT_ACCEPTED '+str(run_id))
+              print('LEGACY_G2B_CANCEL_ACCEPTED',run_id)
+          print('WORKLINKS_G2B_OLD_RUNS_RECONCILED=PASS')
+          PY
   deploy:
+    needs: retire_legacy
     runs-on: [self-hosted, Linux, X64, server123, suaveforge-deploy, suaveforge-org]
     timeout-minutes: 10
     steps:

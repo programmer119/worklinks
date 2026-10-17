@@ -12,6 +12,12 @@ assert '[[ "$RUNNER_NAME" =~ ^123-suaveforge-org-0[123]$ ]]' in workflow
 assert 'research-general' not in workflow.split('runs-on:',1)[1].split('timeout-minutes:',1)[0]
 assert '123-research-general-06' not in workflow
 assert 'cancel-in-progress: false' in workflow
+assert 'group: worklinks-g2b-api-production-org-20261017' in workflow
+assert 'needs: retire_legacy' in workflow
+assert 'runs-on: ubuntu-latest' in workflow
+assert 'actions: write' in workflow
+assert 'for run_id in (39000706357,39005220657):' in workflow
+assert "state not in ('queued','pending','waiting','requested')" in workflow
 assert 'workflow_dispatch:' in workflow
 assert 'test -S /home/ggul-docker/run/docker.sock' in workflow
 assert 'test -s /home/worklinks/g2b/data/bids.sqlite3' in workflow
