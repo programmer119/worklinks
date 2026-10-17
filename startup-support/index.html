@@ -1634,6 +1634,63 @@ async function loadJobEvidence(x){
   renderJobs();
  }
 }
+// Official change-history/base-amount verification is on-demand to avoid
+// spending quota on every thumbnail. Missing API records are never assumed
+// to mean there was no change.
+var bidChangePriceCache=new Map(),bidChangePriceLoading=new Set();
+async function loadBidChangePrice(x){
+ const id=jobBidIdentity(x);if(!id)return;
+ const key=id.bidNo+':'+id.order;
+ if(bidChangePriceLoading.has(key)||bidChangePriceCache.has(key))return;
+ bidChangePriceLoading.add(key);
+ if(activeDetailJobId===x.id)renderJobDetail(x);
+ try{
+  const result=await g2bFetch('/bid-change-price?bidNo='+encodeURIComponent(id.bidNo)+
+    '&order='+encodeURIComponent(id.order));
+  bidChangePriceCache.set(key,result);
+ }catch(e){
+  bidChangePriceCache.set(key,{ok:false,error:String(e.message||e).slice(0,120)});
+ }finally{
+  bidChangePriceLoading.delete(key);
+  if(activeDetailJobId===x.id)renderJobDetail(x);
+ }
+}
+function bidChangePriceMarkup(x){
+ const id=jobBidIdentity(x);if(!id)return '';
+ const key=id.bidNo+':'+id.order,r=bidChangePriceCache.get(key);
+ const preSpec=String(jobEvidenceData(x)?.noticeDocuments?.preSpecificationNo||'').trim();
+ const pre=preSpec?'<div><b>사전규격등록번호:</b> '+htmlEscape(preSpec)+
+  ' · 공식 공고 상세정보에서 확인</div>':
+  '<div>사전규격 연결번호: 공고 상세정보에서 확인되지 않음</div>';
+ let html='<section class="job-detail-section"><h3>공고 변경·기초금액 (공식 조회)</h3>'+pre;
+ if(bidChangePriceLoading.has(key))html+='<p>공식 변경이력과 기초금액 조회 중…</p>';
+ else if(!r)html+='<p>조회 전 · 원문 조건이 변경됐는지 확인할 때 조회하세요.</p>';
+ else{
+  const change=r.changeHistory,price=r.baseAmount;
+  if(change?.ok===true&&change?.complete===true){
+   html+='<p><b>공고 변경이력:</b> 공식 조회 '+(change.totalCount??'미확인')+
+    '건 (0건도 변경 없음의 확정 증거는 아님)</p>';
+   for(const item of (change.records||[]).slice(0,5)){
+    html+='<div>차수 '+htmlEscape(item.order||'미표시')+
+     (item.changedAt?' · 변경일 '+htmlEscape(item.changedAt):'')+
+     (item.reason?' · '+htmlEscape(item.reason):'')+'</div>';
+   }
+  }else html+='<p>공고 변경이력: 조회 실패·부분조회 · 변경 없음으로 처리하지 않음</p>';
+  if(price?.ok===true&&price?.complete===true){
+   const nums=(price.records||[]).filter(z=>z.baseAmount);
+   html+='<p><b>입찰 기초금액:</b> '+(nums.length?
+    nums.slice(0,3).map(z=>htmlEscape(jobAmountLabel(z.baseAmount))+
+      (z.order?' (차수 '+htmlEscape(z.order)+')':'')).join(' · '):
+    '공식 응답에서 수치 확인되지 않음')+'</p>';
+  }else html+='<p>입찰 기초금액: 조회 실패·부분조회 · 예산금액과 혼동 금지</p>';
+ }
+ html+='<button type="button" class="job-repeat" data-bid-change="'+htmlEscape(x.id)+'"'+
+  ((r||bidChangePriceLoading.has(key))?' disabled':'')+
+  '>변경이력·기초금액 조회</button>'+
+  '<p class="partner-foot">기초금액은 낙찰금액·계약금액이 아니며, 변경이력은 실제 공고 원문 최종 확인이 필요합니다.</p></section>';
+ return html;
+}
+
 function normalizedRegion(x){
  return String(x||'').replace(/특별시|광역시|특별자치시|특별자치도|자치도|도|시|군|구|\s/g,'');
 }
@@ -2189,7 +2246,8 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+extractHTML+variantLinks+actions;
+ document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+extractHTML+
+  bidChangePriceMarkup(x)+variantLinks+actions;
 }
 function openJobDetail(id){
  const x=getJobById(id);if(!x)return;
@@ -2215,7 +2273,10 @@ document.getElementById('jobDetailBody').addEventListener('click',function(e){
  const partner=e.target.closest('[data-partner-id]');
  if(partner){e.preventDefault();closeJobDetail();openPartnerModal(partner.dataset.partnerId,partner.dataset.jobId);return}
  const history=e.target.closest('[data-history-id]');
- if(history){closeJobDetail();openHistoryModal(history.dataset.historyId)}
+ if(history){closeJobDetail();openHistoryModal(history.dataset.historyId);return}
+ const change=e.target.closest('[data-bid-change]');
+ if(change){e.preventDefault();const x=getJobById(change.dataset.bidChange);
+  if(x)loadBidChangePrice(x)}
 });
 
 var jobFilter="all",jobRenderLimit=100,selectedPartnerId="all",partnerFilterOptionsKey="",jobVerdictFilter="all";
@@ -2450,7 +2511,8 @@ function renderJobs(){
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+'</div>'+
+       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+
+      (historyCompetition.sameWinner?'<span class="tag" title="과거 사업자번호가 일치하는 낙찰업체가 2개 연도 이상 확인됨 · 현재 사업의 낙찰업체는 미정">기존 업체 연속 낙찰</span>':'')+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        participationStrip(x,comparisonCompanies)+
