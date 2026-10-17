@@ -142,6 +142,40 @@ jobs:
               }""")
               assert history_ui['ok'],history_ui
               print('WORKLINKS_HISTORICAL_BID_UI=PASS',json.dumps(history_ui,ensure_ascii=False))
+              # Verify actual browser presentation of DISTINCT contract numbers
+              # using the already cached official contract register response.
+              # Award data cannot substitute for contract evidence.
+              contract_ui=page.evaluate("""async () => {
+                const no='R25BK00820928',bizno='1168129581';
+                const d=await g2bFetch('/contract-notice?bidNo='+no+'&bizno='+bizno);
+                if(d.ok!==true)return {ok:false,error:d.error};
+                const contracts=(d.contracts||[]).filter(z=>
+                  z.companyBiznoMatched===true&&z.bidNo===no&&z.contractNo);
+                contractByBid.set(no,{confirmed:contracts.length>0,count:contracts.length,
+                  contractNumbers:contracts.map(z=>z.contractNo),
+                  source:'계약정보서비스',date:contracts[0]?.date||'',
+                  amount:Number(contracts[0]?.amount)||null,error:''});
+                const x=g2bLiveJobs.find(z=>z.noticeNumber==='R26BK01775500'||
+                  /농식품 빅데이터 거래소.*운영.*유지관리/.test(String(z.title||'')));
+                if(!x)return {ok:false,error:'current_bid_absent'};
+                openHistoryModal(x.id);
+                refreshPastCompetitionText();
+                const body=document.querySelector('[data-contract-status="'+no+'"]')?.textContent||'';
+                document.getElementById('jobHistoryClose')?.click();
+                return {ok:true,officialRows:d.totalCount,unique:d.uniqueContractNumbers,
+                  duplicates:d.duplicateContractRows,conflicts:d.conflictingDuplicateRows,
+                  companyMatched:contracts.every(z=>z.companyBiznoMatched),
+                  contractNumbers:contracts.map(z=>z.contractNo),
+                  visibleUnique:body.includes('고유 계약번호 3건'),
+                  amountNotTotal:body.includes('전체 합산금액 아님'),
+                  visibleNumber:body.includes('R25TA0057644402')};
+              }""")
+              assert contract_ui['ok'] and contract_ui['officialRows']==6,contract_ui
+              assert contract_ui['unique']==3 and contract_ui['duplicates']==3,contract_ui
+              assert contract_ui['conflicts']==0 and contract_ui['companyMatched'],contract_ui
+              assert contract_ui['visibleUnique'] and contract_ui['amountNotTotal'] and contract_ui['visibleNumber'],contract_ui
+              print('WORKLINKS_KADX_REAL_CONTRACT_UI=PASS',json.dumps(contract_ui,ensure_ascii=False))
+
 
 
               # Do not confuse the official past count with current bidders.
