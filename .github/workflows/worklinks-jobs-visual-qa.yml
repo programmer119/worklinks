@@ -45,6 +45,34 @@ jobs:
                     history:x.repeatHistory?.map(y=>({year:y.year,bidNo:y.bidNo,verified:y.verified}))}))};
               }""")
               print('WORKLINKS_REPEAT_AUDIT',json.dumps(repeat,ensure_ascii=False))
+              proof=page.evaluate("""() => {
+                const rows=collapseSimilarNotices(jobs.concat(g2bLiveJobs))
+                  .filter(x=>jobSoftwareScope(x)==='candidate'&&
+                    ['open','closing'].includes(jobTimeInfo(x).key));
+                const repeat=rows.filter(x=>repeatYears(x)>=2);
+                return {activeSW:rows.length,activeRepeatTwoPlus:repeat.length,
+                  examples:repeat.slice(0,8).map(x=>({
+                    title:x.title,notice:jobBidIdentity(x)?.bidNo,
+                    years:repeatYears(x),
+                    past:x.repeatHistory.filter(y=>y.bidNo).slice(0,2).map(y=>({year:y.year,bidNo:y.bidNo}))}))};
+              }""")
+              print('WORKLINKS_ACTIVE_REPEAT_COUNT',json.dumps(proof,ensure_ascii=False))
+              # Probe exactly one known past award's public participant-count field;
+              # never assume prtcptCnum is available for every notice.
+              award=page.evaluate("""async () => {
+                const past=g2bLiveJobs.flatMap(x=>(x.repeatHistory||[]).filter(y=>y.bidNo))
+                  .find(y=>String(y.bidNo).startsWith('R25'));
+                if(!past)return {state:'no_prior_bid'};
+                try{
+                  const d=await g2bFetch('/awards?bidNo='+encodeURIComponent(past.bidNo));
+                  const exact=(d.items||[]).filter(y=>String(y.bidNtceNo||'')===String(past.bidNo));
+                  return {state:'ok',bidNo:past.bidNo,rows:exact.length,
+                    fields:exact[0]?Object.keys(exact[0]).filter(k=>/num|cnt|cnum|prtcpt|openg/i.test(k)).slice(0,16):[],
+                    counts:exact.slice(0,4).map(y=>String(y.prtcptCnum??''))};
+                }catch(e){return {state:'not_available',reason:String(e.message||e).slice(0,110)}}
+              }""")
+              print('WORKLINKS_OFFICIAL_COMPETITION_PROBE',json.dumps(award,ensure_ascii=False))
+
 
               page.wait_for_function("typeof rfpSnapshotByNotice !== 'undefined' && rfpSnapshotByNotice.size>0",timeout=25000)
               evidence=page.evaluate("""() => {
