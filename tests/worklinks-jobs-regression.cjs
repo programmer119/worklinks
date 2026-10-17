@@ -377,7 +377,7 @@ assert.equal(filterView.matchesVerdictFilter({industry:'no_restriction'},null,'n
 assert.equal(filterView.matchesVerdictFilter({industry:'unverified'},null,'registered'),false);
 assert.equal(filterView.matchesVerdictFilter({industry:'unverified'},null,'no-restriction'),false);
 assert.ok(source.includes('data-verdict-filter="ready"'));
-assert.ok(source.includes('data-verdict-filter="conditional"'));
+assert.ok(!source.includes('data-verdict-filter="conditional"'), 'obsolete conditional filter removed');
 assert.ok(source.includes('data-verdict-filter="blocked"'));
 assert.ok(source.includes('data-verdict-filter="checking"'));
 assert.ok(source.includes('data-verdict-filter="registered"'));
