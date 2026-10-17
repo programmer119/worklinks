@@ -226,7 +226,7 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs',
  'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo',
  part('const COMPETITION_STORE=','function repeatYears(x){')+
- 'return {officialAwardCount,previousOfficialBids,pastCompetitionSummary,competitionByNotice};'
+ 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,competitionByNotice,contractByBid,contractEvidenceText};'
 )(()=> '2026-10-17',{getItem:()=>null,setItem:()=>{}},
  {querySelectorAll:()=>[],getElementById:()=>null},
  async()=>({ok:true,items:[]}),()=>{},()=>[],[],[],()=> 'candidate',()=>({key:'open'}));
@@ -255,6 +255,63 @@ assert.equal(past.pastCompetitionSummary(pastBid).low,true);
 past.competitionByNotice.set('20241237450',{count:9,checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).low,false,
  'past 9-bidder year cannot be labeled uniformly low competition');
+
+// An official award record includes the winner, paid amount and bid rate.
+// These are historic facts, NOT forecasts for the present notice.
+const awardInfo=past.officialAwardDetails({items:[
+ {bidNtceNo:pBid,bidNtceOrd:'000',prtcptCnum:'2',sucsfbidRate:'88.37',
+  sucsfbidAmt:'165000000',bidwinnrNm:'직전 낙찰사',bidwinnrBizno:'123-45-67890',
+  fnlSucsfDate:'2025-09-02'},
+ {bidNtceNo:'R25BK00000009',prtcptCnum:'1',bidwinnrNm:'엉뚱한 낙찰사'}
+]},pBid);
+assert.deepEqual({count:awardInfo.count,rate:awardInfo.rate,amount:awardInfo.amount,
+ winner:awardInfo.winner,winnerBizno:awardInfo.winnerBizno},
+ {count:2,rate:88.37,amount:165000000,winner:'직전 낙찰사',winnerBizno:'1234567890'});
+assert.equal(past.officialAwardDetails({items:[
+ {bidNtceNo:pBid,prtcptCnum:'',sucsfbidRate:'',sucsfbidAmt:''}]},pBid).rate,null);
+assert.equal(past.officialAwardDetails({items:[
+ {bidNtceNo:pBid,prtcptCnum:'1',sucsfbidRate:'250.0'}]},pBid).rate,null);
+assert.equal(past.officialAwardDetails({items:[
+ {bidNtceNo:pBid,prtcptCnum:'0',bidwinnrBizno:'123'}]},pBid).winnerBizno,'');
+past.competitionByNotice.set(pBid,{...awardInfo,checkedAt:Date.now()});
+past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'1234567890',winner:'직전 낙찰사',checkedAt:Date.now()});
+assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,true,
+ 'same verified contractor business ID across years is incumbent evidence');
+past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'9999999999',winner:'다른 업체',checkedAt:Date.now()});
+assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,false,
+ 'different winner across years must not be called an incumbent');
+past.contractByBid.set(pBid,{confirmed:true,count:1,source:'계약정보서비스',
+ amount:200000000,date:'2025-10-01'});
+assert.ok(past.contractEvidenceText(pBid).includes('공고·업체번호 일치'));
+assert.ok(!past.contractEvidenceText(pBid).includes('이행 완료'));
+assert.ok(source.includes('/contract-notice?bidNo='),
+ 'missing-contract-process rows must trigger the official contract-register check');
+assert.ok(source.includes('data-incumbent-id'));
+assert.ok(source.includes('sucsfbidRate'));
+
+const changeMod=new Function('jobBidIdentity','jobEvidenceData','htmlEscape','jobAmountLabel',
+ 'activeDetailJobId','getJobById','g2bFetch','renderJobDetail',
+ part('var bidChangePriceCache=','function normalizedRegion(x){')+
+ 'return {bidChangePriceMarkup,bidChangePriceCache};'
+)(x=>({bidNo:'R26BK01756420',order:'000'}),
+ ()=>({noticeDocuments:{preSpecificationNo:'20260001234'}}),
+ v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),
+ v=>v+'원',null,()=>null,async()=>({}),()=>{});
+const extraBid={id:'g2b-servc-R26BK01756420-000'};
+assert.ok(changeMod.bidChangePriceMarkup(extraBid).includes('20260001234'));
+assert.ok(changeMod.bidChangePriceMarkup(extraBid).includes('조회 전'));
+changeMod.bidChangePriceCache.set('R26BK01756420:000',{
+ changeHistory:{ok:true,complete:true,totalCount:1,records:[
+  {order:'001',changedAt:'2026-10-12',reason:'제출기한 조정 <script>'}]},
+ baseAmount:{ok:true,complete:true,records:[
+  {order:'001',baseAmount:'150000000'}]}
+});
+const extraHtml=changeMod.bidChangePriceMarkup(extraBid);
+assert.ok(extraHtml.includes('기초금액'));
+assert.ok(extraHtml.includes('150000000원'));
+assert.ok(extraHtml.includes('&lt;script&gt;')&&!extraHtml.includes('<script>'));
+assert.ok(source.includes("'/bid-change-price?bidNo=")||
+ source.includes("g2bFetch('/bid-change-price?bidNo="));
 
 // Same-type, same-code clauses are independent until quotation actually repeats.
 const quote='입찰참가자격으로 직접생산확인증명서 8111189901 소지';
