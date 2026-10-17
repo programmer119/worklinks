@@ -18,7 +18,7 @@ def fake(base,operation,params):
     if operation=='getBidPblancListInfoServc':
         return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
             'ntceSpecDocUrl1':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/documents/rfp.pdf',
-            'ntceSpecFileNm1':'입찰공고 제안요청서.pdf',
+            'ntceSpecFileNm1':'입찰공고 제안요청서.pdf','bfSpecRgstNo':'R26PRE000001',
             'ntceSpecDocUrl2':'https://www.g2b.go.kr/docs/rfp.pdf',
             'ntceSpecFileNm2':'별도 과업지시서.pdf'}], 'totalCount':1}
     raise AssertionError(operation)
@@ -37,6 +37,7 @@ try:
     assert data['attachments']['eorderCount']==2
     assert data['attachments']['noticeDetailDocumentCount']==2
     assert data['noticeDocuments']['ok']
+    assert data['noticeDocuments']['preSpecificationNo']=='R26PRE000001'
     assert len(calls)==3 and all(call[2]['bidNtceOrd']=='000' for call in calls)
     # The public notice may contain an RFP even if the e-order API returns zero.
     def eorder_zero(base,operation,params):
@@ -59,6 +60,37 @@ try:
     assert denied['region']['error']=='upstream_result_PERMISSION_DENIED'
 finally:
     g['request_api']=original
+# Official change and base-price APIs are independent and on-demand.
+def changes_prices(base,operation,params):
+    assert 'BidPublicInfoService' in base
+    assert params['bidNtceNo']=='R26BK01756420' and params['bidNtceOrd']=='000'
+    if operation=='getBidPblancListInfoChgHstryServc':
+        return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
+                          'chgDt':'2026-10-14','chgRsn':'입찰기간 변경'}], 'totalCount':1}
+    if operation=='getBidPblancListInfoServcBsisAmount':
+        return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
+                          'bssamt':'150000000','bssamtOpenDt':'2026-10-15'}],
+                'totalCount':1}
+    raise AssertionError(operation)
+g['request_api']=changes_prices
+try:
+    extra=p['bid_change_and_price_query']('R26BK01756420','000')
+    assert extra['ok'] and extra['changeHistory']['complete']
+    assert extra['changeHistory']['records'][0]['reason']=='입찰기간 변경'
+    assert extra['baseAmount']['records'][0]['baseAmount']=='150000000'
+    # An out-of-range or non-numeric price must not appear as validated evidence.
+    def bad_price(base,operation,params):
+        if operation=='getBidPblancListInfoServcBsisAmount':
+            return {'items':[{'bidNtceNo':'R26BK01756420',
+                              'bssamt':'150000000<script>'}],'totalCount':1}
+        return {'items':[],'totalCount':0}
+    g['request_api']=bad_price
+    unknown=p['bid_change_and_price_query']('R26BK01756420','000')
+    assert unknown['baseAmount']['records'][0]['baseAmount']==''
+    assert unknown['changeHistory']['totalCount']==0
+finally:
+    g['request_api']=original
+
 # Authorization discovery is separate from a company's proven performance.
 def contract_mock(base,operation,params):
     if operation=='getCntrctInfoListServc':
