@@ -30,7 +30,7 @@ jobs:
               page=browser.new_page(viewport={'width':1440,'height':900},device_scale_factor=1)
               page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
               page.locator('#jobsView.on').wait_for(timeout=25000)
-              page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('바로 지원 확정')",timeout=30000)
+              page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
               print('WORKLINKS_BROWSER_LIVE_DATA',page.evaluate("({serverAvailable:g2bServerAvailable,savedTotal:g2bSavedTotal,liveRows:g2bLiveJobs.length,visibleCards:document.querySelectorAll('#jobCards .job-mini').length})"))
               page.wait_for_function("typeof rfpSnapshotByNotice !== 'undefined' && rfpSnapshotByNotice.size>0",timeout=25000)
@@ -110,6 +110,33 @@ jobs:
               assert page.locator('[data-verdict-filter="registered"]').get_attribute('aria-pressed')=='true'
               assert page.locator('#jobCards .job-mini').count()>0
               page.locator('[data-verdict-filter="all"]').click()
+              # Provisional eligible screening includes unknowns, but final
+              # confirmed and hard exclusions must remain distinguishable.
+              provisional=page.evaluate("""() => {
+                const xs=collapseSimilarNotices(jobs.concat(g2bLiveJobs))
+                  .filter(x=>jobSoftwareScope(x)==='candidate' &&
+                    ['open','closing'].includes(jobTimeInfo(x).key));
+                const p=partners[0];
+                const result={active:xs.length,provisional:0,confirmed:0,excluded:0,
+                  unknownIndustryCandidates:0,samples:[]};
+                for(const x of xs){
+                  const v=participationVerdict(x,p);
+                  const q=jobQualificationVerdict(x,p);
+                  if(v.type==='ready'){
+                    result.provisional++;
+                    if(v.verified)result.confirmed++;
+                    if(q.type==='unverified')result.unknownIndustryCandidates++;
+                    if(result.samples.length<8)result.samples.push({
+                      id:jobBidIdentity(x)?.bidNo,title:x.title,
+                      industry:q.type,verified:v.verified,reason:v.reason});
+                  } else if(v.type==='blocked') result.excluded++;
+                }
+                return result;
+              }""")
+              assert provisional['provisional']>0, 'unknowns should be eligible candidates'
+              assert provisional['confirmed']<=provisional['provisional']
+              assert provisional['provisional']+provisional['excluded']<=provisional['active']
+              print('WORKLINKS_PROVISIONAL_ELIGIBILITY',json.dumps(provisional,ensure_ascii=False))
               print('WORKLINKS_LIVE_INDUSTRY_FILTERS=PASS',json.dumps(industry_counts,ensure_ascii=False))
               # Identify real source-scanned, registered-industry candidates still blocked.
               # Each record shows why an otherwise relevant open notice does not go ready.
