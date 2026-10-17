@@ -2187,7 +2187,7 @@ function renderJobs(){
  const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
  const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
  const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
- const repeatCount=considered.filter(o=>repeatYears(o.x)>=2).length;
+ const repeatCount=candidateJobs.filter(o=>repeatYears(o.x)>=2).length;
  const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>participationVerdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
  document.getElementById('partnerJobCount').textContent='('+active.length+')';
