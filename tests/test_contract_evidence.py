@@ -58,6 +58,44 @@ try:
     assert len(r2['probes'])==2
 finally:
     g['request_api']=original
+# Independent contract-info lookup: only the SAME notice and an explicitly
+# matching contractor business ID count as a contract. Awards are not proof.
+def contract_register_mock(base,op,params):
+    assert 'CntrctInfoService' in base
+    assert op=='getCntrctInfoListServcPPSSrch'
+    assert params['bidNtceNo']==BID and params['inqryDiv']==4
+    return {'totalCount':4,'items':[
+        {'ntceNo':BID,'dcsnCntrctNo':'REG-1','cntrctNm':'실제 용역 계약',
+         'corpList':[{'corpBizno':'130-81-85973'}],
+         'thtmCntrctAmt':'150000000','cntrctPrd':'1년','cntrctCnclsDate':'2025-10-01'},
+        {'ntceNo':BID,'dcsnCntrctNo':'OTHER',
+         'corpList':[{'corpBizno':'9999999999'}]},
+        {'ntceNo':'DIFFERENT','dcsnCntrctNo':'WRONG-NOTICE',
+         'corpList':[{'corpBizno':'1308185973'}]},
+        {'dcsnCntrctNo':'UNKNOWN-NOTICE','corpList':[{'corpBizno':'1308185973'}]}
+    ]}
+g['request_api']=contract_register_mock
+try:
+    exact=p['contract_notice_lookup'](BID,'1308185973')
+    assert exact['ok'] and exact['complete']
+    assert exact['attributableCount']==1 and exact['contracts'][0]['contractNo']=='REG-1'
+    assert exact['contracts'][0]['companyBiznoMatched']
+    assert exact['contracts'][0]['amount']=='150000000'
+    assert exact['otherCompanyCount']==1 and exact['unattributedCount']==2
+    assert exact['contracts'][0]['performanceComplete'] is None
+    def winner_only(base,op,params):
+        return {'totalCount':1,'items':[{'ntceNo':BID,
+           'bidwinnrBizno':'1308185973','corpList':[]}]}
+    g['request_api']=winner_only
+    assert p['contract_notice_lookup'](BID,'1308185973')['attributableCount']==0
+    def denied_register(base,op,params):
+        raise p['ApiError']('upstream_http_403_SERVICE_ACCESS_DENIED_ERROR')
+    g['request_api']=denied_register
+    failed=p['contract_notice_lookup'](BID,'1308185973')
+    assert failed['ok'] is False and failed['contracts']==[]
+finally:
+    g['request_api']=original
+
 class FakeHTTP403:
     code=403
     def read(self,limit):
