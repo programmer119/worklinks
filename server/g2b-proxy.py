@@ -622,6 +622,55 @@ def query_saved_bids(limit,offset,only_sw=False):
     finally:con.close()
 
 
+def cached_historic_awards(limit=200,offset=0):
+    """Read-only public snapshot: the worker stores exact positive official awards."""
+    db=open_bid_db()
+    try:
+        table=db.execute("SELECT 1 FROM sqlite_master WHERE name='bid_award_cache' AND type='table'").fetchone()
+        now=datetime.datetime.utcnow().isoformat()+'Z'
+        empty={'ok':True,'installed':False,'schemaVersion':1,
+               'source':'나라장터 낙찰정보서비스','verifiedAt':now,'totalCount':0,
+               'records':[],'persisted':True}
+        if not table:return empty
+        cutoff=(datetime.datetime.utcnow()-datetime.timedelta(days=45)).isoformat()+'Z'
+        total=db.execute('SELECT COUNT(*) FROM bid_award_cache WHERE checked_at>=?',(cutoff,)).fetchone()[0]
+        rows=db.execute('''SELECT bid_no,payload,checked_at FROM bid_award_cache
+          WHERE checked_at>=? ORDER BY checked_at DESC,bid_no LIMIT ? OFFSET ?''',
+          (cutoff,limit,offset)).fetchall()
+        records=[]
+        for no,payload,checked in rows:
+            try:
+                row=json.loads(payload)
+                if row.get('bidNo')!=no or int(row.get('count') or 0)<=0:continue
+                row['verifiedAt']=checked
+                records.append(row)
+            except (ValueError,TypeError,AttributeError):pass
+        empty.update({'installed':True,'totalCount':total,
+                      'records':records,'limit':limit,'offset':offset})
+        return empty
+    finally:db.close()
+
+
+def award_enricher_status():
+    """Aggregated worker telemetry; never return raw upstream response fields."""
+    db=open_bid_db()
+    try:
+        table=db.execute("SELECT 1 FROM sqlite_master WHERE name='bid_award_worker_status' AND type='table'").fetchone()
+        if not table:return {'ok':True,'installed':False,'state':'not_installed'}
+        info=db.execute('''SELECT last_run,last_success,requests_last_run,
+          stored_last_run,errors_last_run,cooldown_until,message
+          FROM bid_award_worker_status WHERE id=1''').fetchone()
+        total=db.execute('SELECT COUNT(*) FROM bid_award_cache').fetchone()[0]
+        deferred=db.execute('SELECT COUNT(*) FROM bid_award_attempts WHERE retry_after>?',
+          (datetime.datetime.utcnow().isoformat()+'Z',)).fetchone()[0]
+        return {'ok':True,'installed':True,'state':info[6] if info else 'initialized',
+          'lastRun':info[0] if info else None,'lastSuccess':info[1] if info else None,
+          'requestsLastRun':info[2] if info else 0,'storedLastRun':info[3] if info else 0,
+          'errorsLastRun':info[4] if info else 0,'cooldownUntil':info[5] if info else None,
+          'verifiedAwards':total,'deferredUnknowns':deferred}
+    finally:db.close()
+
+
 def crawler_state():
     con=open_bid_db()
     try:
@@ -862,6 +911,14 @@ class Handler(BaseHTTPRequestHandler):
             if not get_key(): raise ApiError('secret_not_configured',503)
             if u.path == '/api/g2b/crawl-status':
                 return self.reply(200,crawler_state())
+            if u.path == '/api/g2b/award-cache':
+                try: limit,offset=int(get('limit','200')),int(get('offset','0'))
+                except ValueError:raise ApiError('invalid_award_cache_pagination',400)
+                if not (1<=limit<=200 and 0<=offset<=10000):
+                    raise ApiError('invalid_award_cache_pagination',400)
+                return self.reply(200,cached_historic_awards(limit,offset))
+            if u.path == '/api/g2b/award-cache-status':
+                return self.reply(200,award_enricher_status())
             if u.path == '/api/g2b/saved':
                 try: limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except ValueError: raise ApiError('invalid_saved_pagination',400)
