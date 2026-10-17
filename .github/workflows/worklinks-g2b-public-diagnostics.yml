@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/worklinks-g2b-public-diagnostics.yml'
+      - '.github/workflows/worklinks-g2b-api-deploy.yml'
+      - 'server/deploy-g2b-api-only.sh'
+      - 'tests/test_worklinks_deploy_runner_policy.py'
       - 'server/g2b-proxy.py'
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
@@ -26,6 +29,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           python3 -m py_compile server/g2b-proxy.py
+          python3 tests/test_worklinks_deploy_runner_policy.py
           python3 tests/test_g2b_eligibility_join.py
           python3 tests/test_direct_production.py
           python3 tests/test_bid_evidence.py

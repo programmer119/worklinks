@@ -17,18 +17,22 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Linux, X64, server123, research-general]
+    runs-on: [self-hosted, Linux, X64, server123, suaveforge-deploy, suaveforge-org]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Guard dedicated server123 WorkLinks runner
+      - name: Guard production server123 runner 01/02/03 (no research runners)
         shell: bash
         run: |
           set -Eeuo pipefail
           echo "Runner name: $RUNNER_NAME"
-          test "$RUNNER_NAME" = "123-research-general-06"
+          [[ "$RUNNER_NAME" =~ ^123-suaveforge-org-0[123]$ ]] || {
+            echo "INVALID_G2B_DEPLOY_RUNNER=$RUNNER_NAME"; exit 7;
+          }
           test -s /home/worklinks/g2b/data/bids.sqlite3
           test -s /home/worklinks/g2b/g2b-proxy-docker.py
+          test -x /home/ggul-docker/bin/docker
+          test -S /home/ggul-docker/run/docker.sock
       - name: Safe G2B API-only deployment and public smoke test
         shell: bash
         run: bash server/deploy-g2b-api-only.sh

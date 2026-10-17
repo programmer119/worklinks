@@ -83,6 +83,13 @@ done
 echo 'WORKLINKS_CONTRACT_AND_CHANGE_API_ROUTES=PASS'
 PUBLIC="$(curl -fsS --max-time 20 'https://api-suaveforge.suaveforge.com:18458/api/g2b/saved?sw=1&limit=1&offset=0')"
 [[ "$PUBLIC" == *'"eligibilityLinked"'* ]]
+# Verify HTTPS routes have reached the actual production API, not just localhost.
+# Deliberately invalid inputs return 400 without consuming official API quota.
+for path in 'contract-notice?bidNo=BAD&bizno=1' 'bid-change-price?bidNo=BAD&order=0';do
+  code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "https://api-suaveforge.suaveforge.com:18458/api/g2b/$path")"
+  test "$code" = 400 || { echo "PUBLIC_G2B_ROUTE_NOT_DEPLOYED=$path status=$code"; exit 10; }
+done
+echo 'WORKLINKS_G2B_PUBLIC_ROUTES=PASS'
 test "$(dk inspect -f '{{.State.Running}}' "$API")" = true
 trap - ERR
 echo 'WORKLINKS_G2B_API_DEPLOY=PASS'
