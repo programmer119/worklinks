@@ -1328,6 +1328,8 @@ try{
  if(saved&&typeof saved==='object'){
   for(const [no,row] of Object.entries(saved)){
    if(!/^[A-Za-z0-9-]{8,40}$/.test(no)||!row||Date.now()-row.checkedAt>14*86400000)continue;
+   // Purge stale failures persisted by pre-fix versions of the client.
+   if(row.source==='조회 실패')continue;
    if(row.count===null||(Number.isInteger(row.count)&&row.count>0&&row.count<=1000000))
     competitionByNotice.set(no,row);
   }
@@ -1517,13 +1519,17 @@ async function loadPastCompetitionForJobs(targets,limit){
    }catch(e){
     const msg=String(e.message||e);
     // Rate limiting must halt the batch without incorrectly recording zeros.
-    if(/429|rate_limited|LIMITED_NUMBER|upstream_result_22|upstream_result_23/.test(msg))break;
+    if(/429|rate_limited|LIMITED_NUMBER|upstream_result_22|upstream_result_23/.test(msg)){
+     competitionRetryAfter.set(no,Date.now()+30*60000);
+     break;
+    }
     // A failed API response is unknown; retry after a short cooldown.
     competitionRetryAfter.set(no,Date.now()+10*60000);
    }
    competitionFetchRequests++;
    if(competitionFetchRequests%4===0){savePastCompetition();renderJobs();refreshPastCompetitionText()}
-   await new Promise(resolve=>setTimeout(resolve,350));
+   // The crawler shares the upstream quota; avoid bursty on-demand research.
+   await new Promise(resolve=>setTimeout(resolve,750));
   }
  }finally{
   competitionRunning=false;savePastCompetition();renderJobs();refreshPastCompetitionText();

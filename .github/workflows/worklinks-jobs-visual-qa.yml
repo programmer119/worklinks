@@ -259,6 +259,29 @@ jobs:
               assert provisional['provisional']+provisional['excluded']<=provisional['active']
               print('WORKLINKS_PROVISIONAL_ELIGIBILITY',json.dumps(provisional,ensure_ascii=False))
               print('WORKLINKS_LIVE_INDUSTRY_FILTERS=PASS',json.dumps(industry_counts,ensure_ascii=False))
+              # Exercise both newly published buttons on the real page without
+              # spending upstream quota. Existing unit tests prove the data rule.
+              turnover_controls=page.evaluate("""() => {
+                const original=loadPastCompetitionForJobs;
+                loadPastCompetitionForJobs=()=>Promise.resolve();
+                const result=[];
+                try{
+                  for(const code of ['low-changed','low-incumbent']){
+                    const b=document.querySelector('[data-verdict-filter="'+code+'"]');
+                    if(!b){result.push({code,found:false});continue}
+                    b.click();
+                    result.push({code,found:true,pressed:b.getAttribute('aria-pressed'),
+                      selected:jobVerdictFilter,count:b.querySelector('[data-verdict-count]')?.textContent,
+                      rendered:document.querySelectorAll('#jobCards .job-mini').length});
+                  }
+                  document.querySelector('[data-verdict-filter="all"]')?.click();
+                }finally{loadPastCompetitionForJobs=original}
+                return result;
+              }""")
+              assert len(turnover_controls)==2 and all(
+                x.get('found') and x.get('pressed')=='true' and x.get('selected')==x.get('code')
+                for x in turnover_controls),turnover_controls
+              print('WORKLINKS_WINNER_TURNOVER_FILTERS=PASS',json.dumps(turnover_controls,ensure_ascii=False))
               # Identify real source-scanned, registered-industry candidates still blocked.
               # Each record shows why an otherwise relevant open notice does not go ready.
               missed=page.evaluate("""() => {

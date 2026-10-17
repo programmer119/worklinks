@@ -302,6 +302,9 @@ assert.ok(source.includes('data-verdict-filter="low-changed"'));
 assert.ok(source.includes('data-verdict-filter="low-incumbent"'));
 assert.ok(source.includes('historyCompetition.changedWinner'));
 assert.ok(source.includes('const competitionRetryAfter=new Map()'));
+assert.ok(source.includes("if(row.source==='조회 실패')continue"));
+assert.ok(source.includes("competitionRetryAfter.set(no,Date.now()+30*60000)"));
+assert.ok(source.includes('setTimeout(resolve,750)'));
 assert.ok(source.includes('sucsfbidRate'));
 
 const changeMod=new Function('jobBidIdentity','jobEvidenceData','htmlEscape','jobAmountLabel',
@@ -479,7 +482,9 @@ const filterView=new Function('partners','participationVerdict','document','html
 )([bidder],(x,p)=>({type:x.verdict||'checking'}),{
  querySelectorAll:()=>[],
  getElementById:()=>({hidden:false})
-},value=>String(value),(x,p)=>({type:x.industry||'unverified'}),x=>x.repeat||0,x=>({low:!!x.low}),()=> 'candidate');
+},value=>String(value),(x,p)=>({type:x.industry||'unverified'}),x=>x.repeat||0,
+ x=>({low:!!x.low,lowRecentPair:!!x.lowRecentPair,changedWinner:!!x.changedWinner,sameWinner:!!x.sameWinner}),
+ ()=> 'candidate');
 for(const [verdict,type] of [['ready','ready'],['conditional','conditional'],['blocked','blocked'],['checking','checking']]){
  assert.equal(filterView.matchesVerdictFilter({verdict},null,type),true);
  assert.equal(filterView.matchesVerdictFilter({verdict},null,'all'),true);
@@ -495,6 +500,16 @@ assert.equal(filterView.matchesVerdictFilter({low:true},null,'low-bids'),false,
  'past low competition only appears among eligible candidates');
 assert.equal(filterView.matchesVerdictFilter({low:true,verdict:'ready'},null,'low-bids'),true,
  'confirmed past one-to-two bidders can be prioritized among eligible candidates');
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'ready'},
+ null,'low-changed'),true, 'verified historic turnover is a visible filter');
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,sameWinner:true,verdict:'ready'},
+ null,'low-incumbent'),true, 'confirmed historic same-bizno awards are separate');
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,sameWinner:true,verdict:'ready'},
+ null,'low-changed'),false, 'incumbent is not a changed winner');
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'blocked'},
+ null,'low-changed'),false, 'verified exclusion still blocks proposed bid');
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:false,changedWinner:true,verdict:'ready'},
+ null,'low-changed'),false, 'both previous years need confirmed 1-2 participants');
 
 assert.ok(source.includes('data-verdict-filter="ready"'));
 assert.ok(!source.includes('data-verdict-filter="conditional"'), 'obsolete conditional filter removed');
