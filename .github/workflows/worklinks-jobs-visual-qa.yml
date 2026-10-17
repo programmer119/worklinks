@@ -86,6 +86,37 @@ jobs:
                 }catch(e){return {state:'not_available',reason:String(e.message||e).slice(0,110)}}
               }""")
               print('WORKLINKS_OFFICIAL_COMPETITION_PROBE',json.dumps(award,ensure_ascii=False))
+              live_competition=page.evaluate("""async () => {
+                const x=g2bLiveJobs.find(x=>
+                  /농식품 빅데이터 거래소.*운영.*유지관리/.test(String(x.title||''))&&
+                  repeatYears(x)>=2);
+                if(!x)return {ok:false,reason:'KADX recurring record not found'};
+                const prior=previousOfficialBids(x)[0];
+                if(!prior)return {ok:false,reason:'KADX prior notice not found'};
+                try{
+                  const data=await g2bFetch('/awards?bidNo='+encodeURIComponent(prior.bidNo));
+                  const n=officialAwardCount(data,prior.bidNo);
+                  if(n===null)return {ok:false,reason:'official participant count absent',bidNo:prior.bidNo};
+                  competitionByNotice.set(prior.bidNo,{count:n,checkedAt:Date.now(),
+                    source:'나라장터 낙찰정보서비스'});
+                  const summary=pastCompetitionSummary(x);
+                  const verdict=participationVerdict(x,partners[0]).type;
+                  jobVerdictFilter='low-bids';renderJobs();
+                  const filterCount=Number(document.querySelector('[data-verdict-count="low-bids"]')?.textContent||0);
+                  const cards=document.querySelectorAll('#jobCards .job-mini').length;
+                  jobVerdictFilter='all';renderJobs();
+                  return {ok:true,bidNo:prior.bidNo,year:prior.year,participants:n,
+                    previousLow:summary.low,verdict,filterCount,cards};
+                }catch(e){return {ok:false,reason:String(e.message||e).slice(0,100)}}
+              }""")
+              assert live_competition['ok'], live_competition
+              assert live_competition['participants']==2
+              assert live_competition['previousLow'] is True
+              if live_competition['verdict']=='ready':
+                assert live_competition['filterCount']>0
+                assert live_competition['cards']>0
+              print('WORKLINKS_KADX_REAL_LOW_COMPETITION=PASS',json.dumps(live_competition,ensure_ascii=False))
+
               # Do not confuse the official past count with current bidders.
               assert page.evaluate("""() => officialAwardCount({
                 items:[{bidNtceNo:'R25BK00820928',bidNtceOrd:'000',prtcptCnum:'2'}]
