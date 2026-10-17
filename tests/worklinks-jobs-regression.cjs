@@ -333,7 +333,7 @@ assert.ok(source.includes('loadOfficialAwardSnapshot()'));
 const verifiedSnapshot=JSON.parse(require('node:fs').readFileSync(
  require('node:path').join(__dirname,'../startup-support/official-awards-snapshot.json'),'utf8'));
 assert.equal(verifiedSnapshot.source,'나라장터 낙찰정보서비스');
-assert.equal(verifiedSnapshot.records.length,11);
+assert.ok(verifiedSnapshot.records.length>=25);
 const verifiedAt=Date.parse(verifiedSnapshot.verifiedAt);
 // Prior synthetic test overwrote this exact notice with a newer fake winner:
 // remove the fixture before verifying that real snapshot evidence imports.
@@ -343,6 +343,13 @@ assert.ok(sampleExtra>=9,'historical winners from exact official results must be
 assert.equal(past.competitionByNotice.get('R25BK01238764').winnerBizno,'1018654725');
 assert.equal(past.competitionByNotice.get('20241237450').winnerBizno,'1018654725');
 assert.equal(past.competitionByNotice.get('20241122476').count,1);
+assert.equal(past.competitionByNotice.get('R25BK01241784').winnerBizno,'3058195207');
+assert.equal(past.competitionByNotice.get('20241217271').winnerBizno,'3148187981');
+const statsBid={repeatHistory:[{year:2026,verified:true},
+ {year:2025,bidNo:'R25BK01241784',verified:true},
+ {year:2024,bidNo:'20241217271',verified:true}]};
+assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(statsBid)).level,3);
+
 assert.equal(past.mergeOfficialAwardSnapshot({...verifiedSnapshot,records:[
  {bidNo:'R25BK00000099',count:0,winnerBizno:'1018654725',amount:1,winner:'fake',rate:99}
 ]},verifiedAt+86400000),0,'an unknown or zero-participant award is not confirmed');

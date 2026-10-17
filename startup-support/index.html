@@ -1540,20 +1540,21 @@ async function loadPastContracts(x){
  }
 }
 function mergeOfficialAwardSnapshot(snapshot,now=Date.now()){
- // Only PUBLIC, already verified historic awards. A stale or malformed snapshot
- // cannot overwrite newer live browser evidence or manufacture zero bidders.
- const stamp=Date.parse(snapshot?.verifiedAt||'');
+ const published=Date.parse(snapshot?.verifiedAt||'');
  if(snapshot?.schemaVersion!==1||snapshot?.source!=='나라장터 낙찰정보서비스'||
-    !Number.isFinite(stamp)||now<stamp||now-stamp>45*86400000||
+    !Number.isFinite(published)||now<published||now-published>45*86400000||
     !Array.isArray(snapshot.records)||snapshot.records.length>200)return 0;
  let added=0;
  for(const r of snapshot.records){
-  const bidNo=String(r?.bidNo||''),bizno=String(r?.winnerBizno||'');
-  if(!/^[a-zA-Z0-9-]{8,40}$/.test(bidNo)||!/^\d{10}$/.test(bizno)||
+  const bidNo=String(r?.bidNo||''),bizno=String(r?.winnerBizno??'');
+  const stamp=Date.parse(r?.verifiedAt||snapshot.verifiedAt);
+  if(!Number.isFinite(stamp)||stamp>now||now-stamp>45*86400000)continue;
+  if(!/^[a-zA-Z0-9-]{8,40}$/.test(bidNo)||
+     !(bizno===''||/^\d{10}$/.test(bizno))||
      !Number.isInteger(r?.count)||r.count<1||r.count>1000000||
-     !Number.isSafeInteger(r?.amount)||r.amount<=0||
+     !(r.amount===null||(Number.isSafeInteger(r?.amount)&&r.amount>0))||
      !(r.rate===null||(typeof r.rate==='number'&&r.rate>0&&r.rate<=100))||
-     typeof r.winner!=='string'||!r.winner.trim())continue;
+     typeof r.winner!=='string'||r.winner.length>100)continue;
   const prev=competitionByNotice.get(bidNo);
   if(prev&&Number.isFinite(prev.checkedAt)&&prev.checkedAt>=stamp)continue;
   competitionByNotice.set(bidNo,{count:r.count,rate:r.rate,amount:r.amount,
