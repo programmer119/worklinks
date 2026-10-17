@@ -239,6 +239,59 @@ def contract_evidence_query(bid_no,bizno):
             'limitations':'계약 기업정보의 명시된 사업자번호가 정확히 일치할 때만 귀속합니다. 낙찰정보만 일치하면 계약실적으로 귀속하지 않습니다. 이행완료·검수·실적증명은 별도 확인 필요.'}
 
 
+def contract_notice_lookup(bid_no, bizno):
+    """Public contracted work for an exact tender and exact company registration.
+
+    Unlike winner listings, a contract is counted only when BOTH the notice
+    reference and a named contractor registration number match. Missing fields
+    or an empty result are unknown, not proof of no contract/performance.
+    """
+    params={'pageNo':1,'numOfRows':100,'inqryDiv':4,'bidNtceNo':bid_no}
+    try:
+        data=request_api(CONTRACT_BASE,'getCntrctInfoListServcPPSSrch',params)
+    except ApiError as e:
+        return {'ok':False,'bidNo':bid_no,'contracts':[],'attributableCount':0,
+                'complete':False,'error':e.msg,'source':'나라장터 계약정보서비스'}
+    results=[]
+    other=0;unattributed=0
+    for row in data['items']:
+        if not isinstance(row,dict):continue
+        # ntceNo is the tender reference in the official contract list.
+        no=_pick(row,['ntceNo','bidNtceNo','bidPblancNo'])
+        if no!=bid_no:
+            unattributed+=1
+            continue
+        entries=_contract_items(row.get('corpList'))
+        if not entries:
+            unattributed+=1
+            continue
+        ids=set(num for ent in entries for num in _contract_business_number(ent))
+        if not ids:
+            unattributed+=1
+            continue
+        if bizno not in ids:
+            other+=1
+            continue
+        number=_pick(row,['dcsnCntrctNo','cntrctNo','cntrctRefNo'])
+        results.append({
+            'bidNo':bid_no,'companyBiznoMatched':True,'contractNo':number,
+            'title':_pick(row,['cntrctNm','cntrctName']),
+            'date':_pick(row,['cntrctCnclsDate','cntrctDate','cntrctDt']),
+            'amount':_pick(row,['thtmCntrctAmt','totCntrctAmt','cntrctAmt']),
+            'agency':_pick(row,['cntrctInsttNm','dminsttNm']),
+            'contractPeriod':_pick(row,['cntrctPrd']),
+            'performanceComplete':None,'inspectionComplete':None,
+            'certificateAvailable':None})
+    return {'ok':True,'bidNo':bid_no,'bizno':bizno,'contracts':results,
+            'attributableCount':len(results),
+            'totalCount':data['totalCount'],
+            'complete':len(data['items'])>=data['totalCount'],
+            'unattributedCount':unattributed,'otherCompanyCount':other,
+            'source':'나라장터 계약정보서비스 · 공고번호 및 계약업체번호 일치',
+            'contractPerformanceVerified':False,
+            'limitations':'확인된 계약체결만 표시. 계약 이행·검수·실적증명서를 뜻하지 않음.'}
+
+
 def _bid_evidence_fetch(operation, bid_no, order):
     """Public notice metadata. Missing API rows NEVER means unrestricted/qualified."""
     try:
@@ -802,6 +855,17 @@ class Handler(BaseHTTPRequestHandler):
                             'contractPerformanceVerified':False,
                             'officialUrl':'https://www.data.go.kr/data/15129459/openapi.do'}
                 with lock:cache[ck]=(time.time()+6*3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-notice':
+                bid_no=get('bidNo').strip()
+                bizno=re.sub(r'\D','',get('bizno').strip())
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
+                    raise ApiError('invalid_contract_lookup',400)
+                ck=('contract-notice',bid_no,bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=contract_notice_lookup(bid_no,bizno)
+                with lock:cache[ck]=(time.time()+(24*3600 if result.get('ok') else 1200),result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/bid-evidence':
                 bid_no=get('bidNo').strip()
