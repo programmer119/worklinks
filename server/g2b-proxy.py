@@ -352,13 +352,30 @@ def _pick(row, names):
             return str(value).strip()
     return ''
 
+def _all_notice_changes(bid_no):
+    """Read every version of this notice, not just the current bid ordinal."""
+    try:
+        data=request_api(API_BASE,'getBidPblancListInfoChgHstryServc',{
+            'pageNo':1,'numOfRows':100,'inqryDiv':2,'bidNtceNo':bid_no})
+        if data['totalCount']>100:
+            return {'ok':False,'complete':False,'error':'change_history_over_100',
+                    'count':data['totalCount'],'items':[]}
+        exact=[x for x in data['items'] if isinstance(x,dict) and
+               str(x.get('bidNtceNo') or '')==bid_no]
+        return {'ok':True,'complete':len(data['items'])>=data['totalCount'],
+                'error':'','count':data['totalCount'],'items':exact}
+    except ApiError as e:
+        return {'ok':False,'complete':False,'error':e.msg,
+                'count':None,'items':[]}
+
+
 def bid_change_and_price_query(bid_no,order):
     """Bounded official service-bid change history and base amount evidence.
 
     This endpoint does not interpret a returned numeric amount as an actual bid
     or create an 'unchanged' claim from empty/failed upstream responses.
     """
-    changes=_bid_evidence_fetch('getBidPblancListInfoChgHstryServc',bid_no,order)
+    changes=_all_notice_changes(bid_no)
     prices=_bid_evidence_fetch('getBidPblancListInfoServcBsisAmount',bid_no,order)
     history=[]
     for row in changes['items']:
