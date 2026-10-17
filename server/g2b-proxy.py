@@ -320,10 +320,12 @@ def _notice_document_query(bid_no, order):
     Links are untrusted until download-time host, path and file-type validation.
     """
     result=_bid_evidence_fetch('getBidPblancListInfoServc',bid_no,order)
-    items=[];seen=set();found_fields=set()
+    items=[];seen=set();found_fields=set();pre_spec_no=''
     if result['ok'] and result['complete']:
         for row in result['items']:
             if not isinstance(row,dict):continue
+            if not pre_spec_no:
+                pre_spec_no=_pick(row,['bfSpecRgstNo'])
             for i in range(1,11):
                 url=str(row.get('ntceSpecDocUrl'+str(i)) or '').strip()
                 name=str(row.get('ntceSpecFileNm'+str(i)) or '').strip()
@@ -338,6 +340,7 @@ def _notice_document_query(bid_no, order):
             'error':result.get('error',''),'noticeRows':result.get('count'),
             'items':items,'source':'나라장터 입찰공고 상세정보',
             'foundDocumentFields':sorted(found_fields),
+            'preSpecificationNo':pre_spec_no[:40],
             'returnedRawFields':sorted(result['items'][0].keys())
                if result['items'] and isinstance(result['items'][0],dict) else []}
 
@@ -348,6 +351,45 @@ def _pick(row, names):
         if value is not None and str(value).strip():
             return str(value).strip()
     return ''
+
+def bid_change_and_price_query(bid_no,order):
+    """Bounded official service-bid change history and base amount evidence.
+
+    This endpoint does not interpret a returned numeric amount as an actual bid
+    or create an 'unchanged' claim from empty/failed upstream responses.
+    """
+    changes=_bid_evidence_fetch('getBidPblancListInfoChgHstryServc',bid_no,order)
+    prices=_bid_evidence_fetch('getBidPblancListInfoServcBsisAmount',bid_no,order)
+    history=[]
+    for row in changes['items']:
+        if not isinstance(row,dict):continue
+        history.append({
+            'order':_pick(row,['bidNtceOrd']),
+            'changedAt':_pick(row,['chgDt','chgDate','bidNtceChgDt']),
+            'reason':_pick(row,['chgRsn','chgRsnCn','chgRsnNm','chgResnCn'])[:220],
+            'publicFields':sorted(row.keys())[:60]
+        })
+    amounts=[]
+    for row in prices['items']:
+        if not isinstance(row,dict):continue
+        amount=_pick(row,['bssamt','bsisAmount','bssamtAmt','baseAmount'])
+        if amount and not re.fullmatch(r'\d{1,17}(?:\.\d{1,2})?',amount.replace(',','')):
+            amount=''
+        amounts.append({
+            'order':_pick(row,['bidNtceOrd']),'baseAmount':amount.replace(',',''),
+            'publishedAt':_pick(row,['bssamtOpenDt','bssamtRgstrDt','rgstDt']),
+            'publicFields':sorted(row.keys())[:60]
+        })
+    return {'ok':changes['ok'] or prices['ok'],'bidNo':bid_no,'order':order,
+       'changeHistory':{'ok':changes['ok'],'complete':changes['complete'],
+            'totalCount':changes['count'],'records':history,
+            'error':changes.get('error','')},
+       'baseAmount':{'ok':prices['ok'],'complete':prices['complete'],
+            'totalCount':prices['count'],'records':amounts,
+            'error':prices.get('error','')},
+       'checkedAt':datetime.datetime.utcnow().isoformat()+'Z',
+       'limitations':'변경내역 API 0건 또는 미조회는 변경 없음의 보증이 아님. 기초금액은 투찰금액·계약금액이 아님.'}
+
 
 def bid_evidence_query(bid_no, order):
     regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn',bid_no,order)
@@ -866,6 +908,17 @@ class Handler(BaseHTTPRequestHandler):
                 if saved and saved[0]>time.time():return self.reply(200,saved[1])
                 result=contract_notice_lookup(bid_no,bizno)
                 with lock:cache[ck]=(time.time()+(24*3600 if result.get('ok') else 1200),result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/bid-change-price':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('bid-change-price',bid_no,order)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=bid_change_and_price_query(bid_no,order)
+                with lock:cache[ck]=(time.time()+(12*3600 if result.get('ok') else 1200),result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/bid-evidence':
                 bid_no=get('bidNo').strip()
