@@ -121,6 +121,28 @@ jobs:
                 assert live_competition['filterCount']>0
                 assert live_competition['cards']>0
               print('WORKLINKS_KADX_REAL_LOW_COMPETITION=PASS',json.dumps(live_competition,ensure_ascii=False))
+              history_ui=page.evaluate("""() => {
+                const x=g2bLiveJobs.find(z=>z.noticeNumber==='R26BK01775500'||
+                  /농식품 빅데이터 거래소.*운영.*유지관리/.test(String(z.title||'')));
+                if(!x)return {ok:false,reason:'not_found'};
+                for(const p of previousOfficialBids(x)){
+                  if(!competitionByNotice.has(p.bidNo))
+                    competitionByNotice.set(p.bidNo,{count:null,checkedAt:Date.now()});
+                  contractByBid.set(p.bidNo,{confirmed:false,error:''});
+                }
+                openHistoryModal(x.id);
+                refreshPastCompetitionText();
+                const body=document.querySelector('#jobHistoryRows')?.innerText||'';
+                const okay=body.includes('86.842%')&&
+                  body.includes('2개사')&&body.includes('247500000')===false&&
+                  body.includes('2억')&&body.includes('한국능률협회컨설팅')&&
+                  body.includes('실제 계약:');
+                document.getElementById('jobHistoryClose')?.click();
+                return {ok:okay,excerpt:body.slice(0,580)};
+              }""")
+              assert history_ui['ok'],history_ui
+              print('WORKLINKS_HISTORICAL_BID_UI=PASS',json.dumps(history_ui,ensure_ascii=False))
+
 
               # Do not confuse the official past count with current bidders.
               assert page.evaluate("""() => officialAwardCount({
