@@ -105,7 +105,7 @@ jobs:
               assert industry_counts['match']>0,'official registered industry matches must be visible'
               assert industry_counts['noRestriction']>=0
               assert '등록업종 일치' in industry_counts['summary']
-              assert '면허제한 0건' in industry_counts['summary']
+              assert '업종 제한 0건' in industry_counts['summary']
               page.locator('[data-verdict-filter="registered"]').click()
               assert page.locator('[data-verdict-filter="registered"]').get_attribute('aria-pressed')=='true'
               assert page.locator('#jobCards .job-mini').count()>0
