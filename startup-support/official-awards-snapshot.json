@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "source": "나라장터 낙찰정보서비스",
+  "verifiedAt": "2026-10-17T00:00:00Z",
+  "limitations": "과거 낙찰결과만 포함. 계약체결·이행완료·현년도 경쟁업체 수를 확인한 자료가 아님. 참가업체 수 0/미확인 공고는 포함하지 않음.",
+  "records": [
+    {
+      "bidNo": "R25BK00820928",
+      "count": 2,
+      "rate": 86.842,
+      "amount": 247500000,
+      "winner": "(주) 한국능률협회컨설팅",
+      "winnerBizno": "1168129581",
+      "date": "2025-05-26"
+    },
+    {
+      "bidNo": "R25BK01238764",
+      "count": 1,
+      "rate": 99.993,
+      "amount": 8696600000,
+      "winner": "주식회사 케이씨넷",
+      "winnerBizno": "1018654725",
+      "date": "2025-12-29"
+    },
+    {
+      "bidNo": "20241237450",
+      "count": 1,
+      "rate": 99.993,
+      "amount": 7964000000,
+      "winner": "주식회사 케이씨넷",
+      "winnerBizno": "1018654725",
+      "date": "2024-12-26"
+    },
+    {
+      "bidNo": "R25BK01166951",
+      "count": 1,
+      "rate": 99.857,
+      "amount": 757680000,
+      "winner": "주식회사 티앤디소프트",
+      "winnerBizno": "2648142938",
+      "date": "2025-11-25"
+    },
+    {
+      "bidNo": "20241122476",
+      "count": 1,
+      "rate": 100,
+      "amount": 766150000,
+      "winner": "주식회사 티앤디소프트",
+      "winnerBizno": "2648142938",
+      "date": "2024-11-21"
+    },
+    {
+      "bidNo": "R25BK01147547",
+      "count": 1,
+      "rate": 99,
+      "amount": 69300000,
+      "winner": "주식회사 지오아이티",
+      "winnerBizno": "2538800257",
+      "date": "2025-11-19"
+    },
+    {
+      "bidNo": "20241025173",
+      "count": 1,
+      "rate": 100,
+      "amount": 68600000,
+      "winner": "주식회사 지오아이티",
+      "winnerBizno": "2538800257",
+      "date": "2024-11-06"
+    },
+    {
+      "bidNo": "R25BK01118028",
+      "count": 2,
+      "rate": null,
+      "amount": 131560000,
+      "winner": "주식회사 에프에스",
+      "winnerBizno": "3148602779",
+      "date": ""
+    },
+    {
+      "bidNo": "20241024766",
+      "count": 2,
+      "rate": null,
+      "amount": 126500000,
+      "winner": "주식회사 에프에스",
+      "winnerBizno": "3148602779",
+      "date": ""
+    },
+    {
+      "bidNo": "R25BK01106114",
+      "count": 2,
+      "rate": null,
+      "amount": 1104000000,
+      "winner": "주식회사 범일정보",
+      "winnerBizno": "5028129666",
+      "date": ""
+    },
+    {
+      "bidNo": "20241224968",
+      "count": 1,
+      "rate": 99.612,
+      "amount": 1073500000,
+      "winner": "주식회사 범일정보",
+      "winnerBizno": "5028129666",
+      "date": ""
+    }
+  ]
+}

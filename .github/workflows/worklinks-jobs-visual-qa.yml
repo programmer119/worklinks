@@ -259,6 +259,19 @@ jobs:
               assert provisional['provisional']+provisional['excluded']<=provisional['active']
               print('WORKLINKS_PROVISIONAL_ELIGIBILITY',json.dumps(provisional,ensure_ascii=False))
               print('WORKLINKS_LIVE_INDUSTRY_FILTERS=PASS',json.dumps(industry_counts,ensure_ascii=False))
+              # Verify the shared public evidence snapshot, loaded without
+              # extra live G2B calls, precedes user-triggered history research.
+              page.wait_for_function("() => competitionByNotice.has('R25BK01238764')",
+                                     timeout=20000)
+              historical_reuse=page.evaluate("""() => {
+                const a=competitionByNotice.get('R25BK01238764');
+                const b=competitionByNotice.get('20241237450');
+                return {count:competitionByNotice.size,
+                  sameBizNo:!!a&&!!b&&a.winnerBizno===b.winnerBizno,
+                  aCount:a?.count,bCount:b?.count,source:a?.source}
+              }""")
+              assert historical_reuse['sameBizNo'] and historical_reuse['aCount']==1 and historical_reuse['bCount']==1,historical_reuse
+              print('WORKLINKS_OFFICIAL_AWARD_SNAPSHOT=PASS',json.dumps(historical_reuse,ensure_ascii=False))
               # Exercise both newly published buttons on the real page without
               # spending upstream quota. Existing unit tests prove the data rule.
               turnover_controls=page.evaluate("""() => {

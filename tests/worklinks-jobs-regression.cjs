@@ -226,7 +226,7 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs','jobAmountLabel',
  'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo',
  part('const COMPETITION_STORE=','function repeatYears(x){')+
- 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,winnerTrendLabel,competitionByNotice,contractByBid,contractEvidenceText};'
+ 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,winnerTrendLabel,mergeOfficialAwardSnapshot,competitionByNotice,contractByBid,contractEvidenceText};'
 )(()=> '2026-10-17',{getItem:()=>null,setItem:()=>{}},
  {querySelectorAll:()=>[],getElementById:()=>null},
  async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}));
@@ -302,6 +302,24 @@ assert.ok(source.includes('data-verdict-filter="low-changed"'));
 assert.ok(source.includes('data-verdict-filter="low-incumbent"'));
 assert.ok(source.includes('historyCompetition.changedWinner'));
 assert.ok(source.includes('const competitionRetryAfter=new Map()'));
+assert.ok(source.includes('loadOfficialAwardSnapshot()'));
+const verifiedSnapshot=JSON.parse(require('node:fs').readFileSync(
+ require('node:path').join(__dirname,'../startup-support/official-awards-snapshot.json'),'utf8'));
+assert.equal(verifiedSnapshot.source,'나라장터 낙찰정보서비스');
+assert.equal(verifiedSnapshot.records.length,11);
+const verifiedAt=Date.parse(verifiedSnapshot.verifiedAt);
+const sampleExtra=past.mergeOfficialAwardSnapshot(verifiedSnapshot,verifiedAt+86400000);
+assert.ok(sampleExtra>=9,'historical winners from exact official results must be reusable without live API calls');
+assert.equal(past.competitionByNotice.get('R25BK01238764').winnerBizno,'1018654725');
+assert.equal(past.competitionByNotice.get('20241237450').winnerBizno,'1018654725');
+assert.equal(past.competitionByNotice.get('20241122476').count,1);
+assert.equal(past.mergeOfficialAwardSnapshot({...verifiedSnapshot,records:[
+ {bidNo:'R25BK00000099',count:0,winnerBizno:'1018654725',amount:1,winner:'fake',rate:99}
+]},verifiedAt+86400000),0,'an unknown or zero-participant award is not confirmed');
+assert.equal(past.mergeOfficialAwardSnapshot(verifiedSnapshot,verifiedAt+46*86400000),0,
+ 'stale award snapshots must not persist as fresh verification');
+assert.equal(past.mergeOfficialAwardSnapshot(verifiedSnapshot,verifiedAt-1),0,
+ 'future-dated snapshots must not masquerade as verified results');
 assert.ok(source.includes("if(row.source==='조회 실패')continue"));
 assert.ok(source.includes("competitionRetryAfter.set(no,Date.now()+30*60000)"));
 assert.ok(source.includes('setTimeout(resolve,750)'));
