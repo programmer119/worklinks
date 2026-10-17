@@ -233,6 +233,24 @@
 .job-vf.checking:not(.on){border-color:#cbd5e1;color:#334155;background:#f1f5f9}
 .job-vf:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 .job-vf-note{font-size:10px;color:#64748b;margin-left:3px}
+/* Each filled segment is a verified historic RESEARCH PRIORITY signal. */
+.job-advantage-toolbar{flex:1 0 100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;border-top:1px solid #e2e8f0;padding:10px 4px 2px}
+.job-advantage-toolbar>strong{font-size:15px;color:#0f172a}
+.job-advantage-toolbar .job-vf{min-height:40px;padding:8px 11px;font-size:13px}
+.job-advantage-toolbar [data-verdict-filter="adv-3"]:not(.on){color:#065f46;background:#ecfdf5;border-color:#86efac}
+.job-advantage-toolbar [data-verdict-filter="adv-2"]:not(.on){color:#1e40af;background:#eff6ff;border-color:#93c5fd}
+.job-advantage-toolbar [data-verdict-filter="adv-1"]:not(.on){color:#92400e;background:#fffbeb;border-color:#fcd34d}
+.job-advantage-explain{flex:1 0 100%;font-size:12px;line-height:1.5;color:#475569}
+#jobCards .job-advantage{display:flex;align-items:center;flex-wrap:wrap;gap:4px 7px;min-width:0;font-size:12px}
+#jobCards .job-advantage .advantage-pills{display:inline-flex;gap:3px;align-items:center;flex:none}
+#jobCards .job-advantage .advantage-pill{width:17px;height:9px;display:block;border-radius:6px;background:currentColor}
+#jobCards .job-advantage .advantage-label{font-weight:900;white-space:nowrap}
+#jobCards .job-advantage .advantage-reason{font-size:12px;color:#475569;min-width:0;flex:1 1 135px}
+#jobCards .job-advantage.adv-high{color:#047857}
+#jobCards .job-advantage.adv-medium{color:#1d4ed8}
+#jobCards .job-advantage.adv-caution{color:#92400e}
+#jobCards .job-advantage.adv-mixed,#jobCards .job-advantage.adv-unknown,#jobCards .job-advantage.adv-ineligible{color:#64748b}
+@media(max-width:680px){.job-advantage-toolbar{gap:6px}.job-advantage-toolbar .job-vf{font-size:12px;padding:8px 9px}#jobCards .job-advantage .advantage-reason{flex-basis:100%}}
 @media(max-width:680px){.job-verdict-filter{gap:5px}.job-vf{padding:7px 8px;font-size:11px}.job-vf-note{width:100%;margin-top:2px}}
 
 .partner-next-action{margin:8px 0 10px;background:#fffaf0;border:1px solid #fcd9a3;border-radius:10px;padding:11px 13px}
@@ -419,8 +437,15 @@
  <button type="button" class="job-vf" data-verdict-filter="low-bids" aria-pressed="false" title="실제 과거 개찰 결과에서 1~2개 업체 참가가 확인된 적격 후보. 이번 입찰 참가업체 수는 아직 모름">과거 1~2개사 <span data-verdict-count="low-bids">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="low-changed" aria-pressed="false" title="과거 연속 2개 연도 1~2개사 참가, 사업자번호가 다른 낙찰업체 확인. 이번 사업 낙찰 미정">저경쟁·낙찰사 변경 <span data-verdict-count="low-changed">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="low-incumbent" aria-pressed="false" title="과거 연속 2개 연도 1~2개사 참가, 사업자번호가 같은 낙찰업체 확인. 이번 사업 낙찰 미정">저경쟁·동일사 낙찰 <span data-verdict-count="low-incumbent">0</span></button>
+ <div class="job-advantage-toolbar" role="group" aria-label="적격 후보 내 유리도 구분">
+  <strong>기회 유리도</strong>
+  <button type="button" class="job-vf" data-verdict-filter="adv-3" aria-pressed="false" title="최근 과거 두 연도 모두 1~2개사 참여, 낙찰업체 사업자번호 변경 확인">▰▰▰ 우선 검토 <span data-verdict-count="adv-3">0</span></button>
+  <button type="button" class="job-vf" data-verdict-filter="adv-2" aria-pressed="false" title="공식 과거 참가업체 1~2개사, 동일업체 연속 낙찰 여부는 미확인">▰▰ 관심 검토 <span data-verdict-count="adv-2">0</span></button>
+  <button type="button" class="job-vf" data-verdict-filter="adv-1" aria-pressed="false" title="과거 1~2개사지만 같은 사업자번호의 업체가 연속 낙찰">▰ 기존사 주의 <span data-verdict-count="adv-1">0</span></button>
+  <span class="job-advantage-explain">1~3칩은 과거 공식 개찰 결과에 따른 검토 순위입니다. 지원자격 확정·낙찰확률·이번 경쟁업체 수가 아닙니다. 정보 미확인은 점수 없이 표시합니다.</span>
+ </div>
 
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>참가 가능 후보 우선 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="연속 발주 사업의 과거 낙찰 결과에서 실제 참가업체 수를 조회합니다">과거 경쟁 조사 <span id="competitionLoadStatus">(조회 전)</span></button></div>
+ </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>적격 후보 · 유리도 높은 순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="연속 발주 사업의 과거 낙찰 결과에서 실제 참가업체 수를 조회합니다">과거 경쟁 조사 <span id="competitionLoadStatus">(조회 전)</span></button></div>
 
 
   </div>
@@ -1416,6 +1441,35 @@ function winnerTrendLabel(z){
   z.winnerComparisonYears.join('·')+'년 낙찰업체 변경 확인 (사업자번호 불일치)';
  return '동일 낙찰업체 여부: 연도별 사업자번호 추가 확인 필요';
 }
+function bidAdvantageFromHistory(z){
+ const samples=Array.isArray(z.samples)?z.samples:[];
+ if(z.lowRecentPair&&z.changedWinner)return {level:3,kind:'high',label:'우선 검토',
+  reason:'최근 2개 연도 각 1~2개사 · 낙찰사 사업자번호 변경'};
+ if(z.low&&z.sameWinner)return {level:1,kind:'caution',label:'기존사 주의',
+  reason:'과거 1~2개사지만 동일 업체 '+z.verifiedWinnerYears+'년 연속 낙찰'};
+ if(z.low)return {level:2,kind:'medium',label:'관심 검토',
+  reason:'공식 과거 참가 1~2개사 · 낙찰사 반복 여부 미확인'};
+ if(samples.length)return {level:null,kind:'mixed',label:'저경쟁 미확인',
+  reason:'확인된 과거 회차 중 참가업체 3개사 이상 존재'};
+ return {level:null,kind:'unknown',label:'경쟁자료 부족',
+  reason:'공식 과거 참가업체 수 미확인 · 낮은 평가 아님'};
+}
+function bidAdvantageOrder(t){
+ return t.level===3?0:t.level===2?1:t.level===1?2:t.kind==='unknown'?3:4;
+}
+function bidAdvantageMarkup(z,eligible){
+ const t=eligible?bidAdvantageFromHistory(z):{level:null,kind:'ineligible',
+  label:'유리도 평가 제외',reason:'적격 후보 여부부터 확인'};
+ const n=t.level||0, chips=n?Array.from({length:n},()=>'<i class="advantage-pill"></i>').join(''):
+  '<span class="advantage-unrated">—</span>';
+ const note='과거 기록 기반 유리도 '+t.label+(n?' '+n+'/3칩':' · 미평가')+
+  ' · '+t.reason+' · 현재 입찰 낙찰 가능성을 보장하지 않음';
+ return '<div class="job-advantage adv-'+t.kind+'" data-advantage-tier="'+
+  (n||'unrated')+'" aria-label="'+htmlEscape(note)+'" title="'+htmlEscape(note)+'">'+
+  '<span class="advantage-pills" aria-hidden="true">'+chips+'</span>'+
+  '<strong class="advantage-label">'+htmlEscape(t.label)+(n?' '+n+'/3':'')+
+  '</strong><span class="advantage-reason">'+htmlEscape(t.reason)+'</span></div>';
+}
 function pastAwardText(no){
  const row=competitionByNotice.get(String(no));
  if(!row)return '개찰 참가업체·낙찰률 미조회';
@@ -2372,6 +2426,11 @@ function partnerVerdictTypes(x,selected){
 }
 function matchesVerdictFilter(x,selected,filter){
  if(filter==='repeat')return repeatYears(x)>=2;
+ if(['adv-3','adv-2','adv-1'].includes(filter)){
+  if(jobSoftwareScope(x)!=='candidate')return false;
+  if(!(selected?[selected]:partners).some(p=>participationVerdict(x,p).type==='ready'))return false;
+  return bidAdvantageFromHistory(pastCompetitionSummary(x)).level===Number(filter.slice(-1));
+ }
  if(['low-bids','low-changed','low-incumbent'].includes(filter)){
   if(jobSoftwareScope(x)!=='candidate')return false;
   const trend=pastCompetitionSummary(x);
@@ -2387,7 +2446,7 @@ function matchesVerdictFilter(x,selected,filter){
  return filter==='all'||partnerVerdictTypes(x,selected).includes(filter);
 }
 function refreshVerdictFilters(rows,selected){
- const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0,repeat:0,'low-bids':0,'low-changed':0,'low-incumbent':0};
+ const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0,repeat:0,'low-bids':0,'low-changed':0,'low-incumbent':0,'adv-3':0,'adv-2':0,'adv-1':0};
  for(const o of rows){
   for(const type of partnerVerdictTypes(o.x,selected)){
    if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;
@@ -2398,6 +2457,8 @@ function refreshVerdictFilters(rows,selected){
   if(matchesVerdictFilter(o.x,selected,'low-bids'))counts['low-bids']++;
   if(matchesVerdictFilter(o.x,selected,'low-changed'))counts['low-changed']++;
   if(matchesVerdictFilter(o.x,selected,'low-incumbent'))counts['low-incumbent']++;
+  for(const tier of ['adv-3','adv-2','adv-1'])
+   if(matchesVerdictFilter(o.x,selected,tier))counts[tier]++;
  }
  document.querySelectorAll('[data-verdict-filter]').forEach(function(b){
   const type=b.dataset.verdictFilter,on=type===jobVerdictFilter;
@@ -2514,12 +2575,12 @@ function renderJobs(){
      const aReady=partners.some(p=>participationVerdict(a.x,p).type==='ready')?0:1;
      const bReady=partners.some(p=>participationVerdict(b.x,p).type==='ready')?0:1;
      if(aReady!==bReady)return aReady-bReady;
+     const ar=bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(a.x)));
+     const br=bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(b.x)));
+     if(ar!==br)return ar-br;
      const ac=pastCompetitionSummary(a.x).latest?.count??Infinity;
      const bc=pastCompetitionSummary(b.x).latest?.count??Infinity;
      if(ac!==bc)return ac-bc;
-     const rank=z=>z.lowRecentPair&&z.changedWinner?0:z.lowRecentPair&&z.sameWinner?2:1;
-     const diff=rank(pastCompetitionSummary(a.x))-rank(pastCompetitionSummary(b.x));
-     if(diff)return diff;
      const repeatDiff=repeatYears(b.x)-repeatYears(a.x);
      if(repeatDiff)return repeatDiff;
     }
@@ -2538,6 +2599,10 @@ function renderJobs(){
      };
      const diff=rank(a.x)-rank(b.x);
      if(diff)return diff;
+     // Eligible status dominates; then verified historic opportunity is ordered.
+     const ar=bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(a.x)));
+     const br=bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(b.x)));
+     if(ar!==br)return ar-br;
     }
     const priority=function(t){return ({closing:0,open:1,upcoming:2,unknown:3})[t.key]??4};
     const cmp=priority(a.time)-priority(b.time);
@@ -2573,6 +2638,9 @@ function renderJobs(){
     const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const comparisonCompanies=scoped?[scoped]:partners;
+    const opportunityEligible=jobSoftwareScope(x)==='candidate'&&
+     comparisonCompanies.some(p=>participationVerdict(x,p).type==='ready');
+    const opportunityMarkup=bidAdvantageMarkup(historyCompetition,opportunityEligible);
     const partnerList=confirmed.concat(pending).filter(y=>!scoped||y.p.id===scoped.id);
     const partner=partnerList.length?'<div class="job-partners">파트너 '+
       partnerList.map(function(y){
@@ -2586,11 +2654,8 @@ function renderJobs(){
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+
-      (historyCompetition.sameWinner?'<span class="tag" title="과거 낙찰업체 사업자번호 일치 · 이번 사업 낙찰업체는 미정">'+
-       (historyCompetition.lowRecentPair?'저경쟁 · ':'')+'동일사 연속 낙찰</span>':'')+
-      (historyCompetition.changedWinner?'<span class="tag" title="과거 낙찰업체 사업자번호 불일치 · 이번 사업 낙찰업체는 미정">'+
-       (historyCompetition.lowRecentPair?'저경쟁 · ':'')+'낙찰사 변경 확인</span>':'')+'</div>'+
+       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+'</div>'+
+       opportunityMarkup+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        participationStrip(x,comparisonCompanies)+
@@ -2606,7 +2671,7 @@ function setWorkspaceView(view){document.querySelectorAll(".workspace-tab").forE
 document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
 document.querySelectorAll('[data-verdict-filter]').forEach(function(b){b.addEventListener('click',function(){
  jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=100;renderJobs();
- if(['repeat','low-bids','low-changed','low-incumbent'].includes(jobVerdictFilter))
+ if(['repeat','low-bids','low-changed','low-incumbent','adv-3','adv-2','adv-1'].includes(jobVerdictFilter))
   loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 })});
 document.getElementById('competitionLoadMore').addEventListener('click',function(){
