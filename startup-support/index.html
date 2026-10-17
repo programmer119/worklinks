@@ -1846,7 +1846,12 @@ function participationVerdict(x,p){
    (microOnly&&size!=='소상공인')||(mediumOnly&&size!=='중기업'));
  // A missing document, an API error and an unclassified passage are NOT
  // proof of disqualification. A source-confirmed, definite mismatch is.
- const definitive=proof.rows.find(v=>v.status==='missing'&&v.id!=='joint'&&v.id!=='scope');
+ // Per-row missing license codes are not definitive when the published
+ // grouped restriction could be OR. jobQualificationVerdict evaluates the
+ // group and is the only authority for excluding on missing license codes.
+ const definitive=proof.rows.find(v=>v.status==='missing'&&
+   v.id!=='joint'&&v.id!=='scope'&&!v.id.startsWith('license-')&&
+   !v.id.startsWith('logic-'));
  if(industry.type==='missing'||sizeMismatch||definitive)return {
   type:'blocked',label:'제외',verified:false,
   reason:sizeMismatch?'공고의 필수 기업규모와 창컴의 공식 기업규모가 다름':
