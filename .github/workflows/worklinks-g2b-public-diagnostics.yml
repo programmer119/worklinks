@@ -8,6 +8,9 @@ on:
       - 'server/deploy-g2b-api-only.sh'
       - 'tests/test_worklinks_deploy_runner_policy.py'
       - 'server/g2b-proxy.py'
+      - 'server/g2b-award-enricher.py'
+      - 'tests/test_award_enricher.py'
+      - 'server/deploy-g2b-award-enricher.sh'
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
       - 'tests/test_bid_evidence.py'
@@ -29,6 +32,8 @@ jobs:
         run: |
           set -Eeuo pipefail
           python3 -m py_compile server/g2b-proxy.py
+          python3 -m py_compile server/g2b-award-enricher.py
+          python3 tests/test_award_enricher.py
           python3 tests/test_worklinks_deploy_runner_policy.py
           python3 tests/test_g2b_eligibility_join.py
           python3 tests/test_direct_production.py
