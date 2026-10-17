@@ -57,6 +57,20 @@ jobs:
                     past:x.repeatHistory.filter(y=>y.bidNo).slice(0,2).map(y=>({year:y.year,bidNo:y.bidNo}))}))};
               }""")
               print('WORKLINKS_ACTIVE_REPEAT_COUNT',json.dumps(proof,ensure_ascii=False))
+              repeats=page.evaluate("""() => {
+                const n=Number(document.querySelector('[data-verdict-count="repeat"]')?.textContent||0);
+                if(n<1)return {count:n,badges:0};
+                jobVerdictFilter='repeat';jobRenderLimit=100;renderJobs();
+                const badges=document.querySelectorAll('#jobCards .job-repeat[data-history-id]').length;
+                const cards=document.querySelectorAll('#jobCards .job-mini').length;
+                jobVerdictFilter='all';renderJobs();
+                return {count:n,badges,cards};
+              }""")
+              assert repeats['count']>0, 'verified 2+ year bids must be accessible'
+              assert repeats['badges']>0, 'repeat-only filter must make 2+ badges visible'
+              assert repeats['cards']>0
+              print('WORKLINKS_REPEAT_FILTER=PASS',json.dumps(repeats,ensure_ascii=False))
+
               # Probe exactly one known past award's public participant-count field;
               # never assume prtcptCnum is available for every notice.
               award=page.evaluate("""async () => {
@@ -72,6 +86,14 @@ jobs:
                 }catch(e){return {state:'not_available',reason:String(e.message||e).slice(0,110)}}
               }""")
               print('WORKLINKS_OFFICIAL_COMPETITION_PROBE',json.dumps(award,ensure_ascii=False))
+              # Do not confuse the official past count with current bidders.
+              assert page.evaluate("""() => officialAwardCount({
+                items:[{bidNtceNo:'R25BK00820928',bidNtceOrd:'000',prtcptCnum:'2'}]
+              },'R25BK00820928')""")==2
+              assert page.evaluate("""() => officialAwardCount({
+                items:[{bidNtceNo:'R25BK00820928',prtcptCnum:''}]
+              },'R25BK00820928')""") is None
+
 
 
               page.wait_for_function("typeof rfpSnapshotByNotice !== 'undefined' && rfpSnapshotByNotice.size>0",timeout=25000)
