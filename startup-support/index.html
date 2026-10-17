@@ -1381,14 +1381,21 @@ function pastCompetitionSummary(x){
     winnerBizno:typeof d.winnerBizno==='string'?d.winnerBizno:''};
  });
  const sample=historical.filter(y=>y.count!==null);
- // Only use positively verified winner business IDs for incumbent assertions.
- const verifiedWinners=historical.filter(y=>/^\d{10}$/.test(y.winnerBizno));
- const sameWinner=verifiedWinners.length>=2 &&
-   new Set(verifiedWinners.map(y=>y.winnerBizno)).size===1;
+ // Strictly consecutive preceding years and exact winner company IDs.
+ // 2025 + 2023 with unknown 2024 is NOT a consecutive incumbent streak.
+ let winnerStreak=0;
+ if(historical.length&&/^\d{10}$/.test(historical[0].winnerBizno)){
+  winnerStreak=1;
+  for(let i=1;i<historical.length;i++){
+   if(historical[i-1].year-historical[i].year!==1||
+      historical[i].winnerBizno!==historical[0].winnerBizno)break;
+   winnerStreak++;
+  }
+ }
  return {samples:sample,history:historical,latest:sample[0]||null,
   low:sample.length>0&&sample.every(y=>y.count<=2),
   average:sample.length?sample.reduce((n,y)=>n+y.count,0)/sample.length:null,
-  sameWinner,verifiedWinnerYears:verifiedWinners.length};
+  sameWinner:winnerStreak>=2,verifiedWinnerYears:winnerStreak};
 }
 function pastAwardText(no){
  const row=competitionByNotice.get(String(no));
