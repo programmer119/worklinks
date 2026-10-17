@@ -417,6 +417,8 @@
  <button type="button" class="job-vf" data-verdict-filter="no-restriction" aria-pressed="false" title="공식 면허제한 API 정상조회 0건 · 다른 공고 참가조건 미확정">업종 제한 0건 <span data-verdict-count="no-restriction">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="repeat" aria-pressed="false" title="공식 공고번호와 동일 발주기관·유사 사업명이 확인된 2회차 이상 연속 발주">연속 2회차 이상 <span data-verdict-count="repeat">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="low-bids" aria-pressed="false" title="실제 과거 개찰 결과에서 1~2개 업체 참가가 확인된 적격 후보. 이번 입찰 참가업체 수는 아직 모름">과거 1~2개사 <span data-verdict-count="low-bids">0</span></button>
+ <button type="button" class="job-vf" data-verdict-filter="low-changed" aria-pressed="false" title="과거 연속 2개 연도 1~2개사 참가, 사업자번호가 다른 낙찰업체 확인. 이번 사업 낙찰 미정">저경쟁·낙찰사 변경 <span data-verdict-count="low-changed">0</span></button>
+ <button type="button" class="job-vf" data-verdict-filter="low-incumbent" aria-pressed="false" title="과거 연속 2개 연도 1~2개사 참가, 사업자번호가 같은 낙찰업체 확인. 이번 사업 낙찰 미정">저경쟁·동일사 낙찰 <span data-verdict-count="low-incumbent">0</span></button>
 
  </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>참가 가능 후보 우선 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="연속 발주 사업의 과거 낙찰 결과에서 실제 참가업체 수를 조회합니다">과거 경쟁 조사 <span id="competitionLoadStatus">(조회 전)</span></button></div>
 
@@ -1320,6 +1322,7 @@ function extractBudget(s){
  */
 const COMPETITION_STORE='worklinks_official_past_bidders_v1';
 var competitionByNotice=new Map(),competitionRunning=false,competitionFetchRequests=0;
+const competitionRetryAfter=new Map();
 try{
  const saved=JSON.parse(localStorage.getItem(COMPETITION_STORE)||'{}');
  if(saved&&typeof saved==='object'){
@@ -1392,10 +1395,24 @@ function pastCompetitionSummary(x){
    winnerStreak++;
   }
  }
+ // Compare two most recent consecutive prior years only with matching IDs.
+ const pair=historical.length>=2&&historical[0].year-historical[1].year===1&&
+  /^\d{10}$/.test(historical[0].winnerBizno)&&/^\d{10}$/.test(historical[1].winnerBizno)
+  ?historical.slice(0,2):[];
+ const changedWinner=pair.length===2&&pair[0].winnerBizno!==pair[1].winnerBizno;
+ const lowRecentPair=pair.length===2&&pair.every(y=>y.count!==null&&y.count<=2);
  return {samples:sample,history:historical,latest:sample[0]||null,
   low:sample.length>0&&sample.every(y=>y.count<=2),
   average:sample.length?sample.reduce((n,y)=>n+y.count,0)/sample.length:null,
-  sameWinner:winnerStreak>=2,verifiedWinnerYears:winnerStreak};
+  sameWinner:winnerStreak>=2,changedWinner,lowRecentPair,
+  winnerComparisonYears:pair.map(y=>y.year),verifiedWinnerYears:winnerStreak};
+}
+function winnerTrendLabel(z){
+ if(z.sameWinner)return (z.lowRecentPair?'과거 각 1~2개사 · ':'')+
+  '동일 낙찰업체 '+z.verifiedWinnerYears+'년 연속 확인 (사업자번호 일치)';
+ if(z.changedWinner)return (z.lowRecentPair?'과거 각 1~2개사 · ':'')+
+  z.winnerComparisonYears.join('·')+'년 낙찰업체 변경 확인 (사업자번호 불일치)';
+ return '동일 낙찰업체 여부: 연도별 사업자번호 추가 확인 필요';
 }
 function pastAwardText(no){
  const row=competitionByNotice.get(String(no));
@@ -1444,8 +1461,8 @@ async function loadPastContracts(x){
       confirmed=reg.contracts.filter(z=>z.companyBiznoMatched===true&&
         String(z.bidNo||'')===no);
       status=true;error='';source='계약정보서비스';
-     }else if(!status)error=String(reg.error||error);
-    }catch(e){if(!status)error='contract_lookup_failed'}
+     }else error=String(reg.error||'contract_register_api_failed');
+    }catch(e){error='contract_lookup_failed'}
    }
    contractByBid.set(no,{
      confirmed:status&&confirmed.length>0,source,
@@ -1474,8 +1491,7 @@ function refreshPastCompetitionText(){
  document.querySelectorAll('[data-incumbent-id]').forEach(function(el){
   const x=getJobById(el.dataset.incumbentId);
   if(x){const z=pastCompetitionSummary(x);
-   el.textContent=z.sameWinner?'기존 업체 '+z.verifiedWinnerYears+'년 연속 낙찰 확인':
-    '동일 낙찰업체 여부: 연도별 사업자번호 추가 확인 필요';
+   el.textContent=winnerTrendLabel(z);
   }
  });
  const status=document.getElementById('competitionLoadStatus');
@@ -1487,7 +1503,7 @@ async function loadPastCompetitionForJobs(targets,limit){
  for(const x of targets){
   for(const y of previousOfficialBids(x)){
    const no=String(y.bidNo);
-   if(!competitionByNotice.has(no)&&!ids.includes(no))ids.push(no);
+   if(!competitionByNotice.has(no)&&(competitionRetryAfter.get(no)||0)<=Date.now()&&!ids.includes(no))ids.push(no);
   }
  }
  if(!ids.length){refreshPastCompetitionText();return}
@@ -1502,8 +1518,8 @@ async function loadPastCompetitionForJobs(targets,limit){
     const msg=String(e.message||e);
     // Rate limiting must halt the batch without incorrectly recording zeros.
     if(/429|rate_limited|LIMITED_NUMBER|upstream_result_22|upstream_result_23/.test(msg))break;
-    // Retry unavailable records on the next explicit request, not immediately.
-    competitionByNotice.set(no,{count:null,checkedAt:Date.now(),source:'조회 실패'});
+    // A failed API response is unknown; retry after a short cooldown.
+    competitionRetryAfter.set(no,Date.now()+10*60000);
    }
    competitionFetchRequests++;
    if(competitionFetchRequests%4===0){savePastCompetition();renderJobs();refreshPastCompetitionText()}
@@ -1546,9 +1562,7 @@ function openHistoryModal(jobId){
   '</div>';
  }).join('')+'</div>'+
  '<p class="partner-foot" data-incumbent-id="'+htmlEscape(x.id)+'">'+
- (pastCompetitionSummary(x).sameWinner?
-   '기존 업체 '+pastCompetitionSummary(x).verifiedWinnerYears+'년 연속 낙찰 확인':
-   '동일 낙찰업체 여부: 연도별 사업자번호 추가 확인 필요')+'</p>';
+ htmlEscape(winnerTrendLabel(pastCompetitionSummary(x)))+'</p>';
  const m=document.getElementById('jobHistoryModal');m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
  document.getElementById('jobHistoryClose').focus();
  loadPastCompetitionForJobs([x],6).then(()=>loadPastContracts(x));
@@ -2313,9 +2327,13 @@ function partnerVerdictTypes(x,selected){
 }
 function matchesVerdictFilter(x,selected,filter){
  if(filter==='repeat')return repeatYears(x)>=2;
- if(filter==='low-bids')return jobSoftwareScope(x)==='candidate'&&
-  pastCompetitionSummary(x).low&&
-  (selected?[selected]:partners).some(p=>participationVerdict(x,p).type==='ready');
+ if(['low-bids','low-changed','low-incumbent'].includes(filter)){
+  if(jobSoftwareScope(x)!=='candidate')return false;
+  const trend=pastCompetitionSummary(x);
+  const matched=filter==='low-bids'?trend.low:
+   trend.lowRecentPair&&(filter==='low-changed'?trend.changedWinner:trend.sameWinner);
+  return !!matched&&(selected?[selected]:partners).some(p=>participationVerdict(x,p).type==='ready');
+ }
  if(filter==='registered'||filter==='no-restriction'){
   const list=selected?[selected]:partners;
   const expected=filter==='registered'?'industry_match':'no_restriction';
@@ -2324,7 +2342,7 @@ function matchesVerdictFilter(x,selected,filter){
  return filter==='all'||partnerVerdictTypes(x,selected).includes(filter);
 }
 function refreshVerdictFilters(rows,selected){
- const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0,repeat:0,'low-bids':0};
+ const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0,repeat:0,'low-bids':0,'low-changed':0,'low-incumbent':0};
  for(const o of rows){
   for(const type of partnerVerdictTypes(o.x,selected)){
    if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;
@@ -2333,6 +2351,8 @@ function refreshVerdictFilters(rows,selected){
   if(matchesVerdictFilter(o.x,selected,'no-restriction'))counts['no-restriction']++;
   if(matchesVerdictFilter(o.x,selected,'repeat'))counts.repeat++;
   if(matchesVerdictFilter(o.x,selected,'low-bids'))counts['low-bids']++;
+  if(matchesVerdictFilter(o.x,selected,'low-changed'))counts['low-changed']++;
+  if(matchesVerdictFilter(o.x,selected,'low-incumbent'))counts['low-incumbent']++;
  }
  document.querySelectorAll('[data-verdict-filter]').forEach(function(b){
   const type=b.dataset.verdictFilter,on=type===jobVerdictFilter;
@@ -2452,6 +2472,9 @@ function renderJobs(){
      const ac=pastCompetitionSummary(a.x).latest?.count??Infinity;
      const bc=pastCompetitionSummary(b.x).latest?.count??Infinity;
      if(ac!==bc)return ac-bc;
+     const rank=z=>z.lowRecentPair&&z.changedWinner?0:z.lowRecentPair&&z.sameWinner?2:1;
+     const diff=rank(pastCompetitionSummary(a.x))-rank(pastCompetitionSummary(b.x));
+     if(diff)return diff;
      const repeatDiff=repeatYears(b.x)-repeatYears(a.x);
      if(repeatDiff)return repeatDiff;
     }
@@ -2519,7 +2542,10 @@ function renderJobs(){
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
        '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+
-      (historyCompetition.sameWinner?'<span class="tag" title="과거 사업자번호가 일치하는 낙찰업체가 2개 연도 이상 확인됨 · 현재 사업의 낙찰업체는 미정">기존 업체 연속 낙찰</span>':'')+'</div>'+
+      (historyCompetition.sameWinner?'<span class="tag" title="과거 낙찰업체 사업자번호 일치 · 이번 사업 낙찰업체는 미정">'+
+       (historyCompetition.lowRecentPair?'저경쟁 · ':'')+'동일사 연속 낙찰</span>':'')+
+      (historyCompetition.changedWinner?'<span class="tag" title="과거 낙찰업체 사업자번호 불일치 · 이번 사업 낙찰업체는 미정">'+
+       (historyCompetition.lowRecentPair?'저경쟁 · ':'')+'낙찰사 변경 확인</span>':'')+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        participationStrip(x,comparisonCompanies)+
@@ -2535,7 +2561,7 @@ function setWorkspaceView(view){document.querySelectorAll(".workspace-tab").forE
 document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
 document.querySelectorAll('[data-verdict-filter]').forEach(function(b){b.addEventListener('click',function(){
  jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=100;renderJobs();
- if(jobVerdictFilter==='repeat'||jobVerdictFilter==='low-bids')
+ if(['repeat','low-bids','low-changed','low-incumbent'].includes(jobVerdictFilter))
   loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 })});
 document.getElementById('competitionLoadMore').addEventListener('click',function(){

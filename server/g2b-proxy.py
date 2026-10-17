@@ -37,6 +37,7 @@ BID_OPS = {
 ORIGINS = ('https://worklinks.suaveforge.com', 'https://programmer119.github.io')
 cache = {}
 lock = threading.Lock()
+award_fetch_lock = threading.Lock()  # serialize identical official award requests
 
 def get_key():
     k = os.environ.get('G2B_SERVICE_KEY', '').strip()
@@ -106,6 +107,26 @@ def request_api(base, operation, params):
     if isinstance(items, dict): items = items.get('item') or []
     if not isinstance(items, list): items = [items]
     return {'items':items,'totalCount':int(body.get('totalCount') or len(items))}
+
+def cached_awards_query(bid_no):
+    """Cache a successful official historic award query by exact notice number."""
+    key=('awards',bid_no)
+    with lock: saved=cache.get(key)
+    if saved and saved[0]>time.time():
+        result=dict(saved[1]);result['cached']=True
+        return result
+    with award_fetch_lock:
+        with lock: saved=cache.get(key)
+        if saved and saved[0]>time.time():
+            result=dict(saved[1]);result['cached']=True
+            return result
+        data=request_api(AWARD_BASE,'getScsbidListSttusServc',{
+            'pageNo':1,'numOfRows':50,'inqryDiv':4,'bidNtceNo':bid_no})
+        result={'ok':True,'totalCount':data['totalCount'],
+                'items':data['items'],'cached':False}
+        with lock: cache[key]=(time.time()+12*3600,result)
+        return result
+
 
 def format_bid(x, kind):
     def get(*keys):
@@ -1028,9 +1049,7 @@ class Handler(BaseHTTPRequestHandler):
                 bid_no = get('bidNo').strip()
                 if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no):
                     raise ApiError('invalid_bid_no',400)
-                data = request_api(AWARD_BASE,'getScsbidListSttusServc',{
-                    'pageNo':1,'numOfRows':50,'inqryDiv':4,'bidNtceNo':bid_no})
-                return self.reply(200,{'ok':True,'totalCount':data['totalCount'],'items':data['items']})
+                return self.reply(200,cached_awards_query(bid_no))
             if u.path != '/api/g2b/bids': raise ApiError('not_found',404)
             kind = get('kind','servc')
             if kind not in BID_OPS: raise ApiError('invalid_kind',400)
@@ -1058,7 +1077,12 @@ class Handler(BaseHTTPRequestHandler):
             result['savedReceived']=stats['received']
             result['savedTotal']=stats['storedTotal']
             with lock:
-                if len(cache)>150: cache.clear()
+                if len(cache)>150:
+                    # A blanket clear would reset the official API's 429 circuit breaker.
+                    now=time.time()
+                    for key,entry in list(cache.items()):
+                        if isinstance(entry,tuple) and len(entry)==2 and entry[0]<now:
+                            del cache[key]
                 cache[ck] = (time.time()+900,result)
             self.reply(200,result)
         except ApiError as e:

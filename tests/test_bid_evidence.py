@@ -176,4 +176,33 @@ finally:
     globals_api['get_key']=old_key
     globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
 
+# Reusing successful exact-notice awards must not consume repeat upstream calls.
+award_calls=[]
+def mock_award(base,op,params):
+    assert base==p['AWARD_BASE'] and op=='getScsbidListSttusServc'
+    award_calls.append(params['bidNtceNo'])
+    return {'totalCount':1,'items':[{'bidNtceNo':params['bidNtceNo'],
+        'prtcptCnum':'2','bidwinnrBizno':'1168129581'}]}
+g['request_api']=mock_award
+try:
+    one='R25BK00820928';two='R25BK00826083'
+    g['cache'].pop(('awards',one),None)
+    g['cache'].pop(('awards',two),None)
+    first=p['cached_awards_query'](one)
+    again=p['cached_awards_query'](one)
+    assert not first['cached'] and again['cached']
+    assert first['items'][0]['bidNtceNo']==one and award_calls==[one]
+    assert p['cached_awards_query'](two)['items'][0]['bidNtceNo']==two
+    assert award_calls==[one,two]
+    def denied(base,op,params):
+        raise p['ApiError']('upstream_http_429_LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR')
+    g['request_api']=denied
+    try:p['cached_awards_query']('R25BK00000099')
+    except p['ApiError']:pass
+    else:raise AssertionError('upstream error accepted as award')
+    assert ('awards','R25BK00000099') not in g['cache']
+finally:
+    g['request_api']=original
+    g['cache'].pop(('awards',one),None)
+    g['cache'].pop(('awards',two),None)
 print('G2B_BID_EVIDENCE_PREFLIGHT=PASS')

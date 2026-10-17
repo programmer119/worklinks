@@ -226,7 +226,7 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs','jobAmountLabel',
  'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo',
  part('const COMPETITION_STORE=','function repeatYears(x){')+
- 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,competitionByNotice,contractByBid,contractEvidenceText};'
+ 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,winnerTrendLabel,competitionByNotice,contractByBid,contractEvidenceText};'
 )(()=> '2026-10-17',{getItem:()=>null,setItem:()=>{}},
  {querySelectorAll:()=>[],getElementById:()=>null},
  async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}));
@@ -280,6 +280,17 @@ assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,true,
 past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'9999999999',winner:'다른 업체',checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,false,
  'different winner across years must not be called an incumbent');
+assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,true);
+assert.equal(past.pastCompetitionSummary(pastBid).lowRecentPair,true);
+assert.ok(past.winnerTrendLabel(past.pastCompetitionSummary(pastBid)).includes('낙찰업체 변경'));
+past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'',winner:'직전 낙찰사',checkedAt:Date.now()});
+assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,false,
+ 'names cannot prove a winner change without valid business IDs');
+assert.equal(past.pastCompetitionSummary(pastBid).lowRecentPair,false);
+past.competitionByNotice.set('20241237450',{count:3,winnerBizno:'9999999999',checkedAt:Date.now()});
+assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,true);
+assert.equal(past.pastCompetitionSummary(pastBid).lowRecentPair,false,
+ 'a 3-participant year is not low competition');
 past.contractByBid.set(pBid,{confirmed:true,count:1,source:'계약정보서비스',
  amount:200000000,date:'2025-10-01'});
 assert.ok(past.contractEvidenceText(pBid).includes('공고·업체번호 일치'));
@@ -287,6 +298,10 @@ assert.ok(!past.contractEvidenceText(pBid).includes('이행 완료'));
 assert.ok(source.includes('/contract-notice?bidNo='),
  'missing-contract-process rows must trigger the official contract-register check');
 assert.ok(source.includes('data-incumbent-id'));
+assert.ok(source.includes('data-verdict-filter="low-changed"'));
+assert.ok(source.includes('data-verdict-filter="low-incumbent"'));
+assert.ok(source.includes('historyCompetition.changedWinner'));
+assert.ok(source.includes('const competitionRetryAfter=new Map()'));
 assert.ok(source.includes('sucsfbidRate'));
 
 const changeMod=new Function('jobBidIdentity','jobEvidenceData','htmlEscape','jobAmountLabel',
