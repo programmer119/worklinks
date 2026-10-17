@@ -1377,7 +1377,7 @@ function refreshPastCompetitionText(){
   el.textContent=n===null?'과거 참가업체 수 미확인':'개찰 참가 '+n+'개사';
  });
  const status=document.getElementById('competitionLoadStatus');
- if(status)status.textContent=competitionRunning?'조회 중':'';
+ if(status)status.textContent=competitionRunning?' (조회 중)':competitionByNotice.size?' (과거 '+competitionByNotice.size+'건 조회됨)':' (조회 전)';
 }
 async function loadPastCompetitionForJobs(targets,limit){
  if(competitionRunning)return;
