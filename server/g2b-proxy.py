@@ -99,10 +99,20 @@ def request_api(base, operation, params):
     except (URLError, IOError, ValueError): raise ApiError('upstream_unreachable')
     try: doc = json.loads(raw.decode('utf-8'))
     except (ValueError, UnicodeError): raise ApiError('upstream_not_json')
-    hdr = doc.get('response', {}).get('header', {})
-    rc = str(hdr.get('resultCode', 'missing'))
+    # Bad request parameters may receive a valid HTTP 200 and a provider-specific
+    # error envelope rather than the documented response/header structure.
+    # Never interpret this response as an empty result or leak its free text.
+    if not isinstance(doc,dict):raise ApiError('upstream_malformed_response')
+    if 'nkoneps.com.response.ResponseError' in doc:
+        raise ApiError('upstream_provider_response_error')
+    envelope=doc.get('response')
+    if not isinstance(envelope,dict):raise ApiError('upstream_malformed_response')
+    hdr=envelope.get('header')
+    if not isinstance(hdr,dict) or 'resultCode' not in hdr:
+        raise ApiError('upstream_missing_result_code')
+    rc = str(hdr['resultCode'])
     if rc not in ('00','0'): raise ApiError('upstream_result_' + re.sub(r'[^a-zA-Z0-9_]','',rc)[:20])
-    body = doc.get('response', {}).get('body', {})
+    body = envelope.get('body', {})
     items = body.get('items') or []
     if isinstance(items, dict): items = items.get('item') or []
     if not isinstance(items, list): items = [items]
@@ -267,7 +277,10 @@ def contract_notice_lookup(bid_no, bizno):
     reference and a named contractor registration number match. Missing fields
     or an empty result are unknown, not proof of no contract/performance.
     """
-    params={'pageNo':1,'numOfRows':100,'inqryDiv':4,'bidNtceNo':bid_no}
+    # Verified against the actual official service 2026-10-17:
+    # PPSSrch inqryDiv=4 uses "ntceNo", NOT bidNtceNo. The latter returned
+    # {"nkoneps.com.response.ResponseError":...} with HTTP 200 for KADX.
+    params={'pageNo':1,'numOfRows':100,'inqryDiv':4,'ntceNo':bid_no}
     try:
         data=request_api(CONTRACT_BASE,'getCntrctInfoListServcPPSSrch',params)
     except ApiError as e:

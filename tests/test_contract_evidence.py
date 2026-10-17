@@ -63,7 +63,8 @@ finally:
 def contract_register_mock(base,op,params):
     assert 'CntrctInfoService' in base
     assert op=='getCntrctInfoListServcPPSSrch'
-    assert params['bidNtceNo']==BID and params['inqryDiv']==4
+    assert params['ntceNo']==BID and params['inqryDiv']==4
+    assert 'bidNtceNo' not in params, 'PPSSrch official parameter is ntceNo'
     return {'totalCount':4,'items':[
         {'ntceNo':BID,'dcsnCntrctNo':'REG-1','cntrctNm':'실제 용역 계약',
          'corpList':[{'corpBizno':'130-81-85973'}],
@@ -95,6 +96,29 @@ try:
     assert failed['ok'] is False and failed['contracts']==[]
 finally:
     g['request_api']=original
+
+# Regression: the provider returned this nonstandard HTTP-200 error envelope
+# for the old bad bidNtceNo parameter. It must NEVER become "no contracts".
+env=p['request_api'].__globals__
+orig_open=env['urlopen']
+orig_key=env['get_key']
+class Fake200:
+    def __init__(self,body):self.body=body
+    def read(self):return self.body
+def provider_error(req,timeout):
+    assert 'ntceNo=' in req.full_url and 'bidNtceNo=' not in req.full_url
+    return Fake200(b'{"nkoneps.com.response.ResponseError":{"description":"bad query"}}')
+try:
+    env['urlopen']=provider_error
+    env['get_key']=lambda:'test-not-real-secret'
+    env['cache'].pop(('upstream-rate-cooldown',p['CONTRACT_BASE']),None)
+    incorrect=p['contract_notice_lookup'](BID,'1308185973')
+    assert incorrect['ok'] is False
+    assert incorrect['error']=='upstream_provider_response_error'
+    assert incorrect['attributableCount']==0 and incorrect['complete'] is False
+finally:
+    env['urlopen']=orig_open
+    env['get_key']=orig_key
 
 class FakeHTTP403:
     code=403
