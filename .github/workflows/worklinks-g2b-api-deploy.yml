@@ -1,81 +1,72 @@
-name: WorkLinks G2B API safe deploy
+name: WorkLinks G2B API source gate (server123 org deploy)
 on:
   push:
     branches: [main]
     paths:
       - 'server/g2b-proxy.py'
       - 'server/deploy-g2b-api-only.sh'
+      - 'tests/test_worklinks_deploy_runner_policy.py'
       - '.github/workflows/worklinks-g2b-api-deploy.yml'
   workflow_dispatch:
 
+# Personal repos cannot dispatch the SuaveForge organization's 01/02/03 runners.
+# Actual deploy is isolated in suaveforge/monitor's worklinks-g2b-api-org-deploy.yml.
+# That workflow checks upstream programmer119/worklinks/main every 30 minutes
+# and can also be triggered manually for immediate safe server123 deployment.
 permissions:
   contents: read
 
-concurrency:
-  # Separate the active org runner queue from obsolete research-only runs.
-  group: worklinks-g2b-api-production-org-20261017
-  cancel-in-progress: false
-
 jobs:
-  retire_legacy:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate WorkLinks G2B source and deployment guard
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile server/g2b-proxy.py
+          python3 tests/test_worklinks_deploy_runner_policy.py
+          python3 tests/test_bid_evidence.py
+          python3 tests/test_contract_evidence.py
+          node tests/worklinks-jobs-regression.cjs
+          echo 'WORKLINKS_G2B_SOURCE_GATE=PASS'
+          echo 'SERVER123_API_DEPLOY_CONTROLLER=suaveforge/monitor'
+  retire_stalled_personal_run:
+    # One-time migration: cancel the old queued personal-repository runner job,
+    # which could never be assigned to an organization-only runner.
     runs-on: ubuntu-latest
     timeout-minutes: 3
     permissions:
       actions: write
       contents: read
     steps:
-      - name: Cancel only two obsolete stalled G2B deployment runs
+      - name: Cancel old misrouted WorkLinks API workflow
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -Eeuo pipefail
           python3 - <<'PY'
-          import json,os,urllib.error,urllib.request
-          base='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
-          auth={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
-                'Accept':'application/vnd.github+json',
-                'X-GitHub-Api-Version':'2022-11-28'}
-          # These run IDs were confirmed queued/pending with the old runner
-          # or held by its original concurrency group. Never cancel an active
-          # production deployment or an unrelated workflow.
-          for run_id in (39000706357,39005220657):
-              req=urllib.request.Request(base+'/actions/runs/'+str(run_id),headers=auth)
-              with urllib.request.urlopen(req,timeout=15) as stream:
-                  info=json.load(stream)
-              if info.get('name')!='WorkLinks G2B API safe deploy':
-                  raise SystemExit('UNEXPECTED_G2B_RUN_ID')
-              state=info.get('status')
-              if state not in ('queued','pending','waiting','requested'):
-                  print('LEGACY_RUN_NOT_PENDING',run_id,state)
-                  continue
-              req=urllib.request.Request(base+'/actions/runs/'+str(run_id)+'/cancel',
-                                         data=b'',headers=auth,method='POST')
-              with urllib.request.urlopen(req,timeout=15) as stream:
-                  status=stream.status
-              if status!=202:
-                  raise SystemExit('LEGACY_G2B_CANCEL_NOT_ACCEPTED '+str(run_id))
-              print('LEGACY_G2B_CANCEL_ACCEPTED',run_id)
-          print('WORKLINKS_G2B_OLD_RUNS_RECONCILED=PASS')
+          import json,os,urllib.request
+          run_id=39005363452
+          root='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                   'Accept':'application/vnd.github+json',
+                   'X-GitHub-Api-Version':'2022-11-28'}
+          with urllib.request.urlopen(urllib.request.Request(
+                  root+'/actions/runs/'+str(run_id),headers=headers),timeout=15) as f:
+              item=json.load(f)
+          if item.get('head_sha')!='dd3afbae7a891793a766a1c5e13d7df6d1b50e76':
+              raise SystemExit('LEGACY_RUN_SHA_NOT_EXPECTED')
+          if item.get('status') in ('pending','queued','waiting','requested'):
+              request=urllib.request.Request(
+                  root+'/actions/runs/'+str(run_id)+'/cancel',
+                  headers=headers,data=b'',method='POST')
+              with urllib.request.urlopen(request,timeout=15) as f:
+                  assert f.status==202
+              print('OBSOLETE_PERSONAL_DEPLOY_CANCEL=PASS')
+          else:
+              print('OBSOLETE_PERSONAL_DEPLOY_ALREADY_FINISHED',item.get('status'))
           PY
-  deploy:
-    needs: retire_legacy
-    runs-on: [self-hosted, Linux, X64, server123, suaveforge-deploy, suaveforge-org]
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - name: Guard production server123 runner 01/02/03 (no research runners)
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          echo "Runner name: $RUNNER_NAME"
-          [[ "$RUNNER_NAME" =~ ^123-suaveforge-org-0[123]$ ]] || {
-            echo "INVALID_G2B_DEPLOY_RUNNER=$RUNNER_NAME"; exit 7;
-          }
-          test -s /home/worklinks/g2b/data/bids.sqlite3
-          test -s /home/worklinks/g2b/g2b-proxy-docker.py
-          test -x /home/ggul-docker/bin/docker
-          test -S /home/ggul-docker/run/docker.sock
-      - name: Safe G2B API-only deployment and public smoke test
-        shell: bash
-        run: bash server/deploy-g2b-api-only.sh
