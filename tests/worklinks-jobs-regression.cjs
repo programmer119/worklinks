@@ -224,12 +224,12 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 // Historical competition: only the exact past notice's positive official
 // prtcptCnum counts; unknown/zero must never imply a one-bidder award.
 const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs','jobAmountLabel',
- 'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo',
+ 'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo','htmlEscape',
  part('const COMPETITION_STORE=','function repeatYears(x){')+
- 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,winnerTrendLabel,mergeOfficialAwardSnapshot,competitionByNotice,contractByBid,contractEvidenceText};'
+ 'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,winnerTrendLabel,bidAdvantageFromHistory,bidAdvantageOrder,bidAdvantageMarkup,mergeOfficialAwardSnapshot,competitionByNotice,contractByBid,contractEvidenceText};'
 )(()=> '2026-10-17',{getItem:()=>null,setItem:()=>{}},
  {querySelectorAll:()=>[],getElementById:()=>null},
- async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}));
+ async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}),value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
 const pBid='R25BK00820928';
 assert.equal(past.officialAwardCount({items:[
  {bidNtceNo:pBid,bidNtceOrd:'000',prtcptCnum:'2'}]},pBid),2,
@@ -252,9 +252,16 @@ assert.equal(past.pastCompetitionSummary(pastBid).low,false);
 past.competitionByNotice.set(pBid,{count:2,checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).latest.count,2);
 assert.equal(past.pastCompetitionSummary(pastBid).low,true);
+assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,2,
+ 'one verified low-bid year without a confirmed incumbent merits two research chips');
+assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/class="advantage-pill"/g)||[]).length,2);
 past.competitionByNotice.set('20241237450',{count:9,checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).low,false,
  'past 9-bidder year cannot be labeled uniformly low competition');
+assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,null);
+assert.equal(past.bidAdvantageFromHistory({samples:[],low:false}).kind,'unknown');
+assert.ok(past.bidAdvantageMarkup({samples:[],low:false},true).includes('data-advantage-tier="unrated"'));
+assert.ok(past.bidAdvantageMarkup({samples:[],low:false},false).includes('유리도 평가 제외'));
 
 // An official award record includes the winner, paid amount and bid rate.
 // These are historic facts, NOT forecasts for the present notice.
@@ -277,11 +284,18 @@ past.competitionByNotice.set(pBid,{...awardInfo,checkedAt:Date.now()});
 past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'1234567890',winner:'직전 낙찰사',checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,true,
  'same verified contractor business ID across years is incumbent evidence');
+assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,1);
+assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/class="advantage-pill"/g)||[]).length,1);
 past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'9999999999',winner:'다른 업체',checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,false,
  'different winner across years must not be called an incumbent');
 assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,true);
 assert.equal(past.pastCompetitionSummary(pastBid).lowRecentPair,true);
+assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,3);
+assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/class="advantage-pill"/g)||[]).length,3);
+assert.equal(past.bidAdvantageOrder({level:3}),0);
+assert.ok(past.bidAdvantageOrder({level:2})<past.bidAdvantageOrder({level:1}));
+assert.ok(past.bidAdvantageOrder({level:1})<past.bidAdvantageOrder({level:null,kind:'unknown'}));
 assert.ok(past.winnerTrendLabel(past.pastCompetitionSummary(pastBid)).includes('낙찰업체 변경'));
 past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'',winner:'직전 낙찰사',checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,false,
@@ -310,7 +324,10 @@ assert.ok(source.includes('/contract-notice?bidNo='),
 assert.ok(source.includes('data-incumbent-id'));
 assert.ok(source.includes('data-verdict-filter="low-changed"'));
 assert.ok(source.includes('data-verdict-filter="low-incumbent"'));
-assert.ok(source.includes('historyCompetition.changedWinner'));
+assert.ok(source.includes("bidAdvantageFromHistory(pastCompetitionSummary(a.x))"),
+ 'historic opportunity is integrated into the actual sorting comparator');
+assert.ok(source.includes('opportunityMarkup'),
+ 'visible card must carry the historical opportunity indicator');
 assert.ok(source.includes('const competitionRetryAfter=new Map()'));
 assert.ok(source.includes('loadOfficialAwardSnapshot()'));
 const verifiedSnapshot=JSON.parse(require('node:fs').readFileSync(
@@ -507,7 +524,7 @@ assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all noti
 
 // Status filters must be interactive, cover all currently displayed items, and
 // show a reason even when the notice is outside the software candidate scope.
-const filterView=new Function('partners','participationVerdict','document','htmlEscape','jobQualificationVerdict','repeatYears','pastCompetitionSummary','jobSoftwareScope',
+const filterView=new Function('partners','participationVerdict','document','htmlEscape','jobQualificationVerdict','repeatYears','pastCompetitionSummary','jobSoftwareScope','bidAdvantageFromHistory',
  part('function partnerVerdictTypes(x,selected){','function jobEntryLabel(v){')+
  'return {partnerVerdictTypes,matchesVerdictFilter,refreshVerdictFilters};'
 )([bidder],(x,p)=>({type:x.verdict||'checking'}),{
@@ -515,7 +532,9 @@ const filterView=new Function('partners','participationVerdict','document','html
  getElementById:()=>({hidden:false})
 },value=>String(value),(x,p)=>({type:x.industry||'unverified'}),x=>x.repeat||0,
  x=>({low:!!x.low,lowRecentPair:!!x.lowRecentPair,changedWinner:!!x.changedWinner,sameWinner:!!x.sameWinner}),
- ()=> 'candidate');
+ ()=> 'candidate',
+ z=>z.lowRecentPair&&z.changedWinner?{level:3}:
+   z.low&&z.sameWinner?{level:1}:z.low?{level:2}:{level:null,kind:'unknown'});
 for(const [verdict,type] of [['ready','ready'],['conditional','conditional'],['blocked','blocked'],['checking','checking']]){
  assert.equal(filterView.matchesVerdictFilter({verdict},null,type),true);
  assert.equal(filterView.matchesVerdictFilter({verdict},null,'all'),true);
@@ -531,6 +550,13 @@ assert.equal(filterView.matchesVerdictFilter({low:true},null,'low-bids'),false,
  'past low competition only appears among eligible candidates');
 assert.equal(filterView.matchesVerdictFilter({low:true,verdict:'ready'},null,'low-bids'),true,
  'confirmed past one-to-two bidders can be prioritized among eligible candidates');
+assert.equal(filterView.matchesVerdictFilter({low:true,verdict:'ready'},null,'adv-2'),true);
+assert.equal(filterView.matchesVerdictFilter({low:true,sameWinner:true,verdict:'ready'},null,'adv-1'),true);
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'ready'},null,'adv-3'),true);
+assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'blocked'},null,'adv-3'),false,
+ 'historical competition cannot override a verified exclusion');
+assert.equal(filterView.matchesVerdictFilter({verdict:'ready'},null,'adv-1'),false,
+ 'unresearched history is unrated, not one chip');
 assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'ready'},
  null,'low-changed'),true, 'verified historic turnover is a visible filter');
 assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,sameWinner:true,verdict:'ready'},
@@ -550,6 +576,10 @@ assert.ok(source.includes('data-verdict-filter="registered"'));
 assert.ok(source.includes('data-verdict-filter="no-restriction"'));
 assert.ok(source.includes('data-verdict-filter="repeat"'));
 assert.ok(source.includes('data-verdict-filter="low-bids"'));
+for(const i of [1,2,3])assert.ok(source.includes('data-verdict-filter="adv-'+i+'"'));
+assert.ok(source.includes('data-advantage-tier'));
+assert.ok(source.includes('opportunityMarkup'));
+assert.ok(source.includes('bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(a.x)))'));
 assert.ok(source.includes('value="competition"'));
 assert.ok(source.includes("document.querySelectorAll('[data-verdict-filter]')"));
 assert.ok(source.includes("scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter))"));
