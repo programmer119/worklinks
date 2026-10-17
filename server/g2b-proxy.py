@@ -309,7 +309,8 @@ def contract_notice_lookup(bid_no, bizno):
         return {'ok':False,'bidNo':bid_no,'contracts':[],'attributableCount':0,
                 'complete':False,'error':e.msg,'source':'나라장터 계약정보서비스'}
     results=[]
-    other=0;unattributed=0
+    seen_contracts={}
+    other=0;unattributed=0;duplicate_rows=0;conflicting_duplicates=0
     for row in data['items']:
         if not isinstance(row,dict):continue
         # ntceNo is the tender reference in the official contract list.
@@ -329,7 +330,12 @@ def contract_notice_lookup(bid_no, bizno):
             other+=1
             continue
         number=_pick(row,['dcsnCntrctNo','cntrctNo','cntrctRefNo'])
-        results.append({
+        if not number:
+            # An exact contractor identity without an identifiable contract
+            # cannot be counted as a distinct signed contract.
+            unattributed+=1
+            continue
+        record={
             'bidNo':bid_no,'companyBiznoMatched':True,'contractNo':number,
             'title':_pick(row,['cntrctNm','cntrctName']),
             'date':_pick(row,['cntrctCnclsDate','cntrctDate','cntrctDt']),
@@ -337,15 +343,31 @@ def contract_notice_lookup(bid_no, bizno):
             'agency':_pick(row,['cntrctInsttNm','dminsttNm']),
             'contractPeriod':_pick(row,['cntrctPrd']),
             'performanceComplete':None,'inspectionComplete':None,
-            'certificateAvailable':None})
+            'certificateAvailable':None}
+        if number in seen_contracts:
+            duplicate_rows+=1
+            prior=seen_contracts[number]
+            if prior['date']!=record['date'] or prior['amount']!=record['amount']:
+                # The same contract number with divergent public values may
+                # reflect an amendment. Do not choose a monetary figure blindly.
+                conflicting_duplicates+=1
+                prior['date']=''
+                prior['amount']=''
+                prior['dataConflict']=True
+            continue
+        seen_contracts[number]=record
+        results.append(record)
     return {'ok':True,'bidNo':bid_no,'bizno':bizno,'contracts':results,
             'attributableCount':len(results),
+            'uniqueContractNumbers':len(results),
+            'duplicateContractRows':duplicate_rows,
+            'conflictingDuplicateRows':conflicting_duplicates,
             'totalCount':data['totalCount'],
             'complete':len(data['items'])>=data['totalCount'],
             'unattributedCount':unattributed,'otherCompanyCount':other,
             'source':'나라장터 계약정보서비스 · 공고번호 및 계약업체번호 일치',
             'contractPerformanceVerified':False,
-            'limitations':'확인된 계약체결만 표시. 계약 이행·검수·실적증명서를 뜻하지 않음.'}
+            'limitations':'중복 계약번호는 1건으로 집계. 동일 번호 상충 금액은 미확인. 계약 체결은 이행·검수·실적증명이 아님.'}
 
 
 def _bid_evidence_fetch(operation, bid_no, order):

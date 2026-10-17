@@ -94,9 +94,15 @@ try:
     assert p['_contract_corp_records']('[1^a^b^c^d^e^f^g^h^1308185973]')==decoded
     def caret_register(base,op,params):
         assert 'ntceNo' in params and 'bidNtceNo' not in params
-        return {'totalCount':4,'items':[
+        return {'totalCount':6,'items':[
           {'ntceNo':BID,'dcsnCntrctNo':'CN-C1',
-           'cntrctCnclsDate':'2025-10-01',
+           'cntrctCnclsDate':'2025-10-01','thtmCntrctAmt':'150000000',
+           'corpList':'[1^용역^단독^(주) 테스트^대표^계약^123^(주) 테스트^^1308185973]'},
+          {'ntceNo':BID,'dcsnCntrctNo':'CN-C1',
+           'cntrctCnclsDate':'2025-10-01','thtmCntrctAmt':'150000000',
+           'corpList':'[1^용역^단독^(주) 테스트^대표^계약^123^(주) 테스트^^1308185973]'},
+          {'ntceNo':BID,'dcsnCntrctNo':'CN-C1',
+           'cntrctCnclsDate':'2025-10-01','thtmCntrctAmt':'170000000',
            'corpList':'[1^용역^단독^(주) 테스트^대표^계약^123^(주) 테스트^^1308185973]'},
           {'ntceNo':BID,'dcsnCntrctNo':'CN-C2',
            'corpList':'[1^용역^단독^(주) 타사^대표^계약^123^(주) 타사^^9999999999]'},
@@ -110,6 +116,11 @@ try:
     assert caret_result['contracts'][0]['contractNo']=='CN-C1'
     assert caret_result['otherCompanyCount']==1
     assert caret_result['unattributedCount']==2
+    assert caret_result['uniqueContractNumbers']==1
+    assert caret_result['duplicateContractRows']==2
+    assert caret_result['conflictingDuplicateRows']==1
+    assert caret_result['contracts'][0]['amount']==''
+    assert caret_result['contracts'][0]['dataConflict'] is True
     def winner_only(base,op,params):
         return {'totalCount':1,'items':[{'ntceNo':BID,
            'bidwinnrBizno':'1308185973','corpList':[]}]}
