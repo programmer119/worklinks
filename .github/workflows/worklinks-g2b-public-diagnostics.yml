@@ -10,6 +10,7 @@ on:
       - 'server/g2b-proxy.py'
       - 'server/g2b-award-enricher.py'
       - 'tests/test_award_enricher.py'
+      - 'tests/test_award_cache_api.py'
       - 'server/deploy-g2b-award-enricher.sh'
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
@@ -34,6 +35,7 @@ jobs:
           python3 -m py_compile server/g2b-proxy.py
           python3 -m py_compile server/g2b-award-enricher.py
           python3 tests/test_award_enricher.py
+          python3 tests/test_award_cache_api.py
           python3 tests/test_worklinks_deploy_runner_policy.py
           python3 tests/test_g2b_eligibility_join.py
           python3 tests/test_direct_production.py
