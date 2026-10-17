@@ -295,6 +295,16 @@ past.contractByBid.set(pBid,{confirmed:true,count:1,source:'계약정보서비�
  amount:200000000,date:'2025-10-01'});
 assert.ok(past.contractEvidenceText(pBid).includes('공고·업체번호 일치'));
 assert.ok(!past.contractEvidenceText(pBid).includes('이행 완료'));
+past.contractByBid.set(pBid,{confirmed:true,count:3,source:'계약정보서비스',
+ contractNumbers:['R25TA0057644400','R25TA0057644401','R25TA0057644402'],
+ amount:247500000,date:'2025-05-27'});
+const contractSummary=past.contractEvidenceText(pBid);
+assert.ok(contractSummary.includes('고유 계약번호 3건'));
+assert.ok(contractSummary.includes('R25TA0057644402'));
+assert.ok(contractSummary.includes('첫 조회 계약 금액'));
+assert.ok(contractSummary.includes('전체 합산금액 아님'));
+assert.ok(source.includes('const exactContracts=arr=>'),
+ 'contract UI must deduplicate exact signed contract references');
 assert.ok(source.includes('/contract-notice?bidNo='),
  'missing-contract-process rows must trigger the official contract-register check');
 assert.ok(source.includes('data-incumbent-id'));
