@@ -13,7 +13,8 @@ assert 'suaveforge/monitor' in source
 assert 'worklinks-g2b-api-org-deploy.yml' in source
 assert 'workflow_dispatch:' in source
 assert 'SERVER123_API_DEPLOY_CONTROLLER=suaveforge/monitor' in source
-assert 'OBSOLETE_PERSONAL_DEPLOY_CANCEL=PASS' in source
+assert 'retire_stalled_personal_run' not in source
+assert 'actions: write' not in source
 assert '123-research-general-06' not in source
 assert 'PORT=18192' in deploy
 assert 'WORKLINKS_G2B_PUBLIC_ROUTES=PASS' in deploy
