@@ -80,6 +80,7 @@ for path in 'contract-notice?bidNo=BAD&bizno=1' 'bid-change-price?bidNo=BAD&orde
   code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 5 "http://127.0.0.1:18192/api/g2b/$path")"
   test "$code" = 400 || { echo "MISSING_NEW_G2B_ROUTE=$path status=$code"; exit 9; }
 done
+echo 'WORKLINKS_CONTRACT_AND_CHANGE_API_ROUTES=PASS'
 PUBLIC="$(curl -fsS --max-time 20 'https://api-suaveforge.suaveforge.com:18458/api/g2b/saved?sw=1&limit=1&offset=0')"
 [[ "$PUBLIC" == *'"eligibilityLinked"'* ]]
 test "$(dk inspect -f '{{.State.Running}}' "$API")" = true
