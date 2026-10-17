@@ -223,13 +223,13 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 
 // Historical competition: only the exact past notice's positive official
 // prtcptCnum counts; unknown/zero must never imply a one-bidder award.
-const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs',
+const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs','jobAmountLabel',
  'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo',
  part('const COMPETITION_STORE=','function repeatYears(x){')+
  'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,competitionByNotice,contractByBid,contractEvidenceText};'
 )(()=> '2026-10-17',{getItem:()=>null,setItem:()=>{}},
  {querySelectorAll:()=>[],getElementById:()=>null},
- async()=>({ok:true,items:[]}),()=>{},()=>[],[],[],()=> 'candidate',()=>({key:'open'}));
+ async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}));
 const pBid='R25BK00820928';
 assert.equal(past.officialAwardCount({items:[
  {bidNtceNo:pBid,bidNtceOrd:'000',prtcptCnum:'2'}]},pBid),2,
