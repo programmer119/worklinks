@@ -308,6 +308,9 @@ const verifiedSnapshot=JSON.parse(require('node:fs').readFileSync(
 assert.equal(verifiedSnapshot.source,'나라장터 낙찰정보서비스');
 assert.equal(verifiedSnapshot.records.length,11);
 const verifiedAt=Date.parse(verifiedSnapshot.verifiedAt);
+// Prior synthetic test overwrote this exact notice with a newer fake winner:
+// remove the fixture before verifying that real snapshot evidence imports.
+past.competitionByNotice.delete('20241237450');
 const sampleExtra=past.mergeOfficialAwardSnapshot(verifiedSnapshot,verifiedAt+86400000);
 assert.ok(sampleExtra>=9,'historical winners from exact official results must be reusable without live API calls');
 assert.equal(past.competitionByNotice.get('R25BK01238764').winnerBizno,'1018654725');
