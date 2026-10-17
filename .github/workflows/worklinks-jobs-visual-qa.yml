@@ -95,9 +95,10 @@ jobs:
                 if(!prior)return {ok:false,reason:'KADX prior notice not found'};
                 try{
                   const data=await g2bFetch('/awards?bidNo='+encodeURIComponent(prior.bidNo));
-                  const n=officialAwardCount(data,prior.bidNo);
+                  const details=officialAwardDetails(data,prior.bidNo);
+                  const n=details.count;
                   if(n===null)return {ok:false,reason:'official participant count absent',bidNo:prior.bidNo};
-                  competitionByNotice.set(prior.bidNo,{count:n,checkedAt:Date.now(),
+                  competitionByNotice.set(prior.bidNo,{...details,checkedAt:Date.now(),
                     source:'나라장터 낙찰정보서비스'});
                   const summary=pastCompetitionSummary(x);
                   const verdict=participationVerdict(x,partners[0]).type;
@@ -106,12 +107,16 @@ jobs:
                   const cards=document.querySelectorAll('#jobCards .job-mini').length;
                   jobVerdictFilter='all';renderJobs();
                   return {ok:true,bidNo:prior.bidNo,year:prior.year,participants:n,
+                    awardRate:details.rate,awardAmount:details.amount,
+                    winnerName:details.winner,winnerIdPresent:details.winnerBizno.length===10,
                     previousLow:summary.low,verdict,filterCount,cards};
                 }catch(e){return {ok:false,reason:String(e.message||e).slice(0,100)}}
               }""")
               assert live_competition['ok'], live_competition
               assert live_competition['participants']==2
               assert live_competition['previousLow'] is True
+              assert live_competition['awardRate'] is None or 0<live_competition['awardRate']<=100
+              assert live_competition['awardAmount'] is None or live_competition['awardAmount']>0
               if live_competition['verdict']=='ready':
                 assert live_competition['filterCount']>0
                 assert live_competition['cards']>0
