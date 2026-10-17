@@ -421,6 +421,8 @@ assert.equal(filterView.matchesVerdictFilter({repeat:2},null,'repeat'),true);
 assert.equal(filterView.matchesVerdictFilter({repeat:1},null,'repeat'),false);
 assert.equal(filterView.matchesVerdictFilter({low:true},null,'low-bids'),false,
  'past low competition only appears among eligible candidates');
+assert.equal(filterView.matchesVerdictFilter({low:true,verdict:'ready'},null,'low-bids'),true,
+ 'confirmed past one-to-two bidders can be prioritized among eligible candidates');
 
 assert.ok(source.includes('data-verdict-filter="ready"'));
 assert.ok(!source.includes('data-verdict-filter="conditional"'), 'obsolete conditional filter removed');
