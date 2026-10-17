@@ -329,6 +329,62 @@ jobs:
                 x.get('found') and x.get('pressed')=='true' and x.get('selected')==x.get('code')
                 for x in turnover_controls),turnover_controls
               print('WORKLINKS_WINNER_TURNOVER_FILTERS=PASS',json.dumps(turnover_controls,ensure_ascii=False))
+              # Validate that opportunities are ranked only *inside* suitable
+              # eligibility candidates, and every visible chip has real evidence.
+              # Suppress any additional on-demand research while clicking filters.
+              opportunity_ui=page.evaluate("""() => {
+                const previousLoad=loadPastCompetitionForJobs;
+                const previousFilter=jobFilter;
+                const previousVerdict=jobVerdictFilter;
+                const previousSort=document.getElementById('jobSort').value;
+                loadPastCompetitionForJobs=()=>Promise.resolve();
+                const tiers=[];
+                try{
+                  jobFilter='all';jobVerdictFilter='all';
+                  document.getElementById('jobSort').value='qualified';
+                  renderJobs();
+                  const current=[...document.querySelectorAll('#jobCards .job-mini')];
+                  const tiered=current.map(c=>Number(c.querySelector('[data-advantage-tier]')?.dataset.advantageTier))
+                    .filter(x=>[1,2,3].includes(x));
+                  const sorted=tiered.every((n,i)=>i===0||tiered[i-1]>=n);
+                  const unrated=current.some(c=>c.querySelector('[data-advantage-tier="unrated"]'));
+                  const rows=collapseSimilarNotices(jobs.concat(g2bLiveJobs)
+                    .filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')))
+                    .filter(x=>jobTimeInfo(x).key!=='closed');
+                  for(const i of [3,2,1]){
+                    const code='adv-'+i;
+                    const expected=rows.filter(x=>matchesVerdictFilter(x,null,code)).length;
+                    const b=document.querySelector('[data-verdict-filter="'+code+'"]');
+                    if(!b){tiers.push({tier:i,found:false});continue}
+                    b.click();
+                    const cards=[...document.querySelectorAll('#jobCards .job-mini')];
+                    const right=cards.every(card=>{
+                      const indicator=card.querySelector('.job-advantage');
+                      return indicator?.dataset.advantageTier===String(i)&&
+                        indicator.querySelectorAll('.advantage-pill').length===i;
+                    });
+                    tiers.push({tier:i,found:true,expected,
+                      count:Number(b.querySelector('[data-verdict-count]')?.textContent),
+                      cards:cards.length,
+                      pressed:b.getAttribute('aria-pressed')==='true',
+                      selected:jobVerdictFilter===code,right});
+                  }
+                  return {tiers,sorted,unrated,visibleSample:tiered.slice(0,15)};
+                }finally{
+                  loadPastCompetitionForJobs=previousLoad;
+                  jobFilter=previousFilter;jobVerdictFilter=previousVerdict;
+                  document.getElementById('jobSort').value=previousSort;
+                  renderJobs();
+                }
+              }""")
+              assert opportunity_ui['sorted'] and opportunity_ui['unrated'],opportunity_ui
+              assert len(opportunity_ui['tiers'])==3,opportunity_ui
+              for value in opportunity_ui['tiers']:
+                assert value['found'] and value['pressed'] and value['selected'],opportunity_ui
+                assert value['count']==value['expected'],opportunity_ui
+                assert value['cards']==min(100,value['count']),opportunity_ui
+                assert value['right'],opportunity_ui
+              print('WORKLINKS_ADVANTAGE_CHIPS_VISUAL_QA=PASS',json.dumps(opportunity_ui,ensure_ascii=False))
               # Identify real source-scanned, registered-industry candidates still blocked.
               # Each record shows why an otherwise relevant open notice does not go ready.
               missed=page.evaluate("""() => {
