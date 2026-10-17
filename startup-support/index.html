@@ -1405,7 +1405,7 @@ const contractByBid=new Map(),contractLoading=new Set();
 function contractEvidenceText(no){
  const d=contractByBid.get(String(no));
  if(!d)return '실제 계약: 확인 전';
- if(d.confirmed)return '실제 계약: 업체번호 일치 '+d.count+'건'+
+ if(d.confirmed)return '실제 계약: 공고·업체번호 일치 '+d.count+'건 ('+d.source+')'+
    (d.amount?' · 계약금액 '+jobAmountLabel(String(d.amount)):'')+
    (d.date?' · 계약일 '+d.date:'')+
    ' (이행·검수는 별도 확인)';
@@ -1422,16 +1422,31 @@ async function loadPastContracts(x){
   try{
    const d=await g2bFetch('/contract-evidence?bidNo='+encodeURIComponent(no)+
      '&bizno='+encodeURIComponent(details.winnerBizno));
-   const confirmed=Array.isArray(d.contracts)?
+   let confirmed=Array.isArray(d.contracts)?
     d.contracts.filter(z=>z.companyBiznoMatched===true&&
       String(z.bidNo||'')===no):[];
+   let status=d.ok===true,error=d.ok===true?'':String(d.error||'contract_api_failed');
+   let source='계약과정통합공개';
+   // Contract process often omits nested cntrctInfoList. Try the separate
+   // official contract register and require an exact notice+company match.
+   if(!confirmed.length){
+    try{
+     const reg=await g2bFetch('/contract-notice?bidNo='+encodeURIComponent(no)+
+       '&bizno='+encodeURIComponent(details.winnerBizno));
+     if(reg.ok===true&&Array.isArray(reg.contracts)){
+      confirmed=reg.contracts.filter(z=>z.companyBiznoMatched===true&&
+        String(z.bidNo||'')===no);
+      status=true;error='';source='계약정보서비스';
+     }else if(!status)error=String(reg.error||error);
+    }catch(e){if(!status)error='contract_lookup_failed'}
+   }
    contractByBid.set(no,{
-     confirmed:d.ok===true&&confirmed.length>0,
+     confirmed:status&&confirmed.length>0,source,
      count:confirmed.length,
      date:confirmed[0]?.date||'',
      amount:/^\d+(?:\.\d+)?$/.test(String(confirmed[0]?.amount||''))?
        Number(confirmed[0].amount):null,
-     error:d.ok===true?'':String(d.error||'contract_api_failed')
+     error
    });
   }catch(e){contractByBid.set(no,{confirmed:false,error:'request_failed'})}
   finally{contractLoading.delete(no);refreshPastCompetitionText()}
