@@ -318,7 +318,7 @@ const verdictMod=new Function('jobTimeInfo','jobSoftwareScope','jobQualification
 )(x=>({key:x.closed?'closed':'open'}),x=>x.kind==='thng'?'out':'candidate',
  x=>({type:x.industry||'unverified',reason:'면허검증 대기'}),
  (x,p)=>({complete:!!x.full,counts:{ok:x.ok??2,pending:x.pending??1,unknown:x.unknown??1,missing:0},
-    rows:x.missing?[{id:'license-1',status:'missing',reason:'등록업종 불일치'}]:[]}),
+    rows:x.missing?[{id:x.missingId||'license-1',status:'missing',reason:'공식 조건 불일치'}]:[]}),
  x=>String(x),x=>x.rfp||null);
 const bidder={id:'changcom',short:'창컴',name:'창컴정보통신(주)',smeRecord:{size:'소기업',validState:'valid'}};
 const verdict=(x,p=bidder)=>verdictMod.participationVerdict({kind:'servc',...x},p);
@@ -336,8 +336,14 @@ assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown
 assert.equal(verdict({industry:'no_restriction',full:true,ok:2,pending:0,unknown:0}).verified,true,
  'only completely verified conditions count as confirmed');
 assert.equal(verdict({industry:'missing'}).type,'blocked');
-assert.equal(verdict({industry:'industry_match',missing:true}).type,'blocked',
- 'documented missing mandatory license is disqualifying');
+assert.equal(verdict({industry:'unverified',missing:true}).type,'ready',
+ 'single unmatched row in an unknown OR group cannot exclude the whole bid');
+assert.equal(verdict({industry:'unverified',missing:true}).verified,false,
+ 'alternative license rule remains unverified rather than confirmed eligible');
+assert.equal(verdict({industry:'industry_match',missing:true,missingId:'region'}).type,'blocked',
+ 'verified mandatory region mismatch still excludes the bid');
+assert.equal(verdict({industry:'missing',missing:true}).type,'blocked',
+ 'official group-level license mismatch still excludes the bid');
 assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked',
  'a closed notice is excluded');
 assert.equal(verdict({industry:'industry_match',full:false,ok:6,pending:0,unknown:0}).type,'ready',
