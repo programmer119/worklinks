@@ -111,6 +111,51 @@ jobs:
               assert page.locator('#jobCards .job-mini').count()>0
               page.locator('[data-verdict-filter="all"]').click()
               print('WORKLINKS_LIVE_INDUSTRY_FILTERS=PASS',json.dumps(industry_counts,ensure_ascii=False))
+              # Identify real source-scanned, registered-industry candidates still blocked.
+              # Each record shows why an otherwise relevant open notice does not go ready.
+              missed=page.evaluate("""() => {
+                const p=partners[0];
+                const candidates=collapseSimilarNotices(jobs.concat(g2bLiveJobs))
+                  .filter(x=>jobSoftwareScope(x)==='candidate'&&
+                    ['open','closing'].includes(jobTimeInfo(x).key))
+                  .map(x=>{
+                    const id=jobBidIdentity(x);
+                    const r=rfpSnapshotForJob(x);
+                    if(!id||!r||!officialSourceCoverage(r,jobEvidenceData(x)))return null;
+                    const q=jobQualificationVerdict(x,p);
+                    if(!['industry_match','no_restriction'].includes(q.type))return null;
+                    const verdict=participationVerdict(x,p);
+                    if(verdict.type==='ready')return null;
+                    const proof=comparePartnerJob(x,p);
+                    const clauses=directRfpRequirements(x);
+                    const counts={};
+                    for(const c of clauses)counts[c.type]=(counts[c.type]||0)+1;
+                    const blocked=proof.rows.filter(z=>z.status!=='ok');
+                    const significant=['industry_code','sme_certificate',
+                      'direct_production','performance_proof','staff_proof','region_restriction'];
+                    const strong=clauses.filter(z=>significant.includes(z.type));
+                    const procedural=['bid_security','submission_required',
+                      'registration_identity','eligibility_cutoff','legal_exclusion',
+                      'joint_participation','unclassified_qualification'];
+                    const soft=clauses.filter(z=>procedural.includes(z.type));
+                    return {id:id.bidNo,order:id.order,title:x.title,
+                      closes:x.closes||'',industry:q.type,verdict:verdict.type,
+                      sourceFiles:r.files?.length||0,clauses:clauses.length,
+                      strong:strong.length,procedural:soft.length,
+                      types:counts,
+                      problems:blocked.slice(0,8).map(z=>({
+                        name:z.label,status:z.status,reason:z.reason.slice(0,170)})),
+                      examples:soft.slice(0,4).map(z=>({
+                        type:z.type,text:z.sourceText.slice(0,160)}))};
+                  }).filter(Boolean).sort((a,b)=>
+                    (a.strong-b.strong)||(a.procedural-b.procedural)||
+                    (a.problems.length-b.problems.length)||
+                    String(a.closes).localeCompare(String(b.closes)));
+                return {total:candidates.length,
+                  noStrong:candidates.filter(x=>x.strong===0).length,
+                  sample:candidates.slice(0,12)};
+              }""")
+              print('WORKLINKS_MISSED_SOURCE_CANDIDATES',json.dumps(missed,ensure_ascii=False))
               # Independently list actual open, citation-linked, closest-to-ready
               # notices; never print "ready" based on an industry-code match.
               candidates=page.evaluate("""() => {
