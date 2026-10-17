@@ -84,6 +84,32 @@ try:
     assert exact['contracts'][0]['amount']=='150000000'
     assert exact['otherCompanyCount']==1 and exact['unattributedCount']==2
     assert exact['contracts'][0]['performanceComplete'] is None
+    # Real official corpList is not JSON. The last of TEN caret-separated
+    # bracket fields is the explicit contractor registration number.
+    caret='[1^용역^단독^(주) 테스트^대표^계약^123^(주) 테스트^^1308185973]'
+    decoded=p['_contract_corp_records'](caret)
+    assert len(decoded)==1 and decoded[0]['corpBizno']=='1308185973'
+    assert p['_contract_corp_records']('[1^x^y^z^a^b^c^d^e^12345678901]')==[]
+    assert p['_contract_corp_records']('1308185973')==[]
+    assert p['_contract_corp_records']('[1^a^b^c^d^e^f^g^h^1308185973]')==decoded
+    def caret_register(base,op,params):
+        assert 'ntceNo' in params and 'bidNtceNo' not in params
+        return {'totalCount':4,'items':[
+          {'ntceNo':BID,'dcsnCntrctNo':'CN-C1',
+           'cntrctCnclsDate':'2025-10-01',
+           'corpList':'[1^용역^단독^(주) 테스트^대표^계약^123^(주) 테스트^^1308185973]'},
+          {'ntceNo':BID,'dcsnCntrctNo':'CN-C2',
+           'corpList':'[1^용역^단독^(주) 타사^대표^계약^123^(주) 타사^^9999999999]'},
+          {'ntceNo':'DIFFERENT','dcsnCntrctNo':'CN-OTHER',
+           'corpList':'[1^용역^단독^(주) 테스트^대표^계약^123^(주) 테스트^^1308185973]'},
+          {'ntceNo':BID,'dcsnCntrctNo':'CN-MALFORMED',
+           'corpList':'[1^a^b^c^d^e^f^g^h^12345678901]'}]}
+    g['request_api']=caret_register
+    caret_result=p['contract_notice_lookup'](BID,'1308185973')
+    assert caret_result['ok'] and caret_result['attributableCount']==1
+    assert caret_result['contracts'][0]['contractNo']=='CN-C1'
+    assert caret_result['otherCompanyCount']==1
+    assert caret_result['unattributedCount']==2
     def winner_only(base,op,params):
         return {'totalCount':1,'items':[{'ntceNo':BID,
            'bidwinnrBizno':'1308185973','corpList':[]}]}

@@ -206,6 +206,28 @@ def _contract_items(value):
         return [value]
     return []
 
+def _contract_corp_records(value):
+    """Parse only the official CntrctInfoService.corpList CONTRACTOR field.
+
+    Official responses in October 2026 encode contractor rows as 10-column
+    caret-separated text inside brackets: [...^<10-digit contractor bizno>].
+    Never apply this decoder to a winning-bid / bidder / cntrctInfoList field.
+    Unknown shapes remain unattributed rather than being guessed from names.
+    """
+    rows=_contract_items(value)
+    if rows or not isinstance(value,str) or len(value)>65536:
+        return rows
+    result=[]
+    for segment in re.findall(r'\[([^\[\]]{1,640})\]',value):
+        fields=segment.split('^')
+        if len(fields)!=10:continue
+        registration=fields[9].strip()
+        if re.fullmatch(r'\d{10}',registration):
+            result.append({'corpBizno':registration})
+        if len(result)>=150:break
+    return result
+
+
 def _contract_business_number(row):
     """Only explicitly named contractor/company registration fields are acceptable."""
     fields=('cntrctCorpBizno','cntrctCorpBizNo','cntrctEntrprsBizno',
@@ -295,7 +317,7 @@ def contract_notice_lookup(bid_no, bizno):
         if no!=bid_no:
             unattributed+=1
             continue
-        entries=_contract_items(row.get('corpList'))
+        entries=_contract_corp_records(row.get('corpList'))
         if not entries:
             unattributed+=1
             continue
