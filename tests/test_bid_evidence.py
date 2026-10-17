@@ -63,11 +63,13 @@ finally:
 # Official change and base-price APIs are independent and on-demand.
 def changes_prices(base,operation,params):
     assert 'BidPublicInfoService' in base
-    assert params['bidNtceNo']=='R26BK01756420' and params['bidNtceOrd']=='000'
+    assert params['bidNtceNo']=='R26BK01756420'
     if operation=='getBidPblancListInfoChgHstryServc':
-        return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
+        assert 'bidNtceOrd' not in params
+        return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'001',
                           'chgDt':'2026-10-14','chgRsn':'입찰기간 변경'}], 'totalCount':1}
     if operation=='getBidPblancListInfoServcBsisAmount':
+        assert params['bidNtceOrd']=='000'
         return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
                           'bssamt':'150000000','bssamtOpenDt':'2026-10-15'}],
                 'totalCount':1}
@@ -77,6 +79,7 @@ try:
     extra=p['bid_change_and_price_query']('R26BK01756420','000')
     assert extra['ok'] and extra['changeHistory']['complete']
     assert extra['changeHistory']['records'][0]['reason']=='입찰기간 변경'
+    assert extra['changeHistory']['records'][0]['order']=='001'
     assert extra['baseAmount']['records'][0]['baseAmount']=='150000000'
     # An out-of-range or non-numeric price must not appear as validated evidence.
     def bad_price(base,operation,params):
