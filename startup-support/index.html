@@ -1360,7 +1360,7 @@ function officialAwardCount(data,bidNo){
  rows.sort((a,b)=>Number(b.bidNtceOrd||0)-Number(a.bidNtceOrd||0));
  for(const row of rows){
   const raw=String(row.prtcptCnum??'').trim();
-  if(!/^\\d{1,7}$/.test(raw))continue;
+  if(!/^\d{1,7}$/.test(raw))continue;
   const count=Number(raw);
   if(count>0&&count<=1000000)return count;
  }
@@ -2139,6 +2139,10 @@ function partnerVerdictTypes(x,selected){
  return [...new Set(companies.map(p=>participationVerdict(x,p).type))];
 }
 function matchesVerdictFilter(x,selected,filter){
+ if(filter==='repeat')return repeatYears(x)>=2;
+ if(filter==='low-bids')return jobSoftwareScope(x)==='candidate'&&
+  pastCompetitionSummary(x).low&&
+  (selected?[selected]:partners).some(p=>participationVerdict(x,p).type==='ready');
  if(filter==='registered'||filter==='no-restriction'){
   const list=selected?[selected]:partners;
   const expected=filter==='registered'?'industry_match':'no_restriction';
@@ -2147,13 +2151,15 @@ function matchesVerdictFilter(x,selected,filter){
  return filter==='all'||partnerVerdictTypes(x,selected).includes(filter);
 }
 function refreshVerdictFilters(rows,selected){
- const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0};
+ const counts={all:rows.length,ready:0,conditional:0,blocked:0,checking:0,registered:0,'no-restriction':0,repeat:0,'low-bids':0};
  for(const o of rows){
   for(const type of partnerVerdictTypes(o.x,selected)){
    if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;
   }
   if(matchesVerdictFilter(o.x,selected,'registered'))counts.registered++;
   if(matchesVerdictFilter(o.x,selected,'no-restriction'))counts['no-restriction']++;
+  if(matchesVerdictFilter(o.x,selected,'repeat'))counts.repeat++;
+  if(matchesVerdictFilter(o.x,selected,'low-bids'))counts['low-bids']++;
  }
  document.querySelectorAll('[data-verdict-filter]').forEach(function(b){
   const type=b.dataset.verdictFilter,on=type===jobVerdictFilter;
@@ -2181,6 +2187,8 @@ function renderJobs(){
  const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
  const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
  const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
+ const repeatCount=considered.filter(o=>repeatYears(o.x)>=2).length;
+ const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>participationVerdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
  document.getElementById('partnerJobCount').textContent='('+active.length+')';
  // Always show nonzero officially verified BASIC qualifications outside the
@@ -2188,6 +2196,7 @@ function renderJobs(){
  document.getElementById('partnerSummary').textContent=
   '미마감 '+active.length+'건 · 등록업종 일치 '+industryMatched+
   ' · 면허제한 미검출 '+industryUnrestricted+
+  ' · 연속 2회차 이상 '+repeatCount+' · 과거 1~2개사 '+lowBidCount+
   ' · 적격 후보 '+statusTotal('ready')+
   ' · 지원 불가 '+statusTotal('blocked')+' · 검증 중 '+statusTotal('checking')+
   (registryFailures?' · 업체등록 API 오류 '+registryFailures+'개사':'')+
@@ -2206,7 +2215,8 @@ function renderJobs(){
   '적격 후보 '+readyCount+'건 · 자격 확인 완료 '+verifiedCount+
   '건 · 확인된 제외 '+statusTotal('blocked')+
   '건 · 등록업종 일치 '+industryMatched+'건 · 업종 제한 0건 '+
-  industryUnrestricted+'건 · 원문 스캔 '+sourceScanCount+'건';
+  industryUnrestricted+'건 · 연속 2회차 이상 '+repeatCount+
+  '건 · 과거 1~2개사 '+lowBidCount+'건 · 원문 스캔 '+sourceScanCount+'건';
  const proofEl=document.getElementById('jobMissingInfo');
  if(proofEl){
   const counts={original:0,license:0,direct:0,staff:0,experience:0,sw:0,sme:0,region:0};
@@ -2262,6 +2272,16 @@ function renderJobs(){
   let list=scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter));
   list.sort(function(a,b){
     if(filter==='closed')return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
+    if(sort==='competition'){
+     const aReady=partners.some(p=>participationVerdict(a.x,p).type==='ready')?0:1;
+     const bReady=partners.some(p=>participationVerdict(b.x,p).type==='ready')?0:1;
+     if(aReady!==bReady)return aReady-bReady;
+     const ac=pastCompetitionSummary(a.x).latest?.count??Infinity;
+     const bc=pastCompetitionSummary(b.x).latest?.count??Infinity;
+     if(ac!==bc)return ac-bc;
+     const repeatDiff=repeatYears(b.x)-repeatYears(a.x);
+     if(repeatDiff)return repeatDiff;
+    }
     if(sort==='qualified'){
      const rank=function(x){
       const list=selectedPartnerId==='all'?partners:partners.filter(p=>p.id===selectedPartnerId);
@@ -2304,6 +2324,11 @@ function renderJobs(){
   document.getElementById('g2bMore').textContent='일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
+    const historyCompetition=pastCompetitionSummary(x);
+    const oldCount=historyCompetition.latest;
+    const competitionLabel=oldCount?
+     '<span class="tag" title="과거 '+oldCount.year+'년 공식 개찰 참가업체 수 · 이번 공고의 참가업체 수는 아님">'+
+      '과거 '+oldCount.count+'개사'+(historyCompetition.low?' · 적은 경쟁':'')+'</span>':'';
     const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const comparisonCompanies=scoped?[scoped]:partners;
@@ -2320,7 +2345,7 @@ function renderJobs(){
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+'</div>'+
+       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        participationStrip(x,comparisonCompanies)+
@@ -2336,8 +2361,16 @@ function setWorkspaceView(view){document.querySelectorAll(".workspace-tab").forE
 document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
 document.querySelectorAll('[data-verdict-filter]').forEach(function(b){b.addEventListener('click',function(){
  jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=100;renderJobs();
+ if(jobVerdictFilter==='repeat'||jobVerdictFilter==='low-bids')
+  loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 })});
-document.getElementById("jobSort").addEventListener("change",renderJobs);
+document.getElementById('competitionLoadMore').addEventListener('click',function(){
+ loadPastCompetitionForJobs(activeRecurringForResearch(),24);
+});
+document.getElementById("jobSort").addEventListener("change",function(){
+ renderJobs();
+ if(this.value==='competition')loadPastCompetitionForJobs(activeRecurringForResearch(),24);
+});
 document.getElementById("partnerFilter").addEventListener("change",function(){
  selectedPartnerId=this.value;jobFilter='partner';jobRenderLimit=100;
  localStorage.setItem("worklinks_job_filter_v1","partner");
