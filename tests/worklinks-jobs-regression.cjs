@@ -330,6 +330,11 @@ assert.ok(source.includes('opportunityMarkup'),
  'visible card must carry the historical opportunity indicator');
 assert.ok(source.includes('const competitionRetryAfter=new Map()'));
 assert.ok(source.includes('loadOfficialAwardSnapshot()'));
+assert.ok(source.includes('loadOfficialAwardCacheFromServer()'),
+ 'persistent worker DB award cache must be loaded on real page initialization');
+assert.ok(source.includes("/award-cache?limit=200&offset="),
+ 'one paged read of cached historic awards must replace repeat browser upstream lookups');
+
 const verifiedSnapshot=JSON.parse(require('node:fs').readFileSync(
  require('node:path').join(__dirname,'../startup-support/official-awards-snapshot.json'),'utf8'));
 assert.equal(verifiedSnapshot.source,'나라장터 낙찰정보서비스');
