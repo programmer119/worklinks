@@ -186,6 +186,34 @@ def main():
             assert quick_tabs["jobsVisible"] and quick_tabs["cards"] > 0, quick_tabs
             assert quick_tabs["rerenders"] == 0, ("Every tab switch must not rerender all bids", quick_tabs)
             assert max(quick_tabs["times"]) < 160, ("Tab interaction blocked the UI", quick_tabs)
+
+            # Measure user-observable SALES paint, not only click-handler time.
+            # Throttle CPU like a lower-end mobile device and exercise all three
+            # workspace views while background tender verification continues.
+            session = page.context.new_cdp_session(page)
+            session.send("Emulation.setCPUThrottlingRate", {"rate": 4})
+            sales_latency = page.evaluate("""async () => {
+                const labels=['sales','support','jobs','sales','support','sales'];
+                const times=[], longTasks=[];
+                const observer=new PerformanceObserver(list=>{
+                    for(const entry of list.getEntries()) longTasks.push(Math.round(entry.duration));
+                });
+                try { observer.observe({entryTypes:['longtask']}) } catch(e) {}
+                for (const view of labels) {
+                    const start=performance.now();
+                    document.querySelector('.workspace-tab[data-view="'+view+'"]').click();
+                    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+                    times.push({view,ms:Math.round(performance.now()-start),
+                        salesVisible:!!document.querySelector('#salesView.on'),
+                        salesCards:document.querySelectorAll('#salesCards .card').length});
+                }
+                observer.disconnect();
+                return {times,longTasks};
+            }""")
+            session.send("Emulation.setCPUThrottlingRate", {"rate": 1})
+            assert all(t["salesVisible"] for t in sales_latency["times"] if t["view"] == "sales")
+            assert all(t["salesCards"] == 3 for t in sales_latency["times"] if t["view"] == "sales")
+            print("WORKLINKS_SALES_MOBILE_PAINT", json.dumps(sales_latency, ensure_ascii=False))
             assert not errors, "Browser JS errors: %s" % errors
             print("WORKLINKS_MOBILE_LAZY_QA=PASS",
                   json.dumps({"g2b_requests": calls, "total": 480,
