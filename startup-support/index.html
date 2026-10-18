@@ -394,6 +394,19 @@
 }
 #jobCards .job-mini .job-footer>.job-partners{max-width:none}
 #jobCards .job-mini .job-source-link{flex:none;margin-left:auto}
+/* Bid evidence is a scan aid, not the main sentence of the card.
+   Never clamp title, decision reasoning or required follow-up evidence. */
+#jobCards .job-highlights{gap:5px 6px}
+#jobCards .job-highlights .job-advantage{
+ flex:0 1 auto;min-width:0;gap:3px 5px
+}
+#jobCards .job-highlights .advantage-reason{
+ flex:0 1 auto;max-width:100%;color:#526174;
+ overflow-wrap:anywhere
+}
+#jobCards .job-highlights>.tag,#jobCards .job-highlights>.job-repeat{min-height:23px;padding:3px 6px}
+#jobCards .job-verdict-row .job-verdict-why{order:1}
+#jobCards .job-verdict-row .job-verdict-checks{order:2}
 @media(max-width:1100px){#jobCards.cards{grid-template-columns:1fr}}
 @media(max-width:680px){
  #jobCards .job-day{padding:8px 11px;font-size:15px}
@@ -1608,11 +1621,11 @@ function bidAdvantageMarkup(z,eligible){
   '<span class="advantage-unrated">—</span>';
  const note='과거 기록 기반 유리도 '+t.label+(n?' '+n+'/3칩':' · 미평가')+
   ' · '+t.reason+' · 현재 입찰 낙찰 가능성을 보장하지 않음';
- const brief=t.kind==='high'?'최근 2년 각 1~2개사 · 낙찰사 변경':
-  t.kind==='caution'?'과거 1~2개사 · 동일 업체 '+z.verifiedWinnerYears+'년 낙찰':
-  t.kind==='medium'?'과거 1~2개사 · 낙찰사 확인 필요':
-  t.kind==='mixed'?'과거 3개사 이상 회차 확인':
-  t.kind==='unknown'?'과거 경쟁자료 미확인':'적격 판단 우선';
+ const brief=t.kind==='high'?'최근 2년 1~2개사 · 낙찰사 변경':
+  t.kind==='caution'?'1~2개사 · 동일 낙찰사 '+z.verifiedWinnerYears+'년':
+  t.kind==='medium'?'1~2개사 · 낙찰사 확인 필요':
+  t.kind==='mixed'?'3개사 이상 경쟁 회차 있음':
+  t.kind==='unknown'?'경쟁자료 미확인':'적격 판단 우선';
  return '<div class="job-advantage adv-'+t.kind+'" data-advantage-tier="'+
   (n||'unrated')+'" aria-label="'+htmlEscape(note)+'" title="'+htmlEscape(note)+'">'+
   '<span class="advantage-pills" aria-hidden="true">'+chips+'</span>'+
@@ -2868,8 +2881,8 @@ function renderJobs(){
     const historyCompetition=pastCompetitionSummary(x);
     const oldCount=historyCompetition.latest;
     const competitionLabel=oldCount?
-     '<span class="tag" title="과거 '+oldCount.year+'년 공식 개찰 참가업체 수 · 이번 공고의 참가업체 수는 아님">'+
-      '과거 경쟁 '+oldCount.count+'개사</span>':'';
+     '<span class="tag" title="과거 '+oldCount.year+'년 공식 개찰 참가업체 '+oldCount.count+'개사 · 이번 공고의 참가업체 수가 아님">'+
+      oldCount.year+'년 '+oldCount.count+'개사</span>':'';
     const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const comparisonCompanies=scoped?[scoped]:partners;
