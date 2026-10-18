@@ -138,6 +138,10 @@ def main():
             assert calls == [(0, 160)], "Mobile first page must be bounded: %s" % calls
             # API state is updated before its debounced DOM paint. Wait for
             # the actual visible control, not just the background fetch flag.
+            page.wait_for_function(
+                "() => !jobRenderDirty && !!document.querySelector('#partnerSummary')?.textContent?.includes('현재 로드')",
+                timeout=20000
+            )
             page.locator("#g2bMore").wait_for(state="visible", timeout=15000)
             assert page.evaluate("g2bSavedTotal") == 480
             assert "현재 로드" in page.locator("#partnerSummary").text_content()
