@@ -6,6 +6,7 @@ on:
       - '.github/workflows/worklinks-jobs-visual-qa.yml'
       - 'startup-support/index.html'
       - 'startup-support/rfp-clauses.json'
+      - 'tests/test_worklinks_mobile_bootstrap.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +20,8 @@ jobs:
         run: |
           python3 -m pip install -q playwright
           python3 -m playwright install chromium
+      - name: Validate mobile first paint and incremental saved bids
+        run: python3 tests/test_worklinks_mobile_bootstrap.py
       - name: Validate visible typography and hidden diagnostic helper
         shell: bash
         run: |
