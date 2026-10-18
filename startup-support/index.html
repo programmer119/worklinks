@@ -642,6 +642,12 @@ var partners=[
 function htmlEscape(v){return String(v===undefined||v===null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function renderPartners(){
  var box=document.getElementById("partnerCompanyCards");if(!box)return;
+ // Partner details are a modal: don't rebuild their hidden DOM after every
+ // network response while users switch Support/Jobs/Sales tabs.
+ if(!document.getElementById("partnersModal")?.classList.contains('open')){
+  document.getElementById("partnerHeaderCount").textContent=String(partners.length);
+  return;
+ }
  box.innerHTML=partners.filter(function(p){return !partnerScopedCompany||p.id===partnerScopedCompany}).map(function(p){
   var q=p.qualifications.filter(function(y){
    if(!partnerScopedJob)return true;
@@ -906,10 +912,11 @@ function openPartnerModal(partnerId,jobId){
  const job=jobs.concat(g2bLiveJobs).find(function(x){return x.id===jobId});
  partnerScopedJob=job||null;
  document.getElementById('partnersTitle').textContent=p?p.name+' · 파트너 상세':'협업 파트너';
- renderPartners();
  const subtitle=document.querySelector('#partnersSheet .partner-sheet-head p');
  subtitle.textContent=job?('이 일감: '+job.title+' · 참가자격·공동수급 여부는 공고 원문 기준'): '업체별 공공입찰 업종·직접생산·수행분야·증빙 확인 현황';
- partnerModal.classList.add('open');partnerModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';document.getElementById('partnersClose').focus();
+ partnerModal.classList.add('open');partnerModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ renderPartners();
+ document.getElementById('partnersClose').focus();
  if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
   if(p&&!p.productionCheckedAt&&!p.productionPromise)refreshPartnerProduction(p);
   if(p&&!p.smeCheckedAt&&!p.smePromise)refreshPartnerSme(p);
@@ -2520,6 +2527,32 @@ function refreshVerdictFilters(rows,selected){
 }
 
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
+// One Jobs paint repeatedly evaluates the same notice/company across summary,
+// 14 verdict filters and cards. Share pure results ONLY during that paint.
+// Invalidate the entire memo immediately afterwards; never cache stale evidence.
+var jobRenderCalcCache=null;
+var jobRenderNoPartnerKey=Symbol('no-partner');
+function worklinksMemoDuringPaint(kind,original){
+ return function(x,p){
+  const frame=jobRenderCalcCache;
+  if(!frame||!x||typeof x!=='object')return original.apply(this,arguments);
+  let lookup=frame[kind];
+  if(!lookup){lookup=new WeakMap();frame[kind]=lookup}
+  let values=lookup.get(x);
+  if(!values){values=new Map();lookup.set(x,values)}
+  const key=arguments.length>1?p:jobRenderNoPartnerKey;
+  if(values.has(key))return values.get(key);
+  const result=original.apply(this,arguments);
+  values.set(key,result);
+  return result;
+ };
+}
+participationVerdict=worklinksMemoDuringPaint('verdict',participationVerdict);
+jobQualificationVerdict=worklinksMemoDuringPaint('qualification',jobQualificationVerdict);
+jobSoftwareScope=worklinksMemoDuringPaint('scope',jobSoftwareScope);
+jobTimeInfo=worklinksMemoDuringPaint('time',jobTimeInfo);
+pastCompetitionSummary=worklinksMemoDuringPaint('history',pastCompetitionSummary);
+repeatYears=worklinksMemoDuringPaint('repeat',repeatYears);
 var jobAvailableRows=0,asyncJobRenderTimer=null,jobRenderDirty=true;
 function scheduleJobsRender(){
  jobRenderDirty=true;
@@ -2532,14 +2565,10 @@ function renderJobs(){
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
  jobRenderDirty=false;
  if(asyncJobRenderTimer!==null){clearTimeout(asyncJobRenderTimer);asyncJobRenderTimer=null}
+ jobRenderCalcCache=Object.create(null);
+ try {
  syncPartnerFilterChoices();
- const memoVerdict=new WeakMap();
- const verdict=function(x,p){
-  let byPartner=memoVerdict.get(x);
-  if(!byPartner){byPartner=new Map();memoVerdict.set(x,byPartner)}
-  if(!byPartner.has(p))byPartner.set(p,participationVerdict(x,p));
-  return byPartner.get(p);
- };
+ const verdict=participationVerdict;
  const raw=jobs.concat(g2bLiveJobs);
  const rejected=raw.filter(x=>x.kind&&jobSoftwareScope(x)==='out').length;
  const all=collapseSimilarNotices(raw.filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')));
@@ -2742,6 +2771,11 @@ function renderJobs(){
   if(summary)summary.textContent+=' · 현재 로드분만 집계';
  }
  document.querySelectorAll('.jobf').forEach(function(b){b.classList.toggle('on',b.dataset.jobf===filter)});
+ }finally{
+  // Async API completions can update qualification evidence immediately;
+  // no memo value may survive this synchronous render.
+  jobRenderCalcCache=null;
+ }
 }
 function renderSales(){var el=document.getElementById("salesCards");if(!el)return;el.innerHTML=salesAgencies.length?salesAgencies.map(function(x){return '<article class="card"><div class="cardtop"><span class="tag hot">'+x.kind+'</span><span class="tag">'+x.grade+'</span></div><h3><a href="'+x.url+'" target="_blank" rel="noopener">'+x.name+'</a></h3><div class="why"><b>선별 이유</b><br>'+x.why+'</div><p><b>상담 때 확인:</b> '+x.check+'</p></article>'}).join(""):'<div class="emptycard">현재 선별된 영업대행사가 없습니다.</div>'}
 var jobsBootstrapStarted=false,jobsBootstrapQueued=false,jobsFirstPaintScheduled=false;
