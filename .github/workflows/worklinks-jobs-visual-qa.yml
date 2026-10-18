@@ -38,6 +38,25 @@ jobs:
               # G2B data is fetched before its debounced DOM update. Wait for
               # rendered repeat chips instead of sampling the old static grid.
               page.wait_for_function("() => jobRenderDirty===false && Number(document.querySelector('[data-verdict-count=repeat]')?.textContent||0)>0",timeout=30000)
+              # Real production dataset (often 2,000+ saved notices): profile
+              # tab click-to-paint, not just the JavaScript click handler.
+              desktop_paint=page.evaluate("""async () => {
+                const times=[], longTasks=[];
+                const watcher=new PerformanceObserver(list=>{
+                  for(const task of list.getEntries())longTasks.push(Math.round(task.duration));
+                });
+                try{watcher.observe({entryTypes:['longtask']})}catch(e){}
+                for(const target of ['sales','support','jobs','sales','jobs']){
+                  const began=performance.now();
+                  document.querySelector('.workspace-tab[data-view="'+target+'"]').click();
+                  await new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)));
+                  times.push({view:target,ms:Math.round(performance.now()-began),
+                    cards:document.querySelectorAll('#jobCards .job-mini').length});
+                }
+                watcher.disconnect();
+                return {times,longTasks,liveRows:g2bLiveJobs.length};
+              }""")
+              print('WORKLINKS_DESKTOP_LIVE_TAB_PAINT',json.dumps(desktop_paint,ensure_ascii=False))
               print('WORKLINKS_BROWSER_LIVE_DATA',page.evaluate("({serverAvailable:g2bServerAvailable,savedTotal:g2bSavedTotal,liveRows:g2bLiveJobs.length,visibleCards:document.querySelectorAll('#jobCards .job-mini').length})"))
               repeat=page.evaluate("""() => {
                 const repeated=g2bLiveJobs.filter(x=>repeatYears(x)>=2);
