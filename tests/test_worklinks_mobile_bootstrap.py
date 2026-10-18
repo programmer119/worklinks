@@ -160,7 +160,7 @@ def main():
                 button.textContent='2027년 나라장터 공공기관 AI 데이터 관리시스템 구축 및 클라우드 정보보안 전환 운영 유지관리와 개발 용역 사업 세부 참여 조건 확인 및 과업지시서 전수검토';
                 const style=getComputedStyle(button),headline=getComputedStyle(heading);
                 const title={clamp:style.webkitLineClamp,display:style.display,
-                    visible:button.getBoundingClientRect().height>80,
+                    visible:button.getBoundingClientRect().height>2*parseFloat(style.lineHeight),
                     overflow:button.scrollHeight>button.clientHeight+2,
                     wrapperClipped:heading.scrollHeight>heading.clientHeight+2,
                     lineCount:Math.round(button.getBoundingClientRect().height/
