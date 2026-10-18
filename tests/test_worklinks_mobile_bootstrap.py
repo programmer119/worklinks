@@ -158,6 +158,32 @@ def main():
             page.locator(".workspace-tab[data-view='jobs']").click()
             page.wait_for_timeout(350)
             assert len(calls) == count, "Tab reentry restarted the full sync"
+
+            # Regression: tab navigation must never synchronously rerun the
+            # expensive entire-bid matching/DOM card renderer.
+            page.wait_for_timeout(250)
+            quick_tabs = page.evaluate("""() => {
+                const oldRender = window.renderJobs;
+                let rerenders = 0;
+                window.renderJobs = function(...args) {
+                    rerenders++;
+                    return oldRender.apply(this, args);
+                };
+                const times = [];
+                for(let n=0;n<6;n++){
+                    const started=performance.now();
+                    document.querySelector('.workspace-tab[data-view="support"]').click();
+                    document.querySelector('.workspace-tab[data-view="jobs"]').click();
+                    times.push(performance.now()-started);
+                }
+                return {
+                    times, rerenders, jobsVisible:document.getElementById('jobsView').classList.contains('on'),
+                    cards:document.querySelectorAll('#jobCards [data-job-card]').length
+                };
+            }""")
+            assert quick_tabs["jobsVisible"] and quick_tabs["cards"] > 0, quick_tabs
+            assert quick_tabs["rerenders"] == 0, ("Every tab switch must not rerender all bids", quick_tabs)
+            assert max(quick_tabs["times"]) < 160, ("Tab interaction blocked the UI", quick_tabs)
             assert not errors, "Browser JS errors: %s" % errors
             print("WORKLINKS_MOBILE_LAZY_QA=PASS",
                   json.dumps({"g2b_requests": calls, "total": 480,
