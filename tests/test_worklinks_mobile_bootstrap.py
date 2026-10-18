@@ -142,8 +142,12 @@ def main():
             assert page.evaluate("g2bSavedTotal") == 480
             assert "현재 로드" in page.locator("#partnerSummary").text_content()
             assert "적격 후보" in page.locator("#jobDecisionSummary").text_content()
+            assert page.evaluate("jobRenderLimit") == 24
+            assert page.locator("#jobCards .job-mini").count() <= 24
 
-            for _ in range(6):
+            # Mobile deliberately displays just 24 cards at once; advancing
+            # the server's 160-row cache can take several smaller More clicks.
+            for _ in range(16):
                 if len(calls) > 1:
                     break
                 button = page.locator("#g2bMore")
