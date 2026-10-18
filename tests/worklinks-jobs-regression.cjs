@@ -296,7 +296,8 @@ assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true)
 assert.equal(past.bidAdvantageOrder({level:3}),0);
 assert.ok(past.bidAdvantageOrder({level:2})<past.bidAdvantageOrder({level:1}));
 assert.ok(past.bidAdvantageOrder({level:1})<past.bidAdvantageOrder({level:null,kind:'unknown'}));
-assert.ok(past.winnerTrendLabel(past.pastCompetitionSummary(pastBid)).includes('낙찰업체 변경'));
+assert.ok(past.winnerTrendLabel(past.pastCompetitionSummary(pastBid)).includes('낙찰업체 사업자번호 불일치'),
+ 'different verified winner business IDs must be described precisely without assuming a corporate-name change');
 past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'',winner:'직전 낙찰사',checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,false,
  'names cannot prove a winner change without valid business IDs');
