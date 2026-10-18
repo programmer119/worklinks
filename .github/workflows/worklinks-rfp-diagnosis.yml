@@ -20,6 +20,67 @@ jobs:
       - uses: actions/checkout@v4
       - name: Aggregate RFP gate failures without modifying data
         run: python3 scripts/diagnose_worklinks_rfp_pipeline.py
+      - name: Read exact four Changcom RFP attachments without publishing
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m pip install -q --break-system-packages pyhwp pypdf
+          python3 - <<'PY'
+          import sys,re,json,hashlib,urllib.parse
+          from pathlib import Path
+          sys.path.insert(0,str(Path('scripts').resolve()))
+          import refresh_worklinks_rfp as reader
+          base='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/'
+          targets=[
+            ('R26BK01768055:000','제안요청서.hwpx',
+             base+'downloadRfpFile.do?rfpNo=R26DH00059389&rfpOrd=000&rfpUntyAtchFileNo=16'),
+            ('R26BK01760974:001','NRC-제안요청서.hwp',
+             base+'downloadRfpFile.do?rfpNo=R26DH00060122&rfpOrd=000&rfpUntyAtchFileNo=1'),
+            ('R26BK01759246:000','성평등가족부-제안요청서.hwpx',
+             base+'downloadRfpFile.do?rfpNo=R26DH00059424&rfpOrd=000&rfpUntyAtchFileNo=9'),
+            ('R26BK01775500:000','KADX-제안요청서.hwpx',
+             base+'downloadFile.do?bidPbancNo=R26BK01775500&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03'),
+          ]
+          keywords=[
+            ('bid_eligibility',r'입찰\\s*참가\\s*자격|참가자격'),
+            ('mandatory_performance',r'필수.{0,12}실적|실적.{0,15}(?:필수|이상|보유|제한)|실적증명서'),
+            ('mandatory_staff',r'필수.{0,12}(?:인력|기술자|자격)|(?:인력|기술자).{0,15}(?:필수|상주|이상|경력)|상주인력'),
+            ('labor_schedule',r'투입.{0,7}(?:인력|공수)|M/M|재직증명|고용보험'),
+            ('consortium',r'공동(?:수급|계약|이행)|하도급'),
+          ]
+          seen_success=0
+          for key,name,url in targets:
+            parsed=urllib.parse.urlsplit(url)
+            if parsed.scheme!='https' or parsed.hostname!='www.g2b.go.kr' or not parsed.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
+              raise SystemExit('UNEXPECTED_OFFICIAL_RFP_HOST')
+            try:
+              data=reader.download(url)
+              body=reader.normalize_extracted_text(reader.extract(name,data))
+              if len(body.strip())<150:raise ValueError('RFP_NO_SEARCHABLE_TEXT')
+              seen_success+=1
+              samples=[]
+              for topic,pattern in keywords:
+                matches=list(re.finditer(pattern,body,re.I))
+                narrowed=[]
+                for m in matches:
+                  quote=' '.join(body[max(0,m.start()-75):min(len(body),m.end()+185)].split())
+                  if quote not in narrowed:narrowed.append(quote)
+                  if len(narrowed)>=5:break
+                samples.append({'topic':topic,'count':len(matches),'examples':narrowed})
+              print('CHANGCOM_LIVE_RFP',json.dumps({
+                'key':key,'status':'readable','sourceSha256':hashlib.sha256(data).hexdigest(),
+                'textChars':len(body),'evidence':samples,
+                'note':'source-only; scoring and execution terms are NOT automatically mandatory bidder credentials'
+              },ensure_ascii=False),flush=True)
+            except Exception as e:
+              print('CHANGCOM_LIVE_RFP',json.dumps({
+                'key':key,'status':'unreadable','error':reader.classify_failure(e),
+                'exception':type(e).__name__,'notEvidenceOfDisqualification':True
+              },ensure_ascii=False),flush=True)
+          print('CHANGCOM_LIVE_RFP_SUMMARY',json.dumps({
+            'targetCount':len(targets),'readableCount':seen_success,'wroteServerOrDatabase':False
+          }),flush=True)
+          PY
       - name: Direct official qualification check (no AI)
         run: node tests/test_worklinks_direct_rfp.js
       - name: Existing classification regression tests
