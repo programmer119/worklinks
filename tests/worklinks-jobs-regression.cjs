@@ -528,7 +528,41 @@ for(const no of ['R26BK01768055','R26BK01759246','R26BK01774426','R26BK01775500'
 assert.equal(verdict({noticeNumber:'R26BK01760974',noticeOrder:'001',industry:'industry_match'},officialRegistry).verified,false);
 assert.equal(checkedNotice.changcomOriginalNoticeReview({noticeNumber:'R26BK01757317',noticeOrder:'001'},officialRegistry),null);
 assert.equal(checkedNotice.changcomOriginalNoticeReview({noticeNumber:'R26BK01757317',noticeOrder:'000'},{id:'other'}),null);
-assert.ok(source.includes('changcomOriginalReviewMarkup(x,comparisonCompanies)'));
+const states=[
+ ['R26BK01768055','000','경력확인서','인수인계'],
+ ['R26BK01760974','001','4대보험','하도급'],
+ ['R26BK01759246','000','기술경력확인서','상주인력'],
+ ['R26BK01774426','000','공수 제안','M/M'],
+ ['R26BK01775500','000','실적','보안약점']
+];
+for(const [no,order,proposalWord,deliveryWord] of states){
+ const x={noticeNumber:no,noticeOrder:order};
+ const card=checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry],true);
+ const detail=checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry]);
+ assert.ok(card.includes('입찰참가: 기본 등록조건 일치 · 최종 미확정'),no+' must stay a candidate');
+ assert.ok(card.includes('제안·평가: 준비사항')&&card.includes('낙찰 후: 수행조건'),no+' three short stages on card');
+ assert.ok(!card.includes('미확정)')&&card.length<450,no+' compact card does not repeat full RFP');
+ assert.ok(detail.includes('1. 입찰참가 필수조건'),no+' mandatory-entry stage');
+ assert.ok(detail.includes('2. 제안·평가 준비사항')&&detail.includes(proposalWord),no+' proposal stage');
+ assert.ok(detail.includes('3. 낙찰 후 수행조건')&&detail.includes(deliveryWord),no+' delivery stage');
+ assert.ok(detail.includes('최종 참가자격 확정이 아닙니다'),no+' entry not verified fully');
+ assert.equal(verdict({noticeNumber:no,noticeOrder:order,industry:'industry_match'},officialRegistry).type,'ready');
+ assert.equal(verdict({noticeNumber:no,noticeOrder:order,industry:'industry_match'},officialRegistry).verified,false);
+ assert.equal(checkedNotice.changcomOriginalReviewMarkup(x,[{id:'other'}]),'');
+ assert.equal(checkedNotice.changcomOriginalReviewMarkup({noticeNumber:no,noticeOrder:'999'},[officialRegistry]),'');
+}
+for(const no of ['R26BK01757317','R26BK01766789','R26BK01754276','R26BK01772216']){
+ const x={noticeNumber:no,noticeOrder:'000'};
+ assert.ok(checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry],true).includes('입찰참가: 원문·등록 불일치'));
+ const detailed=checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry]);
+ assert.ok(detailed.includes('1. 입찰참가 필수조건'));
+ assert.ok(detailed.includes('2. 제안·평가 준비사항'));
+ assert.ok(detailed.includes('3. 낙찰 후 수행조건'));
+}
+assert.ok(!checkedNotice.changcomOriginalReviewMarkup(
+ {noticeNumber:'R26BK01757317',noticeOrder:'000'},[bidder],true).includes('원문·등록 불일치'),
+ 'unknown official company registration is not an exclusion');
+assert.ok(source.includes('changcomOriginalReviewMarkup(x,comparisonCompanies,true)'));
 assert.ok(source.includes('changcomOriginalReviewMarkup(x,compareList)'));
 
 assert.equal(verdict({industry:'industry_match'}).type,'ready');
