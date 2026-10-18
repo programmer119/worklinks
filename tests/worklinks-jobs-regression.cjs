@@ -328,7 +328,14 @@ assert.ok(source.includes("bidAdvantageFromHistory(pastCompetitionSummary(a.x))"
  'historic opportunity is integrated into the actual sorting comparator');
 assert.ok(source.includes('opportunityMarkup'),
  'visible card must carry the historical opportunity indicator');
-assert.ok(source.includes('const competitionRetryAfter=new Map()'));
+assert.ok(!source.includes('const competitionRetryAfter=new Map()'),
+ 'browser must not maintain a parallel official-award retry queue');
+const cacheOnly=source.slice(source.indexOf('async function loadPastCompetitionForJobs('),
+ source.indexOf('function activeRecurringForResearch('));
+assert.ok(cacheOnly.includes('await loadOfficialAwardCacheFromServer()'),
+ 'historical browser actions must use persisted server cache');
+assert.ok(!cacheOnly.includes("g2bFetch('/awards?"),
+ 'sorting and filtering must not spend the official award API quota');
 assert.ok(source.includes('loadOfficialAwardSnapshot()'));
 assert.ok(source.includes('loadOfficialAwardCacheFromServer()'),
  'persistent worker DB award cache must be loaded on real page initialization');
