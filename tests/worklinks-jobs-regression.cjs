@@ -444,11 +444,12 @@ const eligibleProof=cmpMod.comparePartnerJob(eligibleBid,eligiblePartner);
 assert.equal(eligibleProof.complete,true,
  'complete one-code public notice must no longer be structurally forced to 0');
 const realVerdict=new Function('jobTimeInfo','jobSoftwareScope','jobQualificationVerdict',
- 'comparePartnerJob','rfpSnapshotForJob',
+ 'comparePartnerJob','rfpSnapshotForJob','changcomOriginalNoticeReview','partnerRegisteredCode',
  part('function participationVerdict(x,p){','function participationStrip(x,companies){')+
  'return participationVerdict;'
 )(()=>({key:'open'}),()=> 'candidate',
- ()=>({type:'industry_match'}),cmpMod.comparePartnerJob,x=>x.rfp);
+ ()=>({type:'industry_match'}),cmpMod.comparePartnerJob,x=>x.rfp,
+ ()=>null,()=>null);
 assert.equal(realVerdict(eligibleBid,eligiblePartner).type,'ready',
  'actual UI verdict must be reachable for completely proven simple conditions');
 const disqualified={...eligibleSource,files:[{...eligibleSource.files[0],
