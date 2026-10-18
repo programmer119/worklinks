@@ -445,7 +445,7 @@
   <span class="job-advantage-explain">1~3칩은 과거 공식 개찰 결과에 따른 검토 순위입니다. 지원자격 확정·낙찰확률·이번 경쟁업체 수가 아닙니다. 정보 미확인은 점수 없이 표시합니다.</span>
  </div>
 
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>적격 후보 · 유리도 높은 순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="연속 발주 사업의 과거 낙찰 결과에서 실제 참가업체 수를 조회합니다">과거 경쟁 조사 <span id="competitionLoadStatus">(조회 전)</span></button></div>
+ </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>적격 후보 · 유리도 높은 순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="서버 DB에 저장된 공식 과거 낙찰 결과를 다시 읽습니다. 신규 조사는 서버 수집기가 시간당 최대 2건 수행합니다">과거 경쟁 캐시 새로고침 <span id="competitionLoadStatus">(조회 전)</span></button></div>
 
 
   </div>
@@ -1346,8 +1346,7 @@ function extractBudget(s){
  * Counts are kept by exact historical bid notice; no cross-project inference.
  */
 const COMPETITION_STORE='worklinks_official_past_bidders_v1';
-var competitionByNotice=new Map(),competitionRunning=false,competitionFetchRequests=0;
-const competitionRetryAfter=new Map();
+var competitionByNotice=new Map(),competitionRunning=false;
 try{
  const saved=JSON.parse(localStorage.getItem(COMPETITION_STORE)||'{}');
  if(saved&&typeof saved==='object'){
@@ -1609,40 +1608,16 @@ function refreshPastCompetitionText(){
  const status=document.getElementById('competitionLoadStatus');
  if(status)status.textContent=competitionRunning?' (조회 중)':competitionByNotice.size?' (과거 '+competitionByNotice.size+'건 조회됨)':' (조회 전)';
 }
-async function loadPastCompetitionForJobs(targets,limit){
+async function loadPastCompetitionForJobs(_targets,_limit){
+ // Browser filter/sort/history actions read only the verified server DB cache.
+ // The server123 award worker alone requests uncached official results.
+ // Unknown or failed upstream responses must never be treated as 0 bidders.
  if(competitionRunning)return;
- const ids=[];
- for(const x of targets){
-  for(const y of previousOfficialBids(x)){
-   const no=String(y.bidNo);
-   if(!competitionByNotice.has(no)&&(competitionRetryAfter.get(no)||0)<=Date.now()&&!ids.includes(no))ids.push(no);
-  }
- }
- if(!ids.length){refreshPastCompetitionText();return}
  competitionRunning=true;refreshPastCompetitionText();
  try{
-  for(const no of ids.slice(0,Math.max(1,Math.min(limit||18,24)))){
-   try{
-    const result=await g2bFetch('/awards?bidNo='+encodeURIComponent(no));
-    competitionByNotice.set(no,{...officialAwardDetails(result,no),
-      checkedAt:Date.now(),source:'나라장터 낙찰정보서비스'});
-   }catch(e){
-    const msg=String(e.message||e);
-    // Rate limiting must halt the batch without incorrectly recording zeros.
-    if(/429|rate_limited|LIMITED_NUMBER|upstream_result_22|upstream_result_23/.test(msg)){
-     competitionRetryAfter.set(no,Date.now()+30*60000);
-     break;
-    }
-    // A failed API response is unknown; retry after a short cooldown.
-    competitionRetryAfter.set(no,Date.now()+10*60000);
-   }
-   competitionFetchRequests++;
-   if(competitionFetchRequests%4===0){savePastCompetition();renderJobs();refreshPastCompetitionText()}
-   // The crawler shares the upstream quota; avoid bursty on-demand research.
-   await new Promise(resolve=>setTimeout(resolve,750));
-  }
+  await loadOfficialAwardCacheFromServer();
  }finally{
-  competitionRunning=false;savePastCompetition();renderJobs();refreshPastCompetitionText();
+  competitionRunning=false;refreshPastCompetitionText();
  }
 }
 function activeRecurringForResearch(){
