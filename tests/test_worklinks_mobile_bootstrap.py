@@ -149,6 +149,43 @@ def main():
             assert page.evaluate("jobRenderLimit") == 24
             assert page.locator("#jobCards .job-mini").count() <= 24
 
+            # Important card text must never be ellipsized, even for unusually
+            # long Korean notice names and verification text. Tiny history
+            # indicators are in a separate wrap-safe row below the heading.
+            card_readability = page.evaluate("""() => {
+                const card=document.querySelector('#jobCards .job-mini');
+                if(!card)return {error:'no displayed job'};
+                const heading=card.querySelector('h3'),button=heading.querySelector('.job-card-title');
+                const original=button.textContent;
+                button.textContent='2027년 나라장터 공공기관 AI 데이터 관리시스템 구축 및 클라우드 정보보안 전환 운영 유지관리와 개발 용역 사업 세부 참여 조건 확인 및 과업지시서 전수검토';
+                const style=getComputedStyle(button),headline=getComputedStyle(heading);
+                const title={clamp:style.webkitLineClamp,display:style.display,
+                    visible:button.getBoundingClientRect().height>80,
+                    overflow:button.scrollHeight>button.clientHeight+2,
+                    wrapperClipped:heading.scrollHeight>heading.clientHeight+2,
+                    lineCount:Math.round(button.getBoundingClientRect().height/
+                        parseFloat(style.lineHeight))};
+                button.textContent=original;
+                const why=card.querySelector('.job-verdict-why');
+                const whyStyle=why?getComputedStyle(why):null;
+                const checks=card.querySelectorAll('.job-verdict-checks');
+                return {title,
+                    containsHighlights:!!card.querySelector('.job-highlights'),
+                    headlineChildren:card.querySelector('.job-headline')?.querySelectorAll('h3').length,
+                    why:why?{clamp:whyStyle.webkitLineClamp,overflow:why.scrollHeight>why.clientHeight+2}:null,
+                    namedChecks:checks.length,
+                    checkText:[...checks].map(el=>el.textContent.slice(0,180))};
+            }""")
+            assert not card_readability.get("error"), card_readability
+            assert card_readability["containsHighlights"] and card_readability["headlineChildren"] == 1, card_readability
+            assert card_readability["title"]["clamp"] == "none", card_readability
+            assert card_readability["title"]["visible"] and card_readability["title"]["lineCount"] > 2, card_readability
+            assert not card_readability["title"]["overflow"] and not card_readability["title"]["wrapperClipped"], card_readability
+            assert card_readability["why"] and card_readability["why"]["clamp"] == "none", card_readability
+            assert not card_readability["why"]["overflow"], card_readability
+            print("WORKLINKS_CARD_READABILITY=PASS",
+                  json.dumps(card_readability, ensure_ascii=False))
+
             # Mobile deliberately displays just 24 cards at once; advancing
             # the server's 160-row cache can take several smaller More clicks.
             for _ in range(16):
