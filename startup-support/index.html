@@ -732,7 +732,7 @@ async function refreshPartnerProduction(p){
   renderPartners();
   if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
   if(partnerScopedJob)renderPartnerJobContext();
-  renderJobs();
+  scheduleJobsRender();
  })();
  try{return await p.productionPromise}finally{p.productionPromise=null}
 }
@@ -774,7 +774,7 @@ async function refreshPartnerAwardEvidence(p){
    detail:verified.length?'공식 나라장터 낙찰업체 사업자번호를 확인. 계약체결·이행완료·검수·실적증명서까지 증명하지는 않음. 확인 후보 공고에 한정.':
     errors.join(' / ')||'현재 확인한 공고에서 낙찰 기록 미발견. 전체 실적 없음으로 판정하지 않음.'
   });
-  renderPartners();renderJobs();
+  renderPartners();scheduleJobsRender();
   if(activeDetailJobId){const j=getJobById(activeDetailJobId);if(j)renderJobDetail(j)}
   if(partnerScopedJob)renderPartnerJobContext();
  })();
@@ -795,7 +795,7 @@ async function refreshContractCapability(){
      ' · 계약과정통합공개: '+(contractCapabilityRecord.alternative?.ok?'호출 성공':'오류 '+(contractCapabilityRecord.alternative?.error||'미확인'))+
      ' · 기본 계약정보 활용신청: https://www.data.go.kr/data/15129427/openapi.do'});
   }
-  renderPartners();renderJobs();
+  renderPartners();scheduleJobsRender();
   if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
   return contractCapabilityRecord;
  })();
@@ -840,7 +840,7 @@ async function refreshPartnerSme(p){
   renderPartners();
   if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
   if(partnerScopedJob)renderPartnerJobContext();
-  renderJobs();
+  scheduleJobsRender();
  })();
  try{return await p.smePromise}finally{p.smePromise=null}
 }
@@ -896,7 +896,7 @@ async function refreshPartnerRegistry(p){
  renderPartners();
  if(activeDetailJobId){const job=getJobById(activeDetailJobId);if(job)renderJobDetail(job)}
  if(partnerScopedJob)renderPartnerJobContext();
- renderJobs();
+ scheduleJobsRender();
 }
 var partnerModal=document.getElementById("partnersModal"),partnerLastFocus=null,partnerScopedCompany=null,partnerScopedJob=null;
 function openPartnerModal(partnerId,jobId){
@@ -1261,7 +1261,7 @@ async function g2bLoadSaved(append){
   g2bLiveJobs=[...seen.values()];
   g2bLoadedOffset=offset;g2bServerAvailable=true;
   g2bSavedTotal=total;g2bLinkedEligibility=linkedOnServer;
-  renderJobs();
+  scheduleJobsRender();
   if(!append){
    setTimeout(function(){
     refreshAllPartnerRegistries().then(queueVisibleBidEligibility).catch(()=>{});
@@ -2520,15 +2520,26 @@ function refreshVerdictFilters(rows,selected){
 }
 
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
-var jobAvailableRows=0,asyncJobRenderTimer=null;
+var jobAvailableRows=0,asyncJobRenderTimer=null,jobRenderDirty=true;
 function scheduleJobsRender(){
+ jobRenderDirty=true;
  if(!document.getElementById('jobsView')?.classList.contains('on')||asyncJobRenderTimer!==null)return;
- asyncJobRenderTimer=setTimeout(function(){asyncJobRenderTimer=null;renderJobs()},160);
+ asyncJobRenderTimer=setTimeout(function(){asyncJobRenderTimer=null;if(jobRenderDirty)renderJobs()},180);
 }
 function renderJobs(){
  const el=document.getElementById('jobCards');
- if(!el||!document.getElementById('jobsView').classList.contains('on'))return;
+ if(!el)return;
+ if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
+ jobRenderDirty=false;
+ if(asyncJobRenderTimer!==null){clearTimeout(asyncJobRenderTimer);asyncJobRenderTimer=null}
  syncPartnerFilterChoices();
+ const memoVerdict=new WeakMap();
+ const verdict=function(x,p){
+  let byPartner=memoVerdict.get(x);
+  if(!byPartner){byPartner=new Map();memoVerdict.set(x,byPartner)}
+  if(!byPartner.has(p))byPartner.set(p,participationVerdict(x,p));
+  return byPartner.get(p);
+ };
  const raw=jobs.concat(g2bLiveJobs);
  const rejected=raw.filter(x=>x.kind&&jobSoftwareScope(x)==='out').length;
  const all=collapseSimilarNotices(raw.filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')));
@@ -2536,12 +2547,12 @@ function renderJobs(){
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
  const candidateJobs=active;
- const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>participationVerdict(o.x,p).type===type)).length;
+ const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>verdict(o.x,p).type===type)).length;
  const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
  const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
  const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
  const repeatCount=candidateJobs.filter(o=>repeatYears(o.x)>=2).length;
- const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>participationVerdict(o.x,p).type==='ready')).length;
+ const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>verdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
  document.getElementById('partnerJobCount').textContent='('+active.length+')';
  // Always show nonzero officially verified BASIC qualifications outside the
@@ -2557,7 +2568,7 @@ function renderJobs(){
  // Source-backed registered candidates cannot be mislabeled as zero merely
  // because final attachment verification remains incomplete.
  const readyCount=statusTotal('ready');
- const verifiedCount=considered.filter(o=>partners.some(p=>participationVerdict(o.x,p).verified===true)).length;
+ const verifiedCount=considered.filter(o=>partners.some(p=>verdict(o.x,p).verified===true)).length;
  const sourceScanCount=considered.filter(o=>officialSourceCoverage(rfpSnapshotForJob(o.x),jobEvidenceData(o.x))).length;
  const fullReviewCount=considered.filter(o=>{
   const r=rfpSnapshotForJob(o.x);
@@ -2627,8 +2638,8 @@ function renderJobs(){
   list.sort(function(a,b){
     if(filter==='closed')return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
     if(sort==='competition'){
-     const aReady=partners.some(p=>participationVerdict(a.x,p).type==='ready')?0:1;
-     const bReady=partners.some(p=>participationVerdict(b.x,p).type==='ready')?0:1;
+     const aReady=partners.some(p=>verdict(a.x,p).type==='ready')?0:1;
+     const bReady=partners.some(p=>verdict(b.x,p).type==='ready')?0:1;
      if(aReady!==bReady)return aReady-bReady;
      const ar=bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(a.x)));
      const br=bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(b.x)));
@@ -2642,7 +2653,7 @@ function renderJobs(){
     if(sort==='qualified'){
      const rank=function(x){
       const list=selectedPartnerId==='all'?partners:partners.filter(p=>p.id===selectedPartnerId);
-      const types=list.map(p=>participationVerdict(x,p).type);
+      const types=list.map(p=>verdict(x,p).type);
       const industry=list.map(p=>jobQualificationVerdict(x,p).type);
       return types.includes('ready')?0:
        types.includes('conditional')&&industry.includes('industry_match')?1:
@@ -2674,7 +2685,7 @@ function renderJobs(){
   if(filter==='partner'){
    const selected=partners.find(p=>p.id===selectedPartnerId);
    const companyList=selected?[selected]:partners;
-   const countByType=type=>list.filter(o=>companyList.some(p=>participationVerdict(o.x,p).type===type)).length;
+   const countByType=type=>list.filter(o=>companyList.some(p=>verdict(o.x,p).type===type)).length;
    document.getElementById('partnerSummary').textContent=
     '파트너 '+(selected?selected.name:'모두')+' · 적격 후보 '+countByType('ready')+
     ' · 제외 '+countByType('blocked')+
@@ -2699,7 +2710,7 @@ function renderJobs(){
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const comparisonCompanies=scoped?[scoped]:partners;
     const opportunityEligible=jobSoftwareScope(x)==='candidate'&&
-     comparisonCompanies.some(p=>participationVerdict(x,p).type==='ready');
+     comparisonCompanies.some(p=>verdict(x,p).type==='ready');
     const opportunityMarkup=bidAdvantageMarkup(historyCompetition,opportunityEligible);
     const partnerList=confirmed.concat(pending).filter(y=>!scoped||y.p.id===scoped.id);
     const partner=partnerList.length?'<div class="job-partners">파트너 '+
@@ -2750,15 +2761,21 @@ function startJobsDataWhenVisible(){
  });
 }
 function setWorkspaceView(view){
- document.querySelectorAll(".workspace-tab").forEach(function(b){b.classList.toggle("on",b.dataset.view===view)});
- document.querySelectorAll(".workspace-view").forEach(function(v){v.classList.remove("on")});
- const target=document.getElementById(view+"View");if(target)target.classList.add("on");
- localStorage.setItem("worklinks_workspace_view_v1",view);
+ const target=document.getElementById(view+"View");
+ if(!target)return;
+ if(!target.classList.contains('on')){
+  document.querySelectorAll(".workspace-tab").forEach(function(b){b.classList.toggle("on",b.dataset.view===view)});
+  document.querySelectorAll(".workspace-view").forEach(function(v){v.classList.remove("on")});
+  target.classList.add("on");
+  localStorage.setItem("worklinks_workspace_view_v1",view);
+ }
  if(view==='jobs'){
   if(!jobsFirstPaintScheduled){
    jobsFirstPaintScheduled=true;
-   requestAnimationFrame(function(){if(document.getElementById('jobsView').classList.contains('on'))renderJobs()});
-  }else renderJobs();
+   requestAnimationFrame(function(){setTimeout(function(){
+    if(target.classList.contains('on')&&jobRenderDirty)renderJobs();
+   },0)});
+  }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
  }
 }
