@@ -214,6 +214,35 @@ def main():
             assert all(t["salesVisible"] for t in sales_latency["times"] if t["view"] == "sales")
             assert all(t["salesCards"] == 3 for t in sales_latency["times"] if t["view"] == "sales")
             print("WORKLINKS_SALES_MOBILE_PAINT", json.dumps(sales_latency, ensure_ascii=False))
+            page.locator(".workspace-tab[data-view='jobs']").click()
+            page.locator("#jobsView.on").wait_for()
+            profile = page.evaluate("""() => {
+                const names = ['renderJobs','refreshVerdictFilters',
+                    'participationVerdict','jobQualificationVerdict','comparePartnerJob',
+                    'matchesVerdictFilter','partnerVerdictTypes','jobTimeInfo',
+                    'pastCompetitionSummary','repeatYears','jobSoftwareScope',
+                    'collapseSimilarNotices','renderPartners'];
+                const meters = {};
+                for(const name of names) {
+                    const fn = window[name];
+                    if(typeof fn !== 'function') continue;
+                    const meter=meters[name]={calls:0,ms:0,maxMs:0};
+                    window[name]=function(...args) {
+                        const at=performance.now();
+                        try{return fn.apply(this,args)}
+                        finally {
+                            const ms=performance.now()-at;
+                            meter.calls++;meter.ms+=ms;
+                            meter.maxMs=Math.max(meter.maxMs,ms);
+                        }
+                    };
+                }
+                window.renderJobs();
+                return Object.entries(meters).map(([name,m])=>({name,calls:m.calls,
+                    inclusiveMs:Math.round(m.ms),maxMs:Math.round(m.maxMs)}))
+                    .sort((a,b)=>b.inclusiveMs-a.inclusiveMs);
+            }""")
+            print("WORKLINKS_JOBS_CPU_PROFILE", json.dumps(profile, ensure_ascii=False))
             assert not errors, "Browser JS errors: %s" % errors
             print("WORKLINKS_MOBILE_LAZY_QA=PASS",
                   json.dumps({"g2b_requests": calls, "total": 480,
