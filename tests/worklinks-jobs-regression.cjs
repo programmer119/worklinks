@@ -621,19 +621,20 @@ assert.ok(source.includes('바로 입찰 가능 확정은 아닙니다.'));
 assert.ok(source.includes("htmlEscape(p.short||p.name)"));
 
 // Partner selector is sourced from the registry and includes *separately labeled* pending candidates.
-const filterSection=part('var jobFilter="all",jobRenderLimit=100','function jobEntryLabel(v){');
+const filterSection=part('function jobPageStep(){','function jobEntryLabel(v){');
 const filterSelect={
  value:'all',innerHTML:'',closest:()=>({classList:{toggle:()=>{}}})
 };
 const companies=[{id:'changcom',name:'창컴정보통신(주)'}];
-const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob','jobSoftwareScope',
+const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob','jobSoftwareScope','g2bCompactScreen',
  filterSection+
- 'return {syncPartnerFilterChoices,jobMatchesSelectedPartner,getSelected:()=>selectedPartnerId,setSelected:v=>{selectedPartnerId=v}};'
+ 'return {syncPartnerFilterChoices,jobMatchesSelectedPartner,getSelected:()=>selectedPartnerId,setSelected:v=>{selectedPartnerId=v},pageStep:jobPageStep()};'
 )(
  companies,{getElementById:id=>id==='partnerFilter'?filterSelect:null},
  value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
- {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[],x=>x.kind==='thng'?'out':'candidate'
+ {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[],x=>x.kind==='thng'?'out':'candidate',()=>false
 );
+assert.strictEqual(filterFns.pageStep,100,'Desktop must still show 100 bid cards per page');
 filterFns.syncPartnerFilterChoices();
 assert.ok(filterSelect.innerHTML.includes('value="all">모두'));
 assert.ok(filterSelect.innerHTML.includes('value="changcom">창컴정보통신(주)'));
