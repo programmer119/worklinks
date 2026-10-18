@@ -489,16 +489,46 @@ assert.ok(!source.includes('return {rows,counts,complete:false};'));
 const resultsById={
  industry_match:'industry_match', unverified:'unverified', missing:'missing'
 };
+const checkedNotice=new Function('jobBidIdentity','htmlEscape','partnerRegisteredCode',
+ part('const changcomOriginalNoticeReviews=','function participationVerdict(x,p){')+
+ 'return {changcomOriginalNoticeReview,changcomOriginalReviewMarkup};'
+)(
+ x=>x.noticeNumber?{bidNo:x.noticeNumber,order:String(x.noticeOrder||'000')}:null,
+ x=>String(x),
+ (p,code)=>p.registryComplete===true?(p.industryRecords||[]).some(v=>v.code===code):null
+);
+const registeredCode=(p,code)=>p.registryComplete===true?(p.industryRecords||[]).some(v=>v.code===code):null;
 const verdictMod=new Function('jobTimeInfo','jobSoftwareScope','jobQualificationVerdict','comparePartnerJob','htmlEscape','rfpSnapshotForJob',
+ 'changcomOriginalNoticeReview','partnerRegisteredCode',
  part('function participationVerdict(x,p){','function matchRowsHTML(x,p){')+
  'return {participationVerdict,participationStrip};'
 )(x=>({key:x.closed?'closed':'open'}),x=>x.kind==='thng'?'out':'candidate',
  x=>({type:x.industry||'unverified',reason:'면허검증 대기'}),
  (x,p)=>({complete:!!x.full,counts:{ok:x.ok??2,pending:x.pending??1,unknown:x.unknown??1,missing:0},
     rows:x.missing?[{id:x.missingId||'license-1',status:'missing',reason:'공식 조건 불일치'}]:[]}),
- x=>String(x),x=>x.rfp||null);
+ x=>String(x),x=>x.rfp||null,checkedNotice.changcomOriginalNoticeReview,registeredCode);
 const bidder={id:'changcom',short:'창컴',name:'창컴정보통신(주)',smeRecord:{size:'소기업',validState:'valid'}};
 const verdict=(x,p=bidder)=>verdictMod.participationVerdict({kind:'servc',...x},p);
+const officialRegistry={...bidder,registryCheckedAt:'2026-10-18',registryComplete:true,
+ industryRecords:[{code:'1468',status:'정상'}]};
+for(const no of ['R26BK01757317','R26BK01766789','R26BK01754276','R26BK01772216']){
+ assert.equal(verdict({noticeNumber:no,noticeOrder:'000',industry:'unverified'},officialRegistry).type,'blocked',
+  'confirmed 0036 mismatch should block reviewed original notice '+no);
+ assert.equal(verdict({noticeNumber:no,noticeOrder:'001',industry:'unverified'},officialRegistry).type,'ready',
+  'later notice amendment does not inherit old mismatch');
+ assert.equal(verdict({noticeNumber:no,noticeOrder:'000',industry:'unverified'},bidder).type,'ready',
+  'unknown company registry must not prove exclusion');
+}
+for(const no of ['R26BK01768055','R26BK01759246','R26BK01774426','R26BK01775500']){
+ assert.equal(verdict({noticeNumber:no,noticeOrder:'000',industry:'industry_match'},officialRegistry).verified,false,
+  'partial original notice review does not confirm final eligibility');
+}
+assert.equal(verdict({noticeNumber:'R26BK01760974',noticeOrder:'001',industry:'industry_match'},officialRegistry).verified,false);
+assert.equal(checkedNotice.changcomOriginalNoticeReview({noticeNumber:'R26BK01757317',noticeOrder:'001'},officialRegistry),null);
+assert.equal(checkedNotice.changcomOriginalNoticeReview({noticeNumber:'R26BK01757317',noticeOrder:'000'},{id:'other'}),null);
+assert.ok(source.includes('changcomOriginalReviewMarkup(x,comparisonCompanies)'));
+assert.ok(source.includes('changcomOriginalReviewMarkup(x,compareList)'));
+
 assert.equal(verdict({industry:'industry_match'}).type,'ready');
 assert.equal(verdict({industry:'industry_match'}).label,'적격 후보');
 assert.equal(verdict({industry:'industry_match'}).verified,false);
