@@ -38,7 +38,7 @@ jobs:
               print('SMPP_LIST',json.dumps({'probe':label,'status':status,'bytes':len(data),'companyMentions':len(hits),
                'totalCountHTML':count[0].group(1) if count else None},ensure_ascii=False),flush=True)
               if label in ('actual_detail_code','false_detail_code','other_detail_code'):
-                field=re.search(r'<input[^>]+name=["\\']detailPrdnmNo["\\'][^>]*>',body,re.I)
+                field=re.search('detailPrdnmNo',body,re.I)
                 print('SMPP_DETAIL_FILTER_ECHO',label,field.group(0)[:350] if field else 'not_found',flush=True)
               if label!='real_business' or not hits: continue
               for idx,hit in enumerate(hits[:3]):
