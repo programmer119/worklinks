@@ -105,8 +105,8 @@ def main():
             assert calls == [(0, 160)], "Mobile first page must be bounded: %s" % calls
             assert page.locator("#g2bMore").is_visible()
             assert page.evaluate("g2bSavedTotal") == 480
-            assert "현재 로드" in page.locator("#partnerSummary").inner_text()
-            assert "적격 후보" in page.locator("#jobDecisionSummary").inner_text()
+            assert "현재 로드" in page.locator("#partnerSummary").text_content()
+            assert "적격 후보" in page.locator("#jobDecisionSummary").text_content()
 
             for _ in range(6):
                 if len(calls) > 1:
