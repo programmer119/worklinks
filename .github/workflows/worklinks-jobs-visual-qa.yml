@@ -35,6 +35,9 @@ jobs:
               page.locator('#jobsView.on').wait_for(timeout=25000)
               page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
+              # G2B data is fetched before its debounced DOM update. Wait for
+              # rendered repeat chips instead of sampling the old static grid.
+              page.wait_for_function("() => jobRenderDirty===false && Number(document.querySelector('[data-verdict-count=\\\"repeat\\\"]')?.textContent||0)>0",timeout=30000)
               print('WORKLINKS_BROWSER_LIVE_DATA',page.evaluate("({serverAvailable:g2bServerAvailable,savedTotal:g2bSavedTotal,liveRows:g2bLiveJobs.length,visibleCards:document.querySelectorAll('#jobCards .job-mini').length})"))
               repeat=page.evaluate("""() => {
                 const repeated=g2bLiveJobs.filter(x=>repeatYears(x)>=2);
