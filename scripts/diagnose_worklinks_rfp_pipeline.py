@@ -10,8 +10,11 @@ AI = json.loads((ROOT / "ai-qualification.json").read_text(encoding="utf-8"))
 source = RFP.get("byNotice") or {}
 analyzed = AI.get("byNotice") or {}
 samples = (
-    "R26BK01756420:000", "R26BK01753188:000",
-    "R26BK01755213:000", "R26BK01747543:000",
+    "R26BK01768055:000",  # nation statistics - 3 chips
+    "R26BK01760974:001",  # NRC amended notice
+    "R26BK01759246:000",  # gender equality systems
+    "R26BK01774426:000",  # election commission HR
+    "R26BK01775500:000",  # KADX
 )
 
 def audit_gate(a):
@@ -177,6 +180,40 @@ emit("DIAG_FIRST_BLOCKER", dict(first_blockers))
 emit("DIAG_POTENTIALLY_PASSING_BOTH", passing[:10])
 for k in samples:
     emit("DIAG_SAMPLE", digest_notice(k))
+    item = source.get(k) or {}
+    brief = []
+    counts = collections.Counter()
+    # This reports EXCERPTS from public documents, never automatic suitability.
+    # Prefer explicit personnel/performance evidence over scoring guidance.
+    for f in (item.get("files") or []):
+        for q in (f.get("clauseCandidates") or []):
+            kind = str(q.get("type") or "unknown")
+            counts[kind] += 1
+            if kind not in ("staff_proof", "performance_proof",
+                            "industry_code", "direct_production",
+                            "region_restriction", "joint_participation"):
+                continue
+            if len(brief) >= 16:
+                continue
+            brief.append({
+                "file": str(f.get("name") or "")[:75],
+                "type": kind, "codes": (q.get("codes") or [])[:3],
+                "source": " ".join(str(q.get("sourceText") or "").split())[:210],
+                "explicitMustHeuristic": q.get("explicitMust") is True,
+            })
+    emit("DIAG_CHANGCOM_SOURCE_EVIDENCE", {
+        "key": k, "status": item.get("status"), "checkedAt": item.get("checkedAt"),
+        "sources": [
+            {"file": str(f.get("name") or "")[:80],
+             "readable": f.get("readable"),
+             "errorCategory": f.get("errorCategory"),
+             "anchorUnmatched": f.get("unmatchedQualificationAnchorCount")}
+            for f in (item.get("files") or [])[:14]
+        ],
+        "candidateTypes": dict(counts),
+        "examples": brief,
+        "note": "source excerpts are unreviewed; score-only clauses are not bidder requirements",
+    })
 
 rfp_only = set(source)-set(analyzed)
 rfp_text_only = [k for k in rfp_only if source[k].get("status") == "text_extracted_requires_review"]
