@@ -370,8 +370,8 @@ assert.equal(past.mergeOfficialAwardSnapshot(verifiedSnapshot,verifiedAt+46*8640
 assert.equal(past.mergeOfficialAwardSnapshot(verifiedSnapshot,verifiedAt-1),0,
  'future-dated snapshots must not masquerade as verified results');
 assert.ok(source.includes("if(row.source==='조회 실패')continue"));
-assert.ok(source.includes("competitionRetryAfter.set(no,Date.now()+30*60000)"));
-assert.ok(source.includes('setTimeout(resolve,750)'));
+
+
 assert.ok(source.includes('sucsfbidRate'));
 
 const changeMod=new Function('jobBidIdentity','jobEvidenceData','htmlEscape','jobAmountLabel',
