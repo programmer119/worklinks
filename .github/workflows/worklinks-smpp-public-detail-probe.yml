@@ -22,6 +22,9 @@ jobs:
            ('unknown_business',{'searchBsnmNo':'0000000000','vCheck':'Y'}),
            ('real_product',{'searchBsnmNo':'1308185973','searchPdctCd':'8111189901','vCheck':'Y'}),
            ('fake_product',{'searchBsnmNo':'1308185973','searchPdctCd':'0000000000','vCheck':'Y'}),
+           ('actual_detail_code',{'searchBsnmNo':'1308185973','detailPrdnmNo':'8111189901','vCheck':'Y'}),
+           ('false_detail_code',{'searchBsnmNo':'1308185973','detailPrdnmNo':'0000000000','vCheck':'Y'}),
+           ('other_detail_code',{'searchBsnmNo':'1308185973','detailPrdnmNo':'8111159901','vCheck':'Y'}),
           ]
           for label,query in QUERIES:
             url=BASE+'?'+urllib.parse.urlencode(query)
@@ -34,6 +37,9 @@ jobs:
               count=list(re.finditer(r'전체\s*<[^>]*>\s*([0-9,]+)',body))
               print('SMPP_LIST',json.dumps({'probe':label,'status':status,'bytes':len(data),'companyMentions':len(hits),
                'totalCountHTML':count[0].group(1) if count else None},ensure_ascii=False),flush=True)
+              if label in ('actual_detail_code','false_detail_code','other_detail_code'):
+                field=re.search(r'<input[^>]+name=["\\']detailPrdnmNo["\\'][^>]*>',body,re.I)
+                print('SMPP_DETAIL_FILTER_ECHO',label,field.group(0)[:350] if field else 'not_found',flush=True)
               if label!='real_business' or not hits: continue
               for idx,hit in enumerate(hits[:3]):
                 excerpt=body[max(0,hit.start()-1100):hit.end()+700]
