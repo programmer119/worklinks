@@ -95,6 +95,39 @@ def main():
             page.wait_for_timeout(500)
             assert not calls, "Startup homepage eagerly requested G2B: %s" % calls
             assert page.evaluate("!jobsBootstrapStarted"), "Jobs booted on support page"
+            assert page.locator("#pageRefreshButton").count() == 1
+            assert "화면 로드" in page.locator("#pageLoadStamp").text_content()
+            assert "v20261018-scroll-reload-1" in page.locator("#pageLoadStamp").text_content()
+
+            # Ordinary browser reload must create a fresh document and return
+            # to the top rather than silently restoring the previous scroll.
+            original_origin = page.evaluate("performance.timeOrigin")
+            page.evaluate("window.scrollTo(0, 1100)")
+            page.wait_for_timeout(200)
+            assert page.evaluate("window.scrollY") > 300, "Page was not scrollable"
+            page.reload(wait_until="load", timeout=30000)
+            page.wait_for_timeout(350)
+            assert page.evaluate("performance.timeOrigin") > original_origin
+            assert page.evaluate("performance.getEntriesByType('navigation')[0].type") == "reload"
+            assert page.evaluate("history.scrollRestoration") == "manual"
+            assert page.evaluate("window.scrollY") <= 2, "Normal reload retained scroll"
+            assert "화면 로드" in page.locator("#pageLoadStamp").text_content()
+            assert not calls, "Reload eagerly fetched G2B while on support view"
+
+            # The visible refresh control must navigate to a unique URL and
+            # also return to the top without modifying hidden/applied records.
+            page.evaluate("window.scrollTo(0, 900)")
+            page.wait_for_timeout(160)
+            assert page.evaluate("window.scrollY") > 300
+            origin_before_button = page.evaluate("performance.timeOrigin")
+            with page.expect_navigation(wait_until="load"):
+                page.evaluate("document.querySelector('#pageRefreshButton').click()")
+            page.wait_for_timeout(350)
+            assert "_refresh=" in page.url
+            assert page.evaluate("performance.timeOrigin") > origin_before_button
+            assert page.evaluate("history.scrollRestoration") == "manual"
+            assert page.evaluate("window.scrollY") <= 2, "In-page refresh retained scroll"
+            assert not calls, "Refresh control eagerly fetched G2B on support"
 
             page.locator(".workspace-tab[data-view='jobs']").click()
             page.locator("#jobsView.on").wait_for(timeout=15000)
