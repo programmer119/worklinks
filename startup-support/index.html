@@ -321,6 +321,88 @@
 .page-loadbar button{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#334155;padding:5px 9px;font-size:11px;font-weight:750;cursor:pointer}
 .page-loadbar button:hover,.page-loadbar button:focus-visible{background:#eff6ff;border-color:#93c5fd}
 @media(max-width:700px){.page-loadbar{gap:5px}.page-loadbar button{padding:5px 7px}}
+
+/* JOB CARD READABILITY v3 — prioritize whole bid name and actual evidence. */
+#jobCards.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+#jobCards .job-mini{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
+#jobCards .job-day{
+ border-right:0;border-bottom:1px solid #e2e8f0;
+ flex-direction:row;align-items:baseline;justify-content:flex-start;
+ gap:10px;padding:8px 15px;font-size:16px;white-space:normal;text-align:left
+}
+#jobCards .job-day .job-date{font-size:12px;letter-spacing:0}
+#jobCards .job-mini h3{
+ display:block;flex:none;min-height:0;margin:0;line-height:1.45;
+ white-space:normal;overflow:visible;-webkit-line-clamp:unset;
+ word-break:normal;overflow-wrap:anywhere
+}
+#jobCards .job-mini .job-headline{display:block;width:100%;min-width:0}
+#jobCards .job-mini .job-card-title{
+ display:block;width:100%;white-space:normal;overflow:visible;
+ -webkit-line-clamp:unset;-webkit-box-orient:initial;word-break:normal;
+ overflow-wrap:anywhere;line-height:1.45;font-size:inherit;text-align:left
+}
+#jobCards .job-highlights{
+ display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center;min-width:0
+}
+#jobCards .job-highlights>.tag,#jobCards .job-highlights>.job-repeat{
+ display:inline-flex;align-items:center;flex:none;max-width:100%;
+ border-radius:7px;padding:4px 7px;font-size:11px;line-height:1.35;
+ white-space:normal;min-height:25px
+}
+#jobCards .job-highlights .job-advantage{
+ display:flex;align-items:center;flex:1 1 190px;
+ flex-wrap:wrap;gap:4px 6px;font-size:11px;min-width:0;line-height:1.4
+}
+#jobCards .job-highlights .advantage-pills{gap:2px}
+#jobCards .job-highlights .advantage-pill{width:11px;height:7px}
+#jobCards .job-highlights .advantage-label{font-size:11px}
+#jobCards .job-highlights .advantage-reason{
+ flex:1 1 100%;font-size:11px;color:#475569;
+ white-space:normal;min-width:0;line-height:1.35
+}
+#jobCards .job-mini .job-meta-row{
+ white-space:normal;flex-wrap:wrap;align-items:baseline;gap:3px 10px;line-height:1.5
+}
+#jobCards .job-mini .job-agency{
+ white-space:normal;overflow:visible;text-overflow:clip;
+ word-break:normal;overflow-wrap:anywhere
+}
+#jobCards .job-mini .job-amount{
+ max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap
+}
+#jobCards .job-verdicts{gap:9px;margin:4px 0 2px}
+#jobCards .job-verdict-row{align-items:center;gap:5px 7px}
+#jobCards .job-verdict-why{
+ flex:1 1 100%;min-width:0;display:block;
+ font-size:12px;line-height:1.55;font-weight:650;color:#334155;
+ white-space:normal;word-break:normal;overflow-wrap:anywhere;
+ overflow:visible;text-overflow:clip;-webkit-line-clamp:unset;
+ -webkit-box-orient:initial;max-height:none
+}
+#jobCards .job-verdict-checks{
+ flex:1 1 100%;min-width:0;background:#f8fafc;
+ padding:7px 9px;border:1px solid #e2e8f0;border-radius:7px;
+ color:#334155;font-size:11px;line-height:1.5;
+ white-space:normal;word-break:normal;overflow-wrap:anywhere
+}
+#jobCards .job-verdict-checks b{font-weight:850;color:#0f172a}
+#jobCards .job-mini .job-partners,
+#jobCards .job-mini .job-partners a{
+ max-width:none;white-space:normal;overflow:visible;
+ text-overflow:clip;flex-wrap:wrap
+}
+#jobCards .job-mini .job-footer>.job-partners{max-width:none}
+#jobCards .job-mini .job-source-link{flex:none;margin-left:auto}
+@media(max-width:1100px){#jobCards.cards{grid-template-columns:1fr}}
+@media(max-width:680px){
+ #jobCards .job-day{padding:8px 11px;font-size:15px}
+ #jobCards .job-day .job-date{font-size:11px}
+ #jobCards .job-core{padding:12px 11px;gap:8px}
+ #jobCards .job-highlights .job-advantage{flex-basis:100%}
+ #jobCards .job-mini .job-footer{flex-wrap:wrap}
+ #jobCards .job-mini .job-meta-row{font-size:12px}
+}
 </style>
 </head>
 <body><main>
@@ -1526,11 +1608,16 @@ function bidAdvantageMarkup(z,eligible){
   '<span class="advantage-unrated">—</span>';
  const note='과거 기록 기반 유리도 '+t.label+(n?' '+n+'/3칩':' · 미평가')+
   ' · '+t.reason+' · 현재 입찰 낙찰 가능성을 보장하지 않음';
+ const brief=t.kind==='high'?'최근 2년 각 1~2개사 · 낙찰사 변경':
+  t.kind==='caution'?'과거 1~2개사 · 동일 업체 '+z.verifiedWinnerYears+'년 낙찰':
+  t.kind==='medium'?'과거 1~2개사 · 낙찰사 확인 필요':
+  t.kind==='mixed'?'과거 3개사 이상 회차 확인':
+  t.kind==='unknown'?'과거 경쟁자료 미확인':'적격 판단 우선';
  return '<div class="job-advantage adv-'+t.kind+'" data-advantage-tier="'+
   (n||'unrated')+'" aria-label="'+htmlEscape(note)+'" title="'+htmlEscape(note)+'">'+
   '<span class="advantage-pills" aria-hidden="true">'+chips+'</span>'+
-  '<strong class="advantage-label">'+htmlEscape(t.label)+(n?' '+n+'/3':'')+
-  '</strong><span class="advantage-reason">'+htmlEscape(t.reason)+'</span></div>';
+  '<strong class="advantage-label">'+htmlEscape(t.label)+
+  '</strong><span class="advantage-reason">'+htmlEscape(brief)+'</span></div>';
 }
 function pastAwardText(no){
  const row=competitionByNotice.get(String(no));
@@ -2354,16 +2441,24 @@ function changcomOriginalReviewMarkup(x,companies){
  return {type:'ready',label:'적격 후보',verified:false,
   reason:'확인된 탈락 사유 없음 · '+notes.join(' · ')+
    ' · 입찰 전 공고문과 필수 참가자격 확인',
+  checkLabels:proof.rows.filter(r=>r.status==='pending'||r.status==='unknown')
+   .map(r=>r.label),
   confirmed:c.ok,pending:c.pending,unknown:c.unknown,missing:0};
 }
 function participationStrip(x,companies){
  if(!companies.length)return '<div class="job-verdict-row"><span class="job-verdict checking">검증 중 · 파트너 미등록</span></div>';
  return '<div class="job-verdicts">'+companies.map(function(p){
-  const v=participationVerdict(x,p);
+  const v=participationVerdict(x,p),checks=Array.isArray(v.checkLabels)?v.checkLabels:[];
+  const reason=v.type==='ready'&&!v.verified?
+   String(v.reason||'').replace(/ · 추가 확인 \d+항목/,'')
+    .replace(/ · 입찰 전 공고문과 필수 참가자격 확인$/,''):String(v.reason||'');
+  const pending=checks.length?
+   '<div class="job-verdict-checks"><b>추가 확인 '+checks.length+'항목:</b> '+
+    checks.map(htmlEscape).join(' · ')+'</div>':'';
   return '<div class="job-verdict-row" title="'+htmlEscape(v.reason)+'">'+
    '<a class="job-verdict-partner" href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">'+htmlEscape(p.short||p.name)+'</a>'+
    '<span class="job-verdict '+v.type+'">'+htmlEscape(v.label)+'</span>'+
-   '<small class="job-verdict-why">'+htmlEscape(v.reason)+'</small></div>';
+   '<small class="job-verdict-why">'+htmlEscape(reason)+'</small>'+pending+'</div>';
  }).join('')+'</div>';
 }
 function matchRowsHTML(x,p){
@@ -2774,7 +2869,7 @@ function renderJobs(){
     const oldCount=historyCompetition.latest;
     const competitionLabel=oldCount?
      '<span class="tag" title="과거 '+oldCount.year+'년 공식 개찰 참가업체 수 · 이번 공고의 참가업체 수는 아님">'+
-      '과거 '+oldCount.count+'개사'+(historyCompetition.low?' · 적은 경쟁':'')+'</span>':'';
+      '과거 경쟁 '+oldCount.count+'개사</span>':'';
     const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const comparisonCompanies=scoped?[scoped]:partners;
@@ -2794,10 +2889,10 @@ function renderJobs(){
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline">'+extras+'<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+repeat+competitionLabel+'</div>'+
-       opportunityMarkup+
+       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3></div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
+       '<div class="job-highlights">'+repeat+competitionLabel+extras+opportunityMarkup+'</div>'+
        participationStrip(x,comparisonCompanies)+
        changcomOriginalReviewMarkup(x,comparisonCompanies)+
        '<div class="job-footer">'+partner+
