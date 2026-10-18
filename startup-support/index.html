@@ -2267,7 +2267,38 @@ function comparePartnerJob(x,p){
  * "ready" means an eligible screening CANDIDATE, not a legal assurance.
  * Only verified mismatch, a closed notice or clearly unrelated SW scope blocks.
  */
-function participationVerdict(x,p){
+// 2026-10-18 official RFP review; EXACT notice-order and Changcom only.
+// A later amended notice must be reviewed again. These are not full-bid approvals.
+const changcomOriginalNoticeReviews=Object.freeze({
+ 'R26BK01757317:000':{state:'missing0036',reason:"1468과 0036 동시 필수; 창컴은 0036 미등록",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757317&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01766789:000':{state:'missing0036',reason:"부산 소재 본점과 1468·0036 동시 필수, 공동입찰 불가; 창컴은 부천 본점·0036 미등록",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01766789&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"},
+ 'R26BK01754276:000':{state:'missing0036',reason:"1468과 0036 동시 필수; 창컴은 0036 미등록",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01754276&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01772216:000':{state:'missing0036',reason:"경남 소재 본점과 1468·0036 동시 필수; 창컴은 부천 본점·0036 미등록",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01772216&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01768055:000':{state:'pending',reason:"1468 등록조건 일치, 공동이행 가능; 제안요청서 실적·인력·수행능력 추가 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01768055&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"},
+ 'R26BK01760974:001':{state:'pending',reason:"정정 공고: 정보시스템유지관리 직접생산 8111189901 및 중소기업확인서 필수, 공동·하도급 불가; 현행 효력 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01760974&bidPbancOrd=001&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01759246:000':{state:'pending',reason:"1468 일치, 유지관리 직접생산 8111189901·중소기업확인서 필수; 현재 효력·RFP 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01759246&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01774426:000':{state:'pending',reason:"1468 일치, 유지관리 직접생산 8111189901·중소기업확인서 필수; 현재 효력·RFP 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01774426&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01775500:000':{state:'pending',reason:"1468·유지관리 직접생산·중소기업확인서 필수; 과거 공고와 과업 달라 경쟁 이력 동일성 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01775500&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"}
+});
+function changcomOriginalNoticeReview(x,p){
+ if(p?.id!=='changcom')return null;
+ const id=jobBidIdentity(x);
+ return id?changcomOriginalNoticeReviews[id.bidNo+':'+id.order]||null:null;
+}
+function changcomOriginalReviewMarkup(x,companies){
+ const p=companies.find(v=>v.id==='changcom'),v=changcomOriginalNoticeReview(x,p);
+ if(!v)return '';
+ const excluded=v.state==='missing0036'&&partnerRegisteredCode(p,'0036')===false;
+ const label=excluded?'공식 원문·업체등록 불일치 확인':
+  v.state==='missing0036'?'원문상 0036 필수 · 업체 등록 조회 대기':
+  '공식 공고문 일부 검증 · 최종 참가자격 확인 중';
+ return '<div class="job-review-note" style="font-size:12px;line-height:1.5;margin:5px 0;color:var(--muted,#657083)">'+
+  '<strong>'+htmlEscape(label)+'</strong> · '+htmlEscape(v.reason)+
+  ' · <a href="'+htmlEscape(v.source)+'" target="_blank" rel="noopener noreferrer">공식 원문 ↗</a>'+
+  ' <span>(2026.10.18 확인, 변경공고 재검증 필요)</span></div>';
+}
+
+ function participationVerdict(x,p){
  const t=jobTimeInfo(x);
  if(t.key==='closed')return {type:'blocked',label:'제외',verified:false,
   reason:t.label==='취소·철회'?'공고 취소·철회':'접수 마감',
@@ -2277,6 +2308,12 @@ function participationVerdict(x,p){
   reason:'SW 개발·운영 대상이 아닌 공고',confirmed:0,pending:0,unknown:0,missing:1};
  if(scope!=='candidate')return {type:'checking',label:'업무 분야 확인',verified:false,
   reason:'SW 개발·운영 사업인지 확인되지 않음',confirmed:0,pending:0,unknown:1,missing:0};
+ const original=changcomOriginalNoticeReview(x,p);
+ if(original?.state==='missing0036'&&partnerRegisteredCode(p,'0036')===false){
+  return {type:'blocked',label:'제외',verified:false,
+   reason:'공식 원문·현재 업체등록 대조: '+original.reason,
+   confirmed:0,pending:0,unknown:0,missing:1};
+ }
  const industry=jobQualificationVerdict(x,p);
  const proof=comparePartnerJob(x,p),c=proof.counts;
  const text=[x.condition||'',x.partnerBidMode||''].join(' ');
@@ -2421,7 +2458,7 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+m+docLinks+extractHTML+
+ document.getElementById('jobDetailBody').innerHTML=base+changcomOriginalReviewMarkup(x,compareList)+m+docLinks+extractHTML+
   bidChangePriceMarkup(x)+variantLinks+actions;
 }
 function openJobDetail(id){
@@ -2762,6 +2799,7 @@ function renderJobs(){
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        participationStrip(x,comparisonCompanies)+
+       changcomOriginalReviewMarkup(x,comparisonCompanies)+
        '<div class="job-footer">'+partner+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
        '</div></div></article>';
