@@ -1233,15 +1233,15 @@ async function g2bLoadSaved(append){
  const out=document.getElementById('g2bApiResult'),more=document.getElementById('g2bMore');
  const compact=g2bCompactScreen();
  if(append&&jobRenderLimit<jobAvailableRows){
-  jobRenderLimit+=100;renderJobs();return {total:g2bSavedTotal};
+  jobRenderLimit+=jobPageStep();renderJobs();return {total:g2bSavedTotal};
  }
  if(append&&(!g2bServerAvailable||g2bLoadedOffset>=g2bSavedTotal)){
-  jobRenderLimit+=100;renderJobs();return {total:g2bSavedTotal};
+  jobRenderLimit+=jobPageStep();renderJobs();return {total:g2bSavedTotal};
  }
  if(g2bSavedLoadRunning)return null;
  g2bSavedLoadRunning=true;
  if(more)more.disabled=true;
- if(append)jobRenderLimit+=100;else{g2bLoadedOffset=0;jobRenderLimit=100}
+ if(append)jobRenderLimit+=jobPageStep();else{g2bLoadedOffset=0;jobRenderLimit=jobPageStep()}
  try{
   const pageSize=compact?160:500;
   const seen=new Map(append?g2bLiveJobs.map(x=>[x.id,x]):[]);
@@ -2454,7 +2454,10 @@ document.getElementById('jobDetailBody').addEventListener('click',function(e){
   if(x)loadBidChangePrice(x)}
 });
 
-var jobFilter="all",jobRenderLimit=100,selectedPartnerId="all",partnerFilterOptionsKey="",jobVerdictFilter="all";
+// Limit expensive bid-card layout on narrow/mobile screens. Full data stays in
+// memory and remains accessible through incremental More controls.
+function jobPageStep(){return g2bCompactScreen()?24:100}
+var jobFilter="all",jobRenderLimit=jobPageStep(),selectedPartnerId="all",partnerFilterOptionsKey="",jobVerdictFilter="all";
 localStorage.setItem("worklinks_job_filter_v1","all");
 function syncPartnerFilterChoices(){
  const select=document.getElementById('partnerFilter');
@@ -2726,7 +2729,7 @@ function renderJobs(){
   const more=document.getElementById('g2bMore');
   more.style.display=list.length>jobRenderLimit||serverMore?'inline-block':'none';
   more.textContent=jobRenderLimit<list.length?
-   '일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 100건 더 보기':
+   '일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · '+jobPageStep()+'건 더 보기':
    '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
@@ -2813,9 +2816,9 @@ function setWorkspaceView(view){
   startJobsDataWhenVisible();
  }
 }
-document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=100;localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
+document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=jobPageStep();localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
 document.querySelectorAll('[data-verdict-filter]').forEach(function(b){b.addEventListener('click',function(){
- jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=100;renderJobs();
+ jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=jobPageStep();renderJobs();
  if(['repeat','low-bids','low-changed','low-incumbent','adv-3','adv-2','adv-1'].includes(jobVerdictFilter))
   loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 })});
@@ -2827,7 +2830,7 @@ document.getElementById("jobSort").addEventListener("change",function(){
  if(this.value==='competition')loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 });
 document.getElementById("partnerFilter").addEventListener("change",function(){
- selectedPartnerId=this.value;jobFilter='partner';jobRenderLimit=100;
+ selectedPartnerId=this.value;jobFilter='partner';jobRenderLimit=jobPageStep();
  localStorage.setItem("worklinks_job_filter_v1","partner");
  renderJobs();
 });
