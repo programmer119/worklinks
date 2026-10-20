@@ -26,6 +26,79 @@ function show(message){
   const target=$('worklinks-auth-info');
   if(target)target.textContent=message;
 }
+// Recovery is opt-in: an explicit member-side false can be intentional.
+// Only offer evidence from the SAME browser's positive guest history to its owner.
+function guestAppliedConflicts(){
+  if(!state.account||!state.serverReady)return [];
+  const owner=localStorage.getItem(GUEST_OWNER_KEY);
+  if(owner&&owner!==state.account)return [];
+  const keys=accountKeys(state.account);
+  const guest=decode(GUEST.applied),member=decode(keys.applied),pending=decode(keys.pending);
+  const confirmed=new Set(state.records.filter(r=>r.kind==='applied'&&r.value===true).map(r=>r.id));
+  return Object.keys(guest).filter(id=>
+    guest[id]===true&&member[id]!==true&&!confirmed.has(id)&&
+    pending['applied:'+id]?.value!==true
+  ).map(id=>({id,...itemDetails(id)}));
+}
+function renderAppliedRecovery(){
+  const root=$('worklinks-applied-recovery');
+  if(!root||root.hidden)return;
+  root.replaceChildren();
+  const message=document.createElement('p');
+  message.style.cssText='margin:0 0 8px;font-size:12px;line-height:1.6';
+  if(!state.serverReady){
+    message.textContent='서버 기록 동기화 전입니다. 계정 기록을 확인한 뒤 복구할 수 있습니다.';
+    root.append(message);return;
+  }
+  const owner=localStorage.getItem(GUEST_OWNER_KEY);
+  if(owner&&owner!==state.account){
+    message.textContent='이 브라우저의 이전 비회원 기록은 다른 계정에 연결되어 있어 자동 복구할 수 없습니다.';
+    root.append(message);return;
+  }
+  const conflicts=guestAppliedConflicts();
+  const guestCount=Object.values(decode(GUEST.applied)).filter(v=>v===true).length;
+  const memberCount=Object.values(decode(accountKeys(state.account).applied)).filter(v=>v===true).length;
+  message.textContent='이 브라우저의 비회원 지원완료 '+guestCount+
+    '건 · 현재 계정 지원완료 '+memberCount+'건 · 이전 기록 중 미반영 '+conflicts.length+'건.';
+  root.append(message);
+  if(!conflicts.length){
+    const note=document.createElement('p');
+    note.style.cssText='font-size:12px;line-height:1.5;margin:0';
+    note.textContent='이 브라우저에서 확인되는 이전 기록과 계정 사이에는 누락이 없습니다. 다른 브라우저·계정의 기록은 여기서 조회할 수 없습니다.';
+    root.append(note);return;
+  }
+  const note=document.createElement('p');
+  note.style.cssText='font-size:12px;line-height:1.5;margin:0 0 8px';
+  note.textContent='이전에 지원완료로 체크한 증거가 있으나 현재 계정에서 체크되지 않은 기록입니다. 실제 완료한 항목만 복구하세요. 기존 서버의 미지원 선택은 자동으로 덮어쓰지 않습니다.';
+  root.append(note);
+  for(const entry of conflicts){
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 0;border-top:1px solid #e2e8f0;flex-wrap:wrap';
+    const title=document.createElement('span');
+    title.textContent=entry.title||entry.id;
+    title.style.cssText='font-size:12px;flex:1 1 200px;overflow-wrap:anywhere';
+    const button=document.createElement('button');
+    button.type='button';button.className='worklinks-auth-button';
+    button.dataset.recoverId=entry.id;
+    button.textContent='지원완료 복구';
+    button.addEventListener('click',()=>{
+      if(!state.serverReady||!state.account)return;
+      if(!guestAppliedConflicts().some(x=>x.id===entry.id))return;
+      const keys=accountKeys(state.account),map=decode(keys.applied);
+      map[entry.id]=true;
+      localStorage.setItem(keys.applied,JSON.stringify(map));
+      window.saved=map;
+      const migratedKey='worklinks_support_guest_migrated_v1:'+state.account;
+      const migrated=decode(migratedKey);
+      migrated['applied:'+entry.id]=true;
+      localStorage.setItem(migratedKey,JSON.stringify(migrated));
+      window.worklinksStatusChanged('applied',entry.id,true);
+      if(typeof window.draw==='function')window.draw();
+      renderAppliedRecovery();
+    });
+    row.append(title,button);root.append(row);
+  }
+}
 async function renewApiSession(account,oldToken){
   if(state.account!==account||!state.client)throw Error('account_changed');
   if(state.token!==oldToken)return; // Another concurrent request already renewed it.
@@ -91,6 +164,7 @@ function applyAccount(records){
   state.records=records;
   window.worklinksArchivedStatuses=records.filter(r=>r.kind==='applied'&&r.value===true);
   if(typeof window.draw==='function')window.draw();
+  renderAppliedRecovery();
 }
 async function flush(){
   // Never upload a guest import or claim sync before existing server data is read.
@@ -164,8 +238,9 @@ function importGuestAutomatically(){
       maps[entry.kind][entry.id]=true;
       imported++;
     }
-    // An existing server value (including false) takes precedence; guest original remains intact.
-    migrated[key]=true;
+    // A conflicting false stays visible for explicit restoration. Do NOT mark
+    // it migrated when no import happened, even if an older build did so.
+    if(maps[entry.kind][entry.id]===true)migrated[key]=true;
   }
   Object.entries(maps).forEach(([kind,map])=>localStorage.setItem(keys[kind],JSON.stringify(map)));
   localStorage.setItem(keys.pending,JSON.stringify(pending));
@@ -234,6 +309,19 @@ function buttons(session){
       try{await state.client.logout()}catch{}
       guestRestore();buttons(null);show('비회원 · 이 브라우저에만 저장');
     });box.append(logout);
+    const recover=document.createElement('button');
+    recover.type='button';recover.className='worklinks-auth-button';
+    recover.textContent='지원기록 점검';
+    recover.addEventListener('click',()=>{
+      let panel=$('worklinks-applied-recovery');
+      if(!panel){
+        panel=document.createElement('section');
+        panel.id='worklinks-applied-recovery';
+        panel.style.cssText='flex:1 0 100%;min-width:0;padding:10px;border:1px solid #d7e2ee;background:#fff;border-radius:9px';
+        document.querySelector('.worklinks-auth-panel')?.append(panel);
+      }else panel.hidden=!panel.hidden;
+      renderAppliedRecovery();
+    });box.append(recover);
   }else{
     for(const mode of ['login','signup']){
       const button=document.createElement('button');button.type='button';
