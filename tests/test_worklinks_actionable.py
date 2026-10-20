@@ -81,5 +81,12 @@ assert all(x['eligibilityVerified'] is False for x in out['bids'])
 assert mod.industry_evidence({'bidEligibility':{'ok':True,'complete':False,'requirements':[]}},
                              {'1468'},set())[0]=='official_license_unavailable'
 assert mod.parse_close('202610231000')==dt.datetime(2026,10,23,10,0,tzinfo=kst)
+maint=sample('R26BK09999001','servc','2027년 정보시스템 유지관리',['1468'],closes=future)
+hardware=sample('R26BK09999002','servc','2027년 보존복원 운용장비 유지관리',['1468'],closes=future)
+ranked=mod.build([maint,hardware],2,company,now=now)
+assert len(ranked['bids'])==2
+assert ranked['bids'][0]['bidNo']=='R26BK09999001'
+assert all(b['eligibilityVerified'] is False for b in ranked['bids'])
+print('WORKLINKS_PRACTICAL_SOFTWARE_RANKING=PASS')
 print('WORKLINKS_ACTIONABLE_5200_BIDS=PASS',
       json.dumps({k:v for k,v in c.items() if v},ensure_ascii=False))
