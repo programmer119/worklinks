@@ -234,11 +234,11 @@ def build(rows,total_count,company,now=None,rfp=None):
             score-=35
         elif re.search(r'ISMP|ISP|정보화전략|컨설팅|전략.*수립',title,re.I):
             score-=16
-        elif re.search(r'유지\\s*관리|유지\\s*보수|유지\\s*운영|'
+        elif re.search(r'유지\s*관리|유지\s*보수|유지\s*운영|'
                        r'시스템.*운영|홈페이지.*관리',title,re.I):
             score+=16
-        elif re.search(r'개발|고도화|기능\\s*개선|재구축|'
-                       r'데이터\\s*이관|연계',title,re.I):
+        elif re.search(r'개발|고도화|기능\s*개선|재구축|'
+                       r'데이터\s*이관|연계',title,re.I):
             score+=12
         if 50_000_000<=price<=300_000_000:score+=12
         elif price>1_000_000_000:score-=22
