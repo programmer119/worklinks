@@ -177,6 +177,26 @@ with sync_playwright() as p:
     check(remote[who[0]]['applied:yangcheon-school']['value'] is False,'existing remote=false overwritten by guest=true')
     check(page4.evaluate("""()=>JSON.parse(localStorage.getItem('worklinks_support_applied_v2:worklinks-qa-account-a'))['yangcheon-school']===false"""),'member remote=false not rendered')
     print('SERVER_FALSE_CONFLICT_PRESERVED=PASS',flush=True)
+    # The guest check remains recoverable, without silently overwriting a
+    # member's previous false value. Restoration needs a deliberate click.
+    page4.get_by_role('button',name='지원기록 점검').click()
+    page4.locator('[data-recover-id="yangcheon-school"]').wait_for(timeout=15000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is False,
+          'history recovery overwrote a member choice without consent')
+    page4.locator('[data-recover-id="yangcheon-school"]').click()
+    page4.wait_for_function("""()=>JSON.parse(
+      localStorage.getItem('worklinks_support_applied_v2:worklinks-qa-account-a')||'{}'
+    )['yangcheon-school']===true""",timeout=10000)
+    page4.wait_for_function("""()=>Object.keys(JSON.parse(
+      localStorage.getItem('worklinks_support_pending_v2:worklinks-qa-account-a')||'{}'
+    )).length===0""",timeout=15000)
+    check(remote[who[0]]['applied:yangcheon-school']['value'] is True,
+          'explicit recovery not persisted to member server')
+    page4.reload(wait_until='domcontentloaded')
+    page4.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('동기화')""",timeout=15000)
+    check(page4.evaluate("""()=>!!window.saved['yangcheon-school']"""),
+          'recovered support completion disappeared after login refresh')
+    print('GUEST_APPLIED_CONFLICT_RECOVERED_WITH_EXPLICIT_CLICK=PASS',flush=True)
     ctx4.close()
 
     # GET outages must not be interpreted as an empty member DB, and must not
