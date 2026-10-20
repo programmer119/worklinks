@@ -226,7 +226,23 @@ def build(rows,total_count,company,now=None,rfp=None):
         score+=10 if hours is not None and 48<=hours<=14*24 else 0
         score+=8 if scanned else 0
         score+=5 if 0<price<=300_000_000 else 0
-        if hours is not None and hours<24:score-=12
+        # Practical contract value is distinct from minimum legal registration.
+        # Never delete a candidate based on these commercial-fit indicators.
+        title=str(row.get('title') or '')
+        if re.search(r'운용장비|보존.?복원.*장비|장비.*유지|마을방송|'
+                     r'정보통신시설|CCTV|스마트기기',title,re.I):
+            score-=35
+        elif re.search(r'ISMP|ISP|정보화전략|컨설팅|전략.*수립',title,re.I):
+            score-=16
+        elif re.search(r'유지\\s*관리|유지\\s*보수|유지\\s*운영|'
+                       r'시스템.*운영|홈페이지.*관리',title,re.I):
+            score+=16
+        elif re.search(r'개발|고도화|기능\\s*개선|재구축|'
+                       r'데이터\\s*이관|연계',title,re.I):
+            score+=12
+        if 50_000_000<=price<=300_000_000:score+=12
+        elif price>1_000_000_000:score-=22
+        if hours is not None and hours<24:score-=18
         if deadline_unknown:score-=60
         if price>=3_000_000_000:score-=12
         if purpose=='software_goods_review':score-=30
