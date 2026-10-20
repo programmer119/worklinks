@@ -1,0 +1,63 @@
+name: WorkLinks Changcom actionable bid shortlist
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_actionable.py'
+      - 'tests/test_worklinks_actionable.py'
+      - '.github/workflows/worklinks-actionable.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '5 */3 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-changcom-actionable
+  cancel-in-progress: false
+jobs:
+  shortlist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test 5,000+ full-corpus shortlist and evidence boundaries
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_actionable.py
+          python3 tests/test_worklinks_actionable.py
+      - name: Read official G2B saved index and company registry
+        run: |
+          python3 scripts/refresh_worklinks_actionable.py
+          cp startup-support/changcom-actionable.json /tmp/worklinks-changcom-actionable.json
+      - name: Verify all active relevant bids are represented
+        run: |
+          python3 - <<'PY'
+          import json,pathlib,datetime
+          d=json.loads(pathlib.Path('/tmp/worklinks-changcom-actionable.json').read_text())
+          c=d['counts']
+          assert d['ok'] is True
+          assert c['indexedSWTotal'] >= 100
+          assert c['softwareService']==c['publishedIndustryAligned']+c['servicePendingReview']
+          assert c['softwareService']>0
+          assert len({(x['bidNo'],x['order']) for x in d['bids']})==len(d['bids'])
+          assert all(x['eligibilityVerified'] is False for x in d['bids'])
+          print('WORKLINKS_ACTIONABLE_SOURCE_VERIFIED=PASS',c)
+          PY
+      - name: Publish only a complete source-backed shortlist, preserving unrelated updates
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/worklinks-changcom-actionable.json startup-support/changcom-actionable.json
+            git add startup-support/changcom-actionable.json
+            if git diff --cached --quiet; then echo 'WORKLINKS_ACTIONABLE_UNCHANGED'; exit 0; fi
+            git commit -m 'data: refresh full-corpus Changcom actionable G2B shortlist'
+            if git push origin HEAD:main; then echo 'WORKLINKS_ACTIONABLE_PUBLISHED=PASS'; exit 0; fi
+            echo "WORKLINKS_ACTIONABLE_PUBLISH_RETRY_$attempt"
+            sleep 2
+          done
+          echo 'WORKLINKS_ACTIONABLE_PUBLISH_FAILED'
+          exit 1
