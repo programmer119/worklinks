@@ -310,5 +310,82 @@ with sync_playwright() as p:
         check(page7.locator('#tb a',has_text=title).count()==1,
               'confirmed support history item not in one-page completed view: '+title)
     print('ALL_17_SUBMITTED_APPLICATIONS_VISIBLE_ON_ONE_PAGE=PASS',flush=True)
+
+    # Search stays usable while '지원완료' is selected and searches all saved,
+    # expired, hidden, and not-yet-checked public notices by title, URL, or ID.
+    page7.locator('#supportSearch').fill('TechBiz Venture Clinic')
+    check(page7.locator('#tb tr').count()==1,'support search did not filter to Dankook')
+    check(page7.locator('#tb a',has_text='TechBiz Venture Clinic').count()==1,
+          'support search could not find registered historic clinic')
+    page7.locator('#supportSearch').fill('kisa-location-privacy-training-6-2026')
+    check(page7.locator('#tb tr').count()==1,'search from completed view missed unsubmitted notice')
+    check(page7.locator('#tb input[data-id="kisa-location-privacy-training-6-2026"]').count()==1,
+          'cannot mark a search result as completed')
+    page7.locator('#tb input[data-id="kisa-location-privacy-training-6-2026"]').check()
+    page7.wait_for_function("""()=>window.saved['kisa-location-privacy-training-6-2026']===true""")
+    page7.wait_for_function("""()=>Object.keys(JSON.parse(
+      localStorage.getItem('worklinks_support_pending_v2:worklinks-qa-account-a')||'{}'
+    )).length===0""",timeout=20000)
+    check(remote[who[0]]['applied:kisa-location-privacy-training-6-2026']['value'] is True,
+          'search-to-completed change was not stored in member account')
+    page7.locator('#supportSearchClear').click()
+    check(page7.locator('#supportSearch').input_value()=='','search clearing failed')
+    print('SUPPORT_HISTORY_SEARCH_AND_MARK_COMPLETED=PASS',flush=True)
+
+    # Notice no longer in the bundled catalog: register only a title and,
+    # optionally, the original URL. Server must persist both without requiring
+    # an old notice ID or replacing any existing completed applications.
+    page7.locator('#supportManualDetails summary').click()
+    page7.locator('#supportManualTitle').fill('과거에 지원한 테스트 창업지원 공고')
+    page7.locator('#supportManualUrl').fill('https://example.org/old-startup-notice')
+    page7.locator('#supportManualForm button[type="submit"]').click()
+    page7.wait_for_function("""()=>Object.keys(JSON.parse(
+      localStorage.getItem('worklinks_support_pending_v2:worklinks-qa-account-a')||'{}'
+    )).length===0""",timeout=20000)
+    saved_custom=[x for x in remote[who[0]].values()
+                  if x.get('kind')=='applied' and x.get('title')=='과거에 지원한 테스트 창업지원 공고']
+    check(len(saved_custom)==1 and saved_custom[0]['value'] is True,'custom applied record not persisted')
+    check(saved_custom[0]['url']=='https://example.org/old-startup-notice','custom record URL lost on sync')
+    custom_id=saved_custom[0]['id']
+    page7.reload(wait_until='domcontentloaded')
+    page7.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('동기화')""",timeout=30000)
+    page7.locator('[data-f="applied"]').click()
+    check(page7.locator('#tb a',has_text='과거에 지원한 테스트 창업지원 공고').count()==1,
+          'custom completed history disappeared on reload')
+    page7.locator('#supportSearch').fill('과거에 지원한 테스트')
+    check(page7.locator('#tb tr').count()==1 and page7.locator('#tb a',has_text='과거에 지원한 테스트').count()==1,
+          'custom archived entry not searchable')
+    print('SUPPORT_CUSTOM_SUBMISSION_SURVIVES_SERVER_SYNC_RELOAD=PASS',flush=True)
+
+    # Guest custom history must also survive refresh and carry the original
+    # title and URL into AuthHub after later sign-in.
+    ctx8=browser.new_context()
+    page8=ctx8.new_page()
+    page8.route('**/api/g2b/worklinks-auth-config',config)
+    page8.route('**/v1/me*',me)
+    page8.route('**/api/g2b/worklinks-state',state)
+    page8.goto(SITE,wait_until='domcontentloaded',timeout=60000)
+    page8.locator('#supportManualDetails summary').click()
+    page8.locator('#supportManualTitle').fill('비회원 당시 지원한 프로그램')
+    page8.locator('#supportManualUrl').fill('https://example.org/guest-archived')
+    page8.locator('#supportManualForm button[type="submit"]').click()
+    old_guest=page8.evaluate("""()=>Object.entries(JSON.parse(
+      localStorage.getItem('externaltools_startup_support_status_v1')||'{}'
+    )).find(([id,v])=>id.startsWith('manual-')&&v===true)?.[0]""")
+    check(bool(old_guest),'guest manual entry not saved')
+    page8.reload(wait_until='domcontentloaded')
+    page8.locator('[data-f="applied"]').click()
+    check(page8.locator('#tb').get_by_text('비회원 당시 지원한 프로그램').count()==1,
+          'guest history vanished after refresh')
+    page8.evaluate("""()=>localStorage.setItem('authhub:p47:production:session',
+      JSON.stringify({accessToken:'qa.mock.session',refreshToken:'qa-refresh'}))""")
+    page8.reload(wait_until='domcontentloaded')
+    page8.wait_for_function("""()=>document.querySelector('#worklinks-auth-info')?.textContent?.includes('서버 저장 완료')""",timeout=30000)
+    check(remote[who[0]]['applied:'+old_guest]['title']=='비회원 당시 지원한 프로그램',
+          'guest manual title not migrated to member')
+    check(remote[who[0]]['applied:'+old_guest]['url']=='https://example.org/guest-archived',
+          'guest manual URL not migrated to member')
+    print('GUEST_CUSTOM_HISTORY_TITLE_URL_MIGRATION=PASS',flush=True)
+    ctx8.close()
     ctx7.close()
     browser.close()
