@@ -3238,7 +3238,7 @@ function supportSearchMatches(x,words){
  return words.every(function(w){return raw.includes(w)||compact.includes(w.replace(/\s+/g,''))});
 }
 function archivedAppliedItems(){
- var known=new Set(items.map(function(x){return x.id})),stored=(window.worklinksArchivedStatuses||[]).concat(manualSupportItems()),seen=new Set(),found=[];
+ var known=new Set(items.map(function(x){return x.id})),stored=(window.worklinksArchivedStatuses||[]).concat(manualSupportItems(),pendingSupportCandidates.filter(function(x){return!!saved[x.id]})),seen=new Set(),found=[];
  stored.forEach(function(x){
   if(!x||!x.id||known.has(x.id)||seen.has(x.id)||!saved[x.id])return;
   seen.add(x.id);
@@ -3258,8 +3258,9 @@ function visibleItems(){
  // Search includes expired, hidden and completed registered notices, irrespective of filters.
  if(supportSearchText.trim()){
   var words=supportSearchText.trim().normalize('NFKC').toLowerCase().split(/\s+/).filter(Boolean);
-  return items.concat(archivedAppliedItems())
-   .filter(function(x){return supportSearchMatches(x,words)})
+  var seen=new Set();
+  return items.concat(pendingSupportCandidates,archivedAppliedItems())
+   .filter(function(x){if(!x||!x.id||seen.has(x.id))return false;seen.add(x.id);return supportSearchMatches(x,words)})
    .sort(function(a,b){return Number(!!saved[b.id])-Number(!!saved[a.id])||
       String(a.title||'').localeCompare(String(b.title||''),'ko')});
  }
@@ -3327,7 +3328,7 @@ document.getElementById("supportManualForm").addEventListener("submit",function(
  if(!title){message.textContent="공고명을 입력하세요.";return}
  if(url){try{var parsed=new URL(url);if(!/^https?:$/.test(parsed.protocol))throw Error('invalid')}catch(e){message.textContent="링크는 http:// 또는 https:// 주소만 입력하세요.";return}}
  var normalize=function(v){return String(v||'').normalize('NFKC').trim().toLowerCase().replace(/\s+/g,'')};
- var match=items.concat(archivedAppliedItems()).find(function(x){
+ var match=items.concat(pendingSupportCandidates,archivedAppliedItems()).find(function(x){
    return (url&&String(x.url||'')===url)||(normalize(x.title)===normalize(title)&&(!url||!x.url||x.url===url));
  });
  var id;
