@@ -19,7 +19,15 @@ const accountKeys = (user)=>({
   pending:'worklinks_support_pending_v2:'+user
 });
 function itemDetails(id){
-  const entry=(window.items||[]).find(x=>x.id===id)||state.records.find(x=>x.id===id)||{};
+  // User-added notices are not part of the public static catalog.
+  // Keep their original title/URL in the per-account server record,
+  // including when a guest's custom submission is migrated on login.
+  const memberKey=state.account?'worklinks_support_manual_entries_v1:'+accountKeys(state.account).applied:'';
+  const owner=localStorage.getItem(GUEST_OWNER_KEY);
+  const guestKey=(!owner||owner===state.account)?'worklinks_support_manual_entries_v1:'+GUEST.applied:'';
+  const member=memberKey?decode(memberKey)[id]:null;
+  const guest=guestKey?decode(guestKey)[id]:null;
+  const entry=(window.items||[]).find(x=>x.id===id)||state.records.find(x=>x.id===id)||member||guest||{};
   return {title:String(entry.title||'').slice(0,180),url:String(entry.url||'').slice(0,600)};
 }
 function show(message){
