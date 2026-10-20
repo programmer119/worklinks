@@ -149,6 +149,41 @@ def main():
             assert page.evaluate("jobRenderLimit") == 24
             assert page.locator("#jobCards .job-mini").count() <= 24
 
+            # The priority panel must work with the COMPLETE static shortlist,
+            # even though mobile lazily loads only 160 regular bid cards.
+            page.wait_for_function(
+                "() => !!changcomActionableData && Array.isArray(changcomActionableData.bids)",
+                timeout=20000
+            )
+            census = page.evaluate("""() => ({
+                indexed:changcomActionableData.counts.indexedSWTotal,
+                aligned:changcomActionableEntries('aligned').length,
+                review:changcomActionableEntries('review').length,
+                unknown:changcomActionableEntries('unknown').length,
+                all:changcomActionableEntries('all').length,
+                display:document.querySelectorAll('#changcomActionableList .card').length,
+                first:document.querySelector('#changcomActionableList .card a')?.href
+            })""")
+            assert census["indexed"] > 100, census
+            assert census["aligned"] > 0 and census["all"] >= census["aligned"], census
+            assert census["all"] == census["aligned"] + census["review"] + census["unknown"], census
+            assert census["display"] == min(24, census["aligned"]), census
+            assert census["first"] and "g2b.go.kr" in census["first"], census
+            page.locator('[data-changcom-actionable="review"]').click()
+            assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
+            page.locator('[data-changcom-actionable="unknown"]').click()
+            assert page.locator("#changcomActionableList .card").count() == min(24,census["unknown"])
+            page.locator('[data-changcom-actionable="aligned"]').click()
+            more = page.locator("#changcomActionableMore")
+            if census["aligned"] > 24:
+                assert more.is_visible()
+                more.click()
+                assert page.locator("#changcomActionableList .card").count() == min(48,census["aligned"])
+            assert calls == [(0,160)], ("static shortlist must not trigger more G2B requests", calls)
+            print("WORKLINKS_CHANGCOM_ACTIONABLE_MOBILE_QA=PASS",
+                  json.dumps(census,ensure_ascii=False))
+
+
             # Important card text must never be ellipsized, even for unusually
             # long Korean notice names and verification text. Tiny history
             # indicators are in a separate wrap-safe row below the heading.
