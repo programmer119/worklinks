@@ -283,5 +283,32 @@ with sync_playwright() as p:
         check(local,'server '+kind+' missing on a fresh browser')
     check(page7.evaluate("""()=>localStorage.getItem('worklinks_support_guest_migration_owner_v1')===null"""),'cross-device restoration unexpectedly claimed guest migration')
     print('FRESH_BROWSER_SERVER_RESTORE_ALL_3_KINDS=PASS',flush=True)
+
+    # A real member's support history can exceed one page. Every completed
+    # application must remain visible in the Support Completed view, including
+    # restored location consulting and the already-saved Dankook application.
+    for i in range(14):
+        ident='qa-old-completion-%02d'%i
+        remote[who[0]]['applied:'+ident]={
+            'kind':'applied','id':ident,'value':True,
+            'title':'Previously completed opportunity %02d'%i,'url':'https://example.org/history'}
+    remote[who[0]]['applied:lbs-consulting']={
+        'kind':'applied','id':'lbs-consulting','value':True,
+        'title':'2026 위치정보 맞춤형 컨설팅 참여기업 모집',
+        'url':'https://www.kisa.or.kr/'}
+    remote[who[0]]['applied:dku-techbiz-venture-clinic-2026']={
+        'kind':'applied','id':'dku-techbiz-venture-clinic-2026','value':True,
+        'title':'단국대학교 2026 TechBiz Venture Clinic 기술·경영 맞춤형 컨설팅',
+        'url':'https://cms.dankook.ac.kr/'}
+    page7.reload(wait_until='domcontentloaded')
+    page7.wait_for_function("""()=>document.querySelector('#stats')?.textContent?.includes('지원완료 17')""",timeout=30000)
+    page7.locator('[data-f="applied"]').click()
+    check(page7.locator('#tb tr').count()==17,'completed history truncated after first ten items')
+    check(page7.locator('#pager button').count()==0,'completed history still split into hidden pages')
+    for title in ['2026 위치정보 맞춤형 컨설팅 참여기업 모집',
+                  '단국대학교 2026 TechBiz Venture Clinic 기술·경영 맞춤형 컨설팅']:
+        check(page7.locator('#tb a',has_text=title).count()==1,
+              'confirmed support history item not in one-page completed view: '+title)
+    print('ALL_17_SUBMITTED_APPLICATIONS_VISIBLE_ON_ONE_PAGE=PASS',flush=True)
     ctx7.close()
     browser.close()
