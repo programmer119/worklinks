@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>공간활용 · WorkLinks</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif;color:#182230;background:#f5f6f8}*{box-sizing:border-box}body{margin:0}main{max-width:1320px;margin:auto;padding:24px 16px 72px}h1{font-size:26px;margin:0 0 5px}p{line-height:1.6}.muted{color:#64748b}.head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.back{color:#184a8c;text-decoration:none;font-weight:800}.toolbar{background:white;border:1px solid #dfe4ec;border-radius:16px;padding:16px;margin-bottom:15px;display:grid;gap:14px}.search{width:100%;font:inherit;padding:13px 16px;border:1px solid #b8c3d0;border-radius:10px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:999px;padding:9px 14px;cursor:pointer;font-weight:750}.chip.active{background:#15243a;border-color:#15243a;color:white}.count{font-size:14px;color:#64748b}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.item{background:white;border:1px solid #dfe4ec;border-radius:16px;padding:19px;display:flex;flex-direction:column;gap:9px;min-width:0}.item h2{font-size:19px;margin:0;line-height:1.4}.top{display:flex;justify-content:space-between;gap:10px;align-items:start}.fee{font-size:12px;background:#e9f8ef;color:#14704b;border-radius:8px;font-weight:850;padding:5px 8px;flex:none}.place{font-weight:750;color:#334155;font-size:13px}.line{font-size:13px;line-height:1.6}.line b{color:#17243a}.equip{display:flex;flex-wrap:wrap;gap:5px}.equip span{font-size:12px;background:#f0f4f8;border-radius:6px;padding:4px 7px}.notes{color:#64748b;font-size:12px;line-height:1.6}.links{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:6px}.links a{display:inline-flex;background:#15243a;color:white;text-decoration:none;padding:10px 15px;border-radius:9px;font-weight:800}.deadline{font-size:12px;color:#a04913;font-weight:800}.sectionbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:20px 0 12px}.sectionbar h2{margin:0;font-size:20px}.blank{padding:30px;background:#fff;border-radius:14px;text-align:center}.summary{background:#edf3fa;padding:11px 14px;border-radius:11px;font-size:13px;line-height:1.65;margin-bottom:12px}.subselect{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.subselect select{font:inherit;padding:8px 12px;border:1px solid #cbd5e1;border-radius:8px;background:white}small{color:#64748b}@media(max-width:730px){main{padding:15px 12px 50px}.grid{grid-template-columns:1fr}.toolbar{padding:12px}.chip{padding:8px 10px;font-size:12px}.item{padding:15px}.head{align-items:flex-start}}
+</style></head><body><main>
+<div class="head"><div><h1>공간활용</h1><div class="muted">전국 무료 공방·작업실·회의·촬영·전시 공간</div></div><a class="back" href="./?view=support">← WorkLinks 돌아가기</a></div>
+<div class="summary">공간 이용료가 0원인 시설과 무료 선정형 행사만 수록합니다. 교육 이수·회원 조건·재료비·예약 승인 여부는 각 카드에 따로 표시합니다. 행사형 판매공간은 상설 무료 이용과 구분하며, 무료 공간이라고 해서 상업적 사용이 모두 허용되는 것은 아닙니다.</div>
+<div class="toolbar">
+<input class="search" type="search" id="search" placeholder="공간명, 지역, 장비(3D프린터·레이저커터·회의실 등), 이용조건 검색" aria-label="공간 검색">
+<div class="chips" id="regionChips" aria-label="지역 선택"></div>
+<div class="chips" id="typeChips" aria-label="공간 유형"></div>
+<div class="subselect"><label for="city">시·도 선택</label><select id="city"><option value="">전체 시·도</option></select><label for="activeOnly"><input type="checkbox" id="activeOnly" checked> 접수 마감 행사 제외</label></div>
+<div class="count" id="count" role="status">목록을 불러오는 중입니다.</div>
+</div><div id="content"></div>
+<p class="notes" id="sourceInfo"></p>
+</main><script>
+(function(){
+const ui={region:'서울',type:'전체',city:'',search:'',activeOnly:true};
+let rows=[];
+const cats=['전체','공방·제작','작업·협업','회의·교육','촬영·편집','전시·판매'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dateNow=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+function chips(id,values,current,callback){document.getElementById(id).innerHTML=values.map(x=>'<button type="button" class="chip '+(x===current?'active':'')+'" data-value="'+esc(x)+'" aria-pressed="'+(x===current)+'">'+esc(x)+'</button>').join('');document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>callback(b.dataset.value))}
+function card(e){const ended=e.deadline&&e.deadline<dateNow();const equipment=(e.equipment||[]).map(x=>'<span>'+esc(x)+'</span>').join('');
+return '<article class="item"><div class="top"><h2>'+esc(e.name)+'</h2><span class="fee">'+(e.status==='event'?'선정형 무료':'무료')+'</span></div><div class="place">'+esc(e.region)+' · '+esc(e.area)+' · '+esc(e.category)+'</div><div class="line"><b>이용료</b> '+esc(e.fee)+'</div><div class="line"><b>대상</b> '+esc(e.access)+'</div><div class="line"><b>예약</b> '+esc(e.booking)+'</div><div class="line"><b>이용 시간</b> '+esc(e.hours)+'</div><div class="equip">'+equipment+'</div><div class="notes">'+esc(e.notes)+'</div><div class="notes">'+esc(e.address)+' · '+esc(e.phone||'')+'</div><div class="links"><a href="'+esc(e.url)+'" target="_blank" rel="noopener noreferrer">공식 예약·공고 ↗</a>'+(e.deadline?'<span class="deadline">'+(ended?'마감 · ':'접수 ~ ')+esc(e.deadline)+'</span>':'')+'</div></article>'}
+function render(){
+chips('regionChips',['서울','서울 외','전국'],ui.region,x=>{ui.region=x;ui.city='';document.getElementById('city').value='';render()});
+chips('typeChips',cats,ui.type,x=>{ui.type=x;render()});
+const cities=[...new Set(rows.filter(e=>ui.region==='전국'||(ui.region==='서울'?e.region==='서울':e.region!=='서울')).map(e=>e.region))].sort((a,b)=>a.localeCompare(b,'ko'));document.getElementById('city').innerHTML='<option value="">전체 시·도</option>'+cities.map(x=>'<option value="'+esc(x)+'" '+(ui.city===x?'selected':'')+'>'+esc(x)+'</option>').join('');
+const search=ui.search.trim().toLocaleLowerCase('ko');
+const result=rows.filter(e=>(ui.region==='전국'||(ui.region==='서울'?e.region==='서울':e.region!=='서울'))&&(ui.type==='전체'||e.category===ui.type)&&(!ui.city||e.region===ui.city)&&(!ui.activeOnly||!e.deadline||e.deadline>=dateNow())&&(!search||[e.name,e.region,e.area,e.address,e.category,e.fee,e.access,e.booking,e.hours,e.notes,...(e.equipment||[])].join(' ').toLocaleLowerCase('ko').includes(search)));
+document.getElementById('count').textContent='검색 결과 '+result.length+'곳 · 공식 자료 확인 '+rows.length+'건 (서울 '+rows.filter(e=>e.region==='서울').length+'곳, 서울 외 '+rows.filter(e=>e.region!=='서울').length+'곳)';
+let groups=ui.region==='전국'?['서울','서울 외']: [ui.region];
+document.getElementById('content').innerHTML=groups.map(g=>{const list=result.filter(e=>g==='서울'?e.region==='서울':e.region!=='서울');return '<section><div class="sectionbar"><h2>'+g+'</h2><small>'+list.length+'건</small></div>'+(list.length?'<div class="grid">'+list.map(card).join('')+'</div>':'<div class="blank muted">조건에 맞는 무료 공간이 없습니다.</div>')+'</section>'}).join('');
+}
+document.getElementById('search').addEventListener('input',e=>{ui.search=e.target.value;render()});
+document.getElementById('city').addEventListener('change',e=>{ui.city=e.target.value;render()});
+document.getElementById('activeOnly').addEventListener('change',e=>{ui.activeOnly=e.target.checked;render()});
+fetch('./spaces-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{rows=data.items;document.getElementById('sourceInfo').textContent='확인일: '+data.asOf+' · '+data.criteria+' · 상세 출처: 각 카드의 공식 링크';const p=new URLSearchParams(location.search);const area=p.get('region');if(['서울','서울 외','전국'].includes(area))ui.region=area;render()}).catch(err=>{document.getElementById('count').textContent='목록을 불러오지 못했습니다.';document.getElementById('content').innerHTML='<div class="blank">네트워크 연결 후 새로고침해 주세요. ('+esc(err.message)+')</div>'});
+})();
+</script></body></html>
