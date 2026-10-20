@@ -583,8 +583,15 @@ assert.equal(verdict({industry:'unverified',missing:true}).type,'ready',
  'single unmatched row in an unknown OR group cannot exclude the whole bid');
 assert.equal(verdict({industry:'unverified',missing:true}).verified,false,
  'alternative license rule remains unverified rather than confirmed eligible');
-assert.equal(verdict({industry:'industry_match',missing:true,missingId:'region'}).type,'blocked',
- 'verified mandatory region mismatch still excludes the bid');
+assert.equal(verdict({industry:'industry_match',missing:true,missingId:'region'}).type,'ready',
+ 'unverified region historical exceptions must keep candidates visible');
+assert.equal(verdict({industry:'industry_match',missing:true,missingId:'region'}).label,'원문 검토');
+assert.equal(verdict({industry:'industry_match',missing:true,missingId:'source-industry_code'}).type,'ready');
+assert.equal(verdict({industry:'industry_match',missing:true,missingId:'source-industry_code'}).verified,false);
+assert.equal(scope({id:'g2b-servc-R26BK01799999-000',kind:'servc',
+ title:'AI타워 폐합성수지 처리 용역'}),'unknown',
+ 'indexed SW candidates must remain visible rather than be silently screened out');
+assert.equal(scope({id:'static-irrelevant',kind:'servc',title:'AI타워 폐합성수지 처리 용역'}),'out');
 assert.equal(verdict({industry:'missing',missing:true}).type,'blocked',
  'official group-level license mismatch still excludes the bid');
 assert.equal(verdict({industry:'industry_match',closed:true}).type,'blocked',
