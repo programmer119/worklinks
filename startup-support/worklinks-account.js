@@ -27,7 +27,7 @@ function itemDetails(id){
   const guestKey=(!owner||owner===state.account)?'worklinks_support_manual_entries_v1:'+GUEST.applied:'';
   const member=memberKey?decode(memberKey)[id]:null;
   const guest=guestKey?decode(guestKey)[id]:null;
-  const entry=(window.items||[]).find(x=>x.id===id)||state.records.find(x=>x.id===id)||member||guest||{};
+  const entry=(window.items||[]).find(x=>x.id===id)||(window.pendingSupportCandidates||[]).find(x=>x.id===id)||state.records.find(x=>x.id===id)||member||guest||{};
   return {title:String(entry.title||'').slice(0,180),url:String(entry.url||'').slice(0,600)};
 }
 function show(message){
