@@ -8,6 +8,9 @@ on:
       - 'server/deploy-g2b-api-only.sh'
       - 'tests/test_worklinks_deploy_runner_policy.py'
       - 'server/g2b-proxy.py'
+      - 'server/g2b-eligibility-worker.py'
+      - 'server/deploy-g2b-eligibility-worker-only.sh'
+      - 'tests/test_g2b_eligibility_worker.py'
       - 'server/g2b-award-enricher.py'
       - 'tests/test_award_enricher.py'
       - 'tests/test_award_cache_api.py'
@@ -38,6 +41,9 @@ jobs:
           python3 tests/test_award_cache_api.py
           python3 tests/test_worklinks_deploy_runner_policy.py
           python3 tests/test_g2b_eligibility_join.py
+          python3 tests/test_g2b_eligibility_worker.py
+          python3 -m py_compile server/g2b-eligibility-worker.py
+          bash -n server/deploy-g2b-eligibility-worker-only.sh
           python3 tests/test_direct_production.py
           python3 tests/test_bid_evidence.py
           python3 tests/test_rfp_failures.py
