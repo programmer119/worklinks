@@ -36,7 +36,8 @@ rows=[sample('R26BK01760001','servc','2027년 정보시스템 유지관리',['14
       sample('R26BK01760007','servc','정보시스템 유지관리',['1169']),
       sample('R26BK01760008','servc','2026년 앱 개발',['1468'],order='000'),
       sample('R26BK01760008','servc','2026년 앱 개발 정정',['1468'],order='001'),
-      sample('R26BK01760009','servc','정보시스템 유지관리',['1468'],closes=past)]
+      sample('R26BK01760009','servc','정보시스템 유지관리',['1468'],closes=past),
+      sample('R26BK01760010','servc','2027년 앱 개발',['1468'],closes='')]
 # >4,000 SW indexed candidates must not silently truncate the index.
 for i in range(5200):
     rows.append(sample('R26BK'+str(i).zfill(8),'frgcpt',
@@ -56,6 +57,7 @@ c=out['counts']
 assert c['indexedSWTotal']==len(rows)
 assert c['latestRevisions']==len(rows)-1
 assert c['softwareService']==5,c
+assert c['unknownDeadlineRelevant']==1,c
 assert c['publishedIndustryAligned']==2 if 'publishedIndustryAligned' in c else True
 byNo={r['bidNo']:r for r in out['bids']}
 assert byNo['R26BK01760001']['screening']=='published_industry_codes_match'
@@ -70,6 +72,9 @@ assert byNo['R26BK01760006']['scope']=='software_goods_review'
 assert byNo['R26BK01760007']['screening']=='industry_rule_conflict_review'
 assert byNo['R26BK01760008']['order']=='001'
 assert 'R26BK01760009' not in byNo
+assert byNo['R26BK01760010']['deadlineState']=='unknown'
+assert byNo['R26BK01760010']['closes'] is None
+assert byNo['R26BK01760010']['needsFullNoticeReview'] is True
 assert all(x['needsFullNoticeReview'] for x in out['bids'])
 assert all(x['eligibilityVerified'] is False for x in out['bids'])
 # Partial official API cannot appear to contain no restrictions.

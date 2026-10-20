@@ -174,18 +174,20 @@ def build(rows,total_count,company,now=None,rfp=None):
     selected=latest_revisions(rows)
     groups={'open':0,'expired':0,'deadline_unknown':0,'openService':0,
         'softwareService':0,'publishedIndustryAligned':0,'servicePendingReview':0,
-        'serviceCodeConflict':0,'otherOrSpecialist':0,'softwareGoodsReview':0}
+        'serviceCodeConflict':0,'otherOrSpecialist':0,'softwareGoodsReview':0,
+        'unknownDeadlineRelevant':0}
     bids=[]
     for row in selected:
         end=parse_close(row.get('closes'))
-        if end is None:
+        deadline_unknown=end is None
+        if deadline_unknown:
             groups['deadline_unknown']+=1
-            continue
-        if end<=now:
+        elif end<=now:
             groups['expired']+=1
             continue
-        groups['open']+=1
-        if row.get('kind')=='servc':groups['openService']+=1
+        else:
+            groups['open']+=1
+            if row.get('kind')=='servc':groups['openService']+=1
         purpose=scope(row)
         if purpose=='other_or_specialist':
             groups['otherOrSpecialist']+=1
@@ -193,10 +195,13 @@ def build(rows,total_count,company,now=None,rfp=None):
         if purpose=='scope_review':
             groups['otherOrSpecialist']+=1
             continue
-        if purpose=='software_goods_review':groups['softwareGoodsReview']+=1
-        if purpose=='software_service':groups['softwareService']+=1
+        if deadline_unknown:
+            groups['unknownDeadlineRelevant']+=1
+        else:
+            if purpose=='software_goods_review':groups['softwareGoodsReview']+=1
+            if purpose=='software_service':groups['softwareService']+=1
         screening,codes,matched,unclear,missing=industry_evidence(row,registered,uncertain)
-        if purpose=='software_service':
+        if purpose=='software_service' and not deadline_unknown:
             if screening=='published_industry_codes_match':
                 groups['publishedIndustryAligned']+=1
             else:
@@ -207,8 +212,8 @@ def build(rows,total_count,company,now=None,rfp=None):
         key=no+':'+order
         source=rfp.get(key) if isinstance(rfp.get(key),dict) else {}
         scanned=source.get('status')=='text_extracted_requires_review'
-        hours=(end-now).total_seconds()/3600
-        days=int((hours+23.999)//24)
+        hours=(end-now).total_seconds()/3600 if end is not None else None
+        days=int((hours+23.999)//24) if hours is not None else None
         subject=str(row.get('purchsObjPrdctList') or '')
         has_svc=bool(SVC_PRODUCT.search(subject))
         budget=str(row.get('budget') or '').strip()
@@ -218,17 +223,19 @@ def build(rows,total_count,company,now=None,rfp=None):
                25 if screening=='official_license_unavailable' else
                15 if screening=='official_license_ambiguous' else 0)
         score+=20 if has_svc else 0
-        score+=10 if 48<=hours<=14*24 else 0
+        score+=10 if hours is not None and 48<=hours<=14*24 else 0
         score+=8 if scanned else 0
         score+=5 if 0<price<=300_000_000 else 0
-        if hours<24:score-=12
+        if hours is not None and hours<24:score-=12
+        if deadline_unknown:score-=60
         if price>=3_000_000_000:score-=12
         if purpose=='software_goods_review':score-=30
         bids.append({
             'bidNo':no,'order':order,'title':str(row.get('title') or ''),
             'org':str(row.get('org') or row.get('agency') or ''),
-            'closes':end.isoformat(timespec='minutes'),
-            'hoursLeft':round(hours,1),'daysLeft':days,
+            'closes':end.isoformat(timespec='minutes') if end is not None else None,
+            'deadlineState':'unknown' if deadline_unknown else 'open',
+            'hoursLeft':round(hours,1) if hours is not None else None,'daysLeft':days,
             'budget':budget,'kind':str(row.get('kind') or ''),
             'scope':purpose,'screening':screening,'requiredCodes':codes,
             'registeredCodesMatched':matched,'codesUnknownStatus':unclear,
@@ -248,8 +255,9 @@ def build(rows,total_count,company,now=None,rfp=None):
            'official_license_ambiguous':2,
            'official_license_unavailable':3,
            'industry_rule_conflict_review':4}
-    bids.sort(key=lambda x:(0 if x['scope']=='software_service' else 1,
-        order.get(x['screening'],5),-x['priorityScore'],x['closes'],x['bidNo']))
+    bids.sort(key=lambda x:(2 if x['deadlineState']=='unknown' else
+        0 if x['scope']=='software_service' else 1,
+        order.get(x['screening'],5),-x['priorityScore'],x['closes'] or '9999',x['bidNo']))
     observed=len(rows)
     return {
         'ok':True,'generatedAt':now.isoformat(timespec='seconds'),
