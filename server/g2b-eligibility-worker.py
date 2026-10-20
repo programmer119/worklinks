@@ -17,7 +17,7 @@ import urllib.request
 DB=os.environ.get('G2B_DB_PATH','/app/data/bids.sqlite3')
 API=os.environ.get('G2B_LOCAL_API','http://127.0.0.1:18192/api/g2b')
 POLL=max(60,int(os.environ.get('G2B_QUAL_POLL','180')))
-BATCH=max(20,min(350,int(os.environ.get('G2B_QUAL_BATCH','200')))
+BATCH=max(20,min(350,int(os.environ.get('G2B_QUAL_BATCH','200'))))
 TTL=dt.timedelta(days=7)
 
 def now():
