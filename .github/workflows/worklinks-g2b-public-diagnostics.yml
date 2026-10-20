@@ -21,6 +21,7 @@ on:
       - 'tests/test_rfp_failures.py'
       - 'tests/test_contract_evidence.py'
       - 'tests/worklinks-jobs-regression.cjs'
+      - 'tests/worklinks-live-partner-smoke.cjs'
       - 'startup-support/direct-production-snapshot.json'
   workflow_dispatch:
 permissions:

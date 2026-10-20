@@ -257,7 +257,7 @@ def main():
             }""")
             session.send("Emulation.setCPUThrottlingRate", {"rate": 1})
             assert all(t["salesVisible"] for t in sales_latency["times"] if t["view"] == "sales")
-            assert all(t["salesCards"] == 3 for t in sales_latency["times"] if t["view"] == "sales")
+            assert all(t["salesCards"] == page.evaluate("salesAgencies.length") for t in sales_latency["times"] if t["view"] == "sales"), ("sales tab card count must reflect the live agency list", sales_latency)
             print("WORKLINKS_SALES_MOBILE_PAINT", json.dumps(sales_latency, ensure_ascii=False))
             page.locator(".workspace-tab[data-view='jobs']").click()
             page.locator("#jobsView.on").wait_for()
