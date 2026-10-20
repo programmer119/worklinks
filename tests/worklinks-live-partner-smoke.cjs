@@ -29,7 +29,16 @@ async function get(uri){
   const data=await get('/saved?sw=1&limit=500&offset='+offset);
   rows.push(...(data.items||[]));
  }
- const relevant=rows.filter(row=>mod.jobSoftwareScope(row)==='candidate'&&
+ // The public SQLite /saved SW index is the corpus to display. Recreate the
+ // exact G2B card identity; a second title-only heuristic must not hide it.
+ const indexed=rows.map(row=>({...row,id:'g2b-'+row.kind+'-'+row.bidNo+'-'+row.order,
+  subject:row.purchsObjPrdctList||''}));
+ const scopeTotals={candidate:0,mixed:0,unknown:0,out:0};
+ for(const row of indexed)scopeTotals[mod.jobSoftwareScope(row)]++;
+ assert.equal(scopeTotals.out,0,'no official SW-indexed notice may disappear through a title-only exclusion');
+ assert.equal(indexed.length,Number(first.totalCount),'all saved SW candidates must be checked without an arbitrary page cap');
+ console.log('WORKLINKS_INDEXED_SW_VISIBILITY',JSON.stringify({total:indexed.length,scopes:scopeTotals}));
+ const relevant=indexed.filter(row=>mod.jobSoftwareScope(row)==='candidate'&&
   (!row.closes||Date.parse(row.closes.replace(' ','T')+'+09:00')>=Date.now()));
  const summary={total:rows.length,swServiceCandidates:relevant.length,confirmed:0,pending:0,missing:0,
   examples:[]};
