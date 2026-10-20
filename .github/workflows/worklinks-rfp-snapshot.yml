@@ -6,6 +6,7 @@ on:
       - '.github/workflows/worklinks-rfp-snapshot.yml'
       - 'scripts/refresh_worklinks_rfp.py'
       - 'tests/test_rfp_failures.py'
+      - 'tests/test_rfp_rolling_coverage.py'
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'
@@ -25,6 +26,7 @@ jobs:
       - name: Verify per-cause classification
         run: |
           python3 tests/test_rfp_failures.py
+          python3 tests/test_rfp_rolling_coverage.py
           python3 tests/test_rfp_ai.py
           python3 tests/test_worklinks_rfp_coverage.py
       - name: Extract limited official RFP eligibility text
@@ -36,6 +38,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           cp startup-support/rfp-clauses.json /tmp/worklinks-rfp-new.json
+          cp startup-support/rfp-coverage-index.json /tmp/worklinks-rfp-index-new.json
           # Retry from newest main instead of rebasing two snapshot JSON objects.
           # Merge by notice and keep prior readable text if a later API call is empty.
           for attempt in 1 2 3 4; do
@@ -45,6 +48,7 @@ jobs:
           import datetime,json,pathlib,os
           dst=pathlib.Path('startup-support/rfp-clauses.json')
           new=json.loads(pathlib.Path('/tmp/worklinks-rfp-new.json').read_text())
+          new_index=json.loads(pathlib.Path('/tmp/worklinks-rfp-index-new.json').read_text())
           old=json.loads(dst.read_text()) if dst.exists() else {'byNotice':{}}
           merged=dict(old.get('byNotice') or {})
           for key,item in (new.get('byNotice') or {}).items():
@@ -58,9 +62,20 @@ jobs:
           result={**new,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
                   'byNotice':dict(list(merged.items())[-240:])}
           dst.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          archive_path=pathlib.Path('startup-support/rfp-coverage-index.json')
+          old_index=json.loads(archive_path.read_text()) if archive_path.exists() else {'byNotice':{}}
+          indexed=dict(old_index.get('byNotice') or {})
+          for key,item in (new_index.get('byNotice') or {}).items():
+            prior=indexed.get(key) or {}
+            if str(item.get('checkedAt') or '')>=str(prior.get('checkedAt') or ''):
+              indexed[key]=item
+          archive={**new_index,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
+                   'scannedNoticeCount':len(indexed),'byNotice':indexed}
+          archive_path.write_text(json.dumps(archive,ensure_ascii=False,indent=2)+'\n')
+          print('RFP_CUMULATIVE_SCANNED',len(indexed))
           print('RFP_MERGED_RECORDS',len(result['byNotice']))
           PY
-            git add startup-support/rfp-clauses.json
+            git add startup-support/rfp-clauses.json startup-support/rfp-coverage-index.json
             if git diff --cached --quiet; then echo 'RFP_SNAPSHOT_UNCHANGED'; exit 0; fi
             git commit -m 'data: merge G2B RFP evidence without dropping older snippets'
             if git push origin HEAD:main; then echo 'RFP_SNAPSHOT_PUBLISHED'; exit 0; fi

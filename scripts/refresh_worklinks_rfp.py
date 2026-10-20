@@ -23,6 +23,7 @@ import zipfile
 BASE='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
 ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
+COVERAGE_DEST=ROOT/'startup-support/rfp-coverage-index.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
@@ -42,10 +43,7 @@ EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'조세\s*포탈|제\s*8조의\s*2|특별법인|입찰보증금|'
     r'입찰참가자격등록증상|입찰참가자격의\s*판단기준일|입찰업체\s*서약서', re.I)
 
-PRIORITY_NOTICE_IDS=(
-    'R26BK01756420', 'R26BK01747588', 'R26BK01753188', 'R26BK01747543', 'R26BK01755651',
-    'R26BK01753150', 'R26BK01748179', 'R26BK01753451', 'R26BK01755213',
-)
+# Priority is derived from *all* live indexed bids. No pinned notice IDs.
 SIGNALS={
  '입찰참가자격':r'입찰\s*참가\s*자격|참가\s*자격',
  '직접생산':r'직접\s*생산|세부품명번호',
@@ -88,19 +86,20 @@ def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
     return m.group(1)+m.group(2)+m.group(3) if m else ''
 def discover(limit,prior=None):
-    """Page through all live SW candidates; prioritize unreviewed, matching, urgent.
+    """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
-    Only notice metadata is queried here. Never claim an individual notice fully
-    reviewed because the saved API or an attachment API happens to return zero.
+    The file snapshot only contains recent detailed snippets, while the
+    coverage index records previously scanned official documents. Neither is
+    a final bidder qualification. Expired or unclassified bids are NOT
+    classified as ineligible merely because they are lower scan priority.
     """
     prior=prior or {}
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
-    now=dt.datetime.now(dt.timezone.utc)
+    utc=dt.datetime.now(dt.timezone.utc)
     try:
-        total=None
-        for offset in range(0,20000,500):
+        for offset in range(0,100000,500):
             data=fetch_json(BASE+'saved?sw=1&limit=500&offset='+str(offset))
             if not data.get('ok'):
                 print('RFP_DISCOVER_SERVER_ERROR',data.get('error','unknown'))
@@ -112,53 +111,50 @@ def discover(limit,prior=None):
                 if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11})',no):continue
                 order=str(item.get('order') or '0').zfill(3)
                 end=datestr(item.get('closes'))
-                priority_case=no in PRIORITY_NOTICE_IDS
-                if not end and not priority_case:continue
-                date=dt.datetime.strptime(end,'%Y%m%d').date() if end else today
-                if not priority_case and (date<today or date>today+dt.timedelta(days=18)):continue
+                date=dt.datetime.strptime(end,'%Y%m%d').date() if end else None
                 key=no+':'+order
                 cached=prior.get(key) or {}
-                reader_retry=needs_hwpx_reader_retry(cached)
+                retry=needs_hwpx_reader_retry(cached)
                 if cached.get('reviewComplete') is True:continue
-                if cached.get('classificationVersion')==CLASSIFICATION_VERSION:
+                if cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry:
                     try:
-                        checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
-                        if checked.tzinfo and (now-checked).total_seconds()<24*3600 and not reader_retry:
+                        checked=dt.datetime.fromisoformat(str(cached.get('checkedAt','')).replace('Z','+00:00'))
+                        if checked.tzinfo and (utc-checked).total_seconds()<24*3600:
                             continue
                     except (ValueError,TypeError):pass
-                # Observed industry restriction is a useful scheduling signal,
-                # never an official statement of eligibility.
                 qual=item.get('bidEligibility') or {}
                 matching=any(PARTNER_VERIFIED_CODES.intersection(
                                  str(v) for v in (row.get('codes') or []))
                              for row in (qual.get('requirements') or [])
                              if isinstance(row,dict))
-                service=str(item.get('kind') or '')=='servc'
-                priority=(0 if no in PRIORITY_NOTICE_IDS else 1,
-                          0 if reader_retry else 1,0 if matching else 1,date,
-                          0 if service else 1)
-                seen[key]=(priority,no,order,date.isoformat())
-            if len(rows)<500 or offset+len(rows)>=total:break
-    except Exception as e:
-        print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(e).__name__,str(e)[:140])
-    # Revisit previous official notices even after they drop out of the
-    # current closing-date window. Otherwise old parser versions remain
-    # permanently unreviewed, despite later classifier improvements.
-    for key, cached in prior.items():
-        if not isinstance(cached, dict):
+                # Urgent, unreviewed and official-license-matched bids first.
+                # Do not confuse a lack of matching metadata with a rejection.
+                temporal=0 if date and date>=today else 1 if date is None else 2
+                novel=0 if not cached else 1
+                rank=(temporal,novel,0 if retry else 1,
+                      0 if matching else 1,
+                      date if date is not None and date>=today else today+dt.timedelta(days=3650),
+                      0 if item.get('kind')=='servc' else 1,key)
+                seen[key]=(rank,no,order,date.isoformat() if date else '')
+            if not rows or offset+len(rows)>=total:break
+        else:
+            print('RFP_DISCOVER_PAGINATION_LIMIT_REACHED','offset_limit',100000)
+    except Exception as error:
+        print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(error).__name__,str(error)[:140])
+    # Old parser versions still get retried after all currently open/unread
+    # notices; they never displace an urgent live bidder's first source scan.
+    for key,cached in prior.items():
+        if not isinstance(cached,dict):continue
+        if cached.get('classificationVersion')==CLASSIFICATION_VERSION and not needs_hwpx_reader_retry(cached):
             continue
-        if cached.get('classificationVersion') == CLASSIFICATION_VERSION and not needs_hwpx_reader_retry(cached):
-            continue
-        m = re.fullmatch(r'(R\d{2}BK\d{8}|\d{11}):(\d{3})', key)
-        if not m:
-            continue
-        no, order = m.groups()
-        if key in seen and seen[key][0][0] == 0:
-            continue
-        seen[key] = ((1, 0 if needs_hwpx_reader_retry(cached) else 1, -1, today, 0),
-                     no, order, today.isoformat())
-    candidates=[(no,order,date) for _,no,order,date in sorted(seen.values(),key=lambda x:x[0])]
-    return candidates[:limit]
+        m=re.fullmatch(r'(R\d{2}BK\d{8}|\d{11}):(\d{3})',key)
+        if not m or key in seen:continue
+        no,order=m.groups()
+        rank=(3,1,0 if needs_hwpx_reader_retry(cached) else 1,1,
+              today+dt.timedelta(days=3650),1,key)
+        seen[key]=(rank,no,order,'')
+    sorted_rows=sorted(seen.values(),key=lambda row:row[0])
+    return [(no,order,date) for _,no,order,date in sorted_rows[:limit]]
 
 def legal_file(item):
     url=str(item.get('url') or '')
@@ -792,6 +788,32 @@ def process(no,ordn):
             'files':saved,
             'reviewComplete':False,'requiredConditionsComplete':False,
             'contractPerformanceVerified':False}
+def compact_coverage(item):
+    """Keep cross-run scan provenance for every bid, not capped at 240.
+
+    Compact index is a *scan inventory*, not a license grant, a verified RFP
+    comparison, nor proof that missing attachments never existed.
+    """
+    return {
+        'status':item.get('status') or 'unknown',
+        'checkedAt':item.get('checkedAt') or '',
+        'classificationVersion':item.get('classificationVersion',0),
+        'hwpxReaderVersion':item.get('hwpxReaderVersion',0),
+        'reviewComplete':False,
+        'attachmentManifestCount':item.get('attachmentManifestCount'),
+        'readableDocumentCount':item.get('readableDocumentCount',0),
+        'unreadableDocumentCount':item.get('unreadableDocumentCount',0),
+        'files':[{
+            'name':str(f.get('name') or '')[:160],
+            'readable':f.get('readable') is True,
+            'sourceSha256':str(f.get('sourceSha256') or '')[:64],
+            'errorCategory':str(f.get('errorCategory') or '')[:60],
+            'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
+            'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
+            'clauseCandidateCount':len(f.get('clauseCandidates') or [])
+        } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
+    }
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
@@ -802,7 +824,14 @@ def main():
     if DEST.exists():
         try:old=json.loads(DEST.read_text()).get('byNotice',{})
         except (ValueError,OSError):pass
-    selected=discover(limit,old)
+    prior_index={}
+    if COVERAGE_DEST.exists():
+        try:prior_index=json.loads(COVERAGE_DEST.read_text()).get('byNotice',{})
+        except (ValueError,OSError):pass
+    # The detailed snapshot wins for equal keys; the index preserves ALL
+    # previously scanned keys and prevents a repeat 240-bid treadmill.
+    prior={**prior_index,**old}
+    selected=discover(limit,prior)
     results=dict(old)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
     # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
@@ -857,5 +886,18 @@ def main():
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
             'reviewComplete':False,'byNotice':dict(list(results.items())[-240:])}
     DEST.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    print('RFP_SNAPSHOT_READY','NOTICES',len(output['byNotice']),'NEW_READABLE',success)
+    coverage=dict(prior_index)
+    for key,item in results.items():
+        if not isinstance(item,dict):continue
+        update=compact_coverage(item)
+        prev=coverage.get(key) or {}
+        if str(update.get('checkedAt') or '')>=str(prev.get('checkedAt') or ''):
+            coverage[key]=update
+    cumulative={'ok':True,'generatedAt':now.isoformat(),
+       'scope':'누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)',
+       'reviewComplete':False,'scannedNoticeCount':len(coverage),
+       'byNotice':coverage}
+    COVERAGE_DEST.write_text(json.dumps(cumulative,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    print('RFP_SNAPSHOT_READY','DETAIL_RECORDS',len(output['byNotice']),
+          'CUMULATIVE_SCANNED',len(coverage),'NEW_READABLE',success)
 if __name__=='__main__':main()
