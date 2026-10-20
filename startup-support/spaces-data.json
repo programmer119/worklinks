@@ -1,0 +1,421 @@
+{
+  "asOf": "2026-10-21",
+  "criteria": "공식 기관·공유누리에서 이용료 0원 및 구체적 이용대상 확인. 상업행위 제한은 명시. 실시간 잔여 예약은 별도.",
+  "items": [
+    {
+      "id": "seongbuk-3dp4",
+      "name": "성북창작소 3D프린터 4호기",
+      "region": "서울",
+      "area": "성북구",
+      "category": "공방·제작",
+      "address": "서울 성북구 오패산로1길 57",
+      "fee": "장비 이용료 0원",
+      "access": "장비 안전교육 이수자 또는 사용 경험자",
+      "booking": "공유누리 사전 예약·관리자 승인, 당일 예약 불가",
+      "hours": "평일 12:00~22:00",
+      "equipment": [
+        "3D프린터 4호기",
+        "FDM",
+        "PLA 1.75mm",
+        "출력 150×150×150mm",
+        "FlashPrint·STL"
+      ],
+      "notes": "필라멘트 개별 지참 원칙. 1인 1장비, 2일 이상은 날짜별 예약. 3일 이상 연속 예약 제한 가능.",
+      "phone": "02-941-9468",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcGds/index.do?rsrc_no=DD08Q1704789",
+      "status": "usable"
+    },
+    {
+      "id": "seongbuk-laser",
+      "name": "성북창작소 레이저커터",
+      "region": "서울",
+      "area": "성북구",
+      "category": "공방·제작",
+      "address": "서울 성북구 오패산로1길 57",
+      "fee": "장비 이용료 0원",
+      "access": "일반인 직접 사용 가능, 관리자 승인",
+      "booking": "공유누리 사전 예약, 당일 예약 불가",
+      "hours": "평일 12:00~18:00 · 1회 최대 2시간",
+      "equipment": [
+        "레이저커터",
+        "가공 1,300×900mm",
+        "아크릴·목재류"
+      ],
+      "notes": "재료 개별 지참. 3mm 초과 재료 가공 불가. 장비 1인 1대 원칙.",
+      "phone": "02-941-9468",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcGds/index.do?rsrc_no=CD19Q3850258",
+      "status": "usable"
+    },
+    {
+      "id": "seongbuk-multi",
+      "name": "성북창작소 다목적실",
+      "region": "서울",
+      "area": "성북구",
+      "category": "작업·협업",
+      "address": "서울 성북구 오패산로1길 57",
+      "fee": "이용료 0원",
+      "access": "1그룹 최대 4인",
+      "booking": "공유누리 사전 예약·승인",
+      "hours": "평일 12:00~22:00 · 1회 최대 3시간",
+      "equipment": [
+        "촬영 공간",
+        "후가공·프로젝트 작업 공간"
+      ],
+      "notes": "3일 이상 연속 예약 시 제한 가능. 제품 가공·촬영 등 창작 작업용.",
+      "phone": "02-941-9468",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=DJ28L5311301",
+      "status": "usable"
+    },
+    {
+      "id": "geumcheon-cowork",
+      "name": "금천구공동체경제통합지원센터 경청마루",
+      "region": "서울",
+      "area": "금천구",
+      "category": "작업·협업",
+      "address": "서울 금천구 은행나무로 45",
+      "fee": "공간 이용료 0원",
+      "access": "일반인 자유 이용·대관은 전화 협의",
+      "booking": "자유 이용 / 회의실 대관 전화 예약",
+      "hours": "평일 09:00~18:00, 야간·토요일은 10명 이상 단체 대관",
+      "equipment": [
+        "노트북 작업",
+        "무료 Wi-Fi",
+        "복합기·스캔·복사",
+        "빔프로젝터",
+        "회의실 6~14인",
+        "무료 전시공간"
+      ],
+      "notes": "1층 코워킹 경청마루는 자유 이용. 6인 이하 소회의실 여러 곳, 14인 회의실 별도.",
+      "phone": "02-2627-2218",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=GD29L5417648",
+      "status": "usable"
+    },
+    {
+      "id": "seongbuk-onemedia",
+      "name": "아리랑시네센터 1인 미디어실",
+      "region": "서울",
+      "area": "성북구",
+      "category": "촬영·편집",
+      "address": "서울 성북구 아리랑로 82 아리랑시네센터 4층",
+      "fee": "대관료 0원",
+      "access": "전체 이용대상, 관리자 승인",
+      "booking": "공유누리 예약·관리자 승인",
+      "hours": "예약 화면에서 날짜·시간 선택",
+      "equipment": [
+        "1인 영상 촬영실"
+      ],
+      "notes": "공식 무료 등록 자원. 상업 촬영 허용 범위는 공개된 시설 설명에 별도 기재되지 않음.",
+      "phone": "02-2241-2223",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=EJ26T1343289",
+      "status": "usable"
+    },
+    {
+      "id": "seongbuk-radio",
+      "name": "아리랑시네센터 라디오 스튜디오",
+      "region": "서울",
+      "area": "성북구",
+      "category": "촬영·편집",
+      "address": "서울 성북구 아리랑로 82 아리랑시네센터 2층",
+      "fee": "대관료 0원",
+      "access": "전체 이용대상, 관리자 승인",
+      "booking": "공유누리 예약·관리자 승인",
+      "hours": "예약 화면에서 날짜·시간 선택",
+      "equipment": [
+        "라디오 녹음 스튜디오"
+      ],
+      "notes": "공식 무료 등록 자원. 상세 대여 장비는 공식 페이지에 미기재.",
+      "phone": "02-2241-2223",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=EJ26T0655535",
+      "status": "usable"
+    },
+    {
+      "id": "seongbuk-edit",
+      "name": "아리랑시네센터 맥 스튜디오 편집실",
+      "region": "서울",
+      "area": "성북구",
+      "category": "촬영·편집",
+      "address": "서울 성북구 아리랑로 82 아리랑시네센터 4층",
+      "fee": "대관료 0원",
+      "access": "전체 이용대상, 관리자 승인",
+      "booking": "공유누리 예약·관리자 승인",
+      "hours": "예약 화면에서 날짜·시간 선택",
+      "equipment": [
+        "영상 편집실",
+        "Mac 편집 환경"
+      ],
+      "notes": "편집실 무료 대관 등록. 설치 소프트웨어·PC 세부사양은 공식 등록 정보에 없음.",
+      "phone": "02-2241-2223",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=EJ26T1911852",
+      "status": "usable"
+    },
+    {
+      "id": "ydp-studio",
+      "name": "스튜디오 영원",
+      "region": "서울",
+      "area": "영등포구",
+      "category": "촬영·편집",
+      "address": "서울 영등포구 경인로 846 롯데백화점 시네마동 2층",
+      "fee": "대관료 0원",
+      "access": "사회적경제조직·소상공인·청년·창업팀",
+      "booking": "네이버 예약 후 동의서·서약서·신청서·증빙 제출",
+      "hours": "사용 1개월~3일 전 예약",
+      "equipment": [
+        "제품 촬영",
+        "라이브커머스",
+        "유튜브 영상 촬영"
+      ],
+      "notes": "상업적 행사 대관은 제한. 제품 소개영상·라이브커머스 촬영용. 방음시설 없음.",
+      "phone": "02-2670-3961",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=DF08J3835950",
+      "status": "usable"
+    },
+    {
+      "id": "ydp-color",
+      "name": "스튜디오 영원 컬러 스튜디오",
+      "region": "서울",
+      "area": "영등포구",
+      "category": "촬영·편집",
+      "address": "서울 영등포구 경인로 846 롯데백화점 시네마동 2층",
+      "fee": "대관료 0원",
+      "access": "공식 등록상 전체 이용대상",
+      "booking": "공유누리 온라인 예약",
+      "hours": "예약 화면에서 날짜·시간 선택",
+      "equipment": [
+        "컬러 배경 촬영 공간"
+      ],
+      "notes": "스튜디오 영원 내 별도 무료 등록 시설. 세부 소품·조명 장비는 원문에 미기재.",
+      "phone": "02-2670-3961",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=EH24Q1937728",
+      "status": "usable"
+    },
+    {
+      "id": "dk-studio",
+      "name": "DK Works 스튜디오",
+      "region": "서울",
+      "area": "금천구",
+      "category": "촬영·편집",
+      "address": "서울 금천구 디지털로 178 퍼블릭가산 C동 5층",
+      "fee": "대관료 0원",
+      "access": "공식 등록상 전체 이용대상·승인제",
+      "booking": "공유누리 사전 예약·승인",
+      "hours": "예약 화면에서 날짜·시간 선택",
+      "equipment": [
+        "촬영·영상편집용 스튜디오"
+      ],
+      "notes": "공식 무료 등록 공간. 상세 장비 목록은 공식 시설등록에 기재되지 않음.",
+      "phone": "02-2627-1310",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=FJ22O1219749",
+      "status": "usable"
+    },
+    {
+      "id": "jeongneung-meeting",
+      "name": "정릉3동 자치회관 2층 회의실",
+      "region": "서울",
+      "area": "성북구",
+      "category": "회의·교육",
+      "address": "서울 성북구 솔샘로1길 6-3 2층",
+      "fee": "대관료 0원",
+      "access": "서울 시민·서울 직장·학교 주소를 둔 사람",
+      "booking": "공유누리 예약·주민센터 사전 협의",
+      "hours": "센터와 사용시간 협의",
+      "equipment": [
+        "30명",
+        "빔프로젝터",
+        "음향장비",
+        "무료 Wi-Fi"
+      ],
+      "notes": "회의·교육장 용도. 노트북 자체 대여 불가. 강한 소음 활동 불가.",
+      "phone": "02-2241-5365",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=BI17J2148993",
+      "status": "usable"
+    },
+    {
+      "id": "seoul-yeouido-meeting",
+      "name": "한국승강기안전공단 서울지역본부 교육장",
+      "region": "서울",
+      "area": "구로구",
+      "category": "회의·교육",
+      "address": "서울 구로구 디지털로31길 41 이앤씨벤처드림타워6차 13층",
+      "fee": "대관료 0원",
+      "access": "전체 이용대상·승인제",
+      "booking": "공유누리 예약·사용신청서",
+      "hours": "월·수·금 09:00~18:00 / 화·목 09:00~11:00",
+      "equipment": [
+        "30인 대회의실",
+        "교육·발표 공간"
+      ],
+      "notes": "취소는 사용 3일 전까지 안내. 행사 목적별 승인 필요.",
+      "phone": "02-801-0322",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=DJ27K4324022",
+      "status": "usable"
+    },
+    {
+      "id": "seoul-pop-jungnang",
+      "name": "2026 중랑구 사회적경제 팝업스토어",
+      "region": "서울",
+      "area": "중랑구",
+      "category": "전시·판매",
+      "address": "서울 중랑구 중랑구청 1층 로비",
+      "fee": "판매부스·집기·참가비 0원",
+      "access": "서울 소재 사회적경제기업·소셜벤처, 완제품 판매 가능 기업",
+      "booking": "이메일 신청·선정 후 참여",
+      "hours": "11월 10일 또는 12일 중 1일 운영",
+      "equipment": [
+        "판매부스 1개",
+        "테이블·의자",
+        "공동 홍보"
+      ],
+      "notes": "상설 임대가 아닌 행사형 무료 판매부스. 접수: jeha2547@sehub.net. 판매 수수료 없음.",
+      "phone": "02-2088-6187",
+      "url": "https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000127300",
+      "deadline": "2026-10-29",
+      "status": "event"
+    },
+    {
+      "id": "seoul-pop-hwarang",
+      "name": "2026 농부의시장 연계 사회적경제 플리마켓",
+      "region": "서울",
+      "area": "노원구",
+      "category": "전시·판매",
+      "address": "서울 노원구 화랑대철도공원 농부의시장 행사장",
+      "fee": "판매부스·집기·참가비 0원",
+      "access": "서울 소재 사회적경제기업·소셜벤처",
+      "booking": "이메일 신청·선정 후 참여",
+      "hours": "2026년 11월 7~8일 행사",
+      "equipment": [
+        "판매부스 1개",
+        "테이블·의자",
+        "공동 홍보"
+      ],
+      "notes": "비식품 완제품 판매 행사. 접수: bkkoh0518@sehub.net.",
+      "phone": "02-2088-6246",
+      "url": "https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000127299",
+      "deadline": "2026-10-27",
+      "status": "event"
+    },
+    {
+      "id": "pohang-expo",
+      "name": "구룡포 과메기문화관 1층 전시실",
+      "region": "경북",
+      "area": "포항시",
+      "category": "전시·판매",
+      "address": "경북 포항시 남구 구룡포읍 구룡포길117번길 28-8",
+      "fee": "전시실 대관료 0원",
+      "access": "전체 이용대상, 전시계획서 심사·승인",
+      "booking": "사전 전화 후 대관신청서·전시계획서 제출",
+      "hours": "승인된 대관 일정 기준",
+      "equipment": [
+        "전시용 와이어",
+        "전시 차단봉",
+        "탁자·의자",
+        "무료 Wi-Fi"
+      ],
+      "notes": "무료 전시만 확인됨. 현장 상품 판매 허용 근거 없어 판매 부스로 표시하지 않음. 작품 운송·보험·홍보비 본인 부담.",
+      "phone": "054-270-2864",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=EI06P0615662",
+      "status": "usable"
+    },
+    {
+      "id": "daejeon-galma",
+      "name": "대전 갈마역 화상회의실",
+      "region": "대전",
+      "area": "서구",
+      "category": "회의·교육",
+      "address": "대전 서구 한밭대로 지하 666 갈마역 지하1층",
+      "fee": "대관료 0원",
+      "access": "최소 6명~최대 30명",
+      "booking": "공유누리 예약·역사 담당자 협의",
+      "hours": "09:00~22:00 · 1일 최대 3시간·주 2회",
+      "equipment": [
+        "화상회의 카메라",
+        "65인치 전자칠판",
+        "65인치 모니터",
+        "인터넷·PC",
+        "스피커·마이크"
+      ],
+      "notes": "영업행위 제한. 6명 미만 이용 제한. 일요일·법정공휴일 제외.",
+      "phone": "042-539-3613",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=DK11H3914064",
+      "status": "usable"
+    },
+    {
+      "id": "daejeon-byeon",
+      "name": "대전 변동주민자치문화센터 회의실",
+      "region": "대전",
+      "area": "서구",
+      "category": "회의·교육",
+      "address": "대전 서구 동서대로1064번길 4",
+      "fee": "대관료 0원",
+      "access": "전체 이용대상, 관리자 승인",
+      "booking": "방문·전화 사전협의",
+      "hours": "평일 09:00~17:00",
+      "equipment": [
+        "30인 회의실"
+      ],
+      "notes": "센터 행사·프로그램 시간에는 사용할 수 없음.",
+      "phone": "042-288-5124",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=BA10A0007604",
+      "status": "usable"
+    },
+    {
+      "id": "busan-pangnamu",
+      "name": "부산 1797팽나무하우스 공유공간",
+      "region": "부산",
+      "area": "동래구",
+      "category": "작업·협업",
+      "address": "부산 동래구 충렬대로256번길 31",
+      "fee": "공유공간 대관료 0원",
+      "access": "공유서재는 누구나, 단체공간은 주민동호회·주민단체 등",
+      "booking": "대관 신청서·일정 협의, 비어 있으면 수시 이용",
+      "hours": "시설별 운영시간 확인",
+      "equipment": [
+        "북카페·공유서재",
+        "단체 모임공간",
+        "Wi-Fi",
+        "전시공간"
+      ],
+      "notes": "2층 공유서재 누구나 이용 가능. 개인 상업 작업용 무료 사무실이 아니라 주민 커뮤니티 공간.",
+      "phone": "051-550-4844",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=CI03P2538167",
+      "status": "usable"
+    },
+    {
+      "id": "incheon-samsan",
+      "name": "인천 삼산도서관 문화아지트",
+      "region": "인천",
+      "area": "부평구",
+      "category": "회의·교육",
+      "address": "인천 부평구 부평북로 445 삼산도서관 2층",
+      "fee": "대관료 0원 · 회당 2시간",
+      "access": "최대 10명, 기관 방문신청",
+      "booking": "전화·방문 확인 후 매월 넷째 주 방문 접수",
+      "hours": "평일 09:00~22:00 · 토요일 09:00~18:00",
+      "equipment": [
+        "10명 모임공간"
+      ],
+      "notes": "1일 1회, 월 4회 이하. 선착순 방문 접수, 사용 목적 부적합 시 취소.",
+      "phone": "032-520-8111",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=BA10A0011349",
+      "status": "usable"
+    },
+    {
+      "id": "incheon-unnbuk",
+      "name": "인천환경공단 운북사업소 회의실",
+      "region": "인천",
+      "area": "영종구",
+      "category": "회의·교육",
+      "address": "인천 영종구 영종해안북로1204번길 105",
+      "fee": "대관료 0원",
+      "access": "공식 등록상 전체 이용대상, 사용 목적 심사",
+      "booking": "공유누리 온라인 예약·관리자 승인",
+      "hours": "예약 화면에서 날짜·시간 선택",
+      "equipment": [
+        "20인 회의실"
+      ],
+      "notes": "신청 시 회의 목적 필수 기재.",
+      "phone": "032-899-4765",
+      "url": "https://www.eshare.go.kr/UserPortal/Upv/UprResrcFacl/index.do?rsrc_no=BD08I1149522",
+      "status": "usable"
+    }
+  ]
+}
