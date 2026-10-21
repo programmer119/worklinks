@@ -159,6 +159,7 @@ def main():
                 indexed:changcomActionableData.counts.indexedSWTotal,
                 aligned:changcomActionableEntries('aligned').length,
                 review:changcomActionableEntries('review').length,
+                mismatch:changcomActionableEntries('mismatch').length,
                 unknown:changcomActionableEntries('unknown').length,
                 all:changcomActionableEntries('all').length,
                 display:document.querySelectorAll('#changcomActionableList .card').length,
@@ -166,11 +167,15 @@ def main():
             })""")
             assert census["indexed"] > 100, census
             assert census["aligned"] > 0 and census["all"] >= census["aligned"], census
-            assert census["all"] == census["aligned"] + census["review"] + census["unknown"], census
+            assert census["all"] == census["aligned"] + census["review"] + census["unknown"] + census["mismatch"], census
             assert census["display"] == min(24, census["aligned"]), census
             assert census["first"] and "g2b.go.kr" in census["first"], census
             page.locator('[data-changcom-actionable="review"]').click()
             assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
+            page.locator('[data-changcom-actionable="mismatch"]').click()
+            assert page.locator("#changcomActionableList .card").count() == min(24,census["mismatch"])
+            if census["mismatch"]:
+                assert "지역제한 불일치" in page.locator("#changcomActionableList").inner_text()
             page.locator('[data-changcom-actionable="unknown"]').click()
             assert page.locator("#changcomActionableList .card").count() == min(24,census["unknown"])
             page.locator('[data-changcom-actionable="aligned"]').click()
