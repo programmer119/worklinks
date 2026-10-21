@@ -8,7 +8,11 @@ import re
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 import requests
+import sys
 from bs4 import BeautifulSoup
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path: sys.path.insert(0, str(SCRIPT_DIR))
+from worklinks_sefund import scan_band
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "startup-support/investment-opportunities.json"
@@ -110,6 +114,33 @@ def dcamp():
         except (requests.RequestException,ValueError):
             failed+=1;rows.append(make(url,title,"","디캠프 공식 프로그램","목록만 확인"))
     return rows,{"name":"디캠프 공식 프로그램","url":"https://dcamp.kr/","status":"partial" if failed else "ok","discovered":len(rows),"detailErrors":failed,"checkedAt":now().isoformat(timespec="seconds")}
+def band():
+    return scan_band(html, now())
+
+
+def normalize_title(title):
+    text = re.sub(r"\([^)]*\)", "", str(title or ""))
+    return re.sub(r"[^0-9a-zA-Z가-힣]", "", text).casefold()
+
+
+def registered_titles():
+    doc = (ROOT / "startup-support/index.html").read_text(encoding="utf-8")
+    found = {}
+    for prefix in ("var items=", "var pendingSupportCandidates="):
+        m = re.search(re.escape(prefix) + r"(\[.*?\]);", doc, re.S)
+        if not m:
+            continue
+        try:
+            entries = json.loads(m.group(1))
+        except json.JSONDecodeError:
+            continue
+        for entry in entries:
+            key = normalize_title(entry.get("title", ""))
+            if key:
+                found[key] = entry.get("id", "")
+    return found
+
+
 def historic():
     doc=(ROOT/"startup-support/index.html").read_text(encoding="utf-8")
     out=[]
@@ -138,12 +169,20 @@ def main():
         try:old=json.loads(OUT.read_text(encoding="utf-8"))
         except (OSError,json.JSONDecodeError):pass
     rows=[];sources=[]
-    for name,fetch in (("벤처스퀘어 모집공고",venture),("디캠프 공식 프로그램",dcamp)):
+    for name,fetch in (("벤처스퀘어 모집공고",venture),("디캠프 공식 프로그램",dcamp),("재단법인 밴드 공식 공지",band)):
         try:
             items,status=fetch();rows+=items;sources.append(status)
-        except (requests.RequestException,ValueError,AttributeError) as ex:
+        except (requests.RequestException,ValueError,AttributeError,RuntimeError) as ex:
             sources.append({"name":name,"status":"error","discovered":0,"detailErrors":0,"error":tidy(ex,170),"checkedAt":now().isoformat(timespec="seconds")})
-    checked={x["id"] for x in rows};rows+=historic()
+    registered = registered_titles()
+    for item in rows:
+        if item.get("source") == "재단법인 밴드 공식 공지사항":
+            matched = registered.get(normalize_title(item.get("title", "")))
+            if matched:
+                item["worklinksRecordId"] = matched
+    checked={x["id"] for x in rows}
+    known_titles={normalize_title(x.get("title","")) for x in rows}
+    rows += [x for x in historic() if normalize_title(x.get("title","")) not in known_titles]
     merged={x["id"]:x for x in rows}
     for p in old.get("opportunities",[]):
         if not isinstance(p,dict) or p.get("id") in merged or p.get("source")=="기존 WorkLinks 등록":continue
@@ -155,7 +194,7 @@ def main():
     for p in merged.values():
         end=deadline_dt(p.get("deadline"))
         if end and end<now()-dt.timedelta(days=40):continue
-        p["deadlineState"]="closed" if end and end<now() else "open_by_date" if end else "unknown"
+        p["deadlineState"]="closed" if p.get("sourceStatus")=="closed" or (end and end<now()) else "open_by_date" if end else "unknown"
         p["freshness"]="checked" if p["id"] in checked else "historical" if p["source"]=="기존 WorkLinks 등록" else "stale"
         listing.append(p)
     listing.sort(key=lambda x:(x["freshness"]!="checked",x["deadlineState"]=="closed",x["deadlineState"]=="unknown",x.get("deadline") or "9999",x["title"]))

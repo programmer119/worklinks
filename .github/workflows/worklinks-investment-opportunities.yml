@@ -2,9 +2,17 @@ name: WorkLinks investment opportunities
 on:
   push:
     branches:
+      - main
       - feature/investment-monitor-20261015
     paths:
       - '.github/workflows/worklinks-investment-opportunities.yml'
+      - 'scripts/refresh_worklinks_investment.py'
+      - 'scripts/worklinks_sefund.py'
+      - 'tests/test_investment_monitor.py'
+      - 'tests/test_sefund.py'
+      - 'startup-support/investment.html'
+  schedule:
+    - cron: '25 0,12 * * *'
   workflow_dispatch:
 permissions:
   contents: write
@@ -24,7 +32,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
       - name: Test parsing and cautious eligibility
         run: python -m unittest discover -s tests -p 'test_investment_monitor.py' -v
-      - name: Read investment notices
+      - name: Read investment and BAND Foundation notices
         id: collect
         continue-on-error: true
         run: python scripts/refresh_worklinks_investment.py
