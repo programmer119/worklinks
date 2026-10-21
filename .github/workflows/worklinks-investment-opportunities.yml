@@ -8,6 +8,8 @@ on:
       - '.github/workflows/worklinks-investment-opportunities.yml'
       - 'scripts/refresh_worklinks_investment.py'
       - 'scripts/worklinks_sefund.py'
+      - 'scripts/worklinks_global_accelerators.py'
+      - 'tests/test_global_accelerators.py'
       - 'tests/test_investment_monitor.py'
       - 'tests/test_sefund.py'
       - 'startup-support/investment.html'
@@ -32,6 +34,8 @@ jobs:
         run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
       - name: Test parsing and cautious eligibility
         run: python -m unittest discover -s tests -p 'test_investment_monitor.py' -v
+      - name: Test international accelerator parsing
+        run: python -m unittest discover -s tests -p 'test_global_accelerators.py' -v
       - name: Read investment and BAND Foundation notices
         id: collect
         continue-on-error: true
