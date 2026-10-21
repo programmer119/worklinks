@@ -16,6 +16,7 @@ import urllib.request
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'startup-support/changcom-actionable.json'
 RFP=ROOT/'startup-support/rfp-coverage-index.json'
+NOTICE_REVIEWS=ROOT/'startup-support/changcom-bid-review.json'
 API='https://api-suaveforge.suaveforge.com:18458/api/g2b'
 BIZNO='1308185973'
 KST=dt.timezone(dt.timedelta(hours=9))
@@ -213,6 +214,35 @@ def comparable_competition(row,awards):
                         'source':'나라장터 과거 낙찰정보·유사 공고번호 대조'})
     return results[:3]
 
+def load_verified_reviews(path=NOTICE_REVIEWS):
+    """Human-checked notice-source observations. Never imply legal approval."""
+    try:
+        data=json.loads(path.read_text(encoding='utf-8'))
+        by=data.get('byNotice') if isinstance(data,dict) else None
+        return by if isinstance(by,dict) else {}
+    except (OSError,ValueError,TypeError):
+        return {}
+
+def notice_review(key,record,company):
+    """Validate any geographic mismatch against current complete official registry."""
+    if not isinstance(record,dict) or record.get('bidNo')+':'+str(record.get('order'))!=key:
+        return {}
+    output=dict(record)
+    rawstate=record.get('state')
+    if rawstate=='explicit_mandatory_region_mismatch':
+        city=str((record.get('mandatory') or {}).get('regionCity') or '')
+        firm=company.get('company') if isinstance(company.get('company'),dict) else {}
+        address=str(firm.get('regionName') or '')+' '+str(firm.get('address') or '')
+        if not (company.get('complete') is True and city and address.strip()):
+            output['state']='regional_eligibility_unverified'
+        elif city in address:
+            output['state']='regional_eligibility_recheck'
+        else:
+            output['state']='explicit_mandatory_region_mismatch'
+            output['officialRegistryCity']=str(firm.get('regionName') or '')
+    output['finalEligibilityCertified']=False
+    return output
+
 def latest_revisions(rows):
     dedup={}
     for row in rows:
@@ -223,12 +253,13 @@ def latest_revisions(rows):
             dedup[no]={**row,'_order':order}
     return list(dedup.values())
 
-def build(rows,total_count,company,now=None,rfp=None,awards=None):
+def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
     now=now or dt.datetime.now(KST)
     if now.tzinfo is None:now=now.replace(tzinfo=KST)
     registered,uncertain=active_codes(company)
     rfp=rfp or {}
     awards=awards or {}
+    reviews=reviews or {}
     selected=latest_revisions(rows)
     groups={'open':0,'expired':0,'deadline_unknown':0,'openService':0,
         'softwareService':0,'publishedIndustryAligned':0,'servicePendingReview':0,
@@ -268,6 +299,7 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None):
                     groups['serviceCodeConflict']+=1
         no,order=canonical(row)
         key=no+':'+order
+        human=notice_review(key,reviews.get(key),company)
         source=rfp.get(key) if isinstance(rfp.get(key),dict) else {}
         evidence=source.get('changcomClauseEvidence')
         if not isinstance(evidence,dict):evidence={}
@@ -328,7 +360,9 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None):
             'officialClauseEvidence':evidence,
             'originalRequirementTypes':cited_types,
             'originalSourceDocumentCount':len(cited_documents),
-            'historicalCompetition':historical,
+            'historicalCompetition':historical,'reviewedNotice':human,
+            'precheckedMandatoryClauses':bool(human),
+            'confirmedRegionalMismatch':human.get('state')=='explicit_mandatory_region_mismatch',
             'competitionVerified':bool(historical),'costVerified':False,
             'personnelAndScopeVerified':False,'proposalReady':False,
             'sourceUrl':('https://www.g2b.go.kr/link/PNPE027_01/single/?'+
@@ -349,6 +383,8 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None):
     tracked=len(bids)
     progress={
         'reviewTarget':tracked,
+        'precheckedNoticeRequirements':sum(x['precheckedMandatoryClauses'] for x in bids),
+        'explicitMandatoryMismatch':sum(x['confirmedRegionalMismatch'] for x in bids),
         'industryBasicMatched':sum(x['screening']=='published_industry_codes_match'
                                    for x in bids),
         'rfpTextScanned':sum(x['rfpTextScanned'] for x in bids),
@@ -385,7 +421,7 @@ def main():
     rows,count=all_indexed()
     company=get_json('/company?bizno='+BIZNO)
     snapshot=build(rows,count,company,rfp=extract_rfp_index(),
-                   awards=load_official_award_cache())
+                   awards=load_official_award_cache(),reviews=load_verified_reviews())
     c=snapshot['counts']
     if c['indexedSWTotal']<100 or c['softwareService']<1:
         raise SystemExit('LIVE_G2B_DATA_NOT_CREDIBLE_REFUSING_EMPTY_OUTPUT')
