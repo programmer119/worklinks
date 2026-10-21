@@ -24,6 +24,8 @@ BASE='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
 ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
 COVERAGE_DEST=ROOT/'startup-support/rfp-coverage-index.json'
+CHANGCOM_SOURCE=ROOT/'startup-support/changcom-actionable.json'
+CHANGCOM_EVIDENCE_DEST=ROOT/'startup-support/changcom-rfp-evidence.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
@@ -85,7 +87,17 @@ def needs_hwpx_reader_retry(record):
 def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
     return m.group(1)+m.group(2)+m.group(3) if m else ''
-def discover(limit,prior=None):
+def changcom_targets(path=CHANGCOM_SOURCE):
+    """All live candidates; no hardcoded bid numbers."""
+    try:
+        doc=json.loads(path.read_text(encoding='utf-8'))
+        if not doc.get('ok') or doc.get('bizno')!='1308185973':return set()
+        return {str(x.get('bidNo'))+':'+str(x.get('order') or '0').zfill(3)
+                for x in doc.get('bids',[]) if x.get('deadlineState') in ('open','unknown')}
+    except (OSError,ValueError,TypeError,AttributeError):
+        return set()
+
+def discover(limit,prior=None,targets=None):
     """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
     The file snapshot only contains recent detailed snippets, while the
@@ -94,6 +106,7 @@ def discover(limit,prior=None):
     classified as ineligible merely because they are lower scan priority.
     """
     prior=prior or {}
+    targets=changcom_targets() if targets is None else targets
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -131,7 +144,9 @@ def discover(limit,prior=None):
                 # Do not confuse a lack of matching metadata with a rejection.
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached else 1
-                rank=(temporal,novel,0 if retry else 1,
+                rank=(0 if key in targets and temporal==0 else 1 if temporal==0 else
+                      2 if key in targets else 3,
+                      novel,0 if retry else 1,
                       0 if matching else 1,
                       date if date is not None and date>=today else today+dt.timedelta(days=3650),
                       0 if item.get('kind')=='servc' else 1,key)
@@ -150,7 +165,7 @@ def discover(limit,prior=None):
         m=re.fullmatch(r'(R\d{2}BK\d{8}|\d{11}):(\d{3})',key)
         if not m or key in seen:continue
         no,order=m.groups()
-        rank=(3,1,0 if needs_hwpx_reader_retry(cached) else 1,1,
+        rank=(4,1,0 if needs_hwpx_reader_retry(cached) else 1,1,
               today+dt.timedelta(days=3650),1,key)
         seen[key]=(rank,no,order,'')
     sorted_rows=sorted(seen.values(),key=lambda row:row[0])
@@ -831,7 +846,8 @@ def main():
     # The detailed snapshot wins for equal keys; the index preserves ALL
     # previously scanned keys and prevents a repeat 240-bid treadmill.
     prior={**prior_index,**old}
-    selected=discover(limit,prior)
+    targets=changcom_targets()
+    selected=discover(limit,prior,targets=targets)
     results=dict(old)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
     # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
