@@ -98,6 +98,24 @@ ranked=mod.build([maint,hardware],2,company,now=now)
 assert len(ranked['bids'])==2
 assert ranked['bids'][0]['bidNo']=='R26BK09999001'
 assert all(b['eligibilityVerified'] is False for b in ranked['bids'])
+# A cached award counts only with a worker-verified comparable past notice.
+matched=sample('R26BK09999003','servc','2027년 정보시스템 유지관리',['1468'])
+matched['repeatHistory']=[
+    {'year':2025,'bidNo':'R25BK01111111','title':'2025년 정보시스템 유지관리',
+     'verified':True},
+    {'year':2024,'bidNo':'R24BK02222222','title':'다른 사업','verified':False}]
+old={'R25BK01111111':{'participants':2,'winner':'과거 낙찰업체',
+                      'awardAmount':123000000,'awardRate':85,
+                      'verifiedAt':'2026-10-20T00:00:00Z'},
+     'R24BK02222222':{'participants':1,'winner':'무관 업체',
+                      'awardAmount':1000,'awardRate':100,'verifiedAt':''}}
+matched_result=mod.build([matched],1,company,now=now,awards=old)
+one=matched_result['bids'][0]
+assert one['competitionVerified'] is True
+assert one['historicalCompetition'][0]['participants']==2
+assert len(one['historicalCompetition'])==1
+assert matched_result['verificationProgress']['historicalCompetitionVerified']==1
+assert one['eligibilityVerified'] is False
 print('WORKLINKS_PRACTICAL_SOFTWARE_RANKING=PASS')
 print('WORKLINKS_ACTIONABLE_5200_BIDS=PASS',
       json.dumps({k:v for k,v in c.items() if v},ensure_ascii=False))
