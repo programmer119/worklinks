@@ -211,6 +211,12 @@ def build(rows,total_count,company,now=None,rfp=None):
         no,order=canonical(row)
         key=no+':'+order
         source=rfp.get(key) if isinstance(rfp.get(key),dict) else {}
+        evidence=source.get('changcomClauseEvidence')
+        if not isinstance(evidence,dict):evidence={}
+        clauses=evidence.get('clauseCandidates')
+        if not isinstance(clauses,dict):clauses={}
+        cited_types={str(t):len(v) for t,v in clauses.items() if isinstance(v,list)}
+        cited_documents=evidence.get('files') if isinstance(evidence.get('files'),list) else []
         scanned=source.get('status')=='text_extracted_requires_review'
         hours=(end-now).total_seconds()/3600 if end is not None else None
         days=int((hours+23.999)//24) if hours is not None else None
@@ -260,6 +266,11 @@ def build(rows,total_count,company,now=None,rfp=None):
             'rfpTextScanned':scanned,
             'rfpScanStatus':str(source.get('status') or 'not_scanned'),
             'rfpCheckedAt':str(source.get('checkedAt') or ''),
+            'officialClauseEvidence':evidence,
+            'originalRequirementTypes':cited_types,
+            'originalSourceDocumentCount':len(cited_documents),
+            'competitionVerified':False,'costVerified':False,
+            'personnelAndScopeVerified':False,'proposalReady':False,
             'sourceUrl':('https://www.g2b.go.kr/link/PNPE027_01/single/?'+
                          urllib.parse.urlencode({'bidPbancNo':no,'bidPbancOrd':order})),
             'priorityScore':score,
@@ -275,13 +286,26 @@ def build(rows,total_count,company,now=None,rfp=None):
         0 if x['scope']=='software_service' else 1,
         order.get(x['screening'],5),-x['priorityScore'],x['closes'] or '9999',x['bidNo']))
     observed=len(rows)
+    tracked=len(bids)
+    progress={
+        'reviewTarget':tracked,
+        'industryBasicMatched':sum(x['screening']=='published_industry_codes_match'
+                                   for x in bids),
+        'rfpTextScanned':sum(x['rfpTextScanned'] for x in bids),
+        'citableRfpExtracts':sum(bool(x['originalRequirementTypes']) for x in bids),
+        'fullLegalEligibilityVerified':sum(x['eligibilityVerified'] for x in bids),
+        'executionFeasibilityVerified':sum(x['personnelAndScopeVerified'] for x in bids),
+        'historicalCompetitionVerified':sum(x['competitionVerified'] for x in bids),
+        'costProfitabilityVerified':sum(x['costVerified'] for x in bids),
+        'proposalReadyVerified':sum(x['proposalReady'] for x in bids)
+    }
     return {
         'ok':True,'generatedAt':now.isoformat(timespec='seconds'),
         'company':str((company.get('company') or {}).get('name') or '창컴정보통신 주식회사')
                   if isinstance(company.get('company'),dict) else str(company.get('company') or ''),
         'bizno':BIZNO,'companyRegistryCheckedAt':company.get('checkedAt'),
         'activeIndustryCodes':sorted(registered),'industryStatusUncertainCodes':sorted(uncertain),
-        'officialSource':API+'/saved?sw=1',
+        'officialSource':API+'/saved?sw=1','verificationProgress':progress,
         'counts':{'indexedSWTotal':total_count,'indexRowsFetched':observed,
                   'latestRevisions':len(selected),**groups},
         'statusDefinition':{
