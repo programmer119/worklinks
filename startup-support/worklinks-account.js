@@ -9,6 +9,10 @@ const GUEST = {
 };
 const KIND = {applied:true,hidden:true,business:true};
 const GUEST_OWNER_KEY = 'worklinks_support_guest_migration_owner_v1';
+const INTENT_PREFIX='worklinks_support_intents_v1:';
+const intentsFor=key=>decode(INTENT_PREFIX+key);
+const timeOf=x=>Number(x?.at)||0;
+const remoteTime=x=>Date.parse(x?.updatedAt||'')||0;
 const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
 const $ = (id)=>document.getElementById(id);
 const decode = (key)=>{try{const r=JSON.parse(localStorage.getItem(key)||'{}');return r&&typeof r==='object'&&!Array.isArray(r)?r:{}}catch{return {}}};
@@ -159,13 +163,25 @@ function applyAccount(records){
   const keys=accountKeys(state.account);
   const maps={applied:decode(keys.applied),hidden:decode(keys.hidden),business:decode(keys.business)};
   const pending=decode(keys.pending);
+  const memberIntents=intentsFor(keys.applied);
   for(const record of records){
     if(!record||!Object.prototype.hasOwnProperty.call(KIND,record.kind)||typeof record.id!=='string')continue;
     maps[record.kind][record.id]=record.value===true;
   }
+  if(state.serverReady){
+    for(const choice of Object.values(memberIntents)){
+      if(choice?.kind!=='applied'||typeof choice.id!=='string'||typeof choice.value!=='boolean')continue;
+      const key='applied:'+choice.id,remote=records.find(r=>r.kind==='applied'&&r.id===choice.id);
+      if(!timeOf(choice)||(remote&&remoteTime(remote)>=timeOf(choice)))continue;
+      if(pending[key]&&timeOf(pending[key])>=timeOf(choice))continue;
+      if(remote?.value===choice.value)continue;
+      pending[key]={kind:'applied',id:choice.id,value:choice.value,at:timeOf(choice),...itemDetails(choice.id)};
+    }
+  }
   for(const entry of Object.values(pending)){
     if(entry&&maps[entry.kind])maps[entry.kind][entry.id]=entry.value===true;
   }
+  localStorage.setItem(keys.pending,JSON.stringify(pending));
   Object.entries(maps).forEach(([kind,map])=>localStorage.setItem(keys[kind],JSON.stringify(map)));
   window.statusKey=keys.applied;window.hiddenKey=keys.hidden;window.businessKey=keys.business;
   window.saved=maps.applied;window.hidden=maps.hidden;window.business=maps.business;
@@ -219,7 +235,8 @@ function importGuestAutomatically(){
   const guest={applied:decode(GUEST.applied),hidden:decode(GUEST.hidden),business:decode(GUEST.business)};
   const entries=Object.entries(guest).flatMap(([kind,map])=>
     Object.entries(map).filter(([,v])=>v===true).map(([id])=>({kind,id,value:true})));
-  if(!entries.length)return 0;
+  const guestChoices=Object.values(intentsFor(GUEST.applied));
+  if(!entries.length&&!guestChoices.length)return 0;
   const owner=localStorage.getItem(GUEST_OWNER_KEY);
   // A guest history must never be silently copied into someone else's account.
   if(owner&&owner!==state.account){
@@ -250,6 +267,17 @@ function importGuestAutomatically(){
     // it migrated when no import happened, even if an older build did so.
     if(maps[entry.kind][entry.id]===true)migrated[key]=true;
   }
+  const memberChoices=intentsFor(keys.applied);
+  for(const choice of guestChoices){
+    if(choice?.kind!=='applied'||typeof choice.id!=='string'||typeof choice.value!=='boolean'||!(/^[A-Za-z0-9_.:-]{1,160}$/.test(choice.id)))continue;
+    const key='applied:'+choice.id,at=timeOf(choice),remoteRecord=state.records.find(r=>r.kind==='applied'&&r.id===choice.id);
+    if(!at||(remoteRecord&&remoteTime(remoteRecord)>=at)||timeOf(memberChoices[key])>=at)continue;
+    if(pending[key]&&timeOf(pending[key])>=at)continue;
+    if(remoteRecord?.value===choice.value)continue;
+    pending[key]={kind:'applied',id:choice.id,value:choice.value,at,...itemDetails(choice.id)};
+    maps.applied[choice.id]=choice.value;
+    imported++;
+  }
   Object.entries(maps).forEach(([kind,map])=>localStorage.setItem(keys[kind],JSON.stringify(map)));
   localStorage.setItem(keys.pending,JSON.stringify(pending));
   localStorage.setItem(migratedKey,JSON.stringify(migrated));
@@ -264,7 +292,7 @@ window.worklinksStatusChanged=(kind,id,value)=>{
   const keys=accountKeys(state.account);
   const item=itemDetails(id);
   const pending=decode(keys.pending);
-  pending[kind+':'+id]={kind,id,value:!!value,...item};
+  pending[kind+':'+id]={kind,id,value:!!value,at:Date.now(),...item};
   localStorage.setItem(keys.pending,JSON.stringify(pending));
   if(!state.serverReady)show('브라우저 기록 보존됨 · 서버 기록 확인 후 자동 동기화');
   flush().catch(()=>show('브라우저 저장됨 · 서버 동기화 대기'));
