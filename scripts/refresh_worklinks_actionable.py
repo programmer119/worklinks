@@ -156,6 +156,63 @@ def extract_rfp_index(path=RFP):
         return d.get('byNotice') if isinstance(d.get('byNotice'),dict) else {}
     except (OSError,ValueError):return {}
 
+
+def load_official_award_cache(fetch=get_json):
+    """Official historic participation counts, indexed by exact old bid notice.
+
+    Never infer a competitor count from a missing cache row, zero, or an
+    unrelated award. The recurring_projects worker independently verifies
+    comparable agency + title before its history may be used.
+    """
+    try:
+        first=fetch('/award-cache?limit=200&offset=0')
+        if not first.get('installed'):return {}
+        total=int(first.get('totalCount') or 0)
+        if total<0 or total>10000:return {}
+        rows=list(first.get('records') or [])
+        for offset in range(200,total,200):
+            page=fetch('/award-cache?limit=200&offset='+str(offset))
+            if page.get('ok') is not True or page.get('installed') is not True:
+                return {}
+            rows.extend(page.get('records') or [])
+        found={}
+        for row in rows:
+            if not isinstance(row,dict):continue
+            no=str(row.get('bidNo') or '')
+            count=row.get('count')
+            if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11})',no):continue
+            try:num=int(count)
+            except (ValueError,TypeError):continue
+            if not 1<=num<=1000000:continue
+            found[no]={'participants':num,'winner':str(row.get('winner') or ''),
+                       'awardAmount':row.get('amount'),
+                       'awardRate':row.get('rate'),
+                       'verifiedAt':str(row.get('verifiedAt') or '')}
+        return found
+    except (ValueError,OSError,KeyError,TypeError,RuntimeError,TimeoutError):
+        return {}
+
+def comparable_competition(row,awards):
+    """Past matched bids only: not present-day odds or a guaranteed low bid."""
+    history=row.get('repeatHistory')
+    if not isinstance(history,list):return []
+    results=[]
+    for past in history:
+        if not isinstance(past,dict) or past.get('verified') is not True:continue
+        no=str(past.get('bidNo') or '')
+        if no not in awards:continue
+        year=past.get('year')
+        try:past_year=int(year)
+        except (ValueError,TypeError):continue
+        if not 2022<=past_year<=2026:continue
+        item=awards[no]
+        results.append({'pastBidNo':no,'year':past_year,'pastTitle':str(past.get('title') or ''),
+                        'participants':item['participants'],'winner':item['winner'],
+                        'awardAmount':item['awardAmount'],'awardRate':item['awardRate'],
+                        'verifiedAt':item['verifiedAt'],
+                        'source':'나라장터 과거 낙찰정보·유사 공고번호 대조'})
+    return results[:3]
+
 def latest_revisions(rows):
     dedup={}
     for row in rows:
@@ -166,11 +223,12 @@ def latest_revisions(rows):
             dedup[no]={**row,'_order':order}
     return list(dedup.values())
 
-def build(rows,total_count,company,now=None,rfp=None):
+def build(rows,total_count,company,now=None,rfp=None,awards=None):
     now=now or dt.datetime.now(KST)
     if now.tzinfo is None:now=now.replace(tzinfo=KST)
     registered,uncertain=active_codes(company)
     rfp=rfp or {}
+    awards=awards or {}
     selected=latest_revisions(rows)
     groups={'open':0,'expired':0,'deadline_unknown':0,'openService':0,
         'softwareService':0,'publishedIndustryAligned':0,'servicePendingReview':0,
@@ -217,6 +275,7 @@ def build(rows,total_count,company,now=None,rfp=None):
         if not isinstance(clauses,dict):clauses={}
         cited_types={str(t):len(v) for t,v in clauses.items() if isinstance(v,list)}
         cited_documents=evidence.get('files') if isinstance(evidence.get('files'),list) else []
+        historical=comparable_competition(row,awards)
         scanned=source.get('status')=='text_extracted_requires_review'
         hours=(end-now).total_seconds()/3600 if end is not None else None
         days=int((hours+23.999)//24) if hours is not None else None
@@ -269,7 +328,8 @@ def build(rows,total_count,company,now=None,rfp=None):
             'officialClauseEvidence':evidence,
             'originalRequirementTypes':cited_types,
             'originalSourceDocumentCount':len(cited_documents),
-            'competitionVerified':False,'costVerified':False,
+            'historicalCompetition':historical,
+            'competitionVerified':bool(historical),'costVerified':False,
             'personnelAndScopeVerified':False,'proposalReady':False,
             'sourceUrl':('https://www.g2b.go.kr/link/PNPE027_01/single/?'+
                          urllib.parse.urlencode({'bidPbancNo':no,'bidPbancOrd':order})),
@@ -324,7 +384,8 @@ def main():
     args=parser.parse_args()
     rows,count=all_indexed()
     company=get_json('/company?bizno='+BIZNO)
-    snapshot=build(rows,count,company,rfp=extract_rfp_index())
+    snapshot=build(rows,count,company,rfp=extract_rfp_index(),
+                   awards=load_official_award_cache())
     c=snapshot['counts']
     if c['indexedSWTotal']<100 or c['softwareService']<1:
         raise SystemExit('LIVE_G2B_DATA_NOT_CREDIBLE_REFUSING_EMPTY_OUTPUT')
