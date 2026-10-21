@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path: sys.path.insert(0, str(SCRIPT_DIR))
 from worklinks_sefund import scan_band
+from worklinks_global_accelerators import scan_global
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "startup-support/investment-opportunities.json"
@@ -174,6 +175,9 @@ def main():
             items,status=fetch();rows+=items;sources.append(status)
         except (requests.RequestException,ValueError,AttributeError,RuntimeError) as ex:
             sources.append({"name":name,"status":"error","discovered":0,"detailErrors":0,"error":tidy(ex,170),"checkedAt":now().isoformat(timespec="seconds")})
+    global_rows, global_sources = scan_global()
+    rows += global_rows
+    sources += global_sources
     registered = registered_titles()
     for item in rows:
         if item.get("source") == "재단법인 밴드 공식 공지사항":
