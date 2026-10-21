@@ -829,6 +829,67 @@ def compact_coverage(item):
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
     }
 
+
+def compact_changcom_evidence(item):
+    """Bounded official source excerpts, never a verified qualification."""
+    types=('industry_code','direct_production','sme_certificate','region_restriction',
+           'joint_participation','performance_proof','staff_proof','eligibility_cutoff',
+           'registration_identity','unclassified_qualification','legal_exclusion',
+           'submission_required','bid_security')
+    excerpts={t:[] for t in types}
+    links=[]
+    seen=set()
+    for file in item.get('files') or []:
+        if not isinstance(file,dict) or not file.get('readable'):continue
+        url=str(file.get('sourceUrl') or '')
+        if not url.startswith('https://www.g2b.go.kr/'):continue
+        name=str(file.get('name') or '공식 첨부자료')[:100]
+        if url not in [x['url'] for x in links] and len(links)<6:
+            links.append({'name':name,'url':url})
+        for clause in file.get('clauseCandidates') or []:
+            if not isinstance(clause,dict):continue
+            typ=str(clause.get('type') or '')
+            if typ not in excerpts or len(excerpts[typ])>=3:continue
+            quote=' '.join(str(clause.get('sourceText') or '').split())[:320]
+            if not quote or (typ,quote) in seen:continue
+            seen.add((typ,quote))
+            codes=[str(c) for c in (clause.get('codes') or [])
+                   if re.fullmatch(r'\d{4}|\d{10}',str(c))]
+            excerpts[typ].append({'text':quote,'codes':codes,
+                'sourceFile':name,'url':url,'interpretation':'manual_review_required'})
+    return {
+        'status':item.get('status') or 'not_scanned',
+        'checkedAt':item.get('checkedAt') or '',
+        'readableDocumentCount':item.get('readableDocumentCount',0),
+        'unreadableDocumentCount':item.get('unreadableDocumentCount',0),
+        'manifestComplete':item.get('manifestComplete') is True,
+        'reviewComplete':False,'eligibilityVerified':False,
+        'files':links,'clauseCandidates':{k:v for k,v in excerpts.items() if v}
+    }
+
+def write_changcom_evidence(results,targets,now):
+    """Keep compact candidate evidence after the 240-record detailed snapshot rolls."""
+    old={}
+    if CHANGCOM_EVIDENCE_DEST.exists():
+        try:old=json.loads(CHANGCOM_EVIDENCE_DEST.read_text(
+            encoding='utf-8')).get('byNotice',{})
+        except (OSError,ValueError,TypeError):pass
+    merged={k:v for k,v in old.items() if k in targets}
+    for key,item in results.items():
+        if key not in targets:continue
+        current=compact_changcom_evidence(item)
+        previous=merged.get(key) or {}
+        if (previous.get('status')=='text_extracted_requires_review' and
+                current.get('status')!='text_extracted_requires_review'):continue
+        if current.get('checkedAt','')>=previous.get('checkedAt',''):
+            merged[key]=current
+    output={'ok':True,'generatedAt':now.isoformat(),'reviewComplete':False,
+            'scope':'창컴 후보 공식 원문 발췌: 법적 자격, 경쟁도, 수익성 미확정',
+            'candidateCount':len(targets),'byNotice':merged}
+    CHANGCOM_EVIDENCE_DEST.write_text(
+        json.dumps(output,ensure_ascii=False,indent=1)+'\n',encoding='utf-8')
+    return output
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
@@ -914,6 +975,8 @@ def main():
        'reviewComplete':False,'scannedNoticeCount':len(coverage),
        'byNotice':coverage}
     COVERAGE_DEST.write_text(json.dumps(cumulative,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    ledger=write_changcom_evidence(results,targets,now)
+    print('CHANGCOM_RFP_EVIDENCE',len(ledger['byNotice']),'of',len(targets))
     print('RFP_SNAPSHOT_READY','DETAIL_RECORDS',len(output['byNotice']),
           'CUMULATIVE_SCANNED',len(coverage),'NEW_READABLE',success)
 if __name__=='__main__':main()
