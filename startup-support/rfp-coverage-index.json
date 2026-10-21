@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-21T07:38:59.138413+00:00",
+  "generatedAt": "2026-10-21T13:47:50.067120+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 1823,
+  "scannedNoticeCount": 1917,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -5059,12 +5059,12 @@
     },
     "R26BK01775090:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 1,
-      "readableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -5076,11 +5076,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 63
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01778220:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5101,8 +5102,8 @@
       "files": []
     },
     "R26BK01751709:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5113,12 +5114,12 @@
     },
     "R26BK01757930:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 1,
-      "readableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -5130,11 +5131,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 31
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01765124:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5144,8 +5146,8 @@
       "files": []
     },
     "R26BK01767859:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5156,12 +5158,12 @@
     },
     "R26BK01763585:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -5191,11 +5193,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 269
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01767859:001": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5205,8 +5208,8 @@
       "files": []
     },
     "R26BK01768382:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5217,13 +5220,13 @@
     },
     "R26BK01758592:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서_감리 및 개인정보영향평가 최종 수정(10.6).hwp",
@@ -5261,11 +5264,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 416
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01754857:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5275,8 +5279,8 @@
       "files": []
     },
     "R26BK01769925:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5286,8 +5290,8 @@
       "files": []
     },
     "R26BK01771537:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5399,8 +5403,8 @@
       ]
     },
     "R26BK01771867:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5410,8 +5414,8 @@
       "files": []
     },
     "R26BK01772876:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5421,8 +5425,8 @@
       "files": []
     },
     "R26BK01774595:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5432,8 +5436,8 @@
       "files": []
     },
     "R26BK01774829:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5443,8 +5447,8 @@
       "files": []
     },
     "R26BK01776394:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5455,12 +5459,12 @@
     },
     "R26BK01755696:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -5481,17 +5485,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 108
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779261:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "★공고문(내수 구성리 도로확포장공사 도로 및 지하시설물 GIS DB구축 용역).hwpx",
@@ -5520,17 +5525,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779531:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "5. 과업지시서(제주하수처리구역 차집관로 정비공사(2공구) GIS DB구축 용역).hwpx",
@@ -5586,16 +5592,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 54
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01779542:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -5643,11 +5650,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 54
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01755418:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5658,13 +5666,13 @@
     },
     "R26BK01756762:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2026년 중요기록물전산화사업_긴급공고요청사유서(수정).pdf",
@@ -5711,11 +5719,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 413
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01759241:001": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5725,8 +5734,8 @@
       "files": []
     },
     "R26BK01759241:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5736,8 +5745,8 @@
       "files": []
     },
     "R26BK01765243:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5747,8 +5756,8 @@
       "files": []
     },
     "R26BK01765243:001": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5758,8 +5767,8 @@
       "files": []
     },
     "R26BK01765589:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5769,8 +5778,8 @@
       "files": []
     },
     "R26BK01766465:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5781,12 +5790,12 @@
     },
     "R26BK01779552:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -5834,11 +5843,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 54
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01768381:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5848,8 +5858,8 @@
       "files": []
     },
     "R26BK01768585:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5859,8 +5869,8 @@
       "files": []
     },
     "R26BK01770246:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5870,8 +5880,8 @@
       "files": []
     },
     "R26BK01773241:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5881,8 +5891,8 @@
       "files": []
     },
     "R26BK01773827:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5892,8 +5902,8 @@
       "files": []
     },
     "R26BK01773919:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5903,8 +5913,8 @@
       "files": []
     },
     "R26BK01774205:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -5915,13 +5925,13 @@
     },
     "R26BK01765511:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 1,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "26.08.24 물품구매규격서_GPU.hwp",
@@ -5941,17 +5951,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 116
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779564:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "7. 과업지시서(제주하수처리구역 차집관로 정비공사(1공구) GIS DB구축 용역).hwpx",
@@ -6007,7 +6018,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 54
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779843:000": {
       "status": "text_extracted_requires_review",
@@ -6051,12 +6063,12 @@
     },
     "R26BK01777393:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6086,7 +6098,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 5
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01751751:000": {
       "status": "text_extracted_requires_review",
@@ -6129,8 +6142,8 @@
       "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01775044:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -6140,8 +6153,8 @@
       "files": []
     },
     "R26BK01776046:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -6152,13 +6165,13 @@
     },
     "R26BK01764795:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "6.소프트웨어 품질성능 평가시험 사전협의 요청 및 결과.zip",
@@ -6187,7 +6200,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 259
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01753412:000": {
       "status": "text_extracted_requires_review",
@@ -6904,13 +6918,13 @@
     },
     "R26BK01761803:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "붙임2. [제안요청서] 지역 주도형 AI 대전환 사업 제조 AI 혁신 허브 쇼룸 제작·설치 용역_v.4.1.hwpx",
@@ -6948,7 +6962,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 386
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01764771:000": {
       "status": "text_extracted_requires_review",
@@ -7072,13 +7087,13 @@
     },
     "R26BK01765191:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "1.입찰공고문(온라인시험분석시스템 운영지원 및 유지보수 용역)나라장터게시.hwp",
@@ -7116,7 +7131,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01768432:000": {
       "status": "text_extracted_requires_review",
@@ -7325,12 +7341,12 @@
     },
     "R26BK01779489:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7351,7 +7367,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 33
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01769396:000": {
       "status": "text_extracted_requires_review",
@@ -7453,12 +7470,12 @@
     },
     "R26BK01780282:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7506,16 +7523,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01761733:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7545,7 +7563,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 453
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01760291:000": {
       "status": "text_extracted_requires_review",
@@ -7598,13 +7617,13 @@
     },
     "R26BK01762934:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(2026년 제2차 정보자원 통합구축 감리용역)_최종.hwpx",
@@ -7633,7 +7652,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 410
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762864:000": {
       "status": "text_extracted_requires_review",
@@ -7677,13 +7697,13 @@
     },
     "R26BK01765570:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "[붙임2] 제안요청서(수정).hwpx",
@@ -7721,7 +7741,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 439
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01770889:000": {
       "status": "text_extracted_requires_review",
@@ -7765,12 +7786,12 @@
     },
     "R26BK01765211:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7809,7 +7830,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 210
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777856:000": {
       "status": "text_extracted_requires_review",
@@ -7880,13 +7902,13 @@
     },
     "R26BK01742820:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "260928_차세대시스템 2단계 구축사업 PMO 제안요청서_FN.hwp",
@@ -7924,7 +7946,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 381
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01743047:000": {
       "status": "text_extracted_requires_review",
@@ -8084,12 +8107,12 @@
     },
     "R26BK01762777:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8110,7 +8133,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 437
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762517:000": {
       "status": "text_extracted_requires_review",
@@ -8408,12 +8432,12 @@
     },
     "R26BK01778283:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8443,16 +8467,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 23
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01778130:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8482,7 +8507,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 99
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01777942:000": {
       "status": "text_extracted_requires_review",
@@ -8544,12 +8570,12 @@
     },
     "R26BK01780158:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8579,7 +8605,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 324
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01756735:000": {
       "status": "text_extracted_requires_review",
@@ -8864,13 +8891,13 @@
     },
     "R26BK01767873:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2. 2027학년도 DSC공유대학(대전형) 온라인 콘텐츠 개발(제안요청서)(추가수정)(최종).hwpx",
@@ -8899,16 +8926,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 384
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01767164:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8947,17 +8975,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 43
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01764739:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 5,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "12. 정성 평가- 수정.xlsx",
@@ -9013,7 +9042,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 25
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01774764:000": {
       "status": "text_extracted_requires_review",
@@ -9057,12 +9087,12 @@
     },
     "R26BK01779217:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9083,7 +9113,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 322
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779030:000": {
       "status": "text_extracted_requires_review",
@@ -9880,12 +9911,12 @@
     },
     "R26BK01760072:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9924,7 +9955,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 128
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01778984:000": {
       "status": "text_extracted_requires_review",
@@ -10026,13 +10058,13 @@
     },
     "R26BK01773189:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "입찰공고문.hwpx",
@@ -10079,7 +10111,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 153
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01745667:000": {
       "status": "text_extracted_requires_review",
@@ -10448,12 +10481,12 @@
     },
     "R26BK01774995:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10483,7 +10516,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 559
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01774408:000": {
       "status": "text_extracted_requires_review",
@@ -10526,8 +10560,8 @@
       "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01773568:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -10863,12 +10897,12 @@
     },
     "R26BK01748555:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10898,16 +10932,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 418
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01750771:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10928,16 +10963,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 92
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01749418:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10985,7 +11021,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 173
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01751393:000": {
       "status": "text_extracted_requires_review",
@@ -12293,7 +12330,7 @@
     },
     "R26BK01778846:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12304,7 +12341,7 @@
     },
     "R26BK01778714:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12315,7 +12352,7 @@
     },
     "R26BK01749632:002": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12326,7 +12363,7 @@
     },
     "R26BK01768184:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12337,7 +12374,7 @@
     },
     "R26BK01769769:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12347,8 +12384,8 @@
       "files": []
     },
     "R26BK01768869:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12359,7 +12396,7 @@
     },
     "R26BK01769769:002": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12370,7 +12407,7 @@
     },
     "R26BK01769769:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12381,7 +12418,7 @@
     },
     "R26BK01770566:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12403,7 +12440,7 @@
     },
     "R26BK01756460:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12414,7 +12451,7 @@
     },
     "R26BK01756460:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12425,7 +12462,7 @@
     },
     "R26BK01756460:002": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12436,7 +12473,7 @@
     },
     "R26BK01775397:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12447,7 +12484,7 @@
     },
     "R26BK01776590:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12458,7 +12495,7 @@
     },
     "R26BK01765143:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12469,7 +12506,7 @@
     },
     "R26BK01748007:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12479,8 +12516,8 @@
       "files": []
     },
     "R26BK01769825:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12534,8 +12571,8 @@
       "files": []
     },
     "R26BK01770870:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12546,7 +12583,7 @@
     },
     "R26BK01719530:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12557,7 +12594,7 @@
     },
     "R26BK01747684:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12567,8 +12604,8 @@
       "files": []
     },
     "R26BK01767857:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12579,7 +12616,7 @@
     },
     "R26BK01751073:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12590,7 +12627,7 @@
     },
     "R26BK01771992:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12601,7 +12638,7 @@
     },
     "R26BK01774382:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12612,7 +12649,7 @@
     },
     "R26BK01777045:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12623,7 +12660,7 @@
     },
     "R26BK01769998:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12634,7 +12671,7 @@
     },
     "R26BK01778734:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12645,7 +12682,7 @@
     },
     "R26BK01779838:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12656,7 +12693,7 @@
     },
     "R26BK01770133:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12667,7 +12704,7 @@
     },
     "R26BK01777064:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12677,8 +12714,8 @@
       "files": []
     },
     "R26BK01764746:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12689,7 +12726,7 @@
     },
     "R26BK01779885:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12700,7 +12737,7 @@
     },
     "R26BK01769458:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12710,8 +12747,8 @@
       "files": []
     },
     "R26BK01755821:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12722,7 +12759,7 @@
     },
     "R26BK01770425:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12744,7 +12781,7 @@
     },
     "R26BK01777192:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12754,8 +12791,8 @@
       "files": []
     },
     "R26BK01763617:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12766,7 +12803,7 @@
     },
     "R26BK01778212:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12788,7 +12825,7 @@
     },
     "R26BK01776059:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12799,7 +12836,7 @@
     },
     "R26BK01764221:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12864,8 +12901,8 @@
       "files": []
     },
     "R26BK01778203:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14262,7 +14299,7 @@
     },
     "R26BK01773255:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14273,7 +14310,7 @@
     },
     "R26BK01773238:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14316,8 +14353,8 @@
       "files": []
     },
     "R26BK01773163:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14328,7 +14365,7 @@
     },
     "R26BK01765893:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14339,7 +14376,7 @@
     },
     "R26BK01774124:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14350,7 +14387,7 @@
     },
     "R26BK01774594:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14372,7 +14409,7 @@
     },
     "R26BK01775679:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14382,8 +14419,8 @@
       "files": []
     },
     "R26BK01761842:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14394,7 +14431,7 @@
     },
     "R26BK01775500:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14427,7 +14464,7 @@
     },
     "R26BK01776382:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14438,7 +14475,7 @@
     },
     "R26BK01777075:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14449,7 +14486,7 @@
     },
     "R26BK01776808:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14460,7 +14497,7 @@
     },
     "R26BK01777630:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14482,7 +14519,7 @@
     },
     "R26BK01777293:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14492,8 +14529,8 @@
       "files": []
     },
     "R26BK01780184:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14515,7 +14552,7 @@
     },
     "R26BK01778242:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14558,8 +14595,8 @@
       "files": []
     },
     "R26BK01779977:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -27385,7 +27422,1041 @@
       "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": []
+    },
+    "R26BK01783996:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783488:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783828:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783880:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783626:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783903:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784706:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784525:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01768487:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784274:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784135:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01781222:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783107:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783274:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783305:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01779688:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783584:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783711:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783673:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783776:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783467:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783471:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783937:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783943:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783853:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783948:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783775:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783958:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783960:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783985:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784451:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784467:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784499:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784450:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784859:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01779643:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784787:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784558:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784040:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784661:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784614:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783221:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783209:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783291:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783439:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01782037:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783666:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783701:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784049:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784097:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784113:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784124:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784080:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784192:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784169:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784192:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784196:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784158:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784553:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784585:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784502:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784733:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784196:001": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784621:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784495:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784867:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784836:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784921:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01781747:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01782617:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784850:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783178:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784166:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784913:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784761:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784694:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01779041:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784885:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01769827:002": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01777976:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01769827:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784516:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783556:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01782942:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784829:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783942:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783669:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783987:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783875:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "20240344841:005": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R25BK01244337:002": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01450117:002": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01784551:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01783970:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T13:47:50.067120+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
     }
   },
-  "workflowRunId": "39563437615"
+  "workflowRunId": "39611097903"
 }
