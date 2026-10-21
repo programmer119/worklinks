@@ -77,6 +77,17 @@ assert byNo['R26BK01760010']['closes'] is None
 assert byNo['R26BK01760010']['needsFullNoticeReview'] is True
 assert all(x['needsFullNoticeReview'] for x in out['bids'])
 assert all(x['eligibilityVerified'] is False for x in out['bids'])
+progress=out['verificationProgress']
+assert progress['reviewTarget']==len(out['bids'])
+assert progress['industryBasicMatched']==sum(
+    b['screening']=='published_industry_codes_match' for b in out['bids'])
+assert progress['fullLegalEligibilityVerified']==0
+assert progress['executionFeasibilityVerified']==0
+assert progress['historicalCompetitionVerified']==0
+assert progress['costProfitabilityVerified']==0
+assert progress['proposalReadyVerified']==0
+assert all(b['officialClauseEvidence']=={} for b in out['bids'])
+
 # Partial official API cannot appear to contain no restrictions.
 assert mod.industry_evidence({'bidEligibility':{'ok':True,'complete':False,'requirements':[]}},
                              {'1468'},set())[0]=='official_license_unavailable'
