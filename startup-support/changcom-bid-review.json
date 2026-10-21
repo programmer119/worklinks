@@ -50,7 +50,10 @@
           "8111189901"
         ],
         "sme": "소기업 또는 소상공인",
-        "region": "경상남도 창원시 본점, 공고일 전일부터 계약체결일까지"
+        "region": "경상남도 창원시 본점, 공고일 전일부터 계약체결일까지",
+        "regionCity": "창원시",
+        "regionBasis": "법인등기부상 본점",
+        "regionWhen": "공고일 전일부터 계약체결일까지"
       },
       "industryAndProductionMatch": true,
       "consortium": {
