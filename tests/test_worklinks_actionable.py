@@ -117,5 +117,29 @@ assert len(one['historicalCompetition'])==1
 assert matched_result['verificationProgress']['historicalCompetitionVerified']==1
 assert one['eligibilityVerified'] is False
 print('WORKLINKS_PRACTICAL_SOFTWARE_RANKING=PASS')
+
+# Exact-source geographic mismatch: requires official current business location.
+real_region={
+ 'bidNo':'R26BK01760001','order':'000',
+ 'state':'explicit_mandatory_region_mismatch',
+ 'mandatory':{'regionCity':'창원시'},'sourceUrl':'https://bizsearch.io.kr/gosi/9888960'
+}
+rbase={'R26BK01760001:000':real_region}
+firm={**company,'company':{'name':'창컴정보통신 주식회사',
+                            'regionName':'경기도 부천시 소사구','address':'경기도 부천시'}}
+validated=mod.build(indexed,count,firm,now=now,rfp=rfp,reviews=rbase)
+record=next(x for x in validated['bids'] if x['bidNo']=='R26BK01760001')
+assert record['confirmedRegionalMismatch'] is True
+assert record['eligibilityVerified'] is False
+assert len(validated['bids'])==len(out['bids'])
+assert validated['verificationProgress']['explicitMandatoryMismatch']==1
+assert validated['verificationProgress']['precheckedNoticeRequirements']==1
+notconfirmed=mod.build(indexed,count,company,now=now,rfp=rfp,reviews=rbase)
+assert notconfirmed['verificationProgress']['explicitMandatoryMismatch']==0
+already_local={**company,'company':{'regionName':'경상남도 창원시',
+                                   'address':'경상남도 창원시'},'complete':True}
+no_longer_mismatch=mod.build(indexed,count,already_local,now=now,rfp=rfp,reviews=rbase)
+assert no_longer_mismatch['verificationProgress']['explicitMandatoryMismatch']==0
+print('WORKLINKS_GROUNDED_MANDATORY_REGION=PASS')
 print('WORKLINKS_ACTIONABLE_5200_BIDS=PASS',
       json.dumps({k:v for k,v in c.items() if v},ensure_ascii=False))
