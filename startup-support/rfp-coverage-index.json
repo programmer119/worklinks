@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-21T02:22:26.643652+00:00",
+  "generatedAt": "2026-10-21T07:38:59.138413+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
   "scannedNoticeCount": 1823,
@@ -5090,8 +5090,8 @@
       "files": []
     },
     "R26BK01779897:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -6011,12 +6011,12 @@
     },
     "R26BK01779843:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6046,7 +6046,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 32
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777393:000": {
       "status": "text_extracted_requires_review",
@@ -6089,12 +6090,12 @@
     },
     "R26BK01751751:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6124,7 +6125,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 429
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01775044:000": {
       "status": "no_official_attachment_metadata",
@@ -6189,13 +6191,13 @@
     },
     "R26BK01753412:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "수정 제안요청서.hwpx",
@@ -6233,16 +6235,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 405
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01746434:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6281,16 +6284,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 431
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01778297:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 9,
-      "readableDocumentCount": 9,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6374,16 +6378,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 173
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01736101:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6422,16 +6427,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 394
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01753233:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6470,16 +6476,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 444
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01754277:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6509,17 +6516,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 466
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01759210:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(수정).hwpx",
@@ -6557,17 +6565,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 310
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01756112:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2027년 시뮬레이션시스템 유지관리 용역 제안요청서(수정).hwpx",
@@ -6614,17 +6623,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 522
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01759582:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "261007 제안요청서(2027년 온라인 자료 메타데이터 DB 구축)_수정.hwpx",
@@ -6662,17 +6672,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 494
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01759378:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "(제안요청서) 충남도서관 정보자원시스템 통합유지관리 용역 사업(구매업무협의 반영).hwpx",
@@ -6719,16 +6730,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01761557:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 1,
-      "readableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6740,16 +6752,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 414
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01760534:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6788,17 +6801,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 507
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01764394:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "붙임 1. 제안요청서(C4ISR분석모델 유지관리 용역사업)_구매업무 협의 반영 (4).hwpx",
@@ -6845,16 +6859,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 413
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762068:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6884,7 +6899,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 183
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01761803:000": {
       "status": "text_extracted_requires_review",
@@ -6936,12 +6952,12 @@
     },
     "R26BK01764771:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -6971,17 +6987,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 464
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01767680:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(수정1).hwpx",
@@ -7010,16 +7027,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 448
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01766795:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7049,7 +7067,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 406
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01765191:000": {
       "status": "text_extracted_requires_review",
@@ -7101,13 +7120,13 @@
     },
     "R26BK01768432:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 7,
-      "readableDocumentCount": 5,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "붙임2. 제안요청서.hwpx",
@@ -7172,16 +7191,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 9
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01768601:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7211,16 +7231,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 522
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01770492:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7259,16 +7280,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01768612:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7298,7 +7320,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 464
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779489:000": {
       "status": "text_extracted_requires_review",
@@ -7332,13 +7355,13 @@
     },
     "R26BK01769396:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "261013 제안요청서-2027년 성범죄자 신상정보 공개고지시스템 운영 및 유지관리.hwpx",
@@ -7376,16 +7399,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 440
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01760183:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7424,7 +7448,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 402
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01780282:000": {
       "status": "text_extracted_requires_review",
@@ -7524,12 +7549,12 @@
     },
     "R26BK01760291:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7568,7 +7593,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 457
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762934:000": {
       "status": "text_extracted_requires_review",
@@ -7611,13 +7637,13 @@
     },
     "R26BK01762864:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2027년 전자관보시스템 유지관리 사업 제안요청서_구매업무협의.hwpx",
@@ -7646,7 +7672,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 426
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01765570:000": {
       "status": "text_extracted_requires_review",
@@ -7698,12 +7725,12 @@
     },
     "R26BK01770889:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7733,7 +7760,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 483
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01765211:000": {
       "status": "text_extracted_requires_review",
@@ -7785,12 +7813,12 @@
     },
     "R26BK01777856:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 6,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7847,7 +7875,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 26
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01742820:000": {
       "status": "text_extracted_requires_review",
@@ -7899,12 +7928,12 @@
     },
     "R26BK01743047:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -7943,16 +7972,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 506
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01744926:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8000,16 +8030,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01745800:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8048,7 +8079,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 507
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762777:000": {
       "status": "text_extracted_requires_review",
@@ -8082,12 +8114,12 @@
     },
     "R26BK01762517:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8126,16 +8158,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 489
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01748226:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8165,16 +8198,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 501
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762777:001": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8204,17 +8238,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 3
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01774080:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(해로드 앱 유지관리 용역)_수정.hwpx",
@@ -8252,17 +8287,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 479
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01775972:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2. 2026 꿈it(잇)다 시스템 고도화 제안요청서(사전규격공개 의견 반영).hwpx",
@@ -8300,17 +8336,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 409
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777701:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "1. 입찰공고문.hwpx",
@@ -8366,7 +8403,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 187
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01778283:000": {
       "status": "text_extracted_requires_review",
@@ -8448,13 +8486,13 @@
     },
     "R26BK01777942:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서.hwp",
@@ -8501,7 +8539,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 23
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01780158:000": {
       "status": "text_extracted_requires_review",
@@ -8544,12 +8583,12 @@
     },
     "R26BK01756735:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8588,17 +8627,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 474
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779412:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 8,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "26-HS115 03. 입찰공고문(협상(SW)).pdf",
@@ -8672,16 +8712,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01723015:001": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -8720,17 +8761,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01764561:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "261012 2027년 소방정보통신시스템 유지관리 용역 제안요청서.hwpx",
@@ -8759,17 +8801,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 487
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762841:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "과업지시서.hwp",
@@ -8816,7 +8859,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 439
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01767873:000": {
       "status": "text_extracted_requires_review",
@@ -8973,12 +9017,12 @@
     },
     "R26BK01774764:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9008,7 +9052,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 511
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779217:000": {
       "status": "text_extracted_requires_review",
@@ -9042,12 +9087,12 @@
     },
     "R26BK01779030:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9086,16 +9131,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 8
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01775018:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9134,16 +9180,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 454
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762755:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9164,17 +9211,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 420
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01780223:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "공고문_[정보화] 2027년 헬스케어 인공지능 분석시스템 유지관리 및 운영 지원.hwpx",
@@ -9212,16 +9260,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 312
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01766426:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9242,16 +9291,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 420
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01765992:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9290,16 +9340,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 484
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01768188:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9338,17 +9389,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 355
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01767047:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 1,
-      "unreadableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2027년 부산도서관 정보시스템 통합 유지관리 계획.pdf",
@@ -9386,17 +9438,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 504
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01769864:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "붙임04.긴급입찰사유서.hwp",
@@ -9443,16 +9496,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 479
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01771419:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9491,16 +9545,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 427
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01774426:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9530,17 +9585,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 413
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01768142:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 9,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서_전군 PC 보안체계(TACS) 구축 사업(HW교체 및 SW도입).hwpx",
@@ -9623,16 +9679,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 445
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777097:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9671,17 +9728,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 385
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01775196:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "서비스수준협약서(학교 홈페이지 유지관리).hwpx",
@@ -9719,17 +9777,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 519
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777362:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "계약특수조건(2027년 국방일보 조판시스템 유지보수 사업).hwp",
@@ -9776,16 +9835,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 429
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01779994:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9815,7 +9875,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 521
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01760072:000": {
       "status": "text_extracted_requires_review",
@@ -9867,12 +9928,12 @@
     },
     "R26BK01778984:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -9911,17 +9972,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 65
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01769429:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "물품공급·기술지원 협약서_최종.pdf",
@@ -9959,7 +10021,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 468
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01773189:000": {
       "status": "text_extracted_requires_review",
@@ -10020,13 +10083,13 @@
     },
     "R26BK01745667:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "4. 긴급입찰사유서(2027_2028년(2개년) 정보시스템 유지관리)_ver1.0.pdf",
@@ -10064,17 +10127,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 519
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01745710:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(종합해양정보시스템 등 유지관리(2027~2028))_조달청 보완 최종.hwpx",
@@ -10103,17 +10167,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 519
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01754921:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "(긴급입찰 사유서) 낚시어선 승선자·낚시시설 안전점검 관리시스템 운영·유지관리(2027~2028).pdf",
@@ -10151,17 +10216,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 530
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01742791:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "차세대시스템 2단계 구축사업 SI 제안요청서(260929, 1530).hwp",
@@ -10199,17 +10265,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 388
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01764684:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "조달협의_'27년 금융위 국영문 홈페이지 유지보수 사업 제안요청서_261015_구매업무회신 반영.hwpx",
@@ -10238,17 +10305,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 371
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01772926:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서_ver5.0.hwpx",
@@ -10286,16 +10354,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 474
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01773763:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10325,16 +10394,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 497
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01768036:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10373,7 +10443,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 529
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01774995:000": {
       "status": "text_extracted_requires_review",
@@ -10416,12 +10487,12 @@
     },
     "R26BK01774408:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10451,7 +10522,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 417
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01773568:000": {
       "status": "no_official_attachment_metadata",
@@ -10466,12 +10538,12 @@
     },
     "R26BK01777288:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10510,16 +10582,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 512
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01775322:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10567,17 +10640,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 211
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01778235:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "3. 제안요청서(`27년 수운영 감시제어시스템 유지관리 용역)(수정).hwpx",
@@ -10624,16 +10698,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 487
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01745658:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10663,16 +10738,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 457
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01747557:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10702,16 +10778,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 99
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01749276:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10732,16 +10809,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 486
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01747372:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10780,7 +10858,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 37
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01748555:000": {
       "status": "text_extracted_requires_review",
@@ -10910,12 +10989,12 @@
     },
     "R26BK01751393:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -10945,16 +11024,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 390
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01749538:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 5,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11002,17 +11082,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 19
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01756209:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "261013 (제안요청서)2027~2029년 수산물이력제 정보시스템 유지관리.hwpx",
@@ -11050,7 +11131,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 530
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01762162:000": {
       "status": "text_extracted_requires_review",
@@ -11084,13 +11166,13 @@
     },
     "R26BK01757449:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "[제안요청서(2027년 교통정보센터 및 교통신호제어기 유지보수 용역).hwpx",
@@ -11128,7 +11210,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 468
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01751887:000": {
       "status": "text_extracted_requires_review",
@@ -11216,13 +11299,13 @@
     },
     "R26BK01761641:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "기타문서(품의 등).zip",
@@ -11269,16 +11352,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 414
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01762162:001": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11308,17 +11392,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 1
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01764614:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "긴급입찰사유서_2027년 국제거래통합분석시스템 운영 및 유지관리.hwpx",
@@ -11365,17 +11450,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 435
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01767152:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(2027~2028년도 항로표지 관리운영시스템 유지관리 용역).hwpx",
@@ -11413,16 +11499,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01765541:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 6,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11479,17 +11566,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 446
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01767933:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서.hwp",
@@ -11527,17 +11615,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01771253:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "제안요청서(2차수정)_2027년 이천시 교통정보센터(첨단신호 및 ITS) 운영 유지관리 용역.hwpx",
@@ -11566,16 +11655,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 487
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01770663:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11605,16 +11695,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 373
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01772523:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11644,7 +11735,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 472
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01773319:000": {
       "status": "text_extracted_requires_review",
@@ -11678,12 +11770,12 @@
     },
     "R26BK01772684:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11713,16 +11805,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 464
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01773319:001": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11752,16 +11845,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777524:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11791,17 +11885,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 395
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01776790:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 5,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2027년 학교누리집CMS 기술지원 협약서.pdf",
@@ -11848,16 +11943,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 430
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01776862:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 4,
-      "readableDocumentCount": 4,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -11896,17 +11992,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 451
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777772:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "2. 제안요청서.hwpx",
@@ -11935,17 +12032,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 424
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01777538:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 4,
-      "unreadableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "붙임2_2027년 교육행정통합누리집유지관리 사업 제안요청서_20261014.hwp",
@@ -12001,16 +12099,17 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 426
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01778477:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -12040,11 +12139,12 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 465
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_fetch_failed"
     },
     "R26BK01736987:001": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12055,12 +12155,12 @@
     },
     "R26BK01736716:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 2,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -12081,17 +12181,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 506
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01780348:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "(제안요청서) 2027년 마을방송 유지관리 용역_수정본.hwpx",
@@ -12120,17 +12221,18 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 421
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01778913:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-20T02:24:14.260494+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 6,
-      "readableDocumentCount": 5,
-      "unreadableDocumentCount": 1,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
       "files": [
         {
           "name": "27~28년 국립산림과학원 연구정보시스템 통합 운영 및 유지관리 제안요청서V2.0조달청구매업무2차협의서반영(20261015).hwpx",
@@ -12186,7 +12288,8 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 370
         }
-      ]
+      ],
+      "lastAttemptStatus": "metadata_not_confirmed"
     },
     "R26BK01778846:000": {
       "status": "metadata_not_confirmed",
@@ -12289,7 +12392,7 @@
     },
     "R26BK01772816:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12388,7 +12491,7 @@
     },
     "R26BK01766783:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12399,7 +12502,7 @@
     },
     "R26BK01756998:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12410,7 +12513,7 @@
     },
     "R26BK01770003:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12421,7 +12524,7 @@
     },
     "R26BK01773446:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12630,7 +12733,7 @@
     },
     "R26BK01773434:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12674,7 +12777,7 @@
     },
     "R26BK01764949:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12707,7 +12810,7 @@
     },
     "R26BK01762794:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12718,7 +12821,7 @@
     },
     "R26BK01752011:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12728,8 +12831,8 @@
       "files": []
     },
     "R26BK01767551:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12740,7 +12843,7 @@
     },
     "R26BK01746262:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12751,7 +12854,7 @@
     },
     "R26BK01775710:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12773,7 +12876,7 @@
     },
     "R26BK01746848:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12795,7 +12898,7 @@
     },
     "R26BK01776765:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12806,7 +12909,7 @@
     },
     "R26BK01749902:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12816,8 +12919,8 @@
       "files": []
     },
     "R26BK01761982:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12828,7 +12931,7 @@
     },
     "R26BK01751122:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12839,7 +12942,7 @@
     },
     "R26BK01753055:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12849,8 +12952,8 @@
       "files": []
     },
     "R26BK01747817:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12861,7 +12964,7 @@
     },
     "R26BK01748934:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12871,8 +12974,8 @@
       "files": []
     },
     "R26BK01776836:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12883,7 +12986,7 @@
     },
     "R26BK01778478:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12905,7 +13008,7 @@
     },
     "R26BK01780042:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12916,7 +13019,7 @@
     },
     "R26BK01770300:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12927,7 +13030,7 @@
     },
     "R26BK01773612:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12938,7 +13041,7 @@
     },
     "R26BK01750878:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12949,7 +13052,7 @@
     },
     "R26BK01748601:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12970,8 +13073,8 @@
       "files": []
     },
     "R26BK01745088:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12982,7 +13085,7 @@
     },
     "R26BK01751385:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -12992,8 +13095,8 @@
       "files": []
     },
     "R26BK01746690:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13004,7 +13107,7 @@
     },
     "R26BK01768004:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13014,8 +13117,8 @@
       "files": []
     },
     "R26BK01754854:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13026,7 +13129,7 @@
     },
     "R26BK01776778:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13037,7 +13140,7 @@
     },
     "R26BK01739043:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13047,8 +13150,8 @@
       "files": []
     },
     "R26BK01753120:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13058,8 +13161,8 @@
       "files": []
     },
     "R26BK01755227:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13070,7 +13173,7 @@
     },
     "R26BK01754114:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13081,7 +13184,7 @@
     },
     "R26BK01758110:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13092,7 +13195,7 @@
     },
     "R26BK01760453:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13103,7 +13206,7 @@
     },
     "R26BK01768055:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13113,8 +13216,8 @@
       "files": []
     },
     "R26BK01747488:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13125,7 +13228,7 @@
     },
     "R26BK01757043:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13135,8 +13238,8 @@
       "files": []
     },
     "R26BK01764593:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13147,7 +13250,7 @@
     },
     "R26BK01757706:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13158,7 +13261,7 @@
     },
     "R26BK01756453:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13169,7 +13272,7 @@
     },
     "R26BK01759044:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13180,7 +13283,7 @@
     },
     "R26BK01759046:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13191,7 +13294,7 @@
     },
     "R26BK01750330:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13202,7 +13305,7 @@
     },
     "R26BK01754477:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13213,7 +13316,7 @@
     },
     "R26BK01758415:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13223,8 +13326,8 @@
       "files": []
     },
     "R26BK01761785:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13235,7 +13338,7 @@
     },
     "R26BK01761954:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13256,8 +13359,8 @@
       "files": []
     },
     "R26BK01759843:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13268,7 +13371,7 @@
     },
     "R26BK01760442:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13278,8 +13381,8 @@
       "files": []
     },
     "R26BK01768329:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13290,7 +13393,7 @@
     },
     "R26BK01766866:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13301,7 +13404,7 @@
     },
     "R26BK01765348:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13312,7 +13415,7 @@
     },
     "R26BK01768670:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13322,8 +13425,8 @@
       "files": []
     },
     "R26BK01766752:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13334,7 +13437,7 @@
     },
     "R26BK01769247:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13344,8 +13447,8 @@
       "files": []
     },
     "R26BK01771462:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13356,7 +13459,7 @@
     },
     "R26BK01772168:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13367,7 +13470,7 @@
     },
     "R26BK01778106:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13378,7 +13481,7 @@
     },
     "R26BK01778153:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13399,8 +13502,8 @@
       "files": []
     },
     "R26BK01776330:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13411,7 +13514,7 @@
     },
     "R26BK01747860:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13422,7 +13525,7 @@
     },
     "R26BK01748592:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13432,8 +13535,8 @@
       "files": []
     },
     "R26BK01778316:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13455,7 +13558,7 @@
     },
     "R26BK01755138:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13465,8 +13568,8 @@
       "files": []
     },
     "R26BK01758708:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13488,7 +13591,7 @@
     },
     "R26BK01761036:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13509,8 +13612,8 @@
       "files": []
     },
     "R26BK01752085:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13521,7 +13624,7 @@
     },
     "R26BK01763450:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13565,7 +13668,7 @@
     },
     "R26BK01763165:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13576,7 +13679,7 @@
     },
     "R26BK01763231:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13597,8 +13700,8 @@
       "files": []
     },
     "R26BK01777118:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13609,7 +13712,7 @@
     },
     "R26BK01761455:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13620,7 +13723,7 @@
     },
     "R26BK01761703:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13630,8 +13733,8 @@
       "files": []
     },
     "R26BK01769178:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13642,7 +13745,7 @@
     },
     "R26BK01765630:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13653,7 +13756,7 @@
     },
     "R26BK01765343:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13664,7 +13767,7 @@
     },
     "R26BK01752620:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13675,7 +13778,7 @@
     },
     "R26BK01757633:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13686,7 +13789,7 @@
     },
     "R26BK01762414:000": {
       "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13708,7 +13811,7 @@
     },
     "R26BK01761774:001": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13718,8 +13821,8 @@
       "files": []
     },
     "R26BK01774434:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13741,7 +13844,7 @@
     },
     "R26BK01758084:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13751,8 +13854,8 @@
       "files": []
     },
     "R26BK01756835:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13763,7 +13866,7 @@
     },
     "R26BK01761853:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13773,8 +13876,8 @@
       "files": []
     },
     "R26BK01749070:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13785,7 +13888,7 @@
     },
     "R26BK01760315:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13807,7 +13910,7 @@
     },
     "R26BK01764188:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13817,8 +13920,8 @@
       "files": []
     },
     "R26BK01765272:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13840,7 +13943,7 @@
     },
     "R26BK01766063:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13851,7 +13954,7 @@
     },
     "R26BK01765505:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13861,8 +13964,8 @@
       "files": []
     },
     "R26BK01763976:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13872,8 +13975,8 @@
       "files": []
     },
     "R26BK01764148:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13884,7 +13987,7 @@
     },
     "R26BK01766276:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13906,7 +14009,7 @@
     },
     "R26BK01766629:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13917,7 +14020,7 @@
     },
     "R26BK01766737:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13927,8 +14030,8 @@
       "files": []
     },
     "R26BK01767797:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13938,8 +14041,8 @@
       "files": []
     },
     "R26BK01768251:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13949,8 +14052,8 @@
       "files": []
     },
     "R26BK01766710:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13961,7 +14064,7 @@
     },
     "R26BK01770012:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13983,7 +14086,7 @@
     },
     "R26BK01769835:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -13994,7 +14097,7 @@
     },
     "R26BK01768704:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14037,8 +14140,8 @@
       "files": []
     },
     "R26BK01771582:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14060,7 +14163,7 @@
     },
     "R26BK01770606:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14082,7 +14185,7 @@
     },
     "R26BK01771473:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14093,7 +14196,7 @@
     },
     "R26BK01767105:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14115,7 +14218,7 @@
     },
     "R26BK01769654:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14125,8 +14228,8 @@
       "files": []
     },
     "R26BK01764898:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14137,7 +14240,7 @@
     },
     "R26BK01772930:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14148,7 +14251,7 @@
     },
     "R26BK01769544:000": {
       "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -14191,8 +14294,8 @@
       "files": []
     },
     "R26BK01772462:000": {
-      "status": "metadata_fetch_failed",
-      "checkedAt": "2026-10-20T04:50:12.982682+00:00",
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-21T07:38:59.138413+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -27284,5 +27387,5 @@
       "files": []
     }
   },
-  "workflowRunId": "39532186767"
+  "workflowRunId": "39563437615"
 }
