@@ -161,6 +161,47 @@ def _rendered_project_links(page, seen):
             if row:
                 seen.setdefault(row["id"], row)
 
+def _dom_ir_records(page, seen):
+    """Fallback for visible per-day operator labels when a public API schema changes."""
+    text = page.locator("body").inner_text(timeout=9000)
+    year_match = re.search(r"(20\d\d)년\s*(\d{1,2})월", text)
+    year = int(year_match[1]) if year_match else dt.datetime.now(KST).year
+    headers = list(DAY_DATE.finditer(text))
+    today = dt.datetime.now(KST).date()
+    added = 0
+    for i, header in enumerate(headers[:65]):
+        mo, day = int(header[1]), int(header[2])
+        try:
+            date = dt.date(year, mo, day)
+        except ValueError:
+            continue
+        if date < today or date > today + dt.timedelta(days=110):
+            continue
+        end = headers[i+1].start() if i+1 < len(headers) else min(len(text),header.end()+4200)
+        segment = text[header.end():end]
+        if len(segment) > 6500 or not re.search(r"운영사|접수중|접수마감",segment):
+            continue
+        candidates = re.findall(
+            r"(?:^|\n|[•·])\s*([가-힣A-Za-z0-9&().\- ]{2,48}?)\s+(접수중|신청가능|접수마감|마감)\b",
+            segment, re.M)
+        if not candidates:
+            # Some calendar cells concatenate labels without newlines.
+            candidates = re.findall(
+                r"[•·]\s*([가-힣A-Za-z0-9&().\- ]{2,48}?)\s*(접수중|접수마감)",
+                segment)
+        for j,(operator,status) in enumerate(candidates[:40]):
+            operator = clean(operator,48)
+            if not operator or re.search(r"전체선택|투자분야|IR 회차",operator):
+                continue
+            program = "visible-%s-%s-%s" % (date.isoformat(),i,j)
+            row = ir_record({"operatorName":operator,"irDate":date.isoformat(),
+                             "programId":program,"applicationStatus":status})
+            if row and row["id"] not in seen:
+                row["sourceKind"]="공식 공개 달력 표기·상세 자격 및 잔여정원 확인 필요"
+                seen[row["id"]]=row
+                added+=1
+    return added
+
 def scan_browser_sources():
     """Return records plus explicit per-source status, preserving legacy feeds."""
     sources = [
@@ -195,6 +236,8 @@ def scan_browser_sources():
                             page.wait_for_timeout(650)
                         if name.startswith("서울 스타트업플러스"):
                             _rendered_project_links(page, records)
+                        else:
+                            _dom_ir_records(page, records)
                         page.close()
                         rows=list(records.values())
                         all_rows.extend(rows)
