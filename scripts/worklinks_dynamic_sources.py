@@ -122,6 +122,16 @@ def ir_record(obj):
         "applicationStatus": status or None,
     }
 
+def _schema_keys(value, depth=0):
+    """Describe nested public JSON structure without retaining any raw values."""
+    if depth >= 4:
+        return type(value).__name__
+    if isinstance(value, dict):
+        return {str(k)[:60]:_schema_keys(v,depth+1) for k,v in list(value.items())[:18]}
+    if isinstance(value, list):
+        return {"count":len(value),"item":_schema_keys(value[0],depth+1) if value else None}
+    return type(value).__name__
+
 def _collect_json(page, seen, debug):
     def handle(resp):
         try:
@@ -139,7 +149,7 @@ def _collect_json(page, seen, debug):
             # Avoid recording tokens, cookie headers or query parameters.
             debug.append({"path": scrubbed_path[:170], "status": resp.status,
                           "keys": list(data)[:12] if isinstance(data, dict) else ["array"],
-                          "bytes": len(resp.body())})
+                          "bytes": len(resp.body()), "shape": _schema_keys(data)})
             for ob in objects(data):
                 for parser in (project_record, ir_record):
                     row = parser(ob)
@@ -247,6 +257,7 @@ def scan_browser_sources():
                                        "apiResponses":len(debug),
                                        "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
                                        "sampleKeys":[x["keys"] for x in debug[:5]],
+                                       "sampleShapes":[x["shape"] for x in debug[:6]],
                                        "note":("공개 개별항목 추출 확인" if rows else
                                                "개별항목 미추출·JS 목록 구조 또는 인증 확인 필요")})
                     except Exception as e:
@@ -254,7 +265,8 @@ def scan_browser_sources():
                                        "discovered":len(records),"error":clean(e,160),
                                        "apiResponses":len(debug),
                                        "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
-                                       "sampleKeys":[x["keys"] for x in debug[:5]]})
+                                       "sampleKeys":[x["keys"] for x in debug[:5]],
+                                       "sampleShapes":[x["shape"] for x in debug[:6]]})
             finally:
                 browser.close()
     except Exception as e:
