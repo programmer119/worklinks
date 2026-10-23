@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-23T12:40:19+09:00",
+  "generatedAt": "2026-10-23T12:42:10+09:00",
   "sources": [
     {
       "name": "벤처스퀘어 모집공고",
@@ -8,7 +8,7 @@
       "status": "ok",
       "discovered": 16,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T12:39:20+09:00"
+      "checkedAt": "2026-10-23T12:41:19+09:00"
     },
     {
       "name": "디캠프 공식 프로그램",
@@ -16,7 +16,7 @@
       "status": "ok",
       "discovered": 3,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T12:39:24+09:00"
+      "checkedAt": "2026-10-23T12:41:22+09:00"
     },
     {
       "name": "재단법인 밴드 공식 공지",
@@ -26,7 +26,7 @@
       "detailErrors": 0,
       "pagesScanned": 2,
       "listPagesFailed": 0,
-      "checkedAt": "2026-10-23T12:39:24+09:00"
+      "checkedAt": "2026-10-23T12:41:22+09:00"
     },
     {
       "name": "벤처투자종합포털 벤처투자마트",
@@ -34,7 +34,7 @@
       "status": "ok",
       "discovered": 10,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T12:39:31+09:00",
+      "checkedAt": "2026-10-23T12:41:27+09:00",
       "note": "공개 상세 링크 10개 발견. 접수·자격은 반드시 공식 상세 확인."
     },
     {
@@ -43,7 +43,7 @@
       "status": "partial",
       "discovered": 3,
       "detailErrors": 3,
-      "checkedAt": "2026-10-23T12:39:47+09:00",
+      "checkedAt": "2026-10-23T12:41:40+09:00",
       "note": "공개 상세 링크 3개 발견. 접수·자격은 반드시 공식 상세 확인."
     },
     {
@@ -65,6 +65,105 @@
           "result",
           "data"
         ]
+      ],
+      "sampleShapes": [
+        {
+          "result": "bool",
+          "data": {
+            "pagination": {
+              "currentElements": "int",
+              "last": "bool",
+              "hasNext": "bool",
+              "totalCount": "int",
+              "blockEnd": "int",
+              "totalElements": "int",
+              "blockStart": "int",
+              "size": "int",
+              "totalPages": "int",
+              "hasPrevious": "bool",
+              "page": "int",
+              "currentPage": "int",
+              "first": "bool"
+            },
+            "contents": {
+              "count": 10,
+              "item": {
+                "projectCode": "str",
+                "sequenceNumberOfPortal": "int",
+                "projectName": "str",
+                "portalName": "str",
+                "portalNameEN": "str",
+                "businessCategory": "dict",
+                "projectTarget": "dict",
+                "receiptBeginDate": "str",
+                "receiptEndDate": "str",
+                "hits": "int",
+                "status": "dict",
+                "createDateTime": "str",
+                "updateDateTime": "str",
+                "guide": "str",
+                "businessLink": "str",
+                "businessTarget": "str",
+                "organizationName": "str",
+                "isLink": "bool"
+              }
+            },
+            "commonCode": {
+              "ProjectTarget": {
+                "count": 2,
+                "item": "dict"
+              },
+              "BusinessCategory": {
+                "count": 6,
+                "item": "dict"
+              }
+            }
+          }
+        },
+        {
+          "result": "bool",
+          "data": {
+            "pagination": {
+              "currentElements": "int",
+              "last": "bool",
+              "hasNext": "bool",
+              "totalCount": "int",
+              "blockEnd": "int",
+              "totalElements": "int",
+              "blockStart": "int",
+              "size": "int",
+              "totalPages": "int",
+              "hasPrevious": "bool",
+              "page": "int",
+              "currentPage": "int",
+              "first": "bool"
+            },
+            "contents": {
+              "count": 114,
+              "item": {
+                "seqNo": "int",
+                "siteDomain": "str",
+                "siteEngDomain": "str",
+                "siteDomainDesc": "str",
+                "logoUse": "bool",
+                "operatingProgram": "str",
+                "coordinate": "str",
+                "coordinateKey": "str",
+                "siteTel": "str",
+                "siteEmail": "str",
+                "siteAddr": "str",
+                "siteHomepage": "str",
+                "siteFax": "str",
+                "rentInfo": "str",
+                "rentPeriod": "str",
+                "rentStandard": "str",
+                "rentTarget": "str",
+                "rentSupport": "str"
+              }
+            },
+            "commonCode": {}
+          }
+        }
       ],
       "note": "공개 개별항목 추출 확인"
     },
@@ -101,6 +200,99 @@
           "data"
         ]
       ],
+      "sampleShapes": [
+        {
+          "code": "int",
+          "data": {
+            "count": 2,
+            "item": {
+              "id": "str",
+              "siteId": "int",
+              "year": "int",
+              "seq": "int",
+              "name": "str",
+              "status": "str",
+              "maxApplicationsPerMember": "int",
+              "applyCutoffDays": "int",
+              "applyFrom": "str",
+              "applyTo": "str",
+              "applyFromAt": "str",
+              "applyToAt": "str",
+              "meetFrom": "str",
+              "meetTo": "str"
+            }
+          }
+        },
+        {
+          "code": "int",
+          "data": {
+            "count": 8,
+            "item": {
+              "groupCd": "str",
+              "detailCd": "str",
+              "langCd": "str",
+              "codeNm": "str",
+              "useYn": "str",
+              "sortOrd": "int"
+            }
+          }
+        },
+        {
+          "code": "int",
+          "data": {
+            "count": 13,
+            "item": {
+              "groupCd": "str",
+              "detailCd": "str",
+              "langCd": "str",
+              "codeNm": "str",
+              "remark": "str",
+              "useYn": "str",
+              "sortOrd": "int"
+            }
+          }
+        },
+        {
+          "code": "int",
+          "data": {
+            "count": 17,
+            "item": {
+              "groupCd": "str",
+              "detailCd": "str",
+              "langCd": "str",
+              "codeNm": "str",
+              "useYn": "str",
+              "sortOrd": "int"
+            }
+          }
+        },
+        {
+          "code": "int",
+          "data": {
+            "count": 286,
+            "item": {
+              "slotId": "str",
+              "roundId": "str",
+              "operatorId": "str",
+              "operatorName": "str",
+              "bizYears": "int",
+              "regionText": "str",
+              "eventName": "str",
+              "meetDate": "str",
+              "applyDeadline": "str",
+              "meetingClosed": "bool",
+              "applyCutoffDays": "int",
+              "place": "str",
+              "capacity": "int",
+              "appliedCount": "int",
+              "industry12Tags": "str",
+              "industryStdTags": "str",
+              "regionCd": "str",
+              "industryStdCodes": "str"
+            }
+          }
+        }
+      ],
       "note": "개별항목 미추출·JS 목록 구조 또는 인증 확인 필요"
     },
     {
@@ -111,7 +303,7 @@
       "detailErrors": 0,
       "pagesScanned": 1,
       "error": "",
-      "checkedAt": "2026-10-23T12:40:14+09:00"
+      "checkedAt": "2026-10-23T12:42:04+09:00"
     },
     {
       "name": "Y Combinator 공식 모집",
@@ -121,7 +313,7 @@
       "detailErrors": 0,
       "pagesScanned": 1,
       "error": "",
-      "checkedAt": "2026-10-23T12:40:15+09:00"
+      "checkedAt": "2026-10-23T12:42:05+09:00"
     },
     {
       "name": "Techstars 공식 액셀러레이터",
@@ -131,7 +323,7 @@
       "detailErrors": 0,
       "pagesScanned": 17,
       "error": "",
-      "checkedAt": "2026-10-23T12:40:18+09:00"
+      "checkedAt": "2026-10-23T12:42:08+09:00"
     },
     {
       "name": "Entrepreneurs First 공식 지원",
@@ -141,7 +333,7 @@
       "detailErrors": 0,
       "pagesScanned": 3,
       "error": "",
-      "checkedAt": "2026-10-23T12:40:19+09:00"
+      "checkedAt": "2026-10-23T12:42:10+09:00"
     }
   ],
   "watchTargets": [
@@ -217,7 +409,7 @@
       "description": "2026 산업단지 오픈이노베이션프로그램 KICXUP 챌린지 & 로컬 스타트업 2차 모집 공고 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:15+09:00",
+      "lastSeenAt": "2026-10-23T12:41:15+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -232,7 +424,7 @@
       "description": "2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 모집 (3회차: 기후·ESG) - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Se",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:18+09:00",
+      "lastSeenAt": "2026-10-23T12:41:18+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -247,7 +439,7 @@
       "description": "2026-9회 충청권 엔젤투자 피칭룸 프로그램 참가기업 모집 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:10+09:00",
+      "lastSeenAt": "2026-10-23T12:41:11+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -262,7 +454,7 @@
       "description": "2026년 광명 글로컬 데모데이 참관객 모집 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS C",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:16+09:00",
+      "lastSeenAt": "2026-10-23T12:41:16+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -291,7 +483,7 @@
       "description": "『도로공사-재단법인 밴드 상생형 창업·벤처기업 지원사업』 2026년 한국도로공사 상생형 창업·벤처기업 지원사업 모집공고 한국도로공사와 재단법인 밴드는 도로교통 분야 우수 창업·벤처기업 발굴및 사업화 자금지원 등을 통한 혁신 Start-up 육성을 위하여 다음과 같이 창업·벤처기업 지원 프로그램을 공고하오니 관련 기업의 많은 참여 바랍니다. 2026년 10월 6일 한국도로공사 사장",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 원문·첨부 자격 재확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "listed_open",
       "sourceStatusText": "마감 D- 6",
@@ -325,7 +517,7 @@
       "description": "TIPS · LIPS를 준비하는 스타트업을 위한 IR 전략 - 제10차 DDM 벤처스타트업 아카데미 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Ser",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:02+09:00",
+      "lastSeenAt": "2026-10-23T12:41:05+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -340,7 +532,7 @@
       "description": "2026 FAST TRACK 농식품 데모데이 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS C",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:01+09:00",
+      "lastSeenAt": "2026-10-23T12:41:04+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -355,7 +547,7 @@
       "description": "2026 강원권 LIPS 민간운영사 연합 INVESTOR DAY 11월 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A S",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:20+09:00",
+      "lastSeenAt": "2026-10-23T12:41:19+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -371,7 +563,7 @@
       "source": "Entrepreneurs First 공식 지원",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:19+09:00",
+      "lastSeenAt": "2026-10-23T12:42:10+09:00",
       "review": "지역별 자격·비자·전일제 참여 제한과 마감 회차 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -400,7 +592,7 @@
       "description": "2026년 서울핀테크랩 FIN-오픈이노베이션 Meep-up Day 10회차 - DB손해보험 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:08+09:00",
+      "lastSeenAt": "2026-10-23T12:41:09+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -430,7 +622,7 @@
       "source": "Y Combinator 공식 모집",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:15+09:00",
+      "lastSeenAt": "2026-10-23T12:42:05+09:00",
       "review": "정규 마감 이후 접수 가능 여부와 미국 프로그램 참여·SAFE 투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -445,7 +637,7 @@
       "description": "2026년 서초창업스테이션 프리-오픈이노베이션 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:09+09:00",
+      "lastSeenAt": "2026-10-23T12:41:10+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -460,7 +652,7 @@
       "description": "[GBSA] 2026 판교스타트업 투자교류회 제 4차 투자교류회 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Serie",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:05+09:00",
+      "lastSeenAt": "2026-10-23T12:41:07+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -475,7 +667,7 @@
       "description": "[해수부] 2026년 해양수산 통합데모데이 참가자 모집 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:06+09:00",
+      "lastSeenAt": "2026-10-23T12:41:08+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -518,7 +710,7 @@
       "description": "2026 서울창업허브 창동 데모데이 참관 신청 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:03+09:00",
+      "lastSeenAt": "2026-10-23T12:41:06+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -548,7 +740,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:16+09:00",
+      "lastSeenAt": "2026-10-23T12:42:06+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -564,7 +756,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:16+09:00",
+      "lastSeenAt": "2026-10-23T12:42:06+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -580,7 +772,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:16+09:00",
+      "lastSeenAt": "2026-10-23T12:42:06+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -596,7 +788,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:16+09:00",
+      "lastSeenAt": "2026-10-23T12:42:06+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -612,7 +804,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:16+09:00",
+      "lastSeenAt": "2026-10-23T12:42:07+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -628,7 +820,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:17+09:00",
+      "lastSeenAt": "2026-10-23T12:42:07+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -644,7 +836,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:17+09:00",
+      "lastSeenAt": "2026-10-23T12:42:07+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -660,7 +852,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:18+09:00",
+      "lastSeenAt": "2026-10-23T12:42:08+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -676,7 +868,7 @@
       "source": "Entrepreneurs First 공식 지원",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:18+09:00",
+      "lastSeenAt": "2026-10-23T12:42:09+09:00",
       "review": "지역별 자격·비자·전일제 참여 제한과 마감 회차 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -705,7 +897,7 @@
       "description": "<신청하러 가기!!> https://www.seis.or.kr/subPage.do?menuId=30400",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 원문·첨부 자격 재확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "listed_open",
       "sourceStatusText": "접수 중",
@@ -752,7 +944,7 @@
       "description": "2026년 사회적기업 창업지원사업 창업팀 모집& 인증전환형 온라인 사업설명회 안내 강력한 지원과 함께 다시 돌아온 사회적기업 창업지원사업! '초기창업형', '인증전환형', '재도전형'의 3가지 유형으로 진행되어 어떤 유형을 선택해야 고민되시죠? '인증전환형'를 고민 중인 분들을 위해 <인증전환형 온라인 사업설명회> 를 개최합니다. - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *'인증전환형'이란? (예비)사회적기업으로 인·지정을 받고 싶어하는 법인사업자 전용 지",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 원문·첨부 자격 재확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "unknown",
       "sourceStatusText": "",
@@ -772,7 +964,7 @@
       "source": "Antler Korea 공식 레지던시",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T12:40:14+09:00",
+      "lastSeenAt": "2026-10-23T12:42:04+09:00",
       "review": "개인·팀 유형별 신청 필요. 평일 전일제 참여와 투자·지분 조건을 확인",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -788,7 +980,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "unknown",
-      "lastSeenAt": "2026-10-23T12:40:16+09:00",
+      "lastSeenAt": "2026-10-23T12:42:06+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -803,7 +995,7 @@
       "description": "program dcamp batch Share ì¢ì ììì ëì´ ë í° ì±ì¥ì¼ë¡ ëìº í ë°°ì¹ì í¨ê»íì¸ì. ëìº í ë°°ì¹ë ë¤ì ëì½ì ì¤ë¹íë ì¤íí¸ì ì ìí 12ê°ì Scale up íë¡ê·¸ë¨ì ëë¤. ì ë° ì¦ì í¬ìë¶í° 1:1 ì½ì¹­, íìí¬ìÂ·ì¬ì ê¸°í ì°ê²°ê¹ì§",
       "source": "디캠프 공식 프로그램",
       "sourceKind": "공식 모집페이지·접수 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:22+09:00",
+      "lastSeenAt": "2026-10-23T12:41:20+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -818,7 +1010,7 @@
       "description": "program officehour Share ì¬ì ë°©í¥ì± ì¤ì ê³¼ ì±ì¥ì íìí ì ë¬¸ ë©í ë§ 2013ë ë¶í° ììëì´ ì§ê¸ê¹ì§ 1,500í ì´ì ì§íë ì¤íí¸ì ë§ì¶¤í ë©í ë§ íë¡ê·¸ë¨, ëìº í ì¤í¼ì¤ììë ì±ì¥ì íìì ì¸ ì¬ì íë ¥, ë²¤ì²í¬ì ë± ë¶ì¼ë³ ì ë¬¸ê",
       "source": "디캠프 공식 프로그램",
       "sourceKind": "공식 모집페이지·접수 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:23+09:00",
+      "lastSeenAt": "2026-10-23T12:41:21+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -833,7 +1025,7 @@
       "description": "program [10/22(ëª©)~10/28(ì)ã £ì ë¦] 10ì ì¤í¼ì¤ìì Share officehour [10/22(ëª©)~10/28(ì)ã £ì ë¦] 10ì ì¤í¼ì¤ìì ì¤í¼ì¤ìì ë©í ë§ ë²¤ì²í¬ì í¬ìì ì¹ ì ì²­ 2026.09.21 09:00 ~ 2026.10.12 11:59 ì¼ì 2026.10.22 14:00 ~ 2026.10.28 17:00 ì¥ì ëìº í ì ë¦(ì",
       "source": "디캠프 공식 프로그램",
       "sourceKind": "공식 모집페이지·접수 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -848,7 +1040,7 @@
       "description": "",
       "source": "TIPS 공식 행사",
       "sourceKind": "목록에서만 발견 · 동적 상세 확인 실패",
-      "lastSeenAt": "2026-10-23T12:39:48+09:00",
+      "lastSeenAt": "2026-10-23T12:41:42+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -863,7 +1055,7 @@
       "description": "",
       "source": "TIPS 공식 행사",
       "sourceKind": "목록에서만 발견 · 동적 상세 확인 실패",
-      "lastSeenAt": "2026-10-23T12:39:51+09:00",
+      "lastSeenAt": "2026-10-23T12:41:43+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -878,7 +1070,7 @@
       "description": "",
       "source": "TIPS 공식 행사",
       "sourceKind": "목록에서만 발견 · 동적 상세 확인 실패",
-      "lastSeenAt": "2026-10-23T12:39:50+09:00",
+      "lastSeenAt": "2026-10-23T12:41:42+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -893,7 +1085,7 @@
       "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
       "source": "벤처투자종합포털 벤처투자마트",
       "sourceKind": "공식 공개 상세·신청자격 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:34+09:00",
+      "lastSeenAt": "2026-10-23T12:41:30+09:00",
       "review": "VC 1:1 상담 모집. 본문 접수일 확인, 선정·상담 및 투자 보장 없음.",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -908,7 +1100,7 @@
       "description": "성남 기후테크 UpSkill 아카데미 Vol.3 - 투자유치를 위한 IR 전략 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:13+09:00",
+      "lastSeenAt": "2026-10-23T12:41:13+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -923,7 +1115,7 @@
       "description": "[제주창조경제혁신센터]「상시매칭 오픈이노베이션 플랫폼」'에코프로 계열사''수요과제 매칭 스타트업 모집 (~10/16) - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Se",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:17+09:00",
+      "lastSeenAt": "2026-10-23T12:41:17+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -938,7 +1130,7 @@
       "description": "2026 Invest Seoul Partners Night - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:12+09:00",
+      "lastSeenAt": "2026-10-23T12:41:12+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -953,7 +1145,7 @@
       "description": "[중앙사회서비스원] 2026년 제3회 사회서비스 투자교류회 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T12:39:14+09:00",
+      "lastSeenAt": "2026-10-23T12:41:14+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -968,7 +1160,7 @@
       "description": "2026 넥스트밸류 그라운드(NextValue Ground) 참여기업 모집(~10/16, 기간연장)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -987,7 +1179,7 @@
       "description": "2026 서울권역 사회적기업 창업지원사업 <인증전환형> 추가모집(5.29(금) ~ 6.9.(화) 17:00)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1006,7 +1198,7 @@
       "description": "2026 창업팀&육성사업 졸업팀 네트워킹 행사 [SE Solution Bridge : 창업가와 선배기업가, 연결이 답이다!](7.23)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1025,7 +1217,7 @@
       "description": "2026년도 서울권역 (예비)사회적기업 크라우드펀딩 지원사업 참여기업 모집 공고(~10/11 23:29까지)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1044,7 +1236,7 @@
       "description": "2026년사회적기업 성장지원센터(서울) 상주기업 모집 공고 (~6/5(금) 14시까지)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1063,7 +1255,7 @@
       "description": "서울권역 (예비)사회적기업 기초경영지원 멘토링 참여기업 모집 공고(~예산 소진시까지)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T12:39:24+09:00",
+      "lastSeenAt": "2026-10-23T12:41:22+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
