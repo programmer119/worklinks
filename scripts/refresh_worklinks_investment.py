@@ -14,6 +14,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path: sys.path.insert(0, str(SCRIPT_DIR))
 from worklinks_sefund import scan_band
 from worklinks_global_accelerators import scan_global
+from worklinks_dynamic_sources import scan_browser_sources
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "startup-support/investment-opportunities.json"
@@ -127,10 +128,6 @@ def band():
 OFFICIAL_FEEDS = (
  ("벤처투자종합포털 벤처투자마트", "https://www.vcs.go.kr/web/portal/bbs/martnotice/list",
   "vcs.go.kr", r"^/web/portal/bbs/martnotice/[0-9]+$"),
- ("서울 스타트업플러스 지원사업", "https://startup-plus.kr/project",
-  "startup-plus.kr", r"^/project/PRJ[0-9]+$"),
- ("도전의 IR 운영사 신청", "https://irchallenge.jointips.or.kr/apply",
-  "irchallenge.jointips.or.kr", r"^/apply/[A-Za-z0-9_-]+$"),
  ("TIPS 공식 행사", "https://jointips.or.kr/",
   "jointips.or.kr", r"^/contents/events/detail$"),
 )
@@ -263,6 +260,9 @@ def main():
     official_rows, official_sources = scan_official()
     rows += official_rows
     sources += official_sources
+    browser_rows, browser_sources = scan_browser_sources()
+    rows += browser_rows
+    sources += browser_sources
     global_rows, global_sources = scan_global()
     rows += global_rows
     sources += global_sources
