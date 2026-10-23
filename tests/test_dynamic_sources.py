@@ -35,6 +35,36 @@ class DynamicSourcesTest(unittest.TestCase):
         self.assertEqual(a["url"],"https://irchallenge.jointips.or.kr/apply")
         self.assertIn("잔여 3",a["description"])
 
+    def test_official_slot_schema_and_real_deadline(self):
+        slot={
+            "slotId":"d7dad5ca-94e2-42a0-86b1-3dcd1822c3be",
+            "operatorName":"끌림벤처스",
+            "eventName":"끌림벤처스 도전의 IR(오전)",
+            "meetDate":"2026-11-02",
+            "applyDeadline":"2026-10-26",
+            "capacity":3,"appliedCount":3,"operatorApplyLimit":100,
+            "meetingClosed":False,"roundStatus":"OPEN",
+            "bizYears":6,"industry12Tags":'[{"nm":"AI"},{"nm":"헬스케어"}]'
+        }
+        row=ir_record(slot)
+        self.assertTrue(row)
+        self.assertEqual(row["deadline"],"2026-10-26")
+        self.assertEqual(row["programId"],slot["slotId"])
+        self.assertEqual(row["sourceStatus"],"unknown")
+        self.assertEqual(row["applicationStatus"],"접수중(공개정보)")
+        self.assertEqual(row["category"],"TIPS·연계")
+        self.assertIn("3/100",row["description"])
+        self.assertIn("AI",row["description"])
+
+    def test_operator_application_limit_not_meeting_capacity(self):
+        obj={"slotId":"test-slot","operatorName":"벤처스퀘어",
+             "eventName":"IR 프로그램","meetDate":"2026-11-25",
+             "applyDeadline":"2026-11-18",
+             "capacity":3,"appliedCount":100,"operatorApplyLimit":100,
+             "meetingClosed":False,"roundStatus":"OPEN"}
+        row=ir_record(obj)
+        self.assertEqual(row["sourceStatus"],"closed")
+
     def test_invalid_generic_investor_is_not_ir_session(self):
         self.assertIsNone(ir_record({"operatorName":"투자사소개","companyId":"xyz"}))
         self.assertIsNone(ir_record({"irDate":"2026-11-04","title":"IR"}))
