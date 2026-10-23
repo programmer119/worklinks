@@ -7,10 +7,12 @@ on:
     paths:
       - '.github/workflows/worklinks-investment-opportunities.yml'
       - 'scripts/refresh_worklinks_investment.py'
+      - 'scripts/worklinks_dynamic_sources.py'
       - 'scripts/worklinks_sefund.py'
       - 'scripts/worklinks_global_accelerators.py'
       - 'tests/test_global_accelerators.py'
       - 'tests/test_investment_monitor.py'
+      - 'tests/test_dynamic_sources.py'
       - 'tests/test_sefund.py'
       - 'startup-support/investment.html'
   schedule:
@@ -24,7 +26,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,6 +34,12 @@ jobs:
           python-version: '3.12'
       - name: Install public HTML dependencies
         run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
+      - name: Install Chromium for public dynamic listings
+        run: |
+          python -m pip install --disable-pip-version-check 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Test dynamic source extraction
+        run: python -m unittest discover -s tests -p 'test_dynamic_sources.py' -v
       - name: Test parsing and cautious eligibility
         run: python -m unittest discover -s tests -p 'test_investment_monitor.py' -v
       - name: Test international accelerator parsing
