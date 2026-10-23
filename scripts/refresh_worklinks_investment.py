@@ -29,7 +29,9 @@ WATCH = [
  {"name":"블루포인트파트너스","type":"AC","url":"https://bluepoint.ac/"},
  {"name":"스파크랩","type":"AC","url":"https://www.sparklabs.co.kr/"},
  {"name":"COMEUP","type":"IR·매칭","url":"https://www.comeup.org/"},
- {"name":"OI마켓","type":"CVC·OI","url":"https://oimarket.kr/program"}
+ {"name":"OI마켓","type":"CVC·OI","url":"https://oimarket.kr/program"},
+ {"name":"서울 스타트업플러스","type":"공공지원·OI·투자","url":"https://startup-plus.kr/project"},
+ {"name":"도전의 IR 운영사별 접수","type":"TIPS·IR","url":"https://irchallenge.jointips.or.kr/apply"}
 ]
 
 def now(): return dt.datetime.now(KST)
@@ -119,6 +121,62 @@ def band():
     return scan_band(html, now())
 
 
+
+# Additive official-source discovery. Each source is isolated so failures never stop
+# the original VentureSquare/dcamp/Band/global collectors.
+OFFICIAL_FEEDS = (
+ ("벤처투자종합포털 벤처투자마트", "https://www.vcs.go.kr/web/portal/bbs/martnotice/list", "vcs.go.kr", r"/web/portal/bbs/martnotice/"),
+ ("서울 스타트업플러스 지원사업", "https://startup-plus.kr/project", "startup-plus.kr", r"/project/"),
+ ("도전의 IR 운영사 신청", "https://irchallenge.jointips.or.kr/apply", "irchallenge.jointips.or.kr", r"/apply"),
+ ("TIPS 공식", "https://www.jointips.or.kr/", "jointips.or.kr", r"/"),
+)
+OFFICIAL_RELEVANCE = re.compile(
+ r"투자|엔젤|매칭|IR|TIPS|팁스|데모데이|보육|액셀러|오픈이노베이션|실증|PoC|협업|공동개발|창업|사업화|해외진출", re.I)
+def official_source(spec):
+    name, listing_url, host, detail_path = spec
+    checked=now().isoformat(timespec="seconds")
+    soup=html(listing_url)
+    candidates={}
+    for a in soup.select("a[href]"):
+        title=tidy(a.get_text(" ",strip=True),180)
+        href=urljoin(listing_url,a.get("href",""))
+        parts=urlsplit(href)
+        if parts.scheme!="https" or not (parts.hostname==host or parts.hostname.endswith("."+host)):
+            continue
+        if not re.search(detail_path, parts.path) or not OFFICIAL_RELEVANCE.search(title):
+            continue
+        if len(title)<9 or len(title)>160 or href.rstrip("/")==listing_url.rstrip("/"):
+            continue
+        # Listing-only pagination, navigation and generic calls are not opportunities.
+        if re.fullmatch(r"(?i)(투자자 검색|사업공고|지원사업|공고|벤처투자마트|신청|투자상담|스타트업플러스|도전의 IR)",title):
+            continue
+        candidates[href]=title
+    rows=[];errors=0
+    for url,title in list(candidates.items())[:35]:
+        try:
+            detail=html(url)
+            body=tidy((detail.select_one("main") or detail).get_text(" ",strip=True),12000)
+            if not OFFICIAL_RELEVANCE.search(title+" "+body[:500]):continue
+            rows.append(make(url,title,body,name,"공식 사이트 상세 · 신청자격 별도 확인"))
+        except (requests.RequestException,ValueError,AttributeError) as exc:
+            errors+=1
+            rows.append(make(url,title,"",name,"목록만 확인 · 상세 접근 실패"))
+    # JS-only or sign-in pages are successfully fetched but not verified coverage.
+    state="partial" if errors or not rows else "ok"
+    return rows,{"name":name,"url":listing_url,"status":state,
+      "discovered":len(rows),"detailErrors":errors,"checkedAt":checked,
+      "note":"목록에 노출된 공개 상세만 수집; 0건은 JS 렌더링/인증 제한 가능, 전체 공고 0건 단정 금지"}
+def scan_official():
+    found=[];states=[]
+    for spec in OFFICIAL_FEEDS:
+        try:
+            entries,info=official_source(spec);found.extend(entries);states.append(info)
+        except (requests.RequestException,ValueError,AttributeError,RuntimeError) as exc:
+            states.append({"name":spec[0],"url":spec[1],"status":"error",
+              "discovered":0,"detailErrors":0,"checkedAt":now().isoformat(timespec="seconds"),
+              "error":tidy(exc,170)})
+    return found,states
+
 def normalize_title(title):
     text = re.sub(r"\([^)]*\)", "", str(title or ""))
     return re.sub(r"[^0-9a-zA-Z가-힣]", "", text).casefold()
@@ -175,6 +233,9 @@ def main():
             items,status=fetch();rows+=items;sources.append(status)
         except (requests.RequestException,ValueError,AttributeError,RuntimeError) as ex:
             sources.append({"name":name,"status":"error","discovered":0,"detailErrors":0,"error":tidy(ex,170),"checkedAt":now().isoformat(timespec="seconds")})
+    official_rows, official_sources = scan_official()
+    rows += official_rows
+    sources += official_sources
     global_rows, global_sources = scan_global()
     rows += global_rows
     sources += global_sources
@@ -203,7 +264,7 @@ def main():
         listing.append(p)
     listing.sort(key=lambda x:(x["freshness"]!="checked",x["deadlineState"]=="closed",x["deadlineState"]=="unknown",x.get("deadline") or "9999",x["title"]))
     data={"schemaVersion":1,"generatedAt":now().isoformat(timespec="seconds"),"sources":sources,
-    "watchTargets":[dict(x,mode="참고 링크·자동수집 아님") for x in WATCH],"opportunities":listing,
+    "watchTargets":[dict(x,mode=("공식 공개 목록 수집 시도·JS/인증 제한 별도 표시" if x["url"].startswith(("https://www.vcs.go.kr","https://www.jointips.or.kr","https://startup-plus.kr","https://irchallenge.jointips.or.kr")) else "참고 링크·자동수집 아님")) for x in WATCH],"opportunities":listing,
     "stats":{"total":len(listing),"liveDiscovered":sum(x["freshness"]=="checked" for x in listing),
              "historical":sum(x["freshness"]=="historical" for x in listing)}}
     OUT.parent.mkdir(parents=True,exist_ok=True)
