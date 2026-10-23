@@ -54,11 +54,28 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add startup-support/investment-opportunities.json
-          if ! git diff --cached --quiet; then
+          snapshot="$(mktemp)"
+          cp startup-support/investment-opportunities.json "$snapshot"
+          for attempt in 1 2 3; do
+            # Rebase the generated data on the latest default branch; never force push.
+            git fetch origin main
+            git reset --hard origin/main
+            cp "$snapshot" startup-support/investment-opportunities.json
+            git add startup-support/investment-opportunities.json
+            if git diff --cached --quiet; then
+              echo 'Investment snapshot already current'
+              exit 0
+            fi
             git commit -m 'data: refresh investment opportunity snapshot'
-            git push
-          fi
+            if git push origin HEAD:main; then
+              echo 'Investment snapshot committed'
+              exit 0
+            fi
+            echo "Remote changed during snapshot push; retry $attempt/3"
+            sleep 2
+          done
+          echo 'Failed to commit investment snapshot after retries' >&2
+          exit 1
       - name: Mark failed if all sources failed
         if: steps.collect.outcome == 'failure'
         run: exit 1
