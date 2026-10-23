@@ -311,12 +311,31 @@ def scan_browser_sources():
                     page.evaluate("window.scrollTo(0,document.body.scrollHeight)")
                     page.wait_for_timeout(650)
                 _rendered_project_links(page,records)
+                pages_scanned=1
+                consecutive_empty=0
+                # Public listing paginates; scan successive pages while new IDs appear.
+                for page_number in range(2,13):
+                    if consecutive_empty>=2 or len(records)>=140:
+                        break
+                    before=len(records)
+                    try:
+                        page.goto(url+"?page="+str(page_number),
+                                  wait_until="domcontentloaded",timeout=17000)
+                        page.wait_for_timeout(1350)
+                        _rendered_project_links(page,records)
+                        pages_scanned+=1
+                    except Exception:
+                        break
+                    if len(records)==before:
+                        consecutive_empty+=1
+                    else:
+                        consecutive_empty=0
                 page.close()
                 rows=list(records.values())
                 all_rows.extend(rows)
                 states.append({"name":name,"url":url,
                    "status":"ok" if rows else "partial","discovered":len(rows),
-                   "apiResponses":len(debug),
+                   "apiResponses":len(debug), "pagesScanned":pages_scanned,
                    "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
                    "note":"공개 공고별 PRJ ID 확인" if rows else "공개 API 개별공고 미추출"})
             finally:
