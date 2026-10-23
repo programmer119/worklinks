@@ -82,7 +82,8 @@ def project_record(obj):
     return {
         "id": record_id("startup-plus", code), "title": title,
         "url": PROJECT_URL + "/" + code,
-        "category": "서울시 창업지원·투자·OI", "eligibility": "자격 확인 필요",
+        "category": "IR·매칭" if re.search(r"투자|IR|피칭|매칭|오픈이노베이션",title,re.I) else "창업지원·공모",
+        "eligibility": "자격 확인 필요",
         "deadline": deadline, "description": clean((org+" · "+desc).strip(" ·"), 300),
         "source": "서울 스타트업플러스 지원사업",
         "sourceKind": "공식 공개목록·개별 공고원문 자격 검증 필요",
@@ -122,7 +123,7 @@ def ir_record(obj):
                 is_closed = True
         except ValueError:
             pass
-    eligibility = "예비창업자 참여 가능·운영사별 업력·투자분야 확인 필요"
+    eligibility = "예비 언급·조건 확인"
     max_years = obj.get("bizYears")
     industries = []
     for key in ("industry12Tags", "industryStdTags"):
@@ -142,7 +143,7 @@ def ir_record(obj):
     return {
         "id": record_id("ir-slot", session_key),
         "title": operator+" — "+(name or "도전의 IR")+" ("+date[:10]+")",
-        "url": IR_URL, "category": "TIPS 운영사별 IR·투자제안",
+        "url": IR_URL, "category": "TIPS·연계",
         "eligibility": eligibility,
         "deadline": closing,
         "description": clean(description,450),
@@ -150,7 +151,7 @@ def ir_record(obj):
         "sourceKind":"정부·TIPS 운영사 투자상담/IR 신청·투자/TIPS 선정 보장 없음",
         "review":"운영사별 접수자격·IR 자료·최대 2회 투자제안·조기마감 확인. 마감시각 미확인.",
         "operator":operator, "irDate":date, "programId":program or None,
-        "applicationStatus":"마감" if is_closed else "접수상태 확인",
+        "applicationStatus":"마감" if is_closed else "접수중(공개정보)",
         "sourceStatus":"closed" if is_closed else "unknown",
         "lastSeenAt":dt.datetime.now(KST).isoformat(timespec="seconds"),
     }
