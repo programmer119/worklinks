@@ -10,7 +10,7 @@ import datetime as dt
 import hashlib
 import json
 import re
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
 KST = dt.timezone(dt.timedelta(hours=9))
 PROJECT_URL = "https://www.startup-plus.kr/project"
@@ -181,9 +181,14 @@ def _collect_json(page, seen, debug):
             data = resp.json()
             scrubbed_path = urlunsplit(("", "", url.path, "", ""))
             # Avoid recording tokens, cookie headers or query parameters.
+            paging=((data.get("data") or {}).get("pagination") or {}) if isinstance(data,dict) else {}
             debug.append({"path": scrubbed_path[:170], "status": resp.status,
                           "keys": list(data)[:12] if isinstance(data, dict) else ["array"],
-                          "bytes": len(resp.body()), "shape": _schema_keys(data)})
+                          "bytes": len(resp.body()), "shape": _schema_keys(data),
+                          "method":resp.request.method, "requestUrl":resp.url,
+                          "requestBody":resp.request.post_data,
+                          "totalElements":paging.get("totalElements"),
+                          "totalPages":paging.get("totalPages")})
             for ob in objects(data):
                 for parser in (project_record, ir_record):
                     row = parser(ob)
@@ -192,6 +197,86 @@ def _collect_json(page, seen, debug):
         except Exception:
             return
     page.on("response", handle)
+
+def _increment_page(data, number):
+    """Set public-list paging argument without dropping other search filters."""
+    if not isinstance(data,dict):
+        return False
+    changed=False
+    for key,val in data.items():
+        if isinstance(val,dict):
+            changed = _increment_page(val,number) or changed
+        elif key.casefold() in ("page","currentpage","pagenumber","pageno","pagenum","pageindex") and (
+                isinstance(val,int) or str(val).isdigit()):
+            original=int(val)
+            data[key]=(number-1 if original==0 else number)
+            changed=True
+    return changed
+
+def _public_api_pages(page,records,debug):
+    """Replay only the site's own unauthenticated list request with next-page args."""
+    import copy
+    requests_seen=[x for x in debug if x.get("path")=="/api/project/list"
+                   and x.get("status")==200]
+    if not requests_seen:
+        return 0, None
+    base=requests_seen[0]
+    total=base.get("totalElements")
+    max_pages=min(70,max(1,int(base.get("totalPages") or 1)))
+    request_url=base.get("requestUrl","")
+    if not urlsplit(request_url).path.endswith("/api/project/list"):
+        return 0,total
+    method=base.get("method","GET").upper()
+    raw=base.get("requestBody") or ""
+    parsed=None
+    is_json=False
+    if raw:
+        try:
+            parsed=json.loads(raw)
+            is_json=isinstance(parsed,dict)
+        except (ValueError,TypeError):
+            parsed=dict(parse_qsl(raw,keep_blank_values=True))
+    scanned=0
+    for number in range(2,max_pages+1):
+        if total is not None and len(records)>=int(total):
+            break
+        try:
+            if method=="POST":
+                payload=copy.deepcopy(parsed) if isinstance(parsed,dict) else {}
+                if not _increment_page(payload,number):
+                    payload["page"]=number
+                if is_json:
+                    reply=page.request.post(request_url,data=payload,timeout=17000)
+                else:
+                    reply=page.request.post(request_url,form=payload,timeout=17000)
+            else:
+                parts=urlsplit(request_url)
+                params=dict(parse_qsl(parts.query,keep_blank_values=True))
+                if not _increment_page(params,number):
+                    params["page"]=number
+                next_url=parts._replace(query=urlencode(params)).geturl()
+                reply=page.request.get(next_url,timeout=17000)
+            if not reply.ok:
+                break
+            value=reply.json()
+            if not isinstance(value,dict) or not isinstance(value.get("data"),dict):
+                break
+            data=value["data"]
+            rows=data.get("contents")
+            if not isinstance(rows,list) or not rows:
+                break
+            before=len(records)
+            for obj in objects(rows):
+                row=project_record(obj)
+                if row:records[row["id"]]=row
+            scanned+=1
+            if len(records)==before:
+                break
+            if data.get("pagination",{}).get("last") is True:
+                break
+        except Exception:
+            break
+    return scanned,total
 
 def _rendered_project_links(page, seen):
     hrefs = page.locator("a[href*='/project/PRJ']").evaluate_all(
@@ -311,10 +396,11 @@ def scan_browser_sources():
                     page.evaluate("window.scrollTo(0,document.body.scrollHeight)")
                     page.wait_for_timeout(650)
                 _rendered_project_links(page,records)
-                pages_scanned=1
+                api_pages,expected_total=_public_api_pages(page,records,debug)
+                pages_scanned=1+api_pages
                 consecutive_empty=0
-                # Public listing paginates; scan successive pages while new IDs appear.
-                for page_number in range(2,13):
+                # Site-URL pagination fallback if public list API did not advance.
+                for page_number in range(2,13) if api_pages==0 else ():
                     if consecutive_empty>=2 or len(records)>=140:
                         break
                     before=len(records)
@@ -334,7 +420,8 @@ def scan_browser_sources():
                 rows=list(records.values())
                 all_rows.extend(rows)
                 states.append({"name":name,"url":url,
-                   "status":"ok" if rows else "partial","discovered":len(rows),
+                   "status":"ok" if rows and (expected_total is None or len(rows)>=int(expected_total)) else "partial",
+                   "discovered":len(rows),"availableInSource":expected_total,
                    "apiResponses":len(debug), "pagesScanned":pages_scanned,
                    "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
                    "note":"공개 공고별 PRJ ID 확인" if rows else "공개 API 개별공고 미추출"})
