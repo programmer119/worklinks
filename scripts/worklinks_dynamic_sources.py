@@ -19,7 +19,7 @@ RELEVANT = re.compile(r"투자|엔젤|IR|TIPS|팁스|창업|매칭|오픈이노�
 ID_RE = re.compile(r"^PRJ[0-9]{5,9}$", re.I)
 MONTH_DATE = re.compile(r"(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})")
 DAY_DATE = re.compile(r"(\d{1,2})월\s*(\d{1,2})일")
-DATE_KEYS = ("applicationEndDate", "applyEndDate", "receiptEndDate", "recruitEndDate",
+DATE_KEYS = ("applyDeadline", "applicationEndDate", "applyEndDate", "receiptEndDate", "recruitEndDate",
              "applicationEndAt", "applyEndAt", "endDate", "endDt", "closeDate", "deadline",
              "endDtm", "rcptEndDt")
 PROJECT_IDS = ("projectCode", "projectCd", "prjCode", "prjCd", "project_id", "projectId")
@@ -27,9 +27,9 @@ PROJECT_TITLES = ("projectName", "projectNm", "projectTitle", "projectSubject",
                   "businessName", "businessNm", "title", "subject")
 OPERATOR_NAMES = ("operatorName", "operatorNm", "companyName", "companyNm",
                   "investorName", "investorNm", "orgName", "organizationName")
-IR_DATES = ("irDate", "irDay", "eventDate", "scheduleDate", "meetingDate",
+IR_DATES = ("meetDate", "irDate", "irDay", "eventDate", "scheduleDate", "meetingDate",
             "programDate", "irStartDate", "irStartAt", "startDate")
-PROGRAM_IDS = ("irProgramId", "programId", "scheduleId", "irId", "sessionId")
+PROGRAM_IDS = ("slotId", "irProgramId", "programId", "scheduleId", "irId", "sessionId")
 
 def clean(value, n=220):
     return re.sub(r"\s+", " ", str(value or "")).strip()[:n]
@@ -87,6 +87,7 @@ def project_record(obj):
         "source": "서울 스타트업플러스 지원사업",
         "sourceKind": "공식 공개목록·개별 공고원문 자격 검증 필요",
         "review": "사업자등록·연령·소재지·실제 신청폼 확인 필요",
+        "lastSeenAt":dt.datetime.now(KST).isoformat(timespec="seconds"),
     }
 
 def ir_record(obj):
@@ -97,7 +98,7 @@ def ir_record(obj):
     # operator profile, investor ad, or dashboard statistics into an IR round.
     if len(operator) < 2 or not date:
         return None
-    name = first(obj, ("programName", "programTitle", "irTitle", "title"))
+    name = first(obj, ("eventName", "programName", "programTitle", "irTitle", "title"))
     if name and not (RELEVANT.search(name) or "IR" in name.upper()):
         name = ""
     limit = first(obj, ("capacity", "recruitCount", "maxApplicantCount", "applyLimit"))
@@ -105,21 +106,53 @@ def ir_record(obj):
     closing = date_value(first(obj, DATE_KEYS))
     if not closing:
         closing = None  # Seven-days-before is a rule, not a verified clock time.
-    status = first(obj, ("applicationStatus", "applyStatus", "status", "recruitStatus"))
+    status = first(obj, ("applicationStatus", "applyStatus", "roundStatus", "status", "recruitStatus"))
     session_key = program or (operator+"|"+date+"|"+name)
+    limit_value = obj.get("operatorApplyLimit")
+    submitted_value = obj.get("appliedCount")
+    remaining_applications = None
+    if isinstance(limit_value,int) and isinstance(submitted_value,int):
+        remaining_applications = max(0,limit_value-submitted_value)
+    is_closed = (obj.get("meetingClosed") is True or
+                 status.upper() in ("CLOSED","END","ENDED") or
+                 remaining_applications == 0)
+    if closing:
+        try:
+            if dt.date.fromisoformat(closing[:10]) < dt.datetime.now(KST).date():
+                is_closed = True
+        except ValueError:
+            pass
+    eligibility = "예비창업자 참여 가능·운영사별 업력·투자분야 확인 필요"
+    max_years = obj.get("bizYears")
+    industries = []
+    for key in ("industry12Tags", "industryStdTags"):
+        val = obj.get(key)
+        if isinstance(val,str):
+            try: val=json.loads(val)
+            except (ValueError,TypeError): val=[]
+        if isinstance(val,list):
+            industries += [clean(x.get("nm"),40) for x in val if isinstance(x,dict) and x.get("nm")]
+    tags = "·".join(dict.fromkeys(industries))[:120]
+    description = (date+" IR · "+clean(obj.get("regionText"),45)+
+         (f" · 업력기준 {max_years}년" if isinstance(max_years,int) else "")+
+         (f" · 투자분야 {tags}" if tags else "")+
+         (f" · 운영사 접수 {submitted_value}/{limit_value}" if remaining_applications is not None else "")+
+         (f" · IR 미팅 가능 {obj.get('capacity')}개사" if isinstance(obj.get("capacity"),int) else "")+
+         (" · 마감/접수종료" if is_closed else " · 신청상태 별도 확인"))
     return {
-        "id": record_id("ir-session", session_key), "title": operator+" — "+(name or "도전의 IR")+" ("+date[:10]+")",
+        "id": record_id("ir-slot", session_key),
+        "title": operator+" — "+(name or "도전의 IR")+" ("+date[:10]+")",
         "url": IR_URL, "category": "TIPS 운영사별 IR·투자제안",
-        "eligibility": "예비창업자 가능·기관투자 이력 등 운영사별 조건 확인",
+        "eligibility": eligibility,
         "deadline": closing,
-        "description": clean("IR "+date + (" · 정원 "+limit if limit else "")
-                             + (" · 잔여 "+remaining if remaining else "")
-                             + (" · 신청상태 "+status if status else ""), 350),
-        "source": "도전의 IR 운영사별 프로그램",
-        "sourceKind": "공식 공개 운영사별 회차·실제 투자 보장 없음",
-        "review": "회차별 IR 7일 전 신청원칙·조기마감·직접 신청상태 확인. 시각 미확인.",
-        "operator": operator, "irDate": date, "programId": program or None,
-        "applicationStatus": status or None,
+        "description": clean(description,450),
+        "source":"도전의 IR 운영사별 프로그램",
+        "sourceKind":"정부·TIPS 운영사 투자상담/IR 신청·투자/TIPS 선정 보장 없음",
+        "review":"운영사별 접수자격·IR 자료·최대 2회 투자제안·조기마감 확인. 마감시각 미확인.",
+        "operator":operator, "irDate":date, "programId":program or None,
+        "applicationStatus":"마감" if is_closed else "접수상태 확인",
+        "sourceStatus":"closed" if is_closed else "unknown",
+        "lastSeenAt":dt.datetime.now(KST).isoformat(timespec="seconds"),
     }
 
 def _schema_keys(value, depth=0):
@@ -212,64 +245,82 @@ def _dom_ir_records(page, seen):
                 added+=1
     return added
 
+def scan_ir_public_api():
+    """Retrieve actual official operator slots, not one generic IR program."""
+    import requests
+    name="도전의 IR 운영사별 프로그램"
+    rounds_url="https://irchallenge.jointips.or.kr/api/cms/public/challenge-ir/rounds"
+    slots_url="https://irchallenge.jointips.or.kr/api/cms/public/challenge-ir/slots"
+    state={"name":name,"url":IR_URL,"status":"error","discovered":0}
+    try:
+        session=requests.Session()
+        session.headers.update({"User-Agent":"Mozilla/5.0 WorkLinks/1.0 public-ir-discovery",
+                                "Accept":"application/json"})
+        r=session.get(rounds_url,timeout=18);r.raise_for_status()
+        body=r.json()
+        if body.get("code")!=200 or not isinstance(body.get("data"),list):
+            raise ValueError("IR rounds schema changed")
+        today=dt.datetime.now(KST).date()
+        rounds=[x for x in body["data"] if x.get("status")=="OPEN"
+                and (date_value(x.get("applyTo")) or "0000")>=today.isoformat()]
+        results={}; inspected=0
+        for current in rounds[:4]:
+            r=session.get(slots_url,params={"roundId":current["id"]},timeout=20)
+            r.raise_for_status()
+            payload=r.json()
+            if payload.get("code")!=200 or not isinstance(payload.get("data"),list):
+                raise ValueError("IR slots schema changed")
+            inspected+=len(payload["data"])
+            for slot in payload["data"]:
+                if not isinstance(slot,dict):continue
+                item=ir_record(slot)
+                if item:
+                    results[item["id"]]=item
+        state.update({"status":"ok" if results else "partial",
+                      "discovered":len(results),"slotsInspected":inspected,
+                      "roundsInspected":len(rounds),
+                      "uniqueOperators":len({x["operator"] for x in results.values()}),
+                      "note":"운영사별 고유 slotId·IR일·공식 신청마감일·접수상한 확인. 공개 API 접근."})
+        return list(results.values()),state
+    except (requests.RequestException, ValueError, TypeError, KeyError) as exc:
+        state["error"]=clean(exc,160)
+        return [],state
+
 def scan_browser_sources():
-    """Return records plus explicit per-source status, preserving legacy feeds."""
-    sources = [
-        ("서울 스타트업플러스 지원사업", PROJECT_URL),
-        ("도전의 IR 운영사별 프로그램", IR_URL),
-    ]
-    all_rows, states = [], []
+    """Independent startup-plus browser scan plus direct official IR API scan."""
+    ir_rows,ir_state=scan_ir_public_api()
+    all_rows,states=list(ir_rows),[ir_state]
+    name,url="서울 스타트업플러스 지원사업",PROJECT_URL
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        return [], [{"name":n, "url":u, "status":"error", "discovered":0,
-                      "error":"Playwright dependency missing"} for n,u in sources]
+        states.append({"name":name,"url":url,"status":"error","discovered":0,
+                       "error":"Playwright dependency missing"})
+        return all_rows,states
     try:
         with sync_playwright() as tool:
-            browser = tool.chromium.launch(headless=True, args=["--no-sandbox"])
+            browser=tool.chromium.launch(headless=True,args=["--no-sandbox"])
             try:
-                for name,url in sources:
-                    records,debug = {},[]
-                    try:
-                        page = browser.new_page(locale="ko-KR", timezone_id="Asia/Seoul")
-                        _collect_json(page, records, debug)
-                        page.goto(url, wait_until="domcontentloaded", timeout=24000)
-                        page.wait_for_timeout(4200)
-                        if name.startswith("도전의 IR"):
-                            try:
-                                page.get_by_text("리스트 보기", exact=True).first.click(timeout=1800)
-                                page.wait_for_timeout(1500)
-                            except Exception:
-                                pass
-                        for _ in range(4):
-                            page.evaluate("window.scrollTo(0,document.body.scrollHeight)")
-                            page.wait_for_timeout(650)
-                        if name.startswith("서울 스타트업플러스"):
-                            _rendered_project_links(page, records)
-                        else:
-                            _dom_ir_records(page, records)
-                        page.close()
-                        rows=list(records.values())
-                        all_rows.extend(rows)
-                        states.append({"name":name,"url":url,
-                                       "status":"ok" if rows else "partial",
-                                       "discovered":len(rows),
-                                       "apiResponses":len(debug),
-                                       "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
-                                       "sampleKeys":[x["keys"] for x in debug[:5]],
-                                       "sampleShapes":[x["shape"] for x in debug[:6]],
-                                       "note":("공개 개별항목 추출 확인" if rows else
-                                               "개별항목 미추출·JS 목록 구조 또는 인증 확인 필요")})
-                    except Exception as e:
-                        states.append({"name":name,"url":url,"status":"error",
-                                       "discovered":len(records),"error":clean(e,160),
-                                       "apiResponses":len(debug),
-                                       "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
-                                       "sampleKeys":[x["keys"] for x in debug[:5]],
-                                       "sampleShapes":[x["shape"] for x in debug[:6]]})
+                records,debug={},[]
+                page=browser.new_page(locale="ko-KR",timezone_id="Asia/Seoul")
+                _collect_json(page,records,debug)
+                page.goto(url,wait_until="domcontentloaded",timeout=24000)
+                page.wait_for_timeout(4200)
+                for _ in range(4):
+                    page.evaluate("window.scrollTo(0,document.body.scrollHeight)")
+                    page.wait_for_timeout(650)
+                _rendered_project_links(page,records)
+                page.close()
+                rows=list(records.values())
+                all_rows.extend(rows)
+                states.append({"name":name,"url":url,
+                   "status":"ok" if rows else "partial","discovered":len(rows),
+                   "apiResponses":len(debug),
+                   "apiPaths":list(dict.fromkeys(x["path"] for x in debug))[:10],
+                   "note":"공개 공고별 PRJ ID 확인" if rows else "공개 API 개별공고 미추출"})
             finally:
                 browser.close()
-    except Exception as e:
-        return [], [{"name":n,"url":u,"status":"error","discovered":0,
-                      "error":clean(e,160)} for n,u in sources]
+    except Exception as exc:
+        states.append({"name":name,"url":url,"status":"error",
+                       "discovered":0,"error":clean(exc,160)})
     return all_rows,states
