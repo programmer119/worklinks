@@ -125,13 +125,18 @@ def band():
 # Additive official-source discovery. Each source is isolated so failures never stop
 # the original VentureSquare/dcamp/Band/global collectors.
 OFFICIAL_FEEDS = (
- ("벤처투자종합포털 벤처투자마트", "https://www.vcs.go.kr/web/portal/bbs/martnotice/list", "vcs.go.kr", r"/web/portal/bbs/martnotice/"),
- ("서울 스타트업플러스 지원사업", "https://startup-plus.kr/project", "startup-plus.kr", r"/project/"),
- ("도전의 IR 운영사 신청", "https://irchallenge.jointips.or.kr/apply", "irchallenge.jointips.or.kr", r"/apply"),
- ("TIPS 공식", "https://www.jointips.or.kr/", "jointips.or.kr", r"/"),
+ ("벤처투자종합포털 벤처투자마트", "https://www.vcs.go.kr/web/portal/bbs/martnotice/list",
+  "vcs.go.kr", r"^/web/portal/bbs/martnotice/[0-9]+$"),
+ ("서울 스타트업플러스 지원사업", "https://startup-plus.kr/project",
+  "startup-plus.kr", r"^/project/PRJ[0-9]+$"),
+ ("도전의 IR 운영사 신청", "https://irchallenge.jointips.or.kr/apply",
+  "irchallenge.jointips.or.kr", r"^/apply/[A-Za-z0-9_-]+$"),
+ ("TIPS 공식 행사", "https://jointips.or.kr/",
+  "jointips.or.kr", r"^/contents/events/detail$"),
 )
 OFFICIAL_RELEVANCE = re.compile(
  r"투자|엔젤|매칭|IR|TIPS|팁스|데모데이|보육|액셀러|오픈이노베이션|실증|PoC|협업|공동개발|창업|사업화|해외진출", re.I)
+
 def official_source(spec):
     name, listing_url, host, detail_path = spec
     checked=now().isoformat(timespec="seconds")
@@ -141,14 +146,16 @@ def official_source(spec):
         title=tidy(a.get_text(" ",strip=True),180)
         href=urljoin(listing_url,a.get("href",""))
         parts=urlsplit(href)
-        if parts.scheme!="https" or not (parts.hostname==host or parts.hostname.endswith("."+host)):
+        host_name=parts.hostname or ""
+        if parts.scheme!="https" or not (host_name==host or host_name.endswith("."+host)):
             continue
-        if not re.search(detail_path, parts.path) or not OFFICIAL_RELEVANCE.search(title):
+        # A detail URL is mandatory: exclude listing/navigation/pagination and
+        # fabricated JS template URLs such as /project/{{projectCode}}.
+        if not re.fullmatch(detail_path,parts.path):
             continue
-        if len(title)<9 or len(title)>160 or href.rstrip("/")==listing_url.rstrip("/"):
+        if not OFFICIAL_RELEVANCE.search(title) or not 9<=len(title)<=160:
             continue
-        # Listing-only pagination, navigation and generic calls are not opportunities.
-        if re.fullmatch(r"(?i)(투자자 검색|사업공고|지원사업|공고|벤처투자마트|신청|투자상담|스타트업플러스|도전의 IR)",title):
+        if host=="jointips.or.kr" and not re.search(r"(?:^|[?&])eventId=[A-Za-z0-9]+",parts.query):
             continue
         candidates[href]=title
     rows=[];errors=0
@@ -157,15 +164,29 @@ def official_source(spec):
             detail=html(url)
             body=tidy((detail.select_one("main") or detail).get_text(" ",strip=True),12000)
             if not OFFICIAL_RELEVANCE.search(title+" "+body[:500]):continue
-            rows.append(make(url,title,body,name,"공식 사이트 상세 · 신청자격 별도 확인"))
-        except (requests.RequestException,ValueError,AttributeError) as exc:
+            item=make(url,title,body,name,"공식 공개 상세·신청자격 확인 필요")
+            if host=="vcs.go.kr":
+                # Month-only date ranges must not inherit a made-up 23:59 time.
+                ym=re.search(r"(20\d\d)년\s*(\d{1,2})월",title)
+                dr=re.search(r"모집기간\s*[:：]?\s*(?:20\d\d년\s*)?(\d{1,2})월\s*(\d{1,2})일.*?[~～]\s*(\d{1,2})월\s*(\d{1,2})일",body)
+                if ym and dr and int(ym.group(2))==int(dr.group(3)):
+                    item["deadline"]=f"{ym.group(1)}-{int(dr.group(3)):02d}-{int(dr.group(4)):02d}"
+                if re.search(r"예비창업자.{0,45}(?:개인|신청\s*가능)",body):
+                    item["eligibility"]="예비창업자 가능·회원가입 및 세부조건 확인"
+                item["review"]="VC 1:1 상담 모집. 본문 접수일 확인, 선정·상담 및 투자 보장 없음."
+            rows.append(item)
+        except (requests.RequestException,ValueError,AttributeError):
             errors+=1
             rows.append(make(url,title,"",name,"목록만 확인 · 상세 접근 실패"))
-    # JS-only or sign-in pages are successfully fetched but not verified coverage.
+    # A responsive page is not necessarily a working feed. Angular/JS-only
+    # screens are PARTIAL, never a successfully empty monitor.
     state="partial" if errors or not rows else "ok"
+    note=("공개 상세 링크 "+str(len(candidates))+"개 발견. "
+          +("목록 로딩은 되었지만 상세 추출 0건; JS·로그인·API 접근 제한 확인 필요."
+            if not rows else "접수·자격은 반드시 공식 상세 확인."))
     return rows,{"name":name,"url":listing_url,"status":state,
       "discovered":len(rows),"detailErrors":errors,"checkedAt":checked,
-      "note":"목록에 노출된 공개 상세만 수집; 0건은 JS 렌더링/인증 제한 가능, 전체 공고 0건 단정 금지"}
+      "note":note}
 def scan_official():
     found=[];states=[]
     for spec in OFFICIAL_FEEDS:
