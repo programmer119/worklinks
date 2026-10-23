@@ -164,6 +164,12 @@ def official_source(spec):
             detail=html(url)
             body=tidy((detail.select_one("main") or detail).get_text(" ",strip=True),12000)
             if not OFFICIAL_RELEVANCE.search(title+" "+body[:500]):continue
+            # Many TIPS event details are JS-only. A HTTP 200 with only menu
+            # text is NOT a verified application page.
+            if normalize_title(title) not in normalize_title(body):
+                errors+=1
+                rows.append(make(url,title,"",name,"목록에서만 발견 · 동적 상세 확인 실패"))
+                continue
             item=make(url,title,body,name,"공식 공개 상세·신청자격 확인 필요")
             if host=="vcs.go.kr":
                 # Month-only date ranges must not inherit a made-up 23:59 time.
