@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-23T11:52:00+09:00",
+  "generatedAt": "2026-10-23T11:59:37+09:00",
   "sources": [
     {
       "name": "벤처스퀘어 모집공고",
@@ -8,7 +8,7 @@
       "status": "ok",
       "discovered": 16,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T11:50:50+09:00"
+      "checkedAt": "2026-10-23T11:58:58+09:00"
     },
     {
       "name": "디캠프 공식 프로그램",
@@ -16,7 +16,7 @@
       "status": "ok",
       "discovered": 3,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T11:50:54+09:00"
+      "checkedAt": "2026-10-23T11:59:02+09:00"
     },
     {
       "name": "재단법인 밴드 공식 공지",
@@ -26,7 +26,7 @@
       "detailErrors": 0,
       "pagesScanned": 2,
       "listPagesFailed": 0,
-      "checkedAt": "2026-10-23T11:50:54+09:00"
+      "checkedAt": "2026-10-23T11:59:02+09:00"
     },
     {
       "name": "벤처투자종합포털 벤처투자마트",
@@ -34,8 +34,8 @@
       "status": "ok",
       "discovered": 10,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T11:51:16+09:00",
-      "note": "목록에 노출된 공개 상세만 수집; 0건은 JS 렌더링/인증 제한 가능, 전체 공고 0건 단정 금지"
+      "checkedAt": "2026-10-23T11:59:09+09:00",
+      "note": "공개 상세 링크 10개 발견. 접수·자격은 반드시 공식 상세 확인."
     },
     {
       "name": "서울 스타트업플러스 지원사업",
@@ -43,8 +43,8 @@
       "status": "partial",
       "discovered": 0,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T11:51:31+09:00",
-      "note": "목록에 노출된 공개 상세만 수집; 0건은 JS 렌더링/인증 제한 가능, 전체 공고 0건 단정 금지"
+      "checkedAt": "2026-10-23T11:59:25+09:00",
+      "note": "공개 상세 링크 0개 발견. 목록 로딩은 되었지만 상세 추출 0건; JS·로그인·API 접근 제한 확인 필요."
     },
     {
       "name": "도전의 IR 운영사 신청",
@@ -52,17 +52,17 @@
       "status": "partial",
       "discovered": 0,
       "detailErrors": 0,
-      "checkedAt": "2026-10-23T11:51:33+09:00",
-      "note": "목록에 노출된 공개 상세만 수집; 0건은 JS 렌더링/인증 제한 가능, 전체 공고 0건 단정 금지"
+      "checkedAt": "2026-10-23T11:59:27+09:00",
+      "note": "공개 상세 링크 0개 발견. 목록 로딩은 되었지만 상세 추출 0건; JS·로그인·API 접근 제한 확인 필요."
     },
     {
-      "name": "TIPS 공식",
-      "url": "https://www.jointips.or.kr/",
-      "status": "ok",
-      "discovered": 10,
-      "detailErrors": 0,
-      "checkedAt": "2026-10-23T11:51:34+09:00",
-      "note": "목록에 노출된 공개 상세만 수집; 0건은 JS 렌더링/인증 제한 가능, 전체 공고 0건 단정 금지"
+      "name": "TIPS 공식 행사",
+      "url": "https://jointips.or.kr/",
+      "status": "partial",
+      "discovered": 3,
+      "detailErrors": 3,
+      "checkedAt": "2026-10-23T11:59:29+09:00",
+      "note": "공개 상세 링크 3개 발견. 접수·자격은 반드시 공식 상세 확인."
     },
     {
       "name": "Antler Korea 공식 레지던시",
@@ -72,7 +72,7 @@
       "detailErrors": 0,
       "pagesScanned": 1,
       "error": "",
-      "checkedAt": "2026-10-23T11:51:55+09:00"
+      "checkedAt": "2026-10-23T11:59:33+09:00"
     },
     {
       "name": "Y Combinator 공식 모집",
@@ -82,7 +82,7 @@
       "detailErrors": 0,
       "pagesScanned": 1,
       "error": "",
-      "checkedAt": "2026-10-23T11:51:55+09:00"
+      "checkedAt": "2026-10-23T11:59:33+09:00"
     },
     {
       "name": "Techstars 공식 액셀러레이터",
@@ -92,7 +92,7 @@
       "detailErrors": 0,
       "pagesScanned": 17,
       "error": "",
-      "checkedAt": "2026-10-23T11:51:58+09:00"
+      "checkedAt": "2026-10-23T11:59:36+09:00"
     },
     {
       "name": "Entrepreneurs First 공식 지원",
@@ -102,7 +102,7 @@
       "detailErrors": 0,
       "pagesScanned": 3,
       "error": "",
-      "checkedAt": "2026-10-23T11:52:00+09:00"
+      "checkedAt": "2026-10-23T11:59:37+09:00"
     }
   ],
   "watchTargets": [
@@ -178,7 +178,7 @@
       "description": "2026 산업단지 오픈이노베이션프로그램 KICXUP 챌린지 & 로컬 스타트업 2차 모집 공고 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:45+09:00",
+      "lastSeenAt": "2026-10-23T11:58:53+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -193,7 +193,7 @@
       "description": "2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 모집 (3회차: 기후·ESG) - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Se",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:49+09:00",
+      "lastSeenAt": "2026-10-23T11:58:57+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -208,7 +208,7 @@
       "description": "2026-9회 충청권 엔젤투자 피칭룸 프로그램 참가기업 모집 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:40+09:00",
+      "lastSeenAt": "2026-10-23T11:58:48+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -223,7 +223,7 @@
       "description": "2026년 광명 글로컬 데모데이 참관객 모집 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS C",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:46+09:00",
+      "lastSeenAt": "2026-10-23T11:58:54+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -238,7 +238,7 @@
       "description": "『도로공사-재단법인 밴드 상생형 창업·벤처기업 지원사업』 2026년 한국도로공사 상생형 창업·벤처기업 지원사업 모집공고 한국도로공사와 재단법인 밴드는 도로교통 분야 우수 창업·벤처기업 발굴및 사업화 자금지원 등을 통한 혁신 Start-up 육성을 위하여 다음과 같이 창업·벤처기업 지원 프로그램을 공고하오니 관련 기업의 많은 참여 바랍니다. 2026년 10월 6일 한국도로공사 사장",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 원문·첨부 자격 재확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "listed_open",
       "sourceStatusText": "마감 D- 6",
@@ -258,7 +258,7 @@
       "description": "TIPS · LIPS를 준비하는 스타트업을 위한 IR 전략 - 제10차 DDM 벤처스타트업 아카데미 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Ser",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:32+09:00",
+      "lastSeenAt": "2026-10-23T11:58:41+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -273,7 +273,7 @@
       "description": "2026 FAST TRACK 농식품 데모데이 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS C",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:31+09:00",
+      "lastSeenAt": "2026-10-23T11:58:40+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -288,7 +288,7 @@
       "description": "2026 강원권 LIPS 민간운영사 연합 INVESTOR DAY 11월 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A S",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:50+09:00",
+      "lastSeenAt": "2026-10-23T11:58:58+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -304,7 +304,7 @@
       "source": "Entrepreneurs First 공식 지원",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:52:00+09:00",
+      "lastSeenAt": "2026-10-23T11:59:37+09:00",
       "review": "지역별 자격·비자·전일제 참여 제한과 마감 회차 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -319,7 +319,7 @@
       "description": "2026년 서울핀테크랩 FIN-오픈이노베이션 Meep-up Day 10회차 - DB손해보험 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:38+09:00",
+      "lastSeenAt": "2026-10-23T11:58:46+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -335,7 +335,7 @@
       "source": "Y Combinator 공식 모집",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:55+09:00",
+      "lastSeenAt": "2026-10-23T11:59:33+09:00",
       "review": "정규 마감 이후 접수 가능 여부와 미국 프로그램 참여·SAFE 투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -350,7 +350,7 @@
       "description": "2026년 서초창업스테이션 프리-오픈이노베이션 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:39+09:00",
+      "lastSeenAt": "2026-10-23T11:58:47+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -365,7 +365,7 @@
       "description": "[GBSA] 2026 판교스타트업 투자교류회 제 4차 투자교류회 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Serie",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:35+09:00",
+      "lastSeenAt": "2026-10-23T11:58:44+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -380,7 +380,7 @@
       "description": "[해수부] 2026년 해양수산 통합데모데이 참가자 모집 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:37+09:00",
+      "lastSeenAt": "2026-10-23T11:58:45+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -395,7 +395,7 @@
       "description": "2026 서울창업허브 창동 데모데이 참관 신청 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B+ TIPS ",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:34+09:00",
+      "lastSeenAt": "2026-10-23T11:58:42+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -411,7 +411,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:56+09:00",
+      "lastSeenAt": "2026-10-23T11:59:34+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -427,7 +427,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:56+09:00",
+      "lastSeenAt": "2026-10-23T11:59:34+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -443,7 +443,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:57+09:00",
+      "lastSeenAt": "2026-10-23T11:59:35+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -459,7 +459,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:57+09:00",
+      "lastSeenAt": "2026-10-23T11:59:35+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -475,7 +475,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:57+09:00",
+      "lastSeenAt": "2026-10-23T11:59:35+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -491,7 +491,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:58+09:00",
+      "lastSeenAt": "2026-10-23T11:59:36+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -507,7 +507,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:58+09:00",
+      "lastSeenAt": "2026-10-23T11:59:36+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -523,7 +523,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:58+09:00",
+      "lastSeenAt": "2026-10-23T11:59:36+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -539,7 +539,7 @@
       "source": "Entrepreneurs First 공식 지원",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:59+09:00",
+      "lastSeenAt": "2026-10-23T11:59:37+09:00",
       "review": "지역별 자격·비자·전일제 참여 제한과 마감 회차 확인",
       "deadlineState": "open_by_date",
       "freshness": "checked"
@@ -554,28 +554,13 @@
       "description": "<신청하러 가기!!> https://www.seis.or.kr/subPage.do?menuId=30400",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 원문·첨부 자격 재확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "listed_open",
       "sourceStatusText": "접수 중",
       "publishedDate": "2026-05-25",
       "attachmentReview": "첨부파일 내용까지 검증되지 않음",
       "deadlineState": "open_by_date",
-      "freshness": "checked"
-    },
-    {
-      "id": "e8599eb3d33fe9a28157",
-      "title": "+ 4,588 Teams 누구보다 열정적이고, 누구보다 도전적인 TIPS의 스타트업팀들을 만나보세요. 더보기",
-      "url": "https://www.jointips.or.kr/network/startups",
-      "category": "TIPS·연계",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "운영사/창업기업 소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 창업기업 소개 운영사 소개 창업기업 소개 운영사/창업기업 소개 운영사 소개 창업기업 소개 창업기업 소개 상세 필터 0 상세 필터 × 선정연도 전체 선정트랙 지역 투자분야(산업) ? 산업기술표준분류 투자분야(기술) ? 12대 신산업 업력 초기화 적용 초기화 정렬 가나다순 정보 업데이트순 등록일순 팁스 선정연도 오름차순 내림차순",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:50+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
       "freshness": "checked"
     },
     {
@@ -588,7 +573,7 @@
       "description": "2026년 사회적기업 창업지원사업 창업팀 모집& 인증전환형 온라인 사업설명회 안내 강력한 지원과 함께 다시 돌아온 사회적기업 창업지원사업! '초기창업형', '인증전환형', '재도전형'의 3가지 유형으로 진행되어 어떤 유형을 선택해야 고민되시죠? '인증전환형'를 고민 중인 분들을 위해 <인증전환형 온라인 사업설명회> 를 개최합니다. - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *'인증전환형'이란? (예비)사회적기업으로 인·지정을 받고 싶어하는 법인사업자 전용 지",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 원문·첨부 자격 재확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "unknown",
       "sourceStatusText": "",
@@ -608,23 +593,8 @@
       "source": "Antler Korea 공식 레지던시",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "listed_open",
-      "lastSeenAt": "2026-10-23T11:51:55+09:00",
+      "lastSeenAt": "2026-10-23T11:59:33+09:00",
       "review": "개인·팀 유형별 신청 필요. 평일 전일제 참여와 투자·지분 조건을 확인",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "c2c98201289d9b28e707",
-      "title": "TIPS Partners 성공한 벤처인, 보육능력이 검증된 전문 투자사의 멘토링으로 성공가능성을 함께 높여갑니다 더보기",
-      "url": "https://www.jointips.or.kr/network/operators",
-      "category": "TIPS·연계",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "운영사/창업기업 소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 운영사 소개 운영사 소개 창업기업 소개 운영사/창업기업 소개 운영사 소개 창업기업 소개 운영사 소개 상세 필터 0 상세 필터 × 유형 지역 투자분야(산업) ? 산업기술표준분류 투자분야(기술) ? 12대 신산업 초기화 적용 초기화 정렬 가나다순 정보 업데이트순 등록일순 팁스 선정기업 수 오름차순 내림차순",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:48+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
     },
@@ -639,7 +609,7 @@
       "source": "Techstars 공식 액셀러레이터",
       "sourceKind": "공식 모집페이지 자동 확인",
       "sourceStatus": "unknown",
-      "lastSeenAt": "2026-10-23T11:51:56+09:00",
+      "lastSeenAt": "2026-10-23T11:59:34+09:00",
       "review": "지원 가능 국적·프로그램 도시·산업 제한·현지 체류·투자 조건 확인",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -654,7 +624,7 @@
       "description": "program dcamp batch Share ì¢ì ììì ëì´ ë í° ì±ì¥ì¼ë¡ ëìº í ë°°ì¹ì í¨ê»íì¸ì. ëìº í ë°°ì¹ë ë¤ì ëì½ì ì¤ë¹íë ì¤íí¸ì ì ìí 12ê°ì Scale up íë¡ê·¸ë¨ì ëë¤. ì ë° ì¦ì í¬ìë¶í° 1:1 ì½ì¹­, íìí¬ìÂ·ì¬ì ê¸°í ì°ê²°ê¹ì§",
       "source": "디캠프 공식 프로그램",
       "sourceKind": "공식 모집페이지·접수 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:52+09:00",
+      "lastSeenAt": "2026-10-23T11:59:00+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -669,7 +639,7 @@
       "description": "program officehour Share ì¬ì ë°©í¥ì± ì¤ì ê³¼ ì±ì¥ì íìí ì ë¬¸ ë©í ë§ 2013ë ë¶í° ììëì´ ì§ê¸ê¹ì§ 1,500í ì´ì ì§íë ì¤íí¸ì ë§ì¶¤í ë©í ë§ íë¡ê·¸ë¨, ëìº í ì¤í¼ì¤ììë ì±ì¥ì íìì ì¸ ì¬ì íë ¥, ë²¤ì²í¬ì ë± ë¶ì¼ë³ ì ë¬¸ê",
       "source": "디캠프 공식 프로그램",
       "sourceKind": "공식 모집페이지·접수 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:53+09:00",
+      "lastSeenAt": "2026-10-23T11:59:01+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -684,52 +654,52 @@
       "description": "program [10/22(ëª©)~10/28(ì)ã £ì ë¦] 10ì ì¤í¼ì¤ìì Share officehour [10/22(ëª©)~10/28(ì)ã £ì ë¦] 10ì ì¤í¼ì¤ìì ì¤í¼ì¤ìì ë©í ë§ ë²¤ì²í¬ì í¬ìì ì¹ ì ì²­ 2026.09.21 09:00 ~ 2026.10.12 11:59 ì¼ì 2026.10.22 14:00 ~ 2026.10.28 17:00 ì¥ì ëìº í ì ë¦(ì",
       "source": "디캠프 공식 프로그램",
       "sourceKind": "공식 모집페이지·접수 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
     },
     {
-      "id": "f5f699fd65298f6b6f55",
+      "id": "0a638fccb2d37a52ae3f",
       "title": "교육 「포항 엔젤투자 리더스 과정」 접수기간 2026-08-10 ~ 2026-09-04",
-      "url": "https://www.jointips.or.kr/contents/events/detail?eventId=2Q5Qo2&returnUrl=%2Fcontents%2Fevents",
+      "url": "https://jointips.or.kr/contents/events/detail?eventId=2Q5Qo2&returnUrl=%2Fcontents%2Fevents",
       "category": "엔젤",
       "eligibility": "자격 확인 필요",
       "deadline": null,
-      "description": "콘텐츠 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 행사·이벤트 뉴스·소식 행사·이벤트 행사·이벤트(상세) 콘텐츠 뉴스·소식 공고 및 지침 입주공고 사업 관련 안내 STARTUP NEWS 행사·이벤트 ← 목록으로 돌아가기",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:51+09:00",
+      "description": "",
+      "source": "TIPS 공식 행사",
+      "sourceKind": "목록에서만 발견 · 동적 상세 확인 실패",
+      "lastSeenAt": "2026-10-23T11:59:31+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
     },
     {
-      "id": "bb29788b00ecaaf9b4de",
-      "title": "대전팁스타운 소개",
-      "url": "https://www.jointips.or.kr/tipstown/space/d-tipstow",
-      "category": "TIPS·연계",
+      "id": "364a36a93832315d9ecc",
+      "title": "설명회 [무료] 창업자를 위한 금융지원 컨설팅 접수기간 2026-10-02 ~ 2026-10-19",
+      "url": "https://jointips.or.kr/contents/events/detail?eventId=26wJXr&returnUrl=%2Fcontents%2Fevents",
+      "category": "IR·매칭",
       "eligibility": "자격 확인 필요",
       "deadline": null,
-      "description": "팁스타운 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 공간안내 공간안내 입주신청 공용공간 예약 행사장 예약 대전팁스타운 예약 안내 대전팁스타운 소개 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 팁스타운 공간안내 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 입주신청 입주신청 안내 입주신청 검색/조회 공용공간 예약 공용공간 예약 안내 공용공간 예약 신청/현황 행사장 예약 행사장 예약 안내 행사장 예약 신청/현황 대전팁스타운 예약 안내 대전팁스타운 소개 타운소개 층별안내 입주현황 입주 ",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:46+09:00",
+      "description": "",
+      "source": "TIPS 공식 행사",
+      "sourceKind": "목록에서만 발견 · 동적 상세 확인 실패",
+      "lastSeenAt": "2026-10-23T11:59:33+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
     },
     {
-      "id": "554d9d60a0aa0cc72a73",
-      "title": "벤처투자톡톡 [2025년 11월 벤처투자톡톡(1:1상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/129599?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
+      "id": "4859adf603c936cd91db",
+      "title": "설명회 [신청가능] 피지컬 AI 실증 공급 컨소시엄 매칭데이 접수기간 2026-10-22 ~ 2026-11-04",
+      "url": "https://jointips.or.kr/contents/events/detail?eventId=27wL42&returnUrl=%2Fcontents%2Fevents",
+      "category": "IR·매칭",
       "eligibility": "자격 확인 필요",
       "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:31+09:00",
+      "description": "",
+      "source": "TIPS 공식 행사",
+      "sourceKind": "목록에서만 발견 · 동적 상세 확인 실패",
+      "lastSeenAt": "2026-10-23T11:59:32+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "unknown",
       "freshness": "checked"
@@ -739,224 +709,14 @@
       "title": "벤처투자톡톡 [2026년 10월 벤처투자톡톡(1:1 온라인 상담회) 모집 안내 공지]",
       "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/131213?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
       "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
+      "eligibility": "예비창업자 가능·회원가입 및 세부조건 확인",
+      "deadline": "2026-10-10",
       "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
       "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:19+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "13ce4e2063dd58da1161",
-      "title": "벤처투자톡톡 [2026년 1월 벤처투자톡톡(1:1상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/129810?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:30+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "212428eb6f2afbc184b0",
-      "title": "벤처투자톡톡 [2026년 2월 벤처투자톡톡(1:1상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/129902?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:28+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "1aea864e5b7947a8b816",
-      "title": "벤처투자톡톡 [2026년 3월 벤처투자톡톡(1:1상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/130021?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:27+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "e1b9c6f7c248fbd46505",
-      "title": "벤처투자톡톡 [2026년 4월 벤처투자톡톡(1:1상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/130121?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:26+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "35d67cd9ada8bf3cc375",
-      "title": "벤처투자톡톡 [2026년 5월 벤처투자톡톡(1:1상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/130229?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:25+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "5b82885094be9c059068",
-      "title": "벤처투자톡톡 [2026년 7월 벤처투자톡톡(1:1 온라인 상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/130673?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:23+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "92839b1b3be07180af71",
-      "title": "벤처투자톡톡 [2026년 8월 벤처투자톡톡(1:1 온라인 상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/130991?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:22+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "b8b06e004d21d559ecb1",
-      "title": "벤처투자톡톡 [2026년 9월 벤처투자톡톡(1:1 온라인 상담회) 모집 안내 공지]",
-      "url": "https://www.vcs.go.kr/web/portal/bbs/martnotice/131139?cp=1&pageSize=10&bcId=martnotice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-      "category": "VC·투자",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "벤처투자종합포털 메뉴 바로가기 본문 바로가기 벤처투자종합포털 벤처투자매칭 투자자 검색 투자유치 희망기업 검색 기업 홍보 통합공시 - 통합공시 - 벤처투자회사 전자공시 벤처투자마트 - 벤처투자마트란? - 벤처투자마트 공지 - 벤처투자마트 신청 - 신청 정보 확인 - 벤처투자마트 FAQ 주식유통정보 - VC구주유통망 - M&A 정보망 - 비상장주식거래플랫폼 모태출자펀드 운용사 찾기 투자가이드 벤처/개인투자조합 가이드 벤처투자 가이드 A to Z 맞춤투자 가이드 벤처투자 FAQ 용어사전 교육 벤처투자상담 정보서비스 정책 법령 통계 - 대",
-      "source": "벤처투자종합포털 벤처투자마트",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:21+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "aa60cab59fb04604c151",
-      "title": "서울팁스타운 소개",
-      "url": "https://www.jointips.or.kr/tipstown/space/seoul-tips",
-      "category": "TIPS·연계",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "팁스타운 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 공간안내 공간안내 입주신청 공용공간 예약 행사장 예약 대전팁스타운 예약 안내 서울팁스타운 소개 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 팁스타운 공간안내 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 입주신청 입주신청 안내 입주신청 검색/조회 공용공간 예약 공용공간 예약 안내 공용공간 예약 신청/현황 행사장 예약 행사장 예약 안내 행사장 예약 신청/현황 대전팁스타운 예약 안내 서울팁스타운 소개 타운소개 층별안내 입주현황 입주 ",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:42+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "25e15806ddc7f569111d",
-      "title": "설명회 [무료] 창업자를 위한 금융지원 컨설팅 접수기간 2026-10-02 ~ 2026-10-19",
-      "url": "https://www.jointips.or.kr/contents/events/detail?eventId=26wJXr&returnUrl=%2Fcontents%2Fevents",
-      "category": "IR·매칭",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "콘텐츠 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 행사·이벤트 뉴스·소식 행사·이벤트 행사·이벤트(상세) 콘텐츠 뉴스·소식 공고 및 지침 입주공고 사업 관련 안내 STARTUP NEWS 행사·이벤트 ← 목록으로 돌아가기",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:55+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "023404008cde754482db",
-      "title": "설명회 [신청가능] 피지컬 AI 실증 공급 컨소시엄 매칭데이 접수기간 2026-10-22 ~ 2026-11-04",
-      "url": "https://www.jointips.or.kr/contents/events/detail?eventId=27wL42&returnUrl=%2Fcontents%2Fevents",
-      "category": "IR·매칭",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "콘텐츠 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 행사·이벤트 뉴스·소식 행사·이벤트 행사·이벤트(상세) 콘텐츠 뉴스·소식 공고 및 지침 입주공고 사업 관련 안내 STARTUP NEWS 행사·이벤트 ← 목록으로 돌아가기",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:53+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "fb38986996038db6a6d4",
-      "title": "운영사/창업기업 소개",
-      "url": "https://www.jointips.or.kr/network",
-      "category": "IR·매칭",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "운영사/창업기업 소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 운영사 소개 운영사 소개 창업기업 소개 운영사/창업기업 소개 운영사 소개 창업기업 소개 운영사 소개 상세 필터 0 상세 필터 × 유형 지역 투자분야(산업) ? 산업기술표준분류 투자분야(기술) ? 12대 신산업 초기화 적용 초기화 정렬 가나다순 정보 업데이트순 등록일순 팁스 선정기업 수 오름차순 내림차순",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:40+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "d6dae88fda798e5baf6d",
-      "title": "팁스(TIPS) 사업 소개",
-      "url": "https://www.jointips.or.kr/intro/about",
-      "category": "TIPS·연계",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "팁스소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 팁스(TIPS) 사업 소개 팁스(TIPS) 사업 소개 지원내용 및 절차 공지사항 팁스소개 팁스(TIPS) 사업 소개 지원내용 및 절차 공지사항 팁스(TIPS) 사업 소개 국내 유망 기술인력의 글로벌 창업을 지원합니다. 전문성을 갖춘 민간 투자자가 스타트업 심사와 투자를 주도함으로써 기술 혁신을 선도하는 유망 창업기업을 발굴합니다. 왜 민간 주도인가? 민간 투자 리스크를 최소화 하고, 정부 R&D 자금을 매칭하는 민관협력 모델로 기술창업 성공률을 ",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:38+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
-      "freshness": "checked"
-    },
-    {
-      "id": "bbc80ab99e708422c6e9",
-      "title": "포항팁스타운 소개",
-      "url": "https://www.jointips.or.kr/tipstown/space/pohang-tips",
-      "category": "TIPS·연계",
-      "eligibility": "자격 확인 필요",
-      "deadline": null,
-      "description": "팁스타운 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 공간안내 공간안내 입주신청 공용공간 예약 행사장 예약 대전팁스타운 예약 안내 포항팁스타운 소개 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 팁스타운 공간안내 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 입주신청 입주신청 안내 입주신청 검색/조회 공용공간 예약 공용공간 예약 안내 공용공간 예약 신청/현황 행사장 예약 행사장 예약 안내 행사장 예약 신청/현황 대전팁스타운 예약 안내 포항팁스타운 소개 타운소개 층별안내 입주현황 입주 ",
-      "source": "TIPS 공식",
-      "sourceKind": "공식 사이트 상세 · 신청자격 별도 확인",
-      "lastSeenAt": "2026-10-23T11:51:44+09:00",
-      "review": "모집 원문·거주지·법인 요건 확인 필요",
-      "deadlineState": "unknown",
+      "sourceKind": "공식 공개 상세·신청자격 확인 필요",
+      "lastSeenAt": "2026-10-23T11:59:13+09:00",
+      "review": "VC 1:1 상담 모집. 본문 접수일 확인, 선정·상담 및 투자 보장 없음.",
+      "deadlineState": "closed",
       "freshness": "checked"
     },
     {
@@ -969,7 +729,7 @@
       "description": "성남 기후테크 UpSkill 아카데미 Vol.3 - 투자유치를 위한 IR 전략 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:43+09:00",
+      "lastSeenAt": "2026-10-23T11:58:51+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -984,7 +744,7 @@
       "description": "[제주창조경제혁신센터]「상시매칭 오픈이노베이션 플랫폼」'에코프로 계열사''수요과제 매칭 스타트업 모집 (~10/16) - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Se",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:47+09:00",
+      "lastSeenAt": "2026-10-23T11:58:56+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -999,7 +759,7 @@
       "description": "2026 Invest Seoul Partners Night - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:42+09:00",
+      "lastSeenAt": "2026-10-23T11:58:50+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -1014,7 +774,7 @@
       "description": "[중앙사회서비스원] 2026년 제3회 사회서비스 투자교류회 - 벤처스퀘어 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 최신 스타트업 투자 · 금융 칼럼 산업 · 기술 인사이트 인터뷰 정책 · 지원 글로벌 영상 · 이벤트 뉴스레터 광고 · 제휴 투자 · 성장 투자 유치 Seed Pre-Series A Series A Series B",
       "source": "벤처스퀘어 모집공고",
       "sourceKind": "재게시·공식 원문 확인 필요",
-      "lastSeenAt": "2026-10-23T11:50:44+09:00",
+      "lastSeenAt": "2026-10-23T11:58:52+09:00",
       "review": "모집 원문·거주지·법인 요건 확인 필요",
       "deadlineState": "closed",
       "freshness": "checked"
@@ -1029,7 +789,7 @@
       "description": "2026 넥스트밸류 그라운드(NextValue Ground) 참여기업 모집(~10/16, 기간연장)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1048,7 +808,7 @@
       "description": "2026 서울권역 사회적기업 창업지원사업 <인증전환형> 추가모집(5.29(금) ~ 6.9.(화) 17:00)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1067,7 +827,7 @@
       "description": "2026 창업팀&육성사업 졸업팀 네트워킹 행사 [SE Solution Bridge : 창업가와 선배기업가, 연결이 답이다!](7.23)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1086,7 +846,7 @@
       "description": "2026년도 서울권역 (예비)사회적기업 크라우드펀딩 지원사업 참여기업 모집 공고(~10/11 23:29까지)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1105,7 +865,7 @@
       "description": "2026년사회적기업 성장지원센터(서울) 상주기업 모집 공고 (~6/5(금) 14시까지)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1124,7 +884,7 @@
       "description": "서울권역 (예비)사회적기업 기초경영지원 멘토링 참여기업 모집 공고(~예산 소진시까지)",
       "source": "재단법인 밴드 공식 공지사항",
       "sourceKind": "공식 목록 확인·상세 원문 접근 실패",
-      "lastSeenAt": "2026-10-23T11:50:54+09:00",
+      "lastSeenAt": "2026-10-23T11:59:02+09:00",
       "review": "신청 폼·첨부 자격·혜택 직접 확인 필요",
       "sourceStatus": "closed",
       "sourceStatusText": "접수 마감",
@@ -1314,6 +1074,21 @@
       "freshness": "historical"
     },
     {
+      "id": "e8599eb3d33fe9a28157",
+      "title": "+ 4,588 Teams 누구보다 열정적이고, 누구보다 도전적인 TIPS의 스타트업팀들을 만나보세요. 더보기",
+      "url": "https://www.jointips.or.kr/network/startups",
+      "category": "TIPS·연계",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "운영사/창업기업 소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 창업기업 소개 운영사 소개 창업기업 소개 운영사/창업기업 소개 운영사 소개 창업기업 소개 창업기업 소개 상세 필터 0 상세 필터 × 선정연도 전체 선정트랙 지역 투자분야(산업) ? 산업기술표준분류 투자분야(기술) ? 12대 신산업 업력 초기화 적용 초기화 정렬 가나다순 정보 업데이트순 등록일순 팁스 선정연도 오름차순 내림차순",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:50+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
       "id": "1baa9aab600a9c77c2d3",
       "title": "2026 용인 오픈이노베이션 교류회 5회차",
       "url": "https://www.bizinfo.go.kr/",
@@ -1359,6 +1134,21 @@
       "freshness": "historical"
     },
     {
+      "id": "c2c98201289d9b28e707",
+      "title": "TIPS Partners 성공한 벤처인, 보육능력이 검증된 전문 투자사의 멘토링으로 성공가능성을 함께 높여갑니다 더보기",
+      "url": "https://www.jointips.or.kr/network/operators",
+      "category": "TIPS·연계",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "운영사/창업기업 소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 운영사 소개 운영사 소개 창업기업 소개 운영사/창업기업 소개 운영사 소개 창업기업 소개 운영사 소개 상세 필터 0 상세 필터 × 유형 지역 투자분야(산업) ? 산업기술표준분류 투자분야(기술) ? 12대 신산업 초기화 적용 초기화 정렬 가나다순 정보 업데이트순 등록일순 팁스 선정기업 수 오름차순 내림차순",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:48+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
       "id": "b208789781f9dfb667cc",
       "title": "공공데이터 활용 오픈이노베이션",
       "url": "https://www.k-startup.go.kr/",
@@ -1374,6 +1164,81 @@
       "freshness": "historical"
     },
     {
+      "id": "f5f699fd65298f6b6f55",
+      "title": "교육 「포항 엔젤투자 리더스 과정」 접수기간 2026-08-10 ~ 2026-09-04",
+      "url": "https://www.jointips.or.kr/contents/events/detail?eventId=2Q5Qo2&returnUrl=%2Fcontents%2Fevents",
+      "category": "엔젤",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "콘텐츠 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 행사·이벤트 뉴스·소식 행사·이벤트 행사·이벤트(상세) 콘텐츠 뉴스·소식 공고 및 지침 입주공고 사업 관련 안내 STARTUP NEWS 행사·이벤트 ← 목록으로 돌아가기",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:51+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
+      "id": "bb29788b00ecaaf9b4de",
+      "title": "대전팁스타운 소개",
+      "url": "https://www.jointips.or.kr/tipstown/space/d-tipstow",
+      "category": "TIPS·연계",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "팁스타운 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 공간안내 공간안내 입주신청 공용공간 예약 행사장 예약 대전팁스타운 예약 안내 대전팁스타운 소개 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 팁스타운 공간안내 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 입주신청 입주신청 안내 입주신청 검색/조회 공용공간 예약 공용공간 예약 안내 공용공간 예약 신청/현황 행사장 예약 행사장 예약 안내 행사장 예약 신청/현황 대전팁스타운 예약 안내 대전팁스타운 소개 타운소개 층별안내 입주현황 입주 ",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:46+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
+      "id": "aa60cab59fb04604c151",
+      "title": "서울팁스타운 소개",
+      "url": "https://www.jointips.or.kr/tipstown/space/seoul-tips",
+      "category": "TIPS·연계",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "팁스타운 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 공간안내 공간안내 입주신청 공용공간 예약 행사장 예약 대전팁스타운 예약 안내 서울팁스타운 소개 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 팁스타운 공간안내 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 입주신청 입주신청 안내 입주신청 검색/조회 공용공간 예약 공용공간 예약 안내 공용공간 예약 신청/현황 행사장 예약 행사장 예약 안내 행사장 예약 신청/현황 대전팁스타운 예약 안내 서울팁스타운 소개 타운소개 층별안내 입주현황 입주 ",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:42+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
+      "id": "25e15806ddc7f569111d",
+      "title": "설명회 [무료] 창업자를 위한 금융지원 컨설팅 접수기간 2026-10-02 ~ 2026-10-19",
+      "url": "https://www.jointips.or.kr/contents/events/detail?eventId=26wJXr&returnUrl=%2Fcontents%2Fevents",
+      "category": "IR·매칭",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "콘텐츠 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 행사·이벤트 뉴스·소식 행사·이벤트 행사·이벤트(상세) 콘텐츠 뉴스·소식 공고 및 지침 입주공고 사업 관련 안내 STARTUP NEWS 행사·이벤트 ← 목록으로 돌아가기",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:55+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
+      "id": "023404008cde754482db",
+      "title": "설명회 [신청가능] 피지컬 AI 실증 공급 컨소시엄 매칭데이 접수기간 2026-10-22 ~ 2026-11-04",
+      "url": "https://www.jointips.or.kr/contents/events/detail?eventId=27wL42&returnUrl=%2Fcontents%2Fevents",
+      "category": "IR·매칭",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "콘텐츠 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 행사·이벤트 뉴스·소식 행사·이벤트 행사·이벤트(상세) 콘텐츠 뉴스·소식 공고 및 지침 입주공고 사업 관련 안내 STARTUP NEWS 행사·이벤트 ← 목록으로 돌아가기",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:53+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
       "id": "0332d23c2d2e3921d33c",
       "title": "성동구 소셜벤처허브 투자유치 특강: 성공 스타트업 사례로 배우는 투자 유치 성공 전략",
       "url": "https://www.sd.go.kr/sv/selectBbsNttView.do?bbsNo=507&key=3867&nttNo=361929&pageIndex=1&pageUnit=10",
@@ -1387,6 +1252,51 @@
       "review": "현재 모집 원문 확인 필요",
       "deadlineState": "unknown",
       "freshness": "historical"
+    },
+    {
+      "id": "fb38986996038db6a6d4",
+      "title": "운영사/창업기업 소개",
+      "url": "https://www.jointips.or.kr/network",
+      "category": "IR·매칭",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "운영사/창업기업 소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 운영사 소개 운영사 소개 창업기업 소개 운영사/창업기업 소개 운영사 소개 창업기업 소개 운영사 소개 상세 필터 0 상세 필터 × 유형 지역 투자분야(산업) ? 산업기술표준분류 투자분야(기술) ? 12대 신산업 초기화 적용 초기화 정렬 가나다순 정보 업데이트순 등록일순 팁스 선정기업 수 오름차순 내림차순",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:40+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
+      "id": "d6dae88fda798e5baf6d",
+      "title": "팁스(TIPS) 사업 소개",
+      "url": "https://www.jointips.or.kr/intro/about",
+      "category": "TIPS·연계",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "팁스소개 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 팁스(TIPS) 사업 소개 팁스(TIPS) 사업 소개 지원내용 및 절차 공지사항 팁스소개 팁스(TIPS) 사업 소개 지원내용 및 절차 공지사항 팁스(TIPS) 사업 소개 국내 유망 기술인력의 글로벌 창업을 지원합니다. 전문성을 갖춘 민간 투자자가 스타트업 심사와 투자를 주도함으로써 기술 혁신을 선도하는 유망 창업기업을 발굴합니다. 왜 민간 주도인가? 민간 투자 리스크를 최소화 하고, 정부 R&D 자금을 매칭하는 민관협력 모델로 기술창업 성공률을 ",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:38+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
+    },
+    {
+      "id": "bbc80ab99e708422c6e9",
+      "title": "포항팁스타운 소개",
+      "url": "https://www.jointips.or.kr/tipstown/space/pohang-tips",
+      "category": "TIPS·연계",
+      "eligibility": "자격 확인 필요",
+      "deadline": null,
+      "description": "팁스타운 팁스소개 운영사/창업기업 소개 도전의 IR 콘텐츠 팁스타운 지원센터 마이페이지 공간안내 공간안내 입주신청 공용공간 예약 행사장 예약 대전팁스타운 예약 안내 포항팁스타운 소개 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 팁스타운 공간안내 서울팁스타운 소개 포항팁스타운 소개 대전팁스타운 소개 입주신청 입주신청 안내 입주신청 검색/조회 공용공간 예약 공용공간 예약 안내 공용공간 예약 신청/현황 행사장 예약 행사장 예약 안내 행사장 예약 신청/현황 대전팁스타운 예약 안내 포항팁스타운 소개 타운소개 층별안내 입주현황 입주 ",
+      "source": "TIPS 공식",
+      "sourceKind": "과거 수집·이번 실행에서 미확인",
+      "lastSeenAt": "2026-10-23T11:51:44+09:00",
+      "review": "모집 원문·거주지·법인 요건 확인 필요",
+      "deadlineState": "unknown",
+      "freshness": "stale"
     },
     {
       "id": "1b6be92130bdd68b7413",
@@ -1480,8 +1390,8 @@
     }
   ],
   "stats": {
-    "total": 84,
-    "liveDiscovered": 61,
+    "total": 78,
+    "liveDiscovered": 45,
     "historical": 19
   }
 }
