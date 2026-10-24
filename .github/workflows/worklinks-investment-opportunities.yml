@@ -9,6 +9,8 @@ on:
       - 'scripts/refresh_worklinks_investment.py'
       - 'scripts/worklinks_dynamic_sources.py'
       - 'scripts/worklinks_sefund.py'
+      - 'scripts/worklinks_kised.py'
+      - 'tests/test_kised.py'
       - 'scripts/worklinks_global_accelerators.py'
       - 'tests/test_global_accelerators.py'
       - 'tests/test_investment_monitor.py'
@@ -46,6 +48,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_investment_monitor.py' -v
       - name: Test international accelerator parsing
         run: python -m unittest discover -s tests -p 'test_global_accelerators.py' -v
+      - name: Test KIS ED official notice parsing
+        run: python -m unittest discover -s tests -p 'test_kised.py' -v
       - name: Read investment and BAND Foundation notices
         id: collect
         continue-on-error: true
