@@ -248,10 +248,10 @@ jobs:
                     const valid=cited.filter(x=>{
                       const proof=x.officialClauseEvidence||{};
                       const source=Array.isArray(proof.files)&&proof.files.some(f=>
-                        /^https:\/\/www\\.g2b\\.go\\.kr\//.test(String(f.url||'')));
+                        String(f.url||'').startsWith('https://www.g2b.go.kr/'));
                       const clauses=Object.values(proof.clauseCandidates||{})
                         .flat().some(c=>c&&c.sourceFile&&c.text&&
-                          /^https:\/\/www\\.g2b\\.go\\.kr\//.test(String(c.url||'')));
+                          String(c.url||'').startsWith('https://www.g2b.go.kr/'));
                       return source&&clauses;
                     });
                     return {cited:cited.length,valid:valid.length,
