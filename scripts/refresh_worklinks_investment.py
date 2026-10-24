@@ -14,6 +14,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path: sys.path.insert(0, str(SCRIPT_DIR))
 from worklinks_sefund import scan_band
 from worklinks_global_accelerators import scan_global
+from worklinks_kised import scan_kised
 from worklinks_dynamic_sources import scan_browser_sources
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +24,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0 WorkLinks/1.0 public-listing-monitor", "Ac
 KEY = re.compile(r"엔젤투자|액셀러레이|엑셀러레이|투자유치|투자상담|투자교류|투자매칭|벤처투자|투자설명|투자자\s*매칭|오픈이노베이션|투자\s*피칭|IR\s*(?:경진|데모|피칭|상담|캠프)|데모데이|TIPS|LIPS|프라이머|블루포인트|스파크랩|퓨처플레이|배치\s*\d|batch|office\s*hour|d\.day|invest|사업협력.*매칭|CVC|VC\b",re.I)
 DATE = re.compile(r"(20\d{2})[.\-/년\s]+(\d{1,2})[.\-/월\s]+(\d{1,2})\s*(?:일)?(?:\([월화수목금토일]\))?\s*(?:(\d{1,2}):(\d{2}))?",re.I)
 WATCH = [
+ {"name":"창업진흥원 공식 사업공고","type":"창업지원·공모","url":"https://www.kised.or.kr/misAnnouncement/index.es?mid=a10302000000"},
  {"name":"한국엔젤투자협회","type":"엔젤","url":"https://www.kban.or.kr/"},
  {"name":"벤처투자종합포털","type":"VC","url":"https://www.vcs.go.kr/"},
  {"name":"TIPS 공식","type":"TIPS","url":"https://www.jointips.or.kr/"},
@@ -266,6 +268,9 @@ def main():
     global_rows, global_sources = scan_global()
     rows += global_rows
     sources += global_sources
+    kised_rows, kised_sources = scan_kised(html, now())
+    rows += kised_rows
+    sources += kised_sources
     registered = registered_titles()
     for item in rows:
         if item.get("source") == "재단법인 밴드 공식 공지사항":
