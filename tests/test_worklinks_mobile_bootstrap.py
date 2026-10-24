@@ -170,6 +170,11 @@ def main():
             assert census["all"] == census["aligned"] + census["review"] + census["unknown"] + census["mismatch"], census
             assert census["display"] == min(24, census["aligned"]), census
             assert census["first"] and "g2b.go.kr" in census["first"], census
+            # Keep real pointer clicks: center the filters away from the sticky
+            # header and job filter rows before testing mobile interaction.
+            page.locator("#changcomActionableFilters").evaluate(
+                "(el) => el.scrollIntoView({block:'center',inline:'nearest'})"
+            )
             page.locator('[data-changcom-actionable="review"]').click()
             assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
             page.locator('[data-changcom-actionable="mismatch"]').click()
