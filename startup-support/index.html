@@ -1379,6 +1379,7 @@ var g2bLinkedEligibility=null;
 // Official all-indexed G2B shortlist. Do not infer final legal eligibility
 // from license-match labels, and never hide unknown-deadline opportunities.
 var changcomActionableData=null,changcomActionableMode='aligned',changcomActionableLimit=24;
+var changcomReviewedByNotice={};
 var changcomActionableRequest=null;
 function changcomActionableEntries(mode){
  const rows=Array.isArray(changcomActionableData?.bids)?changcomActionableData.bids:[];
@@ -1452,7 +1453,12 @@ function renderChangcomActionable(){
   const proofFiles=Array.isArray(documentProof.files)?documentProof.files:[];
   const primarySource=proofFiles.find(a=>/^https:\/\/www\.g2b\.go\.kr\//.test(String(a.url||'')));
   const sourceKinds=x.originalRequirementTypes||{};
-  const checked=x.reviewedNotice||{};
+  const key=String(x.bidNo||'')+':'+String(x.order||'0').padStart(3,'0');
+  const checked=changcomReviewedByNotice[key]||x.reviewedNotice||{};
+  const budgetAudit=checked.budgetReconciliation||{};
+  const officialPerformance=checked.officialRfpPerformanceEvidence||{};
+  const performanceAlerts=Array.isArray(officialPerformance.requirements)?
+    officialPerformance.requirements.filter(v=>v.phase==='contract_performance').slice(0,2):[];
   const checkedLink=/^https:\/\//.test(String(checked.sourceUrl||''))?checked.sourceUrl:'';
   const checkedLabel=x.confirmedRegionalMismatch?'지역제한 불일치 · 단독 불가':
     checked.state==='core_credentials_matched'?'핵심 등록조건 대조 · 추가검증 필요':
@@ -1472,9 +1478,14 @@ function renderChangcomActionable(){
    '<h3 style="font-size:16px;line-height:1.45;margin:8px 0"><a href="'+htmlEscape(link)+
     '" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.title||'제목 확인 필요')+'</a></h3>'+
    '<div class="why" style="font-size:13px;line-height:1.5">'+htmlEscape(reason)+'</div>'+
-   (Number(x.budget)>0?'<div style="font-size:12px;margin-top:5px;font-weight:800">사업예산 '+Number(x.budget).toLocaleString('ko-KR')+'원 · 경쟁·원가 미검증</div>':'')+
+   (Number(budgetAudit.projectAmountIncludingVatKrw)>0 && Number(budgetAudit.allocationKrw)>0?
+    '<div style="font-size:12px;margin-top:5px;font-weight:800">공고 사업금액 '+Number(budgetAudit.projectAmountIncludingVatKrw).toLocaleString('ko-KR')+
+    '원 · 인덱스 배정예산 '+Number(budgetAudit.allocationKrw).toLocaleString('ko-KR')+'원 (차액은 매출로 미확정) · 경쟁·원가 미검증</div>':
+    Number(x.budget)>0?'<div style="font-size:12px;margin-top:5px;font-weight:800">배정예산 '+Number(x.budget).toLocaleString('ko-KR')+'원 · 경쟁·원가 미검증</div>':'')+
    (checked.stateReason?'<div style="font-size:12px;margin-top:5px;font-weight:600">'+htmlEscape(checked.stateReason)+'</div>':'')+
    (checked.scopeRisk?'<div style="font-size:12px;margin-top:5px">수행·수익성 확인: '+htmlEscape(checked.scopeRisk)+'</div>':'')+
+   (performanceAlerts.length?'<div style="font-size:12px;margin-top:5px">공식 원문 수행조건(최종 검증 전): '+
+     performanceAlerts.map(v=>htmlEscape(String(v.finding||''))).join(' / ')+'</div>':'')+
    (checkedLink?'<div style="font-size:12px;margin-top:5px"><a target="_blank" rel="noopener noreferrer" href="'+htmlEscape(checkedLink)+'">확인 근거 공고문 ↗</a></div>':'')+
    (sourceNote?'<div style="font-size:12px;margin-top:5px">'+htmlEscape(sourceNote)+'</div>':'')+
    (primarySource?'<div style="font-size:12px;margin-top:5px"><a target="_blank" rel="noopener noreferrer" href="'+htmlEscape(primarySource.url)+'">공식 원문 첨부 확인 ↗</a></div>':'')+
@@ -1495,11 +1506,22 @@ async function loadChangcomActionable(force=false){
  if(!force&&changcomActionableData){renderChangcomActionable();return;}
  changcomActionableRequest=(async function(){
   try{
-   const response=await fetch('./changcom-actionable.json',{cache:'no-store'});
+   const [response,reviewResponse]=await Promise.all([
+    fetch('./changcom-actionable.json',{cache:'no-store'}),
+    fetch('./changcom-bid-review.json',{cache:'no-store'}).catch(()=>null)
+   ]);
    if(!response.ok)throw Error('HTTP '+response.status);
    const json=await response.json();
    if(json.ok!==true||json.bizno!=='1308185973'||!Array.isArray(json.bids))
     throw Error('공식 조회 데이터 형식 확인 필요');
+   if(reviewResponse&&reviewResponse.ok){
+    try{
+     const latestReview=await reviewResponse.json();
+     if(latestReview.schemaVersion===1 && latestReview.byNotice &&
+         typeof latestReview.byNotice==='object'&&!Array.isArray(latestReview.byNotice))
+       changcomReviewedByNotice=latestReview.byNotice;
+    }catch(reviewError){/* Preserve valid embedded reviews on a malformed overlay. */}
+   }
    changcomActionableData=json;
    renderChangcomActionable();
   }catch(error){
