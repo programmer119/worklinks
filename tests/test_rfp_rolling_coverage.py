@@ -69,6 +69,13 @@ many={f'k{i:04d}':{'checkedAt':'2026-10-25','files':[]} for i in range(300)}
 kept,not_in_cache=bound(many,max_records=240,max_bytes=100000)
 assert len(kept)==240 and not_in_cache==60
 assert len(many)==300
+# A later outage must not evict previously readable, cited documents.
+good={'status':'text_extracted_requires_review','checkedAt':'2026-10-24',
+      'files':[{'readable':True,'sourceSha256':'f'*64}]}
+outage={'status':'metadata_not_confirmed','checkedAt':'2026-10-25','files':[]}
+preferred,omitted=bound({'GOOD:000':good,'FAIL:000':outage},
+                         max_records=1,max_bytes=100000)
+assert set(preferred)=={'GOOD:000'} and omitted==1,preferred
 print('WORKLINKS_RFP_GITHUB_BLOB_GUARD=PASS','selected',len(selected),'omitted',omitted)
 # An extracted but not legally reviewed RFP is NOT a new download job
 # after 24 hours. Cumulative scans are distinct from participation verdicts.

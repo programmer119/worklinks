@@ -1017,8 +1017,15 @@ def bounded_detail_snapshot(records, max_records=240, max_bytes=MAX_PUBLISHED_RF
     Do not shorten individual quotations or claim that discarded cache entries
     were unscanned. The cumulative evidence index is written independently.
     """
-    ordered=sorted(records.items(), key=lambda pair: str(
-        (pair[1] if isinstance(pair[1],dict) else {}).get('checkedAt') or ''),
+    # Successful official excerpts outrank failed metadata-only refreshes.
+    # Otherwise one G2B outage replaces the complete rolling 240-document
+    # evidence cache with 240 zero-document error records.
+    ordered=sorted(records.items(), key=lambda pair: (
+        int(isinstance(pair[1],dict) and
+            pair[1].get('status')=='text_extracted_requires_review' and
+            any(isinstance(f,dict) and f.get('readable') and f.get('sourceSha256')
+                for f in pair[1].get('files') or [])),
+        str((pair[1] if isinstance(pair[1],dict) else {}).get('checkedAt') or '')),
         reverse=True)
     selected={}
     omitted=[]
@@ -1070,6 +1077,7 @@ def main():
             prior['reasonCode']='eorder_api_returned_zero'
             prior['classificationVersion']=2
     success=0
+    failed_refresh={}
     uncached=[]
     for no,ordn,_ in selected:
         key=no+':'+ordn
@@ -1104,19 +1112,30 @@ def main():
                 data['checkedAt']=now.isoformat()
                 data['classificationVersion']=CLASSIFICATION_VERSION
                 data['hwpxReaderVersion']=HWPX_READER_VERSION
-                results[key]=data
+                if (reusable_rfp_extraction(old.get(key)) and
+                        data['status']!='text_extracted_requires_review'):
+                    results[key]=old[key]
+                    failed_refresh[key]=data['status']
+                    print('RFP_PRIOR_DETAIL_PRESERVED',key,data['status'],flush=True)
+                else:
+                    results[key]=data
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
                 reason=('metadata_http_'+str(e.code) if isinstance(e,urllib.error.HTTPError)
                         else classify_failure(e))
-                results[key]={'status':'metadata_fetch_failed','reasonCode':reason,
+                failed={'status':'metadata_fetch_failed','reasonCode':reason,
                               'source':'나라장터 e발주 첨부파일 API',
                               'sourceError':type(e).__name__+': '+str(e)[:100],
                               'files':[],'reviewComplete':False,
                               'contractPerformanceVerified':False,
                               'checkedAt':now.isoformat(),'classificationVersion':CLASSIFICATION_VERSION,
                               'hwpxReaderVersion':HWPX_READER_VERSION}
+                if reusable_rfp_extraction(old.get(key)):
+                    results[key]=old[key]
+                    failed_refresh[key]='metadata_fetch_failed'
+                else:
+                    results[key]=failed
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
     details,omitted=bounded_detail_snapshot(results)
@@ -1131,6 +1150,9 @@ def main():
         if not isinstance(item,dict):continue
         update=compact_coverage(item)
         prev=coverage.get(key) or {}
+        if key in failed_refresh:
+            update['lastAttemptStatus']=failed_refresh[key]
+            update['lastAttemptAt']=now.isoformat()
         # Retain the last authenticated manifest and pending-change flag if a
         # fresh download failed or the current metadata endpoints were partial.
         # Probe timestamps are newer than the cached detail's extraction
