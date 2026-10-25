@@ -102,7 +102,7 @@ def reusable_rfp_extraction(record):
 # Only attachment METADATA is periodically compared. Unchanged documents
 # never need to be downloaded. Same-order binary changes with identical
 # metadata cannot be proven without a separate, explicit hash audit.
-MAX_MANIFEST_PROBES_PER_RUN=8
+MAX_MANIFEST_PROBES_PER_RUN=2
 MANIFEST_PROBE_INTERVAL=dt.timedelta(hours=36)
 
 

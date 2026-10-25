@@ -32,6 +32,7 @@ jobs:
         run: |
           python3 tests/test_rfp_failures.py
           python3 tests/test_rfp_rolling_coverage.py
+          python3 tests/test_rfp_quota_budget.py
           python3 tests/test_rfp_checkpoint.py
           python3 tests/test_rfp_ai.py
           python3 tests/test_worklinks_rfp_coverage.py
@@ -67,8 +68,13 @@ jobs:
             "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" \
             -o /tmp/worklinks-rfp-unpublished.zip
           python3 scripts/recover_worklinks_rfp_checkpoint.py /tmp/worklinks-rfp-unpublished.zip
-      - name: Extract limited official RFP eligibility text
-        run: python3 scripts/refresh_worklinks_rfp.py --limit 220
+      # The G2B bid-evidence proxy makes up to 3 upstream notice-service calls
+      # per notice (region, e-order attachments, notice-detail). Until the
+      # approved key quota is verified, budget 8 new scans + 2 metadata-only
+      # change checks per hour: <= 720 upstream calls/day for THIS job only.
+      # Other G2B consumers share upstream access and need separate budgets.
+      - name: Extract quota-budgeted official RFP eligibility text
+        run: python3 scripts/refresh_worklinks_rfp.py --limit 8
       - name: Checkpoint extracted RFP records before push
         uses: actions/upload-artifact@v4
         with:
