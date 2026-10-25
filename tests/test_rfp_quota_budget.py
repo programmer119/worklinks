@@ -3,7 +3,7 @@
 import pathlib,re,runpy
 root=pathlib.Path(__file__).resolve().parents[1]
 workflow=(root/'.github/workflows/worklinks-rfp-snapshot.yml').read_text(encoding='utf-8')
-m=re.search(r'python3 scripts/refresh_worklinks_rfp.py --limit (\\d+)',workflow)
+m=re.search(r'python3 scripts/refresh_worklinks_rfp.py --limit (\d+)',workflow)
 assert m,'missing quota-bound scan invocation'
 per_hour=int(m.group(1))
 r=runpy.run_path(str(root/'scripts/refresh_worklinks_rfp.py'),run_name='test_quota')
