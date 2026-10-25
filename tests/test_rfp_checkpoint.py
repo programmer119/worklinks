@@ -27,6 +27,16 @@ with tempfile.TemporaryDirectory() as td:
         'NEW:000': {'status': 'text_extracted_requires_review',
                     'checkedAt': '2026-10-26T00:00:00Z',
                     'files': [{'name': 'new.hwpx', 'readable': True, 'sourceSha256': 'b'*64}]}}}
+    # A concurrent metadata-only probe must outrank a checkpoint whose
+    # extracted document is newer but whose manifest check is older.
+    old_index['byNotice']['NEW:000'] = {
+        'status':'text_extracted_requires_review',
+        'checkedAt':'2026-10-24T00:00:00Z',
+        'manifestSignature':'x'*64,
+        'manifestCheckedAt':'2026-10-27T00:00:00Z',
+        'manifestChangePending':True,
+        'manifestPendingSignature':'y'*64,
+        'files':[{'name':'old-new.pdf','sourceSha256':'z'*64}]}
     old_index_pending = {'ok': True, 'byNotice': {
         'OLD:000': pending['byNotice']['OLD:000'],
         'NEW:000': {**pending['byNotice']['NEW:000'], 'files': [
@@ -45,6 +55,8 @@ with tempfile.TemporaryDirectory() as td:
     assert d['byNotice']['OLD:000']['files'][0]['sourceSha256'] == 'a'*64
     assert i['byNotice']['OLD:000']['changcomClauseEvidence']
     assert i['byNotice']['NEW:000']['files'][0]['sourceSha256'] == 'b'*64
+    assert i['byNotice']['NEW:000']['manifestChangePending'] is True
+    assert i['byNotice']['NEW:000']['manifestCheckedAt'] == '2026-10-27T00:00:00Z'
     assert i['scannedNoticeCount'] == 2
     assert recovery.recover(zpath, detail, index) == (0, 0)
 print('WORKLINKS_RFP_CHECKPOINT_RECOVERY=PASS')

@@ -77,7 +77,7 @@ jobs:
             startup-support/rfp-clauses.json
             startup-support/rfp-coverage-index.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 2
           compression-level: 7
       - name: Publish verified RFP snippets
         shell: bash

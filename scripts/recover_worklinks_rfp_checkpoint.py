@@ -32,7 +32,21 @@ def combine(current, checkpoint, cumulative=False):
         if not isinstance(item, dict):
             continue
         prev = existing.get(key) or {}
-        chosen = newer_evidence(prev, item)
+        chosen = dict(newer_evidence(prev, item))
+        if cumulative and prev:
+            # An old scan's metadata timestamp can equal a NEW checkpoint's
+            # source timestamp. Preserve the newest separately probed manifest,
+            # especially a pending same-order attachment correction.
+            previous_probe=str(prev.get('manifestCheckedAt') or '')
+            incoming_probe=str(chosen.get('manifestCheckedAt') or '')
+            if previous_probe > incoming_probe:
+                for field in ('manifestSignature','manifestCheckedAt',
+                              'manifestChangePending','manifestPendingSignature',
+                              'manifestBaselineUnverified','lastManifestProbeStatus'):
+                    if field in prev:
+                        chosen[field]=prev[field]
+                    else:
+                        chosen.pop(field,None)
         if cumulative and prev.get('changcomClauseEvidence') and not chosen.get('changcomClauseEvidence'):
             chosen = {**chosen, 'changcomClauseEvidence': prev['changcomClauseEvidence']}
         if cumulative and chosen.get('status') == 'text_extracted_requires_review' and not chosen.get('files') and prev.get('files'):
