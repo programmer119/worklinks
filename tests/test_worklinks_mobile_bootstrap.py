@@ -170,20 +170,33 @@ def main():
             assert census["all"] == census["aligned"] + census["review"] + census["unknown"] + census["mismatch"], census
             assert census["display"] == min(24, census["aligned"]), census
             assert census["first"] and "g2b.go.kr" in census["first"], census
-            # Keep real pointer clicks: center the filters away from the sticky
-            # header and job filter rows before testing mobile interaction.
-            page.locator("#changcomActionableFilters").evaluate(
-                "(el) => el.scrollIntoView({block:'center',inline:'nearest'})"
-            )
-            page.locator('[data-changcom-actionable="review"]').click()
+            # Verify a REAL pointer click can reach each control on mobile.
+            # A static scrollIntoView can leave the button under preceding
+            # filters after asynchronous layout shifts. Never force clicks.
+            def click_actionable(mode):
+                selector = '[data-changcom-actionable="%s"]' % mode
+                page.wait_for_function("""selector => {
+                    const target=document.querySelector(selector);
+                    if(!target)return false;
+                    const r=target.getBoundingClientRect();
+                    const desired=window.scrollY+r.top-window.innerHeight*0.64;
+                    window.scrollTo({top:Math.max(0,desired),behavior:'instant'});
+                    const b=target.getBoundingClientRect();
+                    const x=b.left+b.width/2,y=b.top+b.height/2;
+                    if(x<0||x>=innerWidth||y<0||y>=innerHeight)return false;
+                    const hit=document.elementFromPoint(x,y);
+                    return hit===target||target.contains(hit);
+                }""", arg=selector, timeout=12000)
+                page.locator(selector).click(timeout=12000)
+            click_actionable("review")
             assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
-            page.locator('[data-changcom-actionable="mismatch"]').click()
+            click_actionable("mismatch")
             assert page.locator("#changcomActionableList .card").count() == min(24,census["mismatch"])
             if census["mismatch"]:
                 assert "지역제한 불일치" in page.locator("#changcomActionableList").inner_text()
-            page.locator('[data-changcom-actionable="unknown"]').click()
+            click_actionable("unknown")
             assert page.locator("#changcomActionableList .card").count() == min(24,census["unknown"])
-            page.locator('[data-changcom-actionable="aligned"]').click()
+            click_actionable("aligned")
             more = page.locator("#changcomActionableMore")
             if census["aligned"] > 24:
                 assert more.is_visible()
