@@ -135,6 +135,11 @@ assert not module['manifest_probe_due'](
     {**scanned_record(),'manifestCheckedAt':utc.isoformat()},utc)
 assert module['manifest_probe_due'](
     {**scanned_record(),'manifestCheckedAt':(utc-dt.timedelta(days=3)).isoformat()},utc)
+pending_record={**scanned_record(),'checkedAt':utc.isoformat(),
+                'manifestChangePending':True,'manifestSignature':'d'*64}
+pending_key=rows[4]['bidNo']+':000'
+pending_jobs=discover(1,{pending_key:pending_record},targets={pending_key})
+assert pending_jobs and pending_jobs[0][:2]==(rows[4]['bidNo'],'000'),pending_jobs
 probe_candidates=[]
 discover(5, {rows[0]['bidNo']+':000':existing},manifest_probe_out=probe_candidates)
 assert any(x[1]==rows[0]['bidNo'] for x in probe_candidates),probe_candidates[:2]

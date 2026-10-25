@@ -1046,7 +1046,9 @@ def main():
                 (reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key)))):
             print('RFP_REUSE_PREVIOUS_EXTRACTION',key)
             continue
-        if cached:
+        # A confirmed manifest change is more important than the old 6-hour
+        # detail-cache TTL. The previous detail must not block its refresh.
+        if cached and not (prior_index.get(key) or {}).get('manifestChangePending'):
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                 if (cached.get('classificationVersion')==CLASSIFICATION_VERSION and
