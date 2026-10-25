@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-25T03:06:10.620062+00:00",
+  "generatedAt": "2026-10-25T03:11:56.110799+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 2815,
+  "scannedNoticeCount": 3035,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -124249,7 +124249,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01778677:000": {
       "status": "no_official_attachment_metadata",
@@ -138433,7 +138435,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01767840:000": {
       "status": "text_extracted_requires_review",
@@ -138918,7 +138922,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01768626:000": {
       "status": "text_extracted_requires_review",
@@ -139261,7 +139267,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01769691:000": {
       "status": "text_extracted_requires_review",
@@ -139603,7 +139611,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01771613:000": {
       "status": "text_extracted_requires_review",
@@ -139938,7 +139948,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01772182:000": {
       "status": "text_extracted_requires_review",
@@ -140398,7 +140410,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01773976:000": {
       "status": "text_extracted_requires_review",
@@ -140827,7 +140841,9 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T03:11:56.110799+00:00",
+      "lastManifestProbeStatus": "metadata_incomplete"
     },
     "R26BK01774068:000": {
       "status": "text_extracted_requires_review",
@@ -250007,7 +250023,2427 @@
       "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": []
+    },
+    "R26BK01754891:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01754977:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01754868:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01754936:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755145:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755004:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755090:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755090:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755176:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755177:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755334:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755251:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755371:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755481:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755549:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755652:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755733:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755808:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755750:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755827:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01755858:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756277:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756398:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756422:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756470:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756494:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756495:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756591:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756761:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756846:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757092:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01756826:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757214:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757319:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757066:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757092:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757335:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757335:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757133:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757335:002": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757335:003": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757399:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757616:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757616:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757704:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757578:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758057:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758122:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758038:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758267:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757734:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758265:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01757754:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758652:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758297:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758863:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758778:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758948:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758623:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758879:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758734:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759021:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01758995:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759085:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759061:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759203:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759004:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759147:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759038:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759324:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759283:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759604:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759489:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759681:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759320:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759668:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759338:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759764:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759687:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760012:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759996:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760057:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759712:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760028:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01759969:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760257:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760132:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760247:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760445:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760384:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760208:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760633:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760282:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760751:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760735:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760838:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760459:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760829:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760722:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761178:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01760911:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761193:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761178:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761223:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761107:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761223:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761177:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761273:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761253:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761275:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761323:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761336:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761269:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761352:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761613:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761325:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761336:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761813:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761830:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761609:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761928:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761623:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01761773:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762668:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762708:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762758:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762241:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762473:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762578:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762764:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762995:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763046:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763189:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01762832:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763298:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763411:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763252:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763643:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763218:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763425:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763230:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764304:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01763757:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764444:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764308:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764595:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764304:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764527:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764308:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765097:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764805:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765220:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765200:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765354:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01764943:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765322:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765180:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765641:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765653:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765668:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765754:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765393:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765489:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765562:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765771:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01765806:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01766307:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01766360:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01766975:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01766051:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767417:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767127:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767341:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01766988:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767837:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767858:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767816:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767816:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767816:002": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01768640:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01768455:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01769093:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01767992:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01769011:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01768201:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01770159:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01769097:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01770708:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01770937:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01771003:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01770134:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01771075:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01771059:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01772011:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01771003:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01772061:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01772014:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01771989:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01771991:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01772064:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01772143:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01773231:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01773265:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01773377:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01772808:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01773286:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774281:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01773856:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01773279:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774570:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774553:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774625:001": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774120:001": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01775072:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01775382:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774739:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774570:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01776355:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01774625:000": {
+      "status": "metadata_fetch_failed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01775790:000": {
+      "status": "metadata_not_confirmed",
+      "checkedAt": "2026-10-25T03:11:56.110799+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
     }
   },
-  "workflowRunId": "40156944026"
+  "workflowRunId": "40157281016"
 }
