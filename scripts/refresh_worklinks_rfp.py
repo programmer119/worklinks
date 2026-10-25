@@ -829,8 +829,40 @@ def normalize_extracted_text(content):
     return content.replace('\x00', ' ')
 
 
-def process(no,ordn):
-    data=fetch_json(BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn}))
+
+def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
+    """Prevent a broad SW scan when the official attachment endpoint is down.
+
+    Metadata-only probes are reused in the real scan; neither rejected calls
+    nor their transient errors can be treated as a missing legal condition.
+    """
+    fetcher=fetch_json if fetcher is None else fetcher
+    staged={}
+    valid=0
+    for no,ordn in unscanned[:sample_size]:
+        try:
+            data=fetcher(BASE+'bid-evidence?'+urllib.parse.urlencode(
+                {'bidNo':no,'order':ordn}))
+            attachments=data.get('attachments') or {}
+            valid+=int(attachments.get('ok') is True and
+                       attachments.get('complete') is True)
+            staged[(no,ordn)]=data
+        except Exception as err:
+            reason=('http_'+str(err.code) if isinstance(err,urllib.error.HTTPError)
+                    else type(err).__name__)
+            staged[(no,ordn)]={'attachments':{
+                'ok':False,'complete':False,'error':'preflight_'+reason}}
+    print('RFP_METADATA_PREFLIGHT','TESTED',len(staged),
+          'COMPLETE',valid,'UPSTREAM_UNAVAILABLE',len(staged)-valid,flush=True)
+    if staged and not valid:
+        # Do not spend another 200+ requests or increment scan coverage.
+        raise RuntimeError('RFP_UPSTREAM_METADATA_UNAVAILABLE_PREFLIGHT')
+    return staged
+
+
+def process(no,ordn,metadata=None):
+    data=(metadata if metadata is not None else fetch_json(
+        BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn})))
     docs=data.get('attachments') or {}
     if not docs.get('ok') or not docs.get('complete'):
         return {'status':'metadata_not_confirmed','reasonCode':'metadata_api_error' if not docs.get('ok') else 'metadata_page_incomplete',
@@ -1060,8 +1092,10 @@ def main():
         uncached.append((no,ordn))
     # Official requests are bounded; four independent notices run concurrently
     # so one unavailable PDF does not starve the entire 16-minute job.
+    preloaded=preflight_rfp_metadata(uncached)
     with ThreadPoolExecutor(max_workers=4) as pool:
-        tasks={pool.submit(process,no,ordn):(no,ordn) for no,ordn in uncached}
+        tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn))):
+               (no,ordn) for no,ordn in uncached}
         for future in as_completed(tasks):
             no,ordn=tasks[future]
             key=no+':'+ordn

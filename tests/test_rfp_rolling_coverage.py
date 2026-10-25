@@ -160,4 +160,29 @@ stale={**existing,'checkedAt':(utc-dt.timedelta(days=4)).isoformat()}
 changed_index={**existing,**changed,'manifestCheckedAt':utc.isoformat()}
 assert consolidate_manifest(changed_index,stale)['manifestChangePending']
 print('WORKLINKS_RFP_MANIFEST_CHECK=PASS','metadata_probe_only',True)
+
+# Repeated HTTP 503 / incomplete attachment metadata must stop before the
+# 220-document downloader. Healthy responses are reused instead of fetched twice.
+preflight=module['preflight_rfp_metadata']
+todo=[(r['bidNo'],r['order']) for r in rows[:4]]
+attempts=[]
+def bad_upstream(url):
+    attempts.append(url)
+    return {'attachments':{'ok':False,'complete':False,'error':'upstream_http_503'}}
+try:
+    preflight(todo,fetcher=bad_upstream)
+    raise AssertionError('upstream outage was not blocked')
+except RuntimeError as error:
+    assert 'RFP_UPSTREAM_METADATA_UNAVAILABLE_PREFLIGHT' in str(error)
+assert len(attempts)==4,attempts
+attempts.clear()
+def partly_healthy(url):
+    attempts.append(url)
+    return {'attachments':{'ok':len(attempts)==1,
+                           'complete':len(attempts)==1,'items':[]}}
+loaded=preflight(todo,fetcher=partly_healthy)
+assert len(attempts)==4 and len(loaded)==4
+assert loaded[todo[0]]['attachments']['complete'] is True
+assert preflight([],fetcher=bad_upstream)=={}
+print('WORKLINKS_RFP_UPSTREAM_CIRCUIT_BREAKER=PASS')
 print('WORKLINKS_RFP_ROLLING_CORPUS=PASS','total',len(rows),'batch',220,'cumulative_archive',True)
