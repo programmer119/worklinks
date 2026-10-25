@@ -92,11 +92,80 @@ def reusable_rfp_extraction(record):
     """
     if not isinstance(record,dict):return False
     if record.get('status')!='text_extracted_requires_review':return False
+    if record.get('manifestChangePending'):return False
     if record.get('classificationVersion')!=CLASSIFICATION_VERSION:return False
     if needs_hwpx_reader_retry(record):return False
     if int(record.get('readableDocumentCount') or 0)<1:return False
     return any(f.get('readable') is True and f.get('sourceSha256')
                for f in (record.get('files') or []) if isinstance(f,dict))
+
+# Only attachment METADATA is periodically compared. Unchanged documents
+# never need to be downloaded. Same-order binary changes with identical
+# metadata cannot be proven without a separate, explicit hash audit.
+MAX_MANIFEST_PROBES_PER_RUN=8
+MANIFEST_PROBE_INTERVAL=dt.timedelta(hours=36)
+
+
+def official_manifest_signature(data):
+    docs=(data or {}).get('attachments') or {}
+    notice=(data or {}).get('noticeDocuments') or {}
+    # Partial/failed sources do not establish that an attachment was removed.
+    if not (docs.get('ok') and docs.get('complete') and
+            notice.get('ok') and notice.get('complete') and
+            docs.get('eorderCount') is not None):
+        return None
+    items=docs.get('items') or []
+    if not isinstance(items,list):return None
+    normalized=sorted(
+        (str(f.get('name') or '').strip(),str(f.get('url') or '').strip(),
+         str(f.get('source') or '').strip(),
+         str(f.get('officialNoticeField') or '').strip())
+        for f in items if isinstance(f,dict))
+    payload=json.dumps(normalized,ensure_ascii=False,separators=(',',':'))
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
+
+
+def manifest_probe_due(record,now):
+    if not reusable_rfp_extraction(record):return False
+    if not record.get('manifestSignature'):return True
+    try:
+        checked=dt.datetime.fromisoformat(
+            str(record.get('manifestCheckedAt') or record.get('checkedAt') or '').replace('Z','+00:00'))
+        return not checked.tzinfo or now-checked>=MANIFEST_PROBE_INTERVAL
+    except (ValueError,TypeError):
+        return True
+
+
+def inspect_manifest_probe(data,existing,checked_at):
+    sig=official_manifest_signature(data)
+    if not sig:
+        return {'manifestCheckedAt':checked_at,
+                'lastManifestProbeStatus':'metadata_incomplete'},'incomplete'
+    previous=str((existing or {}).get('manifestSignature') or '')
+    result={'manifestCheckedAt':checked_at,'lastManifestProbeStatus':'complete'}
+    if previous and previous!=sig:
+        result.update(manifestChangePending=True,manifestPendingSignature=sig)
+        return result,'changed'
+    if not previous:
+        old_files=[str(f.get('name') or '').strip() for f in
+                   (existing or {}).get('files') or [] if isinstance(f,dict)]
+        new_files=[str(f.get('name') or '').strip() for f in
+                   (data.get('attachments') or {}).get('items') or [] if isinstance(f,dict)]
+        expected=(existing or {}).get('attachmentManifestCount')
+        if (expected is not None and expected==len(old_files) and
+                sorted(old_files)!=sorted(new_files)):
+            result.update(manifestChangePending=True,
+                          manifestPendingSignature=sig,
+                          manifestBaselineUnverified=True)
+            return result,'legacy_list_changed'
+        # Old scans had no manifest digest: establish a baseline. This cannot
+        # prove that an earlier binary revision has not occurred.
+        result.update(manifestSignature=sig,manifestBaselineUnverified=True,
+                      manifestChangePending=False)
+        return result,'baseline'
+    result.update(manifestSignature=sig,manifestChangePending=False)
+    return result,'unchanged'
+
 
 def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
@@ -111,7 +180,7 @@ def changcom_targets(path=CHANGCOM_SOURCE):
     except (OSError,ValueError,TypeError,AttributeError):
         return set()
 
-def discover(limit,prior=None,targets=None):
+def discover(limit,prior=None,targets=None,manifest_probe_out=None):
     """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
     The file snapshot only contains recent detailed snippets, while the
@@ -143,8 +212,17 @@ def discover(limit,prior=None,targets=None):
                 cached=prior.get(key) or {}
                 retry=needs_hwpx_reader_retry(cached)
                 if cached.get('reviewComplete') is True:continue
-                if reusable_rfp_extraction(cached):continue
-                if cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry:
+                if reusable_rfp_extraction(cached):
+                    if (manifest_probe_out is not None and date and date>=today and
+                            manifest_probe_due(cached,utc)):
+                        last=str(cached.get('manifestCheckedAt') or cached.get('checkedAt') or '')
+                        rank=(0 if key in targets else 1,
+                              0 if not cached.get('manifestSignature') else 1,
+                              last,date,key)
+                        manifest_probe_out.append((rank,no,order))
+                    continue
+                if (cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry
+                        and not cached.get('manifestChangePending')):
                     try:
                         checked=dt.datetime.fromisoformat(str(cached.get('checkedAt','')).replace('Z','+00:00'))
                         if checked.tzinfo and (utc-checked).total_seconds()<24*3600:
@@ -158,7 +236,7 @@ def discover(limit,prior=None,targets=None):
                 # Urgent, unreviewed and official-license-matched bids first.
                 # Do not confuse a lack of matching metadata with a rejection.
                 temporal=0 if date and date>=today else 1 if date is None else 2
-                novel=0 if not cached else 1
+                novel=0 if not cached or cached.get('manifestChangePending') else 1
                 rank=(0 if key in targets and temporal==0 else 1 if temporal==0 else
                       2 if key in targets else 3,
                       novel,0 if retry else 1,
@@ -817,14 +895,17 @@ def process(no,ordn):
             'unreadableDocumentCount':sum(int(f.get('readable') is not True) for f in saved),
             'files':saved,
             'reviewComplete':False,'requiredConditionsComplete':False,
-            'contractPerformanceVerified':False}
+            'contractPerformanceVerified':False,
+            'manifestSignature':official_manifest_signature(data),
+            'manifestCheckedAt':dt.datetime.now(dt.timezone.utc).isoformat(),
+            'manifestChangePending':False}
 def compact_coverage(item):
     """Keep cross-run scan provenance for every bid, not capped at 240.
 
     Compact index is a *scan inventory*, not a license grant, a verified RFP
     comparison, nor proof that missing attachments never existed.
     """
-    return {
+    compact={
         'status':item.get('status') or 'unknown',
         'checkedAt':item.get('checkedAt') or '',
         'classificationVersion':item.get('classificationVersion',0),
@@ -843,6 +924,12 @@ def compact_coverage(item):
             'clauseCandidateCount':len(f.get('clauseCandidates') or [])
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
     }
+    for field in ('manifestSignature','manifestCheckedAt',
+                  'manifestChangePending','manifestPendingSignature',
+                  'manifestBaselineUnverified'):
+        if item.get(field) is not None:
+            compact[field]=item[field]
+    return compact
 
 
 def compact_changcom_evidence(item):
@@ -934,9 +1021,10 @@ def main():
         except (ValueError,OSError):pass
     # The detailed snapshot wins for equal keys; the index preserves ALL
     # previously scanned keys and prevents a repeat 240-bid treadmill.
-    prior={**prior_index,**old}
+    prior={**old,**prior_index}
     targets=changcom_targets()
-    selected=discover(limit,prior,targets=targets)
+    manifest_probes=[]
+    selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes)
     results=dict(old)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
     # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
@@ -951,7 +1039,8 @@ def main():
     for no,ordn,_ in selected:
         key=no+':'+ordn
         cached=old.get(key)
-        if reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key)):
+        if (not (prior_index.get(key) or {}).get('manifestChangePending') and
+                (reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key)))):
             print('RFP_REUSE_PREVIOUS_EXTRACTION',key)
             continue
         if cached:
@@ -1003,6 +1092,18 @@ def main():
         if not isinstance(item,dict):continue
         update=compact_coverage(item)
         prev=coverage.get(key) or {}
+        # Retain the last authenticated manifest and pending-change flag if a
+        # fresh download failed or the current metadata endpoints were partial.
+        if prev.get('manifestSignature') and not update.get('manifestSignature'):
+            update['manifestSignature']=prev['manifestSignature']
+        if prev.get('manifestCheckedAt') and not update.get('manifestCheckedAt'):
+            update['manifestCheckedAt']=prev['manifestCheckedAt']
+        if prev.get('manifestChangePending') and not (
+                item.get('status')=='text_extracted_requires_review' and
+                item.get('manifestSignature')):
+            update['manifestChangePending']=True
+            if prev.get('manifestPendingSignature'):
+                update['manifestPendingSignature']=prev['manifestPendingSignature']
         # Add bounded primary-source excerpts to the already published cumulative
         # index, rather than the rolling 240-document detail snapshot.
         if key in targets and item.get('status')=='text_extracted_requires_review':
@@ -1017,6 +1118,21 @@ def main():
                 if prev.get('files'):
                     update['files']=prev['files']
             coverage[key]=update
+    # Re-probe only a small rotating batch of already-extracted, open bids.
+    # The metadata fetch does not download any PDF/HWPX bytes.
+    for _,no,ordn in sorted(manifest_probes,key=lambda x:x[0])[:MAX_MANIFEST_PROBES_PER_RUN]:
+        key=no+':'+ordn
+        previous=coverage.get(key) or prior.get(key) or {}
+        try:
+            meta=fetch_json(BASE+'bid-evidence?'+urllib.parse.urlencode(
+                {'bidNo':no,'order':ordn}))
+            fields,verdict=inspect_manifest_probe(meta,previous,now.isoformat())
+        except Exception as error:
+            fields={'manifestCheckedAt':now.isoformat(),
+                    'lastManifestProbeStatus':'fetch_failed'}
+            verdict='fetch_failed_'+type(error).__name__
+        coverage[key]={**previous,**fields}
+        print('RFP_MANIFEST_PROBE',key,verdict,flush=True)
     cumulative={'ok':True,'generatedAt':now.isoformat(),
        'scope':'누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)',
        'reviewComplete':False,'scannedNoticeCount':len(coverage),

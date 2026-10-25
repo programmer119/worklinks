@@ -102,4 +102,37 @@ corrected=discover(5,all_done)
 assert corrected==[(original['bidNo'],'001',deadline[:4]+'-'+deadline[4:6]+'-'+deadline[6:8])],corrected
 rows[2]=original
 print('WORKLINKS_RFP_SUCCESS_REUSE=PASS','historical',len(all_done),'retry',len(candidate))
+
+# A successful RFP keeps its official source hash but has a separately
+# monitored manifest digest. Metadata checks do not download document bytes.
+manifest=module['official_manifest_signature']
+inspect=module['inspect_manifest_probe']
+def metadata(*names,complete=True):
+    items=[{'name':name,'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/'+name}
+           for name in names]
+    return {'attachments':{'ok':True,'complete':complete,
+                           'eorderCount':len(items),'items':items},
+            'noticeDocuments':{'ok':True,'complete':complete,'items':[]}}
+alpha=metadata('A.pdf','B.hwpx')
+reverse=metadata('B.hwpx','A.pdf')
+modified=metadata('A.pdf','C.hwpx')
+sig=manifest(alpha)
+assert sig and sig==manifest(reverse) and sig!=manifest(modified)
+assert manifest(metadata('A.pdf',complete=False)) is None
+existing={**scanned_record(),'manifestSignature':sig,
+          'manifestCheckedAt':(utc-dt.timedelta(days=3)).isoformat()}
+steady,verdict=inspect(reverse,existing,utc.isoformat())
+assert verdict=='unchanged' and not steady['manifestChangePending']
+changed,verdict=inspect(modified,existing,utc.isoformat())
+assert verdict=='changed' and changed['manifestChangePending']
+assert changed['manifestPendingSignature']!=sig and 'manifestSignature' not in changed
+assert not module['reusable_rfp_extraction']({**existing,**changed})
+legacy,verdict=inspect(alpha,scanned_record(),utc.isoformat())
+assert verdict=='baseline' and legacy['manifestBaselineUnverified']
+incomplete,verdict=inspect(metadata('B.hwpx',complete=False),existing,utc.isoformat())
+assert verdict=='incomplete' and incomplete['lastManifestProbeStatus']=='metadata_incomplete'
+probe_candidates=[]
+discover(5, {rows[0]['bidNo']+':000':existing},manifest_probe_out=probe_candidates)
+assert any(x[1]==rows[0]['bidNo'] for x in probe_candidates),probe_candidates[:2]
+print('WORKLINKS_RFP_MANIFEST_CHECK=PASS','metadata_probe_only',True)
 print('WORKLINKS_RFP_ROLLING_CORPUS=PASS','total',len(rows),'batch',220,'cumulative_archive',True)
