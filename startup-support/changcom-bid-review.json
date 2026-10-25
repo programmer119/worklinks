@@ -118,7 +118,34 @@
         "status": "unresolved_difference",
         "note": "두 사업금액은 서로 다름. 정정공고 또는 계약금액으로 확정하지 않음"
       },
-      "partialReviewUpdatedAt": "2026-10-25"
+      "partialReviewUpdatedAt": "2026-10-25",
+      "companyQualificationEvidence": {
+        "industry1468": {
+          "status": "normal_registration_observed",
+          "checkedAt": "2026-10-25T11:33:00Z",
+          "source": "https://api-suaveforge.suaveforge.com:18458/api/g2b/company?bizno=1308185973",
+          "meaning": "등록업종 정상 조회; 공고별 법적 자격 확정 아님"
+        },
+        "sme": {
+          "status": "valid_public_snapshot",
+          "checkedAt": "2026-10-25T06:25:30Z",
+          "companySize": "소기업",
+          "issuedAt": "2026-04-01",
+          "source": "https://github.com/programmer119/worklinks/blob/main/startup-support/sme-cert-snapshot.json",
+          "meaning": "공개조회 시점 유효; 투찰일 유효 여부는 별도 확인"
+        },
+        "directProduction": {
+          "status": "historical_snapshot",
+          "snapshotDate": "2026-02-01",
+          "item": "정보시스템유지관리서비스",
+          "validFrom": "2025-01-16",
+          "validTo": "2027-01-15",
+          "source": "https://github.com/programmer119/worklinks/blob/main/startup-support/direct-production-snapshot.json",
+          "meaning": "과거 공식 공개 스냅샷; 투찰일 현재 재확인 필요"
+        },
+        "legalEligibilityVerified": false
+      },
+      "companyEvidenceUpdatedAt": "2026-10-25"
     },
     "R26BK01777538:000": {
       "bidNo": "R26BK01777538",
@@ -167,7 +194,34 @@
         "risk": "미제출로 계약 해제 시 입찰제한 가능성; 사전 공급사 비용·발급가능성 확인 필요",
         "sourceUrl": "https://www.bidpro.co.kr/n0_ipchal/konggo/svc/konggo_view.asp?num=3190162"
       },
-      "partialReviewUpdatedAt": "2026-10-25"
+      "partialReviewUpdatedAt": "2026-10-25",
+      "companyQualificationEvidence": {
+        "industry1468": {
+          "status": "normal_registration_observed",
+          "checkedAt": "2026-10-25T11:33:00Z",
+          "source": "https://api-suaveforge.suaveforge.com:18458/api/g2b/company?bizno=1308185973",
+          "meaning": "등록업종 정상 조회; 공고별 법적 자격 확정 아님"
+        },
+        "sme": {
+          "status": "valid_public_snapshot",
+          "checkedAt": "2026-10-25T06:25:30Z",
+          "companySize": "소기업",
+          "issuedAt": "2026-04-01",
+          "source": "https://github.com/programmer119/worklinks/blob/main/startup-support/sme-cert-snapshot.json",
+          "meaning": "공개조회 시점 유효; 투찰일 유효 여부는 별도 확인"
+        },
+        "directProduction": {
+          "status": "historical_snapshot",
+          "snapshotDate": "2026-02-01",
+          "item": "정보시스템유지관리서비스",
+          "validFrom": "2025-01-16",
+          "validTo": "2027-01-15",
+          "source": "https://github.com/programmer119/worklinks/blob/main/startup-support/direct-production-snapshot.json",
+          "meaning": "과거 공식 공개 스냅샷; 투찰일 현재 재확인 필요"
+        },
+        "legalEligibilityVerified": false
+      },
+      "companyEvidenceUpdatedAt": "2026-10-25"
     },
     "R26BK01765541:000": {
       "bidNo": "R26BK01765541",
@@ -205,7 +259,34 @@
         "최근 결산 소프트웨어사업자 일반 현황 관리확인서 창컴 보유·제출 가능성 확인",
         "제안요청서 상주·인력수/등급 및 기존 시스템 운영 인수인계 부담 산출",
         "공고문 사업금액 745000000원 vs 인덱스 750972000원 및 납품기한 2026-12-31 이상기재 확인"
-      ]
+      ],
+      "companyQualificationEvidence": {
+        "industry1468": {
+          "status": "normal_registration_observed",
+          "checkedAt": "2026-10-25T11:33:00Z",
+          "source": "https://api-suaveforge.suaveforge.com:18458/api/g2b/company?bizno=1308185973",
+          "meaning": "등록업종 정상 조회; 공고별 법적 자격 확정 아님"
+        },
+        "sme": {
+          "status": "valid_public_snapshot",
+          "checkedAt": "2026-10-25T06:25:30Z",
+          "companySize": "소기업",
+          "issuedAt": "2026-04-01",
+          "source": "https://github.com/programmer119/worklinks/blob/main/startup-support/sme-cert-snapshot.json",
+          "meaning": "공개조회 시점 유효; 투찰일 유효 여부는 별도 확인"
+        },
+        "directProduction": {
+          "status": "historical_snapshot",
+          "snapshotDate": "2026-02-01",
+          "item": "정보시스템유지관리서비스",
+          "validFrom": "2025-01-16",
+          "validTo": "2027-01-15",
+          "source": "https://github.com/programmer119/worklinks/blob/main/startup-support/direct-production-snapshot.json",
+          "meaning": "과거 공식 공개 스냅샷; 투찰일 현재 재확인 필요"
+        },
+        "legalEligibilityVerified": false
+      },
+      "companyEvidenceUpdatedAt": "2026-10-25"
     }
   }
 }
