@@ -122,10 +122,34 @@ def self_test():
     print("WORKLINKS_CHANGCOM_OFFLINE_EVIDENCE_UNIT=PASS")
 
 
+def print_open_priority_clauses(index):
+    """One bounded *unverified* source excerpt per condition, not a verdict."""
+    types=("industry_code","direct_production","sme_certificate","region_restriction",
+           "joint_participation","staff_proof","performance_proof",
+           "submission_required","eligibility_cutoff","unclassified_qualification")
+    rows=index.get("byNotice") or {}
+    for number in ("R26BK01777288","R26BK01777538","R26BK01765541"):
+        record=rows.get(number+":000") or {}
+        clauses=(record.get("changcomClauseEvidence") or {}).get("clauseCandidates") or {}
+        snippets=[]
+        for typ in types:
+            choices=clauses.get(typ) or []
+            cited=next((c for c in choices if valid_evidence(c)),None)
+            if cited:
+                snippets.append({"type":typ,"text":str(cited.get("text") or "")[:225],
+                                 "codes":cited.get("codes") or [],
+                                 "url":cited.get("url"),"file":cited.get("sourceFile"),
+                                 "status":"unreviewed"})
+        print("WORKLINKS_CHANGCOM_PRIORITY_EXCERPTS",
+              json.dumps({"bidNo":number,"evidence":snippets},ensure_ascii=False,separators=(",",":")))
+
+
 if __name__=="__main__":
     self_test()
-    result=audit(load("changcom-actionable.json"),
-                 load("rfp-coverage-index.json"),
-                 load("rfp-clauses.json"),
-                 load("changcom-bid-review.json"))
+    actionable=load("changcom-actionable.json")
+    index=load("rfp-coverage-index.json")
+    detail=load("rfp-clauses.json")
+    review=load("changcom-bid-review.json")
+    result=audit(actionable,index,detail,review)
     print("WORKLINKS_CHANGCOM_OFFLINE_AUDIT",json.dumps(result,ensure_ascii=False,separators=(",",":")))
+    print_open_priority_clauses(index)
