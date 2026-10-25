@@ -12,6 +12,7 @@ on:
     - cron: '17 * * * *'
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: worklinks-official-rfp-snapshot
   cancel-in-progress: false
@@ -21,16 +22,63 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - name: Refresh RFP input baseline from latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
       - name: Install document readers
         run: python3 -m pip install --break-system-packages -q pyhwp pypdf
       - name: Verify per-cause classification
         run: |
           python3 tests/test_rfp_failures.py
           python3 tests/test_rfp_rolling_coverage.py
+          python3 tests/test_rfp_checkpoint.py
           python3 tests/test_rfp_ai.py
           python3 tests/test_worklinks_rfp_coverage.py
+      - name: Recover checkpoint from last failed RFP publish
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          artifact_id=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=worklinks-rfp-checkpoint&per_page=20" \
+            --jq '.artifacts | map(select(.expired == false)) | sort_by(.created_at) | last | .id // empty')
+          if [[ -z "$artifact_id" ]]; then
+            echo 'RFP_CHECKPOINT_NONE'
+            exit 0
+          fi
+          prior_run=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id" --jq '.workflow_run.id')
+          if [[ "$prior_run" == "$GITHUB_RUN_ID" ]]; then
+            echo 'RFP_CHECKPOINT_SAME_RUN'
+            exit 0
+          fi
+          conclusion=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$prior_run" --jq '.conclusion')
+          if [[ "$conclusion" == success ]]; then
+            echo "RFP_CHECKPOINT_ALREADY_PUBLISHED run=$prior_run"
+            exit 0
+          fi
+          if [[ "$conclusion" != failure && "$conclusion" != cancelled ]]; then
+            echo "RFP_CHECKPOINT_PRIOR_RUN_UNRESOLVED run=$prior_run conclusion=$conclusion"
+            exit 1
+          fi
+          curl -fsSL --retry 2 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" \
+            -o /tmp/worklinks-rfp-unpublished.zip
+          python3 scripts/recover_worklinks_rfp_checkpoint.py /tmp/worklinks-rfp-unpublished.zip
       - name: Extract limited official RFP eligibility text
         run: python3 scripts/refresh_worklinks_rfp.py --limit 220
+      - name: Checkpoint extracted RFP records before push
+        uses: actions/upload-artifact@v4
+        with:
+          name: worklinks-rfp-checkpoint
+          path: |
+            startup-support/rfp-clauses.json
+            startup-support/rfp-coverage-index.json
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 7
       - name: Publish verified RFP snippets
         shell: bash
         run: |
