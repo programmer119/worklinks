@@ -187,7 +187,20 @@ def main():
                     const hit=document.elementFromPoint(x,y);
                     return hit===target||target.contains(hit);
                 }""", arg=selector, timeout=12000)
-                page.locator(selector).click(timeout=12000)
+                # Playwright Locator.click() may perform a SECOND implicit
+                # scroll after this hit-test, moving the button under a nearby
+                # filter/progress block. Use an actual mouse pointer event at
+                # the already verified visible coordinates instead.
+                point=page.evaluate("""selector => {
+                    const target=document.querySelector(selector);
+                    if(!target)return null;
+                    const b=target.getBoundingClientRect();
+                    const x=b.left+b.width/2,y=b.top+b.height/2;
+                    const hit=document.elementFromPoint(x,y);
+                    return hit===target||target.contains(hit)?{x,y}:null;
+                }""",selector)
+                assert point is not None, "mobile filter obstructed: "+mode
+                page.mouse.click(point["x"],point["y"])
             click_actionable("review")
             assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
             click_actionable("mismatch")
