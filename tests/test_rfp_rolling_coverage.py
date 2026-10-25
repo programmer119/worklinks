@@ -143,5 +143,21 @@ assert pending_jobs and pending_jobs[0][:2]==(rows[4]['bidNo'],'000'),pending_jo
 probe_candidates=[]
 discover(5, {rows[0]['bidNo']+':000':existing},manifest_probe_out=probe_candidates)
 assert any(x[1]==rows[0]['bidNo'] for x in probe_candidates),probe_candidates[:2]
+# A newer *metadata-only* change must not be cleared by the previously
+# extracted 240-record detail during the next merge cycle.
+def consolidate_manifest(prev, detail):
+    update=module['compact_coverage'](detail)
+    if str(prev.get('manifestCheckedAt') or '')>str(update.get('manifestCheckedAt') or ''):
+        update['manifestCheckedAt']=prev['manifestCheckedAt']
+    refreshed=(prev.get('manifestChangePending') and
+               detail.get('status')=='text_extracted_requires_review' and
+               detail.get('manifestSignature')==prev.get('manifestPendingSignature') and
+               str(detail.get('checkedAt') or '')>str(prev.get('manifestCheckedAt') or ''))
+    if prev.get('manifestChangePending') and not refreshed:
+        update['manifestChangePending']=True
+    return update
+stale={**existing,'checkedAt':(utc-dt.timedelta(days=4)).isoformat()}
+changed_index={**existing,**changed,'manifestCheckedAt':utc.isoformat()}
+assert consolidate_manifest(changed_index,stale)['manifestChangePending']
 print('WORKLINKS_RFP_MANIFEST_CHECK=PASS','metadata_probe_only',True)
 print('WORKLINKS_RFP_ROLLING_CORPUS=PASS','total',len(rows),'batch',220,'cumulative_archive',True)

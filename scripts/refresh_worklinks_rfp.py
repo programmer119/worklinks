@@ -1099,16 +1099,31 @@ def main():
         prev=coverage.get(key) or {}
         # Retain the last authenticated manifest and pending-change flag if a
         # fresh download failed or the current metadata endpoints were partial.
+        # Probe timestamps are newer than the cached detail's extraction
+        # timestamp. Never roll back a completed metadata check on the next run.
+        if (str(prev.get('manifestCheckedAt') or '') >
+                str(update.get('manifestCheckedAt') or '')):
+            update['manifestCheckedAt']=prev['manifestCheckedAt']
         if prev.get('manifestSignature') and not update.get('manifestSignature'):
             update['manifestSignature']=prev['manifestSignature']
-        if prev.get('manifestCheckedAt') and not update.get('manifestCheckedAt'):
-            update['manifestCheckedAt']=prev['manifestCheckedAt']
-        if prev.get('manifestChangePending') and not (
-                item.get('status')=='text_extracted_requires_review' and
-                item.get('manifestSignature')):
+        if prev.get('manifestBaselineUnverified') and not update.get('manifestBaselineUnverified'):
+            update['manifestBaselineUnverified']=True
+        if prev.get('lastManifestProbeStatus') and not update.get('lastManifestProbeStatus'):
+            update['lastManifestProbeStatus']=prev['lastManifestProbeStatus']
+        # An old, previously successful DETAIL does not prove a subsequently
+        # detected manifest change was handled. Clear pending ONLY after a
+        # newer, successful scan of the exact changed attachment identity.
+        refreshed=(prev.get('manifestChangePending') and
+                   item.get('status')=='text_extracted_requires_review' and
+                   item.get('manifestSignature')==prev.get('manifestPendingSignature') and
+                   str(item.get('checkedAt') or '')>str(prev.get('manifestCheckedAt') or ''))
+        if prev.get('manifestChangePending') and not refreshed:
             update['manifestChangePending']=True
             if prev.get('manifestPendingSignature'):
                 update['manifestPendingSignature']=prev['manifestPendingSignature']
+        elif refreshed:
+            update['manifestChangePending']=False
+            update.pop('manifestPendingSignature',None)
         # Add bounded primary-source excerpts to the already published cumulative
         # index, rather than the rolling 240-document detail snapshot.
         if key in targets and item.get('status')=='text_extracted_requires_review':
