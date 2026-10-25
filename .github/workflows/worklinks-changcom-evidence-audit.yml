@@ -1,0 +1,27 @@
+name: WorkLinks Changcom offline RFP evidence audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/audit_changcom_evidence.py'
+      - '.github/workflows/worklinks-changcom-evidence-audit.yml'
+      - 'startup-support/changcom-actionable.json'
+      - 'startup-support/changcom-bid-review.json'
+      - 'startup-support/rfp-coverage-index.json'
+      - 'startup-support/rfp-clauses.json'
+  workflow_dispatch:
+  schedule:
+    - cron: '43 0,12 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: worklinks-changcom-offline-audit
+  cancel-in-progress: true
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit cached official evidence without API requests
+        run: python3 scripts/audit_changcom_evidence.py
