@@ -265,16 +265,16 @@ def main():
                     break
                 button = page.locator("#g2bMore")
                 assert button.is_visible(), "More button must expose remaining rows"
-                button.click()
+                click_verified("#g2bMore")
                 page.wait_for_timeout(260)
             page.wait_for_function(
                 "() => g2bLoadedOffset >= 320", timeout=15000
             )
             assert calls[:2] == [(0, 160), (160, 160)], calls
-            page.locator(".workspace-tab[data-view='support']").click()
+            click_verified(".workspace-tab[data-view='support']")
             page.locator("#supportView.on").wait_for()
             count = len(calls)
-            page.locator(".workspace-tab[data-view='jobs']").click()
+            click_verified(".workspace-tab[data-view='jobs']")
             page.wait_for_timeout(350)
             assert len(calls) == count, "Tab reentry restarted the full sync"
 
@@ -331,7 +331,7 @@ def main():
             assert all(t["salesVisible"] for t in sales_latency["times"] if t["view"] == "sales")
             assert all(t["salesCards"] == page.evaluate("salesAgencies.length") for t in sales_latency["times"] if t["view"] == "sales"), ("sales tab card count must reflect the live agency list", sales_latency)
             print("WORKLINKS_SALES_MOBILE_PAINT", json.dumps(sales_latency, ensure_ascii=False))
-            page.locator(".workspace-tab[data-view='jobs']").click()
+            click_verified(".workspace-tab[data-view='jobs']")
             page.locator("#jobsView.on").wait_for()
             profile = page.evaluate("""() => {
                 const names = ['renderJobs','refreshVerdictFilters',
