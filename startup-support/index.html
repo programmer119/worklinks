@@ -282,6 +282,11 @@
 #jobsView .partner-filter-control select{font-size:16px;min-width:110px;max-width:min(260px,48vw);min-height:38px;padding:8px 10px}
 #jobsView .job-decision-summary{font-size:16px;font-weight:730;color:#1e293b;line-height:1.55;margin:17px 0 5px}
 #jobsView .job-verdict-filter{gap:10px;margin:15px 0}
+/* The mobile shortlist controls must remain the hit target even when the
+   neighboring progress flex row and generic jobfilters overlap during scroll.
+   Do not disable pointer events on neighboring functional controls. */
+#jobsView #changcomActionableFilters{position:relative;z-index:5;isolation:isolate}
+#jobsView #changcomActionableFilters .job-vf{position:relative;z-index:1;touch-action:manipulation}
 #jobsView .job-verdict-filter>strong{font-size:16px}
 #jobsView .job-vf{font-size:16px;font-weight:850;min-height:48px;padding:11px 16px;border-radius:11px}
 #jobsView .job-vf [data-verdict-count]{font-size:17px;opacity:1}
