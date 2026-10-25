@@ -63,7 +63,7 @@ jobs:
           bounded,omitted=bounded_detail_snapshot(merged)
           result={**new,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
                   'detailOmittedFromRollingCache':omitted,'byNotice':bounded}
-          dst.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          dst.write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n')
           if dst.stat().st_size>MAX_PUBLISHED_RFP_BYTES:
             raise SystemExit('RFP_DETAIL_SIZE_GUARD_FAILED')
           archive_path=pathlib.Path('startup-support/rfp-coverage-index.json')
