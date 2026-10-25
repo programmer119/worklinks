@@ -80,19 +80,21 @@
       "bidNo": "R26BK01777288",
       "order": "000",
       "state": "original_requirements_pending",
-      "stateReason": "등록업종 1468 기본 일치. 공개 공고요약의 공동이행·RFP 정보 확인, 원문 전문의 참가·수행조건 미검증",
+      "stateReason": "공고문 전재에서 업종 1468, 직접생산 8111189901, 중소기업·소상공인 확인서의 AND 요건 및 공동이행 허용 확인. 창컴의 과거 등록자료와 기본 대조 가능하나 입찰일 현재 유효성·인력·과업·원가 미검증",
       "mandatory": {
         "industryCodes": [
           "1468"
         ],
-        "directProductionCodes": [],
-        "sme": "원문 확인 필요",
-        "region": "원문 확인 필요"
+        "directProductionCodes": [
+          "8111189901"
+        ],
+        "sme": "중소기업 또는 소상공인 확인서(공공기관 입찰용), 직접생산과 함께 요구",
+        "region": "공개 공고문 전재에서 별도 지역제한 확인되지 않음; 공식 최신 정정 대조 필요"
       },
       "industryAndProductionMatch": null,
       "consortium": {
-        "form": "공동이행 (공고 기본정보)",
-        "allowed": null,
+        "form": "공동이행(공고문 전재)",
+        "allowed": true,
         "agreementDeadline": "2026-11-05T18:00:00+09:00"
       },
       "proposalDeadline": "2026-11-06T10:00:00+09:00",
@@ -100,13 +102,23 @@
       "scopeRisk": "기술평가 90% 및 기존 홈페이지 인수인계·인력 요건, 제안요청서 전체 확인 필요",
       "profitability": "not_verified",
       "legalEligibilityVerified": false,
-      "sourceKind": "official_notice_field_republication_not_full_text",
-      "sourceUrl": "https://sujubut.com/bid/domestic/3513532/",
+      "sourceKind": "published_official_notice_transcription",
+      "sourceUrl": "https://www.bidpro.co.kr/n0_ipchal/konggo/svc/konggo_view.asp?num=3189988",
       "officialNoticeUrl": "https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo=R26BK01777288&bidPbancOrd=000",
       "nextChecks": [
-        "통일부 첨부 HWPX/PDF에서 업종·직접생산·소기업·공동이행 관계 완독",
-        "홈페이지 운영 인수인계 및 상주인력 요구, 과거 낙찰사 2년 연속 우위 확인"
-      ]
+        "중소기업·직접생산 8111189901의 실제 입찰일 유효성과 나라장터 업종 1468 등록 재확인",
+        "공개 공고문 사업금액 391850000원과 인덱스 배정예산 395466860원 차이의 원인 확인",
+        "제안요청서 전체의 필수 인력, 상주, 실적, 기술지원, 유지관리 범위 및 소요 원가 확인",
+        "공동이행 구성원별 자격/지분, 11월 5일 18시 협정서 및 제안서 준비 확인"
+      ],
+      "amountReconciliation": {
+        "indexBudgetKrw": 395466860,
+        "publishedNoticeProjectAmountKrw": 391850000,
+        "estimatedPriceExVatKrw": 356227273,
+        "status": "unresolved_difference",
+        "note": "두 사업금액은 서로 다름. 정정공고 또는 계약금액으로 확정하지 않음"
+      },
+      "partialReviewUpdatedAt": "2026-10-25"
     },
     "R26BK01777538:000": {
       "bidNo": "R26BK01777538",
@@ -134,17 +146,28 @@
       },
       "proposalDeadline": "2026-11-10T10:00:00+09:00",
       "bidDeadline": "2026-11-10T10:00:00+09:00",
-      "scopeRisk": "사업금액 공고문 299,816,000원과 인덱스 302,663,460원 불일치. 물품공급·기술지원 확약서 비용/제출시점 확인 필요",
+      "scopeRisk": "공고문 사업금액 299,816,000원과 인덱스 302,663,460원 차이 미해소. 기술지원 확약서는 낙찰자만 계약 후 10일 이내 제출하며 발급비용 및 협약 가능성이 수행·수익성 위험",
       "profitability": "not_verified",
       "legalEligibilityVerified": false,
       "sourceKind": "published_official_notice_transcription",
       "sourceUrl": "https://www.bidpro.co.kr/n0_ipchal/konggo/svc/konggo_view.asp?num=3190162",
       "officialNoticeUrl": "https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo=R26BK01777538&bidPbancOrd=000",
       "nextChecks": [
-        "물품공급·기술지원확약서 제출시점과 제조사 협약/실제 소요비용 확인",
-        "사업금액 공고문 299816000원 vs 운영 인덱스 302663460원 정정 여부 확인",
-        "제안요청서와 판독 실패 부속 파일 2개 실제 서류 요구 확인"
-      ]
+        "기술지원 확약서: 낙찰자 계약 후 10일 이내 제출, 제조사 발급 가능 여부 및 비용 사전 협의",
+        "사업금액 299816000원 vs 배정예산 302663460원 차이(추정가격 272560000원)의 공식 정정 확인",
+        "제안요청서 전체 및 미판독 첨부의 인력·상주·실적·수행범위와 원가 검증",
+        "공동이행 모든 구성원 필수자격 및 11월 9일 18시 협정서 제출 준비"
+      ],
+      "technicalSupport": {
+        "phase": "post_award_contract_performance",
+        "requiredForBid": false,
+        "due": "계약 후 10일 이내",
+        "document": "물품공급 및 기술지원확약서",
+        "cost": "unverified",
+        "risk": "미제출로 계약 해제 시 입찰제한 가능성; 사전 공급사 비용·발급가능성 확인 필요",
+        "sourceUrl": "https://www.bidpro.co.kr/n0_ipchal/konggo/svc/konggo_view.asp?num=3190162"
+      },
+      "partialReviewUpdatedAt": "2026-10-25"
     },
     "R26BK01765541:000": {
       "bidNo": "R26BK01765541",
