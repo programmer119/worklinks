@@ -89,6 +89,47 @@ jobs:
           assert any(r.get('product')=='정보시스템개발서비스' for r in rows),'MISSING_CHANGCOM_CERTIFICATE'
           print('DIRECT_PRODUCTION_LIVE_SNAPSHOT=PASS','CHANGCOM_CERTIFICATES',len(rows),'SNAPSHOT_DATE',remote['snapshotDate'])
           PY
+      - name: Diagnose live bid-evidence availability separately from general API
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b'
+          endpoints=[
+              ('saved','/saved?sw=1&limit=1&offset=0'),
+              ('company','/company?bizno=1308185973'),
+              ('rfp_unification','/bid-evidence?bidNo=R26BK01777288&order=000'),
+              ('rfp_education','/bid-evidence?bidNo=R26BK01777538&order=000')]
+          for label,path in endpoints:
+              try:
+                  req=urllib.request.Request(base+path,headers={
+                      'User-Agent':'WorkLinks-RFP-Evidence-Health/1.0'})
+                  with urllib.request.urlopen(req,timeout=16) as f:
+                      response=json.load(f)
+                      http=f.status
+                  if label.startswith('rfp_'):
+                      docs=response.get('attachments') or {}
+                      notice=response.get('noticeDocuments') or {}
+                      print('RFP_EVIDENCE_HEALTH',json.dumps({
+                          'case':label,'http':http,'responseOk':response.get('ok'),
+                          'attachmentsOk':docs.get('ok'),
+                          'attachmentsComplete':docs.get('complete'),
+                          'attachmentsError':str(docs.get('error') or '')[:90],
+                          'eorderCount':docs.get('eorderCount'),
+                          'noticeDetailOk':notice.get('ok'),
+                          'noticeDetailComplete':notice.get('complete'),
+                          'noticeDetailError':str(notice.get('error') or '')[:90],
+                          'documentCount':len(docs.get('items') or [])
+                      },ensure_ascii=False),flush=True)
+                  else:
+                      print('RFP_API_CONTROL',label,'HTTP',http,
+                            'OK',response.get('ok'),flush=True)
+              except urllib.error.HTTPError as e:
+                  print('RFP_EVIDENCE_HEALTH',label,'HTTP_ERROR',e.code,flush=True)
+              except Exception as e:
+                  print('RFP_EVIDENCE_HEALTH',label,
+                        'TRANSPORT_ERROR',type(e).__name__,flush=True)
+          PY
       - name: Check public backend without exposing secrets
         shell: bash
         run: |
