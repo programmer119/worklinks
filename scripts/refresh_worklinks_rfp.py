@@ -127,10 +127,13 @@ def official_manifest_signature(data):
 
 def manifest_probe_due(record,now):
     if not reusable_rfp_extraction(record):return False
-    if not record.get('manifestSignature'):return True
+    # A failed/incomplete metadata probe must rotate out for 36 hours too;
+    # otherwise the same eight legacy records monopolize every hourly run.
+    last=(record.get('manifestCheckedAt') or
+          (record.get('checkedAt') if record.get('manifestSignature') else ''))
+    if not last:return True
     try:
-        checked=dt.datetime.fromisoformat(
-            str(record.get('manifestCheckedAt') or record.get('checkedAt') or '').replace('Z','+00:00'))
+        checked=dt.datetime.fromisoformat(str(last).replace('Z','+00:00'))
         return not checked.tzinfo or now-checked>=MANIFEST_PROBE_INTERVAL
     except (ValueError,TypeError):
         return True

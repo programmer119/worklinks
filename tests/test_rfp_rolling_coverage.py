@@ -131,6 +131,10 @@ legacy,verdict=inspect(alpha,scanned_record(),utc.isoformat())
 assert verdict=='baseline' and legacy['manifestBaselineUnverified']
 incomplete,verdict=inspect(metadata('B.hwpx',complete=False),existing,utc.isoformat())
 assert verdict=='incomplete' and incomplete['lastManifestProbeStatus']=='metadata_incomplete'
+assert not module['manifest_probe_due'](
+    {**scanned_record(),'manifestCheckedAt':utc.isoformat()},utc)
+assert module['manifest_probe_due'](
+    {**scanned_record(),'manifestCheckedAt':(utc-dt.timedelta(days=3)).isoformat()},utc)
 probe_candidates=[]
 discover(5, {rows[0]['bidNo']+':000':existing},manifest_probe_out=probe_candidates)
 assert any(x[1]==rows[0]['bidNo'] for x in probe_candidates),probe_candidates[:2]
