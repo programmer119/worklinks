@@ -7,6 +7,7 @@ on:
       - 'scripts/refresh_worklinks_rfp.py'
       - 'tests/test_rfp_failures.py'
       - 'tests/test_rfp_rolling_coverage.py'
+      - 'tests/test_rfp_quota_budget.py'
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'
