@@ -868,6 +868,41 @@ def compact_changcom_evidence(item):
     }
 
 
+# GitHub rejects blobs over 100 MB. The detailed 240-notice view is a
+# rolling cache; durable source hashes and bounded official excerpts are kept
+# separately in rfp-coverage-index.json for ALL previously scanned notices.
+MAX_PUBLISHED_RFP_BYTES=65_000_000
+
+
+def bounded_detail_snapshot(records, max_records=240, max_bytes=MAX_PUBLISHED_RFP_BYTES):
+    """Prioritize latest scans without silently exceeding the GitHub blob limit.
+
+    Do not shorten individual quotations or claim that discarded cache entries
+    were unscanned. The cumulative evidence index is written independently.
+    """
+    ordered=sorted(records.items(), key=lambda pair: str(
+        (pair[1] if isinstance(pair[1],dict) else {}).get('checkedAt') or ''),
+        reverse=True)
+    selected={}
+    omitted=[]
+    used=4096  # JSON wrapper and metadata headroom
+    for key,item in ordered:
+        encoded=json.dumps(item,ensure_ascii=False,indent=2)
+        # A nested item acquires extra indentation in the enclosing document.
+        estimated=len(encoded.encode('utf-8'))+6*encoded.count('\\n')+len(key.encode('utf-8'))+40
+        if len(selected)>=max_records or used+estimated>max_bytes:
+            omitted.append(key)
+            continue
+        selected[key]=item
+        used+=estimated
+    if not selected and records:
+        raise ValueError('RFP_DETAIL_RECORD_EXCEEDS_SAFE_BUDGET')
+    print('RFP_DETAIL_SNAPSHOT_BOUNDED','STORED',len(selected),
+          'OMITTED_FROM_ROLLING_CACHE',len(omitted),
+          'BYTE_BUDGET',max_bytes,flush=True)
+    return selected,len(omitted)
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
@@ -938,9 +973,13 @@ def main():
                               'hwpxReaderVersion':HWPX_READER_VERSION}
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     if not results:raise SystemExit('NO_RFP_RESULT')
+    details,omitted=bounded_detail_snapshot(results)
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
-            'reviewComplete':False,'byNotice':dict(list(results.items())[-240:])}
-    DEST.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+            'reviewComplete':False,'detailOmittedFromRollingCache':omitted,
+            'byNotice':details}
+    DEST.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+    if DEST.stat().st_size>MAX_PUBLISHED_RFP_BYTES:
+        raise SystemExit('RFP_DETAIL_SNAPSHOT_FILE_TOO_LARGE')
     coverage=dict(prior_index)
     for key,item in results.items():
         if not isinstance(item,dict):continue
