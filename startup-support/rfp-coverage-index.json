@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-25T03:11:56.110799+00:00",
+  "generatedAt": "2026-10-25T16:17:47.056068+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3035,
+  "scannedNoticeCount": 3036,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -28215,7 +28215,7 @@
     },
     "R26BK01773189:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T14:32:22.882301+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -124277,7 +124277,7 @@
     },
     "R26BK01774537:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -124526,7 +124526,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T16:17:47.056068+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "35ef6fb8112107675741e7b34fcd08add736de4bf40e7c08e6434bfbb27162a6",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01780836:000": {
       "status": "no_official_attachment_metadata",
@@ -124860,12 +124865,12 @@
     },
     "R26BK01781328:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": null,
-      "readableDocumentCount": 0,
+      "attachmentManifestCount": 6,
+      "readableDocumentCount": 6,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -124923,9 +124928,12 @@
           "clauseCandidateCount": 1
         }
       ],
+      "manifestSignature": "72c12c518a0a3ca2c7bafea6f16e5732928d55a0d1075adb3e9b3af6390e4767",
+      "manifestCheckedAt": "2026-10-25T16:18:12.367470+00:00",
+      "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-23T01:30:43.976963+00:00",
+        "checkedAt": "2026-10-25T16:17:47.056068+00:00",
         "readableDocumentCount": 6,
         "unreadableDocumentCount": 0,
         "manifestComplete": true,
@@ -125208,8 +125216,7 @@
             }
           ]
         }
-      },
-      "lastAttemptStatus": "no_official_attachment_metadata"
+      }
     },
     "R26BK01781608:000": {
       "status": "text_extracted_requires_review",
@@ -125590,7 +125597,7 @@
     },
     "R26BK01780626:000": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -130298,12 +130305,12 @@
     },
     "R26BK01767164:001": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": null,
-      "readableDocumentCount": 0,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 4,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -130343,9 +130350,12 @@
           "clauseCandidateCount": 43
         }
       ],
+      "manifestSignature": "a060ba015d29efbdb3eceaa120d7f137301b57f4264e101b3833ae2a38f12fc8",
+      "manifestCheckedAt": "2026-10-25T16:18:28.253900+00:00",
+      "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-23T01:30:43.976963+00:00",
+        "checkedAt": "2026-10-25T16:17:47.056068+00:00",
         "readableDocumentCount": 4,
         "unreadableDocumentCount": 0,
         "manifestComplete": true,
@@ -130630,8 +130640,7 @@
             }
           ]
         }
-      },
-      "lastAttemptStatus": "no_official_attachment_metadata"
+      }
     },
     "R26BK01779210:000": {
       "status": "text_extracted_requires_review",
@@ -133518,12 +133527,12 @@
     },
     "R26BK01782053:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": null,
-      "readableDocumentCount": 0,
+      "attachmentManifestCount": 1,
+      "readableDocumentCount": 1,
       "unreadableDocumentCount": 0,
       "files": [
         {
@@ -133536,9 +133545,12 @@
           "clauseCandidateCount": 524
         }
       ],
+      "manifestSignature": "ffd55072e7627b3c9039f2fa550c16cf934a32af04ce3554a10eed54d9bc5b77",
+      "manifestCheckedAt": "2026-10-25T16:18:09.368919+00:00",
+      "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-23T01:30:43.976963+00:00",
+        "checkedAt": "2026-10-25T16:17:47.056068+00:00",
         "readableDocumentCount": 1,
         "unreadableDocumentCount": 0,
         "manifestComplete": true,
@@ -133828,8 +133840,7 @@
             }
           ]
         }
-      },
-      "lastAttemptStatus": "no_official_attachment_metadata"
+      }
     },
     "R26BK01780393:000": {
       "status": "text_extracted_requires_review",
@@ -141344,7 +141355,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T16:17:47.056068+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "cfdadad545d4d93a5a3c9e6131eba4cdac3654b629248ecdbce4ce0cd1f57f6c",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01782338:000": {
       "status": "text_extracted_requires_review",
@@ -185815,13 +185831,13 @@
     },
     "R26BK01782556:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": null,
-      "readableDocumentCount": 0,
-      "unreadableDocumentCount": 0,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 1,
       "files": [
         {
           "name": "붙임. 물품공급기술지원 협약서(변경).pdf",
@@ -185860,9 +185876,12 @@
           "clauseCandidateCount": 468
         }
       ],
+      "manifestSignature": "8480741805ac06b90a79d19018c95015219d6f603be35bba216052e62e9d12d8",
+      "manifestCheckedAt": "2026-10-25T16:18:30.186081+00:00",
+      "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-22T22:20:34.127547+00:00",
+        "checkedAt": "2026-10-25T16:17:47.056068+00:00",
         "readableDocumentCount": 3,
         "unreadableDocumentCount": 1,
         "manifestComplete": true,
@@ -186193,8 +186212,7 @@
             }
           ]
         }
-      },
-      "lastAttemptStatus": "metadata_not_confirmed"
+      }
     },
     "R26BK01782644:000": {
       "status": "text_extracted_requires_review",
@@ -252443,7 +252461,330 @@
       "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": []
+    },
+    "R26BK01784794:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 2,
+      "unreadableDocumentCount": 2,
+      "files": [
+        {
+          "name": "261023_긴급입찰 사유서_ODA.hwp",
+          "readable": true,
+          "sourceSha256": "a66d03d49a1131a45f4478c572e08f5db5d65cda41634082150a7f950a82e6cb",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "2. 27년 ODA 정보시스템 운영 및 유지관리 사업 제안요청서_공고용.hwpx",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "file_extract_failure",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "file_extract_failure",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+          "readable": true,
+          "sourceSha256": "03f5d27d1e68632d3656b4285980dac27071e339566b683c61dd0fe64fd63c4c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 444
+        }
+      ],
+      "manifestSignature": "ec9cdcac0a7819361506adcaf40d14c6e2fee00ef171b24972eddc02eb19a5dd",
+      "manifestCheckedAt": "2026-10-25T16:18:29.319300+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-10-25T16:17:47.056068+00:00",
+        "readableDocumentCount": 2,
+        "unreadableDocumentCount": 2,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "261023_긴급입찰 사유서_ODA.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059197&rfpOrd=000&rfpUntyAtchFileNo=11"
+          },
+          {
+            "name": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록한 자 - [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468)] 업종을 등록한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "아래의 입찰참가자격을 모두 갖춘 자이어야 합니다 . ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스 템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록한 자 - [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468)] 업종을 등록한 업체 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468)] 업종을 등록한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스 템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록한 자 - [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468)] 업종을 등록한 업체 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생 산확인증명서 [ 정보시스템유지관리서비스 ( 세부품명번호 : 8111189901 )] 를 소지한 자",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "보시스템유지관리서비스 ( 세부품명번호 : 8111189901 )] 를 소지한 자",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생 산확인증명서 [ 정보시스템유지관리서비스 ( 세부품명번호 : 8111189901 )] 를 소지한 자",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "법률 」 제 2 조에 따른 소상 공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중소기업ㆍ소상공인 확인서를 소지한 자",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업기본법 」 제 2 조에 따른 중소기업자 또는 「 소상공인 보호 및 지원에 관한 법률 」 제 2 조에 따른 소상 공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중소기업ㆍ소상공인 확인서를 소지한 자",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생 산확인증명서 [ 정보시스템유지관리서비스 ( 세부품명번호 : 8111189901 )] 를 소지한 자 ○ 「 중소기업기본법 」 제 2 조에 따른 중소기업자 또는 「 소상공인 보호 및 지원에 관한 법률 」 제 2 조에 따른 소상 공인으로서 「 중소기업 범위 및 확인에 관한 규정 」 에 따라 발급된 중소기업ㆍ소상공인 확인서를 소지한 자 ◇ ‘ 중소기업ㆍ소상공인확인서",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "- 제안요청 설명회 : 해당없음 - 하도급 : 사전승인",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "하자담보비고내용 : 제안서 , 제안요청서 , 기술협상서에 따름 ○ 기타사항 : - 제안요청 설명회 : 해당없음 - 하도급 : 사전승인 - 차등점수제 : 해당없음",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 하도급 : 사전승인",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "련 규정에 따라 협상적격자에서 제외 , 계약해제 · 해지 또는 부정당업자 입찰참가자격제한 등의 불이익을 받을 수 있으며 기재한 내용에 대한 사실 확인에 대한 의무 및 입증 책임은 입찰자 본인 에게 있습니다 . * 기타 세부사항은 수요기관 규격서 ( 제안요청서 등 ) 에 의합니다 . * 당해 계약에 따른 계약목적물의 지식재산권은 규격서 ( 제안요청서 등 ) 에 따릅니다 . * 정보기술 심사분야 투입인력 등의 적정성 평가 자료 제출 ( 투입인력 정성평가 시 해당 )",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "투입인력 등의 적정성 평가 자료 제출 ( 투입인력 정성평가 시 해당 )",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "* 당해 계약에 따른 계약목적물의 지식재산권은 규격서 ( 제안요청서 등 ) 에 따릅니다 . * 정보기술 심사분야 투입인력 등의 적정성 평가 자료 제출 ( 투입인력 정성평가 시 해당 )",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "원 전원 해당 ) - 다만 , 법 인등 기 부등 본 ( 또 는 사업 자 등록 증 ) 의 상 호 또 는 대표 자 변 경신 고 후 해당 기 관 에서 변경 사 항이 확 정 되지 않 아 입 찰 자에 게 책 임 이 없 는 사유 로 입찰 참 가자 격 등 록 을 할 수 없어 변경 전 상호 또 는 대 표자 명 의로 한 입찰 은 유 효 한 입 찰 로 간 주 합니 다 . 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이며 마감일 ( 일시가 정",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이며 마감일 ( 일시가 정",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이며 마감일 ( 일시가 정 해져 있는 경우에는 해당일시 ) 까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다 .",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스 템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록한 자",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "아래의 입찰참가자격을 모두 갖춘 자이어야 합니다 . ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스 템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록한 자 - [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468)] 업종을 등록한 업체 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스 템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록한 자 - [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468)] 업종을 등록한 업체 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생 산확인증명서 [ 정보시스템유지관리서비스 ( 세부품명번호 : 8111189901 )] 를 소지한 자",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3-2. 입찰참가자격 등록",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "* 이 사업은 사업금액이 20 억원 미만인 사업으로서 「 중소 소프트웨어사업자의 사업 참여 지원에 관한 지침 ( 과학기술정 보통신부 고시 ) 」 에 따라 대기업 및 중견기업인 소프트웨어사업자는 본 입찰에 참여할 수 없으며 ,",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 발급된 중소기업ㆍ소상공인확인서의 유효기간 시작일이 전자입찰서 제출 마감일 이후 ( 마감일 포함 ) 인 경우 - 전자입찰서 제출 마감일 전일까지 중소기업ㆍ소상공인확인서를 신청하지 않은 경우 * 이 사업은 사업금액이 20 억원 미만인 사업으로서 「 중소 소프트웨어사업자의 사업 참여 지원에 관한 지침 ( 과학기술정 보통신부 고시 ) 」 에 따라 대기업 및 중견기업인 소프트웨어사업자는 본 입찰에 참여할 수 없으며 , * 「 소프트웨어 진흥법 」 제 48 조제 4 항 규정에 의하여 「",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "보통신부 고시 ) 」 에 따라 대기업 및 중견기업인 소프트웨어사업자는 본 입찰에 참여할 수 없으며 ,",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "- 4 - ※ 입찰참가자격 공지사항 ◐ 적격조합의 입찰참가 - 「 중소기업협동조합법 」 제 3 조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 상 기 각 호의 입찰참가자격을 갖춘 소속 조합원사중 2 개사 이상의 배정비율을 확정하여 전자입찰서 제출 마감일 전일까",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 「 중소기업협동조합법 」 제 3 조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 상 기 각 호의 입찰참가자격을 갖춘 소속 조합원사중 2 개사 이상의 배정비율을 확정하여 전자입찰서 제출 마감일 전일까",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 입찰참가자격 공지사항 ◐ 적격조합의 입찰참가 - 「 중소기업협동조합법 」 제 3 조에 따른 중소기업협동조합으로서 적격조합 확인서를 소지한 자는 입찰참가가 가능하나 상 기 각 호의 입찰참가자격을 갖춘 소속 조합원사중 2 개사 이상의 배정비율을 확정하여 전자입찰서 제출 마감일 전일까 지 관련 서류를 제출 ( 제출서류 항목 참조 ) 하여야 합니다 .",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "센 터 ( ☎ 1588-0800, FAX: 042-472-2297) 로 문 의 하 시 기 바 랍 니 다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다 . 공동수급체의 경우",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "시 기 바 랍 니 다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다 . 공동수급체의 경우",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ ( 입 찰 참 가 자 격 등 록 ) 조 달 청 경 쟁 입 찰 참 가 자 격 등 록 은 수 시 로 가 능 하 며 , 입 찰 참 가 를 위 해 서 는 전 자 입 찰 서 제 출 마 감 일 전 일 18:00 까 지 등 록 을 하 여 야 합 니 다 . 등 록 절 차 와 나 라 장 터 이 용 안 내 는 정 부 조 달 콜 센 터 ( ☎ 1588-0800, FAX: 042-472-2297) 로 문 의 하 시 기 바 랍 니 다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고",
+              "codes": [],
+              "sourceFile": "공고서_국가_제한_국내_유지관리_1468_20억미만_공동이행_하도급사전승인_서면.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01784794&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
     }
   },
-  "workflowRunId": "40157281016"
+  "workflowRunId": "40210964304"
 }
