@@ -48,4 +48,26 @@ assert summary['reviewComplete'] is False
 assert summary['files'][0]['sourceSha256']=='a'*64
 assert 'clauseCandidates' not in summary['files'][0]
 assert summary['files'][0]['clauseCandidateCount']==1
+# Regression: the publication must never create a 100 MB GitHub blob.
+# Keep the newest, unabridged detail records; older ones remain indexed by
+# their official source hashes and bounded, verifiable quotations.
+bound=module['bounded_detail_snapshot']
+records={
+    'older:000':{'checkedAt':'2026-10-01T00:00:00+00:00','files':[
+        {'sourceSha256':'a'*64,'clauseCandidates':[{'sourceText':'old '+('가'*1200)}]}]},
+    'newer:000':{'checkedAt':'2026-10-25T00:00:00+00:00','files':[
+        {'sourceSha256':'b'*64,'clauseCandidates':[{'sourceText':'new '+('나'*1200)}]}]},
+}
+selected,omitted=bound(records,max_records=240,max_bytes=10000)
+assert omitted==1 and list(selected)==['newer:000'],(selected.keys(),omitted)
+assert selected['newer:000']['files'][0]['clauseCandidates'][0]['sourceText'].endswith('나'*1200)
+assert len(json.dumps({'byNotice':selected},ensure_ascii=False,indent=2).encode('utf-8'))<10000
+assert records['older:000']['files'][0]['sourceSha256']=='a'*64
+# Equal timestamp ordering is deterministic, and count cap remains independent
+# of byte cap. The original source dict is never modified by this function.
+many={f'k{i:04d}':{'checkedAt':'2026-10-25','files':[]} for i in range(300)}
+kept,not_in_cache=bound(many,max_records=240,max_bytes=100000)
+assert len(kept)==240 and not_in_cache==60
+assert len(many)==300
+print('WORKLINKS_RFP_GITHUB_BLOB_GUARD=PASS','selected',len(selected),'omitted',omitted)
 print('WORKLINKS_RFP_ROLLING_CORPUS=PASS','total',len(rows),'batch',220,'cumulative_archive',True)
