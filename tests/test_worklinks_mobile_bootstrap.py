@@ -173,8 +173,7 @@ def main():
             # Verify a REAL pointer click can reach each control on mobile.
             # A static scrollIntoView can leave the button under preceding
             # filters after asynchronous layout shifts. Never force clicks.
-            def click_actionable(mode):
-                selector = '[data-changcom-actionable="%s"]' % mode
+            def click_verified(selector):
                 page.wait_for_function("""selector => {
                     const target=document.querySelector(selector);
                     if(!target)return false;
@@ -199,8 +198,10 @@ def main():
                     const hit=document.elementFromPoint(x,y);
                     return hit===target||target.contains(hit)?{x,y}:null;
                 }""",selector)
-                assert point is not None, "mobile filter obstructed: "+mode
+                assert point is not None, "mobile action obstructed: "+selector
                 page.mouse.click(point["x"],point["y"])
+            def click_actionable(mode):
+                click_verified('[data-changcom-actionable="%s"]' % mode)
             click_actionable("review")
             assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
             click_actionable("mismatch")
@@ -213,7 +214,7 @@ def main():
             more = page.locator("#changcomActionableMore")
             if census["aligned"] > 24:
                 assert more.is_visible()
-                more.click()
+                click_verified("#changcomActionableMore")
                 assert page.locator("#changcomActionableList .card").count() == min(48,census["aligned"])
             assert calls == [(0,160)], ("static shortlist must not trigger more G2B requests", calls)
             print("WORKLINKS_CHANGCOM_ACTIONABLE_MOBILE_QA=PASS",
