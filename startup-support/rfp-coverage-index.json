@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-25T19:36:44.755036+00:00",
+  "generatedAt": "2026-10-25T22:33:03.954636+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
   "scannedNoticeCount": 3036,
@@ -101615,15 +101615,205 @@
       }
     },
     "R26BK01761853:000": {
-      "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": null,
-      "readableDocumentCount": 0,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 4,
       "unreadableDocumentCount": 0,
-      "files": []
+      "files": [
+        {
+          "name": "1. 입찰공고.hwp",
+          "readable": true,
+          "sourceSha256": "a198c150d63c246946146756b22db7a5c933c9e5939fb2e427d4833b902aeaea",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 23
+        },
+        {
+          "name": "1. 입찰공고.pdf",
+          "readable": true,
+          "sourceSha256": "5c2adff7b9d71db19fa0e10e42bd40f031ba4c94943fd731f719d489189afae1",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 58
+        },
+        {
+          "name": "2. 제안요청서.hwp",
+          "readable": true,
+          "sourceSha256": "32386fbc07b7d97b31d0f31170ec75b4aab56a3c877e6fd53795e531a5706988",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 16
+        },
+        {
+          "name": "3. 제출서식.hwp",
+          "readable": true,
+          "sourceSha256": "c8dacd8dd6b4c759cd3c8648c86a73b6c7dc433a45ab586d21553d9702751346",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "52be6d2664a84830a639e333b68900e86c9eae8c5d912947733f6fe2ed3fc92e",
+      "manifestCheckedAt": "2026-10-25T22:33:25.860942+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-10-25T22:33:03.954636+00:00",
+        "readableDocumentCount": 4,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "1. 입찰공고.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "1. 입찰공고.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "2. 제안요청서.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "3. 제출서식.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제76조의 제한을 받은 사실이 없 으며, 동법 시행령 제12조 및 동법 시행규칙 제14조에 의한 유자격업체 나. 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조 및 동시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업)[1468]",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조 및 동시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업)[1468]",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조 및 동시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업)[1468] 다. 본 사업은「소프트웨어 진흥법」에 의한「중소 소프트웨어사업자의 사업 참여지원에 관한 지침」(과학기술정보통신부고시)이 적용되는 사업으로 대기업/중견기업은 입찰에 참여할 수 없음",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "마. 공공동수급계약(공동이행방식)으로 입찰에 참여할 수 있으며, 공동수급 시 공동이행방식에 한함. (공동수급협정서 제출) 공동수급체 구성원 간 역할 및 책임 분담을 명확히 해야 하며, 주관사는 전체 사업 관리 및 결과물 책임을 부담해야 함.",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "바. 본 사업은 하도급이 가능하되, 핵심 기능(데이터 연동·보안 등)은 원도급자가 직접 수행해야 하며, 하도급 계약 시 발주처 승인을 득하고 수행인력 명세서 및 보안서약서를 제출해야 함.",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "바. 본 사업은 하도급이 가능하되, 핵심 기능(데이터 연동·보안 등)은 원도급자가 직접 수행해야 하며, 하도급 계약 시 발주처 승인을 득하고 수행인력 명세서 및 보안서약서를 제출해야 함. 9. 입찰보증금 및 귀속",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "12. 입찰 참가 등록서류",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "파. 위임장(대리인인 경우) 및 입찰 참가자 재직증명서 1부.",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제출시 재직증명서 확인 및 현장접수확인서 작성(인감 날인)",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "나. 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조 및 동시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업)[1468] 다. 본 사업은「소프트웨어 진흥법」에 의한「중소 소프트웨어사업자의 사업 참여지원에 관한 지침」(과학기술정보통신부고시)이 적용되는 사업으로 대기업/중견기업은 입찰에 참여할 수 없음",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 본 사업은「소프트웨어 진흥법」에 의한「중소 소프트웨어사업자의 사업 참여지원에 관한 지침」(과학기술정보통신부고시)이 적용되는 사업으로 대기업/중견기업은 입찰에 참여할 수 없음",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 본 사업은「소프트웨어 진흥법」에 의한「중소 소프트웨어사업자의 사업 참여지원에 관한 지침」(과학기술정보통신부고시)이 적용되는 사업으로 대기업/중견기업은 입찰에 참여할 수 없음 라. 본 사업은 20억원 미만 사업으로 「소프트웨어 진흥법」 제48조 및 중소소프트웨어사업자의 사업 참여 지원에 관한 지침 제2조, 제3조에 따라 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한 함",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "9. 입찰보증금 및 귀속",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "9. 입찰보증금 및 귀속 가. 국가를 당사자로 하는 계약에 관한 법률 시행령 제37조 및 제38조에 준함.",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "바. 본 사업은 하도급이 가능하되, 핵심 기능(데이터 연동·보안 등)은 원도급자가 직접 수행해야 하며, 하도급 계약 시 발주처 승인을 득하고 수행인력 명세서 및 보안서약서를 제출해야 함. 9. 입찰보증금 및 귀속",
+              "codes": [],
+              "sourceFile": "1. 입찰공고.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01761853&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
     },
     "R26BK01749070:000": {
       "status": "text_extracted_requires_review",
@@ -102797,15 +102987,358 @@
       }
     },
     "R26BK01765272:000": {
-      "status": "metadata_not_confirmed",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": null,
-      "readableDocumentCount": 0,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
       "unreadableDocumentCount": 0,
-      "files": []
+      "files": [
+        {
+          "name": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+          "readable": true,
+          "sourceSha256": "b90895ee4e40051cf778fdc3469d3883be02821d4ca19f16f0013e5724e69db9",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 95
+        },
+        {
+          "name": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+          "readable": true,
+          "sourceSha256": "6cb3284e8f5e30e5cf3fae1cc0fa01332f1273ea0e7f33ff2b3dd4d50f1cdd02",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 56
+        },
+        {
+          "name": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+          "readable": true,
+          "sourceSha256": "9a5470af88170cf9c19242f5a0d6d370a153736fde2e61d2cf645260644b6c19",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 297
+        }
+      ],
+      "manifestSignature": "e2b2d5911391330962ac488fd3278c99d47375fa30bf4d6d15c1efb3e60ed9d6",
+      "manifestCheckedAt": "2026-10-25T22:33:26.608933+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-10-25T22:33:03.954636+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11"
+          },
+          {
+            "name": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "※ 입찰공고일 현재를 기준으로 하며, 제한 기간 중인 자는 입찰 불가 ㅇ 본 사업은 사업금액 20억원 이상 40억원 미만의 사업으로서, 「소프트웨어 진흥법」 제48조 제2항 및 「중소 소프트웨어 사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부고시)[별표 1]에 따라 대기업인 소프트웨어사업자의 입찰 참여 제한",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "ㅇ 본 사업은 사업금액 20억원 이상 40억원 미만의 사업으로서, 「소프트웨어 진흥법」 제48조 제2항 및 「중소 소프트웨어 사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부고시)[별표 1]에 따라 대기업인 소프트웨어사업자의 입찰 참여 제한",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "ㅇ 「정보통신공사업법」에 의한 정보통신공사업(업종코드 0036)으로 등록되어 있는 업체",
+              "codes": [
+                "0036"
+              ],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "재 등의 처분을 받을 수 있습니다. 7)일할 계산하여 용역대금이 산정되는 경우 대금지급은 계약체결 후 실제 용역 제공일수에 따라 일할 계산하여 지급합니다. 8)이 용역입찰의 낙찰자는 근로자와 고용계약을 체결할 경우 「최저임금법」 제10조제1항의 규정에 따라 고용노동부 장관이 고시한 최저임금액 미만으로 계약할 수 없습니다. 9)계약담당공무원은 계약상대자가 직접생산 확인기준을 위반한 사실을 확인한 경우 계약해지, 계약보증금 국고 귀속, 입찰참",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "고시한 최저임금액 미만으로 계약할 수 없습니다. 9)계약담당공무원은 계약상대자가 직접생산 확인기준을 위반한 사실을 확인한 경우 계약해지, 계약보증금 국고 귀속, 입찰참",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "7)일할 계산하여 용역대금이 산정되는 경우 대금지급은 계약체결 후 실제 용역 제공일수에 따라 일할 계산하여 지급합니다. 8)이 용역입찰의 낙찰자는 근로자와 고용계약을 체결할 경우 「최저임금법」 제10조제1항의 규정에 따라 고용노동부 장관이 고시한 최저임금액 미만으로 계약할 수 없습니다. 9)계약담당공무원은 계약상대자가 직접생산 확인기준을 위반한 사실을 확인한 경우 계약해지, 계약보증금 국고 귀속, 입찰참 가자격제한 등의 조치를 할 수 있습니다. 다만, 해당 계약물품을 직접생산 확",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "연번구분서 류 명부수비 고1입찰관련서류나라장터에서 출력한 경쟁입찰참가자격등록증1부 2법인 등기부등본(개인사업자는 사업자등록증)1부 3소프트웨어사업자 신고확인서1부업종코드14684정보통신공사업 등록증(신고확인서)1부업종코드00365중소기업 확인서 또는 중견기업 확인서1부대기업 참여제한 대상 사업6제안서및 부속 서류정량평가 제안서1식[붙임 6~9호]·[붙임 17호]서식 및 증빙 포함7정성평가 제안서1식정량평가 제안서와 별권 편철, [붙임 10~11호] 서식 및 증빙 포함8제안요약서1",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "중소기업 확인서 또는 중견기업 확인서",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "중소기업 확인서 또는 중견기업 확인서 1부",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "신청인업체명(상호)대 표 자영업소재지전 화 번 호사업자번호제 출 처증명서 용도입찰 및 제안서 심사 제출용 사 업이 행실 적내 용사 업 명구 분 사 업 개 요계 약 번 호계약일자계약기간계약금액이행실적비 고 공동비율실 적증명서발 급기 관 위 사실을 증명함년 월 일 기 관 명 : (인) (전화번호 : ) 주 소 : (FAX번호: ) 발급부서 : 담당자: (인)",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "ㅇ 요구한 업무는 용역사가 직접 수행하며, 과업의 전부 또는 일부를 하도급할 수 없음",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "ㅇ 요구한 업무는 용역사가 직접 수행하며, 과업의 전부 또는 일부를 하도급할 수 없음 ㅇ 업무 협의 및 지시는 다음 체계에 따름",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "세부내용 ㅇ 요구한 업무는 용역사가 직접 수행하며, 과업의 전부 또는 일부를 하도급할 수 없음",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "[붙임 8호] 주요사업실적 [붙임 9호] 사업 실적 증명서",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "[붙임 9호] 사업 실적 증명서 [붙임 10호] 참여인력 이력사항",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "2. 경영상태 및 수행실적",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "기관주요 역할주관기관 - 위성 지상시스템 운용 및 점검 용역 전반에 대한 총괄 관리- 용역 수행 결과의 정기 통지 접수 및 산출물에 대한 검수·승인- 이상·장애 현상의 원인 규명 주관 (필요시 개발기관 기술지원 요청)- 업무 절차·지침 및 비상연락 체계 제시, 협의회 소집·주관- 근무 장소(관제실·부속실) 및 지상시스템·업무용 장비 제공용역사 - 용역 계약 이행 및 사업 전반(일정·품질·조직·투입인력) 총괄 관리- 이상·장애 발생 시 후속 수습 및 재발방지 조치 총괄- 업무수행지",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "·투입인력) 총괄 관리- 이상·장애 발생 시 후속 수습 및 재발방지 조치 총괄- 업무수행지침서(SOP) 수립·제출 및 승인 후 이행 관리- 24시간 무중단 교대 운영 체계 유지 및 실시간 위성 교신 수행- 지상시스템(관제·임무계획·수신·비행역학·보안/네트워크·기타)의 상시 운용·점검·유지관리- 이상 인지 시 비상연락 체계에 따른 즉시 1차 통지 및 현상 결과서 작성- 산출물 백업·형상관리·기록관리 및 보안관리 계획 이행- 사업수행관리자 부재 시 현장대리인이 직무 대행",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 용역 계약 이행 및 사업 전반(일정·품질·조직·투입인력) 총괄 관리",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰에 참여하여야 하며, 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의하시기 바랍니다. (공동수급 구성원 전원 해당) - 다만, 등기관청에 상호 또는 대표자 변경신고 후 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "연번구분서 류 명부수비 고1입찰관련서류나라장터에서 출력한 경쟁입찰참가자격등록증1부 2법인 등기부등본(개인사업자는 사업자등록증)1부 3소프트웨어사업자 신고확인서1부업종코드14684정보통신공사업 등록증(신고확인서)1부업종코드00365중소기업 확인서 또는 중견기업 확인서1부대기업 참여제한 대상 사업6제안서및 부속 서류정량평가 제안서1식[붙임 6~9호]·[붙임 17호]서식 및 증빙 포함7정성평가 제안서1식정량평가 제안서와 별권 편철, [붙임 10~11호] 서식 및 증빙 포함8제안요약서1",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격등록증상의 상호 및 대표자(대표자가 다수인 경우 대표자 전원의 성명을 모두 등재, 각자 대표도 해당)가 법인등기부등본상(개인인 경우 사업자등록증)의 상호, 대표자와 다른 경우에는 입찰참가자격등록증을 변경등록하고 입찰에 참여하여야 하며, 변경등록하지 않고",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다만, 등기관청에 상호 또는 대표자 변경신고 후 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다.",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "(2) 입찰 참가자격 및 제한사항",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "연번구분서 류 명부수비 고1입찰관련서류나라장터에서 출력한 경쟁입찰참가자격등록증1부 2법인 등기부등본(개인사업자는 사업자등록증)1부 3소프트웨어사업자 신고확인서1부업종코드1",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "격등록증1부 2법인 등기부등본(개인사업자는 사업자등록증)1부 3소프트웨어사업자 신고확인서1부업종코드14684정보통신공사업 등록증(신고확인서)1부업종코드00365중소기업 확인서",
+              "codes": [],
+              "sourceFile": "(제안요청서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058139&rfpOrd=000&rfpUntyAtchFileNo=11",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "본 사업은 사업금액이 40억 원 미만으로서, 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부 고시)에 따라 대기업 소프트웨어사업자는 본 입찰에 참여할 수 없으며, 「소프트웨어 진흥법」 제48조 제4항 및 「독점규제 및 공정거래에 관한 법률」 제31조에 따라 지정된 상호출자제한기업집단에 속하는 기업도 입찰에 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자 3-1. 제출서류",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "[입찰업체 서약서 및 공동책임 확인서 각 1부. (본 공고서 붙임 참조 )",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "[입찰업체 서약서 및 공동책임 확인서 각 1부. (본 공고서 붙임 참조 ) ※ 정성/정량 참고자료는 해당 제안서에 포함하여 가급적 하나의 파일로 제출",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라 [입찰업체 서약서 및 공동책임 확인서 각 1부. (본 공고서 붙임 참조 )",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "(입찰보증금 납부) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 공동수급체의 경우 대표사는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다.",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "(납부기한 및 장소) 입찰보증금은 반드시 입찰서 제출마감일 전일(공휴일인 경우 그 전일) 18:00까지 조달청 본청 조달회계팀 또는 각 지방조달청 경영지원과(팀)에 납부하여야 합니다.",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "(납부면제) 위 사항을 제외하고는 이 입찰에서 입찰보증금의 납부는 면제하되, 입찰보증금 지급각서를 제출하여야 합니다. 이 경우 공동수급체 구성원이 입찰보증금 납부대상이면 대표자가 납부 면제 대상에 해당되어 입찰보증금 지급각서를 제출하여도 공동수급체 구성원의 입찰보증금 납부 의무는 면제되지 않습니다.",
+              "codes": [],
+              "sourceFile": "(공고서)27년 국가위성운영센터 위성 지상시스템 운용 및 점검 용역_261012.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01765272&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
     },
     "R26BK01764707:000": {
       "status": "text_extracted_requires_review",
@@ -137532,7 +138065,7 @@
     },
     "R26BK01780979:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -144996,7 +145529,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T22:33:03.954636+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "53253f7d0b1b453a73fe1ed7bb11d57aefddf90b51decfb8c6d9a8d12a2ce219",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01769106:000": {
       "status": "text_extracted_requires_review",
@@ -145237,7 +145775,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-25T22:33:03.954636+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "1a5c6c717e21ee3ef5ea8dbe3d8f6eddbdc6b0ae41fd17d378c95ee50cff21b0",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01771513:000": {
       "status": "text_extracted_requires_review",
@@ -192740,7 +193283,7 @@
     },
     "R26BK01784443:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -193522,7 +194065,7 @@
     },
     "R26BK01782252:000": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -193533,7 +194076,7 @@
     },
     "R26BK01778192:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -196920,7 +197463,7 @@
     },
     "R26BK01783601:000": {
       "status": "text_unavailable",
-      "checkedAt": "2026-10-24T10:59:25.882736+00:00",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -196937,7 +197480,10 @@
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         }
-      ]
+      ],
+      "manifestSignature": "903776d2d00c7e1c92ec3bb536a2a5d7cc6240c983d87b913a22bfa85646b25b",
+      "manifestCheckedAt": "2026-10-25T22:33:26.692350+00:00",
+      "manifestChangePending": false
     },
     "R26BK01784123:000": {
       "status": "text_extracted_requires_review",
@@ -201443,7 +201989,7 @@
     },
     "R26BK01784857:000": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-25T22:33:03.954636+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -254442,5 +254988,5 @@
       }
     }
   },
-  "workflowRunId": "40226824480"
+  "workflowRunId": "40240694361"
 }
