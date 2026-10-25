@@ -70,4 +70,36 @@ kept,not_in_cache=bound(many,max_records=240,max_bytes=100000)
 assert len(kept)==240 and not_in_cache==60
 assert len(many)==300
 print('WORKLINKS_RFP_GITHUB_BLOB_GUARD=PASS','selected',len(selected),'omitted',omitted)
+# An extracted but not legally reviewed RFP is NOT a new download job
+# after 24 hours. Cumulative scans are distinct from participation verdicts.
+old_scan=(utc-dt.timedelta(days=15)).isoformat()
+def scanned_record():
+    return {'checkedAt':old_scan,'status':'text_extracted_requires_review',
+            'classificationVersion':module['CLASSIFICATION_VERSION'],
+            'hwpxReaderVersion':module['HWPX_READER_VERSION'],
+            'reviewComplete':False,'readableDocumentCount':1,
+            'unreadableDocumentCount':0,
+            'files':[{'name':'official.hwpx','readable':True,
+                      'sourceSha256':'d'*64,'sourceTextScanComplete':True}]}
+all_done={row['bidNo']+':'+row['order']:scanned_record() for row in rows}
+calls.clear()
+assert discover(220,all_done)==[], 'old successful RFP downloads must not repeat'
+assert len(calls)==7,calls
+# Transient failures and parser upgrades remain legitimate, bounded retries.
+bad_key=rows[0]['bidNo']+':000'
+version_key=rows[1]['bidNo']+':000'
+retry=dict(all_done)
+retry[bad_key]={**scanned_record(),'status':'metadata_fetch_failed'}
+retry[version_key]={**scanned_record(),
+                    'classificationVersion':module['CLASSIFICATION_VERSION']-1}
+candidate=discover(5,retry)
+assert {(n,o) for n,o,_ in candidate} == {
+    (rows[0]['bidNo'],'000'),(rows[1]['bidNo'],'000')},candidate
+# A published correction order is a NEW document identity, not a repeat.
+original=rows[2]
+rows[2]={**original,'order':'001'}
+corrected=discover(5,all_done)
+assert corrected==[(original['bidNo'],'001',deadline[:4]+'-'+deadline[4:6]+'-'+deadline[6:8])],corrected
+rows[2]=original
+print('WORKLINKS_RFP_SUCCESS_REUSE=PASS','historical',len(all_done),'retry',len(candidate))
 print('WORKLINKS_RFP_ROLLING_CORPUS=PASS','total',len(rows),'batch',220,'cumulative_archive',True)

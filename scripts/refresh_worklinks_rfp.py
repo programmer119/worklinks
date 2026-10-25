@@ -84,6 +84,20 @@ def needs_hwpx_reader_retry(record):
                (Path(f.get('name') or '').suffix.lower() in ('.hwpx',''))
                for f in (record or {}).get('files') or [])
 
+def reusable_rfp_extraction(record):
+    """Reuse a sourced RFP scan; legal qualification review is a separate gate.
+
+    A new official notice order has a different key. Explicit parser-version
+    upgrades and failed/unreadable scans remain eligible for another attempt.
+    """
+    if not isinstance(record,dict):return False
+    if record.get('status')!='text_extracted_requires_review':return False
+    if record.get('classificationVersion')!=CLASSIFICATION_VERSION:return False
+    if needs_hwpx_reader_retry(record):return False
+    if int(record.get('readableDocumentCount') or 0)<1:return False
+    return any(f.get('readable') is True and f.get('sourceSha256')
+               for f in (record.get('files') or []) if isinstance(f,dict))
+
 def datestr(raw):
     m=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',str(raw or ''))
     return m.group(1)+m.group(2)+m.group(3) if m else ''
@@ -129,6 +143,7 @@ def discover(limit,prior=None,targets=None):
                 cached=prior.get(key) or {}
                 retry=needs_hwpx_reader_retry(cached)
                 if cached.get('reviewComplete') is True:continue
+                if reusable_rfp_extraction(cached):continue
                 if cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry:
                     try:
                         checked=dt.datetime.fromisoformat(str(cached.get('checkedAt','')).replace('Z','+00:00'))
@@ -936,6 +951,9 @@ def main():
     for no,ordn,_ in selected:
         key=no+':'+ordn
         cached=old.get(key)
+        if reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key)):
+            print('RFP_REUSE_PREVIOUS_EXTRACTION',key)
+            continue
         if cached:
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
