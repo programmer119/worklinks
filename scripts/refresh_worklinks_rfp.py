@@ -844,9 +844,24 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
             data=fetcher(BASE+'bid-evidence?'+urllib.parse.urlencode(
                 {'bidNo':no,'order':ordn}))
             attachments=data.get('attachments') or {}
+            notice=data.get('noticeDocuments') or {}
+            if ('upstream_temporarily_rate_limited' in
+                    (str(attachments.get('error') or ''),
+                     str(notice.get('error') or ''),
+                     str(data.get('error') or ''))):
+                print('RFP_UPSTREAM_RATE_LIMITED','FIRST_DETECTED',no+':'+ordn,
+                      'SKIP_REMAINING_PROBES',flush=True)
+                # A proxy-enforced 30-minute cooldown must not be multiplied
+                # into four requests, nor mistaken for a zero-document RFP.
+                raise RuntimeError('RFP_UPSTREAM_RATE_LIMITED_PREFLIGHT')
             valid+=int(attachments.get('ok') is True and
                        attachments.get('complete') is True)
             staged[(no,ordn)]=data
+        except RuntimeError as err:
+            if str(err)=='RFP_UPSTREAM_RATE_LIMITED_PREFLIGHT':
+                raise
+            staged[(no,ordn)]={'attachments':{
+                'ok':False,'complete':False,'error':'preflight_RuntimeError'}}
         except Exception as err:
             reason=('http_'+str(err.code) if isinstance(err,urllib.error.HTTPError)
                     else type(err).__name__)

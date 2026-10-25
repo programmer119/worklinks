@@ -183,6 +183,19 @@ except RuntimeError as error:
     assert 'RFP_UPSTREAM_METADATA_UNAVAILABLE_PREFLIGHT' in str(error)
 assert len(attempts)==4,attempts
 attempts.clear()
+def rate_limited(url):
+    attempts.append(url)
+    return {'ok':False,'attachments':{
+        'ok':False,'complete':False,'error':'upstream_temporarily_rate_limited'},
+        'noticeDocuments':{'ok':False,'complete':False,
+                           'error':'upstream_temporarily_rate_limited'}}
+try:
+    preflight(todo,fetcher=rate_limited)
+    raise AssertionError('quota cooldown was not respected')
+except RuntimeError as error:
+    assert str(error)=='RFP_UPSTREAM_RATE_LIMITED_PREFLIGHT',error
+assert len(attempts)==1,attempts
+attempts.clear()
 def partly_healthy(url):
     attempts.append(url)
     return {'attachments':{'ok':len(attempts)==1,
