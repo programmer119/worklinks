@@ -46,6 +46,7 @@ jobs:
             git reset --hard origin/main
             python3 - <<'PY'
           import datetime,json,pathlib,os
+          from scripts.refresh_worklinks_rfp import bounded_detail_snapshot,MAX_PUBLISHED_RFP_BYTES
           dst=pathlib.Path('startup-support/rfp-clauses.json')
           new=json.loads(pathlib.Path('/tmp/worklinks-rfp-new.json').read_text())
           new_index=json.loads(pathlib.Path('/tmp/worklinks-rfp-index-new.json').read_text())
@@ -59,21 +60,32 @@ jobs:
               if item.get('checkedAt','') < prior.get('checkedAt',''):
                 continue
             merged[key]=item
+          bounded,omitted=bounded_detail_snapshot(merged)
           result={**new,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
-                  'byNotice':dict(list(merged.items())[-240:])}
+                  'detailOmittedFromRollingCache':omitted,'byNotice':bounded}
           dst.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          if dst.stat().st_size>MAX_PUBLISHED_RFP_BYTES:
+            raise SystemExit('RFP_DETAIL_SIZE_GUARD_FAILED')
           archive_path=pathlib.Path('startup-support/rfp-coverage-index.json')
           old_index=json.loads(archive_path.read_text()) if archive_path.exists() else {'byNotice':{}}
           indexed=dict(old_index.get('byNotice') or {})
           for key,item in (new_index.get('byNotice') or {}).items():
             prior=indexed.get(key) or {}
             if str(item.get('checkedAt') or '')>=str(prior.get('checkedAt') or ''):
+              # A later missing/partial API scan must not erase earlier
+              # authenticated official excerpts from the cumulative index.
+              if prior.get('changcomClauseEvidence') and not item.get('changcomClauseEvidence'):
+                item={**item,'changcomClauseEvidence':prior['changcomClauseEvidence']}
               indexed[key]=item
           archive={**new_index,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
                    'scannedNoticeCount':len(indexed),'byNotice':indexed}
           archive_path.write_text(json.dumps(archive,ensure_ascii=False,indent=2)+'\n')
+          if archive_path.stat().st_size>=100_000_000:
+            raise SystemExit('RFP_CUMULATIVE_INDEX_AT_GITHUB_BLOB_LIMIT')
           print('RFP_CUMULATIVE_SCANNED',len(indexed))
           print('RFP_MERGED_RECORDS',len(result['byNotice']))
+          print('RFP_DETAIL_PUBLISHED_BYTES',dst.stat().st_size)
+          print('RFP_DETAIL_OMITTED_FROM_ROLLING_CACHE',omitted)
           PY
             git add startup-support/rfp-clauses.json startup-support/rfp-coverage-index.json
             if git diff --cached --quiet; then echo 'RFP_SNAPSHOT_UNCHANGED'; exit 0; fi
