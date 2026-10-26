@@ -1108,7 +1108,9 @@ document.getElementById("jobCards").addEventListener("keydown",function(e){
  }
 });
 renderPartners();
-document.getElementById('partnerCompanyCards').addEventListener('click',function(e){var b=e.target.closest('[data-partner-refresh]');if(b){var p=partners.find(function(x){return x.id===b.dataset.partnerRefresh});if(p){refreshPartnerRegistry(p);refreshPartnerProduction(p);refreshPartnerSme(p)}}});
+document.getElementById('partnerCompanyCards').addEventListener('click',function(e){
+ if(!worklinksPartnerAccess())return;
+ var b=e.target.closest('[data-partner-refresh]');if(b){var p=partners.find(function(x){return x.id===b.dataset.partnerRefresh});if(p){refreshPartnerRegistry(p);refreshPartnerProduction(p);refreshPartnerSme(p)}}});
 /* Partner association is intentionally fail-closed. A software-looking title is not
  * evidence that a company may bid. The official notice industry restrictions and
  * current company registrations must match, before linking the company on a card.
@@ -2780,7 +2782,7 @@ function renderPartnerJobContext(){
 }
 function renderJobDetail(x){
  if(activeDetailJobId!==x.id)return;
- const time=jobTimeInfo(x),partnerList=partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)});
+ const time=jobTimeInfo(x),partnerList=worklinksPartnerAccess()?partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)}):[];
  const orig=jobOriginUrl(x);
  document.getElementById('jobDetailTitle').textContent=x.title||'일감 상세';
  document.getElementById('jobDetailSub').textContent=(x.org||'발주기관 미확인')+' · '+(x.type||'')+(x.noticeNumber?' · 공고번호 '+x.noticeNumber:'');
@@ -2794,8 +2796,8 @@ function renderJobDetail(x){
   '</div><div class="job-detail-section"><h3>사업 내용·검토 이유</h3><p>'+htmlEscape(x.reason||'사업범위 원문 확인 필요')+'</p></div>'+
   '<div class="job-detail-section"><h3>공고의 참가조건·제한</h3><p>'+htmlEscape(x.condition||'공고 원문 확인 필요')+'</p>'+
   '<p style="margin-top:6px"><b>공동수급:</b> '+htmlEscape(x.partnerBidMode||'원문 확인 필요')+'</p></div>';
- const compareList=partners.filter(function(p){return jobSoftwareScope(x)==='candidate'});
- const m=compareList.length?'<section class="job-detail-section"><h3>파트너 업체 적격성 대조</h3>'+
+ const compareList=worklinksPartnerAccess()?partners.filter(function(p){return jobSoftwareScope(x)==='candidate'}):[];
+ const m=!worklinksPartnerAccess()?'':compareList.length?'<section class="job-detail-section"><h3>파트너 업체 적격성 대조</h3>'+
    compareList.map(function(p){
      return '<div class="job-match-company">'+matchRowsHTML(x,p)+
        '<a href="#partner-'+htmlEscape(p.id)+'" data-partner-id="'+htmlEscape(p.id)+'" data-job-id="'+htmlEscape(x.id)+'">회사별 보유자격 자세히 ↗</a></div>';
@@ -2834,7 +2836,7 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+changcomOriginalReviewMarkup(x,compareList)+m+docLinks+extractHTML+
+ document.getElementById('jobDetailBody').innerHTML=base+(worklinksPartnerAccess()?changcomOriginalReviewMarkup(x,compareList):'')+m+docLinks+extractHTML+
   bidChangePriceMarkup(x)+variantLinks+actions;
 }
 function openJobDetail(id){
@@ -2845,7 +2847,7 @@ function openJobDetail(id){
  renderJobDetail(x);
  document.getElementById('jobDetailClose').focus();
  const p=partners.find(function(p){return partnerIdsOfJob(x).includes(p.id)});
- if(p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
+ if(worklinksPartnerAccess()&&p&&!p.registryCheckedAt)refreshPartnerRegistry(p);
  loadJobEligibility(x);
  loadJobEvidence(x);
 }
@@ -2875,6 +2877,11 @@ localStorage.setItem("worklinks_job_filter_v1","all");
 function syncPartnerFilterChoices(){
  const select=document.getElementById('partnerFilter');
  if(!select)return;
+ if(!worklinksPartnerAccess()){
+  select.innerHTML='<option value="all">모두</option>';
+  select.value='all';selectedPartnerId='all';partnerFilterOptionsKey='';
+  return;
+ }
  // Automatically reflect future registry additions and removals.
  const signature=partners.map(p=>String(p.id)+':'+String(p.name)).join('|');
  if(signature!==partnerFilterOptionsKey){
@@ -2983,6 +2990,13 @@ function renderJobs(){
  if(asyncJobRenderTimer!==null){clearTimeout(asyncJobRenderTimer);asyncJobRenderTimer=null}
  jobRenderCalcCache=Object.create(null);
  try {
+ const member=worklinksPartnerAccess();
+ if(!member){
+  if(jobFilter==='partner')jobFilter='all';
+  selectedPartnerId='all';jobVerdictFilter='all';
+  const sorter=document.getElementById('jobSort');
+  if(sorter&&['qualified','competition'].includes(sorter.value))sorter.value='deadline';
+ }
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
  const raw=jobs.concat(g2bLiveJobs);
@@ -2991,6 +3005,7 @@ function renderJobs(){
  const active=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key!=='closed'});
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
+ if(member){
  const candidateJobs=active;
  const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>verdict(o.x,p).type===type)).length;
  const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
@@ -3063,6 +3078,10 @@ function renderJobs(){
    '<p>※ 한 공고에 여러 미확인 항목이 있을 수 있습니다. 공고를 눌러 정확한 요구사유와 출처를 확인하세요.</p>';
  }
 
+ }else{
+  for(const id of ['partnerSummary','jobDecisionSummary','jobMissingInfo'])
+   document.getElementById(id)?.replaceChildren();
+ }
  const filter=jobFilter;
  if(filter==='sources'){
   document.getElementById('jobVerdictFilter').hidden=true;
@@ -3078,7 +3097,7 @@ function renderJobs(){
     if(filter==='partner')return jobMatchesSelectedPartner(x,selectedPartnerId);
     return x.entry===filter;
   });
-  refreshVerdictFilters(scopeRows,selectedCompany);
+  if(member)refreshVerdictFilters(scopeRows,selectedCompany);
   let list=scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter));
   list.sort(function(a,b){
     if(filter==='closed')return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
@@ -3151,12 +3170,12 @@ function renderJobs(){
     const competitionLabel=oldCount?
      '<span class="tag" title="과거 '+oldCount.year+'년 공식 개찰 참가업체 '+oldCount.count+'개사 · 이번 공고의 참가업체 수가 아님">'+
       oldCount.year+'년 '+oldCount.count+'개사</span>':'';
-    const confirmed=jobPartnerMatches(x),pending=jobPartnerCandidates(x);
+    const confirmed=member?jobPartnerMatches(x):[],pending=member?jobPartnerCandidates(x):[];
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
-    const comparisonCompanies=scoped?[scoped]:partners;
+    const comparisonCompanies=member?(scoped?[scoped]:partners):[];
     const opportunityEligible=jobSoftwareScope(x)==='candidate'&&
      comparisonCompanies.some(p=>verdict(x,p).type==='ready');
-    const opportunityMarkup=bidAdvantageMarkup(historyCompetition,opportunityEligible);
+    const opportunityMarkup=member?bidAdvantageMarkup(historyCompetition,opportunityEligible):'';
     const partnerList=confirmed.concat(pending).filter(y=>!scoped||y.p.id===scoped.id);
     const partner=partnerList.length?'<div class="job-partners">파트너 '+
       partnerList.map(function(y){
@@ -3173,8 +3192,7 @@ function renderJobs(){
        '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3></div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
-       participationStrip(x,comparisonCompanies)+
-       changcomOriginalReviewMarkup(x,comparisonCompanies,true)+
+       (member?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
        '<div class="job-highlights">'+repeat+competitionLabel+extras+opportunityMarkup+'</div>'+
        '<div class="job-footer">'+partner+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
@@ -3206,7 +3224,8 @@ function startJobsDataWhenVisible(){
    jobsBootstrapQueued=false;
    if(jobsBootstrapStarted||!document.getElementById('jobsView').classList.contains('on'))return;
    jobsBootstrapStarted=true;
-   g2bCheckStatus();g2bLoadSaved(false);g2bLoadCrawlStatus();loadChangcomActionable();
+   g2bCheckStatus();g2bLoadSaved(false);g2bLoadCrawlStatus();
+    if(worklinksPartnerAccess())loadChangcomActionable();
    loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();refreshRfpSnapshot();
   },0);
  });
