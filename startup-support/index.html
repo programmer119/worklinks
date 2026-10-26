@@ -540,8 +540,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
     </details>
         <div class="note">업종과 발주기관 분야에 상관없이 SW·DB·데이터·AI 관련 발주를 탐색합니다. 파트너 협업에는 직접수주·공동수급·분담이행·공급/납품 참여 가능성을 구분해 표시하고, 미확인 자격 때문에 검색단계에서 제외하지 않습니다.</div>
         <div class="note"><b>자동확인 소스</b> · 개별 협회/학회/연맹/조합 홈페이지 · 네이버 카페 공개글 · BAND 공개페이지 · 업종 커뮤니티 · Facebook 공개그룹 · Discord 공개영역 · 일반 웹검색 <span class="warn">· 회원전용/비공개는 접근제한으로 표시</span></div>
-        <div class="note">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
-        <small class="job-vf-note">업체별 자격·증빙 근거 기준 · 미확인 자료는 상세 화면에 표시하고, 명확한 탈락 사유가 확인될 때만 제외</small>
+        <div class="note worklinks-partner-only">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
+        <small class="job-vf-note worklinks-partner-only">업체별 자격·증빙 근거 기준 · 미확인 자료는 상세 화면에 표시하고, 명확한 탈락 사유가 확인될 때만 제외</small>
         <div class="partner-summary worklinks-partner-only" id="partnerSummary"></div>
         <div class="g2b-panel" id="g2bPanel">
       <div class="g2b-head"><h3>나라장터 공고 API <span class="g2b-live-tag">나라장터 자동수집 · DB 저장</span></h3><div class="g2b-controls"><button type="button" id="g2bLoad">저장된 공고 새로고침</button></div></div>
@@ -3249,7 +3249,28 @@ function setWorkspaceView(view){
   startJobsDataWhenVisible();
  }
 }
-document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){jobFilter=this.dataset.jobf;jobRenderLimit=jobPageStep();localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
+window.addEventListener('worklinks:partner-access',function(){
+ const allowed=worklinksPartnerAccess();
+ if(!allowed){
+  if(partnerModal.classList.contains('open'))closePartnerModal();
+  jobFilter='all';selectedPartnerId='all';jobVerdictFilter='all';
+  for(const id of ['partnerCompanyCards','partnerJobContext','partnerSummary',
+    'jobDecisionSummary','jobMissingInfo','changcomActionableList'])
+   document.getElementById(id)?.replaceChildren();
+ }
+ document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
+  .forEach(option=>{option.hidden=!allowed;option.disabled=!allowed;});
+ const sort=document.getElementById('jobSort');
+ if(!allowed&&sort&&['qualified','competition'].includes(sort.value))sort.value='deadline';
+ partnerFilterOptionsKey='';
+ if(allowed&&jobsBootstrapStarted)loadChangcomActionable();
+ if(activeDetailJobId){
+  const active=getJobById(activeDetailJobId);
+  if(active)renderJobDetail(active);
+ }
+ scheduleJobsRender();
+});
+document.querySelectorAll(".workspace-tab").forEach(function(b){b.onclick=function(){setWorkspaceView(this.dataset.view)}});document.querySelectorAll(".jobf").forEach(function(b){b.onclick=function(){if(this.dataset.jobf==='partner'&&!worklinksPartnerAccess())return;jobFilter=this.dataset.jobf;jobRenderLimit=jobPageStep();localStorage.setItem("worklinks_job_filter_v1",jobFilter);renderJobs()}});
 document.querySelectorAll('[data-verdict-filter]').forEach(function(b){b.addEventListener('click',function(){
  jobVerdictFilter=this.dataset.verdictFilter;jobRenderLimit=jobPageStep();renderJobs();
  if(['repeat','low-bids','low-changed','low-incumbent','adv-3','adv-2','adv-1'].includes(jobVerdictFilter))
@@ -3263,6 +3284,7 @@ document.getElementById("jobSort").addEventListener("change",function(){
  if(this.value==='competition')loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 });
 document.getElementById("partnerFilter").addEventListener("change",function(){
+ if(!worklinksPartnerAccess())return;
  selectedPartnerId=this.value;jobFilter='partner';jobRenderLimit=jobPageStep();
  localStorage.setItem("worklinks_job_filter_v1","partner");
  renderJobs();
