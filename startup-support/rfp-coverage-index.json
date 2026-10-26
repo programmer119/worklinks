@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-25T22:33:03.954636+00:00",
+  "generatedAt": "2026-10-26T01:09:42.840854+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3036,
+  "scannedNoticeCount": 3044,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -146077,7 +146077,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T01:09:42.840854+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "0661a29d81c7c5bb611d8a3651e82ce439c75c822e4a31630904269cd68c0521",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01772590:000": {
       "status": "text_extracted_requires_review",
@@ -146861,7 +146866,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T01:09:42.840854+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "5f7d16b84c13f5e4f57c167c2124cb5f70c289d30cf3588213894aae4371a977",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01777481:000": {
       "status": "text_extracted_requires_review",
@@ -254986,7 +254996,197 @@
           ]
         }
       }
+    },
+    "R26BK01789844:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01789755:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01789653:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01789686:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01789888:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01789606:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "붙임2. 제안요청서_수정_1022.hwpx",
+          "readable": true,
+          "sourceSha256": "57a57ea8bf8f9dfaf10a435097ddd320087006f0b533515dcef02a97f54ea919",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 87
+        },
+        {
+          "name": "공고서(국가_협상_대행_1468_6146_20억미만_공동_고시금액 미만).hwpx",
+          "readable": true,
+          "sourceSha256": "bea23f41fae15043091440bf9d580348de0ff87493870631c09709b8491f3162",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 119
+        },
+        {
+          "name": "공고서(국가_협상_대행_1468_6146_20억미만_공동_고시금액 미만).pdf",
+          "readable": true,
+          "sourceSha256": "c444ca834ff944eb6d8e94b0ca2f2f93a5397a00acf2785912660a8b5800d0c9",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 470
+        }
+      ],
+      "manifestSignature": "630281db519d63b26c00a4a52759f638eb46132bd632ed69f90246e67e8e38bc",
+      "manifestCheckedAt": "2026-10-26T01:10:09.747642+00:00",
+      "manifestChangePending": false
+    },
+    "R26BK01789853:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "(제안요청서) 2026년 보건소 노쇠예방관리시스템 기능개발 사업 감리 및 개인정보영향평가 1부..hwp",
+          "readable": true,
+          "sourceSha256": "4630bf5fc069eda498e1584c8ac474b60d5181fd73e819b725f3be3609e1bc26",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 108
+        },
+        {
+          "name": "(2026-20-1) SSIS 재입찰공고서(2026년 보건소 노쇠예방관리시스템 기능개발 사업 감리 및 개인정보영향평가) 1부.hwp",
+          "readable": true,
+          "sourceSha256": "8e18177203787bd225324610bf862819827ec451e2b7c7a305c6544d07ccee99",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 51
+        },
+        {
+          "name": "(2026-20-1) SSIS 재입찰공고서(2026년 보건소 노쇠예방관리시스템 기능개발 사업 감리 및 개인정보영향평가) 1부.pdf",
+          "readable": true,
+          "sourceSha256": "b07b3b9ed1183a4dfe8d050484547247d1e907545b30c238eb94b6273e26d355",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 214
+        }
+      ],
+      "manifestSignature": "db58f4e4fc4634fdfa795b175367591f01de971e9e2b37fcf666b93eabd1f290",
+      "manifestCheckedAt": "2026-10-26T01:10:17.471204+00:00",
+      "manifestChangePending": false
+    },
+    "R26BK01786020:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 1,
+      "files": [
+        {
+          "name": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+          "readable": true,
+          "sourceSha256": "9493e92b163c6587399c5ab93e1eaad03a90f06486830c3c20c446a37f205abc",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 191
+        },
+        {
+          "name": "2027년 남양주시 홈페이지 통합유지관리 추진 계획.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "file_extract_failure",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+          "readable": true,
+          "sourceSha256": "d4755028560b16b27c5b07a7d79719dce18789bce572f5bc6db6b2ae4a07229c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 117
+        },
+        {
+          "name": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).pdf",
+          "readable": true,
+          "sourceSha256": "95ae99ec3097c5ee8c2aaf636cb252a1d57357747aac381c03f2b6b2826aaf6f",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 472
+        }
+      ],
+      "manifestSignature": "cb612a54dd7aefc373d173d0a9447a0bca48145dfef413834c799be7b5727893",
+      "manifestCheckedAt": "2026-10-26T01:10:23.090511+00:00",
+      "manifestChangePending": false
     }
   },
-  "workflowRunId": "40240694361"
+  "workflowRunId": "40252803221"
 }
