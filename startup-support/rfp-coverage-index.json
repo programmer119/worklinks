@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-26T01:09:42.840854+00:00",
+  "generatedAt": "2026-10-26T06:13:02.647199+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3044,
+  "scannedNoticeCount": 3049,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -147166,7 +147166,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T06:13:02.647199+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "455a59fcec594b92180e43594db5933d90642182fcfe918acc22fde41ebb32cd",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01776795:000": {
       "status": "text_extracted_requires_review",
@@ -180883,7 +180888,7 @@
     },
     "R26BK01776485:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-25T01:59:00.688780+00:00",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -202032,7 +202037,7 @@
     },
     "R26BK01783846:000": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-25T01:59:00.688780+00:00",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -211922,7 +211927,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T06:13:02.647199+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "72ce1a4a36f88d3a4e85c1cc2ad0ea4cc1f987dea4c36a30121ad56099e8d6df",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01786067:000": {
       "status": "text_extracted_requires_review",
@@ -234829,7 +234839,7 @@
     },
     "R26BK01783260:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-25T01:59:00.688780+00:00",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -255185,8 +255195,391 @@
       ],
       "manifestSignature": "cb612a54dd7aefc373d173d0a9447a0bca48145dfef413834c799be7b5727893",
       "manifestCheckedAt": "2026-10-26T01:10:23.090511+00:00",
-      "manifestChangePending": false
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-10-26T01:09:42.840854+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 1,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13"
+          },
+          {
+            "name": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "① 경쟁입찰 참가자격을 갖추고, 조달청 입찰참가자격 등록증을 소지한 사업자 ② 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조(소프트웨어사업자의 실적 등 관리) 및 동 시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업) 등록된 업체",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "② 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조(소프트웨어사업자의 실적 등 관리) 및 동 시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업) 등록된 업체",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "체 입찰 및 계약 집행 기준(행정안전부예규)ｏ 지방자치단체 입찰시 낙찰자 결정기준(행정안전부예규)ｏ 표준 개인정보 보호지침(행정안전부고시) ｏ 엔지니어링사업대가의 기준(산업통상자원부고시)ｏ 소프트웨어 기술성 평가기준 지침(과학기술정보통신부고시)ｏ 소프트웨어사업의 제안서 보상기준 등에 관한 운영규정(과학기술정보통신부고시)ｏ 소프트웨어사업 계약 및 관리감독에 관한 지침(과학기술정보통신부고시)ｏ 중소 소프트웨어사업자의 사업 참여 지원에 관한 지침(과학기술정보통신부고시) ｏ 소프트웨어",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "③「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조(경쟁입찰 참여자격) 및 동법 시행령 제9조에 의한 유자격자로서 “중소기업제품 공공구매제도 운영요령”(중소벤처기업부고시) 제29조 제8항에 의거 입찰 마감일의 전일까지 공공구매정보망(http://smpp.go.kr)에 “직접생산 확인”(정보시스템유지관리서비스(8111189901))에 등재된 업체",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "②「중소기업제품 구매촉진 및 판로지원에 관한 법률」제9조 및 같은 법 시행령 제10조에 의한 직접생산확인증명서(정보시스템유지관리서비스, 세부품명번호 10자리 : 8111189901)를 소지한 자.",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ ‘중소기업ㆍ소상공인확인서’ 및 ‘직접생산확인증명서’가 중소기업제품 공공구매 종합정보망(http://www.smpp.go.kr)에서 확인(전자입찰서 제출 마감일 전일까지 발급된 것으로서 전자입찰서 제출 마감일까지 계속 유지되어야 함)이 안 될 경우 입찰참가자격이 없습니다. ※ ‘중소기업ㆍ소상공인확인서’를 전자입찰서 제출 마감일 전일까지 신청한 사항이 확인된 업체는 입찰참가가 가능하나 다음 중 어느 하나에 해당하는 경우에는 입찰참가자격이 없습니다. - 제안서 제출 마감일부터 5일",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "④「중소기업기본법」제2조에 따른 중 · 소기업자 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중 · 소기업 · 소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다. ② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다. (중소기업자만 입찰참가 가능)",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다. (중소기업자만 입찰참가 가능)",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "양도 금지○ 남양주시의 유지보수대상 변경 등으로 인해 계약 변동사유가 발생하였을 경우 남양주시의 요구에 의하여 사업수행자와 변경 계약할 수 있으며, 유지보수 대상이 증가할 경우 산출된 유지보수 금액에 낙찰률을 적용한 금액으로 반영함○ 기타 명시되지 아니한 사항에 관하여 지방자치단체를 당사자로 하는 계약에 관한 법령 및 예규를 준용하며, 그로 인한 분쟁이 발생하였을 경우 쌍방이 합의하여 결정 - 관련 소송은 남양주시의 소재지 관할 법원에서 진행",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 관련 소송은 남양주시의 소재지 관할 법원에서 진행",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 기타 명시되지 아니한 사항에 관하여 지방자치단체를 당사자로 하는 계약에 관한 법령 및 예규를 준용하며, 그로 인한 분쟁이 발생하였을 경우 쌍방이 합의하여 결정 - 관련 소송은 남양주시의 소재지 관할 법원에서 진행",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "세부 작성지침6. 제안 안내사항 1. 입찰방식 2. 제안서 평가 방법 3. 제출서류 4. 제안서 제출 일정 및 방법 5. 제안요청설명회 6. 제안설명회(제안서평가) 개최 7. 입찰시 유의사항7. 기타 사항 1. 제안사 준수사항 2. 작업장소 상호 협의 3. 계약목적물의 지식재산권 귀속 4. 하도급계약 사전 승인제 5. 누출금지정보의 범위[붙임] 및 [서식]",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 계약목적물의 지식재산권 귀속 4. 하도급계약 사전 승인제",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 하도급계약 사전 승인제",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "Ⅰ. 제안개요1. 일반현황 및 연혁2. 제안사 경영실태3. 사업수행 실적4. 주요사업 및 기술Ⅲ. 과업 수행 방안과업수행 전략기능요구사항 수행방안운영 및 유지관리보안요구제약사항품질요구Ⅴ. 지원부문 및 기타",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 사업수행 실적 4. 주요사업 및 기술",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "작 성 항 목작 성 방 법비고Ⅰ. 제안개요ㆍ제안사는 본 사업의 제안요청 내용을 명확하게 이해하고 본 제안의 배경, 목적, 범위 및 제안내용의 사업추진전략, 제안의 특징, 장단점, 기대효과를 요약하여 기술Ⅱ. 일반현황 1. 일반현황 및 연혁ㆍ제안사의 일반현황, 주요연혁 등을 명료하게 제시 2. 제안사 경영실태ㆍ최근3년간의 자본금 및 부문별 매출액 등을 명료하게 제시 3. 사업수행 실적ㆍ본과업과 관련이 있는 최근3년간 평가대상 사업실적이상 사업 수행경험 및 실적을 제시 4. 주요사업",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "제출⑧ 프로젝트지원 : PSRPSR-001운영일반PSR-002교육 및 자료 제작PSR-003기술이전⑨ 유지관리수행 : MPRMPR-001유지관리 방안 및 체계MPR-002유지관리 수행 요구사항MPR-003홈페이지 상시 유지관리MPR-004상용솔루션 및 기타 정보시스템 유지관리MPR-005신규 사이트 및 서비스 구축·기능개선·운영MPR-006홈페이지 아키텍처 유지관리MPR-007장애처리 및 복구 조치⑩ 유지관리인력 : MHRMHR-001인력 요구사항MHR-002투입인력 자격 기준",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "복구 조치⑩ 유지관리인력 : MHRMHR-001인력 요구사항MHR-002투입인력 자격 기준MHR-003투입인력 변경",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 사업 착수 시 유지관리 대상․업무별 유지관리요원 명단 및 비상연락체계 제출 〇 남양주시는 사업 투입인력의 신원확인에 필요한 조치를 취할 수 있으며 사업자는 이에 응하여야 함",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "10-3. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다만 , 법인등기부등본 ( 또는 사업자등록증 ) 의 상호 또는 대표자 변경신고 후 해당 기관에서 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입 찰은 유효한 입찰로 간주합니다 . 1 0 - 3 . 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "찰은 유효한 입찰로 간주합니다 . 1 0 - 3 . 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "□ 본 제안 사업의 수행이 가능한 업체로서 다음 요건을 모두 갖춘 사업자이어야 합니다. ① 경쟁입찰 참가자격을 갖추고, 조달청 입찰참가자격 등록증을 소지한 사업자",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 경쟁입찰 참가자격을 갖추고, 조달청 입찰참가자격 등록증을 소지한 사업자",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 경쟁입찰 참가자격을 갖추고, 조달청 입찰참가자격 등록증을 소지한 사업자 ② 입찰참가신청 서류 접수마감일 현재 「소프트웨어 진흥법 시행령」제53조(소프트웨어사업자의 실적 등 관리) 및 동 시행규칙 제17조에 의한 소프트웨어사업자(분야: 컴퓨터관련서비스사업) 등록된 업체",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "재직증명서, 4대보험가입확인서, 자격증 및 경력증명서 등",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "(2) 입찰 참가자격",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "[서식10] 제안사 기술인력 보유현황",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "□ 상호출자제한기업집단 소속기업 및 대기업 참여제한 사항 ① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 소프트웨어 진흥법 제48조 제4항에 따라 상호출자제한기업집단에 속하는 회사는 입찰에 참여할 수 없습니다. ② 본 사업은 20억 미만의 사업으로써,「소프트웨어 진흥법」제48조 제2항 및「대기업인 소프트웨어 사업자가 참여할 수 있는 사업금액의 하한(과학기술정보통신부)」에 의거 대기업 및 중견기업인 소프트웨어 사업자의 입찰 참여를 제한합니다. (중소기업자만 입찰참가 가능)",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "③ 공동수급은 공동이행방식을 원칙으로 하며, 공동계약운용요령 상의 공동수급표준협정서(공동이행방식)는 전자조달시스템을 통해 등록합니다. ④ 공동수급은 공동이행방식을 원칙으로 하며, 공동수급체 구성원 모두가 본 입찰에서 요구하는 입찰참가자격을 갖추어야 함.",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 공동수급은 공동이행방식을 원칙으로 하며, 공동수급체 구성원 모두가 본 입찰에서 요구하는 입찰참가자격을 갖추어야 함.",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 공동수급은 공동이행방식을 원칙으로 하며, 공동수급체 구성원 모두가 본 입찰에서 요구하는 입찰참가자격을 갖추어야 함. ⑤ 공동수급체 구성원 중 일부 구성원이 하도급계약을 체결하려는 경우에는 다른 구성원의 동의를 받아야 한다.",
+              "codes": [],
+              "sourceFile": "2027년 남양주시 홈페이지 통합유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060239&rfpOrd=000&rfpUntyAtchFileNo=13",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "2-4-3. 입찰보증금 : 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 공동수급체의 경우 대표사는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다.",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "8-7. 낙찰자 선정방법 : 협상에 의한 낙찰자 결정 9. 입찰보증금",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "9-1. 입찰보증금의 납부",
+              "codes": [],
+              "sourceFile": "입찰공고서(지방_협상_1468(유지관리)_공동_온서).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01786020&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01790545:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01790308:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01781373:001": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01790562:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01790225:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T06:13:02.647199+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
     }
   },
-  "workflowRunId": "40252803221"
+  "workflowRunId": "40278484786"
 }
