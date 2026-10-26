@@ -15,6 +15,17 @@ const timeOf=x=>Number(x?.at)||0;
 const remoteTime=x=>Date.parse(x?.updatedAt||'')||0;
 const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
 const $ = (id)=>document.getElementById(id);
+// Partner UI is fail-closed: only an active AuthHub /v1/me membership grants access.
+// This event drives the existing (non-module) WorkLinks page; no token is exposed.
+function publishPartnerAccess(verified){
+  const allowed=Boolean(verified&&state.account&&state.token);
+  const status=allowed?'granted':'guest';
+  if(window.worklinksMemberAuthenticated===allowed&&document.documentElement.dataset.worklinksPartnerAccess===status)return;
+  window.worklinksMemberAuthenticated=allowed;
+  document.documentElement.dataset.worklinksPartnerAccess=status;
+  window.dispatchEvent(new CustomEvent('worklinks:partner-access',{detail:{authenticated:allowed}}));
+}
+publishPartnerAccess(false);
 const decode = (key)=>{try{const r=JSON.parse(localStorage.getItem(key)||'{}');return r&&typeof r==='object'&&!Array.isArray(r)?r:{}}catch{return {}}};
 const accountKeys = (user)=>({
   applied:'worklinks_support_applied_v2:'+user,
@@ -299,6 +310,7 @@ window.worklinksStatusChanged=(kind,id,value)=>{
 };
 function guestRestore(){
   state.account='';state.token='';state.records=[];state.imported=0;state.serverReady=false;
+  publishPartnerAccess(false);
   window.statusKey=GUEST.applied;window.hiddenKey=GUEST.hidden;window.businessKey=GUEST.business;
   window.saved=decode(GUEST.applied);window.hidden=decode(GUEST.hidden);window.business=decode(GUEST.business);
   window.worklinksArchivedStatuses=[];
@@ -388,8 +400,9 @@ async function bootstrap(){
   }
   try{
     const session=await validSession(state.client);
-    if(!session){buttons(null);show('비회원 · 이 브라우저에만 저장');return}
+    if(!session){guestRestore();buttons(null);show('비회원 · 이 브라우저에만 저장');return}
     state.account=session.identity;state.token=session.token;state.serverReady=false;
+    publishPartnerAccess(true);
     // Show preserved account-local data while waiting, but do not overwrite server truth.
     applyAccount([]);
     await reconcileServer();
@@ -399,5 +412,26 @@ async function bootstrap(){
   }
 }
 window.addEventListener('online',()=>{if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}});
-window.addEventListener('focus',()=>{if(!state.account)return;if(!state.serverReady)reconcileServer().catch(()=>{});else if(!state.busy&&Object.keys(decode(accountKeys(state.account).pending)).length)flush().catch(()=>{})});
+window.addEventListener('focus',()=>{
+  if(!state.account)return;
+  if(!state.serverReady)reconcileServer().catch(()=>{});
+  else if(!state.busy&&Object.keys(decode(accountKeys(state.account).pending)).length)flush().catch(()=>{});
+  const identity=state.account;
+  // Revalidate on returning to the tab; expired/revoked access must not keep Partners open.
+  validSession(state.client).then(session=>{
+    if(identity!==state.account)return;
+    if(!session||session.identity!==identity){
+      guestRestore();buttons(null);show('인증 만료 · 다시 로그인하세요');
+    }else{
+      state.token=session.token;
+      publishPartnerAccess(true);
+    }
+  }).catch(()=>{if(identity===state.account)publishPartnerAccess(false)});
+});
+window.addEventListener('storage',event=>{
+  // A logout in another tab immediately revokes this tab's partner access.
+  if(state.client&&event.key===state.client.key&&!event.newValue&&state.account){
+    guestRestore();buttons(null);show('다른 탭에서 로그아웃됨');
+  }
+});
 bootstrap().catch(error=>{console.warn('WorkLinks AuthHub bootstrap',error);show('브라우저 저장 유지 · 인증 서버 확인 필요')});
