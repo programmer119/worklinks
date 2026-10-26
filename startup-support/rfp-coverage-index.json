@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-26T13:03:04.511831+00:00",
+  "generatedAt": "2026-10-26T19:18:57.833839+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3057,
+  "scannedNoticeCount": 3061,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -28215,7 +28215,7 @@
     },
     "R26BK01773189:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -126452,7 +126452,7 @@
     },
     "R26BK01774537:001": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -126765,14 +126765,23 @@
     },
     "R26BK01780485:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 3,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 4,
       "unreadableDocumentCount": 0,
       "files": [
+        {
+          "name": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+          "readable": true,
+          "sourceSha256": "0c2453bc24687d6f3088779c45fbf27907c203cdaea3b20aa0633c8369d5c384",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 74
+        },
         {
           "name": "공고문 .pdf",
           "readable": true,
@@ -126801,15 +126810,24 @@
           "clauseCandidateCount": 74
         }
       ],
+      "manifestSignature": "95eece2c5ab801101822aa0e29e6f8a80d70bbb67184d2fdc4afe932ce03fd80",
+      "manifestCheckedAt": "2026-10-26T19:19:43.444509+00:00",
+      "manifestChangePending": false,
+      "manifestBaselineUnverified": true,
+      "lastManifestProbeStatus": "complete",
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-24T05:53:07.558298+00:00",
-        "readableDocumentCount": 3,
+        "checkedAt": "2026-10-26T19:18:57.833839+00:00",
+        "readableDocumentCount": 4,
         "unreadableDocumentCount": 0,
         "manifestComplete": true,
         "reviewComplete": false,
         "eligibilityVerified": false,
         "files": [
+          {
+            "name": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1"
+          },
           {
             "name": "공고문 .pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
@@ -126826,97 +126844,97 @@
         "clauseCandidates": {
           "industry_code": [
             {
-              "text": "⑤ 제안요청서 붙임 서식 3. 입찰 참가자의 자격에 관한 사항 가. 아래의 자격을 모두 갖춘 업체 - 「국가종합전자조달시스템입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자입찰서제출 마감일 전일까지 소프트웨어사업자(컴퓨터관련서비스사업,",
+              "text": "- ｢국가종합전자조달시스템 입찰참가자격등록규정｣에 의하여 나라장터(G2B)에 전자입찰서 마감일 전일 18:00 시까지 컴퓨터관련서비스업[업종코드:1468]으로 입찰참가자격을 등록한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 「소프트웨어 진흥법」제48조제4항에 따라 상호출자제한기업집단에 속하는 업체 참여 제한 - 총 사업금액 20억원 미만인 사업으로, 중소 소프트웨어사업자 (소프트웨어사업자 일반 현황 관리확인서 상의‘공공 소프트웨어사업 입찰참여 제한금액 : 없음’으로 확인)만 입찰참가 가능",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "업종코드: 1468)으로 입찰참가자격을 등록한 자.",
-              "codes": [
-                "1468"
-              ],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "업종코드: 1468)으로 입찰참가자격을 등록한 자. - 「중소기업제품 구매촉진 및 판로지원에 관한 법률」제9조 및 같은 법 시행령",
-              "codes": [
-                "1468"
-              ],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "text": "- 총 사업금액 20억원 미만인 사업으로, 중소 소프트웨어사업자 (소프트웨어사업자 일반 현황 관리확인서 상의‘공공 소프트웨어사업 입찰참여 제한금액 : 없음’으로 확인)만 입찰참가 가능",
+              "codes": [],
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             }
           ],
           "direct_production": [
             {
-              "text": "② 법인 등기사항증명서(개인사업자인 경우 사업자등록증) 1부 ③ 직접생산확인증명서 1부",
-              "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "text": "- 「중소기업제품구매촉진 및 판로지원에 관한 법률」제8조 및 같은 법 시행령 제9조에 의한 요건을 갖춘 중소기업자로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 “중소기업확인서” 및 같은 법 제9조에 따른 “직접생산확인증명서[정보시스템개발서비스(8111159901)]를 소지한 업체",
+              "codes": [
+                "8111159901"
+              ],
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "4. 기타서류 ① 나라장터에서 출력한 “경쟁입찰참가자격등록증” 1부 ② 법인 등기사항증명서(개인사업자인 경우 사업자등록증) 1부 ③ 직접생산확인증명서 1부 ④ 중·소기업·소상공인확인서 1부",
+              "text": "※“중소기업확인서”와 “직접생산확인증명서”는 중소기업공공구매 종합정보망 (http://www.smpp.go.kr)에서 확인하며, 입찰마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함.",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "③ 직접생산확인증명서 1부",
+              "text": "※“중소기업확인서”와 “직접생산확인증명서”는 중소기업공공구매 종합정보망 (http://www.smpp.go.kr)에서 확인하며, 입찰마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함. ○ 상호출자제한기업집단 소속기업 및 대기업 참여제한 사항",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             }
           ],
           "sme_certificate": [
             {
-              "text": "4. 기타서류 ① 나라장터에서 출력한 “경쟁입찰참가자격등록증” 1부 ② 법인 등기사항증명서(개인사업자인 경우 사업자등록증) 1부 ③ 직접생산확인증명서 1부 ④ 중·소기업·소상공인확인서 1부",
+              "text": "- 「중소기업제품구매촉진 및 판로지원에 관한 법률」제8조 및 같은 법 시행령 제9조에 의한 요건을 갖춘 중소기업자로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 “중소기업확인서” 및 같은 법 제9조에 따른 “직접생산확인증명서[정보시스템개발서비스(8111159901)]를 소지한 업체",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "③ 직접생산확인증명서 1부 ④ 중·소기업·소상공인확인서 1부",
+              "text": "※“중소기업확인서”와 “직접생산확인증명서”는 중소기업공공구매 종합정보망 (http://www.smpp.go.kr)에서 확인하며, 입찰마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함.",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "① 나라장터에서 출력한 “경쟁입찰참가자격등록증” 1부 ② 법인 등기사항증명서(개인사업자인 경우 사업자등록증) 1부 ③ 직접생산확인증명서 1부 ④ 중·소기업·소상공인확인서 1부 ⑤ 제안요청서 붙임 서식",
+              "text": "※“중소기업확인서”와 “직접생산확인증명서”는 중소기업공공구매 종합정보망 (http://www.smpp.go.kr)에서 확인하며, 입찰마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함. ○ 상호출자제한기업집단 소속기업 및 대기업 참여제한 사항",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             }
           ],
           "joint_participation": [
             {
-              "text": "라. 공동수급(공동이행방식)을 허용하지 않습니다.",
+              "text": "○ 하도급에 관한 사항",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "라. 공동수급(공동이행방식)을 허용하지 않습니다. 4. 낙찰자 결정 방법",
+              "text": "○ 하도급에 관한 사항 - 본 사업의 하도급의 경우「소프트웨어 진흥법」제51조제5항 및 「소프트웨어사업 계약 및 관리감독에 관한 지침」에 의거 반드시 하도급계약 전에‘발주처’로부터 사전승인을 받아야 함.",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "전자입찰서 제출로 서약서 제출을 갈음합니다. 라. 공동수급(공동이행방식)을 허용하지 않습니다.",
+              "text": "- 총 사업금액 20억원 미만인 사업으로, 중소 소프트웨어사업자 (소프트웨어사업자 일반 현황 관리확인서 상의‘공공 소프트웨어사업 입찰참여 제한금액 : 없음’으로 확인)만 입찰참가 가능 ○ 하도급에 관한 사항",
               "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             }
           ],
@@ -126925,25 +126943,32 @@
               "text": "1. 수행실적 : 5점",
               "codes": [],
               "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
               "text": "1. 수행실적 : 5점 □ 평가방법",
               "codes": [],
               "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
               "text": "<표> 1. 수행실적 : 5점",
               "codes": [],
               "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             }
           ],
           "registration_identity": [
+            {
+              "text": "- ｢국가종합전자조달시스템 입찰참가자격등록규정｣에 의하여 나라장터(G2B)에 전자입찰서 마감일 전일 18:00 시까지 컴퓨터관련서비스업[업종코드:1468]으로 입찰참가자격을 등록한 업체",
+              "codes": [],
+              "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
             {
               "text": "① 나라장터에서 출력한 “경쟁입찰참가자격등록증” 1부 ② 법인 등기사항증명서(개인사업자인 경우 사업자등록증) 1부",
               "codes": [],
@@ -126957,13 +126982,6 @@
               "sourceFile": "공고문 .pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
-            },
-            {
-              "text": "① 나라장터에서 출력한 “경쟁입찰참가자격등록증” 1부 ② 법인 등기사항증명서(개인사업자인 경우 사업자등록증) 1부 ③ 직접생산확인증명서 1부 ④ 중·소기업·소상공인확인서 1부 ⑤ 제안요청서 붙임 서식",
-              "codes": [],
-              "sourceFile": "공고문 .pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
             }
           ],
           "unclassified_qualification": [
@@ -126971,21 +126989,21 @@
               "text": "공한 사실이 드러날 경우에는 인천대학교 등에서 발주하는 입찰에 입찰참가 자격제한 처분을 받는 날로부터 2년 동안 참가하지 않겠으며, 입찰 및 계약조건이 입찰자 및 낙찰자에게",
               "codes": [],
               "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
               "text": "공한 사실이 드러날 경우에는 인천대학교 등에서 발주하는 입찰에 입찰참가 자격제한 처분을 받는 날로부터 1년 동안 참가하지 않고, 입찰, 계약체결 및 계약이행과 관련하여 관계직",
               "codes": [],
               "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             },
             {
               "text": "공한 사실이 드러날 경우에는 인천대학교 등에서 발주하는 입찰에 입찰참가 자격제한 처분을 받는 날로부터 6개월 동안 참가하지 않겠습니다.",
               "codes": [],
               "sourceFile": "제안요청서_인천대학교 AI 기반 교육지원시스템 4단계 구축.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01780485&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059864&rfpOrd=000&rfpUntyAtchFileNo=1",
               "interpretation": "manual_review_required"
             }
           ],
@@ -127036,12 +127054,7 @@
             }
           ]
         }
-      },
-      "manifestCheckedAt": "2026-10-26T13:03:04.511831+00:00",
-      "lastManifestProbeStatus": "complete",
-      "manifestChangePending": true,
-      "manifestPendingSignature": "95eece2c5ab801101822aa0e29e6f8a80d70bbb67184d2fdc4afe932ce03fd80",
-      "manifestBaselineUnverified": true
+      }
     },
     "R26BK01781328:000": {
       "status": "text_extracted_requires_review",
@@ -127782,7 +127795,7 @@
     },
     "R26BK01780626:000": {
       "status": "no_official_attachment_metadata",
-      "checkedAt": "2026-10-25T16:17:47.056068+00:00",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
       "classificationVersion": 22,
       "hwpxReaderVersion": 2,
       "reviewComplete": false,
@@ -194731,7 +194744,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T19:18:57.833839+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "3eaa6acd0723ac3852e6c9dea002bb86e6b2b4e2670c830d3aa5b0d1bba09fb1",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01782767:000": {
       "status": "text_extracted_requires_review",
@@ -195235,7 +195253,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T19:18:57.833839+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "cecb791a9df57d3f502ed109481d41a824797747bab13a7d3dd0733bab17d33b",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01782973:000": {
       "status": "text_extracted_requires_review",
@@ -255677,7 +255700,148 @@
       "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": []
+    },
+    "R26BK01789043:001": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 1,
+      "readableDocumentCount": 1,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "입찰취소공고(파주시 노후 하수관로 정비사업(GIS DB구축 용역)(전체분)).hwpx",
+          "readable": true,
+          "sourceSha256": "3defb4f6e9612bac6bcdcdcc1c9e60d15b1cfa2be5e1ac67f8e306c7088352b6",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "b8fa37232e8b9b83bb1465bd75dfafd661cadf18539a7117eae14b2a75877559",
+      "manifestCheckedAt": "2026-10-26T19:19:16.783029+00:00",
+      "manifestChangePending": false
+    },
+    "R26BK01791025:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "[공고문] 주진불빛공원 조성사업 GIS DB구축용역.hwpx",
+          "readable": true,
+          "sourceSha256": "c82448396222ac24d8fa8ede4761784cd387555189a9ca483e8874e826789aab",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 9
+        },
+        {
+          "name": "[공고문] 주진불빛공원 조성사업 GIS DB구축용역.pdf",
+          "readable": true,
+          "sourceSha256": "764e113497779decb69c50712fd9e5682bb8e3c8953f59fa3bb2f9a6e7a1822c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 50
+        },
+        {
+          "name": "[과업지시서] 주진불빛공원 조성사업 GIS DB구축용역.hwpx",
+          "readable": true,
+          "sourceSha256": "cc7819d2bf5d1bbe6119767b2e2f343642af50bfc7ddbc72d551b03671504765",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "0da91bfe122f3d4bd2585c29b6a03b5e4405534c4e759e467423e80771516e24",
+      "manifestCheckedAt": "2026-10-26T19:19:22.659941+00:00",
+      "manifestChangePending": false
+    },
+    "R26BK01789800:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 2,
+      "readableDocumentCount": 2,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "공고문[장척~목현(국지도96호) 상수관로 이설공사  GIS DB구축용역].hwpx",
+          "readable": true,
+          "sourceSha256": "1be409927eca9799720b98db4b595bb8a84efbcca18791f5a57c81a41f2e29db",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 32
+        },
+        {
+          "name": "공고문[장척~목현(국지도96호) 상수관로 이설공사  GIS DB구축용역].pdf",
+          "readable": true,
+          "sourceSha256": "e64d640d9730f6e8220b34ce713ef658c82d0dc7fceb1b8576249da6a1f2259d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 69
+        }
+      ],
+      "manifestSignature": "5f51fd5c1f151b117aa1348337cd37c942782decb6000343e4596b0a4cf2f761",
+      "manifestCheckedAt": "2026-10-26T19:19:25.170431+00:00",
+      "manifestChangePending": false
+    },
+    "R26BK01790840:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-10-26T19:18:57.833839+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "공고문(2026-14, 2027 경기도대기환경진단시스템 유지관리용역).hwpx",
+          "readable": true,
+          "sourceSha256": "0e2aa2183eaa92c04479daa1ec0d331b8307b19fc8bcad8d526999275221f34d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 35
+        },
+        {
+          "name": "과업지시서.hwpx",
+          "readable": true,
+          "sourceSha256": "e058a59cf35fcaf081ca1ae9ad5fc437fd49cf6f32e3ee477555ca873b0e5898",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 71
+        },
+        {
+          "name": "공고문(2026-14, 2027 경기도대기환경진단시스템 유지관리용역).pdf",
+          "readable": true,
+          "sourceSha256": "28d0ef19995c2ee9a69d87eff87e9fdeb78550c9e30d44c366c083b365148921",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 103
+        }
+      ],
+      "manifestSignature": "e2922bdb1b9661d0b569e40848f177ccf2eb7ef273127361bed47d0d4edf8cb4",
+      "manifestCheckedAt": "2026-10-26T19:19:26.091834+00:00",
+      "manifestChangePending": false
     }
   },
-  "workflowRunId": "40327257180"
+  "workflowRunId": "40385571632"
 }
