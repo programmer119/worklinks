@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-10-26T06:13:02.647199+00:00",
+  "generatedAt": "2026-10-26T13:03:04.511831+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3049,
+  "scannedNoticeCount": 3057,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -127036,7 +127036,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T13:03:04.511831+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestChangePending": true,
+      "manifestPendingSignature": "95eece2c5ab801101822aa0e29e6f8a80d70bbb67184d2fdc4afe932ce03fd80",
+      "manifestBaselineUnverified": true
     },
     "R26BK01781328:000": {
       "status": "text_extracted_requires_review",
@@ -127768,7 +127773,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-10-26T13:03:04.511831+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "52638a5c6e96089dd9c4897fd832e4f59b7eb47e2503b9159626bfccf160e25b",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01780626:000": {
       "status": "no_official_attachment_metadata",
@@ -255579,7 +255589,95 @@
       "readableDocumentCount": 0,
       "unreadableDocumentCount": 0,
       "files": []
+    },
+    "R26BK01789238:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01790574:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01791159:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01791045:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01790346:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01781163:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01791648:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
+    },
+    "R26BK01789064:000": {
+      "status": "no_official_attachment_metadata",
+      "checkedAt": "2026-10-26T13:03:04.511831+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": null,
+      "readableDocumentCount": 0,
+      "unreadableDocumentCount": 0,
+      "files": []
     }
   },
-  "workflowRunId": "40278484786"
+  "workflowRunId": "40327257180"
 }
