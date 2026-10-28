@@ -116,6 +116,38 @@ assert one['historicalCompetition'][0]['participants']==2
 assert len(one['historicalCompetition'])==1
 assert matched_result['verificationProgress']['historicalCompetitionVerified']==1
 assert one['eligibilityVerified'] is False
+# A reviewed tender with fresh SME proof and historical direct-production evidence
+# must be visible above the 100s of unreviewed industry matches.
+reviewed={'R26BK01760001:000':{'bidNo':'R26BK01760001','order':'000',
+ 'state':'original_requirements_pending','mandatory':{
+ 'industryCodes':['1468'],'directProductionCodes':['8111189901'],
+ 'sme':'소기업 또는 소상공인'}}}
+sme={'ok':True,'checkedAt':'2026-10-19T10:00:00+09:00',
+     'recordsByBizno':{'1308185973':{'size':'소기업','validState':'valid'}}}
+direct={'ok':True,'snapshotDate':'2026-02-01',
+        'recordsByBizno':{'1308185973':[{
+        'product':'정보시스템유지관리서비스',
+        'validFrom':'2025-01-16','validTo':'2027-01-15'}]}}
+checked=mod.build(indexed,count,company,now=now,rfp=rfp,
+                  reviews=reviewed,sme=sme,direct=direct)
+priority=next(x for x in checked['bids'] if x['bidNo']=='R26BK01760001')
+assert priority['precheckState']=='documented_precheck'
+assert priority['priorityTier']==0
+assert priority['basicQualificationEvidence']['currentMatches']==2
+assert priority['basicQualificationEvidence']['historicalMatches']==1
+assert priority['eligibilityVerified'] is False
+assert checked['verificationProgress']['documentedBasicPrechecks']==1
+assert checked['bids'][0]['bidNo']=='R26BK01760001'
+stale_sme={**sme,'checkedAt':'2026-10-01T10:00:00+09:00'}
+stale_result=mod.build([rows[0]],1,company,now=now,reviews=reviewed,
+                       sme=stale_sme,direct=direct)
+assert stale_result['bids'][0]['precheckState']=='partial_review'
+unmatched_direct={**direct,'recordsByBizno':{}}
+unknown_result=mod.build([rows[0]],1,company,now=now,reviews=reviewed,
+                         sme=sme,direct=unmatched_direct)
+assert unknown_result['bids'][0]['precheckState']=='partial_review'
+assert unknown_result['bids'][0]['eligibilityVerified'] is False
+print('WORKLINKS_SOURCE_BOUND_BASIC_PRECHECK=PASS')
 print('WORKLINKS_PRACTICAL_SOFTWARE_RANKING=PASS')
 
 # Exact-source geographic mismatch: requires official current business location.
