@@ -578,7 +578,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  <p class="g2b-status" id="changcomActionableStatus" role="status" aria-live="polite">일감 탭에서 공식 공고별 우선검토 결과를 불러옵니다.</p>
  <div id="changcomVerificationProgress" aria-label="공고별 자격·수행·수주·수익·입찰준비 검증 진행률" style="font-size:12px;line-height:1.7;display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
  <div class="job-verdict-filter" role="group" aria-label="창컴 우선 입찰 목록 분류" id="changcomActionableFilters">
-  <button type="button" class="job-vf on" data-changcom-actionable="aligned" aria-pressed="true">등록업종 기본 일치 <span data-changcom-count="aligned">–</span></button>
+  <button type="button" class="job-vf on" data-changcom-actionable="verified" aria-pressed="true">기초요건 근거대조 <span data-changcom-count="verified">–</span></button>
+  <button type="button" class="job-vf" data-changcom-actionable="aligned" aria-pressed="false">등록업종 기본 일치 <span data-changcom-count="aligned">–</span></button>
   <button type="button" class="job-vf" data-changcom-actionable="review" aria-pressed="false">조건 추가확인 <span data-changcom-count="review">–</span></button>
   <button type="button" class="job-vf" data-changcom-actionable="mismatch" aria-pressed="false">공식 필수조건 불일치 <span data-changcom-count="mismatch">–</span></button>
   <button type="button" class="job-vf" data-changcom-actionable="unknown" aria-pressed="false">마감일 확인 <span data-changcom-count="unknown">–</span></button>
@@ -1400,14 +1401,15 @@ function g2bCardFromServer(x){
 var g2bLinkedEligibility=null;
 // Official all-indexed G2B shortlist. Do not infer final legal eligibility
 // from license-match labels, and never hide unknown-deadline opportunities.
-var changcomActionableData=null,changcomActionableMode='aligned',changcomActionableLimit=24;
+var changcomActionableData=null,changcomActionableMode='verified',changcomActionableLimit=24;
 var changcomReviewedByNotice={};
 var changcomActionableRequest=null;
 function changcomActionableEntries(mode){
  const rows=Array.isArray(changcomActionableData?.bids)?changcomActionableData.bids:[];
  const aligned=x=>x.scope==='software_service'&&
    x.screening==='published_industry_codes_match'&&x.deadlineState==='open'&&x.confirmedRegionalMismatch!==true;
- if(mode==='aligned')return rows.filter(aligned).sort((a,b)=>Number(Boolean(b.precheckedMandatoryClauses))-Number(Boolean(a.precheckedMandatoryClauses)));
+ if(mode==='verified')return rows.filter(x=>x.deadlineState==='open'&&x.precheckState==='documented_precheck');
+ if(mode==='aligned')return rows.filter(aligned).sort((a,b)=>(Number(a.priorityTier??9)-Number(b.priorityTier??9))||Number(b.priorityScore||0)-Number(a.priorityScore||0));
  if(mode==='mismatch')return rows.filter(x=>x.confirmedRegionalMismatch===true);
  if(mode==='review')return rows.filter(x=>x.deadlineState==='open'&&!aligned(x)&&x.confirmedRegionalMismatch!==true);
  if(mode==='unknown')return rows.filter(x=>x.deadlineState==='unknown');
@@ -1425,6 +1427,7 @@ function renderChangcomActionable(){
  const now=Date.now(),reported=Date.parse(changcomActionableData.generatedAt||'');
  const stale=!Number.isFinite(reported)||(now-reported)>12*3600000;
  const metrics={
+  verified:changcomActionableEntries('verified').length,
   aligned:changcomActionableEntries('aligned').length,
   review:changcomActionableEntries('review').length,
   mismatch:changcomActionableEntries('mismatch').length,
@@ -1446,6 +1449,9 @@ function renderChangcomActionable(){
    ['개별 공고 조건 확인',audit.precheckedNoticeRequirements],
    ['명시적 필수조건 불일치',audit.explicitMandatoryMismatch],
    ['등록업종 기본일치',audit.industryBasicMatched],
+   ['근거대조 기초조건',audit.documentedBasicPrechecks],
+   ['현재 소기업 공개조회',audit.currentSmeMatches],
+   ['과거 직접생산 자료 대조',audit.historicalDirectProductionMatches],
    ['원문 텍스트 수집',audit.rfpTextScanned],
    ['공식 조항 발췌',audit.citableRfpExtracts],
    ['참가자격 전체',audit.fullLegalEligibilityVerified],
@@ -1484,6 +1490,7 @@ function renderChangcomActionable(){
     officialPerformance.requirements.filter(v=>v.phase==='contract_performance').slice(0,2):[];
   const checkedLink=/^https:\/\//.test(String(checked.sourceUrl||''))?checked.sourceUrl:'';
   const checkedLabel=x.confirmedRegionalMismatch?'지역제한 불일치 · 단독 불가':
+    x.precheckState==='documented_precheck'?'기초요건 2종 현재·직생 과거자료 대조 · 최종 미검증':
     checked.state==='core_credentials_matched'?'핵심 등록조건 대조 · 추가검증 필요':
     checked.state==='original_requirements_pending'?'원문 전문 확인 대기':'';
   const sourceNote=Object.keys(sourceKinds).length?
@@ -1505,7 +1512,8 @@ function renderChangcomActionable(){
     '<div style="font-size:12px;margin-top:5px;font-weight:800">공고 사업금액 '+Number(budgetAudit.projectAmountIncludingVatKrw).toLocaleString('ko-KR')+
     '원 · 인덱스 배정예산 '+Number(budgetAudit.allocationKrw).toLocaleString('ko-KR')+'원 (차액은 매출로 미확정) · 경쟁·원가 미검증</div>':
     Number(x.budget)>0?'<div style="font-size:12px;margin-top:5px;font-weight:800">배정예산 '+Number(x.budget).toLocaleString('ko-KR')+'원 · 경쟁·원가 미검증</div>':'')+
-   (checked.stateReason?'<div style="font-size:12px;margin-top:5px;font-weight:600">'+htmlEscape(checked.stateReason)+'</div>':'')+
+   (x.basicQualificationEvidence&&x.basicQualificationEvidence.checks?'<div style="font-size:14px;line-height:1.5;margin-top:6px">기초조건 근거: '+Object.entries(x.basicQualificationEvidence.checks).map(([k,v])=>htmlEscape(k+' '+(v.status==='current_match'?'현재 공개자료 일치':v.status==='historical_match'?'과거 자료 일치·현재 재조회 필요':v.status==='confirmed_mismatch'?'확인된 불일치':'확인 필요'))).join(' / ')+'</div>':'')+
+   (checked.stateReason?'<div style="font-size:14px;margin-top:5px;font-weight:600">'+htmlEscape(checked.stateReason)+'</div>':'')+
    (checked.scopeRisk?'<div style="font-size:12px;margin-top:5px">수행·수익성 확인: '+htmlEscape(checked.scopeRisk)+'</div>':'')+
    (performanceAlerts.length?'<div style="font-size:12px;margin-top:5px">공식 원문 수행조건(최종 검증 전): '+
      performanceAlerts.map(v=>htmlEscape(String(v.finding||''))).join(' / ')+'</div>':'')+
