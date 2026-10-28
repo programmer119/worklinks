@@ -17,6 +17,11 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'startup-support/changcom-actionable.json'
 RFP=ROOT/'startup-support/rfp-coverage-index.json'
 NOTICE_REVIEWS=ROOT/'startup-support/changcom-bid-review.json'
+SME_CERT=ROOT/'startup-support/sme-cert-snapshot.json'
+DIRECT_CERT=ROOT/'startup-support/direct-production-snapshot.json'
+# Only exact mapped product names count as historical certificates; unknown codes stay pending.
+DIRECT_PRODUCT_CODES={'8111189901':'정보시스템유지관리서비스',
+                      '8111159901':'정보시스템개발서비스'}
 API='https://api-suaveforge.suaveforge.com:18458/api/g2b'
 BIZNO='1308185973'
 KST=dt.timezone(dt.timedelta(hours=9))
@@ -243,6 +248,84 @@ def notice_review(key,record,company):
     output['finalEligibilityCertified']=False
     return output
 
+def public_snapshot(path):
+    """Only versioned, published source files. Missing/malformed evidence is unknown."""
+    try:
+        result=json.loads(path.read_text(encoding='utf-8'))
+        return result if isinstance(result,dict) and result.get('ok') is True else {}
+    except (OSError,ValueError,TypeError):
+        return {}
+
+
+def basic_qualification_evidence(human,registered,company,sme,direct,now):
+    """Check explicitly reviewed *basic* conditions, never certify the full tender.
+
+    A historical direct-production snapshot is explicitly distinguished from a
+    currently valid certificate. Other RFP clauses, personnel, costs, and
+    contract performance remain open until independently evidenced.
+    """
+    checks={}
+    mandatory=human.get('mandatory') if isinstance(human,dict) else None
+    if not isinstance(mandatory,dict) or not mandatory:
+        return {'state':'not_reviewed','checks':checks,'currentMatches':0,
+                'historicalMatches':0,'unresolved':['공식 공고 원문 필수조건 전체 검토']}
+    def record(name,status,source='',detail=''):
+        checks[name]={'status':status,'sourceUrl':source,'detail':detail}
+    reg_codes=[str(code) for code in (mandatory.get('industryCodes') or [])]
+    if reg_codes:
+        ok=bool(company.get('complete') is True and reg_codes and all(c in registered for c in reg_codes))
+        record('industry','current_match' if ok else 'unverified',
+               API+'/company?bizno='+BIZNO,','.join(reg_codes))
+    dp_codes=[str(code) for code in (mandatory.get('directProductionCodes') or [])]
+    if dp_codes:
+        products=(direct.get('recordsByBizno') or {}).get(BIZNO) or []
+        historical=True
+        names=[]
+        for code in dp_codes:
+            label=DIRECT_PRODUCT_CODES.get(code)
+            names.append(label or code)
+            if not label or not any(
+                isinstance(p,dict) and p.get('product')==label
+                and str(p.get('validFrom') or '')<=now.date().isoformat()
+                <=str(p.get('validTo') or '') for p in products
+            ):historical=False
+        record('directProduction','historical_match' if historical else 'unverified',
+               str(direct.get('sourceUrl') or ''),','.join(names)+
+               ' · 저장된 자료 '+str(direct.get('snapshotDate') or '날짜 미상')+
+               ' 기준, 입찰일 현재 원본 재확인 필요')
+    if mandatory.get('sme'):
+        size=((sme.get('recordsByBizno') or {}).get(BIZNO) or {})
+        observed=str(size.get('size') or '')
+        valid=size.get('validState')=='valid'
+        checked=parse_close(sme.get('checkedAt'))
+        fresh=bool(checked and dt.timedelta(0)<=now-checked<=dt.timedelta(days=7))
+        requirement=str(mandatory.get('sme') or '')
+        # A small enterprise generally meets 'SME or small enterprise', but
+        # does not establish microenterprise-only or specialist requirements.
+        compatible=(observed=='소기업' and
+                    not ('소상공인만' in requirement or '소상공인에 한' in requirement))
+        record('sme','current_match' if valid and fresh and compatible else 'unverified',
+               str(sme.get('sourceUrl') or ''),observed+' · 공개조회 '+str(sme.get('checkedAt') or '미확인'))
+    region=human.get('state')
+    if region=='explicit_mandatory_region_mismatch':
+        record('region','confirmed_mismatch',str(human.get('officialNoticeUrl') or ''),
+               str((mandatory or {}).get('region') or ''))
+    unresolved=['RFP 모든 필수 참가조건·정정공고 대조','직접생산확인증명서 현재 유효 조회',
+                '투입인력·수행범위·유사실적','원가·경쟁·제안서 제출 가능성']
+    if region=='explicit_mandatory_region_mismatch':
+        state='confirmed_mismatch'
+    elif (checks.get('industry',{}).get('status')=='current_match' and
+          checks.get('sme',{}).get('status')=='current_match' and
+          checks.get('directProduction',{}).get('status')=='historical_match'):
+        state='documented_precheck'
+    else:
+        state='partial_review'
+    return {'state':state,'checks':checks,
+            'currentMatches':sum(c['status']=='current_match' for c in checks.values()),
+            'historicalMatches':sum(c['status']=='historical_match' for c in checks.values()),
+            'unresolved':unresolved}
+
+
 def latest_revisions(rows):
     dedup={}
     for row in rows:
@@ -253,13 +336,15 @@ def latest_revisions(rows):
             dedup[no]={**row,'_order':order}
     return list(dedup.values())
 
-def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
+def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sme=None,direct=None):
     now=now or dt.datetime.now(KST)
     if now.tzinfo is None:now=now.replace(tzinfo=KST)
     registered,uncertain=active_codes(company)
     rfp=rfp or {}
     awards=awards or {}
     reviews=reviews or {}
+    sme=sme or {}
+    direct=direct or {}
     selected=latest_revisions(rows)
     groups={'open':0,'expired':0,'deadline_unknown':0,'openService':0,
         'softwareService':0,'publishedIndustryAligned':0,'servicePendingReview':0,
@@ -300,6 +385,7 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
         no,order=canonical(row)
         key=no+':'+order
         human=notice_review(key,reviews.get(key),company)
+        precheck=basic_qualification_evidence(human,registered,company,sme,direct,now)
         source=rfp.get(key) if isinstance(rfp.get(key),dict) else {}
         evidence=source.get('changcomClauseEvidence')
         if not isinstance(evidence,dict):evidence={}
@@ -343,6 +429,12 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
         if deadline_unknown:score-=60
         if price>=3_000_000_000:score-=12
         if purpose=='software_goods_review':score-=30
+        # Validated basic prechecks rank ahead of raw industry-code matches.
+        tier=(0 if precheck['state']=='documented_precheck' else
+              1 if precheck['state']=='partial_review' else
+              4 if precheck['state']=='confirmed_mismatch' else
+              2 if scanned and screening=='published_industry_codes_match' else
+              3)
         bids.append({
             'bidNo':no,'order':order,'title':str(row.get('title') or ''),
             'org':str(row.get('org') or row.get('agency') or ''),
@@ -361,6 +453,8 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
             'originalRequirementTypes':cited_types,
             'originalSourceDocumentCount':len(cited_documents),
             'historicalCompetition':historical,'reviewedNotice':human,
+            'basicQualificationEvidence':precheck,
+            'precheckState':precheck['state'],'priorityTier':tier,
             'precheckedMandatoryClauses':bool(human),
             'confirmedRegionalMismatch':human.get('state')=='explicit_mandatory_region_mismatch',
             'competitionVerified':bool(historical),'costVerified':False,
@@ -378,7 +472,8 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
            'industry_rule_conflict_review':4}
     bids.sort(key=lambda x:(2 if x['deadlineState']=='unknown' else
         0 if x['scope']=='software_service' else 1,
-        order.get(x['screening'],5),-x['priorityScore'],x['closes'] or '9999',x['bidNo']))
+        x['priorityTier'],order.get(x['screening'],5),-x['priorityScore'],
+        x['closes'] or '9999',x['bidNo']))
     observed=len(rows)
     tracked=len(bids)
     progress={
@@ -387,6 +482,9 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
         'explicitMandatoryMismatch':sum(x['confirmedRegionalMismatch'] for x in bids),
         'industryBasicMatched':sum(x['screening']=='published_industry_codes_match'
                                    for x in bids),
+        'documentedBasicPrechecks':sum(x['precheckState']=='documented_precheck' for x in bids),
+        'currentSmeMatches':sum(x['basicQualificationEvidence']['checks'].get('sme',{}).get('status')=='current_match' for x in bids),
+        'historicalDirectProductionMatches':sum(x['basicQualificationEvidence']['checks'].get('directProduction',{}).get('status')=='historical_match' for x in bids),
         'rfpTextScanned':sum(x['rfpTextScanned'] for x in bids),
         'citableRfpExtracts':sum(bool(x['originalRequirementTypes']) for x in bids),
         'fullLegalEligibilityVerified':sum(x['eligibilityVerified'] for x in bids),
@@ -410,7 +508,7 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None):
             'official_license_unavailable':'면허제한 API 미수집/오류 · 적격·부적격 아님',
             'official_license_ambiguous':'제한 업종 관계·코드 미확정 · 원문 확인',
             'industry_rule_conflict_review':'현 등록업종 외 코드 포함 · 원문 AND/OR·예외 확인 전 제외 금지'},
-        'limitations':'기본 등록업종·SW 업무분야만 대조. 직접생산·기업규모·지역·경력·실적·RFP 원문·정정공고 추가조건은 개별 확인. 적격 확정·낙찰 확률 아님.',
+        'limitations':'공식 공고 일부를 검토한 항목만 기초요건 대조. 직접생산 공개 스냅샷은 과거 자료이므로 현재 증명서 유효성을 보장하지 않음. RFP 전체·투입인력·지역·실적·원가·최신 정정공고는 별도 검증. 적격 확정·낙찰 확률 아님.',
         'bids':bids
     }
 
@@ -421,7 +519,8 @@ def main():
     rows,count=all_indexed()
     company=get_json('/company?bizno='+BIZNO)
     snapshot=build(rows,count,company,rfp=extract_rfp_index(),
-                   awards=load_official_award_cache(),reviews=load_verified_reviews())
+                   awards=load_official_award_cache(),reviews=load_verified_reviews(),
+                   sme=public_snapshot(SME_CERT),direct=public_snapshot(DIRECT_CERT))
     c=snapshot['counts']
     if c['indexedSWTotal']<100 or c['softwareService']<1:
         raise SystemExit('LIVE_G2B_DATA_NOT_CREDIBLE_REFUSING_EMPTY_OUTPUT')
