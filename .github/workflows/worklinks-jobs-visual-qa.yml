@@ -96,14 +96,22 @@ jobs:
               }""")
               print('WORKLINKS_ACTIVE_REPEAT_COUNT',json.dumps(proof,ensure_ascii=False))
               repeats=page.evaluate("""() => {
+                // Real AuthHub may reset our synthetic login while the long
+                // public-data load runs. Keep this test browser's login grant
+                // active just for this synchronous UI filter assertion.
+                if(!worklinksPartnerAccess()){
+                  window.worklinksMemberAuthenticated=true;
+                  document.documentElement.dataset.worklinksPartnerAccess='granted';
+                }
                 // Use the same deduplicated active rows as renderJobs(); do not
                 // confuse the full index with the currently loaded live page.
                 const active=collapseSimilarNotices(
                   jobs.concat(g2bLiveJobs).filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')))
                   .filter(x=>jobTimeInfo(x).key!=='closed');
                 const expected=active.filter(x=>repeatYears(x)>=2).length;
-                const displayed=Number(document.querySelector('[data-verdict-count="repeat"]')?.textContent||0);
                 const before={filter:jobVerdictFilter,limit:jobRenderLimit};
+                renderJobs();
+                const displayed=Number(document.querySelector('[data-verdict-count="repeat"]')?.textContent||0);
                 try{
                   jobVerdictFilter='repeat';jobRenderLimit=100;renderJobs();
                   const cards=[...document.querySelectorAll('#jobCards .job-mini')];
