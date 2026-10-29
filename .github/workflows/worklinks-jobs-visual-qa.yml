@@ -33,7 +33,17 @@ jobs:
               page=browser.new_page(viewport={'width':1440,'height':900},device_scale_factor=1)
               page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
               page.locator('#jobsView.on').wait_for(timeout=25000)
-              page.wait_for_function("document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
+              # Live browser tests run anonymously. Verify the partner panel is
+              # protected, then simulate a granted member session in this test
+              # page only; never change the production authorization guard.
+              assert not page.evaluate("worklinksPartnerAccess()")
+              assert page.locator('#jobDecisionSummary').is_hidden()
+              page.evaluate("""() => {
+                window.worklinksMemberAuthenticated=true;
+                document.documentElement.dataset.worklinksPartnerAccess='granted';
+                window.dispatchEvent(new Event('worklinks:partner-access'));
+              }""")
+              page.wait_for_function("worklinksPartnerAccess() && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
               # G2B data is fetched before its debounced DOM update. Wait for
               # rendered repeat chips instead of sampling the old static grid.
