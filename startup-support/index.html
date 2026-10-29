@@ -577,6 +577,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  </div>
  <p class="g2b-status" id="changcomActionableStatus" role="status" aria-live="polite">일감 탭에서 공식 공고별 우선검토 결과를 불러옵니다.</p>
  <div id="changcomVerificationProgress" aria-label="공고별 자격·수행·수주·수익·입찰준비 검증 진행률" style="font-size:12px;line-height:1.7;display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
+ <p id="changcomStaffingSummary" class="g2b-status" style="font-size:14px;margin:6px 0">인력조건: 기존 공고 원문 근거로만 분류 · 미확인은 D</p>
  <div class="job-verdict-filter" role="group" aria-label="창컴 우선 입찰 목록 분류" id="changcomActionableFilters">
   <button type="button" class="job-vf on" data-changcom-actionable="verified" aria-pressed="true">기초요건 근거대조 <span data-changcom-count="verified">–</span></button>
   <button type="button" class="job-vf" data-changcom-actionable="aligned" aria-pressed="false">등록업종 기본 일치 <span data-changcom-count="aligned">–</span></button>
@@ -1423,6 +1424,13 @@ function renderChangcomActionable(){
  if(!area||!status||!more||!changcomActionableData)return;
  const info=changcomActionableData.counts||{},rows=changcomActionableEntries(changcomActionableMode);
  const audit=changcomActionableData.verificationProgress||{};
+ const staffCount=audit.staffingCounts||{};
+ const staffSummary=document.getElementById('changcomStaffingSummary');
+ if(staffSummary)staffSummary.textContent=
+  '인력조건 · A 후확보 시점 명시 '+Number(staffCount.A||0).toLocaleString('ko-KR')+
+  '건 · B 기존 재직 필수 '+Number(staffCount.B||0).toLocaleString('ko-KR')+
+  '건 · C 인력요건 없음 명시 '+Number(staffCount.C||0).toLocaleString('ko-KR')+
+  '건 · D 근거 부족 '+Number(staffCount.D||0).toLocaleString('ko-KR')+'건';
  const auditTotal=Number(audit.reviewTarget||changcomActionableData.bids.length||0);
  const now=Date.now(),reported=Date.parse(changcomActionableData.generatedAt||'');
  const stale=!Number.isFinite(reported)||(now-reported)>12*3600000;
@@ -1482,6 +1490,10 @@ function renderChangcomActionable(){
   const proofFiles=Array.isArray(documentProof.files)?documentProof.files:[];
   const primarySource=proofFiles.find(a=>/^https:\/\/www\.g2b\.go\.kr\//.test(String(a.url||'')));
   const sourceKinds=x.originalRequirementTypes||{};
+  const staff=x.staffingClassification||{class:'D',reason:'공식 원문 근거 미확인',evidence:null};
+  const staffText={A:'후확보 시점 명시',B:'기존 재직 필수',C:'인력요건 없음 명시',D:'추가 확인'}[staff.class]||'추가 확인';
+  const staffUrl=staff.evidence&&/^https:\/\/www\.g2b\.go\.kr\//.test(String(staff.evidence.sourceUrl||''))?
+    staff.evidence.sourceUrl:'';
   const key=String(x.bidNo||'')+':'+String(x.order||'0').padStart(3,'0');
   const checked=changcomReviewedByNotice[key]||x.reviewedNotice||{};
   const budgetAudit=checked.budgetReconciliation||{};
@@ -1508,6 +1520,8 @@ function renderChangcomActionable(){
    '<h3 style="font-size:16px;line-height:1.45;margin:8px 0"><a href="'+htmlEscape(link)+
     '" target="_blank" rel="noopener noreferrer">'+htmlEscape(x.title||'제목 확인 필요')+'</a></h3>'+
    '<div class="why" style="font-size:13px;line-height:1.5">'+htmlEscape(reason)+'</div>'+
+   '<div style="font-size:14px;line-height:1.5;margin-top:6px"><strong>인력 '+htmlEscape(staff.class)+' · '+htmlEscape(staffText)+'</strong> — '+htmlEscape(staff.reason||'원문 확인 필요')+
+   (staffUrl?' · <a href="'+htmlEscape(staffUrl)+'" target="_blank" rel="noopener noreferrer">원문 근거</a>':'')+'</div>'+
    (Number(budgetAudit.projectAmountIncludingVatKrw)>0 && Number(budgetAudit.allocationKrw)>0?
     '<div style="font-size:12px;margin-top:5px;font-weight:800">공고 사업금액 '+Number(budgetAudit.projectAmountIncludingVatKrw).toLocaleString('ko-KR')+
     '원 · 인덱스 배정예산 '+Number(budgetAudit.allocationKrw).toLocaleString('ko-KR')+'원 (차액은 매출로 미확정) · 경쟁·원가 미검증</div>':
