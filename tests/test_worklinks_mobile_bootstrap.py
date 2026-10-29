@@ -149,7 +149,20 @@ def main():
             page.locator("#g2bMore").wait_for(state="visible", timeout=15000)
             assert page.evaluate("g2bSavedTotal") == 480
             assert "현재 로드" in page.locator("#partnerSummary").text_content()
-            assert "적격 후보" in page.locator("#jobDecisionSummary").text_content()
+            # Partner bid screening is private by default. For the rest of
+            # this browser-only regression, simulate a verified membership
+            # event; never relax the production authentication guard.
+            assert page.locator("#jobDecisionSummary").is_hidden()
+            assert not page.evaluate("worklinksPartnerAccess()")
+            page.evaluate("""() => {
+                window.worklinksMemberAuthenticated=true;
+                document.documentElement.dataset.worklinksPartnerAccess='granted';
+                window.dispatchEvent(new Event('worklinks:partner-access'));
+            }""")
+            page.wait_for_function(
+                "() => worklinksPartnerAccess() && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",
+                timeout=15000
+            )
             assert page.evaluate("jobRenderLimit") == 24
             assert page.locator("#jobCards .job-mini").count() <= 24
 
@@ -166,14 +179,18 @@ def main():
                 mismatch:changcomActionableEntries('mismatch').length,
                 unknown:changcomActionableEntries('unknown').length,
                 all:changcomActionableEntries('all').length,
+                verified:changcomActionableEntries('verified').length,
+                activeMode:changcomActionableMode,
                 display:document.querySelectorAll('#changcomActionableList .card').length,
                 first:document.querySelector('#changcomActionableList .card a')?.href
             })""")
             assert census["indexed"] > 100, census
             assert census["aligned"] > 0 and census["all"] >= census["aligned"], census
             assert census["all"] == census["aligned"] + census["review"] + census["unknown"] + census["mismatch"], census
-            assert census["display"] == min(24, census["aligned"]), census
-            assert census["first"] and "g2b.go.kr" in census["first"], census
+            assert census["activeMode"] == "verified", census
+            assert census["display"] == min(24, census["verified"]), census
+            if census["verified"]:
+                assert census["first"] and "g2b.go.kr" in census["first"], census
             # Verify a REAL pointer click can reach each control on mobile.
             # A static scrollIntoView can leave the button under preceding
             # filters after asynchronous layout shifts. Never force clicks.
