@@ -45,9 +45,12 @@ jobs:
               }""")
               page.wait_for_function("worklinksPartnerAccess() && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
-              # G2B data is fetched before its debounced DOM update. Wait for
-              # rendered repeat chips instead of sampling the old static grid.
-              page.wait_for_function("() => jobRenderDirty===false && Number(document.querySelector('[data-verdict-count=repeat]')?.textContent||0)>0",timeout=30000)
+              # Wait for the rendered count, not a made-up minimum of one.
+              # The current saved page can legitimately contain zero repeats.
+              page.wait_for_function("""() => !jobRenderDirty &&
+                !!document.querySelector('[data-verdict-count="repeat"]') &&
+                document.querySelector('[data-verdict-count="repeat"]').textContent.trim() !== ''
+              """,timeout=30000)
               # Real production dataset (often 2,000+ saved notices): profile
               # tab click-to-paint, not just the JavaScript click handler.
               desktop_paint=page.evaluate("""async () => {
@@ -93,17 +96,29 @@ jobs:
               }""")
               print('WORKLINKS_ACTIVE_REPEAT_COUNT',json.dumps(proof,ensure_ascii=False))
               repeats=page.evaluate("""() => {
-                const n=Number(document.querySelector('[data-verdict-count="repeat"]')?.textContent||0);
-                if(n<1)return {count:n,badges:0};
-                jobVerdictFilter='repeat';jobRenderLimit=100;renderJobs();
-                const badges=document.querySelectorAll('#jobCards .job-repeat[data-history-id]').length;
-                const cards=document.querySelectorAll('#jobCards .job-mini').length;
-                jobVerdictFilter='all';renderJobs();
-                return {count:n,badges,cards};
+                // Use the same deduplicated active rows as renderJobs(); do not
+                // confuse the full index with the currently loaded live page.
+                const active=collapseSimilarNotices(
+                  jobs.concat(g2bLiveJobs).filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')))
+                  .filter(x=>jobTimeInfo(x).key!=='closed');
+                const expected=active.filter(x=>repeatYears(x)>=2).length;
+                const displayed=Number(document.querySelector('[data-verdict-count="repeat"]')?.textContent||0);
+                const before={filter:jobVerdictFilter,limit:jobRenderLimit};
+                try{
+                  jobVerdictFilter='repeat';jobRenderLimit=100;renderJobs();
+                  const cards=[...document.querySelectorAll('#jobCards .job-mini')];
+                  return {expected,displayed,count:cards.length,
+                    badges:document.querySelectorAll('#jobCards .job-repeat[data-history-id]').length};
+                }finally{
+                  jobVerdictFilter=before.filter;jobRenderLimit=before.limit;renderJobs();
+                }
               }""")
-              assert repeats['count']>0, 'verified 2+ year bids must be accessible'
-              assert repeats['badges']>0, 'repeat-only filter must make 2+ badges visible'
-              assert repeats['cards']>0
+              assert repeats['displayed']==repeats['expected'],repeats
+              assert repeats['count']==min(100,repeats['expected']),repeats
+              if repeats['expected']>0:
+                  assert repeats['badges']>0, 'existing verified repeats must render evidence badges'
+              else:
+                  assert repeats['count']==0 and repeats['badges']==0,repeats
               print('WORKLINKS_REPEAT_FILTER=PASS',json.dumps(repeats,ensure_ascii=False))
 
               # Probe exactly one known past award's public participant-count field;
