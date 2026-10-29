@@ -97,7 +97,11 @@ def main():
             assert page.evaluate("!jobsBootstrapStarted"), "Jobs booted on support page"
             assert page.locator("#pageRefreshButton").count() == 1
             assert "화면 로드" in page.locator("#pageLoadStamp").text_content()
-            assert "v20261018-card-evidence-2" in page.locator("#pageLoadStamp").text_content()
+            # The deployment stamp tracks the current revision; it must not be
+            # pinned to a previous release and fail after a valid update.
+            revision = page.evaluate("WORKLINKS_PAGE_REVISION")
+            assert isinstance(revision, str) and revision.startswith("20") and len(revision) >= 12
+            assert page.locator("#pageLoadStamp").text_content().endswith(" · v" + revision)
 
             # Ordinary browser reload must create a fresh document and return
             # to the top rather than silently restoring the previous scroll.
