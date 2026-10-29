@@ -147,6 +147,42 @@ unknown_result=mod.build([rows[0]],1,company,now=now,reviews=reviewed,
                          sme=sme,direct=unmatched_direct)
 assert unknown_result['bids'][0]['precheckState']=='partial_review'
 assert unknown_result['bids'][0]['eligibilityVerified'] is False
+# Personnel classification: only source-linked, explicit dates produce A/B.
+def staffing_clause(quote,url='https://www.g2b.go.kr/pn/official',file='official.hwpx'):
+    return {'clauseCandidates':{'staff_proof':[{'text':quote,'url':url,'sourceFile':file}]}}
+classify=mod.classify_staffing
+hire=classify(staffing_clause('낙찰 후 전문 인력을 신규 채용하여 확보할 수 있다.'),{})
+assert hire['class']=='A',hire
+existing=classify(staffing_clause('입찰공고일 기준 6개월 이상 재직한 사업 책임자(PM)를 필수로 한다.'),{})
+assert existing['class']=='B',existing
+both=classify({'clauseCandidates':{'staff_proof':[
+    {'text':'낙찰 후 기술 인력 채용 및 확보 가능','url':'https://www.g2b.go.kr/1','sourceFile':'r.hwpx'},
+    {'text':'입찰공고일 기준 6개월 이상 재직한 PM 필수','url':'https://www.g2b.go.kr/2','sourceFile':'r.hwpx'}
+]}},{})
+assert both['class']=='B',both
+clear=classify(staffing_clause('본 사업은 투입 인력 요건 없음'),{})
+assert clear['class']=='C',clear
+unsure=classify(staffing_clause('상주 인력은 수행기간 전담으로 근무하여야 한다.'),{})
+assert unsure['class']=='D',unsure
+absent=classify({}, {})
+assert absent['class']=='D' and absent['evidence'] is None
+# An untrusted source cannot become a positive personnel judgement.
+external=classify(staffing_clause('낙찰 후 개발자 인력 채용 가능',
+                                url='https://unverified.example/notice'),{})
+assert external['class']=='D'
+human_staff={'officialRfpPerformanceEvidence':{
+  'sourceUrl':'https://www.g2b.go.kr/some-attachment',
+  'requirements':[{'topic':'on_site_staff','finding':'상주 기술자 근무'}]}}
+assert classify({},human_staff)['class']=='D'
+staffed_rfp={'R26BK01760001:000':{
+ 'status':'text_extracted_requires_review',
+ 'changcomClauseEvidence':staffing_clause('입찰공고일 기준 3개월 재직한 전문기술자 제출 의무')}}
+staffed_output=mod.build([rows[0]],1,company,now=now,rfp=staffed_rfp)
+assert staffed_output['bids'][0]['staffingClassification']['class']=='B'
+assert staffed_output['verificationProgress']['staffingCounts']['B']==1
+assert staffed_output['bids'][0]['eligibilityVerified'] is False
+print('WORKLINKS_STAFFING_ADBC_CLASSIFICATION=PASS')
+
 print('WORKLINKS_SOURCE_BOUND_BASIC_PRECHECK=PASS')
 print('WORKLINKS_PRACTICAL_SOFTWARE_RANKING=PASS')
 
