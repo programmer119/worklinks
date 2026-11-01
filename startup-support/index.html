@@ -3464,7 +3464,7 @@ function supportCompact(raw,limit){
 function supportPeriodBrief(x){
  var d=String(x.deadline||"").trim();
  var p=String(x.period||"").trim();
- var compact=d&&/^\\d{4}-\\d{2}-\\d{2}T/.test(d)?d.slice(0,10).replace(/-/g,".")+' '+d.slice(11,16):d;
+ var compact=d&&d.length>=16&&d.charAt(10)==="T"?d.slice(0,10).replace(/-/g,".")+" "+d.slice(11,16):d;
  if(!compact||compact==="null")compact=p.slice(0,35);
  return '<span>'+htmlEscape(compact)+'</span>'+(p&&p!==compact?'<details class="support-more"><summary>기간 상세</summary><div>'+htmlEscape(p)+'</div></details>':'');
 }
