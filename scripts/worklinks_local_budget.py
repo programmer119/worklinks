@@ -72,10 +72,10 @@ def amount_info(title, body):
 def deadline_from(body):
     # Never mistake the publication date or the START of a range for its end.
     dates = []
-    date = r"(20\\d{2})[.\\-/년\\s]+(\\d{1,2})[.\\-/월\\s]+(\\d{1,2})(?:일)?"
-    ranged = re.compile(r"(?:접수|신청|모집)\\s*(?:기간|일정)[^0-9]{0,32}" + date +
-                        r"\\s*(?:~|∼|～|부터|\\-|–|—)\\s*" + date)
-    explicit = re.compile(r"(?:접수|신청|모집)?\\s*(?:마감일|마감|종료일|신청기한)[^0-9]{0,20}" + date)
+    date = r"(20\d{2})[.\-/년\s]+(\d{1,2})[.\-/월\s]+(\d{1,2})(?:일)?"
+    ranged = re.compile(r"(?:접수|신청|모집)\s*(?:기간|일정)[^0-9]{0,32}" + date +
+                        r"\s*(?:~|∼|～|부터|\-|–|—)\s*" + date)
+    explicit = re.compile(r"(?:접수|신청|모집)?\s*(?:마감일|마감|종료일|신청기한)[^0-9]{0,20}" + date)
     for pattern, offset in ((ranged, 4), (explicit, 1)):
         for m in pattern.finditer(body):
             values = m.groups()[offset-1:offset+2]
