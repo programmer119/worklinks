@@ -70,15 +70,20 @@ def amount_info(title, body):
     return "금전 혜택 미확인", "지급액·수익 여부 원문 확인"
 
 def deadline_from(body):
-    # Deadline is only extracted when the source explicitly labels it.
-    candidates = []
-    for m in CLOSE.finditer(body):
-        try:
-            d = dt.date(int(m[1]), int(m[2]), int(m[3]))
-            candidates.append(d)
-        except ValueError:
-            pass
-    return max(candidates).isoformat() if candidates else None
+    # Never mistake the publication date or the START of a range for its end.
+    dates = []
+    date = r"(20\\d{2})[.\\-/년\\s]+(\\d{1,2})[.\\-/월\\s]+(\\d{1,2})(?:일)?"
+    ranged = re.compile(r"(?:접수|신청|모집)\\s*(?:기간|일정)[^0-9]{0,32}" + date +
+                        r"\\s*(?:~|∼|～|부터|\\-|–|—)\\s*" + date)
+    explicit = re.compile(r"(?:접수|신청|모집)?\\s*(?:마감일|마감|종료일|신청기한)[^0-9]{0,20}" + date)
+    for pattern, offset in ((ranged, 4), (explicit, 1)):
+        for m in pattern.finditer(body):
+            values = m.groups()[offset-1:offset+2]
+            try:
+                dates.append(dt.date(*(int(x) for x in values)))
+            except ValueError:
+                pass
+    return max(dates).isoformat() if dates else None
 
 def assess(title, detail, municipality, url, now):
     if len(title) < 9 or not POSITIVE.search(title) or NEGATIVE.search(title):
