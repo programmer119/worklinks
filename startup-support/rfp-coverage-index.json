@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-11-01T07:31:19.216468+00:00",
+  "generatedAt": "2026-11-01T15:06:41.222196+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3092,
+  "scannedNoticeCount": 3100,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -130237,7 +130237,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-11-01T15:06:41.222196+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "240a79bc71761fcd9f4ee1fa9c97855da22b71dd30da62b16b4ad1a047eae98f",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01781056:000": {
       "status": "text_extracted_requires_review",
@@ -131111,7 +131116,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-11-01T15:06:41.222196+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "b334c64aad6ec7e3af1e2f3cd4c88cbe0da72fa2c6028b1c737e68438a39c063",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01781532:000": {
       "status": "text_extracted_requires_review",
@@ -264436,7 +264446,2500 @@
           ]
         }
       }
+    },
+    "R26BK01793474:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+          "readable": true,
+          "sourceSha256": "65f33878a7b557710626332a74e41e5b9dd8b749c583e1100047cdca29b21aae",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 46
+        },
+        {
+          "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+          "readable": true,
+          "sourceSha256": "9d80feb8eaace234c6fffbce35dd30d2db9cf857c86b459718cc24bf8bd5472b",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 34
+        },
+        {
+          "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.pdf",
+          "readable": true,
+          "sourceSha256": "20f984d77aba9304c048e60ac6ae3ca27dede697d5287da0a0684a1620bfb9a9",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 123
+        }
+      ],
+      "manifestSignature": "6e18dc339c06ce3a105df309a8139f3392457327fcfef309b72fbc5fda00d139",
+      "manifestCheckedAt": "2026-11-01T15:07:07.234844+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1"
+          },
+          {
+            "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "◦ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체 ◦ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체 ◦ 「소프트웨어 진흥법」제48조(중소 소프트웨어사업자의 사업참여 지원)에 따른「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」준수",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "*「국가계약법시행규칙」제44조 제1항 제6의3호 입찰무효 사항인 \"상호 또는 법인의 명칭\" 및 \"대표자(수인의 대표자가 있는 경우에는 대표자 전원)의 성명\" 확인용 ④ 중소기업확인서 각1부(시스템에서 확인가능)",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 중소기업확인서 각1부(시스템에서 확인가능)",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 중소기업확인서 각1부(시스템에서 확인가능) *「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 따라 중소기업자로 간주되는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1부",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "◦ 본 사업은 하도급을 허용하지 않음",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 본 사업은 하도급을 허용하지 않음 2. 제안서 평가 방법",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 국가를 당사자로 하는 계약에 관한 법률」 제27조 및 동법 시행령 제 76조(부정당 업자의 입찰 참가 자격 제한)에 해당하지 않은 업체 ◦ 본 사업은 하도급을 허용하지 않음",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "최근 3년 이내 유사 사업수행 실적",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "최근 3년 이내 유사 사업수행 실적 5점",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "용역사업 수행 실적 최근 3년 이내 유사 사업수행 실적",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "- 인원 및 일반정보의 보호대책 - 투입인력에 대한 비밀유지의무 준수 등 주기적인 보안교육",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 투입인력에 대한 비밀유지의무 준수 등 주기적인 보안교육",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 투입인력에 대한 비밀유지의무 준수 등 주기적인 보안교육 - 기타 보안에 필요한 사항",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며, 마감일(일시가 정해져 있는 경우에는 해당 일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰무효 해당 여부 확인을 위하여 등록정보 확인을 위한 서류 ( 법인등기 부등본 , 입찰대리인임을 확인 할 수 있는 서류 , 관련되는 면허 등을 증명 하는 서류 등 ) 를 요청하는 경우 , 낙찰대상자는 관계서류를 강원대학교 정보 화본부로 제출하여야 합니다 . 다 . 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "화본부로 제출하여야 합니다 . 다 . 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "- 국가종합전자조달시스템 입찰참가자격등록규정(조달청 고시) - (계약예규) 용역입찰유의서(기획재정부계약예규)",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 제안요청에 대한 설명회 : 없음 다. 본 입찰은 전자입찰로서 별도의 입찰참가신청을 하지 않아도 되며, 조달청 입찰참가자격 등록증상의 내용에 따라 입찰에 참가하는 것으로 합니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 본 입찰은 전자입찰로서 별도의 입찰참가신청을 하지 않아도 되며, 조달청 입찰참가자격 등록증상의 내용에 따라 입찰에 참가하는 것으로 합니다. 라. 입찰보증금은 면제됩니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "□ 입찰 참가 자격 기준",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "사업 실적 증명서",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 입찰참가등록",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "◦ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조에 의한 경쟁입찰 참가자격소지자 ◦ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체 ◦ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062525&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "라. 입찰보증금은 면제됩니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 입찰보증금은 면제됩니다. 마. 제안요청과 관련된 모든 질의는 강원대학교에서 답변하고 그 밖의 다른 경로로 얻어지는 정보는 공식적인 것이 아니며 부정확할 수 있어, 이로 인한 제안서 요건에 맞지 않는 등의 불이익은 전적으로 제안 업체가 책임을 지며 부적격 판정의 사유가 될 수 있음",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 본 입찰은 전자입찰로서 별도의 입찰참가신청을 하지 않아도 되며, 조달청 입찰참가자격 등록증상의 내용에 따라 입찰에 참가하는 것으로 합니다. 라. 입찰보증금은 면제됩니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 수강신청 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793474&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01793567:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+          "readable": true,
+          "sourceSha256": "ddb93a2cfa1d4fcbf587a327815ab2e76b5f10c739899e128291d772e2a71e9c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 42
+        },
+        {
+          "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+          "readable": true,
+          "sourceSha256": "4db4ac15480d6bd5f3f24bcde774d3a735e2ddf368588ffb0f458462c24a2ef4",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 34
+        },
+        {
+          "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.pdf",
+          "readable": true,
+          "sourceSha256": "6163fab7a9d0baac430c68c14eb0144fd4de98164e3f8f435ca15e5fefee4d76",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 122
+        }
+      ],
+      "manifestSignature": "abc99f3d03d40fc459363c191b15e9035d750e0af88455d302613a714f20d497",
+      "manifestCheckedAt": "2026-11-01T15:07:07.597975+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9"
+          },
+          {
+            "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체 ○ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체 ○ 「소프트웨어 진흥법」제48조(중소 소프트웨어사업자의 사업참여 지원)에 따른「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」준수",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "*「국가계약법시행규칙」제44조 제1항 제6의3호 입찰무효 사항인 \"상호 또는 법인의 명칭\" 및 \"대표자(수인의 대표자가 있는 경우에는 대표자 전원)의 성명\" 확인용 ④ 중소기업확인서 각1부(시스템에서 확인가능)",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 중소기업확인서 각1부(시스템에서 확인가능)",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 중소기업확인서 각1부(시스템에서 확인가능) *「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조 제1항에 따라 중소기업자로 간주되는 특별법인일 경우 특별법인임을 확인할 수 있는 서류 1부",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "○ 본 사업은 하도급을 허용하지 않음",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 본 사업은 하도급을 허용하지 않음 ○ 국가를 당사자로 하는 계약에 관한 법률」 제27조 및 동법 시행령 제 76조(부정당 업자의 입찰 참가 자격 제한)에 해당하지 않은 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1. 현재 수행중인 업무도 포함하여 최근 연도순으로 기재하며, 본 업무와 유관한 것만 기재한다. 2. 하도급은 발주처가 승인한 경우에 한하며 비고란에 원 도급회사 기재",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "최근 3년 이내 유사 사업수행 실적",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "최근 3년 이내 유사 사업수행 실적 5점",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "용역사업 수행 실적 최근 3년 이내 유사 사업수행 실적",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "- 인원 및 일반정보의 보호대책 - 투입인력에 대한 비밀유지의무 준수 등 주기적인 보안교육",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 투입인력에 대한 비밀유지의무 준수 등 주기적인 보안교육",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 투입인력에 대한 비밀유지의무 준수 등 주기적인 보안교육 - 기타 보안에 필요한 사항",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며, 마감일(일시가 정해져 있는 경우에는 해당 일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰무효 해당 여부 확인을 위하여 등록정보 확인을 위한 서류 ( 법인등기 부등본 , 입찰대리인임을 확인 할 수 있는 서류 , 관련되는 면허 등을 증명 하는 서류 등 ) 를 요청하는 경우 , 낙찰대상자는 관계서류를 강원대학교 정보 화본부로 제출하여야 합니다 . 다 . 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "화본부로 제출하여야 합니다 . 다 . 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "- 국가종합전자조달시스템 입찰참가자격등록규정(조달청 고시) - (계약예규) 용역입찰유의서(기획재정부계약예규)",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 제안요청에 대한 설명회 : 없음 다. 본 입찰은 전자입찰로서 별도의 입찰참가신청을 하지 않아도 되며, 조달청 입찰참가자격 등록증상의 내용에 따라 입찰에 참가하는 것으로 합니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 본 입찰은 전자입찰로서 별도의 입찰참가신청을 하지 않아도 되며, 조달청 입찰참가자격 등록증상의 내용에 따라 입찰에 참가하는 것으로 합니다. 라. 입찰보증금은 면제됩니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "체를 당사자로 하는 계약에 관한 법률 시행령」 제92조에 따라 입찰 참가 자격을 제한합니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 입찰참가등록",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제될 수 있고 , 입찰참가자격 제한 대상에 해당되는 경우 「 국가계약",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "○ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체 ○ 나라장터시스템 업종코드(1468) 소프트웨어사업자(컴퓨터 관련 서비스사업)로 신고한 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "▣ 공고서 입찰 참가 자격 및 다음의 자격을 모두 갖춘 자 ○ 국가를 당사자로 하는 계약에 관한 법률 시행령 제12조 및 동법 시행규칙 제14조에 의한 일반경쟁 입찰 참가 자격을 구비한 업체",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062535&rfpOrd=000&rfpUntyAtchFileNo=9",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "라. 입찰보증금은 면제됩니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 입찰보증금은 면제됩니다. 마. 제안요청과 관련된 모든 질의는 강원대학교에서 답변하고 그 밖의 다른 경로로 얻어지는 정보는 공식적인 것이 아니며 부정확할 수 있어, 이로 인한 제안서 요건에 맞지 않는 등의 불이익은 전적으로 제안 업체가 책임을 지며 부적격 판정의 사유가 될 수 있음",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 본 입찰은 전자입찰로서 별도의 입찰참가신청을 하지 않아도 되며, 조달청 입찰참가자격 등록증상의 내용에 따라 입찰에 참가하는 것으로 합니다. 라. 입찰보증금은 면제됩니다.",
+              "codes": [],
+              "sourceFile": "강원대학교(강릉·원주캠퍼스) 클라우드 기반 포털 시스템 운영 사업 입찰공고서.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793567&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01793552:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+          "readable": true,
+          "sourceSha256": "83d04bc465f93bcb5f0f8a093c0538854f22f6acdd024fab3ae3086aabaccfe2",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 24
+        },
+        {
+          "name": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+          "readable": true,
+          "sourceSha256": "62c4c0f8cf227685c6d8b3483f93cad81f50435de1185327f16a3efc112bfaef",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 27
+        },
+        {
+          "name": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).pdf",
+          "readable": true,
+          "sourceSha256": "99208137c35c4e4d30797a74a6fe5c6e99ae776591a9db2d03875da9a594e1d4",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 76
+        }
+      ],
+      "manifestSignature": "2dbc52accd4adfa15f66c91e09567eee393cd5c47e5117839c9021718a0fbd78",
+      "manifestCheckedAt": "2026-11-01T15:07:07.808117+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "단, 「중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령」 제2조의3제1항제2호에 해당하는 비영리법인은 참여 가능 (‘비영리법인’임을 증명할 수 있는 서류 제출) 라. 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터(G2B)에 개찰일 전일까지 소프트웨어사업자(업종코드 1468)으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터(G2B)에 개찰일 전일까지 소프트웨어사업자(업종코드 1468)으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터(G2B)에 개찰일 전일까지 소프트웨어사업자(업종코드 1468)으로 입찰참가자격을 등록한 자 ※ 개찰 당일 국가종합전자조달시스템에 등록한 업체는 「국가종합전자조달시스템 전자입찰특별유의서」 제4조(전자입찰참가를 위한 업체등록)에 따라 무효 처리함",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "다. 「중소기업기본법」제2조에 따른 중소기업자 또는「소상공인 보호 및 지원에 관 한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중소기업·소상공인 확인서(전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 「중소기업기본법」제2조에 따른 중소기업자 또는「소상공인 보호 및 지원에 관 한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중소기업·소상공인 확인서(전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체 ※ 입찰마감일 전일까지 발급된 것으로 유효기간 내에 있어야 하며, 중소기업 공공구매 종합정보망(SMPP)에서 확인이 되어야 합니다.(확인되지 않을 경우 낙찰자에서 제외)",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 제안서 및 제안발표 자료를 저장한 USB 1개 별도 제출(낙찰자에 한함) 마. 중ㆍ소기업ㆍ소상공인 확인서 1부(비영리법인의 경우, 비영리법인을 확인할 수 있는 증명서)",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "❍ 본 제안요청서에 규정되지 아니한 사항은 관계 법규 및 지침, 제안요청서 등에 따라 발주기관과 협의하여 수행하거나 결정한다. - 이 계약과 관련하여 분쟁이 있을 경우 국가계약법령 등을 준용하며, 관할 법원은 발주기관의 소재지를 관할하는 법원으로 한다.",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 이 계약과 관련하여 분쟁이 있을 경우 국가계약법령 등을 준용하며, 관할 법원은 발주기관의 소재지를 관할하는 법원으로 한다.",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 이 계약과 관련하여 분쟁이 있을 경우 국가계약법령 등을 준용하며, 관할 법원은 발주기관의 소재지를 관할하는 법원으로 한다. ❍ 사업수행 중 여건 변동 등으로 변경이 있을 때는 발주기관과 협의하여야 하며, 과업 범위 또는 내용의 변경, 기타 대학이 필요하다고 인정할 때에는 설계변경을 할 수 있다.",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "※ 최근 3개년 재무제표 또는 부가가치세 과세표준증명원 등 증빙서류 제출 사. 본 입찰 건은 공동수급(공동이행방식) 및 하도급을 허용하지 않으며, 단독 입찰만 가능",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "사. 본 입찰 건은 공동수급(공동이행방식) 및 하도급을 허용하지 않으며, 단독 입찰만 가능",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "사. 본 입찰 건은 공동수급(공동이행방식) 및 하도급을 허용하지 않으며, 단독 입찰만 가능 3. 입찰 및 낙찰자 결정방법",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "라. 제안서 1부 : (서식1) 제안서 표지서식, (서식2) 입찰참가신청서, (서식3) 제안기관 일반현황 및 연혁, (서식4) 용역 실적 총괄표, (서식5) 용역 실적증명서, (서식6) 수행조직 및 업무분장, (서식7) 참여인력 현황, (서식8) 수행 인력 이력사항, (서식9) 청렴계약이행서약서, (서식10) 서약서, (서식11) 보안서약서, (서식12) 개인정보 수집·이용 동의서",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ (서식5) 용역 실적증명서는 실적 건별로, (서식8) 수행 인력 이력사항·(서식12) 개인정보 수집·이용 동의서는 참여인력 전원분 작성 ※ 참여인력 전원의 경력 증빙서류(재직증명서 등) 첨부",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 본 용역과 관련 있는 유사 용역만 기재 (실적 증명서 건별 첨부)",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "※ 투입인력 현황에 기재된 전 인력에 대한 동의서 첨부.",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 투입인력 현황에 기재된 전 인력에 대한 동의서 첨부. 춘천교육대학교산학협력단장 귀하",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "<표> ※ 투입인력 현황에 기재된 전 인력에 대한 동의서 첨부.",
+              "codes": [],
+              "sourceFile": "[제안요청서][춘천교육대학교 앵커사업단]'26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "단, 「중소기업제품 구매촉진 및 판로지원에 관한 법률 시행령」 제2조의3제1항제2호에 해당하는 비영리법인은 참여 가능 (‘비영리법인’임을 증명할 수 있는 서류 제출) 라. 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터(G2B)에 개찰일 전일까지 소프트웨어사업자(업종코드 1468)으로 입찰참가자격을 등록한 자",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터(G2B)에 개찰일 전일까지 소프트웨어사업자(업종코드 1468)으로 입찰참가자격을 등록한 자",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 반드시 나라장터(G2B)에 개찰일 전일까지 소프트웨어사업자(업종코드 1468)으로 입찰참가자격을 등록한 자 ※ 개찰 당일 국가종합전자조달시스템에 등록한 업체는 「국가종합전자조달시스템 전자입찰특별유의서」 제4조(전자입찰참가를 위한 업체등록)에 따라 무효 처리함",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "※대리인 제출 시 위임장, 신분증, 재직증명서 지참",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 위임장 및 재직증명서(대리인 제출 시, 신분증 지참) 각 1부",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 청렴계약이행서약서를 반드시 제출하여야 참가 자격이 주어지며 계약상대자로 선정된 경우에는 청렴계약제를 준수하여야 합니다.",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "※전자입찰(G2B) 미투찰시 입찰에 참여할 수 없습니다. 바. 가격입찰서 제출기간: 2026. 10. 28.(수) 10:00 ~ 11. 09.(월) 15:00",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 전자입찰 (G2B) 미투찰시 입찰에 참여할 수 없습니다 . 바 . 가격입찰서 제출기간 : 2026. 10. 28.( 수 ) 10:00 ~ 11. 09.( 월 ) 15:00",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "마 . 입찰은 전자입찰 ( 가격 제출 ) 과 직접제출 ( 제안서 제출 ) 동시 진행합니다 . ※ 전자입찰 (G2B) 미투찰시 입찰에 참여할 수 없습니다 . 바 . 가격입찰서 제출기간 : 2026. 10. 28.( 수 ) 10:00 ~ 11. 09.( 월 ) 15:00 ※ 입 찰보증서 제출 사 . 개찰일시 : 2026. 11. 18.( 수 ) 10:00 이후",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "6. 입찰보증금의 납부 및 귀속",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "6. 입찰보증금의 납부 및 귀속 ㅇ「국가를 당사자로하는 계약에 관한 법률 시행령」제37조에 따라 100분의5 이상(단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다.",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "ㅇ「국가를 당사자로하는 계약에 관한 법률 시행령」제37조에 따라 100분의5 이상(단서조항에 따른 기획재정부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다.",
+              "codes": [],
+              "sourceFile": "[공고문][춘천교육대학교 앵커사업단]  '26 앵커사업단 웹플랫폼 구축 용역(AI융합영재교육원·온동네 초등돌봄).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793552&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01794775:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+          "readable": true,
+          "sourceSha256": "506fd41ac7aca5714ec69a0129b686d1eeaf08e35a13b619cfb1042e140edd80",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 21
+        },
+        {
+          "name": "1.공고서 (9).hwp",
+          "readable": true,
+          "sourceSha256": "5b9e3003457fe2d62eeed54b0fa0a2aad586f6bba1a895ed19649fb21d53d9c0",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 52
+        },
+        {
+          "name": "1.공고서 (9).pdf",
+          "readable": true,
+          "sourceSha256": "d1d969afb0ff098fc33556f44529f5d37f1c096873aaef80a97587d2922ad714",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 268
+        }
+      ],
+      "manifestSignature": "596746e3aa8a3cb9b7a181d2f15d3fcb49935145a091eef29b39b86bfba5a45b",
+      "manifestCheckedAt": "2026-11-01T15:07:23.853340+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1"
+          },
+          {
+            "name": "1.공고서 (9).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "1.공고서 (9).pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "- 제안사는「개인정보보호법」제33조 및 동법 시행령 제37조, 제38조에 따라 개인정보보호위원회가 지정하는 평가기관(개인정보영향평가기관, 업종코드: 6525)만 영향평가를 수행할 수 있으므로 지정기관만 입찰 가능",
+              "codes": [
+                "6525"
+              ],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 개인정보보호 포털(www.privacy.go.kr)개인정보 영향평가 지정업체 목록 참조 - ｢소프트웨어진흥법｣ 제58조 및 동법시행규칙 제17조에 의한 소프트웨어사업자(컴퓨터관련서비스업, 업종코드:1468)의 신고를 필한 자로서 최근년도 결산신고가 완료된 사업자",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 제안사는「개인정보보호법」제33조 및 동법 시행령 제37조, 제38조에 따라 개인정보보호위원회가 지정하는 평가기관(개인정보영향평가기관, 업종코드: 6525)만 영향평가를 수행할 수 있으므로 지정기관만 입찰 가능 ※ 개인정보보호 포털(www.privacy.go.kr)개인정보 영향평가 지정업체 목록 참조",
+              "codes": [
+                "6525"
+              ],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "※ 최근년도 결산신고된 소프트웨어사업자 일반 현황 관리확인서 제출 필수 - 「중소기업기본법」제2조제2항에 따른 소기업자 또는 「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 소기업․소상공인 확인서(전자 입찰서 제출 마감일 까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 자",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 「중소기업기본법」제2조제2항에 따른 소기업자 또는 「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 소기업․소상공인 확인서(전자 입찰서 제출 마감일 까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 자",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 「중소기업기본법」제2조제2항에 따른 소기업 또는 「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 소기업, 소상공인 확인서(용도 : 공공기관 입찰용)를 소지한 자.",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "- 본 사업은 사업의 원활한 수행과 품질보증을 위하여 분담이행, 공동수급, 하도급이 불가함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 본 사업은 사업의 원활한 수행과 품질보증을 위하여 분담이행, 공동수급, 하도급이 불가함 - 입찰공고일 현재 시행 중인 제규정을 적용하며 입찰마감일 전일 기준으로 입찰참가자격 요건을 판단하며, 우선협상대상자가 된 경우 계약체결일까지 입찰참가자격을 유지하여야 함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "-「국가를 당사자로하는 계약에 관한 법률」제27조 및 동법 시행령 제76조(부정당업자의 입찰참가자격 제한)에 해당되지 않은 업체이어야 함 - 본 사업은 사업의 원활한 수행과 품질보증을 위하여 분담이행, 공동수급, 하도급이 불가함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "투입인력 실적 및 경력(개인정보 영향평가)",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "투입인력 실적 및 경력(개인정보 영향평가) [실적 및 경력]",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "【서식 11호】 투입인력 실적 및 경력(개인정보 영향평가)",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "-「국가를 당사자로 하는 계약에 관한 법률」시행령 제12조(경쟁입찰의 참가자격) 및 동법 시행규칙 제14조(입찰참가자격요건의 증명) 규정에 의한 경쟁입찰 참가자격을 갖추어야 하며, 조달청 입찰참가자격등록증 소지업체이어야 함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가종합전자조달시스템입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자입찰서제출 마감일 전일까지 개인정보 영향평가기관(업종코드:6525)과 소프트웨어사업자(컴퓨터관련서비스사업, 업종코드 : 1468) 입찰 참가 자격을 등록한 업체",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격 증빙자료 1식. - 나라장터에서 출력한 “경쟁입찰참가자격등록증” 1부",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "❍ 입찰참가 자격기준",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 소속회사에 대한 재직증명서와 국민연금 가입자 가입증명(국민연금 : www.nps.or.kr) 또는",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "9. 입찰 무효 및 입찰참가자격 제한",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "- 입찰공고일 현재 시행 중인 제규정을 적용하며 입찰마감일 전일 기준으로 입찰참가자격 요건을 판단하며, 우선협상대상자가 된 경우 계약체결일까지 입찰참가자격을 유지하여야 함 -「국가를 당사자로 하는 계약에 관한 법률」제27조의5 및 같은 법 시행령 제12조제3항에 따라 조세포탈 등을 한 자로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰참가 불가함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "-「국가를 당사자로 하는 계약에 관한 법률」제27조의5 및 같은 법 시행령 제12조제3항에 따라 조세포탈 등을 한 자로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰참가 불가함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 「국가를 당사자로 하는 계약에 관한 법률」 제27조제1항에 따른 부정당업체로 입찰 참가자격의 제한을 받지 않는 업체 나. 「국가를 당사자로 하는 계약에 관한 법률」제27조의5 및 같은 법 시행령 제12조제3항에 따라 조세포탈 등을 한 자로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 업체는 참여불가",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "-「국가를 당사자로 하는 계약에 관한 법률」시행령 제12조(경쟁입찰의 참가자격) 및 동법 시행규칙 제14조(입찰참가자격요건의 증명) 규정에 의한 경쟁입찰 참가자격을 갖추어야 하며, 조달청 입찰참가자격등록증 소지업체이어야 함",
+              "codes": [],
+              "sourceFile": "2026년 노후 인프라 교체 및 정보시스템 고도화 사업 개인정보 영향평가.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062611&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 33 조 제 1 항에 의거 소기업자로 간 주되는 특별법인은 입찰참가 가능함 - 단 , 특별법인은 특별법인임을 확인할 수 있는 서류를 제출하여야 함 ※ 「 중소기업협동조합법 」 제 3 조에 따른 소기업협동조합으로서 적격조합 확인서를 소지한 자 는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2 개사 이상의 배정비율을",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 「 중소기업협동조합법 」 제 3 조에 따른 소기업협동조합으로서 적격조합 확인서를 소지한 자 는 입찰참가가 가능하나 입찰참가자격을 갖춘 소속 조합원사 중 2 개사 이상의 배정비율을",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "5. 입찰참가서류 … 가격입찰서와 제안서 중 어느 하나라도 미제출시 입찰무효 처리 가. 입찰보증금 … 입찰금액의 100분의 5 이상에 해당하는 금액",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰보증금 … 입찰금액의 100분의 5 이상에 해당하는 금액",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰보증금 … 입찰금액의 100분의 5 이상에 해당하는 금액 - 나라장터 입찰참가신청서 작성 시 입찰보증금 지급각서 전자 제출(동의)로 갈음함.",
+              "codes": [],
+              "sourceFile": "1.공고서 (9).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794775&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01793114:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 5,
+      "readableDocumentCount": 5,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "(재)공고문(콜롬비아).hwp",
+          "readable": true,
+          "sourceSha256": "ca1793b8751791f965018fcf342df25f994f89396489b4912633df4eca01e53d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 50
+        },
+        {
+          "name": "붙임1. 제안요청서_콜롬비아 지적정보 데이터 구축.hwp",
+          "readable": true,
+          "sourceSha256": "bb2ed7abe6fd4a5da8e15f0a95df419d0945cd832206483dd19ca649fd325038",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 42
+        },
+        {
+          "name": "붙임2. 과업지시서_콜롬비아 지적정보 데이터 구축.hwp",
+          "readable": true,
+          "sourceSha256": "54dbda6ec84319adbc071e111e4e4c82ac28d462ef87b263a29643a607236c0b",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 9
+        },
+        {
+          "name": "퇴직자 근무현황 확인서.hwp",
+          "readable": true,
+          "sourceSha256": "c6064c6654004b0b0f212f08c22e41b63ba29bbf7c01556ee1cf9f5cf2e91d5c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 2
+        },
+        {
+          "name": "(재)공고문(콜롬비아).pdf",
+          "readable": true,
+          "sourceSha256": "86316931889ef29e4e2fc2d744543e7b953b6e91b59b28bdd01cbdebd0a12563",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 280
+        }
+      ],
+      "manifestSignature": "7e69d6749e958249af6495d5082ec17b287fb3c45c90212d6364df3e38cdaa15",
+      "manifestCheckedAt": "2026-11-01T15:07:24.681695+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 5,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "(재)공고문(콜롬비아).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임1. 제안요청서_콜롬비아 지적정보 데이터 구축.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임2. 과업지시서_콜롬비아 지적정보 데이터 구축.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "퇴직자 근무현황 확인서.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "(재)공고문(콜롬비아).pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련서비스사업) (1468)",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련서비스사업) (1468) 5) 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제10조에 따라",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4) 전자입찰서 제출 마감일 전일까지 나라장터에 아래의 업종으로 모두 입찰 참가자격을 등록한 자 - 소프트웨어사업자(컴퓨터관련서비스사업) (1468)",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "5) 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제10조에 따라 다음의 직접생산확인증명서를 모두 소지한 자",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다음의 직접생산확인증명서를 모두 소지한 자",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다음의 직접생산확인증명서를 모두 소지한 자 - 정보시스템개발서비스(세부품명번호: 8111159901)",
+              "codes": [
+                "8111159901"
+              ],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "3) 「중소기업기본법」 제2조에 따른 중·소기업자 또는「소상공인 보호 및 지원에 관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정｣에 따라 발급된 중·소기업(소상공인)확인서를",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정｣에 따라 발급된 중·소기업(소상공인)확인서를",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정｣에 따라 발급된 중·소기업(소상공인)확인서를 <표>",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "본 입찰은 하도급을 허용하지 않습니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "본 입찰은 하도급을 허용하지 않습니다. <표>",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "<표> 본 입찰은 하도급을 허용하지 않습니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "3) 제출서류: AI 모델 또는 관련 AI 기술에 대한 TTA 등 공인시험·검증기관 기술 성능 시험 성적서, 수행실적총괄표, 수행실적증명서, 기타 서류(필요 시*)",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3) 제출서류: AI 모델 또는 관련 AI 기술에 대한 TTA 등 공인시험·검증기관 기술 성능 시험 성적서, 수행실적총괄표, 수행실적증명서, 기타 서류(필요 시*) * 국가, 지자체, 공공기관 외의 기관 또는 민간이 발주한 실적의 경우에는 계약서, 세금계산서 등을",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "2) 제출방법: 국가전자종합시스템(나라장터)을 통하여 전자 제출 (실적심사신청서에 파일 첨부) 3) 제출서류: AI 모델 또는 관련 AI 기술에 대한 TTA 등 공인시험·검증기관 기술 성능 시험 성적서, 수행실적총괄표, 수행실적증명서, 기타 서류(필요 시*)",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "ㅇ (제안서 보상) 본 사업은 20억원 미만의 SW사업으로 제안서 보상대상 사업에서 제외됩니다. ㅇ (투입인력 관리) 본 사업은 사업대가를 투입공수 방식으로 산정한 사업(컨설팅, DB구축, 디지털 콘텐츠 개발 서비스 등)으로 투입인력 요구 및 관리 금지 대상 사업에서 제외됩니다.",
+              "codes": [],
+              "sourceFile": "붙임2. 과업지시서_콜롬비아 지적정보 데이터 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "ㅇ (투입인력 관리) 본 사업은 사업대가를 투입공수 방식으로 산정한 사업(컨설팅, DB구축, 디지털 콘텐츠 개발 서비스 등)으로 투입인력 요구 및 관리 금지 대상 사업에서 제외됩니다.",
+              "codes": [],
+              "sourceFile": "붙임2. 과업지시서_콜롬비아 지적정보 데이터 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "4) 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우, 무효입찰임을 알려드리니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "하는지의 여부를 반드시 확인하신 후 , 입찰에 참여하시기 바라며 , 위 등록사항에 변경이 있을 경우에는 반드시 경쟁입찰참가자격등록증을 변경하셔야 하며 변경등록을 하지 않고 입찰에 참여한 경우에는 「 국 가를 당사자로 하는 계약에 관한 법률 시행규칙 」 제 44 조에 의거 입찰무효 사유에 해당합니다 . 4) 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4) 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "2) 「국가종합전자조달시스템 입찰참가자격 등록규정」에 따라 국가종합전자조달시스템(나라장터)에 입찰 참가 자격을 등록한 자",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3) 입찰에 참여하는 자는 조달청 경쟁입찰참가자격등록증의 정보와 법인등기부등본 상의 정보가 정확히 일치(상호 또는 법인의 명칭, 대표자(대표자가 복수인 경우에는 대표자 전원)의 성명)하는지의 여부를 반드시 확인하신 후, 입찰에 참여하시기 바라며, 위 등록사항에 변경이 있을 경우에는 반드시 경쟁입찰참가자격등록증을 변경하셔야 하며 변경등록을 하지 않고 입찰에 참여한 경우에는 「국가를 당사자로 하는 계약에 관한 법률 시행규칙」 제44조에 의거 입찰무효 사유에 해당합니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "* 최근 년도 결산 신고된 소프트웨어 사업자 일반현황 관리확인서를 제출서류에 포함 - ｢국가종합전자조달시스템 입찰참가자격등록규정｣에 따라 조달청에 입찰 참가자격을 등록한 자",
+              "codes": [],
+              "sourceFile": "붙임1. 제안요청서_콜롬비아 지적정보 데이터 구축.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "단, 조달청 입찰참가등록 가능시간은 평일 09:00~18:00이며, 토요일, 일요일 및 공휴일은 입찰참가등록 업무처리가 불",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "평일 09:00~18:00이며, 토요일, 일요일 및 공휴일은 입찰참가등록 업무처리가 불가하므로 입찰참가등록은 반드시 2026. 11. 6. 18시까지 하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "토요일, 일요일 및 공휴일은 입찰참가등록 업무처리가 불가하므로 입찰참가등록은 반드시 2026. 11. 6. 18시까지 하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "7) ｢국가를 당사자로 하는 계약에 관한 법률｣ 제27조의5 및 동법 시행령 제12조 제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰에 참여",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰에 참여",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 입찰에 참여 할 수 없습니다. 입찰자는 동법 시행령 제12조 제3항 각 호에 해당하지 아니한다는 서약서를",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의5이상(「국가계약법 시행령」 제37조제1항 단서조항에 따른 재정경재부 장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부하여야 합니다.",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자 - 입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호가목의 사유로 입찰참가자격제한을 받은자(입찰참가자격 제한 기간 중인 경우를 포함한다)",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의5이상(「국가계약법 시행령」 제37조제1항 단서조항에 따른 재정경재부 장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부하여야 합니다. - 신용정보 관리규약에 의한 채무불이행 또는 금융질서 문란자",
+              "codes": [],
+              "sourceFile": "(재)공고문(콜롬비아).hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01793114&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01794845:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 1,
+      "files": [
+        {
+          "name": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+          "readable": true,
+          "sourceSha256": "4f28cafb102c0083edad2da5e8349aeebee79b3cb639e6b266f655b838301810",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 78
+        },
+        {
+          "name": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+          "readable": true,
+          "sourceSha256": "5f85d703664398560ade2f737c5f2fecb01c3df718cf4918465eb961fdc89bcf",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 300
+        },
+        {
+          "name": "2. 2027년 임상연구정보서비스(CRIS) 시스템 유지관리 제안요청서.hwpx",
+          "readable": true,
+          "sourceSha256": "15c86200a2a8558501eed04bf64969e2a0e8f30851e63547ba43ef4f68e021a7",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 103
+        },
+        {
+          "name": "가격입찰서,_입찰보증금지급각서(서식).hwp",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "no_searchable_text",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "1bab149cb827cbc1a9eda6b112054f248262fbca224f08eee4acbf852d8ec8d3",
+      "manifestCheckedAt": "2026-11-01T15:07:27.998993+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 1,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "2. 2027년 임상연구정보서비스(CRIS) 시스템 유지관리 제안요청서.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "[소프트웨어사업자(컴퓨터관련서비스사업)(1468)] 업종을 신고한 업체(소프트웨어 진흥법 제2조)",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "[소프트웨어사업자(컴퓨터관련서비스사업)(1468)] 업종을 신고한 업체(소프트웨어 진흥법 제2조) ○",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- [소프트웨어사업자(컴퓨터관련서비스사업)(1468)] 업종을 신고한 업체(소프트웨어 진흥법 제2조)",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제5조의 규정에 따라 직접 생산확인증명서[정보시스템유지관리서비스(8111189901)]를 소지한 자.",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제5조의 규정에 따라 직접 생산확인증명서[정보시스템유지관리서비스(8111189901)]를 소지한 자.",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "6) 일할 계산하여 용역대금이 산정되는 경우 대금지급은 계약체결 후 실제 용역 제공일수에 따라 일할 계산하여 지 급합니다 . 7) 이 용역입찰의 낙찰자는 근로자와 고용계약을 체결할 경우 「 최저임금법 」 제 10 조제 1 항의 규정에 따라 고용노동부 장관이 고시한 최저임금액 미만으로 계약할 수 없습니다 . 8) 계약담당공무원은 계약상대자가 직접생산 확인기준을 위반한 사실을 확인한 경우 계약해지 , 계약보증금 국고 귀",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "「중소기업기본법」제2조에 따른 중소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 <중소기업 · 소상공인 확인서>를 소지한 자.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 <중소기업 · 소상공인 확인서>를 소지한 자.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 <중소기업 · 소상공인 확인서>를 소지한 자. ◇",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "제8조(효력) 본 계약을 계약체결시부터 효력을 발생한다. 제9조(관할) 본 계약과 관련하여 발생되는 법적 분쟁의 해결은 “갑” 소재지의 관할법원에 의한다.",
+              "codes": [],
+              "sourceFile": "2. 2027년 임상연구정보서비스(CRIS) 시스템 유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제9조(관할) 본 계약과 관련하여 발생되는 법적 분쟁의 해결은 “갑” 소재지의 관할법원에 의한다.",
+              "codes": [],
+              "sourceFile": "2. 2027년 임상연구정보서비스(CRIS) 시스템 유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제9조(관할) 본 계약과 관련하여 발생되는 법적 분쟁의 해결은 “갑” 소재지의 관할법원에 의한다. 제10조(기타사항) 기타 본 계약에 명시되지 아니한 사항에 대해서는 일반 상관례에 따른다.",
+              "codes": [],
+              "sourceFile": "2. 2027년 임상연구정보서비스(CRIS) 시스템 유지관리 제안요청서.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "공동계약 및 구성방식: 공동이행 허용 / 하도급 허용",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "공동이행 허용 / 하도급 허용",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "공동이행 허용 / 하도급 허용 ○",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "입찰참가자격 증명서류 및 제안서는 사실대로 작성하여야 하며, 제안서 제출 후에라도 허위사실이 발견될 경우나 심사에 영향을 미치기 위해 불공정 행위를 한 때에는 낙찰 취소 등의 불이익을 받습니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "(2) 연구명 , 연구기간 등 연구사업 정보는 공고문에 기 제시한 내용의 임의 변경은 불가합니다 . (3) 입찰참가자격 증명서류 및 제안서는 사실대로 작성하여야 하며 , 제안서 제출 후 에라도 허위사실이 발견될 경",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "(1) 제출된 서류는 일체 반환하지 아니하며 , 제출 서류의 내용이 미비하거나 누락된 서류가 있는 경우에는 응모로 인정하지 않습니다 . (2) 연구명 , 연구기간 등 연구사업 정보는 공고문에 기 제시한 내용의 임의 변경은 불가합니다 . (3) 입찰참가자격 증명서류 및 제안서는 사실대로 작성하여야 하며 , 제안서 제출 후 에라도 허위사실이 발견될 경 - 8 -",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "2) 입찰참가자격등록증상의 상호 및 대표자 ( 대표자가 다수인 경우 대표자 전원의 성명을 모두 등재 , 각자 대표도 해 당 ) 가 법인등기부등본상 ( 개인인 경우 사업자등록증 ) 의 상호 , 대표자와 다른 경우에는 입찰참가자격등록증을 변경 등록하고 입찰에 참여하여야 하며 , 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의하시기 바 랍니다 .( 공동수급 구성원 전원 해당 ) 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이며 마감일 ( 일시",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "*공동계약의 경우 아래 주관기관에서 세부기관의 ①,②,③ 서류 취합하여 제출 ① 나라장터에서 출력한 경쟁입찰참가자격등록증 1부",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 나라장터에서 출력한 경쟁입찰참가자격등록증 1부 ② 법인 등기부등본(개인사업자인 경우 사업자등록증) 1부",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "* 입찰무효사항인 ‘상호 또는 법인의 명칭’ 및 ‘대표자(수인의 대표자가 있는 경우에는 대표자 전원)의 성명’ 확인용 ③ 인감증명서 1부(나라장터 “경쟁입찰참가자격등록증”에 사용인감이 등록된 경우 제외)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "‘공공 소프트웨어사업 입찰참여 제한금액 : 없음’으로 확인)만 입찰참가 가능",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "템’ 및 ‘중소기업제품 공공구매 종합정보망’에서 확인이 가능한 입찰참가자격은 별도의 서류를 제출할 필요가 없습니다.(다만, 동 시스템에서 자료가 확인되지 않을 경우 입찰참가",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가 없습니다.(다만, 동 시스템에서 자료가 확인되지 않을 경우 입찰참가자격이 없습니다.)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "(공동계약) 공동수급체를 구성하여 입찰에 참가하는 경우 공동이행방식으로만 입찰참여가 가능하며 공동수급체 구성원은 각각 본 입찰에서 요구하는 입찰참가자격을 모두 갖추어야 합니다. 공동수급체 구성원은 대표사를 포함하여 5개사 이하 구성원별 계약참여 최소지분율은 10%이상으로 구성하여야 하며 , 공동수급체를 중복 결성하여 입찰에 참여할 수 없습니다. ※ 공동수급협정서 미제출시 세부사업에 타 기관이 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "공동수급체 구성원은 대표사를 포함하여 5개사 이하 구성원별 계약참여 최소지분율은 10%이상으로 구성하여야 하며 , 공동수급체를 중복 결성하여 입찰에 참여할 수 없습니다. ※ 공동수급협정서 미제출시 세부사업에 타 기관이 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "④ 입찰보증금 : 입찰보증금 지급각서 1부(주관기관만 제출)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 입찰보증금 : 입찰보증금 지급각서 1부(주관기관만 제출) ⑤ 가격입찰서 1부(주관기관만제출)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "③ 인감증명서 1부(나라장터 “경쟁입찰참가자격등록증”에 사용인감이 등록된 경우 제외) ④ 입찰보증금 : 입찰보증금 지급각서 1부(주관기관만 제출)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 임상연구정보서비스(CRIS) 시스템 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794845&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01794822:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 4,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 1,
+      "files": [
+        {
+          "name": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+          "readable": true,
+          "sourceSha256": "905497141edc3c544fde33311a9ab9638cda19619ac5e93a2808b587d8647a79",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 82
+        },
+        {
+          "name": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.pdf",
+          "readable": true,
+          "sourceSha256": "de2b2f79fcd43fe69cfc0ef13d6be91012ca8170d9ec434b7ae6e37c226b43b5",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 300
+        },
+        {
+          "name": "3. 제안요청서(2027년 국립보건연구원 대표누리집 유지관리)-★.hwpx",
+          "readable": true,
+          "sourceSha256": "5dd37185c46a5ce8163e83d0bfac054e9c0f461d95b4976e9a6e72d0116b2e5f",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 235
+        },
+        {
+          "name": "가격입찰서,_입찰보증금지급각서(서식).hwp",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "no_searchable_text",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "1ee86f60a1ea13aec7469814a6d72e6ec053376fbbbca668adab168a7e7e8227",
+      "manifestCheckedAt": "2026-11-01T15:07:28.888908+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 1,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "3. 제안요청서(2027년 국립보건연구원 대표누리집 유지관리)-★.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "[소프트웨어사업자(컴퓨터관련서비스사업)(1468)] 업종을 신고한 업체(소프트웨어 진흥법 제2조)",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "[소프트웨어사업자(컴퓨터관련서비스사업)(1468)] 업종을 신고한 업체(소프트웨어 진흥법 제2조) ○",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- [소프트웨어사업자(컴퓨터관련서비스사업)(1468)] 업종을 신고한 업체(소프트웨어 진흥법 제2조)",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제5조의 규정에 따라 직접 생산확인증명서[정보시스템유지관리서비스(8111189901)]를 소지한 자.",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제5조의 규정에 따라 직접 생산확인증명서[정보시스템유지관리서비스(8111189901)]를 소지한 자. ○ 「소프트웨어 진흥법」 제48조(중소 소프트웨어사업자의 사업참여 지원)에 따른 「중소 소프트웨어사업자의 사업참여 지원에 관한 지침」 준수",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제5조의 규정에 따라 직접 생산확인증명서[정보시스템유지관리서비스(8111189901)]를 소지한 자.",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "「중소기업기본법」제2조에 따른 중소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 <중소기업 · 소상공인 확인서>를 소지한 자.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 <중소기업 · 소상공인 확인서>를 소지한 자.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 <중소기업 · 소상공인 확인서>를 소지한 자. ◇",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "제8조(효력) 본 계약을 계약체결시부터 효력을 발생한다. 제9조(관할) 본 계약과 관련하여 발생되는 법적 분쟁의 해결은 “갑” 소재지의 관할법원에 의한다.",
+              "codes": [],
+              "sourceFile": "3. 제안요청서(2027년 국립보건연구원 대표누리집 유지관리)-★.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제9조(관할) 본 계약과 관련하여 발생되는 법적 분쟁의 해결은 “갑” 소재지의 관할법원에 의한다.",
+              "codes": [],
+              "sourceFile": "3. 제안요청서(2027년 국립보건연구원 대표누리집 유지관리)-★.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제9조(관할) 본 계약과 관련하여 발생되는 법적 분쟁의 해결은 “갑” 소재지의 관할법원에 의한다. 제10조(기타사항) 기타 본 계약에 명시되지 아니한 사항에 대해서는 일반 상관례에 따른다.",
+              "codes": [],
+              "sourceFile": "3. 제안요청서(2027년 국립보건연구원 대표누리집 유지관리)-★.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "공동계약 및 구성방식: 공동이행 허용 / 하도급 허용",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "공동이행 허용 / 하도급 허용",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "공동이행 허용 / 하도급 허용 ○",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "입찰참가자격 증명서류 및 제안서는 사실대로 작성하여야 하며, 제안서 제출 후에라도 허위사실이 발견될 경우나 심사에 영향을 미치기 위해 불공정 행위를 한 때에는 낙찰 취소 등의 불이익을 받습니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "(2) 연구명 , 연구기간 등 연구사업 정보는 공고문에 기 제시한 내용의 임의 변경은 불가합니다 . (3) 입찰참가자격 증명서류 및 제안서는 사실대로 작성하여야 하며 , 제안서 제출 후 에라도 허위사실이 발견될 경",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 8 - 인정하지 않습니다 . (2) 연구명 , 연구기간 등 연구사업 정보는 공고문에 기 제시한 내용의 임의 변경은 불가합니다 . (3) 입찰참가자격 증명서류 및 제안서는 사실대로 작성하여야 하며 , 제안서 제출 후 에라도 허위사실이 발견될 경 우나 심사에 영향을 미치기 위해 불공정 행위를 한 때에는 낙찰 취소 등의 불이익을 받습니다 .",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "2) 입찰참가자격등록증상의 상호 및 대표자 ( 대표자가 다수인 경우 대표자 전원의 성명을 모두 등재 , 각자 대표도 해 당 ) 가 법인등기부등본상 ( 개인인 경우 사업자등록증 ) 의 상호 , 대표자와 다른 경우에는 입찰참가자격등록증을 변경 등록하고 입찰에 참여하여야 하며 , 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의하시기 바 랍니다 .( 공동수급 구성원 전원 해당 ) 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이며 마감일 ( 일시",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "*공동계약의 경우 아래 주관기관에서 세부기관의 ①,②,③ 서류 취합하여 제출 ① 나라장터에서 출력한 경쟁입찰참가자격등록증 1부",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "① 나라장터에서 출력한 경쟁입찰참가자격등록증 1부 ② 법인 등기부등본(개인사업자인 경우 사업자등록증) 1부",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "* 입찰무효사항인 ‘상호 또는 법인의 명칭’ 및 ‘대표자(수인의 대표자가 있는 경우에는 대표자 전원)의 성명’ 확인용 ③ 인감증명서 1부(나라장터 “경쟁입찰참가자격등록증”에 사용인감이 등록된 경우 제외)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "‘공공 소프트웨어사업 입찰참여 제한금액 : 없음’으로 확인)만 입찰참가 가능",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "템’ 및 ‘중소기업제품 공공구매 종합정보망’에서 확인이 가능한 입찰참가자격은 별도의 서류를 제출할 필요가 없습니다.(다만, 동 시스템에서 자료가 확인되지 않을 경우 입찰참가",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가 없습니다.(다만, 동 시스템에서 자료가 확인되지 않을 경우 입찰참가자격이 없습니다.)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "(공동계약) 공동수급체를 구성하여 입찰에 참가하는 경우 공동이행방식으로만 입찰참여가 가능하며 공동수급체 구성원은 각각 본 입찰에서 요구하는 입찰참가자격을 모두 갖추어야 합니다. 공동수급체 구성원은 대표사를 포함하여 5개사 이하 구성원별 계약참여 최소지분율은 10%이상으로 구성하여야 하며 , 공동수급체를 중복 결성하여 입찰에 참여할 수 없습니다. ※ 공동수급협정서 미제출시 세부사업에 타 기관이 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "공동수급체 구성원은 대표사를 포함하여 5개사 이하 구성원별 계약참여 최소지분율은 10%이상으로 구성하여야 하며 , 공동수급체를 중복 결성하여 입찰에 참여할 수 없습니다. ※ 공동수급협정서 미제출시 세부사업에 타 기관이 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "「국가를 당사자로 하는 계약에 관한 법률」 제27조의5 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "④ 입찰보증금 : 입찰보증금 지급각서 1부(주관기관만 제출)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "④ 입찰보증금 : 입찰보증금 지급각서 1부(주관기관만 제출) ⑤ 가격입찰서 1부(주관기관만제출)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "③ 인감증명서 1부(나라장터 “경쟁입찰참가자격등록증”에 사용인감이 등록된 경우 제외) ④ 입찰보증금 : 입찰보증금 지급각서 1부(주관기관만 제출)",
+              "codes": [],
+              "sourceFile": "공고문_[정보화] 2027년 국립보건연구원 대표누리집 유지관리.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01794822&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01795373:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+          "readable": true,
+          "sourceSha256": "e525e55aa85d82b791d6c51807a3b8c127fdf988a065ebacb9e722c05e633638",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 46
+        },
+        {
+          "name": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+          "readable": true,
+          "sourceSha256": "317decb67a96b751b63715c5019e5e9b8487052a27f948b3365a53deaaf3d89b",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 186
+        },
+        {
+          "name": "2. 제안요청서_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+          "readable": true,
+          "sourceSha256": "68e083c7b2252ebc1681bce7aaa5b1c1fbf27cb0b7e1930e24887a74a9e5f059",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 41
+        }
+      ],
+      "manifestSignature": "01eede7e2c888ad17fba95714e0dbfb19e6fd18ac0120e2b021dfc57fc9206ff",
+      "manifestCheckedAt": "2026-11-01T15:07:37.710425+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-01T15:06:41.222196+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "2. 제안요청서_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "④ 본 사업은 사업금액이 20억 미만인 사업으로서 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부 고시)에 의거 대기업 및 중견기업 소프트웨어 사업자는 본 입찰에 참여할 수 없으며,「소프트웨어 진흥법」제48조 제4항에 따라「독점규제 및 공정거래에 관한 법률」제14조에 따라 지정된 상호출자제한기업집단에 속하는 기업은 입찰에 참여할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자입찰서 제출 마감일 전일까지「소프트웨어 진흥법」제58조에 의한 소프트웨어사업자(업종코드:1468) 및 전자정부법 제58조에 의한 정보시스템 감리법인(업종코드 :6146)로 등록된 업체",
+              "codes": [
+                "1468",
+                "6146"
+              ],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당 업자로 입찰참가자격 제한을 받은 자는 제외 ③ 국가종합전자조달시스템(http://www.g2b.go.kr)에 입찰등록을 필한 업체 ④ 본 사업은 사업금액이 20억 미만인 사업으로서 「중소 소프트웨어사업자의 사업",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "⑥「중소기업기본법」제2조에 따른 소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업·소상공인확인서를 소지한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "업자(업종코드:1468) 및 전자정부법 제58조에 의한 정보시스템 감리법인(업종코드 :6146)로 등록된 업체 ⑥「중소기업기본법」제2조에 따른 소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업·소상공인확인서를 소지한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 소기업·소상공인확인서를 소지한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "⑦ 본원 「계약·구매업무규칙」제9조(입찰참가 제한) 제1항 내지 제4항의 입찰참가자격제한 등에 관한 사항 및 제4항에 해당하는 업체가 하수급으로 입찰 또는 승인을 요청하는 경우에는 참여를 불허하거나 하도급 계약을 승인하지 않을 수 있습니다.",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "⑨ 입찰에 참가하는 업체가 퇴직자등영입현황확인서 등의 허위서류를 제출하는 경우에는 입찰 무효 또는 계약을 해제·해지할 수 있습니다. 4. 공동수급 관련(제안요청서 참조 필수)",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 공동수급 관련(제안요청서 참조 필수)",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "❍ 단계별 감리일정 및 세부 감리절차 제시 ❍ 감리일정별 투입인력 및 투입공수 제시",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "❍ 감리일정별 투입인력 및 투입공수 제시",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "❍ 감리일정별 투입인력 및 투입공수 제시 ❍ 단계별 시정조치 확인에 투입되는 감리인력, 기간, 수행방법 등을 구체적으로 제시",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자입찰서 제출 마감일 전일까지「소프트웨어 진흥법」제58조에 의한 소프트웨어사업자(업종코드:1468) 및 전자정부법 제58조에 의한 정보시스템 감리법인(업종코드 :6146)로 등록된 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "참여 지원에 관한 지침」(과학기술정보통신부 고시)에 의거 대기업 및 중견기업 소프트웨어 사업자는 본 입찰에 참여할 수 없으며,「소프트웨어 진흥법」제48조 제4항에 따라「독점규제 및 공정거래에 관한 법률」제14조에 따라 지정된 상호출자 제한기업집단에 속하는 기업은 입찰에 참여할 수 없습니다. ⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제한기업집단에 속하는 기업은 입찰에 참여할 수 없습니다. ⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "① 낙찰자로 선정된 자는 입찰참가자격을 증명하는 서류를 구비하여 최종 낙찰일로",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "관한 법률 시행령」제76조의 규정에 의하여 입찰참가자격 제한조치를 하며, 낙찰을",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "://www.g2b.go.kr)에 입찰등록을 필한 업체이며, 미등록 업체는 입찰집행일 전일까지 국가종합전자조달시스템에 입찰참가 이용자 등록을 완료하여야 함",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당업자로 입찰참가자격 제한을 받은 자는 제외",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당업자로 입찰참가자격 제한을 받은 자는 제외",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당업자로 입찰참가자격 제한을 받은 자는 제외 ③ 국가종합전자조달시스템(http://www.g2b.go.kr)에 입찰등록을 필한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "3. 참가자격(제안요청서 참조 필수) ①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당업자로 입찰참가자격 제한을 받은 자는 제외",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "6. 입찰보증금(입찰보증보험증권)",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "6. 입찰보증금(입찰보증보험증권) ① (입찰보증금의 납부) 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상의 입찰보증금을 납부하여야 합니다.",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 대표업체는 협정서 승인여부를 확인 후 투찰하셔야 하며, 대표업체의 승인이 이루어지지 않은 상태에서 대표업체가 투찰을 했을 경우 입찰참가자격 미달 등으로 낙찰에서 제외될 수 있으니 유의하시기 바랍니다. 6. 입찰보증금(입찰보증보험증권)",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2026년 AI 사이버공격 대응 플랫폼 구축(1단계) 감리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01795373&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
     }
   },
-  "workflowRunId": "41285085946"
+  "workflowRunId": "41319501280"
 }
