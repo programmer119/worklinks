@@ -1,16 +1,122 @@
 {
   "schemaVersion": 1,
-  "generatedAt": null,
-  "sources": [],
-  "opportunities": [],
+  "generatedAt": "2026-11-01T23:43:46+09:00",
+  "sources": [
+    {
+      "name": "옥천군 공지",
+      "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=36&key=232",
+      "status": "ok",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "candidateLinks": 2,
+      "detailErrors": 0
+    },
+    {
+      "name": "옥천군 고시공고",
+      "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=40&key=236",
+      "status": "ok",
+      "discovered": 1,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "candidateLinks": 2,
+      "detailErrors": 0
+    },
+    {
+      "name": "청양군 공지·지원",
+      "url": "https://www.cheongyang.go.kr/kor.do",
+      "status": "partial",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "candidateLinks": 0,
+      "detailErrors": 0,
+      "note": "목록 정상 응답이나 상세공고 링크 0건: 게시판 형식/접근 차단 검토 필요"
+    },
+    {
+      "name": "봉화군 고시공고",
+      "url": "https://www.bonghwa.go.kr/portal/saeol/gosi/list.do?mid=0201030000&seCode=01",
+      "status": "partial",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "candidateLinks": 0,
+      "detailErrors": 0,
+      "note": "목록 정상 응답이나 상세공고 링크 0건: 게시판 형식/접근 차단 검토 필요"
+    },
+    {
+      "name": "무주군 소식",
+      "url": "https://www.muju.go.kr/index.9is",
+      "status": "partial",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "candidateLinks": 0,
+      "detailErrors": 0,
+      "note": "목록 정상 응답이나 상세공고 링크 0건: 게시판 형식/접근 차단 검토 필요"
+    },
+    {
+      "name": "의령군 새소식",
+      "url": "https://www.uiryeong.go.kr/",
+      "status": "error",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "error": "HTTPSConnectionPool(host='www.uiryeong.go.kr', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.uiryeong.go.kr', port=443) at 0"
+    },
+    {
+      "name": "단양군 소식",
+      "url": "https://www.danyang.go.kr/dy21/",
+      "status": "partial",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "기초지자체 원문",
+      "candidateLinks": 0,
+      "detailErrors": 0,
+      "note": "목록 정상 응답이나 상세공고 링크 0건: 게시판 형식/접근 차단 검토 필요"
+    },
+    {
+      "name": "기업마당 지역공고",
+      "url": "https://www.bizinfo.go.kr/",
+      "status": "partial",
+      "discovered": 0,
+      "checkedAt": "2026-11-01T23:43:46+09:00",
+      "level": "공식 통합 포털",
+      "candidateLinks": 1,
+      "detailErrors": 1
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "localbudget-aa7f46c19ddc9f9b8cd1",
+      "title": "귀농인의 집 11호 입주자 모집 재공고 새글",
+      "url": "https://www.oc.go.kr/www/selectBbsNttView.do?key=236&bbsNo=40&nttNo=195416&searchCtgry=&searchCnd=all&searchKrwd=&integrDeptCode=&pageIndex=1",
+      "monitorTrack": "yearEndLocalBudget",
+      "category": "general",
+      "source": "옥천군",
+      "sourceKind": "지자체 공식 게시판 직접 확인",
+      "deadline": "",
+      "period": "접수 마감일 미확인",
+      "support": "금전 혜택 미확인 · 현금 근거 미확인 · 추가/긴급/재모집 단서",
+      "money": "지급액·수익 여부 원문 확인",
+      "condition": "지역 자격 제한 가능 · 원문 확인 · 접수방식 확인 필요 · 신청자격 및 개인 수령액 검토 필요",
+      "eligibility": "uncertain",
+      "reviewGrade": "현금 근거 미확인",
+      "reviewScore": 2,
+      "benefitType": "금전 혜택 미확인",
+      "regionRestrictionHint": true,
+      "applicationOnlineHint": false,
+      "lastSeenAt": "2026-11-01T23:43:46+09:00",
+      "applied": false
+    }
+  ],
   "stats": {
     "sources": 8,
-    "successfulSources": 0,
-    "partialSources": 0,
-    "failedSources": 0,
-    "opportunities": 0,
+    "successfulSources": 2,
+    "partialSources": 5,
+    "failedSources": 1,
+    "opportunities": 1,
     "cashEvidence": 0
   },
-  "coverageNote": "초기 수집 대기. 현재 8개 경로로 시작하며 전국 시군구·읍면동 전수감시가 아닙니다.",
-  "status": "pending_first_crawl"
+  "coverageNote": "일부 기초지자체 시범 직접수집 및 기업마당 공고. 전국 226개 시군구 또는 전체 읍면동 전수수집은 아님."
 }
