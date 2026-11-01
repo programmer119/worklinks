@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": null,
+  "sources": [],
+  "opportunities": [],
+  "stats": {
+    "sources": 8,
+    "successfulSources": 0,
+    "partialSources": 0,
+    "failedSources": 0,
+    "opportunities": 0,
+    "cashEvidence": 0
+  },
+  "coverageNote": "초기 수집 대기. 현재 8개 경로로 시작하며 전국 시군구·읍면동 전수감시가 아닙니다.",
+  "status": "pending_first_crawl"
+}
