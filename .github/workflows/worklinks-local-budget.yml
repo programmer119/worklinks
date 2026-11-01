@@ -1,0 +1,48 @@
+name: WorkLinks year-end small municipality opportunities
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/worklinks_local_budget.py'
+      - 'tests/test_worklinks_local_budget.py'
+      - '.github/workflows/worklinks-local-budget.yml'
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-local-budget
+  cancel-in-progress: false
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
+      - name: Validate classifiers and deadline boundaries
+        run: python -m unittest discover -s tests -p 'test_worklinks_local_budget.py' -v
+      - name: Collect public municipal announcements
+        run: python scripts/worklinks_local_budget.py
+      - name: Publish without overwriting unrelated changes
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          cp startup-support/year-end-local-budget.json /tmp/year-end-local-budget.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/year-end-local-budget.json startup-support/year-end-local-budget.json
+            git add startup-support/year-end-local-budget.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: refresh small municipality cash opportunity monitor'
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 2
+          done
+          exit 1
