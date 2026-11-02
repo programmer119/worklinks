@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-02T08:38:01+09:00",
+  "generatedAt": "2026-11-02T15:10:15+09:00",
   "sources": [
     {
       "name": "옥천군 공지",
       "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=36&key=232",
       "status": "ok",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 2,
       "detailErrors": 0
@@ -17,7 +17,7 @@
       "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=40&key=236",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 2,
       "detailErrors": 0
@@ -27,7 +27,7 @@
       "url": "https://www.cheongyang.go.kr/kor.do",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -38,7 +38,7 @@
       "url": "https://www.bonghwa.go.kr/portal/saeol/gosi/list.do?mid=0201030000&seCode=01",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -49,7 +49,7 @@
       "url": "https://www.muju.go.kr/index.9is",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -60,7 +60,7 @@
       "url": "https://www.uiryeong.go.kr/",
       "status": "error",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "error": "HTTPSConnectionPool(host='www.uiryeong.go.kr', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.uiryeong.go.kr', port=443) at 0"
     },
@@ -69,7 +69,7 @@
       "url": "https://www.danyang.go.kr/dy21/",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -80,7 +80,7 @@
       "url": "https://www.bizinfo.go.kr/",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-02T08:38:01+09:00",
+      "checkedAt": "2026-11-02T15:10:15+09:00",
       "level": "공식 통합 포털",
       "candidateLinks": 1,
       "detailErrors": 1
@@ -89,7 +89,7 @@
   "opportunities": [
     {
       "id": "localbudget-aa7f46c19ddc9f9b8cd1",
-      "title": "귀농인의 집 11호 입주자 모집 재공고 새글",
+      "title": "귀농인의 집 11호 입주자 모집 재공고",
       "url": "https://www.oc.go.kr/www/selectBbsNttView.do?key=236&bbsNo=40&nttNo=195416&searchCtgry=&searchCnd=all&searchKrwd=&integrDeptCode=&pageIndex=1",
       "monitorTrack": "yearEndLocalBudget",
       "category": "general",
@@ -106,7 +106,7 @@
       "benefitType": "금전 혜택 미확인",
       "regionRestrictionHint": true,
       "applicationOnlineHint": false,
-      "lastSeenAt": "2026-11-02T08:38:01+09:00",
+      "lastSeenAt": "2026-11-02T15:10:15+09:00",
       "applied": false
     }
   ],
