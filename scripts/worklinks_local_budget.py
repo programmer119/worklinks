@@ -115,29 +115,48 @@ def amount_info(title, body):
     return kind, clean(m.group(0), 100) if m else "지급액·개별 수령조건 원문 확인"
 
 def deadline_from(body):
-    # A standalone publication date is not an application deadline.
-    # Support visible title ranges and common YYYY.MM.DD date windows.
-    date = r"(20\d{2})[.\-/년\s]+(\d{1,2})[.\-/월\s]+(\d{1,2})(?:일)?"
-    ranged = re.compile(r"(?:접수|신청|모집|응모|설문|조사|공모)\s*(?:기간|일정)[^0-9]{0,32}" + date +
-                        r"\s*(?:~|∼|～|부터|\-|–|—)\s*" + date, re.I)
-    explicit = re.compile(r"(?:접수|신청|모집|응모)?\s*(?:마감일|마감|종료일|신청기한)[^0-9]{0,20}" + date, re.I)
+    """Extract a grounded application/participation END date, not publication dates."""
+    # Supports 2026.11.26, 2026. 11. 26.(목), 2026년 11월 26일
+    # and a second date without its year, e.g. 2026.11.02~11.26.
+    full = r"(20\d{2})[.\-/년]\s*(\d{1,2})[.\-/월]\s*(\d{1,2})(?:일)?\.?"
+    short = r"(\d{1,2})[.\-/월]\s*(\d{1,2})(?:일)?\.?"
+    dayname = r"\s*(?:\([월화수목금토일]\))?\s*"
+    separator = r"(?:~|∼|～|부터|\-|–|—)"
+    prefix = r"(?:접수|신청|모집|응모|설문|조사|공모|참여|설문조사)\s*(?:기간|일정)(?:은|는)?[^0-9]{0,30}"
     dates = []
-    for pattern, offset in ((ranged, 4), (explicit, 1)):
-        for match in pattern.finditer(body):
-            values = match.groups()[offset-1:offset+2]
-            try:
-                dates.append(dt.date(*(int(x) for x in values)))
-            except ValueError:
-                pass
+    for match in re.finditer(prefix + full + dayname + separator + r"\s*" + full, body, re.I):
+        try:
+            dates.append(dt.date(*map(int, match.groups()[3:6])))
+        except ValueError:
+            pass
+    for match in re.finditer(prefix + full + dayname + separator + r"\s*" + short, body, re.I):
+        try:
+            year, m1, d1, m2, d2 = map(int, match.groups())
+            end_year = year + int(m2 < m1)
+            dates.append(dt.date(end_year, m2, d2))
+        except ValueError:
+            pass
+    explicit = re.compile(r"(?:접수|신청|모집|응모|설문)?\s*(?:마감일|마감|종료일|신청기한)[^0-9]{0,28}" + full, re.I)
+    for match in explicit.finditer(body):
+        try:
+            dates.append(dt.date(*map(int, match.groups())))
+        except ValueError:
+            pass
     if not dates:
-        # Only an unambiguous title/status range, not unrelated dates in prose.
-        title = body.split("\n", 1)[0][:260]
-        match = re.search(date + r"\s*(?:~|∼|～|부터|\-|–|—)\s*" + date, title)
-        if match:
-            try:
-                dates.append(dt.date(*(int(x) for x in match.groups()[3:6])))
-            except ValueError:
-                pass
+        # A literal year-bearing range in the notice TITLE is reliable; a
+        # date in the middle of an article without a label is not.
+        title = body.split("\n", 1)[0][:400]
+        for pattern, suffix_short in (
+            (re.compile(full + dayname + separator + r"\s*" + full), False),
+            (re.compile(full + dayname + separator + r"\s*" + short), True),
+        ):
+            for match in pattern.finditer(title):
+                try:
+                    g = tuple(map(int, match.groups()))
+                    dates.append(dt.date(g[0] + int(g[3] < g[1]), g[3], g[4])
+                                 if suffix_short else dt.date(*g[3:6]))
+                except ValueError:
+                    pass
     return max(dates).isoformat() if dates else None
 
 def assess(title, detail, municipality, url, now):
