@@ -44,6 +44,12 @@ class LocalBudgetTest(unittest.TestCase):
         row=assess('고령친화 헬스케어 실증지원 사업 모집', '예비창업자 지원사업 신청 2026.11.01~2026.11.24.', '서울', 'https://example.go.kr/notice/view?id=5', NOW)
         self.assertTrue(row['kimseRelevantHint'])
 
+    def test_weekday_marked_participation_deadline(self):
+        self.assertEqual(deadline_from('참여기간 : 2026년 7월 16일(목) ~ 2026년 7월 30일(목)'), '2026-07-30')
+        self.assertEqual(deadline_from('설문조사기간 2026.11.02 ~ 11.26'), '2026-11-26')
+    def test_old_survey_does_not_reappear(self):
+        result=assess('2026 독자 설문조사 이벤트', '전 국민 참여 가능, 상품권 1만원 추첨. 참여기간 2026.07.16.(목) ~ 2026.07.30.(목)', '서울', 'https://example.go.kr/notice/view?id=20', dt.datetime(2026,11,3,12,tzinfo=KST))
+        self.assertIsNone(result)
     def test_expired_range_in_title(self):
         self.assertEqual(deadline_from('2026년 공모전 2026-10-02 ~ 2026-11-02\\n공고 11월 발표'), '2026-11-02')
         x=assess('창업 사업화 바우처 모집 2026-10-02 ~ 2026-11-02', '예비창업자 지원금 100만원 신청', '충남', 'https://example.go.kr/view?id=1', dt.datetime(2026,11,3,12,tzinfo=KST))
