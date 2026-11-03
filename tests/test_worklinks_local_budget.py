@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))
-from worklinks_local_budget import assess, deadline_from, amount_info, KST, SOURCES, trusted_notice_url, extract_notice_candidates, strong_notice_title, WATCH_DETAILS, COMPETITION_EVIDENCE
+from worklinks_local_budget import assess, deadline_from, amount_info, KST, SOURCES, trusted_notice_url, extract_notice_candidates, strong_notice_title, WATCH_DETAILS, COMPETITION_EVIDENCE, primary_notice_text
 from bs4 import BeautifulSoup
 
 NOW = dt.datetime(2026,11,1,12,0,tzinfo=KST)
@@ -44,6 +44,20 @@ class LocalBudgetTest(unittest.TestCase):
         row=assess('고령친화 헬스케어 실증지원 사업 모집', '예비창업자 지원사업 신청 2026.11.01~2026.11.24.', '서울', 'https://example.go.kr/notice/view?id=5', NOW)
         self.assertTrue(row['kimseRelevantHint'])
 
+
+    def test_bizinfo_observed_id(self):
+        html = '<a href="javascript:void(0)" onclick="goBiz(\\'PBLN_000000000127529\\')">2026년 지원금 바우처 사업화 지원 공고</a>'
+        soup=BeautifulSoup(html, 'html.parser')
+        c, broken=extract_notice_candidates(soup, 'https://www.bizinfo.go.kr/sii/siia/selectSIIA200View.do', 'national')
+        self.assertEqual(len(c), 1)
+        self.assertIn('pblancId=PBLN_000000000127529', next(iter(c)))
+    def test_epeople_related_notice_cannot_extend_expiry(self):
+        soup=BeautifulSoup('<main><div>2026년 4월 이벤트 참여기간: 2026.05.21 ~ 2026.05.26 투표종료</div><div>연관생각</div><div>진행중 2026.11.01 ~ 2026.11.06</div></main>', 'html.parser')
+        main=primary_notice_text(soup, 'participation')
+        self.assertNotIn('2026.11.06', main)
+        self.assertEqual(deadline_from('2026년 4월 이벤트\\n'+main), '2026-05-26')
+    def test_merchant_notice_is_not_award(self):
+        self.assertIsNone(assess('청양사랑상품권 가맹점', '상품권 가맹점 사용내역 공개 안내', '청양군', 'https://example.go.kr/notice/view?id=50', NOW))
     def test_weekday_marked_participation_deadline(self):
         self.assertEqual(deadline_from('참여기간 : 2026년 7월 16일(목) ~ 2026년 7월 30일(목)'), '2026-07-30')
         self.assertEqual(deadline_from('설문조사기간 2026.11.02 ~ 11.26'), '2026-11-26')
