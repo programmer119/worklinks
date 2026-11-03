@@ -6,6 +6,9 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))
 from worklinks_local_budget import assess, deadline_from, amount_info, KST, SOURCES, trusted_notice_url, extract_notice_candidates, strong_notice_title, WATCH_DETAILS, COMPETITION_EVIDENCE, primary_notice_text
 from bs4 import BeautifulSoup
+from unittest.mock import patch
+import requests
+from worklinks_local_budget import scan_source, OFFICIAL_SOURCE_FALLBACKS
 
 NOW = dt.datetime(2026,11,1,12,0,tzinfo=KST)
 
@@ -86,6 +89,34 @@ class LocalBudgetTest(unittest.TestCase):
     def test_skip_generic_navigation(self):
         self.assertFalse(strong_notice_title('지원사업'))
         self.assertTrue(strong_notice_title('2026 독자 설문조사 이벤트'))
+    def test_municipality_fallback_on_timeout(self):
+        primary = 'https://m.yd21.go.kr/kr/html/sub02/020103.html?mode=L'
+        official_mirror = OFFICIAL_SOURCE_FALLBACKS['영동군 고시공고'][0]
+        calls=[]
+        def fake_fetch(session, url):
+            calls.append(url)
+            if url == primary:
+                raise requests.exceptions.ConnectTimeout('primary blocked by remote network')
+            return BeautifulSoup('<html><body><a href="/kr/html/sub02/020103.html?mode=V&no=123">2026년도 창업지원금 모집 공고</a></body></html>', 'html.parser')
+        with patch('worklinks_local_budget.fetch_soup', side_effect=fake_fetch):
+            rows,state=scan_source(('영동군 고시공고',primary,'영동군','local'),object(),NOW)
+        self.assertTrue(state['officialMirrorUsed'])
+        self.assertEqual(state['sourceUrlUsed'], official_mirror)
+        self.assertEqual(state['connectionAttempts'][0]['cause'], 'timeout')
+        self.assertIn(primary,calls)
+        self.assertIn(official_mirror,calls)
+    def test_municipality_all_hosts_fail_stays_error(self):
+        primary = 'https://www.uiryeong.go.kr/board/list.uiryeong?boardId=BBS_0000070'
+        with patch('worklinks_local_budget.fetch_soup', side_effect=requests.exceptions.ConnectTimeout('connect timeout')):
+            rows,state=scan_source(('의령군 고시공고',primary,'의령군','local'),object(),NOW)
+        self.assertEqual(state['status'], 'error')
+        self.assertEqual(len(rows),0)
+        self.assertEqual(len(state['connectionAttempts']), 1+len(OFFICIAL_SOURCE_FALLBACKS['의령군 고시공고']))
+    def test_mois_survey_watched(self):
+        self.assertIn('행안부 2만원 국민 아이디어 설문', WATCH_DETAILS)
+        x=assess('2027년 비영리민간단체 국민 설문조사', '시행기관 행정안전부. 대상 일반국민, 설문조사 참여자 20명 추첨하여 상품권 2만원 지급. 설문기간 2026.10.21 ~ 2026.11.11.', '행정안전부', 'https://daejeon.go.kr/drh/minwonFormView.do?x=1', NOW)
+        self.assertIsNotNone(x)
+        self.assertEqual(x['quickWinTier'], 'cash_candidate')
     def test_verified_watchlist_exists(self):
         self.assertIn('서울 IP디딤돌 재개 확인', WATCH_DETAILS)
         self.assertTrue(any(spec[3]=='participation' for spec in SOURCES))
