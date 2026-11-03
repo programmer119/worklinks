@@ -40,6 +40,7 @@ test('declared exact time closes but date-only lasts through its day',()=>{
   assert.equal(Q.deadlineState(x({deadline:'2026-11-04'}),NOW),'active');
   assert.equal(Q.deadlineState(x({deadline:'2026-11-03T23:59:00+09:00'}),NOW),'expired');
   assert.equal(Q.deadlineState(x({deadline:'미확인'}),NOW),'unverified');
+  assert.equal(Q.deadlineState(x({deadline:'2026-13-40'}),NOW),'unverified');
 });
 test('no deadline is not mistaken for an open announcement',()=>{
   const unk=x({deadline:'',id:'unknown'});
