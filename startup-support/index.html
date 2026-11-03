@@ -3348,14 +3348,23 @@ async function loadLocalBudgetDiscoveries(){
   if(!data||!Array.isArray(data.opportunities)||!data.stats)throw Error('invalid snapshot');
   if(data.status==='pending_first_crawl'){localBudgetSourceState='첫 공식 지자체 수집 실행 대기 · 기존 공고만 표시';if(typeof draw==='function')draw();return;}
   var seen=new Set(items.map(function(x){return String(x.url||'').split('#')[0].trim().toLowerCase()}));
-  var added=0;
+  var added=0,unregistered=[],cashCandidates=0,kimseCandidates=0;
   data.opportunities.forEach(function(x){
    if(!x||x.monitorTrack!=='yearEndLocalBudget'||!/^https:\/\//.test(String(x.url||'')))return;
    var key=String(x.url).split('#')[0].trim().toLowerCase();
    if(seen.has(key)||!x.id||!x.title)return;
    seen.add(key);items.push(x);if(saved[x.id]===undefined)saved[x.id]=false;added++;
+   unregistered.push(x.title);
+   if(x.quickWinTier==='cash_candidate')cashCandidates++;
+   if(x.kimseRelevantHint)kimseCandidates++;
   });
-  localBudgetSourceState='군 단위 공식공고 '+added+'건 추가 · 정상 '+data.stats.successfulSources+'곳 / 부분 '+data.stats.partialSources+'곳 / 실패 '+data.stats.failedSources+'곳 · 전수감시 아님';
+  // Dynamic candidates remain identifiable as discoveries, not
+  // an assertion of confirmed eligibility or a permanent curated entry.
+  window.worklinksLocalBudgetUnregistered=unregistered;
+  window.worklinksLocalBudgetUnregisteredCount=added;
+  localBudgetSourceState='공식 수집 '+data.stats.sources+'곳 · 정상 '+data.stats.successfulSources+' / 부분 '+data.stats.partialSources+' / 실패 '+data.stats.failedSources+
+    ' · 기존 목록에 없는 발견 '+added+'건(현금성 검토 '+cashCandidates+' / 낌새 '+kimseCandidates+')'+
+    ' · 상세링크 미해결 '+(data.stats.unresolvedLinks||0)+'건 · 전수감시 아님';
   if(typeof draw==='function')draw();
  }catch(err){
   localBudgetSourceState='지자체 수집 결과 미확인 ('+String(err.message||err)+') · 기존 공고만 표시';
