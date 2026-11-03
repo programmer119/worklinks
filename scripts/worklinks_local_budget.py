@@ -48,7 +48,7 @@ SOURCES = (
     ("서울 IP디딤돌 재개 확인", "https://www.ipseoul.kr/Pages/NotificationCenter/NC_DetailView.aspx?category=100000000&guid=c70405df-0d2c-f111-b404-d4f5ef4a1e33", "서울지식재산센터", "watch_detail"),
     ("국세청 1만원 독자 설문", "https://nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2210&nttSn=1355712", "국세청", "watch_detail"),
     ("경기신보 정책 아이디어 공모", "https://www.gg.go.kr/gongmo/bbs/boardView.do?bIdx=110906321&bsIdx=923&menuId=4433", "경기도", "watch_detail"),
-    ("기업마당 지역공고", "https://www.bizinfo.go.kr/", "전국 지역공고", "national"),
+    ("기업마당 지역공고", "https://www.bizinfo.go.kr/sii/siia/selectSIIA200View.do", "전국 지역공고", "national"),
 )
 # Explicit, previously verified official detail pages. These are watched for
 # changes, NOT counted as comprehensive list-page discovery.
@@ -295,13 +295,26 @@ def extract_notice_candidates(soup, source_url, kind):
             if not m:
                 m = re.search(r"""['"]((?:https://|/)[^'"]*(?:view|detail|bbs|notice|ntt|gosi|idx|sn|seq)[^'"]*)['"]""", onclick, re.I)
             raw = m.group(1) if m else ""
+        if kind == "national" and "bizinfo.go.kr" in source_url:
+            # Official Bizinfo listing exposes PBLN ids on some JS onclick
+            # elements. Construct ONLY the documented official detail route
+            # from an observed ID, never a guessed notice number.
+            observed = re.search(r"PBLN_\d{9,}", " ".join([
+                str(raw), str(anchor.get("onclick", "")),
+                str(anchor.get("data-pblanc-id", "")),
+                str(anchor.parent.get("onclick", "") if anchor.parent else ""),
+            ]))
+            if observed:
+                raw = "/sii/siia/selectSIIA200Detail.do?pblancId=" + observed.group(0)
         url = trusted_notice_url(raw, source_url, kind)
         if not url:
             # Do not count "startups" navigation links as missing notices.
             if re.search(r"20\d{2}|재모집|선착순|상품권|바우처|추가\s*접수|설문\s*이벤트", title):
                 unresolved += 1
             continue
-        candidates[normalized_url(url)] = (url, title)
+        row = anchor.find_parent("tr")
+        listing_text = clean(row.get_text(" ", strip=True), 600) if row else ""
+        candidates[normalized_url(url)] = (url, title, listing_text)
     return candidates, unresolved
 
 def watched_detail(spec, session, now):
@@ -346,11 +359,11 @@ def scan_source(spec, session, now):
         soup = fetch_soup(session, source_url)
         candidates, unresolved = extract_notice_candidates(soup, source_url, kind)
         rows, errors, stale = [], 0, 0
-        for url, title in list(candidates.values())[:45]:
+        for url, title, listing_text in list(candidates.values())[:45]:
             try:
                 doc = fetch_soup(session, url)
                 area = doc.select_one("article") or doc.select_one("main") or doc.select_one("#contents") or doc
-                body = area.get_text(" ", strip=True)
+                body = (listing_text + "\n" + area.get_text(" ", strip=True)).strip()
                 first = re.sub(r"\s+", "", title)[:13]
                 if first and first not in re.sub(r"\s+", "", body):
                     errors += 1
