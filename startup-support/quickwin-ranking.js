@@ -17,7 +17,8 @@
    var v=str(value),m=v.match(/^(20\d{2})[.\/-](\d{1,2})[.\/-](\d{1,2})/);
    if(!m)return null;
    var day=m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
-   if(new Date(day+"T00:00:00Z").toISOString().slice(0,10)!==day)return null;
+   var parsed=Date.parse(day+"T00:00:00Z");
+   if(!Number.isFinite(parsed)||new Date(parsed).toISOString().slice(0,10)!==day)return null;
    return day;
  }
  function deadlineState(x,now){
