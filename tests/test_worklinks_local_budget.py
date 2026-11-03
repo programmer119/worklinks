@@ -46,7 +46,7 @@ class LocalBudgetTest(unittest.TestCase):
 
 
     def test_bizinfo_observed_id(self):
-        html = '<a href="javascript:void(0)" onclick="goBiz(\\'PBLN_000000000127529\\')">2026년 지원금 바우처 사업화 지원 공고</a>'
+        html = """<a href="javascript:void(0)" onclick="goBiz('PBLN_000000000127529')">2026년 지원금 바우처 사업화 지원 공고</a>"""
         soup=BeautifulSoup(html, 'html.parser')
         c, broken=extract_notice_candidates(soup, 'https://www.bizinfo.go.kr/sii/siia/selectSIIA200View.do', 'national')
         self.assertEqual(len(c), 1)
