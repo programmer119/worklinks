@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-03T13:34:14+09:00",
+  "generatedAt": "2026-11-03T13:36:34+09:00",
   "sources": [
     {
       "name": "옥천군 공지",
       "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=36&key=232",
       "status": "partial",
       "discovered": 1,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 2,
       "detailErrors": 0,
@@ -18,7 +18,7 @@
       "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=40&key=236",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 1,
       "detailErrors": 0,
@@ -29,7 +29,7 @@
       "url": "https://www.cheongyang.go.kr/kor.do",
       "status": "partial",
       "discovered": 1,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 1,
       "detailErrors": 0,
@@ -40,7 +40,7 @@
       "url": "https://www.bonghwa.go.kr/portal/saeol/gosi/list.do?mid=0201030000&seCode=01",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -52,7 +52,7 @@
       "url": "https://www.muju.go.kr/index.9is",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -64,7 +64,7 @@
       "url": "https://www.uiryeong.go.kr/index.do",
       "status": "error",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "error": "HTTPSConnectionPool(host='www.uiryeong.go.kr', port=443): Max retries exceeded with url: /index.do (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.uiryeong.go.kr', port=4"
     },
@@ -73,7 +73,7 @@
       "url": "https://www.danyang.go.kr/dy21/980",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -85,7 +85,7 @@
       "url": "https://www.yd21.go.kr/kr/html/sub02/020103.html?mode=L",
       "status": "error",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "기초지자체 원문",
       "error": "HTTPSConnectionPool(host='www.yd21.go.kr', port=443): Max retries exceeded with url: /kr/html/sub02/020103.html?mode=L (Caused by SSLError(SSLError(1, '[SSL: SSLV3_ALERT_HANDSHAKE_"
     },
@@ -94,7 +94,7 @@
       "url": "https://www.technopark.or.kr/www/linkBoard/list.do?mid=1012&type=P",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "전국 TP 공식 연결목록",
       "candidateLinks": 4,
       "detailErrors": 3,
@@ -105,7 +105,7 @@
       "url": "https://gjtp.or.kr/home/business.cs",
       "status": "partial",
       "discovered": 1,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "지역 산하기관 공식",
       "candidateLinks": 10,
       "detailErrors": 0,
@@ -116,16 +116,16 @@
       "url": "https://ptp.or.kr/",
       "status": "error",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "지역 산하기관 공식",
-      "error": "HTTPSConnectionPool(host='ptp.or.kr', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='ptp.or.kr', port=443) at 0x73fd27e0b530>, 'C"
+      "error": "HTTPSConnectionPool(host='ptp.or.kr', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='ptp.or.kr', port=443) at 0x76c040293170>, 'C"
     },
     {
       "name": "충남테크노파크",
       "url": "https://www.ctp.or.kr/",
       "status": "partial",
       "discovered": 4,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "지역 산하기관 공식",
       "candidateLinks": 15,
       "detailErrors": 0,
@@ -136,7 +136,7 @@
       "url": "https://www.gtp.or.kr/",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "지역 산하기관 공식",
       "candidateLinks": 0,
       "detailErrors": 0,
@@ -148,7 +148,7 @@
       "url": "https://www.btp.or.kr/kor/Main.do",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "지역 산하기관 공식",
       "candidateLinks": 4,
       "detailErrors": 2,
@@ -159,7 +159,7 @@
       "url": "https://www.bizinfo.go.kr/",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-03T13:34:14+09:00",
+      "checkedAt": "2026-11-03T13:36:34+09:00",
       "level": "공식 통합 포털",
       "candidateLinks": 2,
       "detailErrors": 2,
@@ -190,7 +190,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": false,
       "quickWinTier": "cash_candidate",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     },
     {
@@ -216,7 +216,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": true,
       "quickWinTier": "kimse_candidate",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     },
     {
@@ -242,7 +242,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": true,
       "quickWinTier": "kimse_candidate",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     },
     {
@@ -268,7 +268,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": false,
       "quickWinTier": "regional_or_unverified",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     },
     {
@@ -294,7 +294,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": false,
       "quickWinTier": "regional_or_unverified",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     },
     {
@@ -320,7 +320,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": false,
       "quickWinTier": "regional_or_unverified",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     },
     {
@@ -346,7 +346,7 @@
       "businessRequiredHint": false,
       "kimseRelevantHint": false,
       "quickWinTier": "regional_or_unverified",
-      "lastSeenAt": "2026-11-03T13:34:14+09:00",
+      "lastSeenAt": "2026-11-03T13:36:34+09:00",
       "applied": false
     }
   ],
