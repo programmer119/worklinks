@@ -31,9 +31,9 @@ SOURCES = (
     ("청양군 군정소식", "https://www.cheongyang.go.kr/kor.do", "청양군", "local"),
     ("봉화군 고시공고", "https://www.bonghwa.go.kr/portal/saeol/gosi/list.do?mid=0201030000&seCode=01", "봉화군", "local"),
     ("무주군 소식", "https://www.muju.go.kr/index.9is", "무주군", "local"),
-    ("의령군 고시공고", "https://www.uiryeong.go.kr/index.do", "의령군", "local"),
+    ("의령군 고시공고", "https://www.uiryeong.go.kr/board/list.uiryeong?boardId=BBS_0000070&menuCd=DOM_000000203003001001&paging=ok&startPage=1", "의령군", "local"),
     ("단양군 타기관 고시공고", "https://www.danyang.go.kr/dy21/980", "단양군", "local"),
-    ("영동군 고시공고", "https://www.yd21.go.kr/kr/html/sub02/020103.html?mode=L", "영동군", "local"),
+    ("영동군 고시공고", "https://m.yd21.go.kr/kr/html/sub02/020103.html?mode=L", "영동군", "local"),
     ("전국 테크노파크 사업공고 통합", "https://www.technopark.or.kr/www/linkBoard/list.do?mid=1012&type=P", "전국 19개 테크노파크", "tp_hub"),
     ("광주테크노파크 사업공고", "https://gjtp.or.kr/home/business.cs", "광주테크노파크", "agency"),
     ("포항테크노파크", "https://ptp.or.kr/", "포항테크노파크", "agency"),
@@ -50,6 +50,19 @@ SOURCES = (
     ("경기신보 정책 아이디어 공모", "https://www.gg.go.kr/gongmo/bbs/boardView.do?bIdx=110906321&bsIdx=923&menuId=4433", "경기도", "watch_detail"),
     ("기업마당 지역공고", "https://www.bizinfo.go.kr/sii/siia/selectSIIA200View.do", "전국 지역공고", "national"),
 )
+# Only real, independently verified municipal domains may be tried as
+# alternate public read endpoints when GitHub runner connections time out.
+# A failed alternate remains an error; no fabricated successful scan.
+OFFICIAL_SOURCE_FALLBACKS = {
+    "의령군 고시공고": (
+        "https://www.uiryeong.go.kr/index.uiryeong?menuCd=DOM_000000203003001001",
+        "https://uiryeong.go.kr/board/list.do?boardId=BBS_0000070&menuCd=DOM_000000203003001001&paging=ok&startPage=1",
+    ),
+    "영동군 고시공고": (
+        "https://www.yd21.go.kr/kr/html/sub02/020103.html?mode=L",
+        "https://edu.yd21.go.kr/kr/html/sub02/020103.html?mode=L",
+    ),
+}
 # Explicit, previously verified official detail pages. These are watched for
 # changes, NOT counted as comprehensive list-page discovery.
 WATCH_DETAILS = {
@@ -365,8 +378,30 @@ def scan_source(spec, session, now):
              "checkedAt": now.isoformat(timespec="seconds"), "level": level,
              "watchMode": False}
     try:
-        soup = fetch_soup(session, source_url)
-        candidates, unresolved = extract_notice_candidates(soup, source_url, kind)
+        # Try known official mirror domains on connection failures, with
+        # explicit per-host diagnostics. Do not interpret timeouts as 0 notices.
+        attempts = []
+        soup = None
+        active_url = source_url
+        for candidate_url in (source_url, *OFFICIAL_SOURCE_FALLBACKS.get(name, ())):
+            try:
+                soup = fetch_soup(session, candidate_url)
+                active_url = candidate_url
+                break
+            except (requests.RequestException, ValueError, AttributeError) as origin_exc:
+                cause = ("timeout" if isinstance(origin_exc, requests.exceptions.Timeout)
+                         else "dns" if "NameResolutionError" in str(origin_exc)
+                         else "tls" if isinstance(origin_exc, requests.exceptions.SSLError)
+                         else "http" if isinstance(origin_exc, requests.exceptions.HTTPError)
+                         else "other")
+                attempts.append({"url": candidate_url, "cause": cause, "error": clean(str(origin_exc), 140)})
+        state["connectionAttempts"] = attempts
+        state["officialMirrorUsed"] = active_url != source_url if soup is not None else False
+        if soup is None:
+            state["error"] = "모든 공식 주소 접속 실패: " + ", ".join(a["cause"] for a in attempts)
+            return [], state
+        state["sourceUrlUsed"] = active_url
+        candidates, unresolved = extract_notice_candidates(soup, active_url, kind)
         rows, errors, stale = [], 0, 0
         for url, title, listing_text in list(candidates.values())[:45]:
             try:
