@@ -45,8 +45,18 @@ SOURCES = (
     ("국민생각함 기상청", "https://www.epeople.go.kr/idea/kma/ideajoin.npaid", "기상청", "participation"),
     ("국민생각함 제주교육청", "https://www.epeople.go.kr/idea/jjethink/ideajoin.npaid?pageIndex=1", "제주교육청", "participation"),
     ("대전시소 시민제안", "https://www.daejeon.go.kr/seesaw/djaskList.do", "대전광역시", "participation"),
+    ("서울 IP디딤돌 재개 확인", "https://www.ipseoul.kr/Pages/NotificationCenter/NC_DetailView.aspx?category=100000000&guid=c70405df-0d2c-f111-b404-d4f5ef4a1e33", "서울지식재산센터", "watch_detail"),
+    ("국세청 1만원 독자 설문", "https://nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2210&nttSn=1355712", "국세청", "watch_detail"),
+    ("경기신보 정책 아이디어 공모", "https://www.gg.go.kr/gongmo/bbs/boardView.do?bIdx=110906321&bsIdx=923&menuId=4433", "경기도", "watch_detail"),
     ("기업마당 지역공고", "https://www.bizinfo.go.kr/", "전국 지역공고", "national"),
 )
+# Explicit, previously verified official detail pages. These are watched for
+# changes, NOT counted as comprehensive list-page discovery.
+WATCH_DETAILS = {
+    "서울 IP디딤돌 재개 확인": ("2026년 서울 IP디딤돌 특허출원 실비지원", ""),
+    "국세청 1만원 독자 설문": ("2026년 국세청 국세 독자 설문조사 상품권 이벤트", "2026-11-26"),
+    "경기신보 정책 아이디어 공모": ("모두의 소통 소상공인 성장 재도약 정책 아이디어 공모전", "2026-11-16"),
+}
 # Only the official TP domains shown in the TP association directory are
 # permitted as cross-host detail targets. This is not exhaustive coverage.
 TRUSTED_TP_DOMAINS = frozenset((
@@ -159,7 +169,7 @@ def assess(title, detail, municipality, url, now):
         return None
     region = bool(REGION_LIMIT.search(body))
     everyone = bool(OPEN_TO_ALL.search(body))
-    applicant = bool(APPLICANT.search(body) or everyone)
+    applicant = bool(APPLICANT.search(joined) or everyone)
     business_only = bool(BUSINESS_ONLY.search(body))
     online = bool(ONLINE.search(body))
     in_person = bool(IN_PERSON.search(body))
@@ -240,57 +250,118 @@ def trusted_notice_url(raw, source_url, kind):
             return None
     return url
 
+def strong_notice_title(title):
+    """Ignore navigation labels but retain small local prizes and survey rewards."""
+    if len(title) < 9 or NEGATIVE.search(title) or not POSITIVE.search(title):
+        return False
+    if re.fullmatch(r"(?:지원사업|참여신청|공모전|설문조사|시민참여|고시공고|공지사항|사업공고|더보기|전체보기|바로가기|지원안내|기업지원|수시모집)", title):
+        return False
+    return bool(
+        re.search(r"20\d{2}|공고|모집|신청|접수|참여|공모전|제안|경품|설문|상품권|포상|바우처|지원|무료|감면|할인|안심존|마감|재개", title, re.I)
+    )
+
 def extract_notice_candidates(soup, source_url, kind):
     candidates, unresolved = {}, 0
     for anchor in soup.select("a"):
-        title = clean(anchor.get_text(" ", strip=True) or anchor.get("title", ""), 190)
-        if len(title) < 9 or not POSITIVE.search(title) or NEGATIVE.search(title):
+        title = clean(anchor.get("data-title") or anchor.get("title") or
+                      anchor.get_text(" ", strip=True) or anchor.get("aria-label"), 190)
+        if not strong_notice_title(title):
             continue
         raw = anchor.get("data-href") or anchor.get("data-url") or anchor.get("href", "")
         if not raw or raw.lower().startswith(("javascript:", "#")):
-            # Recover only literal URLs from supported JS navigation.
+            # Only follow an explicit literal URL, never a guessed URL from
+            # opaque function arguments or untrusted third-party hosts.
             onclick = anchor.get("onclick", "")
-            m = re.search(r"""(?:location\.href\s*=|location\.(?:assign|replace)\()\s*['"]([^'"]+)['"]""", onclick)
+            m = re.search(r"""(?:location\.href\s*=|location\.(?:assign|replace)\(|window\.open\()\s*['"]([^'"]+)['"]""", onclick)
+            if not m:
+                m = re.search(r"""['"]((?:https://|/)[^'"]*(?:view|detail|bbs|notice|ntt|gosi|idx|sn|seq)[^'"]*)['"]""", onclick, re.I)
             raw = m.group(1) if m else ""
         url = trusted_notice_url(raw, source_url, kind)
         if not url:
-            unresolved += 1
+            # Do not count "startups" navigation links as missing notices.
+            if re.search(r"20\d{2}|재모집|선착순|상품권|바우처|추가\s*접수|설문\s*이벤트", title):
+                unresolved += 1
             continue
         candidates[normalized_url(url)] = (url, title)
     return candidates, unresolved
 
+def watched_detail(spec, session, now):
+    name, source_url, municipality, kind = spec
+    state = {"name": name, "url": source_url, "status": "error",
+             "discovered": 0, "checkedAt": now.isoformat(timespec="seconds"),
+             "level": "공식 개별혜택 변경감시 · 수집망 전수 포함 안 됨",
+             "watchMode": True}
+    try:
+        doc = fetch_soup(session, source_url)
+        area = doc.select_one("article") or doc.select_one("main") or doc.select_one("#contents") or doc
+        body = area.get_text(" ", strip=True)
+        title, verified_deadline = WATCH_DETAILS[name]
+        item = assess(title, body, municipality, source_url, now)
+        if item and verified_deadline and not item["deadline"]:
+            item["deadline"] = verified_deadline
+            item["period"] = "공식 공고 확인 마감 " + verified_deadline
+        if item and item["deadline"] and item["deadline"] < now.date().isoformat():
+            item = None
+        if item:
+            item["sourceKind"] = "공식 공고 상세 상태 감시"
+        state.update({"status": "ok", "discovered": int(item is not None),
+                      "candidateLinks": 1, "detailErrors": 0, "unresolvedLinks": 0,
+                      "note": "수집처 정상은 상세 1건 확인 의미, 목록 전체 탐색 아님"})
+        return [item] if item else [], state
+    except (requests.RequestException, ValueError, AttributeError, KeyError) as exc:
+        state["error"] = clean(str(exc), 180)
+        return [], state
+
 def scan_source(spec, session, now):
     name, source_url, municipality, kind = spec
-    level = "전국 TP 공식 연결목록" if kind == "tp_hub" else "지역 산하기관 공식" if kind == "agency" else "공식 통합 포털" if kind == "national" else "기초지자체 원문"
-    state = {"name": name, "url": source_url, "status": "error", "discovered": 0, "checkedAt": now.isoformat(timespec="seconds"), "level": level}
+    if kind == "watch_detail":
+        return watched_detail(spec, session, now)
+    level = ("전국 TP 공식 연결목록" if kind == "tp_hub" else
+             "지역 산하기관 공식" if kind == "agency" else
+             "공공 시민참여·상품권 게시판" if kind == "participation" else
+             "공식 통합 포털" if kind == "national" else "기초지자체 원문")
+    state = {"name": name, "url": source_url, "status": "error", "discovered": 0,
+             "checkedAt": now.isoformat(timespec="seconds"), "level": level,
+             "watchMode": False}
     try:
         soup = fetch_soup(session, source_url)
         candidates, unresolved = extract_notice_candidates(soup, source_url, kind)
-        rows, errors = [], 0
-        for url, title in list(candidates.values())[:35]:
+        rows, errors, stale = [], 0, 0
+        for url, title in list(candidates.values())[:45]:
             try:
                 doc = fetch_soup(session, url)
                 area = doc.select_one("article") or doc.select_one("main") or doc.select_one("#contents") or doc
                 body = area.get_text(" ", strip=True)
-                first = re.sub(r"\s+", "", title)[:14]
+                first = re.sub(r"\s+", "", title)[:13]
                 if first and first not in re.sub(r"\s+", "", body):
                     errors += 1
+                    continue
+                deadline = deadline_from(title + "\n" + body)
+                if deadline and deadline < now.date().isoformat():
+                    stale += 1
                     continue
                 row = assess(title, body, municipality, url, now)
                 if row:
                     row["sourceKind"] = (
                         "전국 TP 공식 연결목록 · 지역 TP 원문 확인" if kind == "tp_hub"
                         else "지역 산하기관 공식 사업공고" if kind == "agency"
+                        else "공식 공공참여 공모·설문 게시판" if kind == "participation"
                         else "지자체 공식 게시판 직접 확인" if kind == "local"
                         else "기업마당 공식 재게시 · 원 발행기관 확인 필요")
                     rows.append(row)
             except (requests.RequestException, ValueError, AttributeError):
                 errors += 1
+        # Separate "HTML loaded" from successful notice extraction.
+        # Empty/malformed listing must never be reported as a successful scan.
         state.update({"status": "partial" if errors or unresolved or not candidates else "ok",
                       "discovered": len(rows), "candidateLinks": len(candidates),
-                      "detailErrors": errors, "unresolvedLinks": unresolved})
+                      "detailErrors": errors, "unresolvedLinks": unresolved,
+                      "staleDropped": stale, "candidateLimitReached": len(candidates) > 45})
         if not candidates:
             state["note"] = "상세 공고 추출 0건 · 공식 게시판 형식 확인 필요"
+        if len(candidates) > 45:
+            state["status"] = "partial"
+            state["note"] = "상세 공고 최대 45건 제한 · 이전 페이지 탐색 누락 가능"
         return rows, state
     except (requests.RequestException, ValueError, AttributeError) as exc:
         state["error"] = clean(str(exc), 180)
@@ -314,6 +385,10 @@ def collect(now=None, session=None):
                       "failedSources": sum(s["status"] == "error" for s in statuses),
                       "opportunities": len(values),
                       "unresolvedLinks": sum(s.get("unresolvedLinks", 0) for s in statuses),
+                      "staleDropped": sum(s.get("staleDropped", 0) for s in statuses),
+                      "healthyListingSources": sum(s["status"] == "ok" and not s.get("watchMode") for s in statuses),
+                      "healthyWatchedDetails": sum(s["status"] == "ok" and s.get("watchMode") for s in statuses),
+                      "suspendedCandidates": sum(r.get("suspendedHint") for r in values),
                       "cashEvidence": sum(r["benefitType"] != "금전 혜택 미확인" for r in values),
                       "quickWinCandidates": sum(r.get("quickWinTier") == "cash_candidate" for r in values),
                       "kimseCandidates": sum(r.get("kimseRelevantHint") for r in values)},
