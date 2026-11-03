@@ -72,7 +72,7 @@ TRUSTED_TP_DOMAINS = frozenset((
 # Broad discovery vocabulary: titles are leads, never proof of an award.
 # Both 10,000-won user participation rewards and expensive in-kind services matter.
 POSITIVE = re.compile(r"공모|아이디어|제안|경진|시상|상금|포상|활동비|사업화|실증|지원사업|수혜기업|재공고|추가\s*모집|긴급|바우처|고령친화|헬스케어|치매|의료\s*AI|설문|만족도|조사\s*(?:참여|이벤트)|경품|상품권|기프티콘|답례품|참여수당|사례비|참여보상|수수료\s*감면|무료\s*(?:지원|이용|분석)|안심존|안심구역|분석환경|API|GPU|데이터\s*(?:지원|이용)|특허|출원|IP\s*디딤돌|크레딧|시험분석|검증\s*지원", re.I)
-NEGATIVE = re.compile(r"채용|인사발령|개별공시지가|분묘|폐기물|행정예고|공고\s*취소|합격자|선정\s*결과|심사\s*결과|입법예고|경매|자격증\s*시험|낙찰\s*결과", re.I)
+NEGATIVE = re.compile(r"채용|인사발령|개별공시지가|분묘|폐기물|행정예고|공고\s*취소|합격자|선정\s*결과|심사\s*결과|입법예고|경매|자격증\s*시험|낙찰\s*결과|상품권\s*(?:사용내역|가맹점|판매현황)|치매치료관리비\s*지원기준", re.I)
 PAYOUT = re.compile(r"상금|포상금|시상금|활동비|사례비|원고료|실증비|사업화\s*지원금|지원금|바우처|상품권|기프티콘|경품|답례품|참여수당|쿠폰|크레딧|수수료\s*면제|비용\s*감면|분석비\s*지원", re.I)
 CASH = re.compile(r"상금|포상금|시상금|활동비|사례비|원고료|실증비|사업화\s*지원금|현금|지원금|참여수당", re.I)
 GIFT = re.compile(r"상품권|기프티콘|경품|답례품|쿠폰|모바일\s*교환권|기프트콘", re.I)
@@ -317,6 +317,16 @@ def extract_notice_candidates(soup, source_url, kind):
         candidates[normalized_url(url)] = (url, title, listing_text)
     return candidates, unresolved
 
+def primary_notice_text(soup, kind):
+    """Avoid collecting other articles listed under related-post widgets."""
+    area = soup.select_one("article") or soup.select_one("main") or soup.select_one("#contents") or soup
+    value = area.get_text("\n", strip=True)
+    if kind == "participation":
+        for marker in ("연관생각", "연관 생각", "위 내용과 유사한 생각을 소개", "관련 생각"):
+            if marker in value:
+                value = value.split(marker, 1)[0]
+    return value
+
 def watched_detail(spec, session, now):
     name, source_url, municipality, kind = spec
     state = {"name": name, "url": source_url, "status": "error",
@@ -325,8 +335,7 @@ def watched_detail(spec, session, now):
              "watchMode": True}
     try:
         doc = fetch_soup(session, source_url)
-        area = doc.select_one("article") or doc.select_one("main") or doc.select_one("#contents") or doc
-        body = area.get_text(" ", strip=True)
+        body = primary_notice_text(doc, kind)
         title, verified_deadline = WATCH_DETAILS[name]
         item = assess(title, body, municipality, source_url, now)
         if item and verified_deadline and not item["deadline"]:
@@ -362,8 +371,11 @@ def scan_source(spec, session, now):
         for url, title, listing_text in list(candidates.values())[:45]:
             try:
                 doc = fetch_soup(session, url)
-                area = doc.select_one("article") or doc.select_one("main") or doc.select_one("#contents") or doc
-                body = (listing_text + "\n" + area.get_text(" ", strip=True)).strip()
+                body = (listing_text + "\n" + primary_notice_text(doc, kind)).strip()
+                # E-people detail pages explicitly mark finished participation.
+                if kind == "participation" and re.search(r"(?:투표|설문|공모|참여|접수)\s*종료|종료된\s*안건", body[:6000]):
+                    stale += 1
+                    continue
                 first = re.sub(r"\s+", "", title)[:13]
                 if first and first not in re.sub(r"\s+", "", body):
                     errors += 1
