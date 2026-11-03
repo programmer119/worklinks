@@ -48,6 +48,7 @@ SOURCES = (
     ("서울 IP디딤돌 재개 확인", "https://www.ipseoul.kr/Pages/NotificationCenter/NC_DetailView.aspx?category=100000000&guid=c70405df-0d2c-f111-b404-d4f5ef4a1e33", "서울지식재산센터", "watch_detail"),
     ("국세청 1만원 독자 설문", "https://nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2210&nttSn=1355712", "국세청", "watch_detail"),
     ("행안부 2만원 국민 아이디어 설문", "https://daejeon.go.kr/drh/minwonFormView.do?boardId=&menuSeq=&ntatcSeq=1525718118&pageIndex=4&searchCondition=all&searchKeyword=", "행정안전부", "watch_detail"),
+    ("한국관광공사 데이터랩 1만원 1000명 설문", "https://datalab.visitkorea.or.kr/site/portal/ex/bbs/View.do?bcIdx=311403&cbIdx=1135&pageIndex=1", "한국관광공사", "watch_detail"),
     ("경기신보 정책 아이디어 공모", "https://www.gg.go.kr/gongmo/bbs/boardView.do?bIdx=110906321&bsIdx=923&menuId=4433", "경기도", "watch_detail"),
     ("기업마당 지역공고", "https://www.bizinfo.go.kr/sii/siia/selectSIIA200View.do", "전국 지역공고", "national"),
 )
@@ -70,6 +71,7 @@ WATCH_DETAILS = {
     "서울 IP디딤돌 재개 확인": ("2026년 서울 IP디딤돌 특허출원 실비지원", ""),
     "국세청 1만원 독자 설문": ("2026년 국세청 국세 독자 설문조사 상품권 이벤트", "2026-11-26"),
     "행안부 2만원 국민 아이디어 설문": ("2027년 비영리민간단체 공익사업 유형 및 국민참여 아이디어 설문조사", "2026-11-11"),
+    "한국관광공사 데이터랩 1만원 1000명 설문": ("2026년 한국관광 데이터랩 고객 수요 만족도 조사 1만원 기프티콘", "2026-11-10"),
     "경기신보 정책 아이디어 공모": ("모두의 소통 소상공인 성장 재도약 정책 아이디어 공모전", "2026-11-16"),
 }
 # Only the official TP domains shown in the TP association directory are
