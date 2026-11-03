@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))
-from worklinks_local_budget import assess, deadline_from, amount_info, KST, SOURCES, trusted_notice_url, extract_notice_candidates
+from worklinks_local_budget import assess, deadline_from, amount_info, KST, SOURCES, trusted_notice_url, extract_notice_candidates, strong_notice_title, WATCH_DETAILS, COMPETITION_EVIDENCE
 from bs4 import BeautifulSoup
 
 NOW = dt.datetime(2026,11,1,12,0,tzinfo=KST)
@@ -43,6 +43,33 @@ class LocalBudgetTest(unittest.TestCase):
     def test_kimse_relevance(self):
         row=assess('고령친화 헬스케어 실증지원 사업 모집', '예비창업자 지원사업 신청 2026.11.01~2026.11.24.', '서울', 'https://example.go.kr/notice/view?id=5', NOW)
         self.assertTrue(row['kimseRelevantHint'])
+
+    def test_expired_range_in_title(self):
+        self.assertEqual(deadline_from('2026년 공모전 2026-10-02 ~ 2026-11-02\\n공고 11월 발표'), '2026-11-02')
+        x=assess('창업 사업화 바우처 모집 2026-10-02 ~ 2026-11-02', '예비창업자 지원금 100만원 신청', '충남', 'https://example.go.kr/view?id=1', dt.datetime(2026,11,3,12,tzinfo=KST))
+        self.assertIsNone(x)
+    def test_small_survey_gift_is_visible(self):
+        x=assess('2026년 독자 설문조사 이벤트', '국민 누구나 참여 가능합니다. 2026년 설문기간 2026.11.02 ~ 2026.11.26 추첨 30명에게 모바일 상품권 1만원을 지급합니다.', '국세청', 'https://example.go.kr/notice/view?id=10', dt.datetime(2026,11,3,12,tzinfo=KST))
+        self.assertIsNotNone(x)
+        self.assertEqual(x['quickWinTier'], 'cash_candidate')
+        self.assertEqual(x['competitionLevel'], 'unknown')
+    def test_suspended_patent_goes_to_waiting(self):
+        x=assess('2026 서울 IP 디딤돌 특허출원 지원 모집 공고', '서울 예비창업자 특허출원 비용지원 170만원. 신청 접수 일시 중지. 잔여 건수 발생 시 추가 접수 예정.', '서울', 'https://example.go.kr/notice/view?id=11', dt.datetime(2026,11,3,12,tzinfo=KST))
+        self.assertTrue(x['suspendedHint'])
+        self.assertEqual(x['quickWinTier'], 'waiting_reopen')
+    def test_health_patient_benefit_not_startup(self):
+        self.assertIsNone(assess('치매치료관리비 지원기준 확대', '치매 환자 치료비 지원 안내, 읍면동 신청 가능', '청양', 'https://example.go.kr/view?id=4', NOW))
+    def test_reannouncement_is_not_low_competition_proof(self):
+        x=assess('2026년 추가 모집 예비창업자 상금 공모전', '전 국민 누구나 신청, 상금 10만원 지원', '경기도', 'https://example.go.kr/notice/view?id=13', NOW)
+        self.assertEqual(x['competitionEvidence'], '확인 불가')
+        self.assertTrue(COMPETITION_EVIDENCE.search('접수 미달로 추가모집'))
+    def test_skip_generic_navigation(self):
+        self.assertFalse(strong_notice_title('지원사업'))
+        self.assertTrue(strong_notice_title('2026 독자 설문조사 이벤트'))
+    def test_verified_watchlist_exists(self):
+        self.assertIn('서울 IP디딤돌 재개 확인', WATCH_DETAILS)
+        self.assertTrue(any(spec[3]=='participation' for spec in SOURCES))
+        self.assertTrue(any(spec[3]=='watch_detail' for spec in SOURCES))
 
 
 if __name__ == '__main__':
