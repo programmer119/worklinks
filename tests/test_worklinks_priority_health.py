@@ -70,6 +70,22 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIsNone(valid_official_link(
           "https://other.example/aihubnews/notice/view.do?nttSn=10397",base,"aihub"))
 
+    def test_actual_nia_onclick_article_ids_are_observed_and_constrained(self):
+        source=next(x for x in SOURCES if x[2]=="nia")
+        html="""<table>
+          <tr><td><a href="#view" onclick="doBbsFView('99835','30134','16010100','30134');return false;">
+          2026년 재난안전 AI 데이터 활용 해커톤 모집</a></td></tr>
+          <tr><td><a href="#view" onclick="doBbsFView('99835','30083','16010100','30083');return false;">
+          2026년 NIA 탄소중립 혁신 아이디어 공모전 안내</a></td></tr>
+          <tr><td><a href="#view" onclick="doBbsFView('99835','30151','16010100','30150');return false;">
+          의료 AI 사업 공모</a></td></tr>
+        </table>"""
+        found,count=observed_links(BeautifulSoup(html,"html.parser"),source[1],"nia")
+        self.assertEqual(count,2)
+        self.assertEqual(len(found),2)
+        self.assertTrue(found[0]["url"].endswith("bcIdx=30134"))
+        self.assertTrue(found[1]["url"].endswith("bcIdx=30083"))
+
     def test_real_aihub_static_row_data_key_yields_article(self):
         source=next(x for x in SOURCES if x[2]=="aihub")
         soup=BeautifulSoup("""<table>
