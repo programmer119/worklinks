@@ -85,6 +85,30 @@ class OfficialHealthSourceTest(unittest.TestCase):
         self.assertIn(FUTURE_URL,seen)
         self.assertEqual(rows[0]["eligibility"],"자격 확인 필요")
 
+    def test_no_unknown_date_events_or_recruitment_results_are_published(self):
+        listing=BeautifulSoup("""<table>
+          <tr><td><a href="/board.es?act=view&bid=0001&list_no=2902">[안내] 보건의료 AI 교육 행사 신청</a></td><td>2026/10/25</td></tr>
+          <tr><td><a href="/board.es?act=view&bid=0001&list_no=2903">의료 AI 모집 결과 안내</a></td><td>2026/11/05</td></tr>
+        </table>""","html.parser")
+        article="보건의료 AI 교육 행사 신청. 종료한 교육 프로그램 소개 및 일정 안내."
+        detail=BeautifulSoup("<article>"+article+"</article>","html.parser")
+        def fetch(url):
+            return listing if url==LIST_URL else detail
+        rows,state=scan_source(SOURCES[0],fetch,NOW)
+        self.assertEqual(rows,[])
+        self.assertEqual(state["candidateLinks"],1)
+        self.assertEqual(state["unknownDeadline"],1)
+        self.assertEqual(state["status"],"partial")
+
+    def test_ui_notice_prefix_not_required_in_article_body(self):
+        listing=BeautifulSoup("""<table><tr><td><a href="/board.es?act=view&bid=0001&list_no=2900">
+           새글 [안내] 2026년 디지털헬스 창업 실증 지원기업 모집</a></td><td>2026/11/06</td></tr></table>""","html.parser")
+        detail=BeautifulSoup("""<article><h1>2026년 디지털헬스 창업 실증 지원기업 모집</h1>
+            <p>신청기간: 2026.11.06 ~ 2026.11.19 18:00 까지</p></article>""","html.parser")
+        rows,state=scan_source(SOURCES[0],lambda url:listing if url==LIST_URL else detail,NOW)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["deadline"],"2026-11-19T18:00:00+09:00")
+
     def test_blank_static_listing_must_be_partial(self):
         rows,state=scan_source(SOURCES[0],lambda _:BeautifulSoup("<p>JS shell</p>","html.parser"),NOW)
         self.assertEqual(rows,[])
