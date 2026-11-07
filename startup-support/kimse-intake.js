@@ -10,11 +10,12 @@
 })(typeof window!=='undefined'?window:null,function(){
   'use strict';
   var MAX_SNAPSHOT_AGE_MS=48*60*60*1000;
-  var SOURCE_OK=new Set(['서울 스타트업플러스 지원사업','도전의 IR 운영사별 프로그램']);
+  var SOURCE_OK=new Set(['서울 스타트업플러스 지원사업','도전의 IR 운영사별 프로그램','한국보건의료정보원 공식 공지','한국보건의료정보원 실증·사업 공고']);
   var DOMAIN_FIT=/(치매|경도\s*인지|인지\s*(?:기능|저하|건강|지원)|고령|시니어|실버테크|에이지테크|에이징테크|age[-\s]?tech|의료|헬스케어|디지털\s*헬스|보건의료|병원|임상|데이터안심|위치정보|AI[-\s]?허브|음성\s*(?:AI|바이오마커))/i;
   var PATIENT_ONLY=/(치매\s*(?:치료비|의료비)|환자\s*(?:본인부담|급여))/i;
   var SOURCE_URL=/^https:\/\/(?:www\.)?startup-plus\.kr\/project\/PRJ\d{5,9}$/i;
   var IR_URL='https://irchallenge.jointips.or.kr/apply';
+  var KHIS_URL=/^https:\/\/www\.khis\.kr\/board\.es\?act=view&bid=000[19]&list_no=\d{1,8}&mid=a1030[14]000000$/i;
   function normalize(value){
     return String(value||'').normalize('NFKC').replace(/[^0-9a-zA-Z가-힣]/g,'').toLowerCase();
   }
@@ -48,7 +49,7 @@
       var deadline=deadlineFor(x,title);
       if(!validDeadline(deadline,now))continue;
       var url=String(x.url||'');
-      if(!SOURCE_URL.test(url)&&url!==IR_URL)continue;
+      if(!SOURCE_URL.test(url)&&url!==IR_URL&&!KHIS_URL.test(url))continue;
       seen.add(title);
       var ir=x.source==='도전의 IR 운영사별 프로그램';
       var special=title.includes('2026서울바이오의료오픈콜라보');
