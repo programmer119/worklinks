@@ -96,6 +96,21 @@ def valid_official_link(href,base,kind):
 def observed_links(soup,base,kind):
     discovered={}
     all_valid=0
+    if kind=="nia":
+        # Official NIA list links use an observed onclick call rather than href:
+        # doBbsFView('99835','30134','16010100','30134')
+        for a in soup.select('a[onclick*="doBbsFView"]'):
+            title=clean(a.get_text(" ",strip=True),200)
+            script=str(a.get("onclick",""))
+            m=re.search(r"""doBbsFView\(['"]99835['"]\s*,\s*['"](\d{4,10})['"]\s*,\s*['"]\d+['"]\s*,\s*['"](\d{4,10})['"]\)""",script)
+            if not m or m[1]!=m[2]:continue
+            all_valid+=1
+            if not match_notice(title):continue
+            url=f"https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?cbIdx=99835&bcIdx={m[1]}"
+            tr=a.find_parent("tr")
+            context=clean(tr.get_text(" ",strip=True),340) if tr else ""
+            discovered[url]={"title":title,"url":url,"context":context}
+        return list(discovered.values()),all_valid
     if kind=="aihub":
         # AI-Hub publishes observed article IDs in data-key, not in href.
         # Use only IDs present on official notice-row anchor elements.
