@@ -24,7 +24,9 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
             "2026년 의료 AI 데이터 활용 바우처 지원사업 수요기관 모집",
             "2026년 디지털헬스 의료기기 병원 실증 지원사업 모집",
             "2026년도 보건산업혁신창업센터 혁신창업멤버스 기업 모집공고",
-            "2026년 바이오헬스 특허 및 인허가 컨설팅 지원사업 창업기업 모집"
+            "2026년 바이오헬스 특허 및 인허가 컨설팅 지원사업 창업기업 모집",
+            "2027년 제1차 용역연구개발과제 주관연구기관 공모 공고",
+            "어려울 땐, 전문가에게! 의료기기 전문가 자문위원회 연계 분야별 상담회 신청 안내"
         ]
         missed=[title for title in observed if not match_notice(title)]
         self.assertFalse(missed, f"Critical 2026 opportunities missed: {missed}")
@@ -102,6 +104,35 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertEqual(result[0]["deadline"],"2026-11-24T17:00:00+09:00")
         self.assertEqual(result[0]["eligibility"],"자격 확인 필요")
         self.assertEqual(result[0]["url"],detail_url)
+
+    def test_real_november_mfds_research_call_from_khidi_republication(self):
+        source=next(x for x in SOURCES if x[2]=="khidi_external")
+        detail="/board/view?menuId=MENU01484&linkId=48952358"
+        listing=BeautifulSoup(f"""<table><tr><td>
+          <a href="{detail}">2027년 제1차 용역연구개발과제 주관연구기관 공모 공고</a>
+          </td><td>2026-11-06</td></tr></table>""","html.parser")
+        article=BeautifulSoup("""<article><h1>2027년 제1차 용역연구개발과제 주관연구기관 공모 공고</h1>
+          공모 및 접수기간: 2026.11.6.(금) ~ 2026.12.7.(월) 11:00
+          </article>""","html.parser")
+        rows,state=scan_one(source,lambda url:listing if url==source[1] else article,NOW)
+        self.assertEqual(state["articleLinks"],1)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["deadline"],"2026-12-07T11:00:00+09:00")
+        self.assertEqual(rows[0]["eligibility"],"자격 확인 필요")
+
+    def test_current_khidi_medical_device_consultation_stays_visible_in_audit(self):
+        source=next(x for x in SOURCES if x[2]=="khidi_events")
+        listing=BeautifulSoup("""<table><tr><td>
+          <a href="/board/view?menuId=MENU01491&linkId=48952449">
+          의료기기 전문가 자문위원회 연계 분야별 상담회 신청 안내(11월 3~4주, 상시접수)</a>
+          </td><td>2026-11-06</td></tr></table>""","html.parser")
+        article=BeautifulSoup("""<article>
+          의료기기 전문가 자문위원회 사업화 분야 상담 신청 안내, 상시접수.
+          </article>""","html.parser")
+        rows,state=scan_one(source,lambda url:listing if url==source[1] else article,NOW)
+        self.assertEqual(len(rows),0) # no invented closing date
+        self.assertEqual(state["undatedCandidates"],1)
+        self.assertEqual(state["status"],"partial")
 
     def test_malformed_or_js_only_list_is_not_reported_as_no_opportunity(self):
         listing=BeautifulSoup("""<table><tr><td><a href="javascript:doView('123')">
