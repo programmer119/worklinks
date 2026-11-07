@@ -53,6 +53,19 @@ def probe(source):
                 snippets.append(str(parent)[:1150] if parent else value[:200])
                 if len(snippets)>=5:break
             result["noticeHtmlSnippets"]=snippets
+            if kind=="nia":
+                result["viewLinks"]=[
+                    {"title":" ".join(a.stripped_strings)[:120],
+                     "href":str(a.get("href",""))[:210],
+                     "onclick":str(a.get("onclick",""))[:210]}
+                    for a in soup.select('a[href*="View.do"],a[href*="view"],a[onclick]')[:38]
+                ]
+                result["noticeRows"]=[
+                    str(tr)[:950]
+                    for tr in soup.select('tr') if ("2026" in tr.get_text(" ",strip=True)
+                                                or "데이터" in tr.get_text(" ",strip=True))
+                ][:5]
+
 
 
         if count==0:result["note"]="official list accessible but notice links not extracted"
