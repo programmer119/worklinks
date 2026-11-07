@@ -37,6 +37,17 @@ class TestWorkLinksMCPBridge(unittest.TestCase):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 b.apply(INDEX, [bad], date(2026, 11, 7))
 
+    def test_exported_batch_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            file_path = Path(directory) / "batch.json"
+            file_path.write_text(json.dumps({
+                "schema": b.SCHEMA, "checkpoint": 7, "candidates": [GOOD],
+            }), encoding="utf-8")
+            self.assertEqual(b.batch_from_file(file_path), (7, [GOOD]))
+            file_path.write_text('{"schema":"invalid","candidates":[]}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                b.batch_from_file(file_path)
+
     def test_sqlite_checkpoint_read(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "test.sqlite"
