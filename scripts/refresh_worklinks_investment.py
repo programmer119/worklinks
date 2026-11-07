@@ -16,6 +16,7 @@ from worklinks_sefund import scan_band
 from worklinks_global_accelerators import scan_global
 from worklinks_kised import scan_kised
 from worklinks_dynamic_sources import scan_browser_sources
+from worklinks_health_sources import scan_health_sources
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "startup-support/investment-opportunities.json"
@@ -271,6 +272,10 @@ def main():
     kised_rows, kised_sources = scan_kised(html, now())
     rows += kised_rows
     sources += kised_sources
+    # Additive official KHIS boards; failure never blocks the other sources.
+    health_rows, health_sources = scan_health_sources(now=now())
+    rows += health_rows
+    sources += health_sources
     registered = registered_titles()
     for item in rows:
         if item.get("source") == "재단법인 밴드 공식 공지사항":
