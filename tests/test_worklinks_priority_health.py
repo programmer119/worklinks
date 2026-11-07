@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from worklinks_priority_health import (
     KST,SOURCES,match_notice,valid_official_link,observed_links,
-    explicit_deadline,scan_one,scan_priority_sources
+    explicit_deadline,scan_one,scan_priority_sources,coverage_summary
 )
 
 NOW=dt.datetime(2026,11,7,18,37,tzinfo=KST)
@@ -135,6 +135,16 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertEqual(len(rows),0) # no invented closing date
         self.assertEqual(state["undatedCandidates"],1)
         self.assertEqual(state["status"],"partial")
+
+    def test_source_health_does_not_hide_access_failures(self):
+        summary=coverage_summary([
+          {"name":"KHIDI","status":"ok","articleLinks":12,"discovered":3},
+          {"name":"HIRA","status":"error","error":"timeout"},
+        ],["KHIDI","HIRA","K-DATA"])
+        self.assertEqual(summary["status"],"degraded")
+        self.assertEqual(summary["expected"],3)
+        self.assertEqual(summary["healthy"],1)
+        self.assertEqual(set(summary["degraded"]),{"HIRA","K-DATA"})
 
     def test_malformed_or_js_only_list_is_not_reported_as_no_opportunity(self):
         listing=BeautifulSoup("""<table><tr><td><a href="javascript:doView('123')">
