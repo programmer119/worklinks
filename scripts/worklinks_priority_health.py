@@ -16,17 +16,19 @@ KST = dt.timezone(dt.timedelta(hours=9))
 SOURCES = (
     ("KHIDI 보건산업 사업공고", "https://www.khidi.or.kr/board?menuId=MENU01108", "khidi"),
     ("KHIDI 의료기기 지원사업", "https://www.khidi.or.kr/mdtis/bizPbanc/bizPbancList?menuId=MENU03471", "device"),
+    ("KHIDI 기관별 의료·연구지원 사업", "https://www.khidi.or.kr/board?menuId=MENU01484", "khidi_external"),
+    ("KHIDI 의료기기 상담·교육", "https://www.khidi.or.kr/board?menuId=MENU01491", "khidi_events"),
     ("NIA AI·데이터 공지", "https://www.nia.or.kr/site/nia_kor/ex/bbs/List.do?cbIdx=99835", "nia"),
     ("K-DATA 데이터·안심구역 공지", "https://www.kdata.or.kr/kr/board/notice_01/boardList.do", "kdata"),
     ("심평원 창업·의료데이터 소식", "https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020041000100", "hira"),
 )
 HEADERS = {"User-Agent":"Mozilla/5.0 (compatible; WorkLinks/1.0 public-research-monitor)",
            "Accept-Language":"ko-KR,ko;q=0.9"}
-THEME = re.compile(r"치매|인지(?:저하|장애|건강)|보건|중개연구|IRB|DRB|연구윤리|연구비|안심구역|안심존|건강|고령|실버|에이지|바이오|헬스|의료|병원|임상|임상시험|데이터|빅데이터|음성|AI|인공지능|실증|사용적합성",re.I)
-OFFER = re.compile(r"지원|모집|공모|경진|챌린지|인큐베이팅|창업|바우처|안심구역|안심존|실증|검증|활용|교육|연구|평가|멘토|컨설팅|시험|인증|사업화|장려|서비스|프로그램",re.I)
+THEME = re.compile(r"치매|인지(?:저하|장애|건강)|보건|중개연구|용역연구개발|연구개발|연구과제|규제과학|IRB|DRB|연구윤리|연구비|안심구역|안심존|건강|고령|실버|에이지|바이오|헬스|의료|병원|임상|임상시험|데이터|빅데이터|음성|AI|인공지능|실증|사용적합성",re.I)
+OFFER = re.compile(r"지원|모집|공모|경진|챌린지|인큐베이팅|창업|바우처|안심구역|안심존|실증|검증|활용|교육|연구|평가|멘토|컨설팅|시험|인증|사업화|장려|서비스|프로그램|신청|상담|상시접수",re.I)
 IGNORE = re.compile(r"채용|합격자|선정\s*결과|제안서\s*평가\s*결과|입찰공고|낙찰|수의계약|용역\s*발주|운영\s*용역|대행\s*용역|부처\s*업무보고|보도자료\s*발표|공개검증\s*대상",re.I)
 PATIENT = re.compile(r"당번\s*약국|문여는\s*약국|의료비\s*지원\s*대상|치매\s*치료\s*관리비",re.I)
-APPLICATION = re.compile(r"(?:접수|신청|모집|응모|제출|공모)\s*(?:기간|기한|마감|일정|일시)\s*[:：]?\s*",re.I)
+APPLICATION = re.compile(r"(?:접수|신청|모집|응모|제출|공모|공고)\s*(?:기간|기한|마감|일정|일시)\s*[:：]?\s*",re.I)
 DAY = re.compile(r"(20\d{2})[.\-/년\s]+(\d{1,2})[.\-/월\s]+(\d{1,2})(?:일)?")
 TIME = re.compile(r"(?<!\d)([012]?\d):([0-5]\d)(?!\d)")
 DATE_IN_ROW = re.compile(r"(20\d{2})[.\-/](\d{1,2})[.\-/](\d{1,2})")
@@ -54,6 +56,12 @@ def valid_official_link(href,base,kind):
         if q.get("menuId")!=["MENU01108"] or len(ids)!=1 or not re.fullmatch(r"\d{6,12}",ids[0]):
             return None
         return f"https://www.khidi.or.kr/board/view?menuId=MENU01108&linkId={ids[0]}"
+    if kind in ("khidi_external","khidi_events") and host in ("khidi.or.kr","www.khidi.or.kr") and p.path=="/board/view":
+        expected="MENU01484" if kind=="khidi_external" else "MENU01491"
+        ids=q.get("linkId",[])
+        if q.get("menuId")!=[expected] or len(ids)!=1 or not re.fullmatch(r"\d{6,12}",ids[0]):
+            return None
+        return f"https://www.khidi.or.kr/board/view?menuId={expected}&linkId={ids[0]}"
     if kind=="device" and host in ("khidi.or.kr","www.khidi.or.kr") and p.path=="/mdtis/bizPbanc/bizPbancView":
         a=q.get("biz_pbanc_id",[]);b=q.get("biz_pbanc_no",[])
         if len(a)!=1 or len(b)!=1 or not re.fullmatch(r"[A-Za-z0-9_-]{3,40}",a[0]) or not re.fullmatch(r"\d{1,8}",b[0]):
