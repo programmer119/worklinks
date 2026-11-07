@@ -28,7 +28,9 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
             "2026년도 보건산업혁신창업센터 혁신창업멤버스 기업 모집공고",
             "2026년 바이오헬스 특허 및 인허가 컨설팅 지원사업 창업기업 모집",
             "2027년 제1차 용역연구개발과제 주관연구기관 공모 공고",
-            "어려울 땐, 전문가에게! 의료기기 전문가 자문위원회 연계 분야별 상담회 신청 안내"
+            "어려울 땐, 전문가에게! 의료기기 전문가 자문위원회 연계 분야별 상담회 신청 안내",
+            "방송영상 AI 학습데이터 안심존 정식 개방 안내",
+            "AI 허브 민간기업 지원 안내"
         ]
         missed=[title for title in observed if not match_notice(title)]
         self.assertFalse(missed, f"Critical 2026 opportunities missed: {missed}")
@@ -60,6 +62,13 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
           ("/mdtis/bizPbanc/bizPbancView?biz_pbanc_id=oops",SOURCES[1][1],"device")
         ):
             self.assertIsNone(valid_official_link(href,base,kind),href)
+
+    def test_aihub_detail_url_must_be_official_and_observed(self):
+        base=next(x[1] for x in SOURCES if x[2]=="aihub")
+        self.assertIsNotNone(valid_official_link(
+          "/aihubnews/notice/view.do?pageIndex=1&nttSn=10397&currMenu=132&topMenu=103",base,"aihub"))
+        self.assertIsNone(valid_official_link(
+          "https://other.example/aihubnews/notice/view.do?nttSn=10397",base,"aihub"))
 
     def test_2026_notice_application_date_not_event_start(self):
         self.assertEqual(
