@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-07T14:58:46+09:00",
+  "generatedAt": "2026-11-07T15:02:25+09:00",
   "sources": [
     {
       "name": "옥천군 공지",
       "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=36&key=232",
       "status": "partial",
       "discovered": 2,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [],
@@ -24,7 +24,7 @@
       "url": "https://www.oc.go.kr/www/selectBbsNttList.do?bbsNo=40&key=236",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [],
@@ -41,7 +41,7 @@
       "url": "https://www.cheongyang.go.kr/kor.do",
       "status": "partial",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [],
@@ -58,7 +58,7 @@
       "url": "https://www.bonghwa.go.kr/portal/saeol/gosi/list.do?mid=0201030000&seCode=01",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [],
@@ -76,7 +76,7 @@
       "url": "https://www.muju.go.kr/index.9is",
       "status": "partial",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [],
@@ -93,7 +93,7 @@
       "url": "https://www.uiryeong.go.kr/board/list.uiryeong?boardId=BBS_0000070&menuCd=DOM_000000203003001001&paging=ok&startPage=1",
       "status": "error",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [
@@ -121,7 +121,7 @@
       "url": "https://www.danyang.go.kr/dy21/980",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [],
@@ -139,7 +139,7 @@
       "url": "https://m.yd21.go.kr/kr/html/sub02/020103.html?mode=L",
       "status": "error",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "기초지자체 원문",
       "watchMode": false,
       "connectionAttempts": [
@@ -167,7 +167,7 @@
       "url": "https://www.technopark.or.kr/www/linkBoard/list.do?mid=1012&type=P",
       "status": "ok",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "전국 TP 공식 연결목록",
       "watchMode": false,
       "connectionAttempts": [],
@@ -184,7 +184,7 @@
       "url": "https://gjtp.or.kr/home/business.cs",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "지역 산하기관 공식",
       "watchMode": false,
       "connectionAttempts": [],
@@ -201,7 +201,7 @@
       "url": "https://ptp.or.kr/",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "지역 산하기관 공식",
       "watchMode": false,
       "connectionAttempts": [],
@@ -219,7 +219,7 @@
       "url": "https://www.ctp.or.kr/",
       "status": "ok",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "지역 산하기관 공식",
       "watchMode": false,
       "connectionAttempts": [],
@@ -236,7 +236,7 @@
       "url": "https://www.gtp.or.kr/",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "지역 산하기관 공식",
       "watchMode": false,
       "connectionAttempts": [],
@@ -254,7 +254,7 @@
       "url": "https://www.btp.or.kr/kor/Main.do",
       "status": "partial",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "지역 산하기관 공식",
       "watchMode": false,
       "connectionAttempts": [],
@@ -271,7 +271,7 @@
       "url": "https://www.epeople.go.kr/idea/acrc/ideajoin.npaid",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공공 시민참여·상품권 게시판",
       "watchMode": false,
       "connectionAttempts": [],
@@ -288,7 +288,7 @@
       "url": "https://www.epeople.go.kr/idea/4000/ideajoin.npaid?pageIndex=1",
       "status": "ok",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공공 시민참여·상품권 게시판",
       "watchMode": false,
       "connectionAttempts": [],
@@ -305,7 +305,7 @@
       "url": "https://www.epeople.go.kr/idea/kma/ideajoin.npaid",
       "status": "ok",
       "discovered": 0,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공공 시민참여·상품권 게시판",
       "watchMode": false,
       "connectionAttempts": [],
@@ -322,7 +322,7 @@
       "url": "https://www.epeople.go.kr/idea/jjethink/ideajoin.npaid?pageIndex=1",
       "status": "ok",
       "discovered": 2,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공공 시민참여·상품권 게시판",
       "watchMode": false,
       "connectionAttempts": [],
@@ -339,7 +339,7 @@
       "url": "https://www.daejeon.go.kr/seesaw/djaskList.do",
       "status": "partial",
       "discovered": 2,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공공 시민참여·상품권 게시판",
       "watchMode": false,
       "connectionAttempts": [],
@@ -356,7 +356,7 @@
       "url": "https://www.ipseoul.kr/Pages/NotificationCenter/NC_DetailView.aspx?category=100000000&guid=c70405df-0d2c-f111-b404-d4f5ef4a1e33",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공식 개별혜택 변경감시 · 수집망 전수 포함 안 됨",
       "watchMode": true,
       "candidateLinks": 1,
@@ -369,7 +369,7 @@
       "url": "https://nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2210&nttSn=1355712",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공식 개별혜택 변경감시 · 수집망 전수 포함 안 됨",
       "watchMode": true,
       "candidateLinks": 1,
@@ -382,7 +382,7 @@
       "url": "https://daejeon.go.kr/drh/minwonFormView.do?boardId=&menuSeq=&ntatcSeq=1525718118&pageIndex=4&searchCondition=all&searchKeyword=",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공식 개별혜택 변경감시 · 수집망 전수 포함 안 됨",
       "watchMode": true,
       "candidateLinks": 1,
@@ -395,7 +395,7 @@
       "url": "https://datalab.visitkorea.or.kr/site/portal/ex/bbs/View.do?bcIdx=311403&cbIdx=1135&pageIndex=1",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공식 개별혜택 변경감시 · 수집망 전수 포함 안 됨",
       "watchMode": true,
       "candidateLinks": 1,
@@ -408,7 +408,7 @@
       "url": "https://www.gg.go.kr/gongmo/bbs/boardView.do?bIdx=110906321&bsIdx=923&menuId=4433",
       "status": "ok",
       "discovered": 1,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공식 개별혜택 변경감시 · 수집망 전수 포함 안 됨",
       "watchMode": true,
       "candidateLinks": 1,
@@ -421,7 +421,7 @@
       "url": "https://www.bizinfo.go.kr/sii/siia/selectSIIA200View.do",
       "status": "ok",
       "discovered": 2,
-      "checkedAt": "2026-11-07T14:58:46+09:00",
+      "checkedAt": "2026-11-07T15:02:25+09:00",
       "level": "공식 통합 포털",
       "watchMode": false,
       "connectionAttempts": [],
@@ -461,7 +461,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -490,7 +490,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -519,7 +519,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -548,7 +548,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -577,7 +577,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -606,7 +606,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -635,7 +635,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -664,7 +664,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -693,7 +693,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -722,7 +722,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": true,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -751,7 +751,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -780,7 +780,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -809,7 +809,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -838,7 +838,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -867,7 +867,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -896,7 +896,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     },
     {
@@ -925,7 +925,7 @@
       "competitionEvidence": "확인 불가",
       "competitionLevel": "unknown",
       "suspendedHint": false,
-      "lastSeenAt": "2026-11-07T14:58:46+09:00",
+      "lastSeenAt": "2026-11-07T15:02:25+09:00",
       "applied": false
     }
   ],
