@@ -40,6 +40,23 @@ class OfficialHealthSourceTest(unittest.TestCase):
         self.assertEqual(application_deadline("보건의료 AI","",None),None)
         self.assertEqual(application_deadline("보건의료 AI",body),"2026-11-25T18:00:00+09:00")
 
+    def test_observed_post_year_resolves_short_urgent_deadline(self):
+        listing=BeautifulSoup("""<table><tr><td>
+          <a href="/board.es?act=view&bid=0001&list_no=2778&mid=a10301000000">
+          의료데이터 중심병원 AI기업 매칭 상담 신청</a></td>
+          <td>2026/11/05</td></tr></table>""","html.parser")
+        found=candidate_links(listing,LIST_URL,"0001")
+        self.assertEqual(found[CURRENT_URL][1],dt.date(2026,11,5))
+        text="의료데이터 중심병원 AI기업 매칭 상담 신청\n○ 신청기간: 11 월 6 일(금) 17:00까지"
+        self.assertEqual(application_deadline("의료 AI기업 매칭 신청",text,2026),
+                         "2026-11-06T17:00:00+09:00")
+        self.assertIsNone(application_deadline("의료 AI기업 매칭 신청",text,None))
+
+    def test_medical_information_contest_with_shorthand_end(self):
+        title="2026년 제6회 진료정보교류 사업 우수사례 공모전 안내"
+        body="공모기간: 2026. 10. 30. ~ 11. 16. / 18일 간"
+        self.assertEqual(application_deadline(title,body,2026),"2026-11-16")
+
     def test_missing_deadline_never_assumed_from_event(self):
         body="행사일: 2026.11.28 15:00\n사업기간: 2026.11.01 ~ 2026.12.31"
         self.assertIsNone(application_deadline("의료 AI 매칭 행사",body))
