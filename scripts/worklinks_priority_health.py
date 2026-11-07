@@ -91,22 +91,35 @@ def observed_links(soup,base,kind):
             discovered[url]={"title":title,"url":url,"context":context}
     return list(discovered.values()),all_valid
 
+SHORT_DAY = re.compile(r"(?<!\d)(\d{1,2})[./월\s]+(\d{1,2})(?:일)?(?!\d)")
+
 def explicit_deadline(text):
-    """Conservative: only explicitly labelled *application* dates are deadlines."""
+    """Never turn a registration starting date or event date into an end date."""
     for line in str(text or "").splitlines():
-        line=clean(line,500)
+        line=clean(line,550)
         m=APPLICATION.search(line)
         if not m:continue
         tail=line[m.end():]
-        dates=list(DAY.finditer(tail[:200]))
+        dates=list(DAY.finditer(tail[:230]))
         if not dates:continue
-        last=dates[-1]
-        # Reject a lone initial application date if there is no clear end marker.
-        if len(dates)==1 and not re.search(r"~|～|까지|마감|종료|-",tail[:200]):continue
+        last=dates[-1];year,month,day=int(last[1]),int(last[2]),int(last[3])
+        after=tail[last.end():last.end()+100]
+        short=SHORT_DAY.search(after)
+        final_offset=last.end()
+        if short and re.search(r"[~～\-–]|부터",after[:short.start()+1]):
+            sm,sd=int(short[1]),int(short[2])
+            if sm<month:year+=1
+            month,day=sm,sd
+            final_offset+=short.end()
+        elif len(dates)==1:
+            # A lone full date is usable only if it itself is a deadline,
+            # not the beginning of a partially specified application range.
+            if re.search(r"[~～]|부터",after[:60]):continue
+            if not re.search(r"마감|까지|기한|종료",tail[:240]):continue
         try:
-            date=dt.date(int(last[1]),int(last[2]),int(last[3]))
+            date=dt.date(year,month,day)
         except ValueError:continue
-        times=list(TIME.finditer(tail[last.end():last.end()+40]))
+        times=list(TIME.finditer(tail[final_offset:final_offset+42]))
         if times:
             t=times[-1]
             if int(t[1])>23:continue
