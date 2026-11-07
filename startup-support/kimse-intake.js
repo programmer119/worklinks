@@ -17,6 +17,14 @@
   var IR_URL='https://irchallenge.jointips.or.kr/apply';
   var KHIS_URL=/^https:\/\/www\.khis\.kr\/board\.es\?act=view&bid=000[19]&list_no=\d{1,8}&mid=a1030[14]000000$/i;
   var HEALTH_OFFICIAL_URL=/^https:\/\/www\.khidi\.or\.kr\/(?:board\/view\?menuId=MENU0(?:1108|1484|1491)&linkId=\d{6,12}|mdtis\/bizPbanc\/bizPbancView\?menuId=MENU03471&biz_pbanc_id=[A-Za-z0-9_-]{3,40}&biz_pbanc_no=\d{1,8})$|^https:\/\/www\.nia\.or\.kr\/site\/nia_kor\/ex\/bbs\/View\.do\?cbIdx=99835&bcIdx=\d{4,10}$|^https:\/\/www\.hira\.or\.kr\/bbsDummy\.do\?pgmid=HIRAA020041000100&brdScnBltNo=4&brdBltNo=\d{4,8}$|^https:\/\/www\.aihub\.or\.kr\/aihubnews\/notice\/view\.do\?nttSn=\d{2,8}&currMenu=132&topMenu=103/i;
+  function isOfficialKDataNotice(url){
+    try{
+      var u=new URL(url);
+      if(u.protocol!=='https:'||!['www.kdata.or.kr','kdata.or.kr'].includes(u.hostname)||
+         u.pathname!=='/kr/board/notice_01/boardView.do'||u.hash)return false;
+      return Array.from(u.searchParams.values()).some(function(v){return /^\d{1,12}$/.test(v);});
+    }catch(err){return false;}
+  }
   function normalize(value){
     return String(value||'').normalize('NFKC').replace(/[^0-9a-zA-Z가-힣]/g,'').toLowerCase();
   }
@@ -50,7 +58,7 @@
       var deadline=deadlineFor(x,title);
       if(!validDeadline(deadline,now))continue;
       var url=String(x.url||'');
-      if(!SOURCE_URL.test(url)&&url!==IR_URL&&!KHIS_URL.test(url)&&!HEALTH_OFFICIAL_URL.test(url))continue;
+      if(!SOURCE_URL.test(url)&&url!==IR_URL&&!KHIS_URL.test(url)&&!HEALTH_OFFICIAL_URL.test(url)&&!isOfficialKDataNotice(url))continue;
       seen.add(title);
       var ir=x.source==='도전의 IR 운영사별 프로그램';
       var special=title.includes('2026서울바이오의료오픈콜라보');
