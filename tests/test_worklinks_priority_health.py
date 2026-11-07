@@ -82,9 +82,9 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         </table>"""
         found,count=observed_links(BeautifulSoup(html,"html.parser"),source[1],"nia")
         self.assertEqual(count,2)
-        self.assertEqual(len(found),2)
+        # Carbon-neutral competition is not automatically KIMSE-relevant.
+        self.assertEqual(len(found),1)
         self.assertTrue(found[0]["url"].endswith("bcIdx=30134"))
-        self.assertTrue(found[1]["url"].endswith("bcIdx=30083"))
 
     def test_real_aihub_static_row_data_key_yields_article(self):
         source=next(x for x in SOURCES if x[2]=="aihub")
