@@ -102,6 +102,26 @@ class LocalBudgetTest(unittest.TestCase):
         x=assess('2026 서울 IP 디딤돌 특허출원 지원 모집 공고', '서울 예비창업자 특허출원 비용지원 170만원. 신청 접수 일시 중지. 잔여 건수 발생 시 추가 접수 예정.', '서울', 'https://example.go.kr/notice/view?id=11', dt.datetime(2026,11,3,12,tzinfo=KST))
         self.assertTrue(x['suspendedHint'])
         self.assertEqual(x['quickWinTier'], 'waiting_reopen')
+    def test_public_pharmacy_schedule_is_neither_opportunity_nor_kimse(self):
+        row=assess('[보건의료] 무주읍 당번약국(문여는 약국) 일정 안내(2026.11.2.~2026.11.8.)',
+                   '주민 누구나 확인, 당번 약국 목록 11월 8일까지 공지', '무주',
+                   'https://www.muju.go.kr/planweb/board/view.9is?id=1', NOW)
+        self.assertIsNone(row)
+
+    def test_unrelated_public_survey_does_not_get_kimse_mark_from_boilerplate(self):
+        row=assess('2026 국민참여 정책 아이디어 선호도 투표',
+                   '국민 누구나 투표 참여. 상품권 경품 지급. 2026.11.01~2026.11.25. 게시판 공통 안내: 보건의료와 돌봄 정책도 지원합니다.',
+                   '서울', 'https://example.go.kr/notice/25', NOW)
+        self.assertIsNotNone(row)
+        self.assertFalse(row['kimseRelevantHint'])
+
+    def test_medical_startup_notice_remains_relevant(self):
+        row=assess('보건의료빅데이터 창업 인큐베이팅 무료 이용 모집',
+                   '예비창업자 누구나 신청. 2026.11.01~2026.11.25. 무료 데이터 분석 환경 제공',
+                   '서울', 'https://example.go.kr/notice/26', NOW)
+        self.assertIsNotNone(row)
+        self.assertTrue(row['kimseRelevantHint'])
+
     def test_health_patient_benefit_not_startup(self):
         self.assertIsNone(assess('치매치료관리비 지원기준 확대', '치매 환자 치료비 지원 안내, 읍면동 신청 가능', '청양', 'https://example.go.kr/view?id=4', NOW))
     def test_reannouncement_is_not_low_competition_proof(self):
