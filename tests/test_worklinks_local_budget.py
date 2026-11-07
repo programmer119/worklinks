@@ -48,6 +48,28 @@ class LocalBudgetTest(unittest.TestCase):
         self.assertTrue(row['kimseRelevantHint'])
 
 
+    def test_kimse_healthcare_incubating_lab_not_lost_by_title_gate(self):
+        row=assess('보건의료빅데이터 창업 인큐베이팅 랩 모집',
+                   '예비창업자 무료 컨설팅 신청 및 교육 제공. 신청기간 2026.11.01~2026.12.31.',
+                   '서울', 'https://example.go.kr/notice/view?id=501', NOW)
+        self.assertIsNotNone(row)
+        self.assertTrue(row['kimseRelevantHint'])
+        self.assertEqual(row['quickWinTier'], 'kimse_candidate')
+
+    def test_kimse_cognitive_voice_biomarker_opportunity(self):
+        row=assess('음성 바이오마커 인지건강 실증 참여기업 모집',
+                   '예비창업자와 스타트업 참여 신청. 시험평가 및 데이터 분석 지원.',
+                   '서울', 'https://example.go.kr/notice/view?id=502', NOW)
+        self.assertIsNotNone(row)
+        self.assertTrue(row['kimseRelevantHint'])
+
+    def test_kimse_health_data_support_can_surface(self):
+        row=assess('의료 데이터 개방 환경 지원 공고',
+                   '예비창업자 연구용 데이터 환경 신청 가능, 무료 이용 제공.',
+                   '서울', 'https://example.go.kr/notice/view?id=503', NOW)
+        self.assertIsNotNone(row)
+        self.assertTrue(row['kimseRelevantHint'])
+
     def test_bizinfo_observed_id(self):
         html = """<a href="javascript:void(0)" onclick="goBiz('PBLN_000000000127529')">2026년 지원금 바우처 사업화 지원 공고</a>"""
         soup=BeautifulSoup(html, 'html.parser')
