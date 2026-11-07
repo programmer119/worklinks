@@ -321,9 +321,12 @@ def main():
     if summary:
         with open(summary,"a",encoding="utf-8") as output_summary:
             output_summary.write("\n### 필수 의료·데이터 공고 수집 상태\n")
-            output_summary.write("건강 "+str(critical_coverage["healthy"])+"/"+
+            output_summary.write("공식 상세 공고 링크 탐지 "+str(critical_coverage["listingHealthy"])+"/"+
                                  str(critical_coverage["expected"])+
-                                 " · 실패/부분성공이 있으면 정상 수집으로 보고하지 않음\n\n")
+                                 " · 신청마감 검증 등 완전성 "+str(critical_coverage["healthy"])+"/"+
+                                 str(critical_coverage["expected"])+
+                                 " · 기간 미확인 후보 "+str(critical_coverage["applicationDatesUnverified"])+
+                                 "건. 실패/부분성공을 공고 0건으로 취급하지 않음\n\n")
             for source in critical_coverage["sources"]:
                 output_summary.write("- "+source["name"]+": "+source["status"]+
                                      ", 새 공고 "+str(source["currentQualified"])+
