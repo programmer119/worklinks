@@ -70,6 +70,22 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIsNone(valid_official_link(
           "https://other.example/aihubnews/notice/view.do?nttSn=10397",base,"aihub"))
 
+    def test_real_aihub_static_row_data_key_yields_article(self):
+        source=next(x for x in SOURCES if x[2]=="aihub")
+        soup=BeautifulSoup("""<table>
+          <tr><td class="subject"><a class="btnView" data-key="10554" href="#">
+          방송영상 AI 학습데이터 '안심존' 정식 개방 안내</a></td></tr>
+          <tr><td class="subject"><a class="btnView" data-key="notanid" href="#">
+          의료 AI 데이터 지원 사업 모집</a></td></tr>
+          <tr><td class="subject"><a class="btnView" data-key="10397" href="#">
+          의료 AI 데이터 사업 참여기업 모집 공고</a></td></tr>
+        </table>""","html.parser")
+        found,count=observed_links(soup,source[1],"aihub")
+        self.assertEqual(count,2)
+        self.assertEqual(len(found),2)
+        self.assertIn("nttSn=10554",found[0]["url"])
+        self.assertIn("nttSn=10397",found[1]["url"])
+
     def test_2026_notice_application_date_not_event_start(self):
         self.assertEqual(
           explicit_deadline("신청기간: 2026.11.01 ~ 11.24 16:00"),
