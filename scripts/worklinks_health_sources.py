@@ -144,7 +144,7 @@ def scan_source(spec, fetch, now):
             headline=re.sub(r"^(?:새글\s*|\[[^\]]{1,14}\]\s*)+", "", title)
             headline=re.sub(r"[^0-9a-zA-Z가-힣]", "", headline)[:14]
             page_text=re.sub(r"[^0-9a-zA-Z가-힣]", "", clean(body,30000))
-            if len(page_text)<35 or (headline and headline not in page_text):
+            if len(page_text)<20 or (headline and headline not in page_text):
                 failures += 1
                 continue
             deadline = application_deadline(title, body, published.year if published else None)
