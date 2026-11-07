@@ -1,9 +1,9 @@
 {
   "ok": true,
-  "generatedAt": "2026-11-07T16:26:06.797260+00:00",
+  "generatedAt": "2026-11-07T20:52:11.680832+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
-  "scannedNoticeCount": 3156,
+  "scannedNoticeCount": 3164,
   "byNotice": {
     "R26BK01773649:001": {
       "status": "no_official_attachment_metadata",
@@ -133314,7 +133314,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-11-07T20:52:11.680832+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestChangePending": true,
+      "manifestPendingSignature": "7206011dcd3779cdcd82a1ceaaf7217f7abff298251a5a81173d706dae9bf119",
+      "manifestBaselineUnverified": true
     },
     "R26BK01778529:000": {
       "status": "text_extracted_requires_review",
@@ -134020,7 +134025,12 @@
             }
           ]
         }
-      }
+      },
+      "manifestCheckedAt": "2026-11-07T20:52:11.680832+00:00",
+      "lastManifestProbeStatus": "complete",
+      "manifestSignature": "53ac1b01e2f645722c4196e9e9a06ad5a6a360cf640afe94fa2a7374fc759e7b",
+      "manifestBaselineUnverified": true,
+      "manifestChangePending": false
     },
     "R26BK01778492:000": {
       "status": "text_extracted_requires_review",
@@ -284760,7 +284770,3268 @@
           ]
         }
       }
+    },
+    "R26BK01800268:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 9,
+      "readableDocumentCount": 6,
+      "unreadableDocumentCount": 3,
+      "files": [
+        {
+          "name": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+          "readable": true,
+          "sourceSha256": "77e0453cd22f14c880ed4c71235d853c20215929b37097747cb4a3dad8f6a1d8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 63
+        },
+        {
+          "name": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+          "readable": true,
+          "sourceSha256": "6e1048dd82cec180fcc0a854398dc2a492f2b663b2376f38c0857a31f3ba31cf",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 192
+        },
+        {
+          "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+          "readable": true,
+          "sourceSha256": "06751347f758f75960c5ae9e700ba6a3d265f275b89f3ba5509a8d1f05fa93f8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 16
+        },
+        {
+          "name": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "304905b7b61019cc305a88d1d5d9e38940063292c4fc27c95f594cebb33588b4",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 45
+        },
+        {
+          "name": "붙임6. 제안요청서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "7defca60137cc45c61036148ab6681d699f51551229ed5f6c790212990bf2f69",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 54
+        },
+        {
+          "name": "붙임7. 계약특수조건_20.보안취약점 점검시스템 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "c39a4463f6c3e272d3bb7d483ea2a8f8301371f0099508c5ed1777a34c658911",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 10
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서_20.보안취약점 점검시스템 SW 유지보수.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "과업심의결과서.png",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "unsupported_format",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고 기본 첨부파일_용역.zip",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "file_extract_failure",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "ca225d0c4157e0f063e80f16f7201ee6e5c6e256f0b851b7ff8549b13ce4ba2e",
+      "manifestCheckedAt": "2026-11-07T20:53:27.698553+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 6,
+        "unreadableDocumentCount": 3,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임6. 제안요청서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임7. 계약특수조건_20.보안취약점 점검시스템 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 물품분류번호 : 소프트웨어유지및지원서비스(8111229901) ○「소프트웨어 진흥법」제58조에 의거 소프트웨어사업자로 신고한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 직접생산확인증명서(물품분류번호:8111229901)",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자 ( 컴퓨터관련 서비스사업 ( 업종코드 :1468) 또는 패키지소프트웨어 개발 · 공급 사업 ( 업종코드 : 1426)) 으로 입찰참가자격을 등록한 자 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "【 부정당 제재 적용 예시 】 ◦ 계약을 이행할 때에 부실‧조잡 또는 부정하게 하거나 부정한 행위를 한 자 ◦ 경쟁입찰, 계약 체결 또는 이행 과정에서 입찰자 또는 계약상대자 간에 서로 상의하여 미리 입찰가격, 수주 물량 또는 계약의 내용 등을 협정하였거나 특정인의 낙찰 또는 납품대상자 선정을 위하여 담합한 자 ◦ 하도급에 관한 제한규정을 위반하여 하도급한 자 및 발주관서의 승인 없이 하도급을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행 과정에서 국가에 손해를 끼친 자 ◦ 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행과 관련하여 당사 임직원에게 뇌물을 준 자 ◦ 계약을 이행할 때에 「산업안전보건법」에 따른 안전ㆍ보건 조치 규정을 위반하여 근로자에게 대통령령으로 정하는 기준에 따른 사망 등 중대한 위해를 가한 자 ◦ 입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이 계약을 체결 또는 이행하지 아니하거나 입찰공고와 계약서에 명시된 계약의 주요조건을 위반한 자 - 「국가정보보안기본지침」및 당사「정보보안 절차서」에 따른 보안 위규 수준 A급 등 위반 시 - 발주자의 승인없는 하도급을 시행한 경우",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적 다. 기술보고서 및 업데이트된 사용자 지침서 제공 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 유지보수 실적 나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "사항을 책임 있게 수행한다. 1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리 2) 제 10조 유지보수 실적자료 제출의 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_20.보안취약점 점검시스템 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "나. 상호 또는 법인의 명칭, 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우, 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다. 다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가 . 「 국가계약법 시행령 」 제 39 조제 4 항 및 같은 법 시행규칙 제 44 조에 해당하는 입찰은 무효로 처리됩니다 . 나 . 상호 또는 법인의 명칭 , 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우 , 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다 . - 4 - 다 . 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "마. 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동시 참여하면, 동일인이 2통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다. 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며, 현재 1인만 등록하면 변경등록을 하여야 합니다(2개 이상 법인의 임직원이라 하더라도 1인은 1개 법인에 대해서만 입찰대리인이 될 수 있습니다).",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "낙찰 후 계약체결 전에 부도 또는 파산상태에 있는 업체는 계약체결 대상에서 제외됩니다 . 마 . 한 업체의 소속 대표자 중 1 인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동 시 참여하면 , 동일인이 2 통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다 . 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며 , 현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3. 입찰참가자격에 관한 사항 (아래의 사항을 모두 충족하는 자)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격 등록업체만이 입찰참가할 수 있습니다 .",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "전자조달시스템에 등록 지연 등으로 인하여 입찰참가 마감일시까지 입찰참가자격등록 절차",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다. 라. 공동계약 가능여부 및 이행방식 : 불허용",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00 다. 입찰서(가격및기술) 제출기간 : 공고일시 ~ 2026.11.10. 11:00 (총액, VAT포함, 온라인제출)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰참가 신청방법 : 전자입찰(국가종합전자조달시스템(https://www.g2b.go.kr)) 나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용) 자 격",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안취약점 점검시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800268&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800089:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 9,
+      "readableDocumentCount": 5,
+      "unreadableDocumentCount": 4,
+      "files": [
+        {
+          "name": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+          "readable": true,
+          "sourceSha256": "fb2021fe1230e63f11f8a42d685d4bb617181626b03f34e825ca2355ad074198",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 69
+        },
+        {
+          "name": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+          "readable": true,
+          "sourceSha256": "080c2b9bde22fdb07cb88ae13ea4cb6970823e9a4f548701d722ea505efbbf58",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 201
+        },
+        {
+          "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "hwp5txt_failed",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "24485b100c0bddf6d34bdd2cecb3a3e743f9050137c9957b21f6f5b3dd10c928",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 45
+        },
+        {
+          "name": "붙임6. 제안요청서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "4f70bc2ad64b11fb4f682ebfda50db9f57da32156acdf4fff99f57248211fc5d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 55
+        },
+        {
+          "name": "붙임7. 계약특수조건_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수(최종).hwp",
+          "readable": true,
+          "sourceSha256": "ba54c9e3da4e27ddab864c361978622003a30c60f43808574c095d142f9b4e39",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 10
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "과업심의결과서.png",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "unsupported_format",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고 기본 첨부파일_용역.zip",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "file_extract_failure",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "29072f96ab56855c2f35f50906702c42404b50c65a67538b02573b9567774216",
+      "manifestCheckedAt": "2026-11-07T20:53:28.831928+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 5,
+        "unreadableDocumentCount": 4,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임6. 제안요청서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임7. 계약특수조건_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수(최종).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 사항을 입찰참가자격등록으로 등록한 자 - 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 물품분류번호 : 소프트웨어유지및지원서비스(8111229901) ○「소프트웨어 진흥법」제58조에 의거 소프트웨어사업자로 신고한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 직접생산확인증명서(물품분류번호:8111229901)",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 중소기업자와 우선조달계약일 경우, 중소기업ㆍ소상공인확인서’가 중소기업제품 공공구매 종합정보망",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 중소기업자와 우선조달계약일 경우, 중소기업ㆍ소상공인확인서’가 중소기업제품 공공구매 종합정보망 (http://www.smpp.go.kr)에서 확인. (전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있는 것이 있어야 함)이 안되거나 아래의 사항에 어느 하나라도 해당하는 경우 입찰참가자격이 없으니",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "【 부정당 제재 적용 예시 】 ◦ 계약을 이행할 때에 부실‧조잡 또는 부정하게 하거나 부정한 행위를 한 자 ◦ 경쟁입찰, 계약 체결 또는 이행 과정에서 입찰자 또는 계약상대자 간에 서로 상의하여 미리 입찰가격, 수주 물량 또는 계약의 내용 등을 협정하였거나 특정인의 낙찰 또는 납품대상자 선정을 위하여 담합한 자 ◦ 하도급에 관한 제한규정을 위반하여 하도급한 자 및 발주관서의 승인 없이 하도급을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행 과정에서 국가에 손해를 끼친 자 ◦ 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행과 관련하여 당사 임직원에게 뇌물을 준 자 ◦ 계약을 이행할 때에 「산업안전보건법」에 따른 안전ㆍ보건 조치 규정을 위반하여 근로자에게 대통령령으로 정하는 기준에 따른 사망 등 중대한 위해를 가한 자 ◦ 입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이 계약을 체결 또는 이행하지 아니하거나 입찰공고와 계약서에 명시된 계약의 주요조건을 위반한 자 - 「국가정보보안기본지침」및 당사「정보보안 절차서」에 따른 보안 위규 수준 A급 등 위반 시 - 발주자의 승인없는 하도급을 시행한 경우",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적 다. 기술보고서 및 업데이트된 사용자 지침서 제공 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 유지보수 실적 나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "사항을 책임 있게 수행한다. 1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리 2) 제 10조 유지보수 실적자료 제출의 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_15.네트워크접근관리시스템(NAC) 외 1종 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "나. 상호 또는 법인의 명칭, 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우, 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다. 다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "6. 입찰무효에 관한 사항 가 . 「 국가계약법 시행령 」 제 39 조제 4 항 및 같은 법 시행규칙 제 44 조에 해당하는 입찰은 무효로 처리됩니다 . 나 . 상호 또는 법인의 명칭 , 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우 , 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다 . 다 . 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "마. 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동시 참여하면, 동일인이 2통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다. 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며, 현재 1인만 등록하면 변경등록을 하여야 합니다(2개 이상 법인의 임직원이라 하더라도 1인은 1개 법인에 대해서만 입찰대리인이 될 수 있습니다).",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "낙찰 후 계약체결 전에 부도 또는 파산상태에 있는 업체는 계약체결 대상에서 제외됩니다 . 마 . 한 업체의 소속 대표자 중 1 인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동 시 참여하면 , 동일인이 2 통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다 . 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며 , 현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3. 입찰참가자격에 관한 사항 (아래의 사항을 모두 충족하는 자)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 입찰참가자격에 관한 사항 ( 아래의 사항을 모두 충족하는 자 )",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격 등록업체만이 입찰참가할 수 있습니다 .",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다. 라. 공동계약 가능여부 및 이행방식 : 불허용",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00 다. 입찰서(가격및기술) 제출기간 : 공고일시 ~ 2026.11.10. 11:00 (총액, VAT포함, 온라인제출)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰참가 신청방법 : 전자입찰(국가종합전자조달시스템(https://www.g2b.go.kr)) 나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용) 자 격",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_NAC 외 1종 SW 유지보수.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800089&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800227:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 9,
+      "readableDocumentCount": 6,
+      "unreadableDocumentCount": 3,
+      "files": [
+        {
+          "name": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+          "readable": true,
+          "sourceSha256": "a045737397c7ec440ee4655646abb65f6b847c968c7fd189604ce1bf4e38ccda",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 73
+        },
+        {
+          "name": "☆입찰공고문_웹쉘탐지시스템.pdf",
+          "readable": true,
+          "sourceSha256": "27ba1224476cae30a3bf8a3f688c6e35f142d01d7cb9558a05027279e2b86d1b",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 212
+        },
+        {
+          "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+          "readable": true,
+          "sourceSha256": "06751347f758f75960c5ae9e700ba6a3d265f275b89f3ba5509a8d1f05fa93f8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 16
+        },
+        {
+          "name": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "aaa27b4a82c24a673d2d39ac5a50b5d7e92e6e4063c33f4e0b1855390263447d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 45
+        },
+        {
+          "name": "붙임6. 제안요청서_25.웹쉘탐지시스템 외 1종 유지보수(최종)(.hwp",
+          "readable": true,
+          "sourceSha256": "bd88ce90893114fa13f11cb8ee48c9dac06d5e388d8557e5fcd6b04ef36ba46c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 56
+        },
+        {
+          "name": "붙임7. 계약특수조건_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "a6be85804f9a0a41fa3b66017f2d6903914b0ca2b0c5f80dbcdbf9982c352005",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 12
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서_25.웹쉘탐지시스템 외 1종 유지보수.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "과업심의결과서.png",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "unsupported_format",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고 기본 첨부파일_용역.zip",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "file_extract_failure",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        }
+      ],
+      "manifestSignature": "7efce7d58c654e89baa0cc68c05c140b65d6bf00b5963b42fa7c56143710a01c",
+      "manifestCheckedAt": "2026-11-07T20:53:29.318248+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 6,
+        "unreadableDocumentCount": 3,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "☆입찰공고문_웹쉘탐지시스템.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임6. 제안요청서_25.웹쉘탐지시스템 외 1종 유지보수(최종)(.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임7. 계약특수조건_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 사항을 입찰참가자격등록으로 등록한 자(①항과 ②항의 자격을 모두 갖춘 자) - ① 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- ① 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- ① 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자 - ② 정보통신공사업(업종코드 : 0036)으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426",
+                "0036"
+              ],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 정보통신공사업 등록증 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 정보통신공사업 등록증 ◦ 직접생산확인증명서(물품분류번호:8111229901)",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- ① 소프트웨어사업자 ( 컴퓨터관련 서비스사업 ( 업종코드 :1468) 또는 패키지소프트웨어 개발 · 공 급사업 ( 업종코드 : 1426)) 으로 입찰참가자격을 등록한 자 - ② 정보통신공사업 ( 업종코드 : 0036) 으로 입찰참가자격을 등록한 자 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "【 부정당 제재 적용 예시 】 ◦ 계약을 이행할 때에 부실‧조잡 또는 부정하게 하거나 부정한 행위를 한 자 ◦ 경쟁입찰, 계약 체결 또는 이행 과정에서 입찰자 또는 계약상대자 간에 서로 상의하여 미리 입찰가격, 수주 물량 또는 계약의 내용 등을 협정하였거나 특정인의 낙찰 또는 납품대상자 선정을 위하여 담합한 자 ◦ 하도급에 관한 제한규정을 위반하여 하도급한 자 및 발주관서의 승인 없이 하도급을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행 과정에서 국가에 손해를 끼친 자 ◦ 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행과 관련하여 당사 임직원에게 뇌물을 준 자 ◦ 계약을 이행할 때에 「산업안전보건법」에 따른 안전ㆍ보건 조치 규정을 위반하여 근로자에게 대통령령으로 정하는 기준에 따른 사망 등 중대한 위해를 가한 자 ◦ 입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이 계약을 체결 또는 이행하지 아니하거나 입찰공고와 계약서에 명시된 계약의 주요조건을 위반한 자 - 「국가정보보안기본지침」및 당사「정보보안 절차서」에 따른 보안 위규 수준 A급 등 위반 시 - 발주자의 승인없는 하도급을 시행한 경우",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적 다. 기술보고서 및 업데이트된 사용자 지침서 제공 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 유지보수 실적 나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "사항을 책임 있게 수행한다. 1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리 2) 제 10조 유지보수 실적자료 제출의 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_25.웹쉘탐지시스템 외 1종 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "나. 상호 또는 법인의 명칭, 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우, 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다. 다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "6. 입찰무효에 관한 사항 가 . 「 국가계약법 시행령 」 제 39 조제 4 항 및 같은 법 시행규칙 제 44 조에 해당하는 입찰은 무효로 처리됩니다 . 나 . 상호 또는 법인의 명칭 , 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우 , 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다 . 다 . 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "마. 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동시 참여하면, 동일인이 2통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다. 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며, 현재 1인만 등록하면 변경등록을 하여야 합니다(2개 이상 법인의 임직원이라 하더라도 1인은 1개 법인에 대해서만 입찰대리인이 될 수 있습니다).",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "낙찰 후 계약체결 전에 부도 또는 파산상태에 있는 업체는 계약체결 대상에서 제외됩니다 . 마 . 한 업체의 소속 대표자 중 1 인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동 시 참여하면 , 동일인이 2 통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다 . 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며 , 현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3. 입찰참가자격에 관한 사항 (아래의 사항을 모두 충족하는 자)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 입찰참가자격에 관한 사항 ( 아래의 사항을 모두 충족하는 자 )",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격 등록업체만이 입찰참가할 수 있습니다 .",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "○ 「정보통신공사업법」 제14조에 의한 ‘정보통신공사업 등록증’ 보유 업체 ※ 이 사업은 10억원 미만의 사업으로 「정보통신공사업법」제24조의2 및 동법 시행령 제24조의2 의거 대기업(상호출자제한기업집단, 공공기관, 지방공기업)인 정보통신공사업자는 본 입찰에 참여할 수 없음 (국가계약예규 공사입찰유의서 제15조 입찰의 무효, 9의3에 따라 입찰 무효사유에 해당함)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "※ 이 사업은 10억원 미만의 사업으로 「정보통신공사업법」제24조의2 및 동법 시행령 제24조의2 의거 대기업(상호출자제한기업집단, 공공기관, 지방공기업)인 정보통신공사업자는 본 입찰에 참여할 수 없음 (국가계약예규 공사입찰유의서 제15조 입찰의 무효, 9의3에 따라 입찰 무효사유에 해당함)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00 다. 입찰서(가격및기술) 제출기간 : 공고일시 ~ 2026.11.10 11:00 (총액, VAT포함, 온라인제출)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰참가 신청방법 : 전자입찰(국가종합전자조달시스템(https://www.g2b.go.kr)) 나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 정보통신공사업 등록증 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용) 자 격",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹쉘탐지시스템.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800227&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800253:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 9,
+      "readableDocumentCount": 7,
+      "unreadableDocumentCount": 2,
+      "files": [
+        {
+          "name": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+          "readable": true,
+          "sourceSha256": "337d7278d0cf86fa00e7e913c256b60c8b3560813432edee5ddc133a3f1f231d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 63
+        },
+        {
+          "name": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+          "readable": true,
+          "sourceSha256": "cf87c5006ae3c0becd5af4403660c7819d7c9053890524c5eff12bb748bbef4f",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 192
+        },
+        {
+          "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+          "readable": true,
+          "sourceSha256": "06751347f758f75960c5ae9e700ba6a3d265f275b89f3ba5509a8d1f05fa93f8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 16
+        },
+        {
+          "name": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "f8711b671562e36702525fa9aa87144ec00f54b60968412d461e511ce71c42a8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 45
+        },
+        {
+          "name": "붙임6. 제안요청서_19.문서암호화(DRM) SW 유지보수(최종).hwp",
+          "readable": true,
+          "sourceSha256": "4baf4403d29084a6d228725cf988bccc0c9862251f4cfeabd3b8d61d5733672c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 54
+        },
+        {
+          "name": "붙임7. 계약특수조건_19.문서암호화(DRM) SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "5fe2b40ef61bad8fac2fd31b7ed6aebba78edbaf8e7a9c0568502e835d9e774a",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 10
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서_19.문서암호화(DRM) SW 유지보수.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "과업 심의결과서.png",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "unsupported_format",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고 기본 첨부파일_용역.zip",
+          "readable": true,
+          "sourceSha256": "578da83bb2388a7425e3be9ca54d408629236e9639f69a627f94000fcb07d8c1",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 53
+        }
+      ],
+      "manifestSignature": "90738f451d5b684de172fbbff95ee70718dc41f9ba14f72166618b02b4e4a9ee",
+      "manifestCheckedAt": "2026-11-07T20:53:31.440368+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 7,
+        "unreadableDocumentCount": 2,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임6. 제안요청서_19.문서암호화(DRM) SW 유지보수(최종).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임7. 계약특수조건_19.문서암호화(DRM) SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 물품분류번호 : 소프트웨어유지및지원서비스(8111229901) ○「소프트웨어 진흥법」제58조에 의거 소프트웨어사업자로 신고한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 직접생산확인증명서(물품분류번호:8111229901)",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자 ( 컴퓨터관련 서비스사업 ( 업종코드 :1468) 또는 패키지소프트웨어 개발 · 공급 사업 ( 업종코드 : 1426)) 으로 입찰참가자격을 등록한 자 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "속주체, 지분 등을 정할 수 있다. 다만, 계약의 특수성(국가안전보장, 국방, 외교관계, 정보보안, 계약상대자의 소재지 등)을 고려하여 계약당사자간의 협의를 통해 발주자 단독으로 소유할 수 있다.",
+              "codes": [],
+              "sourceFile": "입찰공고 기본 첨부파일_용역.zip",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=9&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "【 부정당 제재 적용 예시 】 ◦ 계약을 이행할 때에 부실‧조잡 또는 부정하게 하거나 부정한 행위를 한 자 ◦ 경쟁입찰, 계약 체결 또는 이행 과정에서 입찰자 또는 계약상대자 간에 서로 상의하여 미리 입찰가격, 수주 물량 또는 계약의 내용 등을 협정하였거나 특정인의 낙찰 또는 납품대상자 선정을 위하여 담합한 자 ◦ 하도급에 관한 제한규정을 위반하여 하도급한 자 및 발주관서의 승인 없이 하도급을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행 과정에서 국가에 손해를 끼친 자 ◦ 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행과 관련하여 당사 임직원에게 뇌물을 준 자 ◦ 계약을 이행할 때에 「산업안전보건법」에 따른 안전ㆍ보건 조치 규정을 위반하여 근로자에게 대통령령으로 정하는 기준에 따른 사망 등 중대한 위해를 가한 자 ◦ 입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이 계약을 체결 또는 이행하지 아니하거나 입찰공고와 계약서에 명시된 계약의 주요조건을 위반한 자 - 「국가정보보안기본지침」및 당사「정보보안 절차서」에 따른 보안 위규 수준 A급 등 위반 시 - 발주자의 승인없는 하도급을 시행한 경우",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적 다. 기술보고서 및 업데이트된 사용자 지침서 제공 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 유지보수 실적 나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "사항을 책임 있게 수행한다. 1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리 2) 제 10조 유지보수 실적자료 제출의 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_19.문서암호화(DRM) SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "나. 상호 또는 법인의 명칭, 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우, 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다. 다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가 . 「 국가계약법 시행령 」 제 39 조제 4 항 및 같은 법 시행규칙 제 44 조에 해당하는 입찰은 무효로 처리됩니다 . 나 . 상호 또는 법인의 명칭 , 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우 , 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다 . - 4 - 다 . 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "마. 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동시 참여하면, 동일인이 2통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다. 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며, 현재 1인만 등록하면 변경등록을 하여야 합니다(2개 이상 법인의 임직원이라 하더라도 1인은 1개 법인에 대해서만 입찰대리인이 될 수 있습니다).",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "낙찰 후 계약체결 전에 부도 또는 파산상태에 있는 업체는 계약체결 대상에서 제외됩니다 . 마 . 한 업체의 소속 대표자 중 1 인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동 시 참여하면 , 동일인이 2 통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다 . 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며 , 현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3. 입찰참가자격에 관한 사항 (아래의 사항을 모두 충족하는 자)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격 등록업체만이 입찰참가할 수 있습니다 .",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "전자조달시스템에 등록 지연 등으로 인하여 입찰참가 마감일시까지 입찰참가자격등록 절차",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다. 라. 공동계약 가능여부 및 이행방식 : 불허용",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00 다. 입찰서(가격및기술) 제출기간 : 공고일시 ~ 2026.11.10. 11:00 (총액, VAT포함, 온라인제출)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰참가 신청방법 : 전자입찰(국가종합전자조달시스템(https://www.g2b.go.kr)) 나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용) 자 격",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_문서암호화(DRM) SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800253&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800675:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 5,
+      "readableDocumentCount": 4,
+      "unreadableDocumentCount": 1,
+      "files": [
+        {
+          "name": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+          "readable": true,
+          "sourceSha256": "1a67706776c62e89949dc5366b3f18ba4787c3399292dccd9ea93e7febe2cb68",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 40
+        },
+        {
+          "name": "(기술지원협약서)2027년 빅데이터시스템 통합유지보수 용역.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+          "readable": true,
+          "sourceSha256": "ce98d8bd3855ec9e0f38590b3154e3d18445e2b2749309ce083725c99af1307a",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 96
+        },
+        {
+          "name": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+          "readable": true,
+          "sourceSha256": "6a4fc1d8505bd28f010a83d0ef08452ca4d387323fec79fed24974f3b2edbd45",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 28
+        },
+        {
+          "name": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).pdf",
+          "readable": true,
+          "sourceSha256": "23fa25bfe0600f41187a798abbe0367d1b389a0ddedea3b442d8158b080ed132",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 112
+        }
+      ],
+      "manifestSignature": "44c4f0e397cc794bd648582be9aadbb82f4c2a573192f7574e3eed1a443fc85b",
+      "manifestCheckedAt": "2026-11-07T20:53:49.717264+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 4,
+        "unreadableDocumentCount": 1,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          },
+          {
+            "name": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=7&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "나. 「소프트웨어진흥법」 제58조에 의거 소프트웨어사업자(컴퓨터관련서비스사업)(업종코드:1468)로 등록한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 「소프트웨어진흥법」 제58조에 의거 소프트웨어사업자(컴퓨터관련서비스사업)(업종코드:1468)로 등록한 업체 다. 총괄책임자 자격이 되는 전문 인력 보유 또는 계약 전까지 채용 가능한 업체",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제14조의 자격을 갖추고, 입찰공고일 180일 전【신규사업자(법인인 경우 법인등기일, 개인사업자인 경우 사업자등록일)인 경우 입찰공고일 전 180일이 되는 날 이후를 포함】부터 입찰일(낙찰자는 계약체결일)까지 법인등기부상 본점 소재지(개인사업자인 경우에는 사업자등록증 또는 관련 법령에 따른 허가·인가·면허·등록· 신고 등에 관련된 서류에 기재된 사업장의 소재지)가 경상남도 내에 있는 업체로서, 나. 「소프트웨어진흥법」 제58조에 의거 소프트웨어사업자(컴퓨터관련서비스사업)",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=7&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "라.『중소기업제품 구매촉진 및 판로지원에 관한 법률』제9조 및 동법 시행령 제10조의 규정에 의거 입찰 마감일 전일까지 직접생산이 확인된 업체로서, 직접생산확인증명서[정보시스템유지관리서비스]를 소지한 업체",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라.『중소기업제품 구매촉진 및 판로지원에 관한 법률』제9조 및 동법 시행령 제10조의 규정에 의거 입찰 마감일 전일까지 직접생산이 확인된 업체로서, 직접생산확인증명서[정보시스템유지관리서비스]를 소지한 업체 마. 총괄책임자 자격이 되는 전문인력을 보유 또는 계약 전까지 채용 가능한 업체 (계약 시 자격증 사본 및 재직증명서 제출)",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "라. 「중소기업제품 구매촉진 및 판로지원에 관한 법률」 제9조 및 같은 법 시행령 제10조의 규정에 의한 직접생산확인증명서(세부품명:정보시스템유지관리서비스, 세부품명번호:8111189901)를 소지한 업체",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "나.『소프트웨어 진흥법』제58조에 의한 소프트웨어 사업자(분야:컴퓨터관련 서비스사업)로 등록한 업체 다.『중소기업기본법』제2조에 따른 중소기업자 및『소상공인 보호 및 지원에 관한 법률』제2조에 따른 소상공인으로서『중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업 확인서(중기업/소기업/소상공인)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.『중소기업기본법』제2조에 따른 중소기업자 및『소상공인 보호 및 지원에 관한 법률』제2조에 따른 소상공인으로서『중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업 확인서(중기업/소기업/소상공인)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "마. 「중소기업기본법」 제2조에 따른 중·소기업자 또는 「소상공인 보호 및 지원에 관한 법률」 제2조에 따른 소상공인으로서 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인 확인서를 소지한 업체",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "○ 경상남도에 주된 영업소(본점)를 둔 업체와 자발적으로 공동수급체를 구성하여 입찰한 경우 지역업체 참여비율에 따른 점수 적용",
+              "codes": [],
+              "sourceFile": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 경상남도에 주된 영업소(본점)를 둔 업체와 자발적으로 공동수급체를 구성하여 입찰한 경우 지역업체 참여비율에 따른 점수 적용 ※ 지역업체 단독입찰 또는 지역업체",
+              "codes": [],
+              "sourceFile": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3 ○ 경상남도에 주된 영업소(본점)를 둔 업체와 자발적으로 공동수급체를 구성하여 입찰한 경우 지역업체 참여비율에 따른 점수 적용",
+              "codes": [],
+              "sourceFile": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "본 계약을 해지할 수 있고, 이를 서면으로 통보한다.○ 창원시 또는 사업수행자가 본 계약을 해지하고자 할 때에는 해지예정일 1개월 전에 상대방에게 서면으로 통지하여야 한다.○ 창원시와 사업수행자는 서면상의 사전동의 없이 본 계약에 따른 권리, 의무를 타인에게 양도할 수 없다.○ 사업수행자는 본 계약과 관련하여 제3의 업체에 일괄하도급을 할 수 없다.○ 본 계약에 정하지 아니한 사항은 합의하여 결정한다. 단, 합의가 원활치 않을 경우 창원시의 결정을 따른다.○ 본 계약에 대한 해",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 창원시와 사업수행자는 서면상의 사전동의 없이 본 계약에 따른 권리, 의무를 타인에게 양도할 수 없다. ○ 사업수행자는 본 계약과 관련하여 제3의 업체에 일괄하도급을 할 수 없다.",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 사업수행자는 본 계약과 관련하여 제3의 업체에 일괄하도급을 할 수 없다.",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "2. 적격심사 자기평가 및 심사표 1부〈별지 제2호 서식〉 3. 용역이행 실적증명서 1부〈별지 제3호 서식〉 : 필요시 제출",
+              "codes": [],
+              "sourceFile": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 용역이행 실적증명서 1부〈별지 제3호 서식〉 : 필요시 제출 4. 재무제표 또는 신용평가등급확인서 : 적격심사 대상자(공동수급체는 각 구성원)가 선택",
+              "codes": [],
+              "sourceFile": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 다른 법령에 의한 업종을 보완하는 분담이행방식일 경우 공동수급체의 구성원 중 업종보완자는 평가에서 제외함. 다. 용역수행실적 또는 특별신인도 평가는 해당용역의 기초금액 대비 최근 5년간 공동수급체 구성원 각각의 이행실적에 구성원 각자의 출자비율 또는 분담비율을 곱하여 산정한 후 이를 합산한 실적으로 평가한다.",
+              "codes": [],
+              "sourceFile": "[개정전문]경상남도일반용역등적격심사세부기준(230130시행).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "책임자를 교체할 경우 서면요청 후 창원시의 승인을 받는다.○ 주요역할 ­복합장애에 대한 원인분석 및 책임 - 유지보수용역 시행에 대한 총괄관리 ­정기적인 운영보고 및 유지보수 결과 취합보고 ­시스템의 정상운영 여부 수시점검 및 결과보고 ­시스템 처리속도 지연 등 운영에 불편한 사유발생시 개선조치 지원 및 최적의 운영방안을 제시○ 아래와 같은 사유로 총괄책임자인력 교체를 요청할 경우 15일 이내에 창원시의 승인을 받고 인력을 교체하여야 한다. - 투입인력이 불성실하거나 기술능력이",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "내에 창원시의 승인을 받고 인력을 교체하여야 한다. - 투입인력이 불성실하거나 기술능력이 부족한 경우 - 중대한 과실로 시스템의 중단 등을 야기한 경우○ 계약 시 제출해야 할 총괄책임자인력 증명서류 - 경력증명서․자격증 사본 등 경력증명용 서류 1부 - 재직증명서․건강보험증사본 등 재직상태 증명용 서류 1부산출 정보유지보수계획서, 정기점검보고서, 경력증명서, 자격증사본, 재직증명서류",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 아래와 같은 사유로 총괄책임자인력 교체를 요청할 경우 15일 이내에 창원시의 승인을 받고 인력을 교체하여야 한다. - 투입인력이 불성실하거나 기술능력이 부족한 경우",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "다. 입찰 전에 상호 또는 법인의 명칭, 대표자의 성명이 변경(법인은 법인등기부를 기준으로 한다)된 자는 그 사항을 변경등록하고 입찰에 참가해야 하며 변경 등록하지 아니하고 입찰에 참여한 경우에는 「지방자치단체를 당사자로 하는 계약에 관한 법률 시행규칙」 제42조제5호의 입찰무효사유에 해당합니다.",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰 전에 상호 또는 법인의 명칭, 대표자의 성명이 변경(법인은 법인등기부를 기준으로 한다)된 자는 그 사항을 변경등록하고 입찰에 참가해야 하며 변경 등록하지 아니하고 입찰에 참여한 경우에는 「지방자치단체를 당사자로 하는 계약에 관한 법률 시행규칙」 제42조제5호의 입찰무효사유에 해당합니다. 12. 안전보건수준평가 관련사항",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰 전에 상호 또는 법인의 명칭, 대표자의 성명이 변경(법인은 법인등기부를 기준 으로 한다)된 자는 그 사항을 변경등록하고 입찰에 참가해야 하며 변경 등록하지 아니",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=7&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "이내) - 경력증명서․자격증사본 등 경력증명용 서류 1부 - 재직증명서․건강보험증사본 등 재직상태 증명용 서류 1부 ※ 참여인력 교체시에도 해당됨산출 정보유지보수인력현",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "황, 유지보수비상연락체계, 참여인력 전원 경력증명서․자격증사본․재직증명서",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "시 안전한 방법으로 폐기 처리할 예정입니다.(동의거부시 유지보수기술인력으로 참여 불가함)",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "의무 위반금액이 같은 법 제29조제1항제3호에 따른 금액을 초과하는 자 4. 「조세범 처벌법」 제3조에 따른 조세 포탈세액이나 환급ㆍ공제받은 세액이",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 「조세범 처벌법」 제3조에 따른 조세 포탈세액이나 환급ㆍ공제받은 세액이",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 「조세범 처벌법」 제3조에 따른 조세 포탈세액이나 환급ㆍ공제받은 세액이 5억원 이상인 자",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "가.『지방자치단체를 당사자로 하는 계약에 관한 법률』시행령 제13조 및 동법 시행규칙 제14조에 경쟁입찰 참가자격을 구비한 업체",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가.『지방자치단체를 당사자로 하는 계약에 관한 법률』시행령 제13조 및 동법 시행규칙 제14조에 경쟁입찰 참가자격을 구비한 업체 나.『소프트웨어 진흥법』제58조에 의한 소프트웨어 사업자(분야:컴퓨터관련 서비스사업)로 등록한 업체",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 입찰참가자격 가.『지방자치단체를 당사자로 하는 계약에 관한 법률』시행령 제13조 및 동법 시행규칙 제14조에 경쟁입찰 참가자격을 구비한 업체",
+              "codes": [],
+              "sourceFile": "(과업지시서)2027년 빅데이터시스템 통합유지보수 용역.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "10. 입찰보증금 납부 및 귀속",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "10. 입찰보증금 납부 및 귀속 가. 지방자치단체를 당사자로 하는 계약에 관한 법률 제12조 및 같은 법 시행령 제37조 및 제38조에 따르며, 입찰보증금 납부는 조달청 전자입찰서의 납부이행각서로 갈음합니다.",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "9. 청렴계약 이행 준수 : 본 입찰에 참가하는 모든 업체는 우리 시 청렴계약이행서약서를 제출한 것으로 간주하며, 최종 낙찰자로 선정된 업체는 계약체결 시 청렴계약이행서약서를 반드시 우리 시에 제출하여야 합니다. 10. 입찰보증금 납부 및 귀속",
+              "codes": [],
+              "sourceFile": "(공고문)2027년 빅데이터시스템 통합유지보수 용역(수정ver1).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800675&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800655:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 3,
+      "readableDocumentCount": 3,
+      "unreadableDocumentCount": 0,
+      "files": [
+        {
+          "name": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+          "readable": true,
+          "sourceSha256": "4b4ed3a49986bd7a4ffd832a0c03a3c5f86544e915f5e39c8c53c899c6e55886",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 190
+        },
+        {
+          "name": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.hwp",
+          "readable": true,
+          "sourceSha256": "64497d36a664d8dd470b39f5bdd19c12c0524fc7b5b77084a96a5e41028638fe",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 47
+        },
+        {
+          "name": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+          "readable": true,
+          "sourceSha256": "495018447b02245cb10b3f783a0813f254e5f1bb6494e739ff76920b3a63f3ac",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 125
+        }
+      ],
+      "manifestSignature": "eba425c32dc5a56574a3a82cd774e647dbc071bc18c9673fe6b84cf361e79d7d",
+      "manifestCheckedAt": "2026-11-07T20:53:54.642531+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 3,
+        "unreadableDocumentCount": 0,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당 업자로 입찰참가자격 제한을 받은 자는 제외 ③ 국가종합전자조달시스템(http://www.g2b.go.kr)에 입찰등록을 필한 업체 ④ 본 사업은 사업금액이 20억 미만인 사업으로서 「중소 소프트웨어사업자의 사업",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "③ 국가종합전자조달시스템(http://www.g2b.go.kr)에 입찰등록을 필한 업체 ④ 본 사업은 사업금액이 20억 미만인 사업으로서 「중소 소프트웨어사업자의 사업",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당 업자로 입찰참가자격 제한을 받은 자는 제외 ③ 국가종합전자조달시스템(http://www.g2b.go.kr)에 입찰등록을 필한 업체 ④ 본 사업은 사업금액이 20억 미만인 사업으로서 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술정보통신부 고시)에 의거 대기업 및 중견기업",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "입찰서 제출 마감일 전일까지「소프트웨어 진흥법」제58조에 의한 소프트웨어사 업자(업종코드:1468)로 등록된 업체 ⑥ 본 사업은 중소기업간 경쟁제품에 해당되며,「중소기업제품 구매촉진 및 판로지 원에 관한 법률」제2조에 의한 중소기업자로서 같은 법 제9조 및 관련규정에 의한 직접생산증명서(정보시스템유지관리서비스: 8111189901)를 소지한 업체",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "원에 관한 법률」제2조에 의한 중소기업자로서 같은 법 제9조 및 관련규정에 의한 직접생산증명서(정보시스템유지관리서비스: 8111189901)를 소지한 업체",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "업자(업종코드:1468)로 등록된 업체 ⑥ 본 사업은 중소기업간 경쟁제품에 해당되며,「중소기업제품 구매촉진 및 판로지 원에 관한 법률」제2조에 의한 중소기업자로서 같은 법 제9조 및 관련규정에 의한 직접생산증명서(정보시스템유지관리서비스: 8111189901)를 소지한 업체 ⑦ 「중소기업기본법」제2조에 따른 중소기업 또는「소상공인 보호 및 지원에 관한",
+              "codes": [
+                "8111189901"
+              ],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "원에 관한 법률」제2조에 의한 중소기업자로서 같은 법 제9조 및 관련규정에 의한 직접생산증명서(정보시스템유지관리서비스: 8111189901)를 소지한 업체 ⑦ 「중소기업기본법」제2조에 따른 중소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "직접생산증명서(정보시스템유지관리서비스: 8111189901)를 소지한 업체 ⑦ 「중소기업기본법」제2조에 따른 중소기업 또는「소상공인 보호 및 지원에 관한 법률」제2조에 따른 소상공인으로서「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중·소기업·소상공인확인서를 소지한 업체 ※ 전자입찰서 제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 합니다.",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "제2조(공동수급체) 공동수급체의 명칭, 사업소의 소재지, 대표자는 다음과 같다.",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "제2조(공동수급체) 공동수급체의 명칭, 사업소의 소재지, 대표자는 다음과 같다. 1. 명 칭 : ㅇㅇㅇ",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "3. 발주자명 : 제2조(공동수급체) 공동수급체의 명칭, 사업소의 소재지, 대표자는 다음과 같다.",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "본 사업에 책임자로 중복 참여가 불가하며, 책임자가 아닌 경우에도 전 과제에 걸쳐 투입비율이 초과되는 경우 참여가 불인정됩니다. ⑨ 본원 「계약·구매업무규칙」제9조(입찰참가 제한) 제1항 내지 제4항의 입찰참가 자격제한 등에 관한 사항 및 제4항에 해당하는 업체가 하수급으로 입찰 또는 승인을 요청하는 경우에는 참여를 불허하거나 하도급 계약을 승인하지 않을 수 있습니다.",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "자격제한 등에 관한 사항 및 제4항에 해당하는 업체가 하수급으로 입찰 또는 승인을 요청하는 경우에는 참여를 불허하거나 하도급 계약을 승인하지 않을 수 있습니다.",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "걸쳐 투입비율이 초과되는 경우 참여가 불인정됩니다. ⑨ 본원 「계약·구매업무규칙」제9조(입찰참가 제한) 제1항 내지 제4항의 입찰참가 자격제한 등에 관한 사항 및 제4항에 해당하는 업체가 하수급으로 입찰 또는 승인을 요청하는 경우에는 참여를 불허하거나 하도급 계약을 승인하지 않을 수 있습니다. ⑩「국가를 당사자로 하는 계약에 관한 법률」제27조의5 및 동법 시행령 제12조 제3항에",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "□ 2. 자본금 및 매출액 현황(최근 3년) □ 3. 사업 실적 증명서",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "□ 3. 사업 실적 증명서",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "□ 3. 사업 실적 증명서 □ 4. 사업 수행실적 총괄표",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "❍ 수요기관의 자질 부족, 근무태도 불량 등의 사유로 투입인력 교체를 원할 경우, 특별한 사유가 없는 한 상호 협의하에 교체 투입",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "❍ 수요기관의 자질 부족, 근무태도 불량 등의 사유로 투입인력 교체를 원할 경우, 특별한 사유가 없는 한 상호 협의하에 교체 투입 ❍ 투입인력 변경을 필요로 하는 경우 사전에 수요기관과 협의하여 승인을 득한 후 동급 이상의 인력으로 교체하여야함",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "4. 계약조건 ❍ 수요기관의 자질 부족, 근무태도 불량 등의 사유로 투입인력 교체를 원할 경우, 특별한 사유가 없는 한 상호 협의하에 교체 투입",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "참여 지원에 관한 지침」(과학기술정보통신부 고시)에 의거 대기업 및 중견기업 소프트웨어 사업자는 본 입찰에 참여할 수 없으며,「소프트웨어 진흥법」제48조 제4항에 따라「독점규제 및 공정거래에 관한 법률」제14조에 따라 지정된 상호출 자제한기업집단에 속하는 기업은 입찰에 참여할 수 없음 ⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "자제한기업집단에 속하는 기업은 입찰에 참여할 수 없음 ⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "소프트웨어 사업자는 본 입찰에 참여할 수 없으며,「소프트웨어 진흥법」제48조 제4항에 따라「독점규제 및 공정거래에 관한 법률」제14조에 따라 지정된 상호출 자제한기업집단에 속하는 기업은 입찰에 참여할 수 없음 ⑤「국가종합전자조달시스템 입찰참가자격등록규정」에 의하여 나라장터(G2B)에 전자 - 2 -",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "① 낙찰자로 선정된 자는 입찰참가자격을 증명하는 서류를 구비하여 최종 낙찰일로",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "관한 법률 시행령」제76조의 규정에 의하여 입찰참가자격 제한조치를 하며, 낙찰을",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "❍ 입찰 참가자격",
+              "codes": [],
+              "sourceFile": "2. 제안요청서_2027~2028년 KERIS 대표 홈페이지 응용SW 유지관리.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "3. 참가자격(제안요청서 참조 필수) ①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당 업자로 입찰참가자격 제한을 받은 자는 제외",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당 업자로 입찰참가자격 제한을 받은 자는 제외",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당 업자로 입찰참가자격 제한을 받은 자는 제외 ③ 국가종합전자조달시스템(http://www.g2b.go.kr)에 입찰등록을 필한 업체",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "⑦ 가격개찰 일시 및 장소 : 제안서 평가 후 개찰 / 발주처 담당자 PC - 가격개찰은 시스템 상 개찰일시에도 불구하고 제안서 평가완료 후 진행됩니다. 3. 참가자격(제안요청서 참조 필수) ①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 가격개찰은 시스템 상 개찰일시에도 불구하고 제안서 평가완료 후 진행됩니다. 3. 참가자격(제안요청서 참조 필수) ①「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 동법 시행규칙 제14조에 의한 경쟁 입찰 참가 자격을 갖춘 자 ②「국가를 당사자로 하는 계약에 관한 법률 시행규칙」제76조의 규정에 의한 부정당",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "협정체결이 됩니다. - 대표업체는 협정서 승인여부를 확인 후 투찰하셔야 하며, 대표업체의 승인이 이루어지지 않은 상태에서 대표업체가 투찰을 했을 경우 입찰참가자격 미달 등 으로 낙찰에서 제외될 수 있으니 유의하시기 바랍니다. 6. 입찰보증금(입찰보증보험증권)",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "으로 낙찰에서 제외될 수 있으니 유의하시기 바랍니다. 6. 입찰보증금(입찰보증보험증권)",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 대표업체는 협정서 승인여부를 확인 후 투찰하셔야 하며, 대표업체의 승인이 이루어지지 않은 상태에서 대표업체가 투찰을 했을 경우 입찰참가자격 미달 등 으로 낙찰에서 제외될 수 있으니 유의하시기 바랍니다. 6. 입찰보증금(입찰보증보험증권) ① (입찰보증금의 납부) 입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5",
+              "codes": [],
+              "sourceFile": "1. 전자입찰공고문_2027~2028년 KERIS 대표 횸페이지 응용SW 유지관리.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800655&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800277:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 9,
+      "readableDocumentCount": 7,
+      "unreadableDocumentCount": 2,
+      "files": [
+        {
+          "name": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+          "readable": true,
+          "sourceSha256": "731d6f553114e4149a5bf7018443d19414a3eee8249127396dacb818d857c648",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 63
+        },
+        {
+          "name": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+          "readable": true,
+          "sourceSha256": "c768fdf1c84e8a40bfa31065bf9b262091d3f784c68ca20ff714e9949258cac1",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 192
+        },
+        {
+          "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+          "readable": true,
+          "sourceSha256": "06751347f758f75960c5ae9e700ba6a3d265f275b89f3ba5509a8d1f05fa93f8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 16
+        },
+        {
+          "name": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "b11cca45611202793760dc999bb9ccb75d0d204ffdfac68532fddf169ec04f3d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 45
+        },
+        {
+          "name": "붙임6. 제안요청서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "1baca31bf2ab34eb9ecf63f66bb331235dd2197e3fc4c55cae24063d467c3b16",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 54
+        },
+        {
+          "name": "붙임7. 계약특수조건_22.웹 취약점 진단관리 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "bd969ad9328213fdf805f1298c620a96059d3840a4fa2675d6eeed179f21801d",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 10
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서_22.웹 취약점 진단관리 SW 유지보수.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "과업심의결과서.png",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "unsupported_format",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고 기본 첨부파일_용역.zip",
+          "readable": true,
+          "sourceSha256": "578da83bb2388a7425e3be9ca54d408629236e9639f69a627f94000fcb07d8c1",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 53
+        }
+      ],
+      "manifestSignature": "eedeb3338875caa501c17c17adb246b6538ae2da7f19b27b3904e4a6361bc53b",
+      "manifestCheckedAt": "2026-11-07T20:54:18.991427+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 7,
+        "unreadableDocumentCount": 2,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임6. 제안요청서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임7. 계약특수조건_22.웹 취약점 진단관리 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 물품분류번호 : 소프트웨어유지및지원서비스(8111229901) ○「소프트웨어 진흥법」제58조에 의거 소프트웨어사업자로 신고한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 직접생산확인증명서(물품분류번호:8111229901)",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자 ( 컴퓨터관련 서비스사업 ( 업종코드 :1468) 또는 패키지소프트웨어 개발 · 공급 사업 ( 업종코드 : 1426)) 으로 입찰참가자격을 등록한 자 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "속주체, 지분 등을 정할 수 있다. 다만, 계약의 특수성(국가안전보장, 국방, 외교관계, 정보보안, 계약상대자의 소재지 등)을 고려하여 계약당사자간의 협의를 통해 발주자 단독으로 소유할 수 있다.",
+              "codes": [],
+              "sourceFile": "입찰공고 기본 첨부파일_용역.zip",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=9&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "【 부정당 제재 적용 예시 】 ◦ 계약을 이행할 때에 부실‧조잡 또는 부정하게 하거나 부정한 행위를 한 자 ◦ 경쟁입찰, 계약 체결 또는 이행 과정에서 입찰자 또는 계약상대자 간에 서로 상의하여 미리 입찰가격, 수주 물량 또는 계약의 내용 등을 협정하였거나 특정인의 낙찰 또는 납품대상자 선정을 위하여 담합한 자 ◦ 하도급에 관한 제한규정을 위반하여 하도급한 자 및 발주관서의 승인 없이 하도급을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행 과정에서 국가에 손해를 끼친 자 ◦ 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행과 관련하여 당사 임직원에게 뇌물을 준 자 ◦ 계약을 이행할 때에 「산업안전보건법」에 따른 안전ㆍ보건 조치 규정을 위반하여 근로자에게 대통령령으로 정하는 기준에 따른 사망 등 중대한 위해를 가한 자 ◦ 입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이 계약을 체결 또는 이행하지 아니하거나 입찰공고와 계약서에 명시된 계약의 주요조건을 위반한 자 - 「국가정보보안기본지침」및 당사「정보보안 절차서」에 따른 보안 위규 수준 A급 등 위반 시 - 발주자의 승인없는 하도급을 시행한 경우",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적 다. 기술보고서 및 업데이트된 사용자 지침서 제공 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 유지보수 실적 나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "사항을 책임 있게 수행한다. 1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리 2) 제 10조 유지보수 실적자료 제출의 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_22.웹 취약점 진단관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "나. 상호 또는 법인의 명칭, 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우, 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다. 다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가 . 「 국가계약법 시행령 」 제 39 조제 4 항 및 같은 법 시행규칙 제 44 조에 해당하는 입찰은 무효로 처리됩니다 . 나 . 상호 또는 법인의 명칭 , 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우 , 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다 . - 4 - 다 . 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "마. 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동시 참여하면, 동일인이 2통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다. 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며, 현재 1인만 등록하면 변경등록을 하여야 합니다(2개 이상 법인의 임직원이라 하더라도 1인은 1개 법인에 대해서만 입찰대리인이 될 수 있습니다).",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "낙찰 후 계약체결 전에 부도 또는 파산상태에 있는 업체는 계약체결 대상에서 제외됩니다 . 마 . 한 업체의 소속 대표자 중 1 인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동 시 참여하면 , 동일인이 2 통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다 . 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며 , 현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3. 입찰참가자격에 관한 사항 (아래의 사항을 모두 충족하는 자)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격 등록업체만이 입찰참가할 수 있습니다 .",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "전자조달시스템에 등록 지연 등으로 인하여 입찰참가 마감일시까지 입찰참가자격등록 절차",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다. 라. 공동계약 가능여부 및 이행방식 : 불허용",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00 다. 입찰서(가격및기술) 제출기간 : 공고일시 ~ 2026.11.10. 11:00 (총액, VAT포함, 온라인제출)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰참가 신청방법 : 전자입찰(국가종합전자조달시스템(https://www.g2b.go.kr)) 나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용) 자 격",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_웹 취약점 진단관리 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800277&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
+    },
+    "R26BK01800286:000": {
+      "status": "text_extracted_requires_review",
+      "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+      "classificationVersion": 22,
+      "hwpxReaderVersion": 2,
+      "reviewComplete": false,
+      "attachmentManifestCount": 9,
+      "readableDocumentCount": 7,
+      "unreadableDocumentCount": 2,
+      "files": [
+        {
+          "name": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+          "readable": true,
+          "sourceSha256": "53f749f8642eff67dd3415bcff4267395d8b76270ef861f5559d649950883f73",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 63
+        },
+        {
+          "name": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+          "readable": true,
+          "sourceSha256": "5d52c2e848811996003547203054e88d5871a8048642c5840544336bd366fe74",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 192
+        },
+        {
+          "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+          "readable": true,
+          "sourceSha256": "06751347f758f75960c5ae9e700ba6a3d265f275b89f3ba5509a8d1f05fa93f8",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 16
+        },
+        {
+          "name": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "553dcb92bcb343701e4e5203772508db38d9de16f12c2cde0aec4655fac7454c",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 45
+        },
+        {
+          "name": "붙임6. 제안요청서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "e6c83e6dd0d899ad28554c1d088a4233cf755e5b19eca617ee00e2ab80b6b445",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 54
+        },
+        {
+          "name": "붙임7. 계약특수조건_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+          "readable": true,
+          "sourceSha256": "86c04b2690f3320c338ec3bd142fa8fee107b3602b62fac7830172784f70725a",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 10
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.pdf",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "pdf_unreadable_page",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "과업심의결과서.png",
+          "readable": false,
+          "sourceSha256": "",
+          "errorCategory": "unsupported_format",
+          "sourceTextScanComplete": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 0
+        },
+        {
+          "name": "입찰공고 기본 첨부파일_용역.zip",
+          "readable": true,
+          "sourceSha256": "578da83bb2388a7425e3be9ca54d408629236e9639f69a627f94000fcb07d8c1",
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 53
+        }
+      ],
+      "manifestSignature": "ad26937d4ba53095fcbd27f6d07a5a01b578e40a4735289122dfba5824f4d116",
+      "manifestCheckedAt": "2026-11-07T20:54:20.616199+00:00",
+      "manifestChangePending": false,
+      "changcomClauseEvidence": {
+        "status": "text_extracted_requires_review",
+        "checkedAt": "2026-11-07T20:52:11.680832+00:00",
+        "readableDocumentCount": 7,
+        "unreadableDocumentCount": 2,
+        "manifestComplete": true,
+        "reviewComplete": false,
+        "eligibilityVerified": false,
+        "files": [
+          {
+            "name": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
+          },
+          {
+            "name": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+          },
+          {
+            "name": "[업체] 입찰참가 및 계약서 작성 방법_261019.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임6. 제안요청서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "붙임7. 계약특수조건_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=6&prcmBsneSeCd=03"
+          }
+        ],
+        "clauseCandidates": {
+          "industry_code": [
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자(컴퓨터관련 서비스사업(업종코드:1468) 또는 패키지소프트웨어 개발·공급사업(업종코드 : 1426))으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 물품분류번호 : 소프트웨어유지및지원서비스(8111229901) ○「소프트웨어 진흥법」제58조에 의거 소프트웨어사업자로 신고한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "direct_production": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 직접생산확인증명서(물품분류번호:8111229901)",
+              "codes": [
+                "8111229901"
+              ],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "sme_certificate": [
+            {
+              "text": "○「중소기업제품 구매촉진 및 판로지원에 관한 법률』제8조(경쟁입찰참여자격) 및 동법 시행령 제9조(중소기업자간 경쟁입찰의 참가자격 등)에 의한 요건을 갖춘 중소기업자로서 동법 시행령 제10조(직접생산의 확인 등)에 의한 직접생산확인증명서와 「중소기업 범위 및 확인에 관한 규정』에 따라 발급된 중소기업확인서(「중소기업제품 구매촉진 및 판로지원에 관한 법률」제33조에 따라 중소기업으로 간주되는 자도 인정)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 입찰서 제출기한 전일까지 조달청 국가종합전자조달시스템에 아래의 입찰참가자격으로 등록한 자 - 소프트웨어사업자 ( 컴퓨터관련 서비스사업 ( 업종코드 :1468) 또는 패키지소프트웨어 개발 · 공급 사업 ( 업종코드 : 1426)) 으로 입찰참가자격을 등록한 자 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 』 제 8 조 ( 경쟁입찰참여자격 ) 및 동법 시행령 제 9 조 ( 중소기업자간 경쟁입찰의 참가자격 등 ) 에 의한 요건을 갖춘 중소기업자로서 동법 시행",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "region_restriction": [
+            {
+              "text": "속주체, 지분 등을 정할 수 있다. 다만, 계약의 특수성(국가안전보장, 국방, 외교관계, 정보보안, 계약상대자의 소재지 등)을 고려하여 계약당사자간의 협의를 통해 발주자 단독으로 소유할 수 있다.",
+              "codes": [],
+              "sourceFile": "입찰공고 기본 첨부파일_용역.zip",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=9&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "joint_participation": [
+            {
+              "text": "【 부정당 제재 적용 예시 】 ◦ 계약을 이행할 때에 부실‧조잡 또는 부정하게 하거나 부정한 행위를 한 자 ◦ 경쟁입찰, 계약 체결 또는 이행 과정에서 입찰자 또는 계약상대자 간에 서로 상의하여 미리 입찰가격, 수주 물량 또는 계약의 내용 등을 협정하였거나 특정인의 낙찰 또는 납품대상자 선정을 위하여 담합한 자 ◦ 하도급에 관한 제한규정을 위반하여 하도급한 자 및 발주관서의 승인 없이 하도급을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "을 하거나 발주관서의 승인을 얻은 하도급조건을 변경한 자 ◦ 사기, 그 밖의 부정한 행위로 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행 과정에서 국가에 손해를 끼친 자 ◦ 입찰ㆍ낙찰 또는 계약의 체결ㆍ이행과 관련하여 당사 임직원에게 뇌물을 준 자 ◦ 계약을 이행할 때에 「산업안전보건법」에 따른 안전ㆍ보건 조치 규정을 위반하여 근로자에게 대통령령으로 정하는 기준에 따른 사망 등 중대한 위해를 가한 자 ◦ 입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가를 방해하거나 낙찰자의 계약체결 또는 그 이행을 방해한 자 ◦ 정당한 이유 없이 계약을 체결 또는 이행하지 아니하거나 입찰공고와 계약서에 명시된 계약의 주요조건을 위반한 자 - 「국가정보보안기본지침」및 당사「정보보안 절차서」에 따른 보안 위규 수준 A급 등 위반 시 - 발주자의 승인없는 하도급을 시행한 경우",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "performance_proof": [
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 시스템 오류 또는 장애 점검 수행 실적 다. 기술보고서 및 업데이트된 사용자 지침서 제공 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 유지보수 실적 나. 시스템 오류 또는 장애 점검 수행 실적",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "staff_proof": [
+            {
+              "text": "사항을 책임 있게 수행한다. 1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "1) 용역사업의 투입인력 관리 2) 제 10조 유지보수 실적자료 제출의 관리",
+              "codes": [],
+              "sourceFile": "붙임4. 용역시방서_23.보안설정 취약점 진단시스템 관리 SW 유지보수.hwp",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "나. 상호 또는 법인의 명칭, 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우, 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다. 다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않고 제출서류 미첨부시 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가 . 「 국가계약법 시행령 」 제 39 조제 4 항 및 같은 법 시행규칙 제 44 조에 해당하는 입찰은 무효로 처리됩니다 . 나 . 상호 또는 법인의 명칭 , 대표자 및 공동대표자의 성명 등 등록사항이 변경된 경우 , 변경등록 하지 않고 입찰참여 시 입찰무효 처리되오니 유의바랍니다 . - 4 - 다 . 입찰참가자격의 판단기준일은 입찰참가자격 등록마감일 ( 기준일이 정해져 있는 경우에는 해당일 ) 이",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "registration_identity": [
+            {
+              "text": "마. 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동시 참여하면, 동일인이 2통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다. 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며, 현재 1인만 등록하면 변경등록을 하여야 합니다(2개 이상 법인의 임직원이라 하더라도 1인은 1개 법인에 대해서만 입찰대리인이 될 수 있습니다).",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "낙찰 후 계약체결 전에 부도 또는 파산상태에 있는 업체는 계약체결 대상에서 제외됩니다 . 마 . 한 업체의 소속 대표자 중 1 인이 다른 업체의 대표자를 겸임하는 경우 해당 업체들이 하나의 입찰에 동 시 참여하면 , 동일인이 2 통의 입찰서를 제출한 것으로 간주 되어 모두 무효입찰로 처리됩니다 . 이에 따라 대표자가 여럿인 업체의 경우 입찰 참가자격 등록 시 대표자 전원을 등록하여야 하며 , 현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "현재 1 인만 등록하면 변경등록을 하여야 합니다 (2 개 이상 법인의 임직원이라",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "unclassified_qualification": [
+            {
+              "text": "3. 입찰참가자격에 관한 사항 (아래의 사항을 모두 충족하는 자)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "입찰참가자격 등록업체만이 입찰참가할 수 있습니다 .",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "전자조달시스템에 등록 지연 등으로 인하여 입찰참가 마감일시까지 입찰참가자격등록 절차",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "legal_exclusion": [
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다.",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다.「국가를 당사자로 하는 계약에 관한 법률」 제27조의5제1항 및 같은 법 시행령 제12조제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날로부터 2년이 지나지 아니한 자는 입찰에 참가할 수 없습니다. 라. 공동계약 가능여부 및 이행방식 : 불허용",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "submission_required": [
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00 다. 입찰서(가격및기술) 제출기간 : 공고일시 ~ 2026.11.10. 11:00 (총액, VAT포함, 온라인제출)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 입찰참가 신청방법 : 전자입찰(국가종합전자조달시스템(https://www.g2b.go.kr)) 나. 입찰참가자격등록 마감일시 : 입찰서 제출 마감일 전일 18:00",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "bid_security": [
+            {
+              "text": "구 분종 류방 법공 통 ◦ 전자입찰특별유의서, 불공정행위 여부 확약서, 청렴서약서(계약서), 조세포탈 등 유죄판결 비대상자 서약서입찰참가시 시스템 진행단계별체크 및 동의 ◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)자 격(미제출 시 입찰참가 무효) ◦ 소프트웨어사업자 일반현황 관리확인서(최근년도 결산분)‘기타문서’에 제출 ◦ 직접생산확인증명서(물품분류번호:8111229901)기 타 ◦ 신용평가등급확인서(공공기관 제출용) - 입찰공고일 이전에 평가하여 유효기",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용)",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "◦ 입찰보증금 : 지급각서로 대체 (입찰보증금 면제대상자에게만 적용) 자 격",
+              "codes": [],
+              "sourceFile": "☆입찰공고문_보안설정 취약점 진단시스템 SW.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800286&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ]
+        }
+      }
     }
   },
-  "workflowRunId": "42391244109"
+  "workflowRunId": "42413081981"
 }
