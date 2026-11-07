@@ -125,13 +125,25 @@ def apply(index_text, candidates, today):
     return index_text[:start] + serialized + index_text[end:], added
 
 
+def batch_from_file(filename):
+    payload = json.loads(Path(filename).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or payload.get("schema") != SCHEMA:
+        raise ValueError("invalid_batch_file_schema")
+    candidates = payload.get("candidates")
+    if not isinstance(candidates, list) or len(candidates) > MAX_IMPORT:
+        raise ValueError("invalid_batch_size")
+    return payload.get("checkpoint", "file"), candidates
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--db", required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--db")
+    source.add_argument("--batch-file")
     parser.add_argument("--index", required=True)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    batch = latest_batch(args.db)
+    batch = batch_from_file(args.batch_file) if args.batch_file else latest_batch(args.db)
     if batch is None:
         print("MCP_INTAKE_NO_STRUCTURED_BATCH")
         return
