@@ -25,7 +25,7 @@ DOMAIN = re.compile(
     re.I,
 )
 OFFER = re.compile(r"모집|지원|접수|신청|공모|경진|바우처|실증|교육|협력|매칭|설명회|입찰|참여", re.I)
-EXCLUDE = re.compile(r"채용|선정\s*결과|우선협상대상자|낙찰|입찰가격|입찰\s*결과|용역\s*개찰", re.I)
+EXCLUDE = re.compile(r"채용|모집\s*결과|선정\s*결과|모집\s*발표|우선협상대상자|낙찰|입찰가격|입찰\s*결과|용역\s*개찰", re.I)
 DEADLINE_MARKER = re.compile(r"접수\s*(?:기한|기간|마감|일시)|신청\s*(?:기간|기한|마감)|모집\s*(?:기간|마감)|공모\s*(?:기간|마감)|제출\s*기한", re.I)
 FULL_DAY = re.compile(
     r"(20\d{2})[.\-/년\s]+(\d{1,2})[.\-/월\s]+(\d{1,2})\s*(?:일)?(?:\([월화수목금토일]\))?",
@@ -139,13 +139,19 @@ def scan_source(spec, fetch, now):
             content = article.select_one("article") or article.select_one(".board_view") or article.select_one("main") or article
             body = content.get_text("\n", strip=True)
             # Ignore nav-only pages and unrelated redirected content.
-            if clean(title, 35).replace(" ", "")[:12] not in clean(body, 30000).replace(" ", ""):
+            # The listing can prepend [안내] / 새글; the article often drops it.
+            # Compare normalized substantive title rather than its UI prefix.
+            headline=re.sub(r"^(?:새글|\[[^\]]{1,14}\])\s*", "", title)
+            headline=re.sub(r"[^0-9a-zA-Z가-힣]", "", headline)[:14]
+            page_text=re.sub(r"[^0-9a-zA-Z가-힣]", "", clean(body,30000))
+            if len(page_text)<90 or (headline and headline not in page_text):
                 failures += 1
                 continue
             deadline = application_deadline(title, body, published.year if published else None)
             if not deadline:
                 unknown_deadline += 1
-            elif deadline[:10] < now.date().isoformat():
+                continue  # Never publish a possibly finished training/event as open.
+            if deadline[:10] < now.date().isoformat():
                 continue
             identity = hashlib.sha1((detail_url + "|" + title).encode()).hexdigest()[:17]
             results.append({
@@ -159,7 +165,7 @@ def scan_source(spec, fetch, now):
         except (requests.RequestException, ValueError, AttributeError) as exc:
             failures += 1
     state.update({
-        "status": "partial" if failures or not found or len(found) > 25 else "ok",
+        "status": "partial" if failures or unknown_deadline or not found or len(found) > 25 else "ok",
         "discovered": len(results), "candidateLinks": len(found),
         "detailErrors": failures, "unknownDeadline": unknown_deadline,
         "candidateLimitReached": len(found) > 25,
