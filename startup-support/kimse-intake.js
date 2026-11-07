@@ -10,13 +10,13 @@
 })(typeof window!=='undefined'?window:null,function(){
   'use strict';
   var MAX_SNAPSHOT_AGE_MS=48*60*60*1000;
-  var SOURCE_OK=new Set(['서울 스타트업플러스 지원사업','도전의 IR 운영사별 프로그램','한국보건의료정보원 공식 공지','한국보건의료정보원 실증·사업 공고','KHIDI 보건산업 사업공고','KHIDI 의료기기 지원사업','KHIDI 기관별 의료·연구지원 사업','KHIDI 의료기기 상담·교육','NIA AI·데이터 공지','K-DATA 데이터·안심구역 공지','심평원 창업·의료데이터 소식']);
+  var SOURCE_OK=new Set(['서울 스타트업플러스 지원사업','도전의 IR 운영사별 프로그램','한국보건의료정보원 공식 공지','한국보건의료정보원 실증·사업 공고','KHIDI 보건산업 사업공고','KHIDI 의료기기 지원사업','KHIDI 기관별 의료·연구지원 사업','KHIDI 의료기기 상담·교육','NIA AI·데이터 공지','K-DATA 데이터·안심구역 공지','심평원 창업·의료데이터 소식','AI-Hub 의료·안심존 데이터 공지']);
   var DOMAIN_FIT=/(치매|경도\s*인지|인지\s*(?:기능|저하|건강|지원)|고령|시니어|실버테크|에이지테크|에이징테크|age[-\s]?tech|의료|헬스케어|디지털\s*헬스|보건의료|병원|임상|데이터안심|위치정보|AI[-\s]?허브|IRB|DRB|임상\s*시험|시험분석|음성\s*(?:AI|바이오마커))/i;
   var PATIENT_ONLY=/(치매\s*(?:치료비|의료비)|환자\s*(?:본인부담|급여))/i;
   var SOURCE_URL=/^https:\/\/(?:www\.)?startup-plus\.kr\/project\/PRJ\d{5,9}$/i;
   var IR_URL='https://irchallenge.jointips.or.kr/apply';
   var KHIS_URL=/^https:\/\/www\.khis\.kr\/board\.es\?act=view&bid=000[19]&list_no=\d{1,8}&mid=a1030[14]000000$/i;
-  var HEALTH_OFFICIAL_URL=/^https:\/\/www\.khidi\.or\.kr\/(?:board\/view\?menuId=MENU0(?:1108|1484|1491)&linkId=\d{6,12}|mdtis\/bizPbanc\/bizPbancView\?menuId=MENU03471&biz_pbanc_id=[A-Za-z0-9_-]{3,40}&biz_pbanc_no=\d{1,8})$|^https:\/\/www\.nia\.or\.kr\/site\/nia_kor\/ex\/bbs\/View\.do\?cbIdx=99835&bcIdx=\d{4,10}$|^https:\/\/www\.hira\.or\.kr\/bbsDummy\.do\?pgmid=HIRAA020041000100&brdScnBltNo=4&brdBltNo=\d{4,8}$/i;
+  var HEALTH_OFFICIAL_URL=/^https:\/\/www\.khidi\.or\.kr\/(?:board\/view\?menuId=MENU0(?:1108|1484|1491)&linkId=\d{6,12}|mdtis\/bizPbanc\/bizPbancView\?menuId=MENU03471&biz_pbanc_id=[A-Za-z0-9_-]{3,40}&biz_pbanc_no=\d{1,8})$|^https:\/\/www\.nia\.or\.kr\/site\/nia_kor\/ex\/bbs\/View\.do\?cbIdx=99835&bcIdx=\d{4,10}$|^https:\/\/www\.hira\.or\.kr\/bbsDummy\.do\?pgmid=HIRAA020041000100&brdScnBltNo=4&brdBltNo=\d{4,8}$|^https:\/\/www\.aihub\.or\.kr\/aihubnews\/notice\/view\.do\?nttSn=\d{2,8}&currMenu=132&topMenu=103/i;
   function normalize(value){
     return String(value||'').normalize('NFKC').replace(/[^0-9a-zA-Z가-힣]/g,'').toLowerCase();
   }
