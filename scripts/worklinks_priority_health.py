@@ -191,6 +191,33 @@ def scan_one(source,fetch,now):
         state["note"]="지원 가능 공고 미확정. 공식목록 접근 성공만으로 0건 확정하지 않음"
     return results,state
 
+def coverage_summary(states, required_names):
+    """Fail-visible source health. A successful HTTP response is NOT enough."""
+    by_name={s.get("name"):s for s in states if isinstance(s,dict)}
+    required=list(required_names)
+    outcomes=[]
+    for name in required:
+        row=by_name.get(name)
+        state=row.get("status","error") if row else "missing"
+        outcomes.append({
+            "name":name,"status":state,
+            "verifiedArticleLinks":int((row or {}).get("articleLinks",0)),
+            "relevantLinks":int((row or {}).get("relevantLinks",0)),
+            "currentQualified":int((row or {}).get("discovered",0)),
+            "undated":int((row or {}).get("undatedCandidates",0)),
+            "detailErrors":int((row or {}).get("detailErrors",0)),
+            "error":str((row or {}).get("error",""))[:160],
+        })
+    degraded=[x["name"] for x in outcomes if x["status"]!="ok"]
+    return {
+       "expected":len(required),
+       "healthy":len(required)-len(degraded),
+       "degraded":degraded,
+       "status":"healthy" if not degraded else "degraded",
+       "sources":outcomes,
+       "note":"공식 출처 0건과 접속 실패를 구분하며, 응모자격·자료이용권 자동 확인을 의미하지 않음",
+    }
+
 def scan_priority_sources(fetch=None,now=None):
     now=now or dt.datetime.now(KST)
     if fetch is None:
