@@ -58,7 +58,6 @@ jobs:
       - name: Validate healthcare source parser with offline fixtures
         run: python -m unittest discover -s tests -p 'test_worklinks_health_sources.py' -v
       - name: Test dynamic source extraction
-        continue-on-error: true
         run: python -m unittest discover -s tests -p 'test_dynamic_sources.py' -v
       - name: Test parsing and cautious eligibility
         run: python -m unittest discover -s tests -p 'test_investment_monitor.py' -v
@@ -99,3 +98,39 @@ jobs:
       - name: Mark failed if all sources failed
         if: steps.collect.outcome == 'failure'
         run: exit 1
+      - name: Fail visibly on critical KIMSE listing gaps or stale evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import sys
+          from pathlib import Path
+
+          path=Path("startup-support/investment-opportunities.json")
+          if not path.is_file():
+              print("::error title=KIMSE coverage missing::No investment snapshot")
+              sys.exit(1)
+          snapshot=json.loads(path.read_text(encoding="utf-8"))
+          stamp=snapshot.get("generatedAt")
+          try:
+              generated=dt.datetime.fromisoformat(stamp)
+              if generated.tzinfo is None: raise ValueError("timezone missing")
+              age=(dt.datetime.now(dt.timezone.utc)-generated).total_seconds()
+              if not 0 <= age <= 2400: raise ValueError("snapshot is stale or future-dated")
+          except (TypeError, ValueError) as exc:
+              print(f"::error title=KIMSE evidence stale::{exc}")
+              sys.exit(1)
+          coverage=snapshot.get("priorityCoverage") or {}
+          missed=coverage.get("listingDegraded") or []
+          expected=coverage.get("expected",0)
+          healthy=coverage.get("listingHealthy",-1)
+          if missed or not expected or healthy != expected:
+              print("::error title=KIMSE official listing coverage incomplete::"+
+                    ", ".join(missed or ["source counts missing"]))
+              sys.exit(1)
+          uncertain=coverage.get("applicationDatesUnverified",0)
+          if uncertain:
+              print(f"::warning title=KIMSE deadlines require verification::{uncertain} candidates")
+          print(f"Verified official KIMSE listing coverage: {healthy}/{expected}")
+          PY
