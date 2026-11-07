@@ -65,6 +65,17 @@ test('include independent IR slots without silently asserting investor funding',
   assert.match(a[0].money,/보장 없음/);
   assert.match(a[0].period,/11-19/);
 });
+test('K-DATA verified official detail URL is importable but a fake domain is not',()=>{
+  const base=notice('kdata','2026 데이터안심구역 의료 연구용 데이터 활용 지원','2026-11-20',
+    {source:'K-DATA 데이터·안심구역 공지',
+     url:'https://www.kdata.or.kr/kr/board/notice_01/boardView.do?seq=123456'});
+  const good=select(snap(base),[],now);
+  assert.equal(good.length,1);
+  assert.equal(good[0].eligibility,'unknown');
+  const bad=select(snap({...base,id:'evil',
+    url:'https://other.example.kr/kr/board/notice_01/boardView.do?seq=123456'}),[],now);
+  assert.equal(bad.length,0);
+});
 test('refuse stale snapshots instead of claiming no opportunities',()=>{
   assert.equal(select({generatedAt:'2026-10-01T15:17:33+09:00',opportunities:[notice('old','의료 실증','2026-11-20')]},[],now).length,0);
 });
