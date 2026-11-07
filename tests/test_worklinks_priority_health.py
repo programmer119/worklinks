@@ -1,0 +1,130 @@
+"""Offline backtests using titles and link shapes from real 2026 official notices."""
+import datetime as dt
+import sys
+import unittest
+from pathlib import Path
+from bs4 import BeautifulSoup
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from worklinks_priority_health import (
+    KST,SOURCES,match_notice,valid_official_link,observed_links,
+    explicit_deadline,scan_one,scan_priority_sources
+)
+
+NOW=dt.datetime(2026,11,7,18,37,tzinfo=KST)
+
+class PriorityDiscoveryBacktest(unittest.TestCase):
+    def test_known_must_detect_official_2026_opportunities(self):
+        # Official source titles, not keyword-only imaginary cases.
+        observed=[
+            "심평원 2026년 보건의료빅데이터 창업 인큐베이팅 랩 운영",
+            "2026년도 의료기기 사용적합성 인프라 구축 지원사업 신규사업자 모집 공고",
+            "2026년도 바이오헬스산업 기술평가-사업화 연계 지원사업 참여기관 모집 공고",
+            "2026 데이터+AI 혁신 챌린지 통합 공고 안내",
+            "2026년 AI·데이터 문제해결은행 상황별 맞춤 지원 공고",
+            "2026년 의료 AI 데이터 활용 바우처 지원사업 수요기관 모집",
+            "2026년 디지털헬스 의료기기 병원 실증 지원사업 모집"
+        ]
+        missed=[title for title in observed if not match_notice(title)]
+        self.assertFalse(missed, f"Critical 2026 opportunities missed: {missed}")
+
+    def test_reject_news_not_eligible_recruitment_and_pharmacy(self):
+        for title in (
+          "[보건의료] 무주읍 당번약국(문여는 약국) 일정 안내",
+          "의료기기 사업 선정 결과 안내",
+          "2026년 데이터 바우처 운영 용역 입찰공고",
+          "의료 AI 사업 우선협상대상자 낙찰 결과",
+          "의료분야 신입 직원 채용",
+          "치매 치료 관리비 지원 대상 안내"
+        ):
+            self.assertFalse(match_notice(title),title)
+
+    def test_actual_official_links_not_broad_hostnames(self):
+        positives=[
+          ("/board/view?linkId=48939696&menuId=MENU01108", SOURCES[0][1], "khidi"),
+          ("/mdtis/bizPbanc/bizPbancView?biz_pbanc_id=rhId2pj&biz_pbanc_no=91&menuId=MENU03471",SOURCES[1][1],"device"),
+          ("/site/nia_kor/ex/bbs/View.do?bcIdx=29936&cbIdx=99835",SOURCES[2][1],"nia"),
+        ]
+        for href,base,kind in positives:
+            self.assertIsNotNone(valid_official_link(href,base,kind),href)
+        for href,base,kind in (
+          ("javascript:fnDetail('48939696')",SOURCES[0][1],"khidi"),
+          ("https://evil.example/board/view?linkId=48939696&menuId=MENU01108",SOURCES[0][1],"khidi"),
+          ("/board/view?menuId=MENU01108",SOURCES[0][1],"khidi"),
+          ("/site/nia_kor/ex/bbs/View.do?bcIdx=29936&cbIdx=78336",SOURCES[2][1],"nia"),
+          ("/mdtis/bizPbanc/bizPbancView?biz_pbanc_id=oops",SOURCES[1][1],"device")
+        ):
+            self.assertIsNone(valid_official_link(href,base,kind),href)
+
+    def test_2026_notice_application_date_not_event_start(self):
+        self.assertEqual(
+          explicit_deadline("신청기간: 2026.11.01 ~ 11.24 16:00"),
+          "2026-11-24T16:00:00+09:00")
+        self.assertEqual(
+          explicit_deadline("접수기간: 2026.11.01 ~ 2026.11.19 18:00"),
+          "2026-11-19T18:00:00+09:00")
+        self.assertIsNone(explicit_deadline("신청기간: 2026.11.01 ~ 11월 중"))
+        self.assertIsNone(explicit_deadline("행사일: 2026.11.19 10:00"))
+        self.assertIsNone(explicit_deadline("사업기간: 2026.11.01 ~ 2027.12.31"))
+        self.assertEqual(explicit_deadline("접수마감: 2026.11.22 17:00"),
+                         "2026-11-22T17:00:00+09:00")
+
+    def test_historic_khidi_used_to_backtest_scanner(self):
+        url="https://www.khidi.or.kr/board/view?menuId=MENU01108&linkId=48939696"
+        page=BeautifulSoup("""<table><tr><td>
+            <a href="/board/view?linkId=48939696&menuId=MENU01108">
+            2026년도 의료기기 사용적합성 인프라 구축 지원사업 신규사업자 모집 공고</a>
+            </td><td>2026-01-21</td></tr></table>""","html.parser")
+        detail=BeautifulSoup("""<article><h1>2026년도 의료기기 사용적합성 인프라 구축 지원사업</h1>
+            공고기간 : 2026. 1. 20(화) ~ 2026. 2. 3(화) 18:00 마감
+            </article>""","html.parser")
+        def fetch(href):
+            return page if href==SOURCES[0][1] else detail
+        rows,status=scan_one(SOURCES[0],fetch,NOW)
+        self.assertEqual(status["articleLinks"],1)
+        self.assertEqual(status["relevantLinks"],1)
+        self.assertEqual(rows,[])
+        self.assertEqual(status["expiredCandidates"],1)
+
+    def test_one_current_verified_official_notice_emerges_without_eligibility_claim(self):
+        detail_url="https://www.khidi.or.kr/board/view?menuId=MENU01108&linkId=48939696"
+        listing=BeautifulSoup("""<table><tr><td>
+          <a href="/board/view?linkId=48939696&menuId=MENU01108">
+          2026년도 의료기기 사용적합성 인프라 구축 지원사업 신규사업자 모집 공고</a>
+          </td></tr></table>""","html.parser")
+        detail=BeautifulSoup("""<article><p>
+          신청기간: 2026.11.02 ~ 2026.11.24 17:00
+          예비창업자 접수 요건은 첨부파일 참조
+          </p></article>""","html.parser")
+        result,state=scan_one(SOURCES[0],lambda u:listing if u==SOURCES[0][1] else detail,NOW)
+        self.assertEqual(len(result),1)
+        self.assertEqual(result[0]["deadline"],"2026-11-24T17:00:00+09:00")
+        self.assertEqual(result[0]["eligibility"],"자격 확인 필요")
+        self.assertEqual(result[0]["url"],detail_url)
+
+    def test_malformed_or_js_only_list_is_not_reported_as_no_opportunity(self):
+        listing=BeautifulSoup("""<table><tr><td><a href="javascript:doView('123')">
+         의료 AI 실증 지원사업 모집</a></td></tr></table>""","html.parser")
+        rows,state=scan_one(SOURCES[3],lambda _:listing,NOW)
+        self.assertEqual(rows,[])
+        self.assertEqual(state["status"],"partial")
+        self.assertEqual(state["articleLinks"],0)
+        self.assertIn("구조",state["note"])
+
+    def test_one_failed_agency_does_not_block_other_official_agencies(self):
+        good=BeautifulSoup("""<table><tr><td><a href="/board/view?linkId=48939696&menuId=MENU01108">
+          의료기기 실증 지원사업 모집</a></td></tr></table>""","html.parser")
+        bad=BeautifulSoup("<p>Unsupported notice format</p>","html.parser")
+        def get(u):
+            if "khidi.or.kr/board?" in u:return good
+            if "khidi.or.kr/board/view?" in u:
+                return BeautifulSoup("<article>신청마감 2026.11.24 17:00</article>","html.parser")
+            if "nia.or.kr" in u:raise TimeoutError("official portal timeout")
+            return bad
+        rows,states=scan_priority_sources(get,NOW)
+        self.assertEqual(len(states),len(SOURCES))
+        self.assertEqual(next(x["status"] for x in states if "NIA" in x["name"]),"error")
+        self.assertTrue(any(x["status"]=="partial" for x in states))
+        self.assertEqual(len(rows),1)
+
+if __name__=="__main__":
+    unittest.main()
