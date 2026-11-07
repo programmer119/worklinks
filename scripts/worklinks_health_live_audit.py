@@ -42,6 +42,18 @@ def probe(source):
             result["pageTitle"]=(soup.title.get_text(" ",strip=True) if soup.title else "")[:100]
             result["pageBytes"]=len(resp.content)
             result["suspectedArticleAnchors"]=examples
+            target_phrases=["공공데이터 활용기업","2026년도 클라우드","방송영상 AI","AI 허브 민간기업"]
+            snippets=[]
+            for text_node in soup.find_all(string=True):
+                value=str(text_node).strip()
+                if not any(term in value for term in target_phrases):continue
+                parent=text_node.parent
+                for _ in range(2):
+                    if parent and parent.parent:parent=parent.parent
+                snippets.append(str(parent)[:1150] if parent else value[:200])
+                if len(snippets)>=5:break
+            result["noticeHtmlSnippets"]=snippets
+
 
         if count==0:result["note"]="official list accessible but notice links not extracted"
     except Exception as ex:
