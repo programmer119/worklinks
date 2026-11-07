@@ -1,0 +1,27 @@
+name: WorkLinks MCP bridge source gate
+on:
+  push:
+    branches:
+      - automation/mcp-write-bridge-20261107
+    paths:
+      - 'scripts/worklinks_mcp_bridge.py'
+      - 'tests/test_worklinks_mcp_bridge.py'
+      - '.github/workflows/worklinks-mcp-bridge-source-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Static compilation
+        run: python -m py_compile scripts/worklinks_mcp_bridge.py tests/test_worklinks_mcp_bridge.py
+      - name: Fail-closed checkpoint intake tests
+        run: python -m unittest discover -s tests -p test_worklinks_mcp_bridge.py -v
