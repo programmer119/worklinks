@@ -96,6 +96,21 @@ def valid_official_link(href,base,kind):
 def observed_links(soup,base,kind):
     discovered={}
     all_valid=0
+    if kind=="aihub":
+        # AI-Hub publishes observed article IDs in data-key, not in href.
+        # Use only IDs present on official notice-row anchor elements.
+        for a in soup.select("td.subject a.btnView[data-key]"):
+            title=clean(a.get_text(" ",strip=True),200)
+            key=str(a.get("data-key",""))
+            if not re.fullmatch(r"\d{2,8}",key):
+                continue
+            all_valid+=1
+            if not match_notice(title):continue
+            url=f"https://www.aihub.or.kr/aihubnews/notice/view.do?nttSn={key}&currMenu=132&topMenu=103"
+            tr=a.find_parent("tr")
+            context=clean(tr.get_text(" ",strip=True),340) if tr else ""
+            discovered[url]={"title":title,"url":url,"context":context}
+        return list(discovered.values()),all_valid
     for a in soup.select("a[href]"):
         url=valid_official_link(a.get("href"),base,kind)
         if not url:continue
