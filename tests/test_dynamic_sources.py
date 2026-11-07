@@ -50,7 +50,7 @@ class DynamicSourcesTest(unittest.TestCase):
         self.assertEqual(a["deadline"], None)
         self.assertEqual(a["irDate"],"2026-11-02")
         self.assertEqual(a["url"],"https://irchallenge.jointips.or.kr/apply")
-        self.assertIn("잔여 3",a["description"])
+        self.assertIn("신청상태 별도 확인",a["description"])
 
     def test_official_slot_schema_and_real_deadline(self):
         slot={
@@ -67,8 +67,8 @@ class DynamicSourcesTest(unittest.TestCase):
         self.assertTrue(row)
         self.assertEqual(row["deadline"],"2026-10-26")
         self.assertEqual(row["programId"],slot["slotId"])
-        self.assertEqual(row["sourceStatus"],"unknown")
-        self.assertEqual(row["applicationStatus"],"접수중(공개정보)")
+        self.assertEqual(row["sourceStatus"],"closed")
+        self.assertEqual(row["applicationStatus"],"마감")
         self.assertEqual(row["category"],"TIPS·연계")
         self.assertIn("3/100",row["description"])
         self.assertIn("AI",row["description"])
