@@ -27,6 +27,22 @@ def probe(source):
         result.update(articleLinks=count,relevantLinks=len(links),
                       status="ok" if count>0 else "partial",
                       sampleTitles=[x["title"] for x in links[:4]])
+        if count==0:
+            examples=[]
+            for anchor in soup.select("a")[:350]:
+                title=" ".join(anchor.stripped_strings)[:95]
+                if len(title)<8 or not any(token in title for token in ("AI","의료","데이터","공고","지원","공지","사업")):
+                    continue
+                examples.append({
+                    "title":title,
+                    "href":str(anchor.get("href",""))[:150],
+                    "onclick":str(anchor.get("onclick",""))[:150]
+                })
+                if len(examples)>=10:break
+            result["pageTitle"]=(soup.title.get_text(" ",strip=True) if soup.title else "")[:100]
+            result["pageBytes"]=len(resp.content)
+            result["suspectedArticleAnchors"]=examples
+
         if count==0:result["note"]="official list accessible but notice links not extracted"
     except Exception as ex:
         result["error"]=str(ex)[:220]
