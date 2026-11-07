@@ -3,6 +3,7 @@
 from __future__ import annotations
 import datetime as dt
 import hashlib
+import os
 import json
 import re
 from pathlib import Path
@@ -17,7 +18,8 @@ from worklinks_global_accelerators import scan_global
 from worklinks_kised import scan_kised
 from worklinks_dynamic_sources import scan_browser_sources
 from worklinks_health_sources import scan_health_sources
-from worklinks_priority_health import scan_priority_sources
+from worklinks_priority_health import scan_priority_sources, coverage_summary, SOURCES as PRIORITY_OFFICIAL_SOURCES
+from worklinks_health_sources import SOURCES as KHIS_OFFICIAL_SOURCES
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "startup-support/investment-opportunities.json"
@@ -280,6 +282,8 @@ def main():
     priority_rows, priority_sources = scan_priority_sources(now=now())
     rows += priority_rows
     sources += priority_sources
+    critical_names=[source[0] for source in PRIORITY_OFFICIAL_SOURCES + KHIS_OFFICIAL_SOURCES]
+    critical_coverage=coverage_summary(sources,critical_names)
     registered = registered_titles()
     for item in rows:
         if item.get("source") == "재단법인 밴드 공식 공지사항":
@@ -304,12 +308,26 @@ def main():
         p["freshness"]="checked" if p["id"] in checked else "historical" if p["source"]=="기존 WorkLinks 등록" else "stale"
         listing.append(p)
     listing.sort(key=lambda x:(x["freshness"]!="checked",x["deadlineState"]=="closed",x["deadlineState"]=="unknown",x.get("deadline") or "9999",x["title"]))
-    data={"schemaVersion":1,"generatedAt":now().isoformat(timespec="seconds"),"sources":sources,
+    data={"schemaVersion":1,"generatedAt":now().isoformat(timespec="seconds"),"sources":sources,"priorityCoverage":critical_coverage,
     "watchTargets":[dict(x,mode=("공식 공개 목록 수집 시도·JS/인증 제한 별도 표시" if x["url"].startswith(("https://www.vcs.go.kr","https://www.jointips.or.kr","https://startup-plus.kr","https://irchallenge.jointips.or.kr")) else "참고 링크·자동수집 아님")) for x in WATCH],"opportunities":listing,
     "stats":{"total":len(listing),"liveDiscovered":sum(x["freshness"]=="checked" for x in listing),
              "historical":sum(x["freshness"]=="historical" for x in listing)}}
     OUT.parent.mkdir(parents=True,exist_ok=True)
     OUT.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    print(json.dumps({"sources":sources,"stats":data["stats"]},ensure_ascii=False))
+    if critical_coverage["degraded"]:
+        print("::warning title=Critical WorkLinks medical-source coverage::"+
+              "Degraded: "+", ".join(critical_coverage["degraded"]))
+    summary=os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary,"a",encoding="utf-8") as output_summary:
+            output_summary.write("\n### 필수 의료·데이터 공고 수집 상태\n")
+            output_summary.write("건강 "+str(critical_coverage["healthy"])+"/"+
+                                 str(critical_coverage["expected"])+
+                                 " · 실패/부분성공이 있으면 정상 수집으로 보고하지 않음\n\n")
+            for source in critical_coverage["sources"]:
+                output_summary.write("- "+source["name"]+": "+source["status"]+
+                                     ", 새 공고 "+str(source["currentQualified"])+
+                                     ", 마감 미확인 "+str(source["undated"])+"\n")
+    print(json.dumps({"sources":sources,"stats":data["stats"],"priorityCoverage":critical_coverage},ensure_ascii=False))
     return 0 if any(s["status"] in ("ok","partial") for s in sources) else 1
 if __name__=="__main__":raise SystemExit(main())
