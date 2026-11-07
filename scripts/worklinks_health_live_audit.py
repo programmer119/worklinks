@@ -87,11 +87,11 @@ def main():
             for item in states:
                 f.write(f"| {item['name']} | {item['status']} | {item['articleLinks']} | {item['relevantLinks']} |\\n")
             f.write(f"\\nWarnings: {len(summary['degraded'])} / {len(SOURCES)}. 0 captured links is NOT 0 opportunities.\\n")
-    if summary["healthy"]==0:
-        print("::error title=Critical source listings inaccessible::All sources degraded, manual recovery required")
+    if summary["listingDegraded"]:
+        print("::error title=Critical KIMSE official listing gaps::"+", ".join(summary["listingDegraded"]))
         return 1
     if summary["degraded"]:
-        print("::warning title=Critical source listing gaps::"+", ".join(summary["degraded"]))
+        print("::warning title=Unverified KIMSE application details::"+", ".join(summary["degraded"]))
     return 0
 
 if __name__=="__main__":
