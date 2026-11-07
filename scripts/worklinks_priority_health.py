@@ -10,9 +10,12 @@ import hashlib
 import re
 from urllib.parse import parse_qs, urljoin, urlsplit
 import requests
+from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
 
 KST = dt.timezone(dt.timedelta(hours=9))
+MAX_DETAIL_PER_SOURCE = 10
+REQUEST_TIMEOUT_SECONDS = 7
 SOURCES = (
     ("KHIDI 보건산업 사업공고", "https://www.khidi.or.kr/board?menuId=MENU01108", "khidi"),
     ("KHIDI 의료기기 지원사업", "https://www.khidi.or.kr/mdtis/bizPbanc/bizPbancList?menuId=MENU03471", "device"),
@@ -155,7 +158,7 @@ def scan_one(source,fetch,now):
     name,url,kind=source
     stamp=now.isoformat(timespec="seconds")
     state={"name":name,"url":url,"status":"error","discovered":0,"checkedAt":stamp,"articleLinks":0,"relevantLinks":0,
-           "undatedCandidates":0,"detailErrors":0,"expiredCandidates":0,"candidateLimit":24}
+           "undatedCandidates":0,"detailErrors":0,"expiredCandidates":0,"candidateLimit":MAX_DETAIL_PER_SOURCE}
     try:soup=fetch(url)
     except Exception as e:
         state["error"]=clean(type(e).__name__+": "+str(e),200)
@@ -166,7 +169,7 @@ def scan_one(source,fetch,now):
         state.update(status="partial",note="공식 페이지 접근은 성공했으나 실제 상세링크를 0건 식별. 목록 구조 검증 필요")
         return [],state
     results=[]
-    for entry in links[:24]:
+    for entry in links[:MAX_DETAIL_PER_SOURCE]:
         title=entry["title"]
         deadline=row_deadline(entry["context"],kind)
         detail=""
@@ -192,7 +195,7 @@ def scan_one(source,fetch,now):
           "source":name,"sourceKind":"공식기관 직접 검색·신청자격 원문 검증 필요",
           "sourceStatus":"unknown","lastSeenAt":stamp,"review":"사업자등록·IRB·지역제한·실제 지원혜택은 공식 첨부 확인 필요"})
     state["discovered"]=len(results)
-    state["status"]="partial" if len(links)>24 or state["detailErrors"] or state["undatedCandidates"] else "ok"
+    state["status"]="partial" if len(links)>MAX_DETAIL_PER_SOURCE or state["detailErrors"] or state["undatedCandidates"] else "ok"
     if not results:
         state["note"]="지원 가능 공고 미확정. 공식목록 접근 성공만으로 0건 확정하지 않음"
     return results,state
@@ -227,14 +230,15 @@ def coverage_summary(states, required_names):
 def scan_priority_sources(fetch=None,now=None):
     now=now or dt.datetime.now(KST)
     if fetch is None:
-        session=requests.Session()
         def fetch(url):
-            r=session.get(url,headers=HEADERS,timeout=12)
+            r=requests.get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
             r.raise_for_status()
             if len(r.content)>3_000_000:raise ValueError("HTML exceeds safe size")
             return BeautifulSoup(r.text,"html.parser")
     rows,states=[],[]
-    for source in SOURCES:
-        rr,st=scan_one(source,fetch,now)
-        rows.extend(rr);states.append(st)
+    # Concurrent independent source checks are bounded so one slow institution
+    # cannot consume the entire 18-minute WorkLinks refresh time budget.
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for rr,st in pool.map(lambda source:scan_one(source,fetch,now), SOURCES):
+            rows.extend(rr);states.append(st)
     return rows,states
