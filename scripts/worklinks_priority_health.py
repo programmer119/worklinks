@@ -21,6 +21,7 @@ SOURCES = (
     ("NIA AI·데이터 공지", "https://www.nia.or.kr/site/nia_kor/ex/bbs/List.do?cbIdx=99835", "nia"),
     ("K-DATA 데이터·안심구역 공지", "https://www.kdata.or.kr/kr/board/notice_01/boardList.do", "kdata"),
     ("심평원 창업·의료데이터 소식", "https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020041000100", "hira"),
+    ("AI-Hub 의료·안심존 데이터 공지", "https://www.aihub.or.kr/aihubnews/notice/list.do?currMenu=132&topMenu=103", "aihub"),
 )
 HEADERS = {"User-Agent":"Mozilla/5.0 (compatible; WorkLinks/1.0 public-research-monitor)",
            "Accept-Language":"ko-KR,ko;q=0.9"}
@@ -76,6 +77,11 @@ def valid_official_link(href,base,kind):
         if not any(re.fullmatch(r"\d{1,12}",v) for values in q.values() for v in values):
             return None
         return url
+    if kind=="aihub" and host in ("aihub.or.kr","www.aihub.or.kr") and p.path=="/aihubnews/notice/view.do":
+        sn=q.get("nttSn",[])
+        if len(sn)!=1 or not re.fullmatch(r"\d{2,8}",sn[0]):
+            return None
+        return f"https://www.aihub.or.kr/aihubnews/notice/view.do?nttSn={sn[0]}&currMenu=132&topMenu=103"
     if kind=="hira" and host in ("www.hira.or.kr","hira.or.kr") and p.path=="/bbsDummy.do":
         b=q.get("brdBltNo",[])
         if len(b)!=1 or not re.fullmatch(r"\d{4,8}",b[0]):
