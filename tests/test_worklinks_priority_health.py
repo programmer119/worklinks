@@ -11,6 +11,8 @@ from worklinks_priority_health import (
 )
 
 NOW=dt.datetime(2026,11,7,18,37,tzinfo=KST)
+NIA_SOURCE=next(x for x in SOURCES if x[2]=='nia')
+KDATA_SOURCE=next(x for x in SOURCES if x[2]=='kdata')
 
 class PriorityDiscoveryBacktest(unittest.TestCase):
     def test_known_must_detect_official_2026_opportunities(self):
@@ -46,7 +48,7 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         positives=[
           ("/board/view?linkId=48939696&menuId=MENU01108", SOURCES[0][1], "khidi"),
           ("/mdtis/bizPbanc/bizPbancView?biz_pbanc_id=rhId2pj&biz_pbanc_no=91&menuId=MENU03471",SOURCES[1][1],"device"),
-          ("/site/nia_kor/ex/bbs/View.do?bcIdx=29936&cbIdx=99835",SOURCES[2][1],"nia"),
+          ("/site/nia_kor/ex/bbs/View.do?bcIdx=29936&cbIdx=99835",NIA_SOURCE[1],"nia"),
         ]
         for href,base,kind in positives:
             self.assertIsNotNone(valid_official_link(href,base,kind),href)
@@ -54,7 +56,7 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
           ("javascript:fnDetail('48939696')",SOURCES[0][1],"khidi"),
           ("https://evil.example/board/view?linkId=48939696&menuId=MENU01108",SOURCES[0][1],"khidi"),
           ("/board/view?menuId=MENU01108",SOURCES[0][1],"khidi"),
-          ("/site/nia_kor/ex/bbs/View.do?bcIdx=29936&cbIdx=78336",SOURCES[2][1],"nia"),
+          ("/site/nia_kor/ex/bbs/View.do?bcIdx=29936&cbIdx=78336",NIA_SOURCE[1],"nia"),
           ("/mdtis/bizPbanc/bizPbancView?biz_pbanc_id=oops",SOURCES[1][1],"device")
         ):
             self.assertIsNone(valid_official_link(href,base,kind),href)
@@ -137,7 +139,7 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
     def test_malformed_or_js_only_list_is_not_reported_as_no_opportunity(self):
         listing=BeautifulSoup("""<table><tr><td><a href="javascript:doView('123')">
          의료 AI 실증 지원사업 모집</a></td></tr></table>""","html.parser")
-        rows,state=scan_one(SOURCES[3],lambda _:listing,NOW)
+        rows,state=scan_one(KDATA_SOURCE,lambda _:listing,NOW)
         self.assertEqual(rows,[])
         self.assertEqual(state["status"],"partial")
         self.assertEqual(state["articleLinks"],0)
