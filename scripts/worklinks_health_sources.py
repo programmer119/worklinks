@@ -77,11 +77,25 @@ def application_deadline(title, body, year_hint=None):
         dates = list(FULL_DAY.finditer(sample[:300]))
         if dates:
             end = dates[-1]
+            year, month, day_number = int(end[1]), int(end[2]), int(end[3])
+            date_end = end.end()
+            # Common official format: "2026년 5월 27일 ~ 6월 16일 17:00".
+            # The second date is the deadline, not the first date in the range.
+            tail = sample[date_end:date_end+95]
+            after = SHORT_DAY.search(tail)
+            if after and re.search(r"[~～\-–]", tail[:after.start()+1]):
+                month, day_number = int(after[1]), int(after[2])
+                date_end += after.end()
+                if month < int(end[2]):  # crossing December into January
+                    year += 1
+            elif len(dates) == 1 and not re.search(r"까지|마감|기한|~|～|–|\-", sample[date_end:date_end+35]):
+                # A lone start date in an "application period" is not an end.
+                continue
             try:
-                day = dt.date(int(end[1]), int(end[2]), int(end[3]))
+                day = dt.date(year, month, day_number)
             except ValueError:
                 continue
-            clock = list(HOUR.finditer(sample[end.end():end.end()+50]))
+            clock = list(HOUR.finditer(sample[date_end:date_end+45]))
             return day.isoformat() + (f"T{int(clock[-1][1]):02d}:{int(clock[-1][2]):02d}:00+09:00" if clock else "")
         # E.g. a title says "(~11/6 17:00)" but source has no full year.
         # We do not assume which year or which duration the range applies to.
