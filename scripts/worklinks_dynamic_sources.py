@@ -76,6 +76,14 @@ def project_record(obj):
     if not ID_RE.fullmatch(code) or len(title) < 7 or title == code:
         return None
     deadline = date_value(first(obj, DATE_KEYS))
+    # On event-style notices endDate may be the event date rather than the
+    # application deadline. Do not infer a registration cutoff from that field.
+    if re.search(r"오픈[\s·∙-]*콜라보", title, re.I) and not first(obj, (
+        "applyDeadline", "applicationEndDate", "applyEndDate", "receiptEndDate",
+        "recruitEndDate", "applicationEndAt", "applyEndAt", "closeDate",
+        "deadline", "rcptEndDt"
+    )):
+        deadline = None
     desc = first(obj, ("supportContents", "supportContent", "projectDescription",
                        "content", "description", "summary"))
     org = first(obj, ("organizationName", "organizationNm", "orgName", "centerName"))
