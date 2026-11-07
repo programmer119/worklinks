@@ -1,0 +1,40 @@
+name: WorkLinks critical healthcare QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/worklinks_priority_health.py'
+      - 'tests/test_worklinks_priority_health.py'
+      - 'scripts/worklinks_health_sources.py'
+      - 'tests/test_worklinks_health_sources.py'
+      - 'scripts/refresh_worklinks_investment.py'
+      - 'startup-support/kimse-intake.js'
+      - 'tests/test_worklinks_kimse_intake.cjs'
+      - 'startup-support/index.html'
+      - 'tests/test_worklinks_support_sort.cjs'
+      - 'scripts/worklinks_local_budget.py'
+      - 'tests/test_worklinks_local_budget.py'
+      - '.github/workflows/worklinks-critical-health-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install small parser dependencies
+        run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
+      - name: Backtest official healthcare sources and matching
+        run: |
+          python -m unittest discover -s tests -p 'test_worklinks_priority_health.py' -v
+          python -m unittest discover -s tests -p 'test_worklinks_health_sources.py' -v
+          python -m unittest discover -s tests -p 'test_worklinks_local_budget.py' -v
+      - name: Backtest existing D-DAY and authenticated KIMSE intake
+        run: |
+          node --test tests/test_worklinks_kimse_intake.cjs
+          node --test tests/test_worklinks_support_sort.cjs
