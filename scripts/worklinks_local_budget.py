@@ -89,7 +89,7 @@ TRUSTED_TP_DOMAINS = frozenset((
 # Broad discovery vocabulary: titles are leads, never proof of an award.
 # Both 10,000-won user participation rewards and expensive in-kind services matter.
 POSITIVE = re.compile(r"공모|아이디어|제안|경진|시상|상금|포상|활동비|사업화|실증|지원사업|수혜기업|재공고|추가\s*모집|긴급|바우처|고령친화|헬스케어|치매|의료\s*AI|보건\s*의료|의료\s*(?:빅데이터|데이터|기관|기기|실증)|창업\s*인큐베이팅|음성\s*(?:바이오마커|분석|데이터)|인지\s*(?:건강|저하|기능|지원)|설문|만족도|조사\s*(?:참여|이벤트)|경품|상품권|기프티콘|답례품|참여수당|사례비|참여보상|수수료\s*감면|무료\s*(?:지원|이용|분석)|안심존|안심구역|분석환경|API|GPU|데이터\s*(?:지원|이용)|특허|출원|IP\s*디딤돌|크레딧|시험분석|검증\s*지원", re.I)
-NEGATIVE = re.compile(r"채용|인사발령|개별공시지가|분묘|폐기물|행정예고|공고\s*취소|합격자|선정\s*결과|심사\s*결과|입법예고|경매|자격증\s*시험|낙찰\s*결과|상품권\s*(?:사용내역|가맹점|판매현황)|치매치료관리비\s*지원기준", re.I)
+NEGATIVE = re.compile(r"채용|인사발령|개별공시지가|분묘|폐기물|행정예고|공고\s*취소|합격자|선정\s*결과|심사\s*결과|입법예고|경매|자격증\s*시험|낙찰\s*결과|상품권\s*(?:사용내역|가맹점|판매현황)|치매치료관리비\s*지원기준|당번\s*약국|문\s*여는\s*약국|약국\s*(?:운영|진료|개문|휴일|당번)\s*(?:일정|안내)|휴일\s*지킴이\s*약국", re.I)
 PAYOUT = re.compile(r"상금|포상금|시상금|활동비|사례비|원고료|실증비|사업화\s*지원금|지원금|바우처|상품권|기프티콘|경품|답례품|참여수당|쿠폰|크레딧|수수료\s*면제|비용\s*감면|분석비\s*지원", re.I)
 CASH = re.compile(r"상금|포상금|시상금|활동비|사례비|원고료|실증비|사업화\s*지원금|현금|지원금|참여수당", re.I)
 GIFT = re.compile(r"상품권|기프티콘|경품|답례품|쿠폰|모바일\s*교환권|기프트콘", re.I)
@@ -193,7 +193,10 @@ def assess(title, detail, municipality, url, now):
     direct = bool(CASH.search(joined))
     gift = bool(GIFT.search(joined))
     saving = bool(COST_SAVING.search(joined))
-    kimse = bool(KIMSE.search(title + " " + body[:1800]))
+    # Body text on public bulletin boards often contains generic welfare,
+    # medical and data navigation. Label KIMSE only from the actual notice
+    # title, not incidental boilerplate or unrelated policy survey text.
+    kimse = bool(KIMSE.search(title))
     # Genuine free technical resources remain candidates even with no
     # numerical amount or a cash keyword.
     if not (direct or gift or saving or kimse):
