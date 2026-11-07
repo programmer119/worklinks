@@ -22,7 +22,9 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
             "2026 데이터+AI 혁신 챌린지 통합 공고 안내",
             "2026년 AI·데이터 문제해결은행 상황별 맞춤 지원 공고",
             "2026년 의료 AI 데이터 활용 바우처 지원사업 수요기관 모집",
-            "2026년 디지털헬스 의료기기 병원 실증 지원사업 모집"
+            "2026년 디지털헬스 의료기기 병원 실증 지원사업 모집",
+            "2026년도 보건산업혁신창업센터 혁신창업멤버스 기업 모집공고",
+            "2026년 바이오헬스 특허 및 인허가 컨설팅 지원사업 창업기업 모집"
         ]
         missed=[title for title in observed if not match_notice(title)]
         self.assertFalse(missed, f"Critical 2026 opportunities missed: {missed}")
