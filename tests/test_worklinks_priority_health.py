@@ -102,6 +102,11 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIn("nttSn=10554",found[0]["url"])
         self.assertIn("nttSn=10397",found[1]["url"])
 
+    def test_labelled_application_period_date_on_next_line(self):
+        text="공모 및 접수기간:\n2026.11.6.(금) ~ 2026.12.7.(월) 11:00"
+        self.assertEqual(explicit_deadline(text),"2026-12-07T11:00:00+09:00")
+        self.assertIsNone(explicit_deadline("사업기간:\n2026.11.01 ~ 2027.10.31"))
+
     def test_2026_notice_application_date_not_event_start(self):
         self.assertEqual(
           explicit_deadline("신청기간: 2026.11.01 ~ 11.24 16:00"),
@@ -185,6 +190,8 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertEqual(summary["status"],"degraded")
         self.assertEqual(summary["expected"],3)
         self.assertEqual(summary["healthy"],1)
+        self.assertEqual(summary["listingHealthy"],1)
+        self.assertEqual(set(summary["listingDegraded"]),{"HIRA","K-DATA"})
         self.assertEqual(set(summary["degraded"]),{"HIRA","K-DATA"})
 
     def test_malformed_or_js_only_list_is_not_reported_as_no_opportunity(self):
