@@ -10,6 +10,8 @@ on:
       - 'scripts/worklinks_dynamic_sources.py'
       - 'scripts/worklinks_sefund.py'
       - 'scripts/worklinks_kised.py'
+      - 'scripts/worklinks_health_sources.py'
+      - 'tests/test_worklinks_health_sources.py'
       - 'tests/test_kised.py'
       - 'scripts/worklinks_global_accelerators.py'
       - 'tests/test_global_accelerators.py'
@@ -49,6 +51,8 @@ jobs:
         run: |
           node --test tests/test_worklinks_kimse_intake.cjs
           node --test tests/test_worklinks_support_sort.cjs
+      - name: Validate healthcare source parser with offline fixtures
+        run: python -m unittest discover -s tests -p 'test_worklinks_health_sources.py' -v
       - name: Test dynamic source extraction
         continue-on-error: true
         run: python -m unittest discover -s tests -p 'test_dynamic_sources.py' -v
