@@ -21,12 +21,12 @@ SOURCES = (
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; WorkLinks/1.0 public-notice-monitor)",
            "Accept-Language": "ko-KR,ko;q=0.9"}
 DOMAIN = re.compile(
-    r"의료|보건|헬스|데이터|빅데이터|디지털|AI\b|인공지능|병원|실증|바이오|임상|인지|치매|돌봄|표준",
+    r"의료|보건|헬스|데이터|빅데이터|디지털|AI|인공지능|병원|실증|바이오|임상|인지|치매|돌봄|표준|진료정보|건강정보",
     re.I,
 )
 OFFER = re.compile(r"모집|지원|접수|신청|공모|경진|바우처|실증|교육|협력|매칭|설명회|입찰|참여", re.I)
 EXCLUDE = re.compile(r"채용|선정\s*결과|우선협상대상자|낙찰|입찰가격|입찰\s*결과|용역\s*개찰", re.I)
-DEADLINE_MARKER = re.compile(r"접수\s*(?:기한|기간|마감|일시)|신청\s*(?:기간|기한|마감)|모집\s*(?:기간|마감)|제출\s*기한", re.I)
+DEADLINE_MARKER = re.compile(r"접수\s*(?:기한|기간|마감|일시)|신청\s*(?:기간|기한|마감)|모집\s*(?:기간|마감)|공모\s*(?:기간|마감)|제출\s*기한", re.I)
 FULL_DAY = re.compile(
     r"(20\d{2})[.\-/년\s]+(\d{1,2})[.\-/월\s]+(\d{1,2})\s*(?:일)?(?:\([월화수목금토일]\))?",
     re.I,
@@ -60,7 +60,16 @@ def candidate_links(soup, base, board_id):
         url = f"https://www.khis.kr/board.es?act=view&bid={board_id}&list_no={number}&mid=" + (
             "a10301000000" if board_id == "0001" else "a10304000000"
         )
-        found[url] = title
+        row=anchor.find_parent("tr")
+        published=None
+        if row:
+            observed=re.search(r"(20\d{2})[./\-](\d{1,2})[./\-](\d{1,2})",row.get_text(" ",strip=True))
+            if observed:
+                try:
+                    published=dt.date(int(observed[1]),int(observed[2]),int(observed[3]))
+                except ValueError:
+                    pass
+        found[url]=(title,published)
     return found
 
 
@@ -97,8 +106,16 @@ def application_deadline(title, body, year_hint=None):
                 continue
             clock = list(HOUR.finditer(sample[date_end:date_end+45]))
             return day.isoformat() + (f"T{int(clock[-1][1]):02d}:{int(clock[-1][2]):02d}:00+09:00" if clock else "")
-        # E.g. a title says "(~11/6 17:00)" but source has no full year.
-        # We do not assume which year or which duration the range applies to.
+        # Abbreviated dates get their year only from the observed KHIS posting.
+        if isinstance(year_hint,int):
+            short=SHORT_DAY.search(sample[:150])
+            if short and re.search(r"까지|마감|기한|~|～|–",sample[:150]):
+                try:
+                    day=dt.date(year_hint,int(short[1]),int(short[2]))
+                except ValueError:
+                    continue
+                clock=list(HOUR.finditer(sample[short.end():short.end()+45]))
+                return day.isoformat()+(f"T{int(clock[-1][1]):02d}:{int(clock[-1][2]):02d}:00+09:00" if clock else "")
     return None
 
 
@@ -116,7 +133,7 @@ def scan_source(spec, fetch, now):
     results = []
     failures = 0
     unknown_deadline = 0
-    for detail_url, title in list(found.items())[:25]:
+    for detail_url, (title, published) in list(found.items())[:25]:
         try:
             article = fetch(detail_url)
             content = article.select_one("article") or article.select_one(".board_view") or article.select_one("main") or article
@@ -125,7 +142,7 @@ def scan_source(spec, fetch, now):
             if clean(title, 35).replace(" ", "")[:12] not in clean(body, 30000).replace(" ", ""):
                 failures += 1
                 continue
-            deadline = application_deadline(title, body, now.year)
+            deadline = application_deadline(title, body, published.year if published else None)
             if not deadline:
                 unknown_deadline += 1
             elif deadline[:10] < now.date().isoformat():
