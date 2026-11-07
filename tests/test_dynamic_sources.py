@@ -20,6 +20,23 @@ class DynamicSourcesTest(unittest.TestCase):
         self.assertEqual(item["deadline"], "2026-10-31T23:59:00+09:00")
         self.assertEqual(item["eligibility"], "자격 확인 필요")
 
+    def test_event_date_is_not_assumed_to_be_application_deadline(self):
+        record=project_record({
+            "projectCode":"PRJ007687",
+            "projectName":"2026 서울 바이오∙의료 오픈 콜라보",
+            "endDate":"2026-11-17 10:00"
+        })
+        self.assertIsNotNone(record)
+        self.assertIsNone(record["deadline"])
+
+        with_explicit=project_record({
+            "projectCode":"PRJ007687",
+            "projectName":"2026 서울 바이오∙의료 오픈 콜라보",
+            "endDate":"2026-11-17 10:00",
+            "applicationEndDate":"2026-11-16 23:57"
+        })
+        self.assertEqual(with_explicit["deadline"],"2026-11-16T23:57:00+09:00")
+
     def test_project_template_not_a_real_notice(self):
         self.assertIsNone(project_record({"projectCode":"{{projectCode}}","projectName":"투자 모집 공고"}))
         self.assertIsNone(project_record({"projectCode":"PRJ007522","projectName":""}))
