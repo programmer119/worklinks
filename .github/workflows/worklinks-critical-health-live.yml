@@ -1,0 +1,29 @@
+name: WorkLinks critical KIMSE live source audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/worklinks_health_live_audit.py'
+      - 'scripts/worklinks_priority_health.py'
+      - '.github/workflows/worklinks-critical-health-live.yml'
+  schedule:
+    - cron: '10 0,12 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: critical-health-live-audit
+  cancel-in-progress: true
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser dependencies
+        run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
+      - name: Probe actual official healthcare notice list links and report failures
+        run: python scripts/worklinks_health_live_audit.py
