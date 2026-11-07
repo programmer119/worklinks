@@ -11,11 +11,14 @@ import re
 from urllib.parse import parse_qs, urljoin, urlsplit
 import requests
 from concurrent.futures import ThreadPoolExecutor
+import threading
+from urllib.parse import urlsplit as _urlsplit
 from bs4 import BeautifulSoup
 
 KST = dt.timezone(dt.timedelta(hours=9))
 MAX_DETAIL_PER_SOURCE = 10
 REQUEST_TIMEOUT_SECONDS = 7
+_KHIDI_LIMIT=threading.Semaphore(2)
 SOURCES = (
     ("KHIDI 보건산업 사업공고", "https://www.khidi.or.kr/board?menuId=MENU01108", "khidi"),
     ("KHIDI 의료기기 지원사업", "https://www.khidi.or.kr/mdtis/bizPbanc/bizPbancList?menuId=MENU03471", "device"),
@@ -142,11 +145,18 @@ SHORT_DAY = re.compile(r"(?<!\d)(\d{1,2})[./월\s]+(\d{1,2})(?:일)?(?!\d)")
 
 def explicit_deadline(text):
     """Never turn a registration starting date or event date into an end date."""
-    for line in str(text or "").splitlines():
+    lines=str(text or "").splitlines()
+    for i,line in enumerate(lines):
         line=clean(line,550)
         m=APPLICATION.search(line)
         if not m:continue
         tail=line[m.end():]
+        # A marked application-period label on its own line may be followed
+        # by the application dates on the immediately next line.
+        if not DAY.search(tail) and i+1<len(lines) and not tail.strip(" :："):
+            nxt=clean(lines[i+1],320)
+            if re.match(r"^(?:20\d{2})[.\-/년\s]",nxt):
+                tail=nxt
         dates=list(DAY.finditer(tail[:230]))
         if not dates:continue
         last=dates[-1];year,month,day=int(last[1]),int(last[2]),int(last[3])
@@ -248,8 +258,16 @@ def coverage_summary(states, required_names):
             "error":str((row or {}).get("error",""))[:160],
         })
     degraded=[x["name"] for x in outcomes if x["status"]!="ok"]
+    listing_degraded=[
+        x["name"] for x in outcomes
+        if x["status"] in ("error","missing") or
+           (x["verifiedArticleLinks"]==0 and x["currentQualified"]==0)
+    ]
     return {
        "expected":len(required),
+       "listingHealthy":len(required)-len(listing_degraded),
+       "listingDegraded":listing_degraded,
+       "applicationDatesUnverified":sum(x["undated"] for x in outcomes),
        "healthy":len(required)-len(degraded),
        "degraded":degraded,
        "status":"healthy" if not degraded else "degraded",
@@ -261,10 +279,17 @@ def scan_priority_sources(fetch=None,now=None):
     now=now or dt.datetime.now(KST)
     if fetch is None:
         def fetch(url):
-            r=requests.get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
-            r.raise_for_status()
-            if len(r.content)>3_000_000:raise ValueError("HTML exceeds safe size")
-            return BeautifulSoup(r.text,"html.parser")
+            def request_one():
+                r=requests.get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
+                r.raise_for_status()
+                if len(r.content)>3_000_000:raise ValueError("HTML exceeds safe size")
+                return BeautifulSoup(r.text,"html.parser")
+            # Four public KHIDI boards share one host. Avoid self-inflicted
+            # rate limits while probing different official institutions.
+            if _urlsplit(url).hostname in ("www.khidi.or.kr","khidi.or.kr"):
+                with _KHIDI_LIMIT:
+                    return request_one()
+            return request_one()
     rows,states=[],[]
     # Concurrent independent source checks are bounded so one slow institution
     # cannot consume the entire 18-minute WorkLinks refresh time budget.
