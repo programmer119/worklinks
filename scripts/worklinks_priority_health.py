@@ -237,7 +237,7 @@ def observed_listing_pages(soup, list_url):
             continue
         query=parse_qs(part.query)
         valid_pages=[int(v) for k in PAGE_KEYS for v in query.get(k,[])
-                     if re.fullmatch(r"\d{1,3}",v) and 2<=int(v)<=MAX_LIST_PAGES]
+                     if re.fullmatch(r"\d{1,3}",v) and 2<=int(v)<=100]
         if len(valid_pages)!=1:
             continue
         # Ignore unrelated categories or board IDs.
