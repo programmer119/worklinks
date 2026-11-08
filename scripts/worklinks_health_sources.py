@@ -123,13 +123,18 @@ def scan_source(spec, fetch, now):
     name, url, board_id = spec
     checked = now.isoformat(timespec="seconds")
     state = {"name": name, "url": url, "status": "error", "discovered": 0,
-             "checkedAt": checked, "detailErrors": 0}
+             "checkedAt": checked, "detailErrors": 0, "articleLinks": 0,
+             "relevantLinks": 0, "candidateLinks": 0}
     try:
         soup = fetch(url)
     except (requests.RequestException, ValueError, AttributeError) as exc:
         state["error"] = clean(str(exc), 180)
         return [], state
     found = candidate_links(soup, url, board_id)
+    # These are actual observed and validated official article URLs. Expose
+    # the same coverage keys as every other KIMSE official source collector.
+    state.update(articleLinks=len(found), relevantLinks=len(found),
+                 candidateLinks=len(found))
     results = []
     failures = 0
     unknown_deadline = 0
