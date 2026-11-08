@@ -15,6 +15,14 @@ NIA_SOURCE=next(x for x in SOURCES if x[2]=='nia')
 KDATA_SOURCE=next(x for x in SOURCES if x[2]=='kdata')
 
 class PriorityDiscoveryBacktest(unittest.TestCase):
+    def test_kimse_fit_does_not_inherit_unrelated_page_navigation(self):
+        from worklinks_priority_health import kimse_fit
+        nav="홈 데이터안심구역 치매 의료데이터 병원 임상시험 전체 사이트 메뉴"
+        self.assertEqual(kimse_fit("2026 데이터 표준계약서 활용 교육",nav),"검토")
+        self.assertEqual(kimse_fit("치매 조기변화 실증 지원사업",nav),"높음")
+        self.assertEqual(kimse_fit("연구 행정 운영 교육",nav),"검토")
+        self.assertEqual(kimse_fit("시설 안전 점검 안내",nav),"기타")
+
     def test_known_must_detect_official_2026_opportunities(self):
         # Official source titles, not keyword-only imaginary cases.
         observed=[
