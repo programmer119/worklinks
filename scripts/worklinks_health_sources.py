@@ -8,6 +8,8 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import re
+import xml.etree.ElementTree as ET
+from html import escape as html_escape
 from urllib.parse import parse_qs, urljoin, urlsplit
 
 import requests
@@ -180,6 +182,42 @@ def scan_source(spec, fetch, now):
     return results, state
 
 
+KHIS_TENDER_RSS = "https://www.khis.kr/rss/board.es?bid=0009&mid=a10304000000"
+
+
+def official_rss_listing(content, board_id="0009"):
+    """Convert observed KHIS official RSS entry links to an HTML listing.
+    A feed that cannot be validated stays an error, never an empty result.
+    """
+    root = ET.fromstring(content)
+    items = root.findall(".//item")
+    if not items:
+        raise ValueError("KHIS official RSS contains no items")
+    rows = []
+    for item in items[:70]:
+        title = clean(item.findtext("title"), 240)
+        link = str(item.findtext("link") or "").strip()
+        parts = urlsplit(link)
+        q = parse_qs(parts.query)
+        if (parts.scheme != "https" or
+                parts.hostname not in ("www.khis.kr","khis.kr") or
+                parts.path != "/board.es" or
+                q.get("act") != ["view"] or
+                q.get("bid") != [board_id] or
+                q.get("mid") != ["a10304000000"]):
+            continue
+        ids = q.get("list_no", [])
+        if len(ids) != 1 or not re.fullmatch(r"\d{1,8}", ids[0]):
+            continue
+        published = clean(item.findtext("pubDate"), 80)
+        rows.append("<tr><td><a href=\"" + html_escape(link, quote=True) +
+                    "\">" + html_escape(title) + "</a></td><td>" +
+                    html_escape(published) + "</td></tr>")
+    if not rows:
+        raise ValueError("KHIS official RSS lacks verified notice article URLs")
+    return BeautifulSoup("<table>" + "".join(rows) + "</table>", "html.parser")
+
+
 def scan_health_sources(fetch=None, now=None):
     now = now or dt.datetime.now(KST)
     if fetch is None:
@@ -187,9 +225,20 @@ def scan_health_sources(fetch=None, now=None):
             try:
                 response = requests.get(url, headers=HEADERS, timeout=(6, 12))
             except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
-                # KHIS official boards intermittently hang on one request.
-                # Retry once with a bounded timeout; a second failure remains
-                # a source error and can never be mistaken for zero notices.
+                # Use the explicitly linked, officially published RSS endpoint
+                # if the KHIS tender board HTML is slow or unresponsive.
+                if url == SOURCES[1][1]:
+                    try:
+                        feed = requests.get(KHIS_TENDER_RSS, headers=HEADERS,
+                                            timeout=(6, 14))
+                        feed.raise_for_status()
+                        if len(feed.content) > 3_000_000:
+                            raise ValueError("KHIS RSS response too large")
+                        return official_rss_listing(feed.content, "0009")
+                    except (requests.RequestException, ValueError, ET.ParseError):
+                        pass
+                # Bounded final attempt: a second failure is retained as an
+                # error rather than a false no-opportunity result.
                 response = requests.get(url, headers=HEADERS, timeout=(6, 16))
             response.raise_for_status()
             if len(response.content) > 3_000_000:
