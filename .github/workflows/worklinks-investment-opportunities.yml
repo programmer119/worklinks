@@ -132,5 +132,12 @@ jobs:
           uncertain=coverage.get("applicationDatesUnverified",0)
           if uncertain:
               print(f"::warning title=KIMSE deadlines require verification::{uncertain} candidates")
-          print(f"Verified official KIMSE listing coverage: {healthy}/{expected}")
+          uninspected=coverage.get("uninspectedCandidates",0)
+          unscanned=coverage.get("pagesPending",0)
+          if uninspected or unscanned:
+              print(f"::warning title=KIMSE pagination/detail review incomplete::{uninspected} uninspected article candidates, {unscanned} outstanding listing pages")
+          failures=coverage.get("detailFailures",0)
+          if failures:
+              print(f"::warning title=KIMSE detail access failures::{failures} failures require reinspection")
+          print(f"Official KIMSE listing reachability: {healthy}/{expected}. This is NOT full application/eligibility coverage.")
           PY
