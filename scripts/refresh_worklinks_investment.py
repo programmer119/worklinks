@@ -20,6 +20,7 @@ from worklinks_dynamic_sources import scan_browser_sources
 from worklinks_health_sources import scan_health_sources
 from worklinks_priority_health import scan_priority_sources, coverage_summary, SOURCES as PRIORITY_OFFICIAL_SOURCES
 from worklinks_health_sources import SOURCES as KHIS_OFFICIAL_SOURCES
+from worklinks_kimse_merge_audit import merge_verified_deadlines
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "startup-support/investment-opportunities.json"
@@ -284,6 +285,15 @@ def main():
     sources += priority_sources
     critical_names=[source[0] for source in PRIORITY_OFFICIAL_SOURCES + KHIS_OFFICIAL_SOURCES]
     critical_coverage=coverage_summary(sources,critical_names)
+    kimse_deep_meta={"accepted":0,"skipped":"audit_file_not_yet_available"}
+    deep_path=ROOT/"startup-support/kimse-deep-audit.json"
+    if deep_path.is_file():
+        try:
+            deep=json.loads(deep_path.read_text(encoding="utf-8"))
+            rows,kimse_deep_meta=merge_verified_deadlines(rows,deep,now())
+        except (OSError,ValueError,TypeError) as exc:
+            kimse_deep_meta={"accepted":0,"skipped":"invalid_audit",
+                             "error":tidy(ex,160)}
     registered = registered_titles()
     for item in rows:
         if item.get("source") == "재단법인 밴드 공식 공지사항":
@@ -294,8 +304,9 @@ def main():
     known_titles={normalize_title(x.get("title","")) for x in rows}
     rows += [x for x in historic() if normalize_title(x.get("title","")) not in known_titles]
     merged={x["id"]:x for x in rows}
+    collected_urls={x.get("url") for x in rows if x.get("url")}
     for p in old.get("opportunities",[]):
-        if not isinstance(p,dict) or p.get("id") in merged or p.get("source")=="기존 WorkLinks 등록":continue
+        if not isinstance(p,dict) or p.get("id") in merged or p.get("url") in collected_urls or p.get("source")=="기존 WorkLinks 등록":continue
         try:age=(now()-dt.datetime.fromisoformat(p.get("lastSeenAt",""))).days
         except (ValueError,TypeError):continue
         retention=30 if p.get("reviewStatus") and not p.get("deadline") else 7
@@ -307,9 +318,17 @@ def main():
         if end and end<now()-dt.timedelta(days=40):continue
         p["deadlineState"]="closed" if p.get("sourceStatus")=="closed" or (end and end<now()) else "open_by_date" if end else "unknown"
         p["freshness"]="checked" if p["id"] in checked else "historical" if p["source"]=="기존 WorkLinks 등록" else "stale"
+        if p["id"].startswith("kimse-audit-"):
+            try:
+                audit_age=(now()-dt.datetime.fromisoformat(p.get("lastSeenAt",""))).total_seconds()
+            except (TypeError,ValueError):
+                audit_age=float("inf")
+            if audit_age>7200:
+                p["freshness"]="stale"
         listing.append(p)
     listing.sort(key=lambda x:(x["freshness"]!="checked",x["deadlineState"]=="closed",x["deadlineState"]=="unknown",x.get("deadline") or "9999",x["title"]))
     data={"schemaVersion":1,"generatedAt":now().isoformat(timespec="seconds"),"sources":sources,"priorityCoverage":critical_coverage,
+    "kimseDeepAuditMerge":kimse_deep_meta,
     "watchTargets":[dict(x,mode=("공식 공개 목록 수집 시도·JS/인증 제한 별도 표시" if x["url"].startswith(("https://www.vcs.go.kr","https://www.jointips.or.kr","https://startup-plus.kr","https://irchallenge.jointips.or.kr")) else "참고 링크·자동수집 아님")) for x in WATCH],"opportunities":listing,
     "reviewQueue":[x["id"] for x in listing if x.get("reviewStatus") and
                    (not x.get("deadline") or x.get("eligibility")=="자격 확인 필요")],
