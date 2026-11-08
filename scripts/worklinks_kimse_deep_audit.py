@@ -216,11 +216,21 @@ def run(snapshot, now=None, crawl=crawl_source, examine_one=examine):
     sources={spec[0]:spec for spec in ALL_SOURCES}
     evidence={}
     audits=[]
-    for spec in ALL_SOURCES:
-        item=crawl(spec)
-        audits.append({key:value for key,value in item.items() if key!="candidates"})
-        for row in item["candidates"]:
-            evidence.setdefault(row["url"],row)
+    with cf.ThreadPoolExecutor(max_workers=5) as listing_pool:
+        listing_futures={listing_pool.submit(crawl,spec):spec for spec in ALL_SOURCES}
+        for future in cf.as_completed(listing_futures):
+            spec=listing_futures[future]
+            try:
+                item=future.result()
+            except Exception as exc:
+                item={"source":spec[0],"board":spec[1],"visited":0,
+                      "observedPages":[],"pendingPages":[spec[1]],
+                      "failedPages":[{"url":spec[1],
+                       "error":type(exc).__name__+": "+clean(exc,160)}],
+                      "candidates":[]}
+            audits.append({key:value for key,value in item.items() if key!="candidates"})
+            for row in item["candidates"]:
+                evidence.setdefault(row["url"],row)
     # Existing verified official links are retained as previous-run evidence,
     # not misreported as new discoveries.
     for row in snapshot.get("opportunities",[]):
