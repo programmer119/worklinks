@@ -80,10 +80,15 @@ class KimseDeepAuditTests(unittest.TestCase):
                "<p>지원대상: 의료기관과 공동연구 가능한 기업</p></article>","html.parser")
         row=examine(entry,source,NOW,article)
         self.assertEqual(row["status"],"deadline_verified_eligibility_pending")
+        self.assertEqual(row["deadlineEvidenceSource"],"official_article_application_period")
         self.assertEqual(row["applicationDeadline"],"2026-11-29T17:00:00+09:00")
         self.assertEqual(row["eligibility"],"자격 확인 필요")
         fail=examine(entry,source,NOW,lambda url: (_ for _ in ()).throw(TimeoutError()))
         self.assertEqual(fail["status"],"access_failed")
+        unrelated=examine(entry,source,NOW,lambda url:BeautifulSoup(
+            "<article><h1>다른 일반 지원사업 공고</h1><p>신청마감: 2026.12.20</p></article>","html.parser"))
+        self.assertEqual(unrelated["status"],"detail_mismatch")
+        self.assertIsNone(unrelated["applicationDeadline"])
         invalid={**entry,"url":"https://evil.example/board/view?menuId=MENU01108&linkId=48952446"}
         self.assertEqual(examine(invalid,source,NOW,article)["status"],"invalid_official_link")
 
