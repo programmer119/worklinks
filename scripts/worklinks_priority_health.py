@@ -10,6 +10,10 @@ import hashlib
 import re
 from urllib.parse import parse_qs, urljoin, urlsplit
 import requests
+import certifi
+import ssl
+import tempfile
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import threading
 from urllib.parse import urlsplit as _urlsplit
@@ -275,12 +279,46 @@ def coverage_summary(states, required_names):
        "note":"공식 출처 0건과 접속 실패를 구분하며, 응모자격·자료이용권 자동 확인을 의미하지 않음",
     }
 
+KDATA_CA_ISSUER = "http://public.wisekey.com/crt/tsrsasecureca2.cer"
+
+
+def verified_public_get(url, *, headers=HEADERS, timeout=REQUEST_TIMEOUT_SECONDS):
+    """Fetch with TLS verification. Repair K-DATA's incomplete server chain
+    by supplying the certificate issuer intermediate (never a replacement root).
+    OpenSSL must still verify the full chain and the exact requested hostname.
+    """
+    try:
+        return requests.get(url, headers=headers, timeout=timeout)
+    except requests.exceptions.SSLError:
+        if urlsplit(url).hostname != "www.kdata.or.kr":
+            raise
+        # The URL is the explicit CA-Issuers AIA of K-DATA's live certificate.
+        # An untrusted HTTP intermediate cannot authenticate the site: the
+        # subsequent HTTPS request is validated against certifi trust roots.
+        issuer = requests.get(KDATA_CA_ISSUER, timeout=7)
+        issuer.raise_for_status()
+        if not 300 <= len(issuer.content) <= 100000:
+            raise ValueError("K-DATA issuer certificate has invalid length")
+        if issuer.content.lstrip().startswith(b"-----BEGIN CERTIFICATE-----"):
+            pem = issuer.content.decode("ascii")
+        else:
+            pem = ssl.DER_cert_to_PEM_cert(issuer.content)
+        with tempfile.TemporaryDirectory(prefix="worklinks-ca-") as directory:
+            ca_file = Path(directory) / "verified-ca-chain.pem"
+            ca_file.write_bytes(
+                Path(certifi.where()).read_bytes() + b"\n" +
+                pem.encode("ascii") + b"\n"
+            )
+            return requests.get(url, headers=headers, timeout=timeout,
+                                verify=str(ca_file))
+
+
 def scan_priority_sources(fetch=None,now=None):
     now=now or dt.datetime.now(KST)
     if fetch is None:
         def fetch(url):
             def request_one():
-                r=requests.get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
+                r=verified_public_get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
                 r.raise_for_status()
                 if len(r.content)>3_000_000:raise ValueError("HTML exceeds safe size")
                 return BeautifulSoup(r.text,"html.parser")
