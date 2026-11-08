@@ -69,10 +69,11 @@ def probe(source):
                     "board" in str(a.get("href","")).lower() or
                     "view" in str(a.get("onclick","")).lower()
                 ][:45]
+                result["textTail"]=soup.get_text(" ",strip=True)[-1800:]
                 result["datedElementSnippets"]=[]
                 for text_node in soup.find_all(string=True):
                     value=str(text_node).strip()
-                    if not __import__("re").search(r"2026[.\\-/]\\d{1,2}[.\\-/]\\d{1,2}",value):
+                    if not __import__("re").search(r"2026[./-]\d{1,2}[./-]\d{1,2}",value):
                         continue
                     parent=text_node.parent
                     for _ in range(3):
