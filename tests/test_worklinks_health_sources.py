@@ -112,6 +112,27 @@ class OfficialHealthSourceTest(unittest.TestCase):
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["deadline"],"2026-11-19T18:00:00+09:00")
 
+    def test_khis_transient_timeout_retried_but_not_silently_ignored(self):
+        import requests
+        from unittest.mock import patch
+        calls={}
+        class Response:
+            content=b"<html><body><p>empty official list</p></body></html>"
+            text=content.decode("utf-8")
+            def raise_for_status(self): pass
+        def fake(url, **kwargs):
+            calls[url]=calls.get(url,0)+1
+            if url==SOURCES[0][1] and calls[url]==1:
+                raise requests.exceptions.ReadTimeout("transient")
+            return Response()
+        with patch("worklinks_health_sources.requests.get",side_effect=fake):
+            rows,states=scan_health_sources(now=NOW)
+        self.assertEqual(rows,[])
+        self.assertEqual(calls[SOURCES[0][1]],2)
+        self.assertEqual(calls[SOURCES[1][1]],1)
+        self.assertEqual(len(states),2)
+        self.assertEqual(states[0]["status"],"partial")
+
     def test_blank_static_listing_must_be_partial(self):
         rows,state=scan_source(SOURCES[0],lambda _:BeautifulSoup("<p>JS shell</p>","html.parser"),NOW)
         self.assertEqual(rows,[])
