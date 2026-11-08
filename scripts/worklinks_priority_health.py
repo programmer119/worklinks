@@ -26,7 +26,7 @@ SOURCES = (
     ("KHIDI 의료기기 상담·교육", "https://www.khidi.or.kr/board?menuId=MENU01491", "khidi_events"),
     ("NIA AI·데이터 공지", "https://www.nia.or.kr/site/nia_kor/ex/bbs/List.do?cbIdx=99835", "nia"),
     ("K-DATA 데이터·안심구역 공지", "https://www.kdata.or.kr/kr/board/notice_01/boardList.do", "kdata"),
-    ("심평원 창업·의료데이터 소식", "https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020041000100", "hira"),
+    ("심평원 창업·의료데이터 소식", "https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020002000100", "hira"),
     ("AI-Hub 의료·안심존 데이터 공지", "https://www.aihub.or.kr/aihubnews/notice/list.do?currMenu=132&topMenu=103", "aihub"),
 )
 HEADERS = {"User-Agent":"Mozilla/5.0 (compatible; WorkLinks/1.0 public-research-monitor)",
@@ -92,8 +92,8 @@ def valid_official_link(href,base,kind):
         b=q.get("brdBltNo",[])
         if len(b)!=1 or not re.fullmatch(r"\d{4,8}",b[0]):
             return None
-        if q.get("brdScnBltNo")!=["4"]:return None
-        return f"https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020041000100&brdScnBltNo=4&brdBltNo={b[0]}"
+        if q.get("brdScnBltNo")!=["4"] or q.get("pgmid")!=["HIRAA020002000100"]:return None
+        return f"https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020002000100&brdScnBltNo=4&brdBltNo={b[0]}"
     return None
 
 def observed_links(soup,base,kind):
