@@ -55,6 +55,14 @@ class KimseDeepAuditTests(unittest.TestCase):
             "2027 의료 AI 글로벌 박람회 개최 2026.12.12"))
         self.assertIsNone(signed_date_from_title(
             "의료 데이터 창업 상담회 행사일 2026.12.12"))
+        self.assertEqual(signed_date_from_title(
+            "2026년 바이오헬스 참여기업 모집 공고(~11/30)"),"2026-11-30")
+        self.assertEqual(signed_date_from_title(
+            "2025년 의료기기 참가기업 모집(~3.26)"),"2025-03-26")
+        self.assertIsNone(signed_date_from_title(
+            "2027 국제 의료 전시 참가기업 모집(~10.16)"))
+        self.assertIsNone(signed_date_from_title(
+            "의료 AI 지원 공고(~12/4)"))
 
     def test_historic_not_automatically_called_closed(self):
         self.assertTrue(likely_historical("2025 데이터 AI 실증사업",NOW))
