@@ -43,6 +43,12 @@ const local=t=>t?new Date(t).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}):'�
 const deadline=t=>t?(t.slice(0,10)+(t.includes('T')?' '+t.match(/T(\d\d:\d\d)/)?.[1]:' · 마감시각 확인 필요')):'마감일 미확인';
 function draw(){if(!state)return;const all=state.opportunities||[],s=$('search').value.trim().toLowerCase(),kind=$('kind').value,elig=$('status').value,include=$('ended').checked,reviewOnly=$('reviewOnly').checked;
 const filtered=all.filter(x=>(include||x.deadlineState!=='closed')&&(!reviewOnly||!!x.reviewStatus&&!x.deadline)&&(!kind||x.category===kind)&&(!elig||x.eligibility===elig)&&(!s||[x.title,x.description,x.source].join(' ').toLowerCase().includes(s)));
+if(reviewOnly)filtered.sort((a,b)=>{
+const rank=x=>x.kimseFit==='높음'?0:x.kimseFit==='검토'?1:2;
+return rank(a)-rank(b)||(a.freshness==='checked'?0:1)-(b.freshness==='checked'?0:1)||
+String(b.lastSeenAt||'').localeCompare(String(a.lastSeenAt||''))||
+String(a.title).localeCompare(String(b.title),'ko');
+});
 $('shown').textContent='· '+filtered.length+'건 표시 / '+all.length+'건 보관';
 $('countLive').textContent=all.filter(x=>x.freshness==='checked').length+'건';
 $('countOpen').textContent=all.filter(x=>x.freshness==='checked'&&x.deadlineState==='open_by_date').length+'건';
