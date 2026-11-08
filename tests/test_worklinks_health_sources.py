@@ -112,6 +112,51 @@ class OfficialHealthSourceTest(unittest.TestCase):
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["deadline"],"2026-11-19T18:00:00+09:00")
 
+    def test_official_khis_tender_rss_recovers_timeout_and_rejects_other_hosts(self):
+        import requests
+        from unittest.mock import patch
+        from worklinks_health_sources import KHIS_TENDER_RSS, official_rss_listing
+        title="의료 AI 플랫폼 실증 지원사업 모집 공고"
+        rss=("<rss><channel><item><title>"+title+"</title><link>"
+            "https://www.khis.kr/board.es?mid=a10304000000&amp;bid=0009"
+            "&amp;list_no=2678&amp;act=view</link><pubDate>2026-11-01</pubDate></item>"
+            "<item><title>의료 AI 데이터 사업 공모</title><link>"
+            "https://evil.example/board.es?act=view&amp;bid=0009"
+            "&amp;list_no=123&amp;mid=a10304000000</link></item>"
+            "</channel></rss>").encode("utf-8")
+        soup=official_rss_listing(rss)
+        found=candidate_links(soup,SOURCES[1][1],"0009")
+        self.assertEqual(len(found),1)
+        self.assertIn("list_no=2678",next(iter(found)))
+        with self.assertRaises(ValueError):
+            official_rss_listing(
+                b'<rss><item><title>Fake</title><link>https://evil.example/x</link></item></rss>')
+        class Response:
+            def __init__(self, content):
+                self.content=content
+                self.text=content.decode("utf-8")
+            def raise_for_status(self): pass
+        hits=[]
+        def fake(url, **kwargs):
+            hits.append(url)
+            if url==SOURCES[0][1]:
+                return Response(b"<html><body>no official notice</body></html>")
+            if url==SOURCES[1][1]:
+                raise requests.exceptions.ReadTimeout("public tender board timeout")
+            if url==KHIS_TENDER_RSS:
+                return Response(rss)
+            if "list_no=2678" in url:
+                article=f"<article><h1>{title}</h1><p>접수기간: 2026.11.02 ~ 2026.11.20 17:00</p></article>"
+                return Response(article.encode("utf-8"))
+            raise AssertionError("Unexpected URL "+url)
+        with patch("worklinks_health_sources.requests.get",side_effect=fake):
+            rows,states=scan_health_sources(now=NOW)
+        self.assertIn(KHIS_TENDER_RSS,hits)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["deadline"],"2026-11-20T17:00:00+09:00")
+        self.assertEqual(states[1]["articleLinks"],1)
+        self.assertEqual(states[1]["status"],"ok")
+
     def test_khis_transient_timeout_retried_but_not_silently_ignored(self):
         import requests
         from unittest.mock import patch
