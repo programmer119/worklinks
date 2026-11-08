@@ -223,7 +223,23 @@ def official_rss_listing(content, board_id="0009"):
 def scan_health_sources(fetch=None, now=None):
     now = now or dt.datetime.now(KST)
     if fetch is None:
+        # Prefetch this official feed BEFORE visiting KHIS's other board and
+        # article detail URLs. KHIS intermittently throttles sequential
+        # requests on the same host, even though this official RSS is healthy.
+        tender_listing = None
+        try:
+            feed = requests.get(KHIS_TENDER_RSS, headers=HEADERS,
+                                timeout=(6, 14))
+            feed.raise_for_status()
+            if len(feed.content) > 3_000_000:
+                raise ValueError("KHIS RSS too large")
+            tender_listing = official_rss_listing(feed.content, "0009")
+        except (requests.RequestException, ET.ParseError, ValueError):
+            pass
+
         def fetch(url):
+            if url == SOURCES[1][1] and tender_listing is not None:
+                return tender_listing
             try:
                 response = requests.get(url, headers=HEADERS, timeout=(6, 12))
             except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
