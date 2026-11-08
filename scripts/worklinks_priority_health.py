@@ -442,9 +442,11 @@ def verified_public_get(url, *, headers=HEADERS, timeout=REQUEST_TIMEOUT_SECONDS
     try:
         return requests.get(url, headers=headers, timeout=timeout)
     except requests.exceptions.Timeout:
-        # HIRA intermittently times out even when its official notice list
-        # responds on the next attempt. Retry once; never hide a second fault.
-        if urlsplit(url).hostname not in ("www.hira.or.kr","hira.or.kr"):
+        # Both KHIDI boards and the HIRA notice page intermittently time out.
+        # Retry a bounded second request; a second failure stays visible.
+        if urlsplit(url).hostname not in (
+            "www.hira.or.kr","hira.or.kr",
+            "www.khidi.or.kr","khidi.or.kr"):
             raise
         return requests.get(url, headers=headers, timeout=(6,14))
     except requests.exceptions.SSLError:
