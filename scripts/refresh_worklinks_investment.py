@@ -298,7 +298,8 @@ def main():
         if not isinstance(p,dict) or p.get("id") in merged or p.get("source")=="기존 WorkLinks 등록":continue
         try:age=(now()-dt.datetime.fromisoformat(p.get("lastSeenAt",""))).days
         except (ValueError,TypeError):continue
-        if age<=7:
+        retention=30 if p.get("reviewStatus") and not p.get("deadline") else 7
+        if age<=retention:
             p["sourceKind"]="과거 수집·이번 실행에서 미확인";merged[p["id"]]=p
     listing=[]
     for p in merged.values():
@@ -310,8 +311,14 @@ def main():
     listing.sort(key=lambda x:(x["freshness"]!="checked",x["deadlineState"]=="closed",x["deadlineState"]=="unknown",x.get("deadline") or "9999",x["title"]))
     data={"schemaVersion":1,"generatedAt":now().isoformat(timespec="seconds"),"sources":sources,"priorityCoverage":critical_coverage,
     "watchTargets":[dict(x,mode=("공식 공개 목록 수집 시도·JS/인증 제한 별도 표시" if x["url"].startswith(("https://www.vcs.go.kr","https://www.jointips.or.kr","https://startup-plus.kr","https://irchallenge.jointips.or.kr")) else "참고 링크·자동수집 아님")) for x in WATCH],"opportunities":listing,
+    "reviewQueue":[x["id"] for x in listing if x.get("reviewStatus") and
+                   (not x.get("deadline") or x.get("eligibility")=="자격 확인 필요")],
     "stats":{"total":len(listing),"liveDiscovered":sum(x["freshness"]=="checked" for x in listing),
-             "historical":sum(x["freshness"]=="historical" for x in listing)}}
+             "historical":sum(x["freshness"]=="historical" for x in listing),
+             "kimsePending":sum(x["freshness"]=="checked" and bool(x.get("reviewStatus")) and
+                                not x.get("deadline") for x in listing),
+             "kimseDetailFailures":critical_coverage.get("detailFailures",0),
+             "kimseUninspected":critical_coverage.get("uninspectedCandidates",0)}}
     OUT.parent.mkdir(parents=True,exist_ok=True)
     OUT.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if critical_coverage["degraded"]:
@@ -326,6 +333,8 @@ def main():
                                  " · 신청마감 검증 등 완전성 "+str(critical_coverage["healthy"])+"/"+
                                  str(critical_coverage["expected"])+
                                  " · 기간 미확인 후보 "+str(critical_coverage["applicationDatesUnverified"])+
+                                 "건 · 상세 접근 실패 "+str(critical_coverage.get("detailFailures",0))+
+                                 "건 · 상세검사 대기 "+str(critical_coverage.get("uninspectedCandidates",0))+
                                  "건. 실패/부분성공을 공고 0건으로 취급하지 않음\n\n")
             for source in critical_coverage["sources"]:
                 output_summary.write("- "+source["name"]+": "+source["status"]+
