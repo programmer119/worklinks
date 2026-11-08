@@ -25,9 +25,9 @@ def probe(source):
         soup=BeautifulSoup(resp.text,"html.parser")
         links,count=observed_links(soup,url,kind)
         result.update(articleLinks=count,relevantLinks=len(links),
-                      status="ok" if count>0 else "partial",
+                      status="ok" if count>0 and (kind!="kdata" or count>=5) else "partial",
                       sampleTitles=[x["title"] for x in links[:4]])
-        if count==0:
+        if count==0 or (kind=="kdata" and count<5):
             examples=[]
             for anchor in soup.select("a")[:350]:
                 title=" ".join(anchor.stripped_strings)[:95]
@@ -53,6 +53,12 @@ def probe(source):
                 snippets.append(str(parent)[:1150] if parent else value[:200])
                 if len(snippets)>=5:break
             result["noticeHtmlSnippets"]=snippets
+            if kind=="kdata":
+                result["noticeRows"]=[
+                    str(tr)[:1500] for tr in soup.select("tr")
+                    if len(tr.get_text(" ",strip=True))>18
+                ][:10]
+                result["lowLinkCoverage"]=count<5
             if kind=="nia":
                 result["viewLinks"]=[
                     {"title":" ".join(a.stripped_strings)[:120],
