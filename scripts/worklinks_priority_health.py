@@ -84,9 +84,10 @@ def valid_official_link(href,base,kind):
             return None
         return f"https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?cbIdx=99835&bcIdx={ids[0]}"
     if kind=="kdata" and host in ("www.kdata.or.kr","kdata.or.kr") and KDATA_DETAIL.match(p.path):
-        if not any(re.fullmatch(r"\d{1,12}",v) for values in q.values() for v in values):
+        ids=q.get("bbsIdx",[])
+        if len(ids)!=1 or not re.fullmatch(r"\d{2,12}",ids[0]):
             return None
-        return url
+        return f"https://www.kdata.or.kr/kr/board/notice_01/boardView.do?bbsIdx={ids[0]}"
     if kind=="aihub" and host in ("aihub.or.kr","www.aihub.or.kr") and p.path=="/aihubnews/notice/view.do":
         sn=q.get("nttSn",[])
         if len(sn)!=1 or not re.fullmatch(r"\d{2,8}",sn[0]):
@@ -103,6 +104,24 @@ def valid_official_link(href,base,kind):
 def observed_links(soup,base,kind):
     discovered={}
     all_valid=0
+    if kind=="kdata":
+        # The official K-DATA notice list uses <li onclick="fnLinkView('39049');">
+        # rather than hyperlinks. IDs must be observed on actual notice rows.
+        for li in soup.select("ul.bbs_list > li[onclick]"):
+            script=str(li.get("onclick","")).strip()
+            m=re.fullmatch(r"""fnLinkView\(['"](\d{2,12})['"]\)\s*;?""",script)
+            if not m:continue
+            anchor=li.select_one("p.tit a")
+            if anchor is None:continue
+            title=clean(anchor.get_text(" ",strip=True),200)
+            title=re.sub(r"^제목\s*","",title)
+            if len(title)<9:continue
+            all_valid+=1
+            if not match_notice(title):continue
+            article=f"https://www.kdata.or.kr/kr/board/notice_01/boardView.do?bbsIdx={m[1]}"
+            context=clean(li.get_text(" ",strip=True),340)
+            discovered[article]={"title":title,"url":article,"context":context}
+        return list(discovered.values()),all_valid
     if kind=="nia":
         # Official NIA list links use an observed onclick call rather than href:
         # doBbsFView('99835','30134','16010100','30134')
