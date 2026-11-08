@@ -184,7 +184,13 @@ def scan_health_sources(fetch=None, now=None):
     now = now or dt.datetime.now(KST)
     if fetch is None:
         def fetch(url):
-            response = requests.get(url, headers=HEADERS, timeout=15)
+            try:
+                response = requests.get(url, headers=HEADERS, timeout=(6, 12))
+            except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
+                # KHIS official boards intermittently hang on one request.
+                # Retry once with a bounded timeout; a second failure remains
+                # a source error and can never be mistaken for zero notices.
+                response = requests.get(url, headers=HEADERS, timeout=(6, 16))
             response.raise_for_status()
             if len(response.content) > 3_000_000:
                 raise ValueError("HTML body too large")
