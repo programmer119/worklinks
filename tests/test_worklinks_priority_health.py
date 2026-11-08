@@ -22,6 +22,11 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertEqual(kimse_fit("치매 조기변화 실증 지원사업",nav),"높음")
         self.assertEqual(kimse_fit("연구 행정 운영 교육",nav),"검토")
         self.assertEqual(kimse_fit("시설 안전 점검 안내",nav),"기타")
+        self.assertEqual(kimse_fit("2026년 데이터안심구역 지정 신청 공고"),"기타")
+        self.assertEqual(kimse_fit("2026년 의료데이터 중심병원 감리용역 공모"),"기타")
+        self.assertEqual(kimse_fit("2026 보건의료데이터 DRB AI활용 심화교육"),"검토")
+        self.assertEqual(kimse_fit("방송영상 AI 학습데이터 안심존 개방 안내"),"검토")
+        self.assertEqual(kimse_fit("고령자 치매 조기변화 실증 지원사업"),"높음")
 
     def test_known_must_detect_official_2026_opportunities(self):
         # Official source titles, not keyword-only imaginary cases.
