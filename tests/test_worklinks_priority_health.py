@@ -253,9 +253,65 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
           의료기기 전문가 자문위원회 사업화 분야 상담 신청 안내, 상시접수.
           </article>""","html.parser")
         rows,state=scan_one(source,lambda url:listing if url==source[1] else article,NOW)
-        self.assertEqual(len(rows),0) # no invented closing date
+        self.assertEqual(len(rows),1) # retained as unverified, not actionable
+        self.assertIsNone(rows[0]["deadline"])
+        self.assertIn("상시접수",rows[0]["reviewStatus"])
         self.assertEqual(state["undatedCandidates"],1)
         self.assertEqual(state["status"],"partial")
+
+    def test_follow_observed_paginated_list_not_guessed_ids(self):
+        from worklinks_priority_health import observed_listing_pages
+        source=SOURCES[0]
+        base=source[1]
+        p2="/board?menuId=MENU01108&pageNum=2"
+        p3="/board?menuId=MENU01108&pageNum=3"
+        listing=BeautifulSoup('<div class="pagination"><a href="'+p2+'">2</a>'+
+            '<a href="'+p3+'">3</a><a href="https://other.example/board?pageNum=2">bad</a></div>'+
+            '<a href="/board/view?menuId=MENU01108&linkId=48952449">기사</a>',"html.parser")
+        self.assertEqual(len(observed_listing_pages(listing,base)),2)
+        n1="/board/view?menuId=MENU01108&linkId=48952446"
+        n2="/board/view?menuId=MENU01108&linkId=48952447"
+        n3="/board/view?menuId=MENU01108&linkId=48952448"
+        def page(link,title):
+            return BeautifulSoup('<table><tr><td><a href="'+link+'">'+title+'</a></td></tr></table>',"html.parser")
+        first=BeautifulSoup(str(page(n1,"의료 데이터 실증 지원기업 모집"))+
+             '<div class="pagination"><a href="'+p2+'">2</a><a href="'+p3+'">3</a></div>',"html.parser")
+        pages={
+            base:first,
+            "https://www.khidi.or.kr"+p2:page(n2,"치매 조기진단 AI 실증 참여기업 모집"),
+            "https://www.khidi.or.kr"+p3:page(n3,"보건의료데이터 연구 협력기업 모집"),
+        }
+        for u,title in [(n1,"의료 데이터 실증 지원기업 모집"),
+                         (n2,"치매 조기진단 AI 실증 참여기업 모집"),
+                         (n3,"보건의료데이터 연구 협력기업 모집")]:
+            pages["https://www.khidi.or.kr"+u]=BeautifulSoup(
+                "<article><h1>"+title+"</h1><p>신청마감: 2026.12.15 16:00</p></article>",
+                "html.parser")
+        visited=[]
+        def fetch(u):
+            visited.append(u)
+            return pages[u]
+        rows,state=scan_one(source,fetch,NOW)
+        self.assertEqual(state["pagesScanned"],3)
+        self.assertEqual(state["relevantLinks"],3)
+        self.assertEqual(state["discovered"],3)
+        self.assertEqual(len(rows),3)
+        self.assertIn("https://www.khidi.or.kr"+p3,visited)
+        self.assertEqual(len(set(x["id"] for x in rows)),3)
+
+    def test_unverified_review_record_remains_visible_without_fake_deadline(self):
+        source=SOURCES[0]
+        title="의료 AI 데이터 안심구역 실증기업 모집"
+        page=BeautifulSoup('<table><tr><td><a href="/board/view?menuId=MENU01108&linkId=48952446">'+
+            title+'</a></td></tr></table>',"html.parser")
+        detail=BeautifulSoup("<article><p>"+title+" — 상시접수 및 온라인 상담</p></article>","html.parser")
+        rows,state=scan_one(source,lambda u: page if u==source[1] else detail,NOW)
+        self.assertEqual(state["pendingReview"],1)
+        self.assertEqual(len(rows),1)
+        self.assertIsNone(rows[0]["deadline"])
+        self.assertEqual(rows[0]["kimseFit"],"높음")
+        self.assertIn("상시접수",rows[0]["reviewStatus"])
+        self.assertNotEqual(rows[0]["eligibility"],"신청 가능")
 
     def test_source_health_does_not_hide_access_failures(self):
         summary=coverage_summary([
