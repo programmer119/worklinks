@@ -44,10 +44,9 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),vm=require('node:vm');
           const html=fs.readFileSync('startup-support/investment.html','utf8');
-          const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
-            .map(x=>x[1]).filter(x=>x.trim());
-          if(!scripts.length)throw Error('Missing inline opportunity interface script');
-          scripts.forEach((script)=>new vm.Script(script,{filename:'investment.html'}));
+          const start=html.lastIndexOf('<script>'),end=html.lastIndexOf('</script>');
+          if(start<0||end<=start)throw Error('Missing inline opportunity interface script');
+          new vm.Script(html.slice(start+8,end),{filename:'investment.html'});
           for(const tag of ['reviewOnly','countKimseReview']){
             if(!html.includes('id="'+tag+'"'))throw Error('Missing review queue control '+tag);
           }
