@@ -29,5 +29,6 @@ jobs:
         continue-on-error: true
         run: |
           timeout 15s bash -c 'echo | openssl s_client -connect www.kdata.or.kr:443 -servername www.kdata.or.kr -showcerts 2>&1 | grep -E "depth=|verify error|Certificate chain|^[[:space:]]*[0-9]+ s:|^[[:space:]]*i:|Verify return code" | head -n 22'
+          timeout 15s bash -c 'echo | openssl s_client -connect www.kdata.or.kr:443 -servername www.kdata.or.kr 2>/dev/null | openssl x509 -noout -issuer -ext authorityInfoAccess'
       - name: Probe actual official healthcare notice list links and report failures
         run: python scripts/worklinks_health_live_audit.py
