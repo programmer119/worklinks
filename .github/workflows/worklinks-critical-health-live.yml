@@ -30,5 +30,24 @@ jobs:
         run: |
           timeout 15s bash -c 'echo | openssl s_client -connect www.kdata.or.kr:443 -servername www.kdata.or.kr -showcerts 2>&1 | grep -E "depth=|verify error|Certificate chain|^[[:space:]]*[0-9]+ s:|^[[:space:]]*i:|Verify return code" | head -n 22'
           timeout 15s bash -c 'echo | openssl s_client -connect www.kdata.or.kr:443 -servername www.kdata.or.kr 2>/dev/null | openssl x509 -noout -issuer -ext authorityInfoAccess'
+      - name: Diagnose official KHIS tender RSS fallback
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import requests
+          import xml.etree.ElementTree as ET
+          url='https://www.khis.kr/rss/board.es?bid=0009&mid=a10304000000'
+          try:
+              response=requests.get(url,timeout=(5,12))
+              print('KHIS RSS response:',response.status_code,len(response.content),
+                    response.headers.get('Content-Type',''))
+              response.raise_for_status()
+              root=ET.fromstring(response.content)
+              for item in root.findall('.//item')[:5]:
+                  print('RSS notice:',(item.findtext('title') or '')[:110],
+                        (item.findtext('link') or '')[:180])
+          except Exception as exc:
+              print('KHIS RSS probe failed:',type(exc).__name__,str(exc)[:280])
+          PY
       - name: Probe actual official healthcare notice list links and report failures
         run: python scripts/worklinks_health_live_audit.py
