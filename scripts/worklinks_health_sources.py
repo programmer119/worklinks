@@ -121,6 +121,23 @@ def application_deadline(title, body, year_hint=None):
     return None
 
 
+MAX_KHIS_DETAIL = 20
+
+
+def khis_candidate(detail_url, title, name, checked, reason, body="", deadline=None):
+    from worklinks_priority_health import kimse_fit, eligibility_signal
+    identity=hashlib.sha1((detail_url+"|"+title).encode()).hexdigest()[:17]
+    eligibility,proof=eligibility_signal(body)
+    return {"id":"khis-"+identity,"title":title,"url":detail_url,
+            "category":"창업지원·공모","eligibility":eligibility,
+            "eligibilityEvidence":proof,"deadline":deadline,
+            "description":clean(body,300) or "공식 목록에서 확인된 공고, 상세 검증 필요",
+            "source":name,"sourceKind":"공식 기관 공고·신청조건 검증 필요",
+            "lastSeenAt":checked,"sourceStatus":"unknown",
+            "kimseFit":kimse_fit(title,body),"reviewStatus":reason,
+            "review":"재검증 필요: "+reason+" · "+proof}
+
+
 def scan_source(spec, fetch, now):
     name, url, board_id = spec
     checked = now.isoformat(timespec="seconds")
@@ -133,53 +150,58 @@ def scan_source(spec, fetch, now):
         state["error"] = clean(str(exc), 180)
         return [], state
     found = candidate_links(soup, url, board_id)
-    # These are actual observed and validated official article URLs. Expose
-    # the same coverage keys as every other KIMSE official source collector.
     state.update(articleLinks=len(found), relevantLinks=len(found),
                  candidateLinks=len(found))
     results = []
     failures = 0
     unknown_deadline = 0
-    for detail_url, (title, published) in list(found.items())[:25]:
+    pending_examination = 0
+    for index, (detail_url, (title, published)) in enumerate(found.items()):
+        if index >= MAX_KHIS_DETAIL:
+            pending_examination += 1
+            results.append(khis_candidate(detail_url,title,name,checked,
+                                          "상세검사 대기·검사 상한 도달"))
+            continue
         try:
             article = fetch(detail_url)
             content = article.select_one("article") or article.select_one(".board_view") or article.select_one("main") or article
             body = content.get_text("\n", strip=True)
-            # Ignore nav-only pages and unrelated redirected content.
-            # The listing can prepend [안내] / 새글; the article often drops it.
-            # Compare normalized substantive title rather than its UI prefix.
             headline=re.sub(r"^(?:새글\s*|\[[^\]]{1,14}\]\s*)+", "", title)
             headline=re.sub(r"[^0-9a-zA-Z가-힣]", "", headline)[:14]
             page_text=re.sub(r"[^0-9a-zA-Z가-힣]", "", clean(body,30000))
             if len(page_text)<20 or (headline and headline not in page_text):
                 failures += 1
+                results.append(khis_candidate(detail_url,title,name,checked,
+                                              "원문 일치 검증 실패"))
                 continue
             deadline = application_deadline(title, body, published.year if published else None)
             if not deadline:
                 unknown_deadline += 1
-                continue  # Never publish a possibly finished training/event as open.
+                results.append(khis_candidate(detail_url,title,name,checked,
+                     "상시접수·신청기간 재확인" if re.search(r"상시.?접수|상시.?모집",title+" "+body)
+                     else "신청 마감일 불명",body))
+                continue
             if deadline[:10] < now.date().isoformat():
                 continue
-            identity = hashlib.sha1((detail_url + "|" + title).encode()).hexdigest()[:17]
-            results.append({
-                "id": "khis-" + identity, "title": title, "url": detail_url,
-                "category": "창업지원·공모", "eligibility": "자격 확인 필요",
-                "deadline": deadline, "description": clean(body, 300),
-                "source": name, "sourceKind": "공식 게시판 원문 · 신청자격 별도 검증 필요",
-                "lastSeenAt": checked, "sourceStatus": "unknown",
-                "review": "예비창업자 자격·지원규모·실제 신청 가능 여부는 원문 및 첨부 확인 필요",
-            })
-        except (requests.RequestException, ValueError, AttributeError) as exc:
+            results.append(khis_candidate(detail_url,title,name,checked,
+                                          "자격 확인 필요",body,deadline))
+        except (requests.RequestException, ValueError, AttributeError):
             failures += 1
+            results.append(khis_candidate(detail_url,title,name,checked,
+                                          "상세 접근 실패"))
     state.update({
-        "status": "partial" if failures or unknown_deadline or not found or len(found) > 25 else "ok",
-        "discovered": len(results), "candidateLinks": len(found),
-        "detailErrors": failures, "unknownDeadline": unknown_deadline,
-        "candidateLimitReached": len(found) > 25,
+        "status":"partial" if failures or unknown_deadline or not found or
+                 len(found)>MAX_KHIS_DETAIL else "ok",
+        "discovered":sum(bool(r.get("deadline")) for r in results),
+        "pendingReview":sum(not r.get("deadline") for r in results),
+        "candidateLinks":len(found),"detailErrors":failures,
+        "unknownDeadline":unknown_deadline,
+        "uninspectedCandidates":pending_examination,
+        "candidateLimitReached":len(found)>MAX_KHIS_DETAIL,
     })
     if not found:
-        state["note"] = "공식 목록 접근은 성공했으나 상세 링크 0건 · CSS/페이지 형식 확인 필요"
-    return results, state
+        state["note"]="공식 목록은 열렸지만 상세 공고 0건 · 게시판 구조 검증 필요"
+    return results,state
 
 
 KHIS_TENDER_RSS = "https://www.khis.kr/rss/board.es?bid=0009&mid=a10304000000"
