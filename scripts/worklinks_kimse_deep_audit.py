@@ -40,7 +40,8 @@ SNAPSHOT=ROOT/"startup-support/investment-opportunities.json"
 OUTPUT=ROOT/"startup-support/kimse-deep-audit.json"
 MAX_PAGES_PER_SOURCE=80
 MAX_DETAILS=250
-MAX_RUNTIME_SECONDS=720
+MAX_RUNTIME_SECONDS=900
+MAX_LISTING_SECONDS=470
 KHIDI_SEM=threading.BoundedSemaphore(2)
 OFFICIAL_HOSTS={urlsplit(url).hostname for _,url,_ in ALL_SOURCES}
 START=time.monotonic()
@@ -95,7 +96,7 @@ def crawl_source(source, fetch=get_soup, page_cap=MAX_PAGES_PER_SOURCE):
     failed=[]
     page_rows=[]
     while pending and len(visited)<page_cap:
-        if time.monotonic()-START>MAX_RUNTIME_SECONDS:
+        if time.monotonic()-START>MAX_LISTING_SECONDS:
             break
         url=pending.pop(0)
         if url in visited:
@@ -245,7 +246,17 @@ def run(snapshot, now=None, crawl=crawl_source, examine_one=examine):
         1 if likely_historical(x["title"],now) else 0,
         0 if x.get("listingEvidence")!="previous_verified_snapshot" else 1,
         x["title"]))
-    targets=backlog[:MAX_DETAILS]
+    # Keep direct KIMSE opportunities in every scan. Rotate lower-priority
+    # notices so older candidates cannot remain permanently unexamined.
+    direct=[x for x in backlog if kimse_fit(x["title"])=="높음"]
+    remainder=[x for x in backlog if kimse_fit(x["title"])!="높음"]
+    slots=max(0,MAX_DETAILS-len(direct))
+    if remainder and slots:
+        rotation=((now.date().toordinal()*2)+(now.hour>=12))*max(1,slots)
+        offset=rotation%len(remainder)
+        remainder=remainder[offset:]+remainder[:offset]
+    targets=(direct+remainder)[:MAX_DETAILS]
+    target_urls={x["url"] for x in targets}
     results=[]
     with cf.ThreadPoolExecutor(max_workers=6) as pool:
         future_map={pool.submit(examine_one,row,sources[row["source"]],now):
@@ -259,7 +270,7 @@ def run(snapshot, now=None, crawl=crawl_source, examine_one=examine):
                      "source":row["source"],"status":"audit_error",
                      "detailError":type(exc).__name__+": "+clean(exc,160)})
     unexamined=[{"title":x["title"],"url":x["url"],"source":x["source"]}
-                for x in backlog[MAX_DETAILS:]]
+                for x in backlog if x["url"] not in target_urls]
     counts={}
     for record in results:
         counts[record["status"]]=counts.get(record["status"],0)+1
