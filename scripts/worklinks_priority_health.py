@@ -8,6 +8,8 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import re
+import xml.etree.ElementTree as ET
+from html import escape as html_escape
 from urllib.parse import parse_qs, urljoin, urlsplit
 import requests
 import certifi
@@ -469,13 +471,48 @@ def verified_public_get(url, *, headers=HEADERS, timeout=REQUEST_TIMEOUT_SECONDS
                                 verify=str(ca_file))
 
 
+HIRA_NOTICE_RSS = "https://www.hira.or.kr/cms/inform/01/notice.xml"
+
+
+def verified_hira_rss(content):
+    """Parse only HIRA's published official notice RSS; reject alien links."""
+    if len(content)>3_000_000:
+        raise ValueError("HIRA RSS too large")
+    root=ET.fromstring(content)
+    items=root.findall(".//item")
+    if not items:
+        raise ValueError("HIRA RSS contains no notice items")
+    rows=[]
+    base=next(url for _,url,kind in SOURCES if kind=="hira")
+    for item in items[:50]:
+        title=clean(item.findtext("title"),200)
+        link=clean(item.findtext("link"),500)
+        official=valid_official_link(link,base,"hira")
+        if not official or not title:
+            continue
+        rows.append('<tr><td><a href="'+html_escape(official,quote=True)+'">'+
+                    html_escape(title)+'</a></td></tr>')
+    if not rows:
+        raise ValueError("HIRA RSS has no verified official notice links")
+    return BeautifulSoup("<table>"+"".join(rows)+"</table>","html.parser")
+
+
 def scan_priority_sources(fetch=None,now=None):
     now=now or dt.datetime.now(KST)
     if fetch is None:
         def fetch(url):
             def request_one():
-                r=verified_public_get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
-                r.raise_for_status()
+                try:
+                    r=verified_public_get(url,headers=HEADERS,timeout=REQUEST_TIMEOUT_SECONDS)
+                    r.raise_for_status()
+                except requests.exceptions.RequestException:
+                    if url != next(x[1] for x in SOURCES if x[2]=="hira"):
+                        raise
+                    # An independent, officially published feed; only links
+                    # validated against the HIRA notice board are accepted.
+                    feed=requests.get(HIRA_NOTICE_RSS,headers=HEADERS,timeout=(6,14))
+                    feed.raise_for_status()
+                    return verified_hira_rss(feed.content)
                 if len(r.content)>3_000_000:raise ValueError("HTML exceeds safe size")
                 return BeautifulSoup(r.text,"html.parser")
             # Four public KHIDI boards share one host. Avoid self-inflicted
