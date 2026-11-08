@@ -68,12 +68,12 @@ test('include independent IR slots without silently asserting investor funding',
 test('K-DATA verified official detail URL is importable but a fake domain is not',()=>{
   const base=notice('kdata','2026 데이터안심구역 의료 연구용 데이터 활용 지원','2026-11-20',
     {source:'K-DATA 데이터·안심구역 공지',
-     url:'https://www.kdata.or.kr/kr/board/notice_01/boardView.do?seq=123456'});
+     url:'https://www.kdata.or.kr/kr/board/notice_01/boardView.do?bbsIdx=123456'});
   const good=select(snap(base),[],now);
   assert.equal(good.length,1);
   assert.equal(good[0].eligibility,'unknown');
   const bad=select(snap({...base,id:'evil',
-    url:'https://other.example.kr/kr/board/notice_01/boardView.do?seq=123456'}),[],now);
+    url:'https://other.example.kr/kr/board/notice_01/boardView.do?bbsIdx=123456'}),[],now);
   assert.equal(bad.length,0);
 });
 test('refuse stale snapshots instead of claiming no opportunities',()=>{
