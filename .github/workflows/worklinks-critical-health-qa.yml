@@ -9,6 +9,7 @@ on:
       - 'tests/test_worklinks_health_sources.py'
       - 'scripts/refresh_worklinks_investment.py'
       - 'startup-support/kimse-intake.js'
+      - 'startup-support/investment.html'
       - 'tests/test_worklinks_kimse_intake.cjs'
       - 'startup-support/index.html'
       - 'tests/test_worklinks_support_sort.cjs'
@@ -38,3 +39,17 @@ jobs:
         run: |
           node --test tests/test_worklinks_kimse_intake.cjs
           node --test tests/test_worklinks_support_sort.cjs
+      - name: Validate live KIMSE opportunity review UI JavaScript
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm');
+          const html=fs.readFileSync('startup-support/investment.html','utf8');
+          const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
+            .map(x=>x[1]).filter(x=>x.trim());
+          if(!scripts.length)throw Error('Missing inline opportunity interface script');
+          scripts.forEach((script)=>new vm.Script(script,{filename:'investment.html'}));
+          for(const tag of ['reviewOnly','countKimseReview']){
+            if(!html.includes('id="'+tag+'"'))throw Error('Missing review queue control '+tag);
+          }
+          console.log('Opportunity review UI syntax and required controls verified');
+          NODE
