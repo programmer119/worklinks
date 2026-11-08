@@ -16,6 +16,7 @@ from pathlib import Path
 import re
 import sys
 import threading
+import requests
 import time
 from urllib.parse import urljoin, urlsplit, parse_qs
 
@@ -65,6 +66,15 @@ def get_soup(url):
     if hostname in ("www.khidi.or.kr","khidi.or.kr"):
         with KHIDI_SEM:
             return do_get()
+    if url==KHIS_SOURCES[1][1]:
+        try:
+            return do_get()
+        except requests.RequestException:
+            feed=verified_public_get(KHIS_TENDER_RSS,headers=HEADERS,timeout=(5,10))
+            feed.raise_for_status()
+            if urlsplit(getattr(feed,"url",KHIS_TENDER_RSS)).hostname!=hostname:
+                raise ValueError("KHIS feed cross-host redirect")
+            return official_rss_listing(feed.content)
     return do_get()
 
 def source_entries(soup,base,kind):
