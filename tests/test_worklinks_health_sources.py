@@ -80,6 +80,9 @@ class OfficialHealthSourceTest(unittest.TestCase):
             return pages[url]
         rows,state=scan_source(SOURCES[0],fake,NOW)
         self.assertIn(state["status"],("ok","partial"))
+        self.assertEqual(state["candidateLinks"],2)
+        self.assertEqual(state["articleLinks"],2)
+        self.assertEqual(state["relevantLinks"],2)
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]["deadline"],"2026-11-23T18:00:00+09:00")
         self.assertIn(FUTURE_URL,seen)
