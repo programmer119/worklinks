@@ -22,7 +22,8 @@
       var u=new URL(url);
       if(u.protocol!=='https:'||!['www.kdata.or.kr','kdata.or.kr'].includes(u.hostname)||
          u.pathname!=='/kr/board/notice_01/boardView.do'||u.hash)return false;
-      return Array.from(u.searchParams.values()).some(function(v){return /^\d{1,12}$/.test(v);});
+      var ids=u.searchParams.getAll('bbsIdx');
+      return ids.length===1&&/^\d{2,12}$/.test(ids[0]);
     }catch(err){return false;}
   }
   function normalize(value){
