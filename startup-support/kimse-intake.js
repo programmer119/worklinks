@@ -16,7 +16,7 @@
   var SOURCE_URL=/^https:\/\/(?:www\.)?startup-plus\.kr\/project\/PRJ\d{5,9}$/i;
   var IR_URL='https://irchallenge.jointips.or.kr/apply';
   var KHIS_URL=/^https:\/\/www\.khis\.kr\/board\.es\?act=view&bid=000[19]&list_no=\d{1,8}&mid=a1030[14]000000$/i;
-  var HEALTH_OFFICIAL_URL=/^https:\/\/www\.khidi\.or\.kr\/(?:board\/view\?menuId=MENU0(?:1108|1484|1491)&linkId=\d{6,12}|mdtis\/bizPbanc\/bizPbancView\?menuId=MENU03471&biz_pbanc_id=[A-Za-z0-9_-]{3,40}&biz_pbanc_no=\d{1,8})$|^https:\/\/www\.nia\.or\.kr\/site\/nia_kor\/ex\/bbs\/View\.do\?cbIdx=99835&bcIdx=\d{4,10}$|^https:\/\/www\.hira\.or\.kr\/bbsDummy\.do\?pgmid=HIRAA020041000100&brdScnBltNo=4&brdBltNo=\d{4,8}$|^https:\/\/www\.aihub\.or\.kr\/aihubnews\/notice\/view\.do\?nttSn=\d{2,8}&currMenu=132&topMenu=103/i;
+  var HEALTH_OFFICIAL_URL=/^https:\/\/www\.khidi\.or\.kr\/(?:board\/view\?menuId=MENU0(?:1108|1484|1491)&linkId=\d{6,12}|mdtis\/bizPbanc\/bizPbancView\?menuId=MENU03471&biz_pbanc_id=[A-Za-z0-9_-]{3,40}&biz_pbanc_no=\d{1,8})$|^https:\/\/www\.nia\.or\.kr\/site\/nia_kor\/ex\/bbs\/View\.do\?cbIdx=99835&bcIdx=\d{4,10}$|^https:\/\/www\.hira\.or\.kr\/bbsDummy\.do\?pgmid=HIRAA020002000100&brdScnBltNo=4&brdBltNo=\d{4,8}$|^https:\/\/www\.aihub\.or\.kr\/aihubnews\/notice\/view\.do\?nttSn=\d{2,8}&currMenu=132&topMenu=103/i;
   function isOfficialKDataNotice(url){
     try{
       var u=new URL(url);
