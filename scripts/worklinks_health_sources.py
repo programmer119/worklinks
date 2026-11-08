@@ -194,7 +194,9 @@ def official_rss_listing(content, board_id="0009"):
     if not items:
         raise ValueError("KHIS official RSS contains no items")
     rows = []
-    for item in items[:70]:
+    # Keep the two newest public listing pages. Older items remain historical,
+    # while deep fetches of old tenders can exhaust the live monitor time budget.
+    for item in items[:20]:
         title = clean(item.findtext("title"), 240)
         link = str(item.findtext("link") or "").strip()
         parts = urlsplit(link)
