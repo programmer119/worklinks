@@ -299,6 +299,25 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIn("https://www.khidi.or.kr"+p3,visited)
         self.assertEqual(len(set(x["id"] for x in rows)),3)
 
+    def test_unscanned_official_pagination_is_reported_not_hidden(self):
+        source=SOURCES[0]
+        nav='<div class="pagination">'+''.join(
+            f'<a href="/board?menuId=MENU01108&pageNum={n}">{n}</a>'
+            for n in range(2,11))+'</div>'
+        first=BeautifulSoup('<table><tr><td><a href="/board/view?menuId=MENU01108&linkId=48952446">'
+            '의료 데이터 연구 모집 공고</a></td></tr></table>'+nav,"html.parser")
+        other=BeautifulSoup('<table><tr><td><a href="/board/view?menuId=MENU01108&linkId=48952447">'
+            '의료 데이터 실증 모집 공고</a></td></tr></table>'+nav,"html.parser")
+        detail=BeautifulSoup('<article>의료 데이터 연구 모집 공고 신청마감 2026.12.15 16:00</article>',
+                             "html.parser")
+        def fetch(url):
+            return first if url==source[1] else other if "/board?" in url else detail
+        rows,state=scan_one(source,fetch,NOW)
+        self.assertEqual(state["pagesScanned"],4)
+        self.assertGreater(state["pagesPending"],0)
+        self.assertEqual(state["status"],"partial")
+        self.assertTrue(rows)
+
     def test_unverified_review_record_remains_visible_without_fake_deadline(self):
         source=SOURCES[0]
         title="의료 AI 데이터 안심구역 실증기업 모집"
