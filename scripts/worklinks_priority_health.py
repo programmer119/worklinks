@@ -20,7 +20,8 @@ from urllib.parse import urlsplit as _urlsplit
 from bs4 import BeautifulSoup
 
 KST = dt.timezone(dt.timedelta(hours=9))
-MAX_DETAIL_PER_SOURCE = 10
+MAX_DETAIL_PER_SOURCE = 24
+MAX_LIST_PAGES = 4
 REQUEST_TIMEOUT_SECONDS = 7
 _KHIDI_LIMIT=threading.Semaphore(2)
 SOURCES = (
@@ -217,27 +218,129 @@ def row_deadline(row,kind):
     try:return dt.date(int(d[1]),int(d[2]),int(d[3])).isoformat()
     except ValueError:return None
 
+PAGE_KEYS = ("pageIndex", "pageNum", "pageNo", "page", "currentPage")
+
+
+def observed_listing_pages(soup, list_url):
+    """Follow only official pagination URLs actually found on the listing.
+    Do not synthesize a guessed offset, page index or article ID.
+    """
+    root=urlsplit(list_url)
+    found={}
+    for link in soup.select("a[href]"):
+        href=str(link.get("href",""))
+        if href.lower().startswith(("javascript:","mailto:","#")):
+            continue
+        url=urljoin(list_url,href)
+        part=urlsplit(url)
+        if part.scheme!="https" or part.hostname!=root.hostname or part.path!=root.path:
+            continue
+        query=parse_qs(part.query)
+        valid_pages=[int(v) for k in PAGE_KEYS for v in query.get(k,[])
+                     if re.fullmatch(r"\d{1,3}",v) and 2<=int(v)<=MAX_LIST_PAGES]
+        if len(valid_pages)!=1:
+            continue
+        # Ignore unrelated categories or board IDs.
+        baseline=parse_qs(root.query)
+        if any(key in query and query[key]!=value for key,value in baseline.items()
+               if key not in PAGE_KEYS and key not in ("maxIndex","minIndex")):
+            continue
+        found.setdefault(valid_pages[0],url)
+    return [found[k] for k in sorted(found)]
+
+
+def kimse_fit(title, detail=""):
+    """Triage priority, not a claim of application eligibility."""
+    value=clean(title,220)+" "+clean(detail,900)
+    if re.search(r"치매|경도.?인지|인지.?저하|인지.?기능|고령|노인|돌봄|실버|에이지|기억|의료데이터|보건의료데이터|의료 AI|의료.?인공지능|병원.?실증|안심구역|안심존|임상|IRB|DRB",value,re.I):
+        return "높음"
+    if re.search(r"의료|보건|헬스|바이오|데이터|AI|인공지능|연구|실증|창업",value,re.I):
+        return "검토"
+    return "기타"
+
+
+def eligibility_signal(detail):
+    """Return only explicit requirements mentioned in visible source text."""
+    value=clean(detail,4000)
+    if re.search(r"예비창업자\s*(?:및|또는|포함|지원\s*가능|신청\s*가능|참여\s*가능)",value):
+        return "예비 언급·조건 확인","예비창업자 포함 문구 확인, 나머지 조건은 별도 검증"
+    if re.search(r"(?:신청|지원|참여)\s*(?:자격|대상).{0,100}(?:법인사업자|개인사업자|사업자등록증\s*필수)",value):
+        return "사업자 필수","신청대상에 사업자 요건 명시; 상세 예외 확인 필요"
+    return "자격 확인 필요","사업자·업력·IRB·지역 및 협력기관 조건 검증 필요"
+
+
+def review_record(entry, name, stamp, reason, detail="", deadline=None):
+    value=entry["title"]
+    uid=hashlib.sha1(entry["url"].encode()).hexdigest()[:18]
+    eligibility, proof=eligibility_signal(detail)
+    return {"id":"priority-health-"+uid,"title":value,"url":entry["url"],
+            "category":"창업지원·공모","source":name,"deadline":deadline,
+            "description":clean(detail,400) or clean(entry.get("context"),340) or
+                          "공식 목록에서 확인, 상세 공고 재검증 필요",
+            "eligibility":eligibility,"eligibilityEvidence":proof,
+            "kimseFit":kimse_fit(value,detail),
+            "reviewStatus":reason,"review":"재검증 필요: "+reason+" · "+proof,
+            "sourceKind":"공식 게시글 후보·신청 가능 여부 미확인",
+            "sourceStatus":"unknown","lastSeenAt":stamp}
+
+
 def scan_one(source,fetch,now):
     name,url,kind=source
     stamp=now.isoformat(timespec="seconds")
-    state={"name":name,"url":url,"status":"error","discovered":0,"checkedAt":stamp,"articleLinks":0,"relevantLinks":0,
-           "undatedCandidates":0,"detailErrors":0,"expiredCandidates":0,"candidateLimit":MAX_DETAIL_PER_SOURCE}
-    try:soup=fetch(url)
-    except Exception as e:
-        state["error"]=clean(type(e).__name__+": "+str(e),200)
+    state={"name":name,"url":url,"status":"error","discovered":0,"checkedAt":stamp,
+           "articleLinks":0,"relevantLinks":0,"undatedCandidates":0,
+           "detailErrors":0,"expiredCandidates":0,
+           "candidateLimit":MAX_DETAIL_PER_SOURCE,"pagesScanned":0,
+           "pagesPending":0,"uninspectedCandidates":0}
+    try:
+        soup=fetch(url)
+    except Exception as exc:
+        state["error"]=clean(type(exc).__name__+": "+str(exc),200)
         return [],state
-    links,count=observed_links(soup,url,kind)
-    state["articleLinks"]=count;state["relevantLinks"]=len(links)
-    if kind=="kdata" and count<5:
+    pages=[(url,soup)]
+    seen_pages={url}
+    queue=observed_listing_pages(soup,url)
+    while queue and len(pages)<MAX_LIST_PAGES:
+        page_url=queue.pop(0)
+        if page_url in seen_pages:
+            continue
+        seen_pages.add(page_url)
+        try:
+            page=fetch(page_url)
+        except Exception:
+            state["detailErrors"]+=1
+            continue
+        pages.append((page_url,page))
+        for following in observed_listing_pages(page,page_url):
+            if following not in seen_pages and following not in queue:
+                queue.append(following)
+    state["pagesScanned"]=len(pages)
+    state["pagesPending"]=len(queue)
+    all_entries={}
+    total_links=0
+    for page_url,page in pages:
+        links,count=observed_links(page,page_url,kind)
+        total_links+=count
+        for entry in links:
+            all_entries.setdefault(entry["url"],entry)
+    links=list(all_entries.values())
+    state["articleLinks"]=total_links
+    state["relevantLinks"]=len(links)
+    if kind=="kdata" and total_links<5:
         state["lowLinkCoverage"]=True
-    if not count:
-        state.update(status="partial",note="공식 페이지 접근은 성공했으나 실제 상세링크를 0건 식별. 목록 구조 검증 필요")
+    if not total_links:
+        state.update(status="partial",note="목록 접근 성공했으나 실제 게시글 링크 0건. 파서 재검증 필요")
         return [],state
+    state["uninspectedCandidates"]=max(0,len(links)-MAX_DETAIL_PER_SOURCE)
     results=[]
-    for entry in links[:MAX_DETAIL_PER_SOURCE]:
+    for index,entry in enumerate(links):
+        if index>=MAX_DETAIL_PER_SOURCE:
+            results.append(review_record(entry,name,stamp,"상세검사 대기·검사 상한 도달"))
+            continue
         title=entry["title"]
         deadline=row_deadline(entry["context"],kind)
         detail=""
+        error=False
         if not deadline:
             try:
                 article=fetch(entry["url"])
@@ -245,24 +348,34 @@ def scan_one(source,fetch,now):
                 detail=container.get_text("\n",strip=True)
                 deadline=explicit_deadline(detail)
             except Exception:
+                error=True
                 state["detailErrors"]+=1
         if not deadline:
             state["undatedCandidates"]+=1
+            reason="상세 접근 실패" if error else (
+                "상시접수·마감일 별도 확인" if re.search(r"상시.?접수|상시.?모집",title+" "+detail) else
+                "신청 마감일 불명")
+            results.append(review_record(entry,name,stamp,reason,detail))
             continue
-        boundary=dt.datetime.fromisoformat(deadline if "T" in deadline else deadline+"T23:59:59+09:00")
-        if boundary < now:
+        boundary=dt.datetime.fromisoformat(
+            deadline if "T" in deadline else deadline+"T23:59:59+09:00")
+        if boundary<now:
             state["expiredCandidates"]+=1
             continue
-        uid=hashlib.sha1(entry["url"].encode()).hexdigest()[:18]
-        results.append({"id":"priority-health-"+uid,"title":title,"url":entry["url"],"category":"창업지원·공모",
-          "eligibility":"자격 확인 필요","deadline":deadline,
-          "description":clean(detail,400) or "공식 공개목록 확인. 개별 지원요건과 비용은 원문 및 첨부 확인 필요",
-          "source":name,"sourceKind":"공식기관 직접 검색·신청자격 원문 검증 필요",
-          "sourceStatus":"unknown","lastSeenAt":stamp,"review":"사업자등록·IRB·지역제한·실제 지원혜택은 공식 첨부 확인 필요"})
-    state["discovered"]=len(results)
-    state["status"]="partial" if state.get("lowLinkCoverage") or len(links)>MAX_DETAIL_PER_SOURCE or state["detailErrors"] or state["undatedCandidates"] else "ok"
-    if not results:
-        state["note"]="지원 가능 공고 미확정. 공식목록 접근 성공만으로 0건 확정하지 않음"
+        eligibility,proof=eligibility_signal(detail)
+        result=review_record(entry,name,stamp,"자격 확인 필요",detail,deadline)
+        result.update(sourceKind="공식 모집공고·원문 확인",
+                      eligibility=eligibility,eligibilityEvidence=proof,
+                      reviewStatus="자격 확인 필요",
+                      review="모집마감 확인·최종 신청자격 및 첨부 검증 필요")
+        results.append(result)
+    state["discovered"]=sum(bool(r.get("deadline")) for r in results)
+    state["pendingReview"]=sum(not r.get("deadline") for r in results)
+    state["status"]="partial" if (state["pagesPending"] or state["uninspectedCandidates"] or
+       state.get("lowLinkCoverage") or state["detailErrors"] or
+       state["undatedCandidates"]) else "ok"
+    if not state["discovered"]:
+        state["note"]="현재 신청 가능 공고 미확정. 공식 목록 접근 성공만으로 0건 확정하지 않음"
     return results,state
 
 def coverage_summary(states, required_names):
