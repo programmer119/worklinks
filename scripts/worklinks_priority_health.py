@@ -209,6 +209,8 @@ def scan_one(source,fetch,now):
         return [],state
     links,count=observed_links(soup,url,kind)
     state["articleLinks"]=count;state["relevantLinks"]=len(links)
+    if kind=="kdata" and count<5:
+        state["lowLinkCoverage"]=True
     if not count:
         state.update(status="partial",note="공식 페이지 접근은 성공했으나 실제 상세링크를 0건 식별. 목록 구조 검증 필요")
         return [],state
@@ -239,7 +241,7 @@ def scan_one(source,fetch,now):
           "source":name,"sourceKind":"공식기관 직접 검색·신청자격 원문 검증 필요",
           "sourceStatus":"unknown","lastSeenAt":stamp,"review":"사업자등록·IRB·지역제한·실제 지원혜택은 공식 첨부 확인 필요"})
     state["discovered"]=len(results)
-    state["status"]="partial" if len(links)>MAX_DETAIL_PER_SOURCE or state["detailErrors"] or state["undatedCandidates"] else "ok"
+    state["status"]="partial" if state.get("lowLinkCoverage") or len(links)>MAX_DETAIL_PER_SOURCE or state["detailErrors"] or state["undatedCandidates"] else "ok"
     if not results:
         state["note"]="지원 가능 공고 미확정. 공식목록 접근 성공만으로 0건 확정하지 않음"
     return results,state
@@ -265,7 +267,8 @@ def coverage_summary(states, required_names):
     listing_degraded=[
         x["name"] for x in outcomes
         if x["status"] in ("error","missing") or
-           (x["verifiedArticleLinks"]==0 and x["currentQualified"]==0)
+           (x["verifiedArticleLinks"]==0 and x["currentQualified"]==0) or
+           bool((by_name.get(x["name"]) or {}).get("lowLinkCoverage"))
     ]
     return {
        "expected":len(required),
