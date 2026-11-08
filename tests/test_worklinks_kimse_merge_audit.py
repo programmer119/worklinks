@@ -16,6 +16,7 @@ class DeepAuditMergeTests(unittest.TestCase):
            "url":URL,"source":SOURCE,
            "applicationDeadline":"2026-12-07T11:00:00+09:00",
            "status":"deadline_verified_eligibility_pending",
+           "deadlineEvidenceSource":"official_article_application_period",
            "kimseFit":"높음"}
         r.update(changes)
         return r
