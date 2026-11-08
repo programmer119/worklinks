@@ -112,6 +112,23 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertEqual(calls[1][0],KDATA_CA_ISSUER)
         self.assertEqual(len(calls),3)
 
+    def test_kdata_real_onclick_notice_rows_and_canonical_url(self):
+        source=next(x for x in SOURCES if x[2]=="kdata")
+        listing=BeautifulSoup("""<ul class="bbs_list">
+          <li class="cate"><p class="tit">제목</p></li>
+          <li onclick="fnLinkView('39049');"><p class="tit"><a href="javascript:;">[입찰공고] 유지관리 용역</a></p></li>
+          <li onclick="fnLinkView('39030');"><p class="tit"><a href="javascript:;">데이터 표준계약서 활용 우수사례 공모 안내</a></p></li>
+          <li onclick="fnLinkView('39031');alert('oops')"><p class="tit"><a href="javascript:;">데이터 지원사업 모집</a></p></li>
+        </ul>""","html.parser")
+        found,count=observed_links(listing,source[1],"kdata")
+        self.assertEqual(count,2)
+        self.assertEqual(len(found),1)
+        expected="https://www.kdata.or.kr/kr/board/notice_01/boardView.do?bbsIdx=39030"
+        self.assertEqual(found[0]["url"],expected)
+        self.assertEqual(valid_official_link(expected,source[1],"kdata"),expected)
+        self.assertIsNone(valid_official_link(
+            "/kr/board/notice_01/boardView.do?other=39030",source[1],"kdata"))
+
     def test_hira_official_notice_board_not_press_releases(self):
         source=next(x for x in SOURCES if x[2]=="hira")
         self.assertIn("pgmid=HIRAA020002000100",source[1])
