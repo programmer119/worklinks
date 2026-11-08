@@ -70,6 +70,21 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIsNone(valid_official_link(
           "https://other.example/aihubnews/notice/view.do?nttSn=10397",base,"aihub"))
 
+    def test_official_hira_rss_requires_observed_notice_urls(self):
+        from worklinks_priority_health import verified_hira_rss
+        xml=b"""<rss><channel>
+          <item><title>2026 medical AI data experiment support application</title>
+          <link>https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020002000100&amp;brdScnBltNo=4&amp;brdBltNo=12199</link></item>
+          <item><title>Fake foreign source</title>
+          <link>https://evil.example/bbsDummy.do?pgmid=HIRAA020002000100&amp;brdScnBltNo=4&amp;brdBltNo=12199</link></item>
+        </channel></rss>"""
+        soup=verified_hira_rss(xml)
+        links,count=observed_links(soup,next(s[1] for s in SOURCES if s[2]=="hira"),"hira")
+        self.assertEqual(count,1)
+        self.assertEqual(links,[]) # The sample is non-Korean generic; relevance still enforced
+        with self.assertRaises(ValueError):
+            verified_hira_rss(b'<rss><channel><item><title>fake</title><link>https://evil.example/</link></item></channel></rss>')
+
     def test_untrusted_tls_failure_is_not_bypassed_for_other_hosts(self):
         import requests
         from unittest.mock import patch
