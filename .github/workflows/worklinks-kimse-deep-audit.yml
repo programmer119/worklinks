@@ -1,0 +1,92 @@
+name: WorkLinks KIMSE deep verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-kimse-deep-audit.yml'
+      - 'scripts/worklinks_kimse_deep_audit.py'
+      - 'tests/test_worklinks_kimse_deep_audit.py'
+  schedule:
+    - cron: '40 1,13 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-kimse-deep-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 29
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install verified official-page parser dependencies
+        run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5' 'certifi>=2024.2'
+      - name: Verify exact-page, deadline and failure tests
+        run: |
+          python -m unittest discover -s tests -p 'test_worklinks_kimse_deep_audit.py' -v
+          python -m unittest discover -s tests -p 'test_worklinks_priority_health.py' -v
+          python -m unittest discover -s tests -p 'test_worklinks_health_sources.py' -v
+      - name: Verify 10 official sources and all observed pagination URLs
+        id: audit
+        continue-on-error: true
+        run: python scripts/worklinks_kimse_deep_audit.py
+      - name: Commit KIMSE deep audit evidence without touching application records
+        if: always()
+        run: |
+          test -s startup-support/kimse-deep-audit.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          copy="$(mktemp)"
+          cp startup-support/kimse-deep-audit.json "$copy"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp "$copy" startup-support/kimse-deep-audit.json
+            git add startup-support/kimse-deep-audit.json
+            if git diff --cached --quiet; then
+              echo 'KIMSE evidence already current'
+              exit 0
+            fi
+            git commit -m 'data: record verified KIMSE deep-audit evidence'
+            if git push origin HEAD:main; then
+              echo 'KIMSE audit committed'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'KIMSE audit data commit failed'
+          exit 1
+      - name: Fail visibly on incomplete official-source evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          file=Path('startup-support/kimse-deep-audit.json')
+          if not file.is_file():
+              print('::error title=KIMSE audit missing::No audit evidence file')
+              sys.exit(1)
+          result=json.loads(file.read_text(encoding='utf-8'))
+          summary=result.get('summary',{})
+          if summary.get('sources')!=10:
+              print('::error title=KIMSE audit incomplete::Not all ten official boards examined')
+              sys.exit(1)
+          missed=summary.get('pageErrors',0)+summary.get('pagesPending',0)
+          unknown=sum(v for k,v in summary.get('outcomes',{}).items()
+                      if k in ('access_failed','audit_error','unknown_deadline',
+                               'invalid_official_link','invalid_deadline'))
+          skipped=summary.get('detailUnexamined',0)
+          print('KIMSE deep audit: examined',summary.get('detailExamined'),
+                'unexamined',skipped,'page unresolved',missed,
+                'detail/deadline unresolved',unknown)
+          if missed or skipped or unknown:
+              print('::warning title=KIMSE audit evidence still incomplete::'+
+                    f'{missed} pages inaccessible or unvisited, {skipped} details unexamined, {unknown} unverified records')
+              # Auditing successfully is not the same as full verification.
+              sys.exit(1)
+          PY
