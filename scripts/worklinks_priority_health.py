@@ -300,6 +300,12 @@ def scan_one(source,fetch,now):
     pages=[(url,soup)]
     seen_pages={url}
     queue=observed_listing_pages(soup,url)
+    if len(queue)>MAX_LIST_PAGES-1:
+        # Scan page 2 every time; rotate the other *observed* page links
+        # across runs so pages 5-10 are not permanently starved.
+        first,rest=queue[0],queue[1:]
+        rotation=(now.date().toordinal()*2+(now.hour>=12))%len(rest)
+        queue=[first]+rest[rotation:]+rest[:rotation]
     while queue and len(pages)<MAX_LIST_PAGES:
         page_url=queue.pop(0)
         if page_url in seen_pages:
