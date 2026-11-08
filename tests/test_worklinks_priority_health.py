@@ -70,6 +70,48 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIsNone(valid_official_link(
           "https://other.example/aihubnews/notice/view.do?nttSn=10397",base,"aihub"))
 
+    def test_untrusted_tls_failure_is_not_bypassed_for_other_hosts(self):
+        import requests
+        from unittest.mock import patch
+        from worklinks_priority_health import verified_public_get
+        with patch("worklinks_priority_health.requests.get",
+                   side_effect=requests.exceptions.SSLError("untrusted")) as get:
+            with self.assertRaises(requests.exceptions.SSLError):
+                verified_public_get("https://www.hira.or.kr/bbsDummy.do")
+            self.assertEqual(get.call_count,1)
+
+    def test_kdata_aia_uses_ca_bundle_not_unverified_tls(self):
+        import certifi
+        import requests
+        from unittest.mock import patch
+        from pathlib import Path
+        from worklinks_priority_health import verified_public_get, KDATA_CA_ISSUER
+        bundle=Path(certifi.where()).read_bytes()
+        end=b"-----END CERTIFICATE-----"
+        sample=bundle[:bundle.index(end)+len(end)]+b"\\n"
+        class Issuer:
+            content=sample
+            def raise_for_status(self): pass
+        class Result:
+            status_code=200
+        calls=[]
+        def fake(url,**kwargs):
+            calls.append((url,kwargs))
+            if len(calls)==1: raise requests.exceptions.SSLError("missing intermediate")
+            if len(calls)==2: return Issuer()
+            self.assertNotIn("verify",{"verify":False} if kwargs.get("verify") is False else {})
+            chain_path=kwargs.get("verify")
+            self.assertTrue(chain_path)
+            chain=Path(chain_path).read_bytes()
+            self.assertIn(sample.strip(),chain)
+            self.assertIn(bundle[:40],chain)
+            return Result()
+        with patch("worklinks_priority_health.requests.get",side_effect=fake):
+            result=verified_public_get("https://www.kdata.or.kr/kr/board/notice_01/boardList.do")
+        self.assertEqual(result.status_code,200)
+        self.assertEqual(calls[1][0],KDATA_CA_ISSUER)
+        self.assertEqual(len(calls),3)
+
     def test_hira_official_notice_board_not_press_releases(self):
         source=next(x for x in SOURCES if x[2]=="hira")
         self.assertIn("pgmid=HIRAA020002000100",source[1])
