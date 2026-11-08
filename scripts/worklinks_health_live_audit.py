@@ -12,13 +12,13 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 import requests
 
-from worklinks_priority_health import SOURCES, KST, HEADERS, observed_links, coverage_summary
+from worklinks_priority_health import SOURCES, KST, HEADERS, observed_links, coverage_summary, verified_public_get
 
 def probe(source):
     name, url, kind=source
     result={"name":name,"url":url,"status":"error","articleLinks":0,"relevantLinks":0,"discovered":0,"undatedCandidates":0,"detailErrors":0}
     try:
-        resp=requests.get(url,timeout=9,headers=HEADERS)
+        resp=verified_public_get(url,timeout=9,headers=HEADERS)
         resp.raise_for_status()
         if len(resp.content)>3_000_000:
             raise ValueError("oversized listing")
