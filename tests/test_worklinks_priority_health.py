@@ -88,7 +88,7 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         from worklinks_priority_health import verified_public_get, KDATA_CA_ISSUER
         bundle=Path(certifi.where()).read_bytes()
         end=b"-----END CERTIFICATE-----"
-        sample=bundle[:bundle.index(end)+len(end)]+b"\\n"
+        sample=bundle[:bundle.index(end)+len(end)]+b"\n"
         class Issuer:
             content=sample
             def raise_for_status(self): pass
@@ -99,7 +99,7 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
             calls.append((url,kwargs))
             if len(calls)==1: raise requests.exceptions.SSLError("missing intermediate")
             if len(calls)==2: return Issuer()
-            self.assertNotIn("verify",{"verify":False} if kwargs.get("verify") is False else {})
+            self.assertIsNot(kwargs.get("verify"),False)
             chain_path=kwargs.get("verify")
             self.assertTrue(chain_path)
             chain=Path(chain_path).read_bytes()
