@@ -8,6 +8,8 @@ on:
       - 'scripts/worklinks_health_sources.py'
       - 'tests/test_worklinks_health_sources.py'
       - 'scripts/refresh_worklinks_investment.py'
+      - 'scripts/worklinks_kimse_merge_audit.py'
+      - 'tests/test_worklinks_kimse_merge_audit.py'
       - 'startup-support/kimse-intake.js'
       - 'startup-support/investment.html'
       - 'tests/test_worklinks_kimse_intake.cjs'
@@ -34,6 +36,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_worklinks_priority_health.py' -v
           python -m unittest discover -s tests -p 'test_worklinks_health_sources.py' -v
+          python -m unittest discover -s tests -p 'test_worklinks_kimse_merge_audit.py' -v
           python -m unittest discover -s tests -p 'test_worklinks_local_budget.py' -v
       - name: Backtest existing D-DAY and authenticated KIMSE intake
         run: |
