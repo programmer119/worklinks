@@ -134,7 +134,30 @@ def signed_date_from_title(title):
         title,re.I,
     )
     if not m:
-        return None
+        # The literal "~11/30" on an official notice title is an end date,
+        # but ONLY when the title supplies one unambiguous notice year.
+        # E.g. a 2027 exhibition recruitment in 2026 is left unresolved.
+        years=set(int(x) for x in re.findall(r"(?<!\d)(20[12]\d)(?!\d)",title))
+        if len(years)!=1:
+            return None
+        year=next(iter(years))
+        abbreviated=re.search(
+            r"(?:~|～)\s*(\d{1,2})\s*(?:[./]|월)\s*(\d{1,2})\s*일?"
+            r"(?:\s*\([월화수목금토일]\))?", title)
+        if not abbreviated:
+            abbreviated=re.search(
+                r"(?:마감|까지)\s*[:：]?\s*(\d{1,2})\s*(?:[./]|월)\s*(\d{1,2})\s*일?",
+                title)
+        if not abbreviated:
+            return None
+        # A title-year later than the runtime year may be an event year.
+        if year>utc_now().year:
+            return None
+        try:
+            return dt.date(year,int(abbreviated[1]),
+                           int(abbreviated[2])).isoformat()
+        except ValueError:
+            return None
     try:
         return dt.date(int(m[1]),int(m[2]),int(m[3])).isoformat()
     except ValueError:
