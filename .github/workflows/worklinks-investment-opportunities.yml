@@ -22,6 +22,7 @@ on:
       - 'tests/test_investment_monitor.py'
       - 'tests/test_dynamic_sources.py'
       - 'tests/test_sefund.py'
+      - 'startup-support/kimse-deep-audit.json'
       - 'startup-support/investment.html'
       - 'startup-support/index.html'
       - 'startup-support/kimse-intake.js'
