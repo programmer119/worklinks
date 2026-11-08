@@ -98,10 +98,26 @@ class OfficialHealthSourceTest(unittest.TestCase):
         def fetch(url):
             return listing if url==LIST_URL else detail
         rows,state=scan_source(SOURCES[0],fetch,NOW)
-        self.assertEqual(rows,[])
+        self.assertEqual(len(rows),1)
+        self.assertIsNone(rows[0]["deadline"])
+        self.assertIn("마감일",rows[0]["reviewStatus"])
         self.assertEqual(state["candidateLinks"],1)
         self.assertGreaterEqual(state["unknownDeadline"]+state["detailErrors"],1)
         self.assertEqual(state["status"],"partial")
+
+    def test_khis_research_opportunity_without_deadline_is_retained(self):
+        source=SOURCES[1]
+        title="공공의료 AI 플랫폼 시범 구축 및 실증 사업 공고"
+        link="/board.es?act=view&bid=0009&list_no=2678&mid=a10304000000"
+        listing=BeautifulSoup('<table><tr><td><a href="'+link+'">'+
+            title+'</a></td></tr></table>',"html.parser")
+        detail=BeautifulSoup("<article><h1>"+title+"</h1><p>첨부 공고문에서 접수조건 확인</p></article>","html.parser")
+        rows,state=scan_source(source,lambda u:listing if u==source[1] else detail,NOW)
+        self.assertEqual(len(rows),1)
+        self.assertIsNone(rows[0]["deadline"])
+        self.assertEqual(rows[0]["kimseFit"],"높음")
+        self.assertEqual(state["pendingReview"],1)
+        self.assertIn("마감일",rows[0]["reviewStatus"])
 
     def test_ui_notice_prefix_not_required_in_article_body(self):
         listing=BeautifulSoup("""<table><tr><td><a href="/board.es?act=view&bid=0001&list_no=2900">
