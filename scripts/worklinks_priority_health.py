@@ -252,13 +252,23 @@ def observed_listing_pages(soup, list_url):
 
 
 def kimse_fit(title, detail=""):
-    """Triage priority, not a claim of application eligibility."""
-    value=clean(title,220)+" "+clean(detail,900)
-    if re.search(r"치매|경도.?인지|인지.?저하|인지.?기능|고령|노인|돌봄|실버|에이지|기억|의료데이터|보건의료데이터|의료 AI|의료.?인공지능|병원.?실증|안심구역|안심존|임상|IRB|DRB",value,re.I):
+    """A conservative *triage* label based on the actual notice title.
+
+    Full article text often contains site navigation with clinical/data words;
+    treating those boilerplate words as a direct KIMSE match promoted ordinary
+    educational and infrastructure notices to the highest tier.
+    This does NOT establish applicant eligibility or an open application.
+    """
+    value=clean(title,240)
+    direct=re.search(
+        r"치매|경도.?인지|인지.?저하|인지.?기능|고령|노인|돌봄|실버|에이지|기억"
+        r"|의료.?데이터|보건의료.?데이터|의료.?AI|병원.?실증"
+        r"|의료.?실증|디지털.?헬스|안심구역|안심존|임상|IRB|DRB",
+        value,re.I)
+    if direct:
         return "높음"
-    if re.search(r"의료|보건|헬스|바이오|데이터|AI|인공지능|연구|실증|창업",value,re.I):
-        return "검토"
-    return "기타"
+    related=re.search(r"의료|보건|헬스|바이오|데이터|AI|인공지능|연구|실증|창업",value,re.I)
+    return "검토" if related else "기타"
 
 
 def eligibility_signal(detail):
