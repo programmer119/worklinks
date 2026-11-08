@@ -185,6 +185,7 @@ def examine(entry, source, now, fetch=get_soup):
             "kimseFit":kimse_fit(title),
             "eligibility":"자격 확인 필요","eligibilityEvidence":"원문·첨부 근거 필요",
             "applicationDeadline":None,"status":"unknown_deadline",
+            "deadlineEvidenceSource":None,
             "evidence":entry.get("listingEvidence","previous_verified_snapshot"),
             "attachmentLinks":[],"checkedAt":now.isoformat(timespec="seconds")}
     if not validated_detail_target(url,source):
@@ -193,17 +194,34 @@ def examine(entry, source, now, fetch=get_soup):
     # A verified dedicated application-period column may suffice, but not
     # a date that is merely the event, post, or overall project end.
     deadline=row_deadline(entry.get("context",""),source[2])
+    if deadline:
+        record["deadlineEvidenceSource"]="official_listing_application_period"
     if not deadline:
         deadline=signed_date_from_title(title)
+        if deadline:
+            record["deadlineEvidenceSource"]="official_title_explicit_cutoff"
     if not deadline:
         try:
             page=fetch(url)
             section=(page.select_one("article") or page.select_one(".board_view")
                      or page.select_one(".view") or page.select_one("main") or page)
             body=section.get_text("\n",strip=True)[:40000]
+            # Reject redirected shells and unrelated page bodies. A nearby
+            # application period is not evidence for a different notice.
+            prefix=re.sub(r"^(?:새글\s*|\[[^\]]{1,14}\]\s*)+","",title)
+            needle=re.sub(r"[^0-9a-zA-Z가-힣]","",prefix)[:13]
+            normalized=re.sub(r"[^0-9a-zA-Z가-힣]","",body)
+            if len(normalized)<20 or (needle and needle not in normalized):
+                record["status"]="detail_mismatch"
+                record["detailError"]="Official article body does not match its listed title"
+                return record
             deadline=explicit_deadline(body)
+            if deadline:
+                record["deadlineEvidenceSource"]="official_article_application_period"
             if not deadline and source[2] in ("0001","0009"):
                 deadline=application_deadline(title,body)
+                if deadline:
+                    record["deadlineEvidenceSource"]="official_article_application_period"
             eligibility,proof=eligibility_signal(body)
             record["eligibility"]=eligibility
             record["eligibilityEvidence"]=proof
