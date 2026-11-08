@@ -260,6 +260,16 @@ def kimse_fit(title, detail=""):
     This does NOT establish applicant eligibility or an open application.
     """
     value=clean(title,240)
+    # A notice using clinical/data words is not necessarily an opportunity
+    # for KIMSE. Procurement of unrelated services and designation of a data
+    # safe-zone *operator* must not be presented as direct R&D support.
+    if re.search(r"감리\s*용역|위탁\s*회계|회계법인\s*공모|전용회선\s*임차|사전\s*규격|"
+                 r"데이터\s*안심\s*구역\s*지정\s*신청|운영\s*용역\s*입찰",value,re.I):
+        return "기타"
+    if re.search(r"교육|세미나|설명회|워크숍|성과교류회|"
+                 r"성과조사|방송영상\s*AI\s*학습데이터",value,re.I) and not re.search(
+                     r"치매|인지.?저하|경도.?인지",value,re.I):
+        return "검토"
     direct=re.search(
         r"치매|경도.?인지|인지.?저하|인지.?기능|고령|노인|돌봄|실버|에이지|기억"
         r"|의료.?데이터|보건의료.?데이터|의료.?AI|병원.?실증"
