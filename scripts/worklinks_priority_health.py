@@ -329,7 +329,7 @@ def scan_one(source,fetch,now):
     if kind=="kdata" and total_links<5:
         state["lowLinkCoverage"]=True
     if not total_links:
-        state.update(status="partial",note="목록 접근 성공했으나 실제 게시글 링크 0건. 파서 재검증 필요")
+        state.update(status="partial",note="목록 접근 성공했으나 실제 게시글 링크 0건. 목록 구조·파서 재검증 필요")
         return [],state
     state["uninspectedCandidates"]=max(0,len(links)-MAX_DETAIL_PER_SOURCE)
     results=[]
