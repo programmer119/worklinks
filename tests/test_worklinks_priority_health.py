@@ -70,6 +70,22 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertIsNone(valid_official_link(
           "https://other.example/aihubnews/notice/view.do?nttSn=10397",base,"aihub"))
 
+    def test_hira_official_notice_board_not_press_releases(self):
+        source=next(x for x in SOURCES if x[2]=="hira")
+        self.assertIn("pgmid=HIRAA020002000100",source[1])
+        official="/bbsDummy.do?pgmid=HIRAA020002000100&brdScnBltNo=4&brdBltNo=12199"
+        expected="https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA020002000100&brdScnBltNo=4&brdBltNo=12199"
+        self.assertEqual(valid_official_link(official,source[1],"hira"),expected)
+        self.assertIsNone(valid_official_link(
+            "/bbsDummy.do?pgmid=HIRAA020041000100&brdScnBltNo=4&brdBltNo=11144",
+            source[1],"hira"))
+        listing=BeautifulSoup(
+            '<table><tr><td><a href="'+official+'">2026년 의료 AI 데이터 실증 참여기업 모집 공고</a></td></tr></table>',
+            "html.parser")
+        found,count=observed_links(listing,source[1],"hira")
+        self.assertEqual(count,1)
+        self.assertEqual(found[0]["url"],expected)
+
     def test_actual_nia_onclick_article_ids_are_observed_and_constrained(self):
         source=next(x for x in SOURCES if x[2]=="nia")
         html="""<table>
