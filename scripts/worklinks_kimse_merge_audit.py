@@ -70,6 +70,12 @@ def merge_verified_deadlines(rows,audit,now):
         source=row.get("source")
         if not safe_official_url(url,source):
             continue
+        if row.get("deadlineEvidenceSource") not in (
+            "official_listing_application_period",
+            "official_title_explicit_cutoff",
+            "official_article_application_period",
+        ):
+            continue
         date=row.get("applicationDeadline")
         cutoff=safe_deadline(date)
         if not cutoff or not cutoff.tzinfo:
