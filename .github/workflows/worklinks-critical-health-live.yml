@@ -25,5 +25,9 @@ jobs:
           python-version: '3.12'
       - name: Install parser dependencies
         run: python -m pip install --disable-pip-version-check 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5'
+      - name: Diagnose K-DATA TLS issuer chain (certificate verification required)
+        continue-on-error: true
+        run: |
+          timeout 15s bash -c 'echo | openssl s_client -connect www.kdata.or.kr:443 -servername www.kdata.or.kr -showcerts 2>&1 | grep -E "depth=|verify error|Certificate chain|^[[:space:]]*[0-9]+ s:|^[[:space:]]*i:|Verify return code" | head -n 22'
       - name: Probe actual official healthcare notice list links and report failures
         run: python scripts/worklinks_health_live_audit.py
