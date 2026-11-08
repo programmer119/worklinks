@@ -17,7 +17,7 @@ import re
 import sys
 import threading
 import time
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urljoin, urlsplit, parse_qs
 
 from bs4 import BeautifulSoup
 
@@ -28,6 +28,12 @@ from worklinks_priority_health import (
     verified_public_get, valid_official_link,
 )
 
+from worklinks_health_sources import (
+    SOURCES as KHIS_SOURCES, candidate_links, application_deadline,
+    official_rss_listing, KHIS_TENDER_RSS,
+)
+ALL_SOURCES=tuple(SOURCES)+tuple(KHIS_SOURCES)
+
 ROOT=Path(__file__).resolve().parents[1]
 SNAPSHOT=ROOT/"startup-support/investment-opportunities.json"
 OUTPUT=ROOT/"startup-support/kimse-deep-audit.json"
@@ -35,7 +41,7 @@ MAX_PAGES_PER_SOURCE=80
 MAX_DETAILS=250
 MAX_RUNTIME_SECONDS=720
 KHIDI_SEM=threading.BoundedSemaphore(2)
-OFFICIAL_HOSTS={urlsplit(url).hostname for _,url,_ in SOURCES}
+OFFICIAL_HOSTS={urlsplit(url).hostname for _,url,_ in ALL_SOURCES}
 START=time.monotonic()
 
 def utc_now():
@@ -61,6 +67,14 @@ def get_soup(url):
             return do_get()
     return do_get()
 
+def source_entries(soup,base,kind):
+    if kind in ("0001","0009"):
+        entries=candidate_links(soup,base,kind)
+        return [{"url":url,"title":title,"context":""}
+                for url,(title,_) in entries.items()],len(entries)
+    return observed_links(soup,base,kind)
+
+
 def crawl_source(source, fetch=get_soup, page_cap=MAX_PAGES_PER_SOURCE):
     """Never manufacture a page number; only follow links seen in real HTML."""
     name,base,kind=source
@@ -79,7 +93,7 @@ def crawl_source(source, fetch=get_soup, page_cap=MAX_PAGES_PER_SOURCE):
         visited.add(url)
         try:
             soup=fetch(url)
-            entries,count=observed_links(soup,url,kind)
+            entries,count=source_entries(soup,url,kind)
             page_rows.append({"url":url,"articleLinks":count,
                               "matchingNotices":len(entries)})
             for item in entries:
@@ -117,7 +131,17 @@ def signed_date_from_title(title):
 
 def validated_detail_target(url,source):
     base=source[1]
-    return valid_official_link(url,base,source[2])==url
+    kind=source[2]
+    if kind in ("0001","0009"):
+        p=urlsplit(url)
+        q=parse_qs(p.query)
+        mid="a10301000000" if kind=="0001" else "a10304000000"
+        return (p.scheme=="https" and p.hostname=="www.khis.kr"
+            and p.path=="/board.es" and q.get("act")==["view"]
+            and q.get("bid")==[kind] and q.get("mid")==[mid]
+            and len(q.get("list_no",[]))==1
+            and bool(re.fullmatch(r"\d{1,8}",q["list_no"][0])))
+    return valid_official_link(url,base,kind)==url
 
 def examine(entry, source, now, fetch=get_soup):
     url=entry["url"]
@@ -144,6 +168,8 @@ def examine(entry, source, now, fetch=get_soup):
                      or page.select_one(".view") or page.select_one("main") or page)
             body=section.get_text("\n",strip=True)[:40000]
             deadline=explicit_deadline(body)
+            if not deadline and source[2] in ("0001","0009"):
+                deadline=application_deadline(title,body)
             eligibility,proof=eligibility_signal(body)
             record["eligibility"]=eligibility
             record["eligibilityEvidence"]=proof
@@ -177,10 +203,10 @@ def examine(entry, source, now, fetch=get_soup):
 
 def run(snapshot, now=None, crawl=crawl_source, examine_one=examine):
     now=now or utc_now()
-    sources={name:spec for spec in SOURCES for name in (spec[0],)}
+    sources={spec[0]:spec for spec in ALL_SOURCES}
     evidence={}
     audits=[]
-    for spec in SOURCES:
+    for spec in ALL_SOURCES:
         item=crawl(spec)
         audits.append({key:value for key,value in item.items() if key!="candidates"})
         for row in item["candidates"]:
