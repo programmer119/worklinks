@@ -59,6 +59,26 @@ def probe(source):
                     if len(tr.get_text(" ",strip=True))>18
                 ][:10]
                 result["lowLinkCoverage"]=count<5
+                result["noticeLinkCandidates"]=[
+                    {"text":" ".join(a.stripped_strings)[:130],
+                     "href":str(a.get("href",""))[:180],
+                     "onclick":str(a.get("onclick",""))[:180],
+                     "data":{k:str(v)[:100] for k,v in a.attrs.items()
+                             if k.startswith("data-")}}
+                    for a in soup.select("a") if
+                    "board" in str(a.get("href","")).lower() or
+                    "view" in str(a.get("onclick","")).lower()
+                ][:45]
+                result["datedElementSnippets"]=[]
+                for text_node in soup.find_all(string=True):
+                    value=str(text_node).strip()
+                    if not __import__("re").search(r"2026[.\\-/]\\d{1,2}[.\\-/]\\d{1,2}",value):
+                        continue
+                    parent=text_node.parent
+                    for _ in range(3):
+                        if parent and parent.parent: parent=parent.parent
+                    result["datedElementSnippets"].append(str(parent)[:1700])
+                    if len(result["datedElementSnippets"])>=7: break
             if kind=="nia":
                 result["viewLinks"]=[
                     {"title":" ".join(a.stripped_strings)[:120],
