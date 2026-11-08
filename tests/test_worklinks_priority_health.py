@@ -252,6 +252,16 @@ class PriorityDiscoveryBacktest(unittest.TestCase):
         self.assertEqual(set(summary["listingDegraded"]),{"HIRA","K-DATA"})
         self.assertEqual(set(summary["degraded"]),{"HIRA","K-DATA"})
 
+    def test_one_kdata_link_is_not_declared_full_coverage(self):
+        name="K-DATA 데이터·안심구역 공지"
+        summary=coverage_summary([
+            {"name":name,"status":"partial","articleLinks":1,
+             "relevantLinks":0,"discovered":0,"lowLinkCoverage":True}
+        ],[name])
+        self.assertEqual(summary["listingHealthy"],0)
+        self.assertEqual(summary["listingDegraded"],[name])
+        self.assertEqual(summary["status"],"degraded")
+
     def test_malformed_or_js_only_list_is_not_reported_as_no_opportunity(self):
         listing=BeautifulSoup("""<table><tr><td><a href="javascript:doView('123')">
          의료 AI 실증 지원사업 모집</a></td></tr></table>""","html.parser")
