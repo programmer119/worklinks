@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from worklinks_priority_health import KST,SOURCES
 from worklinks_kimse_deep_audit import (
-    crawl_source,examine,likely_historical,signed_date_from_title,run,
+    ALL_SOURCES,crawl_source,examine,likely_historical,signed_date_from_title,run,validated_detail_target,
 )
 
 NOW=dt.datetime(2026,11,8,21,5,tzinfo=KST)
@@ -79,6 +79,14 @@ class KimseDeepAuditTests(unittest.TestCase):
         invalid={**entry,"url":"https://evil.example/board/view?menuId=MENU01108&linkId=48952446"}
         self.assertEqual(examine(invalid,source,NOW,article)["status"],"invalid_official_link")
 
+    def test_khis_trusted_board_urls_included_and_other_hosts_rejected(self):
+        from worklinks_health_sources import SOURCES as KHIS
+        source=KHIS[0]
+        url="https://www.khis.kr/board.es?act=view&bid=0001&list_no=2842&mid=a10301000000"
+        self.assertTrue(validated_detail_target(url,source))
+        self.assertFalse(validated_detail_target(url.replace("www.khis.kr","evil.example"),source))
+        self.assertEqual(len(ALL_SOURCES),10)
+
     def test_all_official_ages_remain_distinct_and_reviewed(self):
         source=SOURCES[0]
         link="https://www.khidi.or.kr/board/view?menuId=MENU01108&linkId=48952446"
@@ -96,8 +104,8 @@ class KimseDeepAuditTests(unittest.TestCase):
         out=run({"generatedAt":"2026-11-08T19:00:00+09:00",
                  "opportunities":[]},now=NOW,
                 crawl=fake_crawl,examine_one=fake_exam)
-        self.assertEqual(out["summary"]["sources"],len(SOURCES))
-        self.assertEqual(out["summary"]["pagesActuallyRead"],len(SOURCES))
+        self.assertEqual(out["summary"]["sources"],len(ALL_SOURCES))
+        self.assertEqual(out["summary"]["pagesActuallyRead"],len(ALL_SOURCES))
         self.assertEqual(out["summary"]["uniqueOfficialCandidateUrls"],1)
         self.assertEqual(out["summary"]["outcomes"]["unknown_deadline"],1)
         self.assertFalse(out["summary"]["fullyVerified"])
