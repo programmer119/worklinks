@@ -13,7 +13,7 @@ permissions:
   contents: write
 concurrency:
   group: worklinks-kimse-deep-audit
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   audit:
     runs-on: ubuntu-latest
