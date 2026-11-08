@@ -76,6 +76,11 @@ def merge_verified_deadlines(rows,audit,now):
             "official_article_application_period",
         ):
             continue
+        # A previous JSON description is NOT a live observed application-
+        # period column; do not upgrade that to official proof.
+        if (row.get("deadlineEvidenceSource")=="official_listing_application_period"
+            and row.get("evidence")=="previous_verified_snapshot"):
+            continue
         date=row.get("applicationDeadline")
         cutoff=safe_deadline(date)
         if not cutoff or not cutoff.tzinfo:
