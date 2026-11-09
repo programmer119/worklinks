@@ -246,6 +246,10 @@
 #jobCards .job-advantage .advantage-pill{width:17px;height:9px;display:block;border-radius:6px;background:currentColor}
 #jobCards .job-advantage .advantage-label{font-weight:900;white-space:nowrap}
 #jobCards .job-advantage .advantage-reason{font-size:12px;color:#475569;min-width:0;flex:1 1 135px}
+#jobCards .job-basic-signal{display:inline-flex;align-items:center;max-width:100%;font-size:13px;font-weight:850;line-height:1.45;padding:4px 9px;border-radius:8px;border:1px solid transparent;white-space:normal}
+#jobCards .job-basic-signal.adv-high{color:#065f46;background:#ecfdf5;border-color:#86efac}
+#jobCards .job-basic-signal.adv-medium{color:#1e40af;background:#eff6ff;border-color:#93c5fd}
+#jobCards .job-basic-signal.adv-caution{color:#92400e;background:#fffbeb;border-color:#fcd34d}
 #jobCards .job-advantage.adv-high{color:#047857}
 #jobCards .job-advantage.adv-medium{color:#1d4ed8}
 #jobCards .job-advantage.adv-caution{color:#92400e}
@@ -612,14 +616,14 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  <button type="button" class="job-vf" data-verdict-filter="low-changed" aria-pressed="false" title="과거 연속 2개 연도 1~2개사 참가, 사업자번호가 다른 낙찰업체 확인. 이번 사업 낙찰 미정">저경쟁·낙찰사 변경 <span data-verdict-count="low-changed">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="low-incumbent" aria-pressed="false" title="과거 연속 2개 연도 1~2개사 참가, 사업자번호가 같은 낙찰업체 확인. 이번 사업 낙찰 미정">저경쟁·동일사 낙찰 <span data-verdict-count="low-incumbent">0</span></button>
  <div class="job-advantage-toolbar" role="group" aria-label="적격 후보 내 유리도 구분">
-  <strong>기회 유리도</strong>
-  <button type="button" class="job-vf" data-verdict-filter="adv-3" aria-pressed="false" title="최근 과거 두 연도 모두 1~2개사 참여, 낙찰업체 사업자번호 변경 확인">▰▰▰ 우선 검토 <span data-verdict-count="adv-3">0</span></button>
-  <button type="button" class="job-vf" data-verdict-filter="adv-2" aria-pressed="false" title="공식 과거 참가업체 1~2개사, 동일업체 연속 낙찰 여부는 미확인">▰▰ 관심 검토 <span data-verdict-count="adv-2">0</span></button>
-  <button type="button" class="job-vf" data-verdict-filter="adv-1" aria-pressed="false" title="과거 1~2개사지만 같은 사업자번호의 업체가 연속 낙찰">▰ 기존사 주의 <span data-verdict-count="adv-1">0</span></button>
-  <span class="job-advantage-explain">1~3칩은 과거 공식 개찰 결과에 따른 검토 순위입니다. 지원자격 확정·낙찰확률·이번 경쟁업체 수가 아닙니다. 정보 미확인은 점수 없이 표시합니다.</span>
+  <strong>1차 공고 선별</strong>
+  <button type="button" class="job-vf" data-verdict-filter="adv-3" aria-pressed="false" title="등록업종 및 직접생산 공개자료 기본대조 · 최종 자격 미확정">기초요건 대조 <span data-verdict-count="adv-3">0</span></button>
+  <button type="button" class="job-vf" data-verdict-filter="adv-2" aria-pressed="false" title="나라장터 공개 등록업종 기본 일치 · 다른 요건은 미검증">등록업종 일치 <span data-verdict-count="adv-2">0</span></button>
+  <button type="button" class="job-vf" data-verdict-filter="adv-1" aria-pressed="false" title="공식 공고상 지역제한 불일치가 확인된 경우">지역 제한 <span data-verdict-count="adv-1">0</span></button>
+  <span class="job-advantage-explain">공고·업체 구조화 자료 기준의 1차 선별입니다. 입찰자격 확정이나 실제 경쟁률이 아닙니다. 과거 개찰 수치는 확인된 공고에만 별도 표시합니다.</span>
  </div>
 
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>기초요건 대조 · 유리도 순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="서버 DB에 저장된 공식 과거 낙찰 결과를 다시 읽습니다. 신규 조사는 서버 수집기가 시간당 최대 2건 수행합니다">과거 경쟁 캐시 새로고침 <span id="competitionLoadStatus">(조회 전)</span></button></div>
+ </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="서버 DB에 저장된 공식 과거 낙찰 결과를 다시 읽습니다. 신규 조사는 서버 수집기가 시간당 최대 2건 수행합니다">과거 경쟁 캐시 새로고침 <span id="competitionLoadStatus">(조회 전)</span></button></div>
 
 
   </div>
@@ -1418,16 +1422,39 @@ var changcomActionableData=null,changcomActionableMode='verified',changcomAction
 var changcomReviewedByNotice={};
 var changcomActionableRequest=null;
 var changcomVerifiedNoticeIds=new Set();
+var changcomPrecheckByNotice=new Map();
 function changcomNoticeIdentity(x){
  const id=jobBidIdentity(x);
  return id?id.bidNo+':'+id.order:'';
+}
+// Stage-one opportunity markers use structured G2B/registry evidence only.
+function basicBidSignal(x){
+ const source=changcomPrecheckByNotice.get(changcomNoticeIdentity(x));
+ if(!source||source.deadlineState!=='open')return null;
+ if(source.confirmedRegionalMismatch===true)return {
+  tier:1,kind:'caution',label:'지역 제한',reason:'공식 지역제한 불일치 확인'};
+ if(source.precheckState==='documented_precheck'&&
+    source.screening==='published_industry_codes_match')return {
+  tier:3,kind:'high',label:'기초요건 대조',
+  reason:'등록업종 현재자료 및 직접생산 과거 공개자료 대조 · 최종 미확정'};
+ if(source.scope==='software_service'&&
+    source.screening==='published_industry_codes_match')return {
+  tier:2,kind:'medium',label:'등록업종 일치',
+  reason:'공식 등록업종 기본 일치 · 기타 참가요건 확인 전'};
+ return null;
+}
+function basicBidMarkup(x){
+ const s=basicBidSignal(x);
+ if(!s)return '';
+ return '<span class="job-basic-signal adv-'+s.kind+'" title="'+htmlEscape(s.reason)+'">'+
+  htmlEscape(s.label)+'</span>';
 }
 function changcomPrecheckCard(x){
  const order=String(x.order||'000').padStart(3,'0');
  const key=String(x.bidNo||'')+':'+order;
  const official='https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo='+encodeURIComponent(x.bidNo)+'&bidPbancOrd='+encodeURIComponent(order);
  return {id:'g2b-precheck-'+key,entry:'business',type:'나라장터 · 기초요건 대조',
-  kind:'service',noticeNumber:x.bidNo,noticeOrder:order,title:x.title||'공고 제목 확인 필요',
+  kind:'servc',noticeNumber:x.bidNo,noticeOrder:order,title:x.title||'공고 제목 확인 필요',
   url:/^https:\/\/www\.g2b\.go\.kr\//.test(String(x.sourceUrl||''))?x.sourceUrl:official,
   org:x.org||'발주기관 확인 필요',amount:x.budget||null,startAt:x.posted||'',endAt:x.closes||'',
   period:x.closes?'입찰마감 '+x.closes:'마감일 확인 필요',
@@ -1602,6 +1629,8 @@ async function loadChangcomActionable(force=false){
    changcomVerifiedNoticeIds=new Set(json.bids.filter(x=>
     x.deadlineState==='open'&&x.precheckState==='documented_precheck'
    ).map(x=>String(x.bidNo||'')+':'+String(x.order||'000').padStart(3,'0')));
+   changcomPrecheckByNotice=new Map(json.bids.map(x=>[
+    String(x.bidNo||'')+':'+String(x.order||'000').padStart(3,'0'),x]));
    renderChangcomActionable();
    scheduleJobsRender();
   }catch(error){
@@ -2972,10 +3001,8 @@ function canShowBidAdvantage(x,companies){
 }
 function matchesVerdictFilter(x,selected,filter){
  if(filter==='repeat')return repeatYears(x)>=2;
- if(['adv-3','adv-2','adv-1'].includes(filter)){
-  if(!canShowBidAdvantage(x,selected?[selected]:partners))return false;
-  return bidAdvantageFromHistory(pastCompetitionSummary(x)).level===Number(filter.slice(-1));
- }
+ if(['adv-3','adv-2','adv-1'].includes(filter))
+  return basicBidSignal(x)?.tier===Number(filter.slice(-1));
  if(['low-bids','low-changed','low-incumbent'].includes(filter)){
   if(jobSoftwareScope(x)!=='candidate')return false;
   const trend=pastCompetitionSummary(x);
@@ -3067,11 +3094,20 @@ function renderJobs(){
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
  const raw=jobs.concat(g2bLiveJobs);
- // One unified card grid, even before the relevant saved-G2B page loads.
+ // Use the verified static index without fetching tender bodies or parsing RFP text.
+ // Add a bounded set to the SAME standard card grid when server paging is incomplete.
  if(member&&changcomActionableData?.bids){
   const present=new Set(raw.map(changcomNoticeIdentity));
-  for(const item of changcomActionableData.bids){
-   if(item.deadlineState!=='open'||item.precheckState!=='documented_precheck')continue;
+  const aligned=changcomActionableData.bids.filter(x=>
+   x.deadlineState==='open'&&x.scope==='software_service'&&
+   x.screening==='published_industry_codes_match'&&x.confirmedRegionalMismatch!==true
+  ).sort((a,b)=>
+   Number(a.priorityTier??9)-Number(b.priorityTier??9)||
+   Number(b.priorityScore||0)-Number(a.priorityScore||0)||
+   String(a.closes||'').localeCompare(String(b.closes||'')));
+  const verified=aligned.filter(x=>x.precheckState==='documented_precheck');
+  const firstPass=aligned.filter(x=>x.precheckState!=='documented_precheck').slice(0,48);
+  for(const item of verified.concat(firstPass)){
    const key=String(item.bidNo||'')+':'+String(item.order||'000').padStart(3,'0');
    if(!present.has(key)){raw.push(changcomPrecheckCard(item));present.add(key)}
   }
@@ -3178,9 +3214,9 @@ function renderJobs(){
   list.sort(function(a,b){
     if(filter==='closed')return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
     if(sort==='qualified'){
-     const aChecked=changcomVerifiedNoticeIds.has(changcomNoticeIdentity(a.x));
-     const bChecked=changcomVerifiedNoticeIds.has(changcomNoticeIdentity(b.x));
-     if(aChecked!==bChecked)return aChecked?-1:1;
+     const ar=basicBidSignal(a.x)?.tier||0;
+     const br=basicBidSignal(b.x)?.tier||0;
+     if(ar!==br)return br-ar;
     }
     if(sort==='competition'){
      const aReady=partners.some(p=>verdict(a.x,p).type==='ready')?0:1;
@@ -3263,7 +3299,7 @@ function renderJobs(){
      }).join(' · ')+'</div>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
-    const highlights=repeat+competitionLabel+extras+opportunityMarkup;
+    const highlights=basicBidMarkup(x)+repeat+competitionLabel+extras+opportunityMarkup;
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
