@@ -2845,9 +2845,8 @@ function participationVerdict(x,p){
 }
 function participationStrip(x,companies){
  if(!companies.length)return '';
- if(changcomVerifiedNoticeIds.has(changcomNoticeIdentity(x))){
-  return '<div class="job-verdict-row"><span class="job-verdict checking" title="등록업종 현재 자료 및 직접생산 과거 공개자료의 기초 대조. 최종 입찰자격 확정 아님">기초요건 대조 · 최종 미확정</span></div>';
- }
+ // The colored first-pass chip is the one concise source indicator.
+ // Do not repeat that same evidence in the participation strip.
  // Display exceptional or fully verified conditions, not repeated unknowns.
  const items=companies.map(function(p){
   const v=participationVerdict(x,p);
