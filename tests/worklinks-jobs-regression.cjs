@@ -262,8 +262,10 @@ assert.equal(past.pastCompetitionSummary(pastBid).low,false,
  'past 9-bidder year cannot be labeled uniformly low competition');
 assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,null);
 assert.equal(past.bidAdvantageFromHistory({samples:[],low:false}).kind,'unknown');
-assert.ok(past.bidAdvantageMarkup({samples:[],low:false},true).includes('data-advantage-tier="unrated"'));
-assert.ok(past.bidAdvantageMarkup({samples:[],low:false},false).includes('유리도 평가 제외'));
+assert.equal(past.bidAdvantageMarkup({samples:[],low:false},true),'',
+ 'unverified competition must not display a rated advantage chip');
+assert.equal(past.bidAdvantageMarkup({samples:[],low:false},false),'',
+ 'disabled advantage must remain hidden');
 
 // An official award record includes the winner, paid amount and bid rate.
 // These are historic facts, NOT forecasts for the present notice.
