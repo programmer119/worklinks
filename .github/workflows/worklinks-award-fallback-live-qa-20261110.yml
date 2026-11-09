@@ -1,0 +1,67 @@
+name: WorkLinks live award fallback browser proof 20261110
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-award-fallback-live-qa-20261110.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install headless Chromium
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Verify public metadata and precheck cards with saved API intentionally unavailable
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json,time
+          from playwright.sync_api import sync_playwright
+          url='https://worklinks.suaveforge.com/startup-support/?view=jobs'
+          targets={
+              'R26BK01777538:000':'낙030005',
+              'R26BK01765541:000':'낙030005',
+              'R26BK01807134:000':'낙030005',
+              'R26BK01797629:000':'낙030029'}
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              context=browser.new_context(viewport={'width':1440,'height':900})
+              page=context.new_page()
+              page.route('**/api/g2b/saved*',lambda route:route.abort())
+              # Production Pages may still be propagating the latest HTML commit.
+              for attempt in range(12):
+                  page.goto(url+'&qa='+str(attempt),wait_until='domcontentloaded',timeout=45000)
+                  if page.evaluate("typeof loadG2bAwardFallback==='function'"):
+                      break
+                  time.sleep(4)
+              else:raise AssertionError('new frontend not yet published')
+              page.wait_for_function("""() => typeof g2bAwardFallbackByNotice!=='undefined' &&
+                g2bAwardFallbackByNotice.has('R26BK01777538:000')""",timeout=25000)
+              source=page.evaluate("""() => ({
+                count:g2bAwardFallbackByNotice.size,
+                rendered:Object.fromEntries(['R26BK01777538','R26BK01765541',
+                  'R26BK01807134','R26BK01797629'].map(no=>[
+                   no,
+                   bidMethodCardMarkup({id:'g2b-precheck-'+no+':000',
+                    noticeNumber:no,noticeOrder:'000'})]))
+              })""")
+              assert source['count']>=1000,source
+              for key,expected_code in targets.items():
+                  number=key.split(':')[0]
+                  card=source['rendered'][number]
+                  assert expected_code in card,{'notice':number,'card':card}
+                  assert '정보 없음' not in card.split('낙찰코드')[1].split('하한율')[0],number
+              assert '88%' in source['rendered']['R26BK01797629']
+              print('WORKLINKS_FALLBACK_BROWSER_LIVE=PASS',
+                    'cached_official_notices',source['count'],
+                    'source',url,'saved_API_intentionally_blocked',True,
+                    'verified_notice_count',len(targets),flush=True)
+              browser.close()
+          PY
