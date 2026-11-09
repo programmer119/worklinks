@@ -82,14 +82,14 @@ def main():
                'PRIMARY KEY(kind,day))')
     db.commit()
     # A transient provider failure can mean a shared daily quota or upstream
-    # outage. Do not retry all missing windows every 30 minutes.
+    # outage. Limit retries to at most once per 30-minute check.
     last_failed = db.execute(
         "SELECT checked_at,note FROM award_method_repair_windows "
         "WHERE status='failed' ORDER BY checked_at DESC LIMIT 1").fetchone()
     if last_failed:
         try:
             checked_at = dt.datetime.fromisoformat(last_failed[0])
-            if (dt.datetime.now(dt.timezone.utc) - checked_at).total_seconds() < 4 * 3600:
+            if (dt.datetime.now(dt.timezone.utc) - checked_at).total_seconds() < 1800:
                 print('REPAIR_PROVIDER_COOLDOWN',str(last_failed[1])[:100],flush=True)
                 db.close()
                 return
@@ -149,8 +149,24 @@ def main():
         original = json.loads(row[0])
         if str(original.get('awardMethod') or '').strip():
             continue
+        single_status = db.execute(
+            "SELECT checked_at,status FROM award_method_repair_windows "
+            "WHERE kind='servc' AND day=?", ('single-'+notice,)).fetchone()
+        if single_status and single_status[1]=='complete':
+            try:
+                if (dt.datetime.now(dt.timezone.utc)-dt.datetime.fromisoformat(single_status[0])).total_seconds() < 86400:
+                    print('REPAIR_SINGLE_OFFICIAL_CHECK_RECENT',notice,flush=True)
+                    continue
+            except (TypeError,ValueError):
+                pass
         try:
-            refresh_exact_notice(db,key,crawler,notice)
+            updated=refresh_exact_notice(db,key,crawler,notice)
+            if not updated:
+                with db:
+                    db.execute('INSERT OR REPLACE INTO award_method_repair_windows '
+                      '(kind,day,checked_at,status,note) VALUES (?,?,?,?,?)',
+                      ('servc','single-'+notice,dt.datetime.now(dt.timezone.utc).isoformat(),
+                       'complete','official_method_missing_or_not_found'))
         except RuntimeError as exc:
             print('REPAIR_SINGLE_FAILED', notice, str(exc)[:90],flush=True)
             with db:
