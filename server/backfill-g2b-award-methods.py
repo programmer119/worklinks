@@ -13,6 +13,9 @@ import re
 import runpy
 import sqlite3
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from collections import defaultdict
 
 SOURCE = os.environ.get('G2B_CRAWLER_SOURCE', '/app/g2b-full-crawler.py')
@@ -24,6 +27,48 @@ PINNED = ('R26BK01777538', 'R26BK01765541', 'R26BK01807134', 'R26BK01797629')
 def stamp_day(value):
     m = re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})', str(value or ''))
     return ''.join(m.groups()) if m else ''
+
+
+def refresh_exact_notice(db, key, crawler, bid_no):
+    """One official API lookup for an existing visible notice, no document parsing."""
+    operation = 'getBidPblancListInfoServc'
+    params = {'serviceKey': key, 'type': 'json', 'pageNo': 1,
+              'numOfRows': 10, 'inqryDiv': 2, 'bidNtceNo': bid_no}
+    url = crawler['API_ROOT'] + '/' + operation + '?' + urllib.parse.urlencode(params)
+    try:
+        req = urllib.request.Request(url, headers={
+            'Accept': 'application/json', 'User-Agent': 'WorkLinksMethodRepair/1.0'})
+        with urllib.request.urlopen(req, timeout=20) as response:
+            doc = json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError('official_api_http_' + str(exc.code)) from None
+    except (OSError, ValueError, UnicodeError):
+        raise RuntimeError('official_api_unreachable_or_invalid_json') from None
+    response = doc.get('response', {})
+    result_code = str(response.get('header', {}).get('resultCode', 'missing'))
+    if result_code not in ('0', '00'):
+        raise RuntimeError('official_api_result_' + re.sub(r'[^0-9A-Za-z]', '', result_code)[:12])
+    items = response.get('body', {}).get('items') or []
+    if isinstance(items, dict):
+        items = items.get('item') or []
+    if not isinstance(items, list):
+        items = [items]
+    for item in items:
+        if str(item.get('bidNtceNo') or '') != bid_no:
+            continue
+        if not str(item.get('sucsfbidMthdNm') or item.get('sucsfbidMthdCd') or '').strip():
+            print('REPAIR_SINGLE_OFFICIAL_METHOD_EMPTY',bid_no,flush=True)
+            return False
+        # Only update a matching source-backed notice; no fallbacks or guesses.
+        compact = crawler['compact'](item, 'servc')
+        if compact.get('bidNo') != bid_no:
+            raise RuntimeError('official_identity_mismatch')
+        crawler['save'](db,[compact])
+        print('REPAIR_SINGLE_UPDATED',bid_no,'method',repr(compact.get('awardMethod','')),
+              'code',repr(compact.get('awardMethodCode','')),flush=True)
+        return True
+    print('REPAIR_SINGLE_NOT_FOUND',bid_no,flush=True)
+    return False
 
 def main():
     crawler = runpy.run_path(SOURCE, run_name='award_method_repair')
@@ -93,6 +138,31 @@ def main():
         db.close()
         raise
     started = time.monotonic()
+    # Fix currently visible stale notices first with a single call each.
+    # Use day-window replay only afterward to replenish the rest of the corpus.
+    for notice in PINNED:
+        row = db.execute(
+          "SELECT payload FROM bid_notices WHERE kind='servc' AND bid_no=? "
+          "ORDER BY last_seen DESC LIMIT 1", (notice,)).fetchone()
+        if not row:
+            continue
+        original = json.loads(row[0])
+        if str(original.get('awardMethod') or '').strip():
+            continue
+        try:
+            refresh_exact_notice(db,key,crawler,notice)
+        except RuntimeError as exc:
+            print('REPAIR_SINGLE_FAILED', notice, str(exc)[:90],flush=True)
+            with db:
+                db.execute('INSERT OR REPLACE INTO award_method_repair_windows '
+                 '(kind,day,checked_at,status,note) VALUES (?,?,?,?,?)',
+                 ('servc','single-'+notice,dt.datetime.now(dt.timezone.utc).isoformat(),
+                  'failed',str(exc)[:90]))
+            if '429' in str(exc) or 'LIMIT' in str(exc).upper():
+                print('REPAIR_UPSTREAM_QUOTA_STOP',flush=True)
+                db.close()
+                return
+        time.sleep(0.5)
     for _, urgent, num, kind, day, pages in work[:LIMIT_WINDOWS]:
         if time.monotonic() - started > 420:
             print('REPAIR_TIME_BUDGET_REACHED', flush=True)
