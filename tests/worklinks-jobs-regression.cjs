@@ -225,11 +225,13 @@ assert.ok(source.includes("sme-cert-snapshot.json"));
 // prtcptCnum counts; unknown/zero must never imply a one-bidder award.
 const past=new Function('kstISO','localStorage','document','g2bFetch','renderJobs','jobAmountLabel',
  'collapseSimilarNotices','jobs','g2bLiveJobs','jobSoftwareScope','jobTimeInfo','htmlEscape',
+ 'changcomPrecheckByNotice','changcomNoticeIdentity',
  part('const COMPETITION_STORE=','function repeatYears(x){')+
  'return {officialAwardCount,officialAwardDetails,previousOfficialBids,pastCompetitionSummary,winnerTrendLabel,bidAdvantageFromHistory,bidAdvantageOrder,bidAdvantageMarkup,mergeOfficialAwardSnapshot,competitionByNotice,contractByBid,contractEvidenceText};'
 )(()=> '2026-10-17',{getItem:()=>null,setItem:()=>{}},
  {querySelectorAll:()=>[],getElementById:()=>null},
- async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}),value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+ async()=>({ok:true,items:[]}),()=>{},v=>String(v)+'원',()=>[],[],[],()=> 'candidate',()=>({key:'open'}),value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),
+ new Map(),()=>'' );
 const pBid='R25BK00820928';
 assert.equal(past.officialAwardCount({items:[
  {bidNtceNo:pBid,bidNtceOrd:'000',prtcptCnum:'2'}]},pBid),2,
