@@ -3341,6 +3341,7 @@ window.addEventListener('worklinks:partner-access',function(){
   .forEach(option=>{option.hidden=!allowed;option.disabled=!allowed;});
  const sort=document.getElementById('jobSort');
  if(!allowed&&sort&&['qualified','competition'].includes(sort.value))sort.value='deadline';
+ if(allowed&&sort&&!sort.dataset.userSelectedSort)sort.value='qualified';
  partnerFilterOptionsKey='';
  if(allowed&&jobsBootstrapStarted)loadChangcomActionable();
  if(activeDetailJobId){
@@ -3359,6 +3360,7 @@ document.getElementById('competitionLoadMore').addEventListener('click',function
  loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 });
 document.getElementById("jobSort").addEventListener("change",function(){
+ this.dataset.userSelectedSort='yes';
  renderJobs();
  if(this.value==='competition')loadPastCompetitionForJobs(activeRecurringForResearch(),24);
 });
