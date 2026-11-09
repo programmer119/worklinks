@@ -185,7 +185,14 @@ def main():
                 firstIds:[...document.querySelectorAll('#jobCards .job-mini')].slice(0,4)
                     .map(e=>e.dataset.jobCard),
                 noisyCards:[...document.querySelectorAll('#jobCards .job-mini')]
-                    .filter(e=>/유리도 평가 제외|경쟁자료 미확인|경쟁자료 부족|창컴 3단계/.test(e.innerText)).length
+                    .filter(e=>/유리도 평가 제외|경쟁자료 미확인|경쟁자료 부족|창컴 3단계/.test(e.innerText)).length,
+                firstPassCards:document.querySelectorAll('#jobCards .job-basic-signal').length,
+                firstPassTags:[...document.querySelectorAll('#jobCards .job-basic-signal')]
+                    .map(e=>e.textContent.trim()),
+                firstPassCounts:{
+                    checked:Number(document.querySelector('[data-verdict-count="adv-3"]')?.textContent||0),
+                    aligned:Number(document.querySelector('[data-verdict-count="adv-2"]')?.textContent||0)
+                }
             })""")
             assert census["indexed"] > 100, census
             assert census["aligned"] > 0 and census["all"] >= census["aligned"], census
@@ -193,6 +200,11 @@ def main():
             assert not census["parallelPanel"], census
             assert census["verified"] >= 2, census
             assert census["noisyCards"] == 0, census
+            assert census["firstPassCards"] >= 2, census
+            assert census["firstPassCounts"]["checked"] >= 2, census
+            assert census["firstPassCounts"]["aligned"] > 0, census
+            assert census["firstPassTags"][:2] == ["기초요건 대조", "기초요건 대조"], census
+            assert "등록업종 일치" in census["firstPassTags"], census
             checked_ids = page.evaluate("""() =>
                 changcomActionableEntries('verified').map(x=>String(x.bidNo)+':'+String(x.order||'000').padStart(3,'0'))
             """)
