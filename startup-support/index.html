@@ -2134,7 +2134,19 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.ge
 /* This compares only observable requirements; a match is never "100%" until all
    tender attachments, license alternatives, documentation and delivery rules have been verified. */
 var bidEligibilityCache=new Map(),activeDetailJobId=null,jobDetailPriorFocus=null,eligibilityLoading=new Set();
-function getJobById(id){return jobs.concat(g2bLiveJobs).find(function(x){return x.id===id})}
+function getJobById(id){
+ const regular=jobs.concat(g2bLiveJobs).find(function(x){return x.id===id});
+ if(regular)return regular;
+ // Evidence-backed shortlist items can be shown before the paginated archive
+ // reaches them; keep their detail view reachable via the normal card action.
+ if(/^g2b-precheck-/.test(String(id||''))&&changcomActionableData?.bids){
+  const row=changcomActionableData.bids.find(function(x){
+   return 'g2b-precheck-'+String(x.bidNo||'')+':'+String(x.order||'000').padStart(3,'0')===id;
+  });
+  if(row)return changcomPrecheckCard(row);
+ }
+ return undefined;
+}
 function jobBidIdentity(x){
  const text=[x.noticeNumber||'',x.id||'',x.url||'',x.condition||''].join(' ');
  const m=text.match(/R\d{2}BK\d{8}/i);
