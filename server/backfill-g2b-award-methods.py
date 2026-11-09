@@ -36,6 +36,20 @@ def main():
                'status TEXT NOT NULL, note TEXT NOT NULL DEFAULT "",'
                'PRIMARY KEY(kind,day))')
     db.commit()
+    # A transient provider failure can mean a shared daily quota or upstream
+    # outage. Do not retry all missing windows every 30 minutes.
+    last_failed = db.execute(
+        "SELECT checked_at,note FROM award_method_repair_windows "
+        "WHERE status='failed' ORDER BY checked_at DESC LIMIT 1").fetchone()
+    if last_failed:
+        try:
+            checked_at = dt.datetime.fromisoformat(last_failed[0])
+            if (dt.datetime.now(dt.timezone.utc) - checked_at).total_seconds() < 4 * 3600:
+                print('REPAIR_PROVIDER_COOLDOWN',str(last_failed[1])[:100],flush=True)
+                db.close()
+                return
+        except (TypeError, ValueError):
+            pass
     grouped = defaultdict(list)
     rows = db.execute('SELECT kind,bid_no,bid_ord,payload FROM bid_notices WHERE sw_candidate=1').fetchall()
     checked = set((kind, day) for kind, day in db.execute(
@@ -94,7 +108,7 @@ def main():
             print('REPAIR_DAY_COMPLETE',kind,day,'rows',processed,flush=True)
         except Exception as exc:
             # Failed windows remain retryable, but never log URLs or API secrets.
-            reason = type(exc).__name__
+            reason = (type(exc).__name__ + ':' + str(exc))[:120]
             with db:
                 db.execute('INSERT OR REPLACE INTO award_method_repair_windows '
                     '(kind,day,checked_at,status,note) VALUES (?,?,?,?,?)',
