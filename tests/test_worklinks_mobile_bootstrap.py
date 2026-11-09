@@ -166,10 +166,10 @@ def main():
             assert page.evaluate("jobRenderLimit") == 24
             assert page.locator("#jobCards .job-mini").count() <= 24
 
-            # The priority panel must work with the COMPLETE static shortlist,
-            # even though mobile lazily loads only 160 regular bid cards.
+            # Source-checked bids must be rendered in the SAME standard cards,
+            # never a second, overfull verification-only card grid.
             page.wait_for_function(
-                "() => !!changcomActionableData && Array.isArray(changcomActionableData.bids)",
+                "() => !!changcomActionableData && Array.isArray(changcomActionableData.bids) && !jobRenderDirty",
                 timeout=20000
             )
             census = page.evaluate("""() => ({
@@ -181,16 +181,29 @@ def main():
                 all:changcomActionableEntries('all').length,
                 verified:changcomActionableEntries('verified').length,
                 activeMode:changcomActionableMode,
-                display:document.querySelectorAll('#changcomActionableList .card').length,
-                first:document.querySelector('#changcomActionableList .card a')?.href
+                parallelPanel:!!document.querySelector('#changcomActionableList'),
+                firstIds:[...document.querySelectorAll('#jobCards .job-mini')].slice(0,4)
+                    .map(e=>e.dataset.jobCard),
+                noisyCards:[...document.querySelectorAll('#jobCards .job-mini')]
+                    .filter(e=>/유리도 평가 제외|경쟁자료 미확인|경쟁자료 부족|창컴 3단계/.test(e.innerText)).length
             })""")
             assert census["indexed"] > 100, census
             assert census["aligned"] > 0 and census["all"] >= census["aligned"], census
             assert census["all"] == census["aligned"] + census["review"] + census["unknown"] + census["mismatch"], census
-            assert census["activeMode"] == "verified", census
-            assert census["display"] == min(24, census["verified"]), census
-            if census["verified"]:
-                assert census["first"] and "g2b.go.kr" in census["first"], census
+            assert not census["parallelPanel"], census
+            assert census["verified"] >= 2, census
+            assert census["noisyCards"] == 0, census
+            checked_ids = page.evaluate("""() =>
+                changcomActionableEntries('verified').map(x=>String(x.bidNo)+':'+String(x.order||'000').padStart(3,'0'))
+            """)
+            displayed_ids = page.evaluate("""() =>
+                [...document.querySelectorAll('#jobCards .job-mini')].slice(0,2)
+                  .map(e=>jobBidIdentity(getJobById(e.dataset.jobCard))?.bidNo||e.dataset.jobCard)
+            """)
+            assert all(any(bid.split(':')[0] in got for got in displayed_ids) for bid in checked_ids[:2]), (checked_ids, displayed_ids)
+            print("WORKLINKS_UNIFIED_SHORTLIST_MOBILE_QA=PASS",
+                  json.dumps(census,ensure_ascii=False))
+
             # Verify a REAL pointer click can reach each control on mobile.
             # A static scrollIntoView can leave the button under preceding
             # filters after asynchronous layout shifts. Never force clicks.
@@ -221,26 +234,7 @@ def main():
                 }""",selector)
                 assert point is not None, "mobile action obstructed: "+selector
                 page.mouse.click(point["x"],point["y"])
-            def click_actionable(mode):
-                click_verified('[data-changcom-actionable="%s"]' % mode)
-            click_actionable("review")
-            assert page.locator("#changcomActionableList .card").count() == min(24,census["review"])
-            click_actionable("mismatch")
-            assert page.locator("#changcomActionableList .card").count() == min(24,census["mismatch"])
-            if census["mismatch"]:
-                assert "지역제한 불일치" in page.locator("#changcomActionableList").inner_text()
-            click_actionable("unknown")
-            assert page.locator("#changcomActionableList .card").count() == min(24,census["unknown"])
-            click_actionable("aligned")
-            more = page.locator("#changcomActionableMore")
-            if census["aligned"] > 24:
-                assert more.is_visible()
-                click_verified("#changcomActionableMore")
-                assert page.locator("#changcomActionableList .card").count() == min(48,census["aligned"])
-            assert calls == [(0,160)], ("static shortlist must not trigger more G2B requests", calls)
-            print("WORKLINKS_CHANGCOM_ACTIONABLE_MOBILE_QA=PASS",
-                  json.dumps(census,ensure_ascii=False))
-
+            assert calls == [(0,160)], ("prechecked card grid must not trigger extra G2B requests", calls)
 
             # Important card text must never be ellipsized, even for unusually
             # long Korean notice names and verification text. Tiny history
@@ -270,12 +264,13 @@ def main():
                     checkText:[...checks].map(el=>el.textContent.slice(0,180))};
             }""")
             assert not card_readability.get("error"), card_readability
-            assert card_readability["containsHighlights"] and card_readability["headlineChildren"] == 1, card_readability
+            assert card_readability["headlineChildren"] == 1, card_readability
             assert card_readability["title"]["clamp"] == "none", card_readability
             assert card_readability["title"]["visible"] and card_readability["title"]["lineCount"] > 2, card_readability
             assert not card_readability["title"]["overflow"] and not card_readability["title"]["wrapperClipped"], card_readability
-            assert card_readability["why"] and card_readability["why"]["clamp"] == "none", card_readability
-            assert not card_readability["why"]["overflow"], card_readability
+            if card_readability["why"]:
+                assert card_readability["why"]["clamp"] == "none", card_readability
+                assert not card_readability["why"]["overflow"], card_readability
             print("WORKLINKS_CARD_READABILITY=PASS",
                   json.dumps(card_readability, ensure_ascii=False))
 
