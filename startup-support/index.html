@@ -425,6 +425,20 @@
  #jobCards .job-mini .job-footer{flex-wrap:wrap}
  #jobCards .job-mini .job-meta-row{font-size:12px}
 }
+/* G2B contract and award metadata: four structured API fields, no RFP parsing. */
+#jobCards .job-bid-methods{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);
+ gap:5px 10px;padding:8px 10px;border:1px solid #dfe7f0;
+ border-radius:9px;background:#f8fafc;min-width:0
+}
+#jobCards .job-bid-method-cell{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:12.5px;line-height:1.55}
+#jobCards .job-bid-label{flex:none;color:#64748b;font-weight:750;white-space:nowrap}
+#jobCards .job-bid-value{color:#1e293b;font-weight:750;min-width:0;word-break:normal;overflow-wrap:anywhere}
+#jobCards .job-bid-method-cell.unknown .job-bid-value{color:#94a3b8;font-weight:600}
+@media(max-width:680px){
+ #jobCards .job-bid-methods{grid-template-columns:1fr;gap:4px}
+ #jobCards .job-bid-method-cell{font-size:13px}
+}
 a.worklinks-home{color:inherit;text-decoration:none;display:inline-block}a.worklinks-home:hover{text-decoration:underline}a.worklinks-home:focus-visible{outline:3px solid #2563eb;outline-offset:3px;border-radius:4px}
 /* Hide all partner-only UI before verified AuthHub membership is known. */
 html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{display:none!important}
@@ -1381,6 +1395,9 @@ function g2bCardFromRecord(x){
  if(!x||!g2bCandidateTitle(String(x.title||''))||!x.bidNo)return null;
  const id='g2b-'+x.kind+'-'+x.bidNo+'-'+x.order;
  return {id,entry:'business',type:'나라장터 API',title:x.title||'(제목 없음)',
+   noticeNumber:x.bidNo,noticeOrder:x.order,kind:x.kind,
+   contract:x.contract||'',awardMethodCode:x.awardMethodCode||'',
+   awardMethod:x.awardMethod||'',awardFloorRate:x.awardFloorRate||'',
   url:x.url||'https://www.g2b.go.kr/',org:x.org||x.agency||'발주기관 미확인',
   period:x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요',
   amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',
@@ -1406,7 +1423,9 @@ function g2bCardFromServer(x){
  const id='g2b-'+x.kind+'-'+x.bidNo+'-'+x.order;
  return {id,entry:'business',type:'나라장터 · DB 저장',title:x.title||'(제목 없음)',
   startAt:x.posted||'',endAt:x.closes||'',state:x.state||'',noticeNumber:x.bidNo,noticeOrder:x.order,kind:x.kind,repeatHistory:Array.isArray(x.repeatHistory)?x.repeatHistory:[],
-  contract:x.contract||'',subject:typeof x.purchsObjPrdctList==='string'?x.purchsObjPrdctList:'',
+  contract:x.contract||'',awardMethodCode:x.awardMethodCode||'',
+   awardMethod:x.awardMethod||'',awardFloorRate:x.awardFloorRate||'',
+   subject:typeof x.purchsObjPrdctList==='string'?x.purchsObjPrdctList:'',
   url:x.url||'https://www.g2b.go.kr/',org:x.org||x.agency||'발주기관 미확인',
   period:x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요',
   amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',
@@ -3098,6 +3117,25 @@ function scheduleJobsRender(){
  if(!document.getElementById('jobsView')?.classList.contains('on')||asyncJobRenderTimer!==null)return;
  asyncJobRenderTimer=setTimeout(function(){asyncJobRenderTimer=null;if(jobRenderDirty)renderJobs()},180);
 }
+function bidMethodCardMarkup(x){
+ // Show actual structured G2B fields only, never guess technical vs price scoring.
+ if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
+ const rate=String(x.awardFloorRate??'').trim();
+ const floor=rate&&/^[0-9]+(?:[.][0-9]+)?$/.test(rate)?rate+'%':rate;
+ const fields=[
+  ['계약방법',x.contract],
+  ['낙찰방법',x.awardMethod],
+  ['낙찰코드',x.awardMethodCode],
+  ['하한율',floor]
+ ];
+ return '<div class="job-bid-methods" aria-label="나라장터 공고 계약·낙찰 정보">'+
+  fields.map(function(pair){
+   const value=String(pair[1]??'').trim();
+   return '<div class="job-bid-method-cell'+(value?'':' unknown')+'">'+
+    '<span class="job-bid-label">'+htmlEscape(pair[0])+'</span>'+
+    '<strong class="job-bid-value">'+htmlEscape(value||'정보 없음')+'</strong></div>';
+  }).join('')+'</div>';
+}
 function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
@@ -3329,6 +3367,7 @@ function renderJobs(){
        '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3></div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
+       bidMethodCardMarkup(x)+
        (member?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
        (highlights?'<div class="job-highlights">'+highlights+'</div>':'')+
        '<div class="job-footer">'+partner+

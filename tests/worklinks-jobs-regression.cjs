@@ -735,4 +735,23 @@ assert.ok(source.includes("loadChangcomActionable();"),'list must load when Jobs
 assert.ok(source.includes("if(mode==='unknown')return rows.filter(x=>x.deadlineState==='unknown')"),'unknown deadlines stay reviewable');
 assert.ok(source.includes("x.screening==='published_industry_codes_match'"),'basic industry match must be source-backed');
 assert.ok(source.includes("미확인은 부적격이 아닙니다"),'no false bidder exclusion messaging');
-console.log('Worklinks job regression: deadlines, scope, AND/OR, corrections, verified/pending partner filters PASS');
+
+// Tender decision information is already present in the same G2B API response.
+// Preserve four distinct fields, including absent / not-yet-collected values.
+const methodView=new Function('htmlEscape','jobBidIdentity',
+ part('function bidMethodCardMarkup(x){','function renderJobs(){')+
+ 'return bidMethodCardMarkup;'
+)(s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
+ x=>x.noticeNumber?{bidNo:x.noticeNumber}:null);
+const sampleMethod=methodView({id:'g2b-servc-R26BK00000100-000',noticeNumber:'R26BK00000100',
+ contract:'제한경쟁',awardMethod:'협상에 의한 계약',awardMethodCode:'낙010001',awardFloorRate:'87.745'});
+for(const term of ['계약방법','낙찰방법','낙찰코드','하한율','제한경쟁','협상에 의한 계약','낙010001','87.745%'])
+ assert.ok(sampleMethod.includes(term),'render missing metadata '+term);
+assert.ok(methodView({id:'g2b-servc-R26BK00000101-000',noticeNumber:'R26BK00000101'}).includes('정보 없음'));
+assert.equal(methodView({id:'other-notice',noticeNumber:'R26BK00000100'}),'');
+const sourceCrawler=fs.readFileSync(path.join(__dirname,'../server/g2b-full-crawler.py'),'utf8');
+for(const [key,field] of [['contract','cntrctCnclsMthdNm'],['awardMethodCode','sucsfbidMthdCd'],
+ ['awardMethod','sucsfbidMthdNm'],['awardFloorRate','sucsfbidLwltRate']])
+ assert.ok(sourceCrawler.includes("'"+key+"':get('"+field+"')"),'crawler must retain '+field);
+
+console.log('Worklinks job regression: deadlines, scope, qualification, bid-method metadata PASS');

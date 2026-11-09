@@ -129,7 +129,10 @@ def compact(x,kind):
       'title':get('bidNtceNm'),'org':get('ntceInsttNm','dminsttNm'),'agency':get('dminsttNm'),
       'posted':get('bidNtceDt'),'closes':get('bidClseDt'),'budget':get('asignBdgtAmt','presmptPrce'),
       'url':get('bidNtceDtlUrl'),'state':get('bidNtceSttusNm'),
-      'contract':get('cntrctCnclsMthdNm'),'purchsObjPrdctList':get('purchsObjPrdctList'),
+      'contract':get('cntrctCnclsMthdNm'),
+      'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),
+      'awardFloorRate':get('sucsfbidLwltRate'),
+      'purchsObjPrdctList':get('purchsObjPrdctList'),
       'category':kind}
 
 def save(db,items):

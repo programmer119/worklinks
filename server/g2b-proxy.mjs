@@ -91,7 +91,10 @@ function g2bMapBid(x,kind){
     budget:String(x.asignBdgtAmt || x.presmptPrce || ''),
     url:/^https:\/\//i.test(String(x.bidNtceDtlUrl || ''))?x.bidNtceDtlUrl:'',
     state:String(x.bidNtceSttusNm || ''),
-    contract:String(x.cntrctCnclsMthdNm || '')
+    contract:String(x.cntrctCnclsMthdNm || ''),
+    awardMethodCode:String(x.sucsfbidMthdCd || ''),
+    awardMethod:String(x.sucsfbidMthdNm || ''),
+    awardFloorRate:String(x.sucsfbidLwltRate || '')
   };
 }
 async function g2bRoute(req,res,u){
