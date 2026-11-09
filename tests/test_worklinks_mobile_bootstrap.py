@@ -198,7 +198,7 @@ def main():
             """)
             displayed_ids = page.evaluate("""() =>
                 [...document.querySelectorAll('#jobCards .job-mini')].slice(0,2)
-                  .map(e=>jobBidIdentity(getJobById(e.dataset.jobCard))?.bidNo||e.dataset.jobCard)
+                  .map(e=>e.dataset.jobCard)
             """)
             assert all(any(bid.split(':')[0] in got for got in displayed_ids) for bid in checked_ids[:2]), (checked_ids, displayed_ids)
             print("WORKLINKS_UNIFIED_SHORTLIST_MOBILE_QA=PASS",
