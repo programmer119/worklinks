@@ -1896,6 +1896,29 @@ function pastCompetitionSummary(x){
     winner:typeof d.winner==='string'?d.winner:'',
     winnerBizno:typeof d.winnerBizno==='string'?d.winnerBizno:''};
  });
+ // The precomputed official-index evidence already contains exact, verified
+ // historical notice numbers and bidder counts. Reuse them directly;
+ // no title-to-title or RFP body matching is needed in the browser.
+ const source=changcomPrecheckByNotice.get(changcomNoticeIdentity(x));
+ const documented=Array.isArray(source?.historicalCompetition)?source.historicalCompetition:[];
+ const observed=new Set(historical.map(y=>y.bidNo));
+ for(const row of documented){
+  const no=String(row?.pastBidNo||'');
+  const n=Number(row?.participants),year=Number(row?.year);
+  if(!/^[A-Za-z0-9-]{8,40}$/.test(no)||
+     !Number.isInteger(n)||n<1||n>1000000||
+     !Number.isInteger(year)||year>=Number(kstISO().slice(0,4)))continue;
+  const found=historical.find(y=>y.bidNo===no);
+  if(found){
+   if(found.count===null){found.count=n;found.winner=String(row.winner||'');}
+   continue;
+  }
+  if(observed.has(no))continue;
+  observed.add(no);
+  historical.push({year,bidNo:no,count:n,rate:null,amount:null,
+   winner:String(row.winner||''),winnerBizno:''});
+ }
+ historical.sort((a,b)=>b.year-a.year);
  const sample=historical.filter(y=>y.count!==null);
  // Strictly consecutive preceding years and exact winner company IDs.
  // 2025 + 2023 with unknown 2024 is NOT a consecutive incumbent streak.
