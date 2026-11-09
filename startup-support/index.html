@@ -3117,15 +3117,48 @@ function scheduleJobsRender(){
  if(!document.getElementById('jobsView')?.classList.contains('on')||asyncJobRenderTimer!==null)return;
  asyncJobRenderTimer=setTimeout(function(){asyncJobRenderTimer=null;if(jobRenderDirty)renderJobs()},180);
 }
+var g2bAwardFallbackByNotice=new Map();
+var g2bAwardFallbackLoading=false;
+async function loadG2bAwardFallback(){
+ if(g2bAwardFallbackLoading)return;
+ g2bAwardFallbackLoading=true;
+ try{
+  // Published from the server123 saved DB, not queried from the official upstream API.
+  const response=await fetch('./g2b-award-fields-open.json',{cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const snapshot=await response.json();
+  if(snapshot.ok!==true||!snapshot.byNotice||Array.isArray(snapshot.byNotice))throw Error('bad snapshot');
+  const next=new Map();
+  for(const [key,meta] of Object.entries(snapshot.byNotice)){
+   if(!/^R[0-9]{2}BK[0-9]{8}:[0-9]{3}$/.test(key)||!meta||typeof meta!=='object')continue;
+   const fields={};
+   for(const name of ['contract','awardMethod','awardMethodCode','awardFloorRate'])
+    fields[name]=String(meta[name]??'');
+   next.set(key,fields);
+  }
+  g2bAwardFallbackByNotice=next;
+  scheduleJobsRender();
+ }catch(e){
+  // The existing API and truthful unknown-value display remain usable.
+ }finally{g2bAwardFallbackLoading=false}
+}
+function g2bCardAwardMetadata(x){
+ const id=jobBidIdentity(x);
+ const fallback=id?g2bAwardFallbackByNotice.get(id.bidNo+':'+id.order):null;
+ const official=name=>String(x[name]??'').trim()||String(fallback?.[name]??'').trim();
+ return {contract:official('contract'),awardMethod:official('awardMethod'),
+  awardMethodCode:official('awardMethodCode'),awardFloorRate:official('awardFloorRate')};
+}
 function bidMethodCardMarkup(x){
  // Show actual structured G2B fields only, never guess technical vs price scoring.
  if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
- const rate=String(x.awardFloorRate??'').trim();
+ const metadata=g2bCardAwardMetadata(x);
+ const rate=metadata.awardFloorRate;
  const floor=rate&&/^[0-9]+(?:[.][0-9]+)?$/.test(rate)?rate+'%':rate;
  const fields=[
-  ['계약방법',x.contract],
-  ['낙찰방법',x.awardMethod],
-  ['낙찰코드',x.awardMethodCode],
+  ['계약방법',metadata.contract],
+  ['낙찰방법',metadata.awardMethod],
+  ['낙찰코드',metadata.awardMethodCode],
   ['하한율',floor]
  ];
  return '<div class="job-bid-methods" aria-label="나라장터 공고 계약·낙찰 정보">'+
@@ -3400,7 +3433,7 @@ function startJobsDataWhenVisible(){
    jobsBootstrapQueued=false;
    if(jobsBootstrapStarted||!document.getElementById('jobsView').classList.contains('on'))return;
    jobsBootstrapStarted=true;
-   g2bCheckStatus();g2bLoadSaved(false);g2bLoadCrawlStatus();
+   loadG2bAwardFallback();g2bCheckStatus();g2bLoadSaved(false);g2bLoadCrawlStatus();
     if(worklinksPartnerAccess())loadChangcomActionable();
    loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();refreshRfpSnapshot();
   },0);
