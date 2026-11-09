@@ -25,7 +25,7 @@ if cmp -s "$SOURCE" "$TARGET";then
 fi
 # Read-only new-source validation before touching production.
 dk run --rm -v "$SOURCE:/app/crawler.py:ro" "$IMG" python -m py_compile /app/crawler.py
-dk run --rm -v "$SOURCE:/app/crawler.py:ro" "$IMG" python - <<'PY'
+dk run --rm -i -v "$SOURCE:/app/crawler.py:ro" "$IMG" python - <<'PY'
 import runpy
 m=runpy.run_path('/app/crawler.py',run_name='preflight')
 sample={'bidNtceNo':'R26BK12345678','bidNtceOrd':'000','cntrctCnclsMthdNm':'제한경쟁',
