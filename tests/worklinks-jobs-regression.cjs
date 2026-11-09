@@ -738,11 +738,21 @@ assert.ok(source.includes("미확인은 부적격이 아닙니다"),'no false bi
 
 // Tender decision information is already present in the same G2B API response.
 // Preserve four distinct fields, including absent / not-yet-collected values.
-const methodView=new Function('htmlEscape','jobBidIdentity',
- part('function bidMethodCardMarkup(x){','function renderJobs(){')+
+const awardFallback=new Map([['R26BK01777538:000',{
+ contract:'제한경쟁',awardMethod:'협상에의한계약-협상에 의한 낙찰자 결정(SW사업)',
+ awardMethodCode:'낙030005',awardFloorRate:''
+}]]);
+const methodView=new Function('htmlEscape','jobBidIdentity','g2bAwardFallbackByNotice',
+ part('function g2bCardAwardMetadata(x){','function renderJobs(){')+
  'return bidMethodCardMarkup;'
 )(s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
- x=>x.noticeNumber?{bidNo:x.noticeNumber}:null);
+ x=>x.noticeNumber?{bidNo:x.noticeNumber,order:String(x.noticeOrder||'000').padStart(3,'0')}:null,
+ awardFallback);
+const precheckMarkup=methodView({id:'g2b-precheck-R26BK01777538:000',
+ noticeNumber:'R26BK01777538',noticeOrder:'000'});
+assert.ok(precheckMarkup.includes('낙030005'),'static DB fallback must enrich precheck-only cards');
+assert.ok(precheckMarkup.includes('협상에의한계약'),'static DB fallback must restore award method');
+assert.ok(precheckMarkup.includes('제한경쟁'),'static DB fallback must restore contract method');
 const sampleMethod=methodView({id:'g2b-servc-R26BK00000100-000',noticeNumber:'R26BK00000100',
  contract:'제한경쟁',awardMethod:'협상에 의한 계약',awardMethodCode:'낙010001',awardFloorRate:'87.745'});
 for(const term of ['계약방법','낙찰방법','낙찰코드','하한율','제한경쟁','협상에 의한 계약','낙010001','87.745%'])
