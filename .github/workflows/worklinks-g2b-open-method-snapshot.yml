@@ -1,0 +1,95 @@
+name: WorkLinks open G2B award metadata fallback snapshot
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-g2b-open-method-snapshot.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */4 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-g2b-open-method-snapshot
+  cancel-in-progress: false
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read existing WorkLinks public saved data (never official G2B API)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import datetime as dt,json,pathlib,urllib.request,urllib.error,time,re
+          BASE='https://api-suaveforge.suaveforge.com:18458/api/g2b'
+          KST=dt.timezone(dt.timedelta(hours=9))
+          now=dt.datetime.now(KST).replace(tzinfo=None)
+          items=[]
+          total=None
+          for page in range(300):
+              offset=page*500
+              url=BASE+'/saved?sw=1&limit=500&offset='+str(offset)
+              response=None
+              for attempt in range(3):
+                  try:
+                      req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-G2B-Static-Fallback/1.0','Accept':'application/json'})
+                      with urllib.request.urlopen(req,timeout=28) as f:
+                          response=json.load(f)
+                      if not response.get('ok') or not response.get('persisted'):
+                          raise RuntimeError('INVALID_SAVED_RESPONSE')
+                      break
+                  except (OSError,ValueError,RuntimeError) as exc:
+                      if attempt==2:raise
+                      time.sleep(2+attempt*3)
+              if total is None: total=int(response['totalCount'])
+              page_items=response.get('items') or []
+              if not isinstance(page_items,list):raise RuntimeError('INVALID_ITEMS')
+              items.extend(page_items)
+              print('G2B_SNAPSHOT_PAGE',page,len(page_items),len(items),total,flush=True)
+              if len(items)>=total or not page_items:break
+          assert total is not None and len(items)>=total, 'INCOMPLETE_G2B_SNAPSHOT'
+          def parse_close(v):
+              m=re.match(r'^(\d{4})[-./]?(\d{2})[-./]?(\d{2})(?:[ T]?(\d{2})(?::?(\d{2}))?)?',str(v or ''))
+              if not m:return None
+              y,mo,d=map(int,m.group(1,2,3))
+              try:return dt.datetime(y,mo,d,int(m.group(4) or 23),int(m.group(5) or 59))
+              except ValueError:return None
+          out={}
+          for x in items:
+              number=str(x.get('bidNo') or '')
+              if not number.startswith('R') or not number:continue
+              close=parse_close(x.get('closes'))
+              if not close or close<=now:continue
+              order=str(x.get('order') or '0').zfill(3)
+              fields={key:str(x.get(key) or '') for key in ('contract','awardMethod','awardMethodCode','awardFloorRate')}
+              if not any(fields.values()):continue
+              out[number+':'+order]=fields
+          pinned=('R26BK01777538:000','R26BK01765541:000','R26BK01807134:000','R26BK01797629:000')
+          missing=[p for p in pinned if not (p in out and out[p].get('awardMethod'))]
+          assert not missing,'VISIBLE_METHODS_MISSING_FROM_BACKEND '+','.join(missing)
+          result={'ok':True,'generatedAt':dt.datetime.now(dt.timezone.utc).isoformat(),
+                  'source':'WorkLinks server123 saved DB /saved, no official tender API requests',
+                  'totalSavedSw':total,'count':len(out),'byNotice':out}
+          dest=pathlib.Path('startup-support/g2b-award-fields-open.json')
+          dest.write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n',encoding='utf-8')
+          print('G2B_FALLBACK_READY',len(out),'SAVED_TOTAL',total,'BYTES',dest.stat().st_size,
+                'PINNED_VERIFIED',len(pinned),flush=True)
+          PY
+      - name: Publish verified same-origin metadata fallback
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add startup-support/g2b-award-fields-open.json
+          if git diff --cached --quiet; then
+            echo 'G2B_METHOD_FALLBACK_UNCHANGED=PASS'
+            exit 0
+          fi
+          git commit -m 'data: sync official award method metadata from saved WorkLinks DB'
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
