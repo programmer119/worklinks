@@ -152,7 +152,7 @@ def format_bid(x, kind):
             'url':link if link and link.startswith('https://') else '',
             'state':get('bidNtceSttusNm'),'contract':get('cntrctCnclsMthdNm'),
             'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),
-            'awardFloorRate':get('sucsfbidLwltRate')}
+            'awardFloorRate':get('sucsfbidLwltRate'),'awardFieldsVerified':True}
 
 def date(s):
     if not re.match(r'^\d{8}$', s): raise ApiError('invalid_date',400)
