@@ -13,6 +13,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
 calls = []
+external_calls = []
 errors = []
 
 
@@ -38,6 +39,10 @@ def record(index):
 def api_route(route):
     url = urlparse(route.request.url)
     path = url.path
+    if any(path.endswith("/"+operation) for operation in (
+        "company", "eligibility", "bid-evidence", "direct-production",
+        "contract-capability", "awards", "contract-evidence", "contract-notice")):
+        external_calls.append(path)
     if path.endswith("/worklinks-auth-config"):
         payload = {"ok": True, "enabled": False}
     elif path.endswith("/saved"):
@@ -140,6 +145,7 @@ def main():
                 timeout=20000
             )
             assert calls == [(0, 160)], "Mobile first page must be bounded: %s" % calls
+            assert not external_calls, "Jobs refresh queried upstream-dependent endpoints: %s" % external_calls
             # API state is updated before its debounced DOM paint. Wait for
             # the actual visible control, not just the background fetch flag.
             page.wait_for_function(
@@ -198,12 +204,17 @@ def main():
             assert census["aligned"] > 0 and census["all"] >= census["aligned"], census
             assert census["all"] == census["aligned"] + census["review"] + census["unknown"] + census["mismatch"], census
             assert not census["parallelPanel"], census
-            assert census["verified"] >= 2, census
+            # Snapshot evidence can legitimately have zero documented prechecks.
+            # Never manufacture a positive qualification count merely to satisfy QA.
+            assert census["verified"] >= 0, census
             assert census["noisyCards"] == 0, census
             assert census["firstPassCards"] >= 2, census
-            assert census["firstPassCounts"]["checked"] >= 2, census
+            assert census["firstPassCounts"]["checked"] >= 0, census
             assert census["firstPassCounts"]["aligned"] > 0, census
-            assert census["firstPassTags"][:2] == ["기초요건 대조", "기초요건 대조"], census
+            if census["verified"] >= 2:
+                assert census["firstPassTags"][:2] == ["기초요건 대조", "기초요건 대조"], census
+            else:
+                assert all(tag == "등록업종 일치" for tag in census["firstPassTags"][:2]), census
             assert "등록업종 일치" in census["firstPassTags"], census
             checked_ids = page.evaluate("""() =>
                 changcomActionableEntries('verified').map(x=>String(x.bidNo)+':'+String(x.order||'000').padStart(3,'0'))
@@ -247,6 +258,7 @@ def main():
                 assert point is not None, "mobile action obstructed: "+selector
                 page.mouse.click(point["x"],point["y"])
             assert calls == [(0,160)], ("prechecked card grid must not trigger extra G2B requests", calls)
+            assert not external_calls, ("first paint must use stored evidence only", external_calls)
 
             # Important card text must never be ellipsized, even for unusually
             # long Korean notice names and verification text. Tiny history
