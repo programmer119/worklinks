@@ -23,16 +23,16 @@ BIND_HOST = os.environ.get('BIND_HOST', '127.0.0.1')
 TLS_CERT_FILE = os.environ.get('G2B_TLS_CERT_FILE', '').strip()
 TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
 SECRET_PATH = os.environ.get('G2B_SECRET_PATH', '/home/worklinks/g2b/secrets/g2b.env')
-API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService'
+API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService02'
 AWARD_BASE = 'https://apis.data.go.kr/1230000/as/ScsbidInfoService'
 CONTRACT_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctInfoService'
 CONTRACT_PROCESS_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctProcssIntgOpenService'
 COMPANY_BASE = 'https://apis.data.go.kr/1230000/ao/UsrInfoService02'
 BID_OPS = {
-    'servc':'getBidPblancListInfoServcPPSSrch',
-    'thng':'getBidPblancListInfoThngPPSSrch',
-    'cnstwk':'getBidPblancListInfoCnstwkPPSSrch',
-    'frgcpt':'getBidPblancListInfoFrgcptPPSSrch'
+    'servc':'getBidPblancListInfoServcPPSSrch02',
+    'thng':'getBidPblancListInfoThngPPSSrch02',
+    'cnstwk':'getBidPblancListInfoCnstwkPPSSrch02',
+    'frgcpt':'getBidPblancListInfoFrgcptPPSSrch02'
 }
 ORIGINS = ('https://worklinks.suaveforge.com', 'https://programmer119.github.io')
 cache = {}
@@ -399,7 +399,7 @@ def _notice_document_query(bid_no, order):
     This only fetches public metadata from a documented G2B notice-detail operation.
     Links are untrusted until download-time host, path and file-type validation.
     """
-    result=_bid_evidence_fetch('getBidPblancListInfoServc',bid_no,order)
+    result=_bid_evidence_fetch('getBidPblancListInfoServc02',bid_no,order)
     items=[];seen=set();found_fields=set();pre_spec_no=''
     if result['ok'] and result['complete']:
         for row in result['items']:
@@ -435,7 +435,7 @@ def _pick(row, names):
 def _all_notice_changes(bid_no):
     """Read every version of this notice, not just the current bid ordinal."""
     try:
-        data=request_api(API_BASE,'getBidPblancListInfoChgHstryServc',{
+        data=request_api(API_BASE,'getBidPblancListInfoChgHstryServc02',{
             'pageNo':1,'numOfRows':100,'inqryDiv':2,'bidNtceNo':bid_no})
         if data['totalCount']>100:
             return {'ok':False,'complete':False,'error':'change_history_over_100',
@@ -456,7 +456,7 @@ def bid_change_and_price_query(bid_no,order):
     or create an 'unchanged' claim from empty/failed upstream responses.
     """
     changes=_all_notice_changes(bid_no)
-    prices=_bid_evidence_fetch('getBidPblancListInfoServcBsisAmount',bid_no,order)
+    prices=_bid_evidence_fetch('getBidPblancListInfoServcBsisAmount02',bid_no,order)
     history=[]
     for row in changes['items']:
         if not isinstance(row,dict):continue
@@ -489,10 +489,12 @@ def bid_change_and_price_query(bid_no,order):
 
 
 def bid_evidence_query(bid_no, order):
-    regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn',bid_no,order)
-    attachments=_bid_evidence_fetch('getBidPblancListInfoEorderAtchFileInfo',bid_no,order)
-    # Keep the two official origins distinct; a zero result from either is not
-    # proof that the public notice has no RFP/statement of work.
+    """Four official A02 sources; include ordinary attachments beyond e-order."""
+    regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
+    # The ordinary attachment operation can contain the actual RFP even when
+    # e-order has no rows. Treat absence and upstream failure differently.
+    ordinary=_bid_evidence_fetch('getBidPblancListInfoAtchFileInfo02',bid_no,order)
+    attachments=_bid_evidence_fetch('getBidPblancListInfoEorderAtchFileInfo02',bid_no,order)
     notice_docs=_notice_document_query(bid_no,order)
     normalized_regions=[]
     for row in regions['items']:
@@ -500,32 +502,42 @@ def bid_evidence_query(bid_no, order):
         code=_pick(row,['prtcptPsblRgnCd','rgnCd','rgnCode'])
         if name or code:normalized_regions.append({'name':name,'code':code})
     normalized_attachments=[]
-    for row in attachments['items']:
-        name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName','eorderAtchFileNm'])
-        url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl','fileDownloadUrl','eorderAtchFileUrl'])
-        # Links must remain official HTTPS URLs; never convert arbitrary API strings into a link.
-        if url and not re.match(r'^https://',url,re.I):url=''
-        if name or url:normalized_attachments.append({'name':name,'url':url})
+    seen_urls=set()
+    for source,origin in ((ordinary,'notice_attachment_api'),(attachments,'eorder')):
+        for row in source['items']:
+            name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName','eorderAtchFileNm'])
+            url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl','fileDownloadUrl','eorderAtchFileUrl'])
+            # Only allow HTTPS links; download-time validation restricts host/path.
+            if url and not re.match(r'^https://',url,re.I):url=''
+            if url and url in seen_urls:continue
+            if url:seen_urls.add(url)
+            if name or url:normalized_attachments.append({'name':name,'url':url,'source':origin})
     for item in notice_docs['items']:
         url=item.get('url') or ''
-        if url and url not in set(x.get('url') or '' for x in normalized_attachments):
+        if url and url not in seen_urls:
             normalized_attachments.append(item)
+            seen_urls.add(url)
+    attachment_ok=ordinary['ok'] or attachments['ok'] or notice_docs['ok']
+    all_complete=ordinary['complete'] and attachments['complete'] and notice_docs['complete']
+    source_errors=[x['error'] for x in (ordinary,attachments,notice_docs) if x.get('error')]
     return {
-        'ok':regions['ok'] or attachments['ok'] or notice_docs['ok'],'bidNo':bid_no,'order':order,
+        'ok':regions['ok'] or attachment_ok,'bidNo':bid_no,'order':order,
         'region':{'ok':regions['ok'],'complete':regions['complete'],
                   'count':regions['count'],'items':normalized_regions,
                   'rawFields':sorted(regions['items'][0].keys()) if regions['items'] else [],
                   'error':regions.get('error','')},
-        'attachments':{'ok':attachments['ok'] or notice_docs['ok'],
-                       'complete':attachments['complete'] or notice_docs['complete'],
+        'attachments':{'ok':attachment_ok,
+                       'complete':all_complete,
                        'count':len(normalized_attachments),'items':normalized_attachments,
+                       'generalCount':ordinary['count'],
                        'eorderCount':attachments['count'],
                        'noticeDetailDocumentCount':len(notice_docs['items']),
-                       'rawFields':sorted(attachments['items'][0].keys()) if attachments['items'] else [],
-                       'error':attachments.get('error','') if not notice_docs['ok'] else ''},
+                       'rawFields':sorted(ordinary['items'][0].keys()) if ordinary['items']
+                           else sorted(attachments['items'][0].keys()) if attachments['items'] else [],
+                       'error':';'.join(dict.fromkeys(source_errors))[:220]},
         'noticeDocuments':notice_docs,
         'checkedAt':datetime.datetime.utcnow().isoformat()+'Z',
-        'limitations':'공고 원문 첨부 미열람. 지역조회 0건은 전국 허용 증명이 아님.'
+        'limitations':'첨부파일 목록 조회 결과. 실제 내용과 참가자격은 문서 다운로드 및 분석 후 판단.'
     }
 
 # Persistent storage for all returned G2B notices (not just SW-title hits).
@@ -1110,13 +1122,13 @@ class Handler(BaseHTTPRequestHandler):
                 with lock: saved=cache.get(ck)
                 if saved and saved[0]>time.time():
                     return self.reply(200,saved[1])
-                data=request_api(API_BASE,'getBidPblancListInfoLicenseLimit',{
+                data=request_api(API_BASE,'getBidPblancListInfoLicenseLimit02',{
                     'pageNo':1,'numOfRows':100,'inqryDiv':2,'bidNtceNo':bid_no,'bidNtceOrd':order
                 })
                 rows=list(data['items'])
                 total=data['totalCount']
                 for page in range(2,min((total+99)//100,10)+1):
-                    nxt=request_api(API_BASE,'getBidPblancListInfoLicenseLimit',{
+                    nxt=request_api(API_BASE,'getBidPblancListInfoLicenseLimit02',{
                         'pageNo':page,'numOfRows':100,'inqryDiv':2,
                         'bidNtceNo':bid_no,'bidNtceOrd':order})
                     rows.extend(nxt['items'])
