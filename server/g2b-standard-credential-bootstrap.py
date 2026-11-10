@@ -19,7 +19,7 @@ BASE = "https://apis.data.go.kr/1230000/ao/PubDataOpnStdService/"
 DEST = "/secrets/g2b-standard.env"
 TESTS = (
     ("B1", "getDataSetOpnStdBidPblancInfo", {"pageNo": 1, "numOfRows": 1}),
-    ("B2", "getDataSetOpnStdScsbidInfo", {"pageNo": 1, "numOfRows": 1}),
+    ("B2", "getDataSetOpnStdScsbidInfo", {"pageNo": 1, "numOfRows": 1, "bsnsDivCd": "5", "opengBgnDt": "20261101", "opengEndDt": "20261110"}),
     ("B3", "getDataSetOpnStdCntrctInfo", {"pageNo": 1, "numOfRows": 1}),
 )
 
@@ -43,6 +43,8 @@ def call(label, operation, params, key):
         header = response.get("header") or {}
         gateway = (data.get("OpenAPI_ServiceResponse") or {}).get("cmmMsgHeader") or {}
         output["result_code"] = str(header.get("resultCode") or "")
+        output["response_root_keys"] = list(data.keys())[:6]
+        output["result_message"] = str(header.get("resultMsg") or "")[:80]
         output["gateway_code"] = gateway.get("returnReasonCode")
         body = response.get("body") or {}
         output["total_count"] = body.get("totalCount")
