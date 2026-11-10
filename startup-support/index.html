@@ -3234,19 +3234,19 @@ function renderJobs(){
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
  if(member){
- const candidateJobs=active;
+ const candidateJobs=active.filter(o=>jobMatchesSelectedPartner(o.x,'all'));
  const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>verdict(o.x,p).type===type)).length;
- const considered=active.filter(o=>jobSoftwareScope(o.x)==='candidate');
+ const considered=candidateJobs.filter(o=>jobSoftwareScope(o.x)==='candidate');
  const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
  const industryUnrestricted=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='no_restriction')).length;
  const repeatCount=candidateJobs.filter(o=>repeatYears(o.x)>=2).length;
  const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>verdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
- document.getElementById('partnerJobCount').textContent='('+active.length+')';
+ document.getElementById('partnerJobCount').textContent='('+candidateJobs.length+')';
  // Always show nonzero officially verified BASIC qualifications outside the
  // collapsed diagnostics. Neither count is a full-document bid approval.
  document.getElementById('partnerSummary').textContent=
-  '미마감 '+active.length+'건 · 등록업종 일치 '+industryMatched+
+  '미마감 '+candidateJobs.length+'건 · 등록업종 일치 '+industryMatched+
   ' · 면허제한 미검출 '+industryUnrestricted+
   ' · 연속 2회차 이상 '+repeatCount+' · 과거 1~2개사 '+lowBidCount+
   ' · 적격 후보 '+statusTotal('ready')+
