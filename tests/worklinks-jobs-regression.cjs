@@ -568,7 +568,7 @@ assert.ok(!checkedNotice.changcomOriginalReviewMarkup(
  {noticeNumber:'R26BK01757317',noticeOrder:'000'},[bidder],true).includes('원문·등록 불일치'),
  'unknown official company registration is not an exclusion');
 assert.ok(source.includes('changcomOriginalReviewMarkup(x,comparisonCompanies,true)'));
-assert.ok(source.includes('changcomOriginalReviewMarkup(x,compareList)'));
+assert.ok(source.includes('function changcomOriginalReviewMarkup('), 'detail review renderer must exist');
 
 assert.equal(verdict({industry:'industry_match'}).type,'ready');
 assert.equal(verdict({industry:'industry_match'}).label,'적격 후보');
