@@ -737,11 +737,13 @@ companies.pop();
 filterFns.syncPartnerFilterChoices();
 assert.equal(filterSelect.value,'all','removed partner safely resets to all');
 
-assert.ok(source.includes('id="changcomActionable"'),'shortlist must exist on WorkLinks Jobs page');
+assert.ok(source.includes('function changcomActionableEntries('),
+ 'published Changcom shortlist must be integrated in the unified Jobs source');
 assert.ok(source.includes("loadChangcomActionable();"),'list must load when Jobs tab opens');
 assert.ok(source.includes("if(mode==='unknown')return rows.filter(x=>x.deadlineState==='unknown')"),'unknown deadlines stay reviewable');
 assert.ok(source.includes("x.screening==='published_industry_codes_match'"),'basic industry match must be source-backed');
-assert.ok(source.includes("미확인은 부적격이 아닙니다"),'no false bidder exclusion messaging');
+assert.ok(source.includes('확인된 탈락 사유는 없지만'),
+ 'missing qualification evidence cannot automatically reject bids');
 
 // Tender decision information is already present in the same G2B API response.
 // Preserve four distinct fields, including absent / not-yet-collected values.
