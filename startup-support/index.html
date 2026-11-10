@@ -683,7 +683,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 <script src="./kimse-fit.js?v=20261107-1"></script>
 <script src="./kimse-intake.js?v=20261107-1"></script>
 <script>
-var WORKLINKS_PAGE_REVISION='20261026-partner-auth-v1';
+var WORKLINKS_PAGE_REVISION='20261110-cache-only-boot-v1';
 function worklinksPartnerAccess(){
  return window.worklinksMemberAuthenticated===true&&
    document.documentElement.dataset.worklinksPartnerAccess==='granted';
@@ -1316,43 +1316,7 @@ function refreshAllPartnerRegistries(){
   .then(function(){scheduleJobsRender()}).finally(function(){partnerRefreshPromise=null});
  return partnerRefreshPromise;
 }
-var eligibilityQueueRunning=false;
-async function queueVisibleBidEligibility(){
- if(eligibilityQueueRunning)return;
- eligibilityQueueRunning=true;
- try{
-  // Server worker backfills license data; rotate browser evidence enrichment
-  // across ALL unchecked open SW notices, not just the first 60 deadlines.
-  const byNotice=new Map();
-  for(const x of jobs.concat(g2bLiveJobs)){
-   const id=jobBidIdentity(x);
-   if(!id||jobSoftwareScope(x)!=='candidate'||jobTimeInfo(x).key==='closed')continue;
-   if(jobEligibilityData(x)&&jobEvidenceData(x))continue;
-   byNotice.set(id.bidNo+':'+id.order,x);
-  }
-  const pending=[...byNotice.values()].sort((a,b)=>
-   (jobTimeInfo(a).end||Infinity)-(jobTimeInfo(b).end||Infinity));
-  if(!pending.length)return;
-  let cursor=0;
-  try{cursor=Math.max(0,Number(localStorage.getItem('worklinks_bid_review_cursor_v2'))||0)}catch(e){}
-  const start=cursor%pending.length;
-  // Limit browser enrichment: each bid can require four G2B upstream calls.
-  // The server's license cache supplies bulk results without browser bursts.
-  const picked=Array.from({length:Math.min(g2bCompactScreen()?2:10,pending.length)},(_,i)=>
-   pending[(start+i)%pending.length]);
-  let completed=0;
-  for(const x of picked){
-   await Promise.allSettled([loadJobEligibility(x),loadJobEvidence(x)]);
-   completed++;
-   const evidence=jobEvidenceData(x),eligibility=jobEligibilityData(x);
-   const errors=[eligibility?.error,evidence?.error,evidence?.region?.error,
-    evidence?.attachments?.error,evidence?.noticeDocuments?.error].join(' ');
-   if(/429|LIMITED_NUMBER_OF_SERVICE_REQUESTS|upstream_temporarily_rate_limited/.test(errors))break;
-   await new Promise(resolve=>setTimeout(resolve,900));
-  }
-  try{localStorage.setItem('worklinks_bid_review_cursor_v2',String((start+completed)%pending.length))}catch(e){}
- }finally{eligibilityQueueRunning=false}
-}
+// Periodic bid eligibility backfill is owned by server/g2b-eligibility-worker.py.
 
 function partnerJobInfo(x){
  if(!worklinksPartnerAccess())return '';
@@ -1648,6 +1612,42 @@ function renderChangcomActionable(){
   btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',on?'true':'false');
  });
 }
+// Read official company registry evidence from the existing 3-hour published snapshot.
+// A dated snapshot supports first-pass screening; it never certifies final eligibility.
+function hydratePeriodicPartnerRegistry(snapshot){
+ const bizno=String(snapshot?.bizno||'').replace(/\D/g,'');
+ const p=partners.find(x=>String(x.businessNo||'').replace(/\D/g,'')===bizno);
+ if(!p||!Array.isArray(snapshot?.activeIndustryCodes)||!snapshot.activeIndustryCodes.length)return;
+ const checked=Date.parse(String(snapshot.companyRegistryCheckedAt||''));
+ const published=Date.parse(String(snapshot.generatedAt||''));
+ const age=Date.now()-checked;
+ if(!Number.isFinite(checked)||!Number.isFinite(published)||age<0||age>12*3600000||
+    published<checked-3600000||Date.now()-published>12*3600000)return;
+ if(p.registryCheckedAt&&Date.parse(p.registryCheckedAt)>checked)return;
+ const codes=new Set(snapshot.activeIndustryCodes.map(String).filter(c=>/^\d{4}$/.test(c)));
+ if(!codes.size)return;
+ const uncertain=new Set((Array.isArray(snapshot.industryStatusUncertainCodes)?snapshot.industryStatusUncertainCodes:[])
+   .map(String).filter(c=>/^\d{4}$/.test(c)&&!codes.has(c)));
+ p.industryRecords=[...codes].map(code=>({code,status:'정상'}))
+   .concat([...uncertain].map(code=>({code,status:'미확인'})));
+ p.registryCheckedAt=new Date(checked).toISOString();
+ p.registryComplete=true;
+ p.registryError='';
+ const stamp=p.registryCheckedAt.replace('T',' ').slice(0,16)+' UTC';
+ const is1468=codes.has('1468');
+ setPartnerQual(p,'SW사업자 · 컴퓨터관련서비스사업 1468',{
+  state:is1468?'snapshot':'pending',
+  value:is1468?'1468 정상등록 · 정기 수집본':'1468 등록상태 확인 필요',
+  detail:'서버 정기 나라장터 공식 조회 · '+stamp+
+   ' · 화면 새로고침 시 재조회하지 않음 · 입찰시점 유효성 별도 확인'
+ });
+ setPartnerQual(p,'나라장터 업체 등록',{
+  state:'snapshot',value:'서버 정기 수집본 · 정상업종 '+codes.size+'개',
+  detail:'전체 업체업종 공식 조회 후 정기 저장된 자료 · '+stamp+
+   ' · 원문·직접생산·인력·실적은 별도 확인'
+ });
+ renderPartners();
+}
 async function loadChangcomActionable(force=false){
  if(!worklinksPartnerAccess())return;
  if(changcomActionableRequest)return changcomActionableRequest;
@@ -1672,6 +1672,9 @@ async function loadChangcomActionable(force=false){
     }catch(reviewError){/* Preserve valid embedded reviews on a malformed overlay. */}
    }
    changcomActionableData=json;
+   hydratePeriodicPartnerRegistry(json);
+   const cachedFirm=partners.find(p=>String(p.businessNo||'').replace(/\D/g,'')===json.bizno);
+   if(cachedFirm&&!cachedFirm.smeCheckedAt)refreshPartnerSme(cachedFirm); // Local published JSON, no official API.
    changcomVerifiedNoticeIds=new Set(json.bids.filter(x=>
     x.deadlineState==='open'&&x.precheckState==='documented_precheck'
    ).map(x=>String(x.bidNo||'')+':'+String(x.order||'000').padStart(3,'0')));
@@ -1739,11 +1742,7 @@ async function g2bLoadSaved(append){
   g2bLoadedOffset=offset;g2bServerAvailable=true;
   g2bSavedTotal=total;g2bLinkedEligibility=linkedOnServer;
   scheduleJobsRender();
-  if(!append){
-   setTimeout(function(){
-    refreshAllPartnerRegistries().then(queueVisibleBidEligibility).catch(()=>{});
-   },compact?700:0);
-  }
+  // UI reloads read stored data. Scheduled server workers own upstream enrichment.
   const checked=[...bidEligibilityCache.values()];
   const ok=checked.filter(v=>v?.ok&&v?.complete),failed=checked.filter(v=>!v?.ok);
   const empty=ok.filter(v=>!Array.isArray(v.requirements)||v.requirements.length===0);
@@ -3205,6 +3204,7 @@ jobTimeInfo=worklinksMemoDuringPaint('time',jobTimeInfo);
 pastCompetitionSummary=worklinksMemoDuringPaint('history',pastCompetitionSummary);
 repeatYears=worklinksMemoDuringPaint('repeat',repeatYears);
 var jobAvailableRows=0,asyncJobRenderTimer=null,jobRenderDirty=true;
+var jobsInitialDataReady=false;
 function scheduleJobsRender(){
  jobRenderDirty=true;
  if(!document.getElementById('jobsView')?.classList.contains('on')||asyncJobRenderTimer!==null)return;
@@ -3316,6 +3316,15 @@ function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
+ if(!jobsInitialDataReady){
+  jobRenderDirty=true;
+  el.innerHTML='<div class="emptycard">서버 DB에 저장된 공고를 불러오는 중입니다. 수집은 서버에서 별도로 진행됩니다.</div>';
+  const summary=document.getElementById('partnerSummary');
+  if(summary)summary.textContent='서버 DB 목록 로딩 중 · 부분 집계 미표시';
+  const detail=document.getElementById('jobDecisionSummary');
+  if(detail)detail.textContent='저장된 전체 목록을 불러오는 중';
+  return;
+ }
  jobRenderDirty=false;
  if(asyncJobRenderTimer!==null){clearTimeout(asyncJobRenderTimer);asyncJobRenderTimer=null}
  jobRenderCalcCache=Object.create(null);
@@ -3576,8 +3585,13 @@ function startJobsDataWhenVisible(){
    jobsBootstrapQueued=false;
    if(jobsBootstrapStarted||!document.getElementById('jobsView').classList.contains('on'))return;
    jobsBootstrapStarted=true;
-   loadG2bAwardFallback();g2bCheckStatus();g2bLoadSaved(false);g2bLoadCrawlStatus();
-    if(worklinksPartnerAccess())loadChangcomActionable();
+   loadG2bAwardFallback();g2bCheckStatus();g2bLoadCrawlStatus();
+   const initialLoads=[g2bLoadSaved(false)];
+   if(worklinksPartnerAccess())initialLoads.push(loadChangcomActionable());
+   Promise.allSettled(initialLoads).then(function(){
+    jobsInitialDataReady=true;
+    scheduleJobsRender();
+   });
    loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();refreshRfpSnapshot();
   },0);
  });
