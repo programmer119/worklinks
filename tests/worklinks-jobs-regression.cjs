@@ -622,7 +622,7 @@ assert.ok(source.includes("if(v.verified===true)")&&source.includes('job-verdict
 
 // Status filters must be interactive, cover all currently displayed items, and
 // show a reason even when the notice is outside the software candidate scope.
-const filterView=new Function('partners','participationVerdict','document','htmlEscape','jobQualificationVerdict','repeatYears','pastCompetitionSummary','jobSoftwareScope','bidAdvantageFromHistory',
+const filterView=new Function('partners','participationVerdict','document','htmlEscape','jobQualificationVerdict','repeatYears','pastCompetitionSummary','jobSoftwareScope','bidAdvantageFromHistory','basicBidSignal',
  part('function partnerVerdictTypes(x,selected){','function jobEntryLabel(v){')+
  'return {partnerVerdictTypes,matchesVerdictFilter,refreshVerdictFilters};'
 )([bidder],(x,p)=>({type:x.verdict||'checking'}),{
@@ -632,7 +632,8 @@ const filterView=new Function('partners','participationVerdict','document','html
  x=>({low:!!x.low,lowRecentPair:!!x.lowRecentPair,changedWinner:!!x.changedWinner,sameWinner:!!x.sameWinner}),
  ()=> 'candidate',
  z=>z.lowRecentPair&&z.changedWinner?{level:3}:
-   z.low&&z.sameWinner?{level:1}:z.low?{level:2}:{level:null,kind:'unknown'});
+   z.low&&z.sameWinner?{level:1}:z.low?{level:2}:{level:null,kind:'unknown'},
+ x=>x.verdict==='blocked'?{tier:1}:Number.isInteger(x.basicTier)?{tier:x.basicTier}:null);
 for(const [verdict,type] of [['ready','ready'],['conditional','conditional'],['blocked','blocked'],['checking','checking']]){
  assert.equal(filterView.matchesVerdictFilter({verdict},null,type),true);
  assert.equal(filterView.matchesVerdictFilter({verdict},null,'all'),true);
@@ -648,11 +649,11 @@ assert.equal(filterView.matchesVerdictFilter({low:true},null,'low-bids'),true,
  'historical low competition is a research filter, not a final eligibility verdict');
 assert.equal(filterView.matchesVerdictFilter({low:true,verdict:'ready'},null,'low-bids'),true,
  'confirmed past one-to-two bidders can be prioritized among eligible candidates');
-assert.equal(filterView.matchesVerdictFilter({low:true,verdict:'ready'},null,'adv-2'),true);
-assert.equal(filterView.matchesVerdictFilter({low:true,sameWinner:true,verdict:'ready'},null,'adv-1'),true);
-assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'ready'},null,'adv-3'),true);
-assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'blocked'},null,'adv-3'),false,
- 'historical competition cannot override a verified exclusion');
+assert.equal(filterView.matchesVerdictFilter({basicTier:2,verdict:'ready'},null,'adv-2'),true);
+assert.equal(filterView.matchesVerdictFilter({basicTier:1,verdict:'ready'},null,'adv-1'),true);
+assert.equal(filterView.matchesVerdictFilter({basicTier:3,verdict:'ready'},null,'adv-3'),true);
+assert.equal(filterView.matchesVerdictFilter({basicTier:3,verdict:'blocked'},null,'adv-3'),false,
+ 'verified exclusion forces a caution rather than high eligibility badge');
 assert.equal(filterView.matchesVerdictFilter({verdict:'ready'},null,'adv-1'),false,
  'unresearched history is unrated, not one chip');
 assert.equal(filterView.matchesVerdictFilter({lowRecentPair:true,changedWinner:true,verdict:'ready'},
