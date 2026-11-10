@@ -1,0 +1,46 @@
+name: WorkLinks diagnose stale GitHub Pages environment deployment
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-pages-deployment-audit-20261110.yml']
+permissions:
+  contents: read
+  deployments: read
+  pages: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Identify stale deployment record and live deployment separately
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error
+          base='https://api.github.com/repos/programmer119/worklinks'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                   'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2026-03-10'}
+          def get(path):
+              req=urllib.request.Request(base+path,headers=headers)
+              try:
+                  with urllib.request.urlopen(req,timeout=20) as f:return json.load(f)
+              except urllib.error.HTTPError as e:return {'error_http':e.code}
+          target='dc42aab1fde30993e291b0b9c2e345827affb9f6'
+          result=get('/deployments?per_page=100')
+          if isinstance(result,list):
+              d=[x for x in result if x.get('environment')=='github-pages' or x.get('sha')==target]
+              for x in d[:20]:
+                  status=get('/deployments/'+str(x['id'])+'/statuses?per_page=3')
+                  print('PAGES_ENV_DEPLOY',json.dumps({'id':x['id'],'sha':x.get('sha'),
+                    'targetOld':x.get('sha')==target,'environment':x.get('environment'),
+                    'created':x.get('created_at'),'latest':[
+                     {'state':z.get('state'),'created':z.get('created_at'),'environment_url':z.get('environment_url')}
+                     for z in status[:2]] if isinstance(status,list) else status},ensure_ascii=False),flush=True)
+          else:print('PAGES_ENV_LIST_ERROR',result,flush=True)
+          pages=get('/pages/deployments/'+target)
+          print('PAGES_PROVIDER_STALE_STATE',json.dumps({
+            'status':pages.get('status'),'error_http':pages.get('error_http')},ensure_ascii=False),flush=True)
+          PY
