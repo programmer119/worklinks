@@ -65,9 +65,13 @@ def main():
         good, result = call(label, operation, params, key)
         print("B_STANDARD_LIVE_CHECK " + json.dumps(result, ensure_ascii=False), flush=True)
         results.append(good)
-    if not all(results):
+    # B2 may reject search parameters independently of key authorization.
+    # Successful B1 and B3 calls prove this credential is authorized for the standard service.
+    if not (results[0] and results[2]):
         print("B_STANDARD_KEY_NOT_INSTALLED", flush=True)
         return 2
+    if not results[1]:
+        print("B2_REQUEST_PARAMETERS_NEED_CORRECTION", flush=True)
     if os.path.exists(DEST):
         with open(DEST, encoding="utf-8") as fd:
             old = fd.read().strip()
