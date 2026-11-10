@@ -2943,15 +2943,23 @@ function renderJobDetail(x){
  document.getElementById('jobDetailTitle').textContent=x.title||'일감 상세';
  document.getElementById('jobDetailSub').textContent=(x.org||'발주기관 미확인')+' · '+(x.type||'')+(x.noticeNumber?' · 공고번호 '+x.noticeNumber:'');
  const chips='<span class="jobmatch-chip '+(time.key==='closed'?'unknown':time.key==='closing'?'pending':'ok')+'">'+htmlEscape(time.label)+'</span>';
+ const checkCompanies=selectedPartnerId==='all'?partners:partners.filter(p=>p.id===selectedPartnerId);
+ const eligibility=worklinksPartnerAccess()&&jobSoftwareScope(x)==='candidate'?checkCompanies.map(p=>participationVerdict(x,p)):[];
+ const eligibleLabel=!eligibility.length?'':eligibility.some(v=>v.verified===true&&v.type==='ready')?'참가자격 확인':eligibility.some(v=>v.type==='ready')?'적격 후보':eligibility.some(v=>v.type==='checking'||v.type==='conditional')?'자격 확인 중':'참가 제한';
+ const eligibilityBadge=eligibleLabel?' <span class="job-verdict '+(eligibleLabel==='참가 제한'?'blocked':eligibleLabel==='자격 확인 중'?'checking':'ready')+'">'+eligibleLabel+'</span>':'';
+ const reasonText=String(x.reason||'').trim();
+ const internalReview=/등록업종|기초요건 대조|공식 API|자동 수집|최종 참가자격|파트너 협업 검토/.test(reasonText);
+ const scopeText=String(x.subject||'').trim() || (!internalReview&&reasonText?reasonText:'세부 사업범위는 공고 원문·과업지시서 확인 필요');
+ const reviewNote=internalReview&&reasonText?'<details class="job-detail-advanced"><summary>검토 메모 보기</summary><p>'+htmlEscape(reasonText)+'</p></details>':'';
  const meta=(label,value)=>value?'<div class="job-detail-meta-item"><span>'+label+'</span><strong>'+htmlEscape(value)+'</strong></div>':'';
- const base='<div class="job-detail-overview"><div class="job-detail-status">'+chips+'</div><div class="job-detail-meta-grid">'+
+ const base='<div class="job-detail-overview"><div class="job-detail-status">'+chips+eligibilityBadge+'</div><div class="job-detail-meta-grid">'+
   meta('사업예산',jobAmountLabel(x.amount))+
   meta('공고·모집 기간',time.text)+
   (x.contract?meta('계약 방식',x.contract):'')+
   (x.noticeNumber?meta('공고번호',x.noticeNumber+' / '+(x.noticeOrder||'000')):'')+
   '</div></div>'+
-  '<section class="job-detail-section"><h3>사업 내용</h3><p>'+htmlEscape(x.reason||'사업범위 원문 확인 필요')+'</p>'+
-  (x.subject?'<p class="job-detail-secondary">발주 품목 · '+htmlEscape(x.subject)+'</p>':'')+'</section>'+
+  '<section class="job-detail-section"><h3>사업 개요</h3><p>'+htmlEscape(scopeText)+'</p>'+
+  '</section>'+
   '<section class="job-detail-section"><h3>참가조건·제한</h3><p>'+htmlEscape(x.condition||'공고 원문 확인 필요')+'</p>'+
   '<p class="job-detail-secondary"><strong>공동수급·협업:</strong> '+htmlEscape(x.partnerBidMode||'원문 확인 필요')+'</p></section>';
  const compareList=[];
@@ -2964,7 +2972,7 @@ function renderJobDetail(x){
    return '<p>'+(safe?'<a href="'+htmlEscape(file.url)+'" target="_blank" rel="noopener noreferrer">'+label+' ↗</a>':label+' · 공고 원문에서 확인')+'</p>';
   }).join(''):'<p>e발주 첨부파일 목록 0건 · 실제 공고 첨부 없음으로 해석할 수 없습니다.</p>')+
   '<p>※ 첨부파일 메타데이터 조회 완료. 과업지시서·RFP 전체 참가조건 분석은 별도 검증 필요.</p></section>':
-  '<section class="job-detail-section"><h3>공식 첨부파일</h3><p>'+htmlEscape(docs?.error||'공식 조회 대기 · 원문 확인 필요')+'</p></section>';
+  '<section class="job-detail-section"><h3>공식 첨부파일</h3><p>첨부파일은 원문에서 확인 필요</p></section>';
  const extracted=rfpSnapshotForJob(x);
 
  const readable=(extracted?.files||[]).filter(f=>f.readable);
@@ -2989,7 +2997,7 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+docLinks+
+ document.getElementById('jobDetailBody').innerHTML=base+reviewNote+docLinks+
   (extractHTML?'<details class="job-detail-advanced"><summary>RFP 원문 발췌·검토 내용 보기</summary>'+extractHTML+'</details>':'')+
   '<details class="job-detail-advanced"><summary>공고 변경·기초금액 조회</summary>'+bidChangePriceMarkup(x)+'</details>'+variantLinks+actions;
 }
