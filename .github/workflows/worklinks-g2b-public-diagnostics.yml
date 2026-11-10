@@ -18,6 +18,7 @@ on:
       - 'startup-support/index.html'
       - 'tests/test_direct_production.py'
       - 'tests/test_bid_evidence.py'
+      - 'tests/test_bid_extra.py'
       - 'tests/test_rfp_failures.py'
       - 'tests/test_contract_evidence.py'
       - 'tests/worklinks-jobs-regression.cjs'
@@ -47,6 +48,7 @@ jobs:
           bash -n server/deploy-g2b-eligibility-worker-only.sh
           python3 tests/test_direct_production.py
           python3 tests/test_bid_evidence.py
+          python3 tests/test_bid_extra.py
           python3 tests/test_rfp_failures.py
           python3 tests/test_contract_evidence.py
           node tests/worklinks-jobs-regression.cjs
