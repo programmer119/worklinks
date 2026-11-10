@@ -27,6 +27,11 @@ dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.
 dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_bid_evidence.py:/app/test_bid_evidence.py:ro" "$IMG" python /app/test_bid_evidence.py
 dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_award_cache_api.py:/app/test_award_cache_api.py:ro" "$IMG" python /app/test_award_cache_api.py
 dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_contract_evidence.py:/app/test_contract_evidence.py:ro" "$IMG" python /app/test_contract_evidence.py
+dk run --rm \
+  -v "$NEXT:/app/api.py:ro" \
+  -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/server/g2b-standard-worker.py:/app/g2b-standard-worker.py:ro" \
+  -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_g2b_standard_api.py:/app/test_g2b_standard_api.py:ro" \
+  "$IMG" python /app/test_g2b_standard_api.py
 dk run --rm -e WORKLINKS_STATE_DB=/tmp/worklinks-state-test.sqlite3 -v "$NEXT:/app/g2b-proxy.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_worklinks_user_state.py:/app/test_worklinks_user_state.py:ro" "$IMG" python /app/test_worklinks_user_state.py
 dk run --rm -i -v "$NEXT:/app/api.py:ro" -e G2B_DB_PATH=/tmp/test.sqlite3 "$IMG" python - <<'PY'
 import datetime,json,runpy
