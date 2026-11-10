@@ -1,0 +1,51 @@
+name: WorkLinks recover stale GitHub Pages deployment lock
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-pages-unlock-20261110.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+jobs:
+  inspect-and-cancel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Cancel only the identified stuck Pages deployment, never the live site
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          sha=dc42aab1fde30993e291b0b9c2e345827affb9f6
+          base="https://api.github.com/repos/programmer119/worklinks/pages/deployments/$sha"
+          body="$(mktemp)"
+          code="$(curl -sS -L -o "$body" -w '%{http_code}' --max-time 20 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2026-03-10' "$base")"
+          echo "PAGES_STUCK_QUERY_HTTP=$code"
+          test "$code" = 200 || { echo 'PAGES_STATUS_QUERY_UNAVAILABLE'; exit 2; }
+          status="$(python3 - "$body" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          print(d.get('status','unknown'))
+          PY
+          )"
+          echo "PAGES_OLD_DEPLOYMENT_STATUS=$status"
+          case "$status" in
+            succeed|failed|cancelled|canceled)
+              echo 'PAGES_OLD_DEPLOYMENT_TERMINAL_NO_CANCEL'
+              ;;
+            *)
+              result="$(curl -sS -L -o "$body" -w '%{http_code}' --max-time 20 \
+                -X POST -H "Authorization: Bearer $GH_TOKEN" \
+                -H 'Accept: application/vnd.github+json' \
+                -H 'X-GitHub-Api-Version: 2026-03-10' "$base/cancel")"
+              echo "PAGES_STUCK_CANCEL_HTTP=$result"
+              test "$result" = 204 || exit 3
+              echo 'PAGES_STUCK_OLD_DEPLOYMENT_CANCELLED=PASS'
+              ;;
+          esac
