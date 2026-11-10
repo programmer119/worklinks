@@ -1,4 +1,4 @@
-name: WorkLinks public RFP text extraction capability
+name: WorkLinks public RFP attachment live verification
 on:
   push:
     branches: [main]
@@ -9,42 +9,66 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
     steps:
-      - name: Install a reader for official HWP RFPs
-        run: python3 -m pip install -q pyhwp --break-system-packages
-      - name: Download one publicly linked official bid RFP and test extraction
+      - name: Verify specific official bid attachment API and download (read-only)
         shell: bash
         run: |
           python3 - <<'PY'
-          import urllib.request,urllib.parse,json,subprocess,tempfile,pathlib,re,hashlib
-          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/bid-evidence?bidNo=R26BK01756420&order=000'
-          with urllib.request.urlopen(urllib.request.Request(api,headers={'User-Agent':'WorkLinksRFPCheck/1.0'}),timeout=25) as response:
-            evidence=json.load(response)
-          files=evidence.get('attachments',{}).get('items') or []
-          print('DOCUMENT_METADATA_COUNT',len(files))
-          if not files:raise SystemExit('NO_PUBLIC_RFP_METADATA')
-          selected=next((x for x in files if (x.get('name') or '').lower().endswith('.hwp')),None)
-          if not selected:raise SystemExit('NO_SAMPLE_HWP')
-          url=selected['url'];parsed=urllib.parse.urlparse(url)
-          if parsed.scheme!='https' or parsed.netloc!='www.g2b.go.kr' or not parsed.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
-            raise SystemExit('UNEXPECTED_RFP_HOST_OR_PATH')
-          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
-          with urllib.request.urlopen(req,timeout=35) as response:
-            if int(response.headers.get('Content-Length') or '0')>16_000_000:raise SystemExit('OVERSIZE_DOCUMENT')
-            raw=response.read(16_000_001)
-            print('RFP_DOWNLOAD_STATUS',response.status,'TYPE',response.headers.get('Content-Type'),
-                  'BYTES',len(raw),'MAGIC',repr(raw[:12]))
-          if len(raw)>16_000_000:raise SystemExit('OVERSIZE_DOCUMENT')
-          if not raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):raise SystemExit('NOT_OLD_HWP_BINARY')
-          with tempfile.TemporaryDirectory() as td:
-            path=pathlib.Path(td)/'rfp.hwp'
-            path.write_bytes(raw)
-            process=subprocess.run(['hwp5txt',str(path)],capture_output=True,timeout=50)
-            text=process.stdout.decode('utf-8','replace')
-            print('HWP_EXTRACT_RETURN_CODE',process.returncode,'TEXT_CHARS',len(text),'STDERR_SIZE',len(process.stderr))
-            for term in ['입찰참가자격','수행실적','실적','투입인력','기술인력','지역제한','제안요청서','공동수급']:
-              print('RFP_TERM',term,len(re.findall(re.escape(term),text)))
-            if process.returncode!=0 or len(text)<100:raise SystemExit('HWP_EXTRACT_FAILED')
-            print('PUBLIC_RFP_TEXT_READABLE=PASS')
+          import json,urllib.request,urllib.error,urllib.parse
+          no='R26BK01797629'
+          url='https://api-suaveforge.suaveforge.com:18458/api/g2b/bid-evidence?bidNo='+no+'&order=000'
+          req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-RFP-Live-Probe/1.0','Accept':'application/json'})
+          try:
+              with urllib.request.urlopen(req,timeout=28) as response:
+                  status=response.status
+                  data=json.load(response)
+          except urllib.error.HTTPError as e:
+              print('BID_EVIDENCE_HTTP_FAILURE',e.code,flush=True)
+              raise
+          except Exception as e:
+              print('BID_EVIDENCE_TRANSPORT_FAILURE',type(e).__name__,str(e)[:180],flush=True)
+              raise
+          e=data.get('attachments') or {}
+          detail=data.get('noticeDocuments') or {}
+          items=e.get('items') or []
+          print('BID_EVIDENCE_RESULT',json.dumps({
+              'notice':no,'http':status,'ok':data.get('ok'),
+              'attachmentOk':e.get('ok'),'attachmentComplete':e.get('complete'),
+              'eorderCount':e.get('eorderCount'),
+              'noticeDetailOk':detail.get('ok'),
+              'noticeDetailComplete':detail.get('complete'),
+              'noticeDetailCount':detail.get('noticeRows'),
+              'fileCount':len(items),
+              'attachmentError':str(e.get('error') or '')[:180],
+              'noticeDetailError':str(detail.get('error') or '')[:180],
+              'names':[str(i.get('name') or '')[:70] for i in items[:12]]
+          },ensure_ascii=False),flush=True)
+          selected=None
+          for item in items:
+              u=urllib.parse.urlsplit(str(item.get('url') or ''))
+              if u.scheme=='https' and u.hostname=='www.g2b.go.kr' and u.port in (None,443) and u.path.startswith('/pn/pnp/pnpe/UntyAtchFile/'):
+                  selected=item
+                  break
+          if not selected:
+              print('ATTACHMENT_FILE_DOWNLOAD=UNAVAILABLE','API metadata may be unavailable, empty or lack direct official links',flush=True)
+              if not (e.get('ok') and detail.get('ok')):
+                  raise SystemExit('OFFICIAL_ATTACHMENT_API_NOT_BOTH_WORKING')
+              raise SystemExit('NO_DIRECT_OFFICIAL_ATTACHMENT_URL')
+          req=urllib.request.Request(selected['url'],headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+          try:
+              with urllib.request.urlopen(req,timeout=40) as response:
+                  raw=response.read(12_000_001)
+                  print('ATTACHMENT_DOWNLOAD',json.dumps({
+                      'status':response.status,'fileName':str(selected.get('name') or '')[:100],
+                      'size':len(raw),'contentType':str(response.headers.get('Content-Type') or '')[:80],
+                      'magic':raw[:8].hex()
+                  },ensure_ascii=False),flush=True)
+          except urllib.error.HTTPError as ex:
+              print('ATTACHMENT_DOWNLOAD_HTTP_FAILURE',ex.code,flush=True)
+              raise
+          if len(raw)>12_000_000:raise SystemExit('ATTACHMENT_FILE_TOO_BIG_FOR_PROBE')
+          magic_ok=raw.startswith((b'%PDF-',b'PK\\x03\\x04',bytes.fromhex('D0CF11E0A1B11AE1')))
+          if not magic_ok:raise SystemExit('FILE_NOT_PDF_OR_HWP_OR_ZIP_FORMAT')
+          print('OFFICIAL_BID_ATTACHMENT_DOWNLOAD=PASS',flush=True)
           PY
