@@ -20,8 +20,8 @@ from collections import defaultdict
 
 SOURCE = '/app/g2b-full-crawler.py'
 KST = dt.timezone(dt.timedelta(hours=9))
-PINNED = ('R26BK01777538','R26BK01765541','R26BK01807134','R26BK01797629')
-MAX_REQUESTS = int(os.environ.get('OPEN_AWARD_MAX_REQUESTS','1250'))
+PINNED = ()  # Grouped A02 refresh covers all active notices without per-notice requests.
+MAX_REQUESTS = int(os.environ.get('OPEN_AWARD_MAX_REQUESTS','120'))
 MAX_SECONDS = int(os.environ.get('OPEN_AWARD_MAX_SECONDS','510'))
 MAX_WINDOW_PAGES = int(os.environ.get('OPEN_AWARD_MAX_WINDOW_PAGES','35'))
 FIELDS = (
@@ -30,12 +30,12 @@ FIELDS = (
     ('awardMethodCode', 'sucsfbidMthdCd'),
     ('awardFloorRate', 'sucsfbidLwltRate'),
 )
-ROOT = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService'
+ROOT = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService02'
 OPS = {
- 'servc': 'getBidPblancListInfoServcPPSSrch',
- 'thng': 'getBidPblancListInfoThngPPSSrch',
- 'cnstwk': 'getBidPblancListInfoCnstwkPPSSrch',
- 'frgcpt': 'getBidPblancListInfoFrgcptPPSSrch',
+ 'servc': 'getBidPblancListInfoServcPPSSrch02',
+ 'thng': 'getBidPblancListInfoThngPPSSrch02',
+ 'cnstwk': 'getBidPblancListInfoCnstwkPPSSrch02',
+ 'frgcpt': 'getBidPblancListInfoFrgcptPPSSrch02',
 }
 class UpstreamError(Exception):
     pass
@@ -90,7 +90,7 @@ def read_rows(db):
     return candidates,dict(excluded)
 def official_request(key, operation, args):
     params=dict(args,serviceKey=key,type='json',pageNo=args.get('pageNo',1),
-                numOfRows=args.get('numOfRows',100))
+                numOfRows=args.get('numOfRows',999))
     url=ROOT+'/'+operation+'?'+urllib.parse.urlencode(params)
     req=urllib.request.Request(url,headers={
         'Accept':'application/json','User-Agent':'WorkLinksOpenAwardOnePass/1.0'})
@@ -220,15 +220,15 @@ def run():
         collected=[]
         try:
             first_count,first=call(OPS[kind],{'inqryDiv':1,
-                   'inqryBgnDt':day+'0000','inqryEndDt':day+'2359','numOfRows':100})
-            pages=max(1,(first_count+99)//100)
+                   'inqryBgnDt':day+'0000','inqryEndDt':day+'2359','numOfRows':999})
+            pages=max(1,(first_count+998)//999)
             if pages>MAX_WINDOW_PAGES:
                 stats['large_group_skipped']+=1
                 continue
             collected.extend(first)
             for page in range(2,pages+1):
                 _,rows=call(OPS[kind],{'inqryDiv':1,'inqryBgnDt':day+'0000',
-                         'inqryEndDt':day+'2359','numOfRows':100,'pageNo':page})
+                         'inqryEndDt':day+'2359','numOfRows':999,'pageNo':page})
                 collected.extend(rows)
             # The full window must be fetched before applying DB changes,
             # and no other unrelated or expired notice may be updated.
@@ -254,28 +254,9 @@ def run():
             if group_limited:
                 break
 
-    # If date-group endpoint is rate-limited, use successful exact-notice endpoint
-    # for service notices (same official API service, no RFPs).
+    # Never fall back to ~1,000 per-notice API calls if grouped lookup is limited.
     if group_limited:
-        print('OPEN_AWARD_SINGLE_FALLBACK_START',len(targets),flush=True)
-        ordered_remaining=sorted(targets.items(),key=lambda v:(v[1]['deadline'],v[0][1]))
-        for (kind,num,ord_),data in ordered_remaining:
-            if not budget():
-                break
-            if kind!='servc':
-                stats['unsupported_single_fallback']+=1
-                continue
-            try:
-                _,items=call('getBidPblancListInfoServc',{
-                    'inqryDiv':2,'bidNtceNo':num,'numOfRows':10})
-                merge(db,targets,items,kind,stats)
-                stats['single_requests']+=1
-            except UpstreamError as exc:
-                stats['single_errors']+=1
-                print('OPEN_AWARD_SINGLE_ERROR',num,str(exc),flush=True)
-                if '429' in str(exc):
-                    stats['rate_limit_429']+=1
-                    break
+        print('OPEN_AWARD_QUOTA_STOP_NO_SINGLE_FALLBACK',flush=True)
     remaining,_=read_rows(db)
     after=len(remaining)
     pinned={}
