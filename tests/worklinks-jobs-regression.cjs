@@ -617,7 +617,8 @@ assert.equal(html,'',
  'first-pass-only partners must not create duplicate clickable chips or imply certified eligibility');
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 assert.ok(source.includes('function participationVerdict(x,p)'));
-assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all notices as ready');
+assert.ok(source.includes("if(v.verified===true)")&&source.includes('job-verdict ready'),
+ 'the ready chip must remain conditional on fully verified eligibility');
 
 // Status filters must be interactive, cover all currently displayed items, and
 // show a reason even when the notice is outside the software candidate scope.
