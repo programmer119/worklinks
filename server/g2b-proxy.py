@@ -488,6 +488,71 @@ def bid_change_and_price_query(bid_no,order):
        'limitations':'변경내역 API 0건 또는 미조회는 변경 없음의 보증이 아님. 기초금액은 투찰금액·계약금액이 아님.'}
 
 
+# These official supplemental operations are collected by the scheduled worker,
+# never by a page reload. Each stored value keeps exact notice/order provenance.
+BID_EXTRA_OPERATIONS={
+    'serviceProducts':'getBidPblancListInfoServcPurchsObjPrdct02',
+    'mandatoryJointRegion':'getBidPblancJntcontrctDutyRgnListInfo02',
+    'regionalIncentives':'getBidPblancIncntvRgnListInfo02'
+}
+EXTRA_TTL_SUCCESS=72*3600
+EXTRA_TTL_PARTIAL=6*3600
+
+def bid_extra_query(bid_no, order, collect=True):
+    order=str(order).zfill(3)
+    con=open_bid_db()
+    try:
+        saved=con.execute('SELECT payload,checked_at FROM bid_extra_cache WHERE bid_no=? AND bid_ord=?',
+                          (bid_no,order)).fetchone()
+    finally:
+        con.close()
+    if saved:
+        try:
+            prior=json.loads(saved[0])
+            timestamp=datetime.datetime.fromisoformat(str(saved[1]).replace('Z','+00:00'))
+            age=(datetime.datetime.now(datetime.timezone.utc)-timestamp).total_seconds()
+            ttl=EXTRA_TTL_SUCCESS if prior.get('complete') else EXTRA_TTL_PARTIAL
+            if 0<=age<ttl:
+                return {**prior,'cached':True}
+        except (TypeError,ValueError,AttributeError):
+            pass
+    if not collect:
+        return {'ok':False,'complete':False,'state':'not_collected','bidNo':bid_no,'order':order}
+    sources={}
+    upstream_limited=False
+    for name,operation in BID_EXTRA_OPERATIONS.items():
+        if upstream_limited:
+            sources[name]={'ok':False,'complete':False,'totalCount':None,'items':[],
+                           'operation':operation,'error':'skipped_upstream_cooldown'}
+            continue
+        result=_bid_evidence_fetch(operation,bid_no,order)
+        # Keep public fields without inventing their meanings; bound DB growth.
+        rows=[]
+        for row in result.get('items',[])[:100]:
+            if not isinstance(row,dict):continue
+            rows.append({str(k)[:72]:str(v)[:350] for k,v in list(row.items())[:42]
+                         if v is not None and not str(k).lower().startswith('servicekey')})
+        sources[name]={'ok':result['ok'],'complete':result['complete'],
+                       'totalCount':result.get('count'),'items':rows,
+                       'operation':operation,'error':result.get('error','')}
+        if '429' in str(result.get('error','')) or 'rate_limited' in str(result.get('error','')):
+            upstream_limited=True
+    complete=all(x['ok'] and x['complete'] for x in sources.values())
+    checked=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds')
+    result={'ok':complete,'complete':complete,'bidNo':bid_no,'order':order,
+            'checkedAt':checked,'source':'조달청 나라장터 입찰공고정보서비스',
+            'sources':sources,
+            'limitations':'0건·조회실패는 필수조건 부재의 증명이 아님. 원문·참가자격·인력은 별도로 확인.',
+            'cached':False}
+    con=open_bid_db()
+    try:
+        with con:
+            con.execute('INSERT OR REPLACE INTO bid_extra_cache(bid_no,bid_ord,payload,checked_at) VALUES(?,?,?,?)',
+                        (bid_no,order,json.dumps(result,ensure_ascii=False,separators=(',',':')),checked))
+    finally:
+        con.close()
+    return result
+
 def bid_evidence_query(bid_no, order):
     """Four official A02 sources; include ordinary attachments beyond e-order."""
     regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
@@ -574,6 +639,8 @@ def open_bid_db():
                             (int(found),kind,no,order))
     con.execute('CREATE INDEX IF NOT EXISTS bid_notices_sw_seen_idx ON bid_notices(sw_candidate,last_seen DESC)')
     con.execute('CREATE TABLE IF NOT EXISTS bid_license_cache (bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
+    # Supplemental facts never overwrite the notice or its official license state.
+    con.execute('CREATE TABLE IF NOT EXISTS bid_extra_cache (bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
     return con
 
 def persist_bids(items):
@@ -603,18 +670,19 @@ def query_saved_bids(limit,offset,only_sw=False):
         total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
         matching=con.execute('SELECT COUNT(*) FROM bid_notices WHERE sw_candidate=1').fetchone()[0]
         history=bool(con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='recurring_projects'").fetchone())
-        sel='b.payload'+(',r.history_json,r.repeat_years' if history else ',NULL,0')+',q.payload'
+        sel='b.payload'+(',r.history_json,r.repeat_years' if history else ',NULL,0')+',q.payload,x.payload'
         from_sql=' FROM bid_notices b '
         if history:
             from_sql+='LEFT JOIN recurring_projects r ON b.kind=r.kind AND b.bid_no=r.bid_no '
         # Notice ordinal is sometimes stored as "0" while eligibility uses "000".
         # Join on the normalized ordinal without mutating existing DB primary keys.
         from_sql+="LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
+        from_sql+="LEFT JOIN bid_extra_cache x ON b.bid_no=x.bid_no AND x.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
         where='WHERE b.sw_candidate=1 ' if only_sw else ''
         rows=con.execute('SELECT '+sel+from_sql+where+
             'ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
         items=[]
-        for payload,series,years,qualification in rows:
+        for payload,series,years,qualification,extra in rows:
             obj=json.loads(payload)
             if series and (years or 0)>=2:
                 try:
@@ -623,6 +691,9 @@ def query_saved_bids(limit,offset,only_sw=False):
                 except (ValueError,TypeError): pass
             if qualification:
                 try: obj['bidEligibility']=json.loads(qualification)
+                except (ValueError,TypeError): pass
+            if extra:
+                try: obj['supplementalBidFacts']=json.loads(extra)
                 except (ValueError,TypeError): pass
             items.append(obj)
         checked=con.execute('SELECT COUNT(*) FROM bid_license_cache').fetchone()[0]
@@ -1198,6 +1269,12 @@ class Handler(BaseHTTPRequestHandler):
                 result=bid_change_and_price_query(bid_no,order)
                 with lock:cache[ck]=(time.time()+(12*3600 if result.get('ok') else 1200),result)
                 return self.reply(200,result)
+            if u.path == '/api/g2b/bid-extra':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                return self.reply(200,bid_extra_query(bid_no,order,collect=True))
             if u.path == '/api/g2b/bid-evidence':
                 bid_no=get('bidNo').strip()
                 order=get('order','000').strip()
