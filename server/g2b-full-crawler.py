@@ -134,7 +134,7 @@ def compact(x,kind):
       'url':get('bidNtceDtlUrl'),'state':get('bidNtceSttusNm'),
       'contract':get('cntrctCnclsMthdNm'),
       'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),
-      'awardFloorRate':get('sucsfbidLwltRate'),
+      'awardFloorRate':get('sucsfbidLwltRate'),'awardFieldsVerified':True,
       'purchsObjPrdctList':get('purchsObjPrdctList'),
       'category':kind}
 
