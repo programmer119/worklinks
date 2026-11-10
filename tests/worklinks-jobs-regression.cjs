@@ -763,13 +763,21 @@ for(const term of ['계약방법','낙찰방법','하한율','제한경쟁','협
  assert.ok(sampleMethod.includes(term),'render missing metadata '+term);
 assert.ok(sampleMethod.includes('title="낙찰코드: 낙010001"'),'award code is available on hover');
 assert.ok(!sampleMethod.includes('>낙찰코드<'),'award code must not take a visible cell');
-const methodWithoutFloor=(code,rate='')=>methodView({id:'g2b-servc-R26BK00000101-000',
- noticeNumber:'R26BK00000101',awardMethodCode:code,awardFloorRate:rate});
-assert.ok(methodWithoutFloor('낙030005').includes('하한율 없음'),'negotiated contract has no floor rate');
-assert.ok(methodWithoutFloor('낙030001').includes('정보 수집 오류'),'missing required floor rate is error');
+const methodWithoutFloor=(code,rate='',extra={})=>methodView({id:'g2b-servc-R26BK00000101-000',
+ noticeNumber:'R26BK00000101',awardMethodCode:code,awardFloorRate:rate,...extra});
+assert.ok(methodWithoutFloor('낙030005').includes('하한율 비적용'),'non-applicable must NOT be a failed fetch');
+assert.ok(methodWithoutFloor('낙030001').includes('조사 미완료'),'no official evidence must NOT be called a source error');
+assert.ok(methodWithoutFloor('낙030001','',{awardFieldsVerified:true}).includes('원본 미기재'),
+ 'missing numeric floor with verified original must be source-missing');
+assert.ok(methodWithoutFloor('낙030001','',{awardFieldsFetchStatus:'error'}).includes('수집 실패'),
+ 'explicit extraction error must be distinct from blank official field');
 assert.ok(methodWithoutFloor('낙030029','88').includes('88%'),'numeric floor rate preserved');
-assert.ok(methodWithoutFloor('낙099999').includes('확인 필요'),'unknown method must not be guessed');
-assert.ok(methodWithoutFloor('').includes('확인 필요'),'no method evidence must not claim no floor');
+assert.ok(methodWithoutFloor('낙099999').includes('확인 필요'),'unclassified method code is not a collection error');
+assert.ok(methodWithoutFloor('').includes('조사 미완료'),'no method evidence is uninvestigated');
+assert.ok(!methodWithoutFloor('낙030001').includes('원본 미기재'),
+ 'cannot infer source absence before verified original fetch');
+assert.ok(!methodWithoutFloor('낙030001','',{awardFieldsFetchStatus:'error'}).includes('하한율 비적용'),
+ 'failed source cannot be rendered as a verified nonapplicable rate');
 assert.equal(methodView({id:'other-notice',noticeNumber:'R26BK00000100'}),'');
 const sourceCrawler=fs.readFileSync(path.join(__dirname,'../server/g2b-full-crawler.py'),'utf8');
 for(const [key,field] of [['contract','cntrctCnclsMthdNm'],['awardMethodCode','sucsfbidMthdCd'],
