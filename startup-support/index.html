@@ -435,6 +435,8 @@
 #jobCards .job-bid-label{flex:none;color:#64748b;font-weight:750;white-space:nowrap}
 #jobCards .job-bid-value{color:#1e293b;font-weight:750;min-width:0;word-break:normal;overflow-wrap:anywhere}
 #jobCards .job-bid-method-cell.unknown .job-bid-value{color:#94a3b8;font-weight:600}
+#jobCards .job-bid-value.has-method-code{cursor:help;text-decoration:underline dotted #94a3b8;text-underline-offset:3px}
+#jobCards .job-bid-method-cell.error .job-bid-value{color:#b45309}
 @media(max-width:680px){
  #jobCards .job-bid-methods{grid-template-columns:1fr;gap:4px}
  #jobCards .job-bid-method-cell{font-size:13px}
@@ -3180,24 +3182,39 @@ function g2bCardAwardMetadata(x){
  return {contract:official('contract'),awardMethod:official('awardMethod'),
   awardMethodCode:official('awardMethodCode'),awardFloorRate:official('awardFloorRate')};
 }
+function g2bAwardFloorDisplay(metadata){
+ const rate=String(metadata.awardFloorRate||'').trim().replace(/%$/,'');
+ if(/^[0-9]+(?:[.][0-9]+)?$/.test(rate))return {value:rate+'%',status:'rate'};
+ const code=String(metadata.awardMethodCode||'').trim();
+ // Verified against the saved official G2B award-field snapshot: these methods
+ // do not use a numeric bid-award floor rate (not a collection failure).
+ if(/^(?:낙030002|낙030003|낙030004|낙030005|낙030006|낙030009|낙030011|낙030016|낙030018|낙030021)$/.test(code))
+  return {value:'하한율 없음',status:'none'};
+ // These award methods do publish a floor rate in G2B. A missing value needs repair.
+ if(/^(?:낙030001|낙030010|낙030022|낙030029|낙030033)$/.test(code))
+  return {value:'정보 수집 오류',status:'error'};
+ // No evidence for either conclusion: do not label an unfamiliar method as error/no floor.
+ return {value:'확인 필요',status:'unknown'};
+}
 function bidMethodCardMarkup(x){
- // Show actual structured G2B fields only, never guess technical vs price scoring.
  if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
  const metadata=g2bCardAwardMetadata(x);
- const rate=metadata.awardFloorRate;
- const floor=rate&&/^[0-9]+(?:[.][0-9]+)?$/.test(rate)?rate+'%':rate;
+ const floor=g2bAwardFloorDisplay(metadata);
  const fields=[
-  ['계약방법',metadata.contract],
-  ['낙찰방법',metadata.awardMethod],
-  ['낙찰코드',metadata.awardMethodCode],
-  ['하한율',floor]
+  {label:'계약방법',value:metadata.contract},
+  {label:'낙찰방법',value:metadata.awardMethod,code:metadata.awardMethodCode},
+  {label:'하한율',value:floor.value,status:floor.status}
  ];
  return '<div class="job-bid-methods" aria-label="나라장터 공고 계약·낙찰 정보">'+
-  fields.map(function(pair){
-   const value=String(pair[1]??'').trim();
-   return '<div class="job-bid-method-cell'+(value?'':' unknown')+'">'+
-    '<span class="job-bid-label">'+htmlEscape(pair[0])+'</span>'+
-    '<strong class="job-bid-value">'+htmlEscape(value||'정보 없음')+'</strong></div>';
+  fields.map(function(field){
+   const value=String(field.value??'').trim();
+   const code=String(field.code||'').trim();
+   const status=field.status==='error'?' error':field.status==='unknown'?' unknown':'';
+   const codeHint=code?' title="'+htmlEscape('낙찰코드: '+code)+'" tabindex="0"':'';
+   return '<div class="job-bid-method-cell'+(!value?' unknown':'')+status+'">'+
+    '<span class="job-bid-label">'+htmlEscape(field.label)+'</span>'+
+    '<strong class="job-bid-value'+(code?' has-method-code':'')+'"'+codeHint+'>'+
+     htmlEscape(value||'정보 없음')+'</strong></div>';
   }).join('')+'</div>';
 }
 function renderJobs(){
