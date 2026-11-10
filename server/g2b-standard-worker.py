@@ -23,7 +23,8 @@ ROOT = "https://apis.data.go.kr/1230000/ao/PubDataOpnStdService/"
 DB_PATH = os.environ.get("G2B_STANDARD_DB", "/app/data/g2b-standard.sqlite3")
 SECRET_PATH = os.environ.get("G2B_STANDARD_KEY_PATH", "/run/secrets/g2b-standard.env")
 PAGE_ROWS = 999
-MAX_PAGES = 25
+B2_ROWS = 500  # smaller pages protect against provider 999-row B2 read timeouts
+MAX_PAGES = 35
 OPERATIONS = {
     "B1": "getDataSetOpnStdBidPblancInfo",
     "B2": "getDataSetOpnStdScsbidInfo",
@@ -87,7 +88,7 @@ def percentage(value):
 
 
 def params(service, day):
-    common = {"pageNo": 1, "numOfRows": PAGE_ROWS}
+    common = {"pageNo": 1, "numOfRows": B2_ROWS if service == "B2" else PAGE_ROWS}
     if service == "B1":
         return dict(common, bidNtceBgnDt=day + "0000", bidNtceEndDt=day + "2359")
     if service == "B2":
@@ -131,15 +132,16 @@ def request_page(service, day, page, key, fetch=None):
         total = int(body.get("totalCount") or 0)
     except (TypeError, ValueError):
         raise ProviderFailure("invalid_total") from None
-    if total < 0 or total > MAX_PAGES * PAGE_ROWS or len(items) > PAGE_ROWS:
+    requested_rows = B2_ROWS if service == "B2" else PAGE_ROWS
+    if total < 0 or total > MAX_PAGES * requested_rows or len(items) > requested_rows:
         raise ProviderFailure("unbounded_window")
     return total, [x for x in items if isinstance(x, dict)]
 
 
 def collect_window(service, day, key, budget, fetch=None):
-    total, first = request_page(service, day, 1, key, fetch)
-    budget[0] += 1
-    pages = max(1, (total + PAGE_ROWS - 1) // PAGE_ROWS)
+    page_rows = B2_ROWS if service == "B2" else PAGE_ROWS
+    total, first = request_budgeted(service, day, 1, key, budget, fetch)
+    pages = max(1, (total + page_rows - 1) // page_rows)
     if pages > MAX_PAGES:
         raise ProviderFailure("window_too_large")
     rows = list(first)
@@ -147,14 +149,28 @@ def collect_window(service, day, key, budget, fetch=None):
         if budget[0] >= budget[1]:
             raise ProviderFailure("request_budget_exhausted")
         time.sleep(0.18 if fetch is None else 0)
-        page_total, items = request_page(service, day, page, key, fetch)
-        budget[0] += 1
+        page_total, items = request_budgeted(service, day, page, key, budget, fetch)
         if page_total != total or not items:
             raise ProviderFailure("pagination_changed_or_empty")
         rows.extend(items)
     if len(rows) != total:
         raise ProviderFailure("incomplete_window")
     return rows, pages
+
+
+def request_budgeted(service, day, page, key, budget, fetch=None):
+    """Count every attempted upstream call, including failures and single retry."""
+    if budget[0] >= budget[1]:
+        raise ProviderFailure("request_budget_exhausted")
+    budget[0] += 1
+    try:
+        return request_page(service, day, page, key, fetch)
+    except ProviderFailure as exc:
+        if exc.limited or exc.reason != "upstream_transport_or_json" or budget[0] >= budget[1]:
+            raise
+        time.sleep(1.3 if fetch is None else 0)
+        budget[0] += 1
+        return request_page(service, day, page, key, fetch)
 
 
 def connect(path=DB_PATH):
