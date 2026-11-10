@@ -706,13 +706,13 @@ const filterSelect={
  value:'all',innerHTML:'',closest:()=>({classList:{toggle:()=>{}}})
 };
 const companies=[{id:'changcom',name:'창컴정보통신(주)'}];
-const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob','jobSoftwareScope','g2bCompactScreen',
+const filterFns=new Function('partners','document','htmlEscape','localStorage','partnerIdsOfJob','partnerCandidateIdsOfJob','jobSoftwareScope','g2bCompactScreen','worklinksPartnerAccess',
  filterSection+
  'return {syncPartnerFilterChoices,jobMatchesSelectedPartner,getSelected:()=>selectedPartnerId,setSelected:v=>{selectedPartnerId=v},pageStep:jobPageStep()};'
 )(
  companies,{getElementById:id=>id==='partnerFilter'?filterSelect:null},
  value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'),
- {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[],x=>x.kind==='thng'?'out':'candidate',()=>false
+ {setItem:()=>{}},x=>x.matches||[],x=>x.candidates||[],x=>x.kind==='thng'?'out':'candidate',()=>false,()=>true
 );
 assert.strictEqual(filterFns.pageStep,100,'Desktop must still show 100 bid cards per page');
 filterFns.syncPartnerFilterChoices();
