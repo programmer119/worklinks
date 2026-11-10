@@ -9,13 +9,16 @@ original=g['request_api']
 calls=[]
 def fake(base,operation,params):
     calls.append((base,operation,params.copy()))
-    if operation=='getBidPblancListInfoPrtcptPsblRgn':
+    if operation=='getBidPblancListInfoPrtcptPsblRgn02':
         return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000','prtcptPsblRgnNm':'서울특별시','prtcptPsblRgnCd':'11'},
                          {'bidNtceNo':'R26BK00000001','prtcptPsblRgnNm':'잘못된공고'}], 'totalCount':2}
-    if operation=='getBidPblancListInfoEorderAtchFileInfo':
+    if operation=='getBidPblancListInfoAtchFileInfo02':
+        return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000','atchFileNm':'과업지시서.hwpx',
+                         'atchFileUrl':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/ordinary.hwpx'}], 'totalCount':1}
+    if operation=='getBidPblancListInfoEorderAtchFileInfo02':
         return {'items':[{'bidNtceNo':'R26BK01756420','atchFileNm':'제안요청서.pdf','atchFileUrl':'https://www.g2b.go.kr/docs/rfp.pdf'},
                          {'bidNtceNo':'R26BK01756420','atchFileNm':'부적절','atchFileUrl':'javascript:alert(1)'}], 'totalCount':2}
-    if operation=='getBidPblancListInfoServc':
+    if operation=='getBidPblancListInfoServc02':
         return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
             'ntceSpecDocUrl1':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/documents/rfp.pdf',
             'ntceSpecFileNm1':'입찰공고 제안요청서.pdf','bfSpecRgstNo':'R26PRE000001',
@@ -29,19 +32,22 @@ try:
     assert data['region']['ok'] and data['region']['complete']
     assert data['region']['count']==2
     assert data['region']['items']==[{'name':'서울특별시','code':'11'}]
-    assert len(data['attachments']['items'])==3
-    assert data['attachments']['items'][0]['name']=='제안요청서.pdf'
-    assert data['attachments']['items'][1]['url']==''
-    assert data['attachments']['items'][2]['source']=='notice_detail'
-    assert data['attachments']['items'][2]['name']=='입찰공고 제안요청서.pdf'
+    assert len(data['attachments']['items'])==4
+    assert data['attachments']['items'][0]['name']=='과업지시서.hwpx'
+    assert data['attachments']['items'][0]['source']=='notice_attachment_api'
+    assert data['attachments']['items'][1]['name']=='제안요청서.pdf'
+    assert data['attachments']['items'][2]['url']==''
+    assert data['attachments']['items'][3]['source']=='notice_detail'
+    assert data['attachments']['items'][3]['name']=='입찰공고 제안요청서.pdf'
+    assert data['attachments']['generalCount']==1
     assert data['attachments']['eorderCount']==2
     assert data['attachments']['noticeDetailDocumentCount']==2
     assert data['noticeDocuments']['ok']
     assert data['noticeDocuments']['preSpecificationNo']=='R26PRE000001'
-    assert len(calls)==3 and all(call[2]['bidNtceOrd']=='000' for call in calls)
+    assert len(calls)==4 and all(call[2]['bidNtceOrd']=='000' for call in calls)
     # The public notice may contain an RFP even if the e-order API returns zero.
     def eorder_zero(base,operation,params):
-        if operation=='getBidPblancListInfoServc':
+        if operation=='getBidPblancListInfoServc02':
             return {'items':[{'bidNtceNo':'R26BK01756420',
                 'ntceSpecDocUrl1':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/rfp.hwp',
                 'ntceSpecFileNm1':'입찰참가 제안요청서.hwp'}],'totalCount':1}
@@ -62,13 +68,13 @@ finally:
     g['request_api']=original
 # Official change and base-price APIs are independent and on-demand.
 def changes_prices(base,operation,params):
-    assert 'BidPublicInfoService' in base
+    assert 'BidPublicInfoService02' in base
     assert params['bidNtceNo']=='R26BK01756420'
-    if operation=='getBidPblancListInfoChgHstryServc':
+    if operation=='getBidPblancListInfoChgHstryServc02':
         assert 'bidNtceOrd' not in params
         return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'001',
                           'chgDt':'2026-10-14','chgRsn':'입찰기간 변경'}], 'totalCount':1}
-    if operation=='getBidPblancListInfoServcBsisAmount':
+    if operation=='getBidPblancListInfoServcBsisAmount02':
         assert params['bidNtceOrd']=='000'
         return {'items':[{'bidNtceNo':'R26BK01756420','bidNtceOrd':'000',
                           'bssamt':'150000000','bssamtOpenDt':'2026-10-15'}],
@@ -83,7 +89,7 @@ try:
     assert extra['baseAmount']['records'][0]['baseAmount']=='150000000'
     # An out-of-range or non-numeric price must not appear as validated evidence.
     def bad_price(base,operation,params):
-        if operation=='getBidPblancListInfoServcBsisAmount':
+        if operation=='getBidPblancListInfoServcBsisAmount02':
             return {'items':[{'bidNtceNo':'R26BK01756420',
                               'bssamt':'150000000<script>'}],'totalCount':1}
         return {'items':[],'totalCount':0}
@@ -156,17 +162,17 @@ try:
     globals_api['urlopen']=quota_exhausted
     globals_api['get_key']=lambda:'unit-test-key'
     globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
-    try:p['request_api'](api_base,'getBidPblancListInfoLicenseLimit',{'bidNtceNo':'R26BK01756420'})
+    try:p['request_api'](api_base,'getBidPblancListInfoLicenseLimit02',{'bidNtceNo':'R26BK01756420'})
     except p['ApiError'] as e:
         assert 'upstream_http_429' in e.msg
     else:raise AssertionError('upstream quota exhaustion not detected')
-    try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn',{'bidNtceNo':'R26BK01756420'})
+    try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn02',{'bidNtceNo':'R26BK01756420'})
     except p['ApiError'] as e:
         assert e.msg=='upstream_temporarily_rate_limited'
     else:raise AssertionError('quota circuit breaker absent')
     assert len(attempts)==1,'one 429 should suppress further upstream requests'
     globals_api['cache'][('upstream-rate-cooldown',api_base)]=0
-    try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn',{})
+    try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn02',{})
     except p['ApiError'] as e:
         assert 'upstream_http_429' in e.msg
     else:raise AssertionError('expired cooldown did not permit retry')
