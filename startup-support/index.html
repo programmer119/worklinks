@@ -437,6 +437,9 @@
 #jobCards .job-bid-method-cell.unknown .job-bid-value{color:#94a3b8;font-weight:600}
 #jobCards .job-bid-value.has-method-code{cursor:help;text-decoration:underline dotted #94a3b8;text-underline-offset:3px}
 #jobCards .job-bid-method-cell.error .job-bid-value{color:#b45309}
+#jobCards .job-bid-method-cell.source_missing .job-bid-value{color:#925a22}
+#jobCards .job-bid-method-cell.pending .job-bid-value{color:#64748b}
+#jobCards .job-bid-method-cell.not_applicable .job-bid-value{color:#475569}
 @media(max-width:680px){
  #jobCards .job-bid-methods{grid-template-columns:1fr;gap:4px}
  #jobCards .job-bid-method-cell{font-size:13px}
@@ -3209,9 +3212,11 @@ function scheduleJobsRender(){
 }
 var g2bAwardFallbackByNotice=new Map();
 var g2bAwardFallbackLoading=false;
+var g2bAwardFallbackLoadState='not_started'; // not_started | loading | loaded | error
 async function loadG2bAwardFallback(){
  if(g2bAwardFallbackLoading)return;
  g2bAwardFallbackLoading=true;
+ g2bAwardFallbackLoadState='loading';
  try{
   // Published from the server123 saved DB, not queried from the official upstream API.
   const response=await fetch('./g2b-award-fields-open.json',{cache:'no-store'});
@@ -3224,34 +3229,59 @@ async function loadG2bAwardFallback(){
    const fields={};
    for(const name of ['contract','awardMethod','awardMethodCode','awardFloorRate'])
     fields[name]=String(meta[name]??'');
+   // This record was actually retrieved by the server123 official A02 crawler.
+   // Do not interpret a missing record as an official value of zero/blank.
+   fields.awardFieldsVerified=true;
    next.set(key,fields);
   }
   g2bAwardFallbackByNotice=next;
+  g2bAwardFallbackLoadState='loaded';
   scheduleJobsRender();
  }catch(e){
-  // The existing API and truthful unknown-value display remain usable.
+  // A failed snapshot download is a fetch error, NOT an absent floor in the source.
+  g2bAwardFallbackLoadState='error';
+  scheduleJobsRender();
  }finally{g2bAwardFallbackLoading=false}
 }
 function g2bCardAwardMetadata(x){
  const id=jobBidIdentity(x);
  const fallback=id?g2bAwardFallbackByNotice.get(id.bidNo+':'+id.order):null;
  const official=name=>String(x[name]??'').trim()||String(fallback?.[name]??'').trim();
+ // Explicit evidence of an A02 success (live record or saved official snapshot).
+ // A failed/offline fallback is not proof that a field was missing in the source.
+ const sourceVerified=x.awardFieldsVerified===true||fallback?.awardFieldsVerified===true;
+ const rawError=x.awardFieldsFetchStatus==='error'||fallback?.awardFieldsFetchStatus==='error';
+ const fallbackState=typeof g2bAwardFallbackLoadState==='string'?g2bAwardFallbackLoadState:'not_started';
  return {contract:official('contract'),awardMethod:official('awardMethod'),
-  awardMethodCode:official('awardMethodCode'),awardFloorRate:official('awardFloorRate')};
+  awardMethodCode:official('awardMethodCode'),awardFloorRate:official('awardFloorRate'),
+  sourceVerified,fetchFailed:rawError||(!sourceVerified&&fallbackState==='error'),
+  fallbackState};
 }
 function g2bAwardFloorDisplay(metadata){
  const rate=String(metadata.awardFloorRate||'').trim().replace(/%$/,'');
- if(/^[0-9]+(?:[.][0-9]+)?$/.test(rate))return {value:rate+'%',status:'rate'};
+ if(/^(?:100(?:\\.0+)?|(?:[1-9]\\d?|0)(?:\\.\\d+)?)$/.test(rate)&&Number(rate)>0)
+  return {value:rate+'%',status:'rate',reason:'공식 데이터의 숫자 하한율'};
  const code=String(metadata.awardMethodCode||'').trim();
- // Verified against the saved official G2B award-field snapshot: these methods
- // do not use a numeric bid-award floor rate (not a collection failure).
+ // Non-applicable classification comes from verified official award-method codes,
+ // not from a blank numeric value.
  if(/^(?:낙030002|낙030003|낙030004|낙030005|낙030006|낙030009|낙030011|낙030016|낙030018|낙030021)$/.test(code))
-  return {value:'하한율 없음',status:'none'};
- // These award methods do publish a floor rate in G2B. A missing value needs repair.
- if(/^(?:낙030001|낙030010|낙030022|낙030029|낙030033)$/.test(code))
-  return {value:'정보 수집 오류',status:'error'};
- // No evidence for either conclusion: do not label an unfamiliar method as error/no floor.
- return {value:'확인 필요',status:'unknown'};
+  return {value:'하한율 비적용',status:'not_applicable',
+    reason:'낙찰방법 코드 '+code+'에 일반적인 숫자 낙찰하한율을 적용하지 않습니다. 원문 특약은 별도 확인'};
+ if(metadata.fetchFailed)
+  return {value:'수집 실패',status:'error',
+    reason:'공식 보완자료 조회가 실패했거나 수집 오류로 기록됐습니다. 원본에 하한율이 없다는 뜻이 아닙니다.'};
+ const expectsFloor=/^(?:낙030001|낙030010|낙030022|낙030029|낙030033)$/.test(code);
+ if(expectsFloor&&metadata.sourceVerified)
+  return {value:'원본 미기재',status:'source_missing',
+    reason:'공식 공고 데이터 수집은 확인됐지만 해당 응답에 숫자 하한율이 비어 있습니다. 공고 원문 확인 필요'};
+ if(expectsFloor)
+  return {value:'조사 미완료',status:'pending',
+    reason:'하한율 적용 가능성이 있는 방식이지만 원본 수집 성공 여부를 확인하지 못했습니다.'};
+ if(!code)
+  return {value:'조사 미완료',status:'pending',
+    reason:'공식 낙찰방법 코드가 확인되지 않아 적용 여부를 조사하지 못했습니다.'};
+ return {value:'확인 필요',status:'unknown',
+  reason:'공식 낙찰방법 코드를 받았지만 하한율 적용 여부의 검증된 분류가 없습니다.'};
 }
 function bidMethodCardMarkup(x){
  if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
@@ -3260,14 +3290,16 @@ function bidMethodCardMarkup(x){
  const fields=[
   {label:'계약방법',value:metadata.contract},
   {label:'낙찰방법',value:metadata.awardMethod,code:metadata.awardMethodCode},
-  {label:'하한율',value:floor.value,status:floor.status}
+  {label:'하한율',value:floor.value,status:floor.status,reason:floor.reason}
  ];
  return '<div class="job-bid-methods" aria-label="나라장터 공고 계약·낙찰 정보">'+
   fields.map(function(field){
    const value=String(field.value??'').trim();
    const code=String(field.code||'').trim();
-   const status=field.status==='error'?' error':field.status==='unknown'?' unknown':'';
-   const codeHint=code?' title="'+htmlEscape('낙찰코드: '+code)+'" tabindex="0"':'';
+   const status=/^(?:error|source_missing|pending|unknown|not_applicable)$/.test(field.status||'')?
+    ' '+field.status:'';
+   const tip=field.reason?field.reason:(code?'낙찰코드: '+code:'');
+   const codeHint=tip?' title="'+htmlEscape(tip)+'" tabindex="0"':'';
    return '<div class="job-bid-method-cell'+(!value?' unknown':'')+status+'">'+
     '<span class="job-bid-label">'+htmlEscape(field.label)+'</span>'+
     '<strong class="job-bid-value'+(code?' has-method-code':'')+'"'+codeHint+'>'+
