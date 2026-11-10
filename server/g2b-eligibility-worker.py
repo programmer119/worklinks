@@ -19,6 +19,9 @@ API=os.environ.get('G2B_LOCAL_API','http://127.0.0.1:18192/api/g2b')
 POLL=max(60,int(os.environ.get('G2B_QUAL_POLL','180')))
 BATCH=max(20,min(350,int(os.environ.get('G2B_QUAL_BATCH','200'))))
 TTL=dt.timedelta(days=7)
+EXTRA_POLL=max(1800,int(os.environ.get('G2B_EXTRA_POLL','1800')))
+EXTRA_SUCCESS_TTL=dt.timedelta(hours=72)
+EXTRA_PARTIAL_TTL=dt.timedelta(hours=6)
 
 def now():
  return dt.datetime.now(dt.timezone.utc)
@@ -87,6 +90,54 @@ def targets(conn,retry_after=None,at_monotonic=None):
  ranked.sort(key=lambda x:x[0])
  return [(kind,no,ordn) for _,kind,no,ordn in ranked[:BATCH]]
 
+def extra_target(conn):
+ """Choose one open software-service notice, never scan upstream on UI reload.
+
+ At most one notice per EXTRA_POLL interval, three optional official operations
+ per notice. An absent/failed response is pending, not 'no restrictions'.
+ """
+ conn.execute('CREATE TABLE IF NOT EXISTS bid_extra_cache(bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
+ rows=conn.execute("""
+  SELECT b.bid_no,b.bid_ord,b.payload,e.payload,e.checked_at
+  FROM bid_notices b LEFT JOIN bid_extra_cache e
+   ON b.bid_no=e.bid_no AND e.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER))
+  WHERE b.sw_candidate=1 AND b.kind='servc'
+  ORDER BY b.last_seen DESC,b.bid_no DESC
+ """).fetchall()
+ seen=set()
+ candidates=[]
+ today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
+ for no,order,payload,cached,checked_at in rows:
+  try: canonical=str(order or '').zfill(3)
+  except (ValueError,TypeError):continue
+  if not re.fullmatch(r'\d{3}',canonical) or (no,canonical) in seen:continue
+  seen.add((no,canonical))
+  try: info=json.loads(payload)
+  except (TypeError,ValueError): info={}
+  end=datepart(info.get('closes'))
+  if end is not None and end<today:continue
+  if checked_at:
+   try:
+    stamp=dt.datetime.fromisoformat(checked_at.replace('Z','+00:00'))
+    data=json.loads(cached or '{}')
+    limit=EXTRA_SUCCESS_TTL if data.get('complete') is True else EXTRA_PARTIAL_TTL
+    if stamp.tzinfo is not None and now()-stamp<limit:continue
+   except (ValueError,TypeError,AttributeError):pass
+  remaining=(end-today).days if end is not None else 99999
+  candidates.append(((remaining,0 if not checked_at else 1,no),no,canonical))
+ if not candidates:return None
+ candidates.sort(key=lambda x:x[0])
+ return (candidates[0][1],candidates[0][2])
+
+def fetch_extra(no,order):
+ query=urllib.parse.urlencode({'bidNo':no,'order':order})
+ req=urllib.request.Request(API+'/bid-extra?'+query,headers={'Accept':'application/json'})
+ with urllib.request.urlopen(req,timeout=38) as response:
+  data=json.loads(response.read().decode('utf8'))
+ if str(data.get('bidNo') or '')!=no or str(data.get('order') or '')!=order:
+  raise ValueError('supplemental_notice_identity_mismatch')
+ return data
+
 def verify(no,order):
  query=urllib.parse.urlencode({'bidNo':no,'order':order})
  req=urllib.request.Request(API+'/eligibility?'+query,headers={'Accept':'application/json'})
@@ -106,7 +157,20 @@ def main():
  conn.commit()
  retry_after={}
  attempts={}
+ last_extra=0
  while True:
+  if time.monotonic()-last_extra>=EXTRA_POLL:
+   last_extra=time.monotonic()
+   try:
+    target=extra_target(conn)
+    if target:
+     extra=fetch_extra(*target)
+     log('BID_EXTRA_CACHE_REFRESH',target[0],target[1],
+         'complete',bool(extra.get('complete')),
+         'sources',len(extra.get('sources') or {}))
+    else:log('BID_EXTRA_CACHE_UP_TO_DATE_OR_NO_OPEN_NOTICE')
+   except Exception as error:
+    log('BID_EXTRA_CACHE_RETRY_LATER',type(error).__name__)
   completed=0
   errors=0
   rate_limited=False
