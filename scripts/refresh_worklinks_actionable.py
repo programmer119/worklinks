@@ -414,6 +414,16 @@ def classify_staffing(evidence, human):
     return answer('D','인력조건을 판단할 공식 원문 근거 미확인',None)
 
 
+def latest_revisions(rows):
+    dedup={}
+    for row in rows:
+        ident=canonical(row)
+        if ident is None:continue
+        no,order=ident
+        if no not in dedup or int(order)>int(dedup[no]['_order']):
+            dedup[no]={**row,'_order':order}
+    return list(dedup.values())
+
 def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sme=None,direct=None):
     now=now or dt.datetime.now(KST)
     if now.tzinfo is None:now=now.replace(tzinfo=KST)
