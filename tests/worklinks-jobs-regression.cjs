@@ -613,8 +613,8 @@ assert.equal(verdict({industry:'industry_match',pending:3,unknown:5,full:false})
  'unknown clauses are not a rejection and remain individually visible');
 const html=verdictMod.participationStrip({id:'test-bid',condition:'',industry:'industry_match'},
   [bidder,{id:'other',short:'다른 업체',smeRecord:{size:'소기업',validState:'valid'}}]);
-assert.ok(html.includes('data-partner-id="changcom"')&&html.includes('data-partner-id="other"'));
-assert.ok(html.includes('적격 후보'));
+assert.equal(html,'',
+ 'first-pass-only partners must not create duplicate clickable chips or imply certified eligibility');
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 assert.ok(source.includes('function participationVerdict(x,p)'));
 assert.ok(source.includes('job-verdict ready')===false,'do not hardcode all notices as ready');
