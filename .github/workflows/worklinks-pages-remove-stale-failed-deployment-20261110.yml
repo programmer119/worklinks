@@ -1,0 +1,55 @@
+name: WorkLinks remove confirmed failed Pages deployment lock record
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-pages-remove-stale-failed-deployment-20261110.yml']
+permissions:
+  contents: read
+  deployments: write
+  pages: read
+jobs:
+  cleanup-one-failed-deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Delete only exact failed stale deployment record while preserving live successful deployment
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error
+          root='https://api.github.com/repos/programmer119/worklinks'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                   'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2026-03-10'}
+          dead_sha='dc42aab1fde30993e291b0b9c2e345827affb9f6'
+          dead_id=7676821608
+          latest_good_sha='1302c55e6ce7d5f4fc75d5129a3e6079a26b1aa3'
+          latest_good_id=7676762077
+          def get(path):
+              with urllib.request.urlopen(urllib.request.Request(root+path,headers=headers),timeout=20) as r:
+                  return json.load(r)
+          dead=get('/deployments/'+str(dead_id))
+          good=get('/deployments/'+str(latest_good_id))
+          dead_status=get('/deployments/'+str(dead_id)+'/statuses?per_page=1')
+          good_status=get('/deployments/'+str(latest_good_id)+'/statuses?per_page=1')
+          assert dead['sha']==dead_sha and dead['environment']=='github-pages', 'TARGET_ID_MISMATCH'
+          assert dead_status[0]['state'] in ('error','failure','inactive'), 'TARGET_NOT_TERMINAL_FAILED'
+          assert good['sha']==latest_good_sha and good['environment']=='github-pages'
+          assert good_status[0]['state']=='success','LIVE_LAST_GOOD_NOT_SUCCESS'
+          assert good['id']!=dead['id']
+          print('GITHUB_PAGES_SAFE_DELETE_PREFLIGHT=PASS',flush=True)
+          request=urllib.request.Request(root+'/deployments/'+str(dead_id),
+                    headers=headers,method='DELETE')
+          try:
+              with urllib.request.urlopen(request,timeout=30) as r:
+                  print('GITHUB_PAGES_STALE_DELETE_HTTP='+str(r.status),flush=True)
+                  if r.status!=204:raise SystemExit('DELETE_NOT_204')
+          except urllib.error.HTTPError as err:
+              print('GITHUB_PAGES_STALE_DELETE_HTTP='+str(err.code),flush=True)
+              raise
+          live=get('/deployments/'+str(latest_good_id))
+          assert live['id']==latest_good_id and live['sha']==latest_good_sha
+          print('GITHUB_PAGES_LAST_GOOD_RECORD_RETAINED=PASS',flush=True)
+          PY
