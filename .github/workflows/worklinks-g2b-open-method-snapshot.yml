@@ -69,15 +69,22 @@ jobs:
               if not any(fields.values()):continue
               out[number+':'+order]=fields
           pinned=('R26BK01777538:000','R26BK01765541:000','R26BK01807134:000','R26BK01797629:000')
-          missing=[p for p in pinned if not (p in out and out[p].get('awardMethod'))]
-          assert not missing,'VISIBLE_METHODS_MISSING_FROM_BACKEND '+','.join(missing)
+          # Expired notices are deliberately absent from this OPEN-only snapshot.
+          open_pinned=set()
+          for x in items:
+              key=str(x.get('bidNo') or '')+':'+str(x.get('order') or '0').zfill(3)
+              if key in pinned:
+                  close=parse_close(x.get('closes'))
+                  if close and close>now:open_pinned.add(key)
+          missing=[p for p in open_pinned if not (p in out and out[p].get('awardMethod'))]
+          assert not missing,'OPEN_VISIBLE_METHODS_MISSING_FROM_BACKEND '+','.join(sorted(missing))
           result={'ok':True,'generatedAt':dt.datetime.now(dt.timezone.utc).isoformat(),
                   'source':'WorkLinks server123 saved DB /saved, no official tender API requests',
                   'totalSavedSw':total,'count':len(out),'byNotice':out}
           dest=pathlib.Path('startup-support/g2b-award-fields-open.json')
           dest.write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n',encoding='utf-8')
           print('G2B_FALLBACK_READY',len(out),'SAVED_TOTAL',total,'BYTES',dest.stat().st_size,
-                'PINNED_VERIFIED',len(pinned),flush=True)
+                'PINNED_OPEN_VERIFIED',len(open_pinned),flush=True)
           PY
       - name: Publish verified same-origin metadata fallback
         shell: bash
