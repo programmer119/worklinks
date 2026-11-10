@@ -74,6 +74,21 @@ with tempfile.TemporaryDirectory(prefix='worklinks-eligibility-backfill-') as te
  con.commit()
  next_batch=mod['targets'](con)
  assert next_batch[-1][1]=='R26BK99999997',next_batch
+ # Supplemental API targets must be open, SW service only, and source cached.
+ one_extra=mod['extra_target'](con)
+ assert one_extra and len(one_extra)==2 and one_extra[1]=='000',one_extra
+ cached_no,cached_ord=one_extra
+ con.execute('INSERT INTO bid_extra_cache VALUES(?,?,?,?)',
+  (cached_no,cached_ord,json.dumps({'complete':True}),timestamp))
+ con.commit()
+ next_extra=mod['extra_target'](con)
+ assert next_extra and next_extra != one_extra,(one_extra,next_extra)
+ # A future incomplete result is not a verified no-restriction finding.
+ con.execute('INSERT OR REPLACE INTO bid_extra_cache VALUES(?,?,?,?)',
+  (next_extra[0],next_extra[1],json.dumps({'complete':False}),timestamp))
+ con.commit()
+ assert mod['extra_target'](con)!=next_extra
+ print('WORKLINKS_EXTRA_BACKFILL_OPEN_NOTICE_CACHE=PASS')
  print('WORKLINKS_WHOLE_CORPUS_LICENSE_BACKFILL=PASS',
        'indexed',len(rows)-1,'already_cached',len(cache),'remaining',len(result),
        'normalized_ordinals',True,'unbounded_scan',True,'retry_isolated',True)
