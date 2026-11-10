@@ -5,6 +5,7 @@ Key comes ONLY from stdin (never argv, env, repository file, or logs).
 Do not change the existing A02 service key. Requires 3 successful upstream checks
 before writing the new credential in its own root-restricted secret file.
 """
+import datetime as dt
 import hashlib
 import json
 import os
@@ -17,9 +18,11 @@ import urllib.request
 EXPECTED_KEY_SHA256 = "45b84afe183091bda2e74a0d968e0b4f3fff39011daee29776699883fd33e36b"
 BASE = "https://apis.data.go.kr/1230000/ao/PubDataOpnStdService/"
 DEST = "/secrets/g2b-standard.env"
+KST = dt.timezone(dt.timedelta(hours=9))
+YESTERDAY = (dt.datetime.now(KST).date() - dt.timedelta(days=1)).strftime("%Y%m%d")
 TESTS = (
     ("B1", "getDataSetOpnStdBidPblancInfo", {"pageNo": 1, "numOfRows": 1}),
-    ("B2", "getDataSetOpnStdScsbidInfo", {"pageNo": 1, "numOfRows": 1, "bsnsDivCd": "5", "opengBgnDt": "20261101", "opengEndDt": "20261110"}),
+    ("B2", "getDataSetOpnStdScsbidInfo", {"pageNo": 1, "numOfRows": 1, "bsnsDivCd": "5", "opengBgnDt": YESTERDAY + "0000", "opengEndDt": YESTERDAY + "2359"}),
     ("B3", "getDataSetOpnStdCntrctInfo", {"pageNo": 1, "numOfRows": 1}),
 )
 
