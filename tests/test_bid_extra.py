@@ -31,6 +31,8 @@ with tempfile.TemporaryDirectory(prefix='worklinks-extra-') as d:
         raise AssertionError(operation)
     g['request_api']=provider
     try:
+        mod['persist_bids']([{'kind':'servc','bidNo':no,'order':'0',
+             'title':'정보시스템 기능 개선','closes':'2026-12-01'}])
         result=mod['bid_extra_query'](no,'000')
         assert not result['complete'] and not result['ok']
         assert set(result['sources'])=={'serviceProducts','mandatoryJointRegion','regionalIncentives'}
@@ -45,8 +47,6 @@ with tempfile.TemporaryDirectory(prefix='worklinks-extra-') as d:
         again=mod['bid_extra_query'](no,'000')
         assert again['cached'] is True and len(calls)==3
         # UI reads saved bids only; even supplementary data cannot trigger G2B.
-        mod['persist_bids']([{'kind':'servc','bidNo':no,'order':'0',
-             'title':'정보시스템 기능 개선','closes':'2026-12-01'}])
         listing=mod['query_saved_bids'](50,0,True)
         assert listing['items'][0]['supplementalBidFacts']['sources']['serviceProducts']['ok']
         assert listing['items'][0]['supplementalBidFacts']['complete'] is False
