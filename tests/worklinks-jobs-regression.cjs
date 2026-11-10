@@ -557,7 +557,8 @@ for(const [no,order,proposalWord,deliveryWord] of states){
 }
 for(const no of ['R26BK01757317','R26BK01766789','R26BK01754276','R26BK01772216']){
  const x={noticeNumber:no,noticeOrder:'000'};
- assert.ok(checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry],true).includes('입찰참가: 원문·등록 불일치'));
+ assert.equal(checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry],true),'',
+  'compact cards intentionally keep mandatory-qualification notes in detail view');
  const detailed=checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry]);
  assert.ok(detailed.includes('1. 입찰참가 필수조건'));
  assert.ok(detailed.includes('2. 제안·평가 준비사항'));
