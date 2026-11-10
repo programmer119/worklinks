@@ -184,4 +184,17 @@ slide=office_xml('requirements.pptx','ppt/slides/slide1.xml',
  '<p:sld xmlns:p="urn:p" xmlns:a="urn:a"><a:p><a:r><a:t>중소기업확인서 소지 필수</a:t></a:r></a:p></p:sld>')
 assert '중소기업확인서 소지 필수' in slide
 
+# Staffing clauses often omit the exact phrase '투입 인력'.
+staff_text=(
+ '입찰공고일 기준 자사 소속 중급기술자 2명 이상 재직을 증명하여야 한다.\n'
+ '상주 개발자 1명, 총 11.522MM의 업무량을 배정한다.\n'
+ '관련 분야 경력 5년 이상이며 4대보험 가입확인서를 제출한다.\n'
+ '낙찰 후 전문인력 신규 채용하여 착수 전까지 확보할 수 있다.')
+staff_candidates=rfp.extract_rule_candidates(staff_text,'직무상세요건.hwpx')
+assert sum(x['type']=='staff_proof' for x in staff_candidates)>=4,staff_candidates
+staff_scan=rfp.audit_qualification_scan(staff_text,staff_candidates)
+assert staff_scan['unmatchedQualificationAnchorCount']==0,staff_scan
+assert not rfp.nonqualification_context(
+ '낙찰 후 전문인력을 채용하여 사업 착수 전까지 확보할 수 있다.')
+print('WORKLINKS_RFP_STAFFING_SOURCE_CAPTURE=PASS')
 print('WORKLINKS_RFP_FAILURE_CLASSIFICATION=PASS')
