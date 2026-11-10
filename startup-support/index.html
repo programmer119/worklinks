@@ -3484,7 +3484,7 @@ function renderJobs(){
     const oldCount=historyCompetition.latest;
     const competitionLabel=oldCount?
      '<span class="tag" title="과거 '+oldCount.year+'년 공식 개찰 참가업체 '+oldCount.count+'개사 · 이번 공고의 참가업체 수가 아님">'+
-      oldCount.year+'년 '+oldCount.count+'개사</span>':'';
+      oldCount.year+'년 입찰참가 '+oldCount.count+'개사</span>':'';
     const confirmed=member?jobPartnerMatches(x):[],pending=member?jobPartnerCandidates(x):[];
     const scoped=filter!=='partner'||selectedPartnerId==='all'?null:partners.find(p=>p.id===selectedPartnerId);
     const comparisonCompanies=member?(scoped?[scoped]:partners):[];
