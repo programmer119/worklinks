@@ -502,10 +502,16 @@ def bid_extra_query(bid_no, order, collect=True):
     order=str(order).zfill(3)
     con=open_bid_db()
     try:
+        # Only enrich an already-indexed SW service notice, never arbitrary IDs.
+        indexed=con.execute("SELECT 1 FROM bid_notices WHERE kind='servc' AND bid_no=? AND sw_candidate=1 AND printf('%03d',CAST(bid_ord AS INTEGER))=? LIMIT 1",
+                            (bid_no,order)).fetchone()
         saved=con.execute('SELECT payload,checked_at FROM bid_extra_cache WHERE bid_no=? AND bid_ord=?',
                           (bid_no,order)).fetchone()
     finally:
         con.close()
+    if not indexed:
+        return {'ok':False,'complete':False,'state':'not_indexed_sw_service',
+                'bidNo':bid_no,'order':order,'sources':{}}
     if saved:
         try:
             prior=json.loads(saved[0])
@@ -518,6 +524,16 @@ def bid_extra_query(bid_no, order, collect=True):
             pass
     if not collect:
         return {'ok':False,'complete':False,'state':'not_collected','bidNo':bid_no,'order':order}
+    # Global hourly budget limits new official lookups even under repeated GETs.
+    with lock:
+        budget_key=('bid-extra-global-hour',)
+        prev=cache.get(budget_key)
+        right_now=time.time()
+        if not prev or prev[0]<=right_now:
+            prev=(right_now+3600,0)
+        if prev[1]>=4:
+            raise ApiError('supplemental_hourly_budget_exhausted',429)
+        cache[budget_key]=(prev[0],prev[1]+1)
     sources={}
     upstream_limited=False
     for name,operation in BID_EXTRA_OPERATIONS.items():
