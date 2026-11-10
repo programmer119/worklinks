@@ -204,6 +204,25 @@ print('WORKLINKS_STAFFING_FIELDS_AND_PRIORITY_GUARD=PASS')
 print('WORKLINKS_STAFFING_ADBC_CLASSIFICATION=PASS')
 
 print('WORKLINKS_SOURCE_BOUND_BASIC_PRECHECK=PASS')
+# Prior competitors are advisory, never a proxy for current legal readiness.
+market=mod.competition_outlook([
+ {'pastBidNo':'R25BK00000001','year':2025,'participants':2,'winner':'업체A'},
+ {'pastBidNo':'R24BK00000002','year':2024,'participants':1,'winner':'업체B'}])
+assert market['state']=='low_changing_winners' and market['bonus']>0,market
+incumbent=mod.competition_outlook([
+ {'pastBidNo':'R25BK00000001','year':2025,'participants':1,'winner':'업체A'},
+ {'pastBidNo':'R24BK00000002','year':2024,'participants':2,'winner':'업체A'}])
+assert incumbent['state']=='low_same_incumbent' and incumbent['bonus']<0,incumbent
+unknown_market=mod.competition_outlook([
+ {'pastBidNo':'R25BK00000001','year':2025,'participants':0,'winner':''}])
+assert unknown_market['state']=='insufficient' and unknown_market['bonus']==0
+extra=mod.supplemental_summary({'supplementalBidFacts':{
+ 'complete':False,'checkedAt':'2026-11-10T10:00:00+00:00','sources':{
+ 'serviceProducts':{'ok':True,'complete':True,'totalCount':1,'items':[{'prdctClsfcNo':'8111189901'}]},
+ 'mandatoryJointRegion':{'ok':False,'complete':False,'error':'upstream_http_429'}}}})
+assert extra['state']=='partial' and extra['legalQualificationVerified'] is False
+assert not extra['sources']['mandatoryJointRegion']['ok']
+print('WORKLINKS_MARKET_AND_SUPPLEMENTAL_SOURCE_BOUND=PASS')
 print('WORKLINKS_PRACTICAL_SOFTWARE_RANKING=PASS')
 
 # Exact-source geographic mismatch: requires official current business location.
