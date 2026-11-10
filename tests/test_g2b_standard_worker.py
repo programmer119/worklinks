@@ -14,6 +14,7 @@ spec.loader.exec_module(m)
 
 assert set(m.OPERATIONS) == {"B1", "B2", "B3"}
 assert m.PAGE_ROWS == 999
+assert m.B2_ROWS == 500
 assert m.params("B2", "20261109")["opengBgnDt"] == "202611090000"
 assert m.params("B3", "20261109")["cntrctCnclsBgnDate"] == "20261109"
 
@@ -43,7 +44,7 @@ rows = {
 
 def fetch(service, day, page, query):
     assert page == 1 and query["serviceKey"] == "mock"
-    assert query["numOfRows"] == 999
+    assert query["numOfRows"] == (500 if service == "B2" else 999)
     if service == "B2":
         assert len(query["opengBgnDt"]) == 12
         assert query["bsnsDivCd"] == "5"
