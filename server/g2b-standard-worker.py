@@ -334,11 +334,17 @@ def run(days=2, max_requests=90, fetch=None, db_path=DB_PATH, key=None):
         for offset in range(1, int(days) + 1):
             day = (today - dt.timedelta(days=offset)).strftime("%Y%m%d")
             for service in ("B1", "B2", "B3"):
-                exists = db.execute("SELECT received FROM std_windows WHERE service=? AND day=?",
+                exists = db.execute("SELECT received,refreshed_at FROM std_windows WHERE service=? AND day=?",
                                     (service, day)).fetchone()
                 if exists:
-                    print("STD_WINDOW_ALREADY_CACHED " + service + " " + day, flush=True)
-                    continue
+                    try:
+                        previous = dt.datetime.fromisoformat(exists[1].replace("Z", "+00:00"))
+                        fresh = dt.datetime.now(dt.timezone.utc) - previous < dt.timedelta(hours=12)
+                    except (TypeError,ValueError):
+                        fresh = False
+                    if fresh:
+                        print("STD_WINDOW_ALREADY_FRESH " + service + " " + day, flush=True)
+                        continue
                 if budget[0] >= budget[1]:
                     errors.append("request_budget_exhausted")
                     break
@@ -377,7 +383,7 @@ def run(days=2, max_requests=90, fetch=None, db_path=DB_PATH, key=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--days", type=int, default=2)
+    parser.add_argument("--days", type=int, default=7)
     parser.add_argument("--max-requests", type=int, default=90)
     arg = parser.parse_args()
     if not (1 <= arg.days <= 7 and 3 <= arg.max_requests <= 150):
