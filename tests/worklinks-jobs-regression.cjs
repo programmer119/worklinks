@@ -543,9 +543,9 @@ for(const [no,order,proposalWord,deliveryWord] of states){
  const x={noticeNumber:no,noticeOrder:order};
  const card=checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry],true);
  const detail=checkedNotice.changcomOriginalReviewMarkup(x,[officialRegistry]);
- assert.ok(card.includes('입찰참가: 기본 등록조건 일치 · 최종 미확정'),no+' must stay a candidate');
- assert.ok(card.includes('제안·평가: 준비사항')&&card.includes('낙찰 후: 수행조건'),no+' three short stages on card');
- assert.ok(!card.includes('미확정)')&&card.length<450,no+' compact card does not repeat full RFP');
+ // Full mandatory/award/delivery stages belong to the detail drawer now.
+ // Compact cards intentionally do not duplicate these potentially long notes.
+ assert.equal(card,'',no+' should not duplicate lengthy RFP stages on compact cards');
  assert.ok(detail.includes('1. 입찰참가 필수조건'),no+' mandatory-entry stage');
  assert.ok(detail.includes('2. 제안·평가 준비사항')&&detail.includes(proposalWord),no+' proposal stage');
  assert.ok(detail.includes('3. 낙찰 후 수행조건')&&detail.includes(deliveryWord),no+' delivery stage');
