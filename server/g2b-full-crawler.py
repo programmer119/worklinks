@@ -21,17 +21,17 @@ import urllib.request
 
 DB_PATH=os.environ.get('G2B_DB_PATH','/app/data/bids.sqlite3')
 KEY_FILE=os.environ.get('G2B_SECRET_PATH','/run/secrets/g2b.env')
-API_ROOT='https://apis.data.go.kr/1230000/ad/BidPublicInfoService'
+API_ROOT='https://apis.data.go.kr/1230000/ad/BidPublicInfoService02'
 OPERATIONS={
- 'servc':'getBidPblancListInfoServcPPSSrch',
- 'thng':'getBidPblancListInfoThngPPSSrch',
- 'cnstwk':'getBidPblancListInfoCnstwkPPSSrch',
- 'frgcpt':'getBidPblancListInfoFrgcptPPSSrch'
+ 'servc':'getBidPblancListInfoServcPPSSrch02',
+ 'thng':'getBidPblancListInfoThngPPSSrch02',
+ 'cnstwk':'getBidPblancListInfoCnstwkPPSSrch02',
+ 'frgcpt':'getBidPblancListInfoFrgcptPPSSrch02'
 }
 BACKFILL_DAYS=max(7,min(30,int(os.environ.get('G2B_BACKFILL_DAYS','14'))))
 REFRESH_DAYS=max(2,min(7,int(os.environ.get('G2B_REFRESH_DAYS','3'))))
 INTERVAL=max(900,int(os.environ.get('G2B_INTERVAL_SECONDS','3600')))
-ROWS=100
+ROWS=999
 PER_REQUEST_DELAY=0.22
 SHUTDOWN=False
 
@@ -105,6 +105,9 @@ def call(key,kind,day,page):
             return int(body.get('totalCount') or 0),items
         except (urllib.error.HTTPError,urllib.error.URLError,TimeoutError,ValueError,KeyError,OSError) as e:
             # Never include URL: it contains the service key.
+            if isinstance(e,urllib.error.HTTPError) and e.code == 429:
+                # Quota exhaustion: no retries, and no further date/kind requests this cycle.
+                raise RuntimeError('g2b_rate_limited_429') from None
             last=type(e).__name__+((':'+str(getattr(e,'code',''))) if isinstance(e,urllib.error.HTTPError) else '')
             if attempt<4:time.sleep(min(8,attempt*1.7)+random.random())
     raise RuntimeError('upstream_error_'+str(last))
@@ -199,6 +202,10 @@ def scan(db,key,days,reason):
                 db.execute('UPDATE crawl_status SET error_count=error_count+1 WHERE id=1')
                 db.commit()
                 log('WINDOW_FAILED',err)
+                if 'g2b_rate_limited_429' in str(e):
+                    state(db,'partial','g2b_rate_limited_429;paused_until_next_cycle',finished=True)
+                    log('QUOTA_STOPPED_FURTHER_REQUESTS')
+                    return False
             time.sleep(PER_REQUEST_DELAY)
     total=db.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
     message='reason=%s;windows=%d;received=%d;unique_total=%d;errors=%d'%(reason,days*4,scanned,total,len(errors))
