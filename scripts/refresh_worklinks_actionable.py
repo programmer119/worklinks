@@ -327,10 +327,10 @@ def basic_qualification_evidence(human,registered,company,sme,direct,now):
 
 
 def classify_staffing(evidence, human):
-    """Conservative A/B/C/D from already saved, source-linked personnel clauses.
+    """Classify staffing only from source-linked RFP clauses, not from bidder assumptions.
 
-    No absence inference from missing text. Generic on-site/dedicated duties do
-    not prove that a person must be employed at bid time or can be hired later.
+    A: explicit post-award / pre-start hiring deadline. B: pre-bid existing
+    employee condition. C: explicit no personnel requirement. D: unresolved.
     """
     clauses=(evidence.get('clauseCandidates') or {}).get('staff_proof') or []
     official=[]
@@ -338,70 +338,81 @@ def classify_staffing(evidence, human):
         if not isinstance(item,dict):continue
         url=str(item.get('url') or '')
         quote=' '.join(str(item.get('text') or '').split())
-        if (url.startswith('https://www.g2b.go.kr/') and
-                item.get('sourceFile') and quote):
+        if url.startswith('https://www.g2b.go.kr/') and item.get('sourceFile') and quote:
             official.append({'text':quote[:320],'sourceUrl':url,
                              'sourceFile':str(item['sourceFile'])[:120]})
-    # Manual summaries of official attachments are useful for a pending warning,
-    # but are never promoted to firm A/B/C decisions as they are not verbatim.
     performance=human.get('officialRfpPerformanceEvidence') or {}
     findings=[str(x.get('finding') or '') for x in
               (performance.get('requirements') or []) if isinstance(x,dict) and
               x.get('topic') in ('on_site_staff','dedicated_staff',
                                  'staffing','staff_qualification')]
-    source=official[0] if official else None
+    text=' '.join(c['text'] for c in official)
+    onsite=bool(re.search(r'상주|현장\s*(?:근무|배치)|전담\s*근무',text))
+    people=[]
+    for item in official:
+        quote=item['text']
+        for pattern in (
+            r'(?:상주|전담|현장\s*배치|투입\s*인력).{0,35}?(\d{1,2})\s*(?:명|인)(?!\w)',
+            r'(\d{1,2})\s*(?:명|인)(?!\w).{0,35}?(?:상주|전담|현장\s*배치)'):
+            people.extend(int(v) for v in re.findall(pattern,quote) if 0<int(v)<=99)
+    months=[float(v) for v in re.findall(
+        r'(?<!\d)(\d+(?:\.\d+)?)\s*(?:MM|M/M|맨먼스|man[- ]?month)\b',
+        text,re.I) if 0<float(v)<=2000]
+    years=[int(v) for v in re.findall(
+        r'(?:관련\s*분야|개발|실무|기술)?\s*경력\s*(\d{1,2})\s*년\s*이상',
+        text) if 0<int(v)<=50]
+    grades=list(dict.fromkeys(re.findall(
+        r'(?:특급|고급|중급|초급)\s*(?:이상\s*)?(?:기술자|기술인력|개발자)',text)))
+    proofs=[name for name,rx in {
+        '재직증명서':r'재직\s*증명서',
+        '4대보험':r'4대\s*보험|사대보험',
+        '경력증명서':r'경력\s*증명서',
+        '자격증':r'자격\s*증(?:명서|사본)|자격증',
+    }.items() if re.search(rx,text)]
+    requirements={'onSite':onsite,'peopleMentioned':sorted(set(people)),
+                  'manMonthsMentioned':sorted(set(months)),
+                  'gradesMentioned':grades,
+                  'experienceYearsMentioned':sorted(set(years)),
+                  'proofsMentioned':proofs,
+                  'officialExtractCount':len(official)}
+    cutoff=r'입찰\s*공고일|공고일|입찰\s*마감일|입찰일|제안서\s*제출일|제안\s*마감일'
+    employed=r'재직|(?:자사|당사|제안사|업체|회사)\s*소속|소속\s*(?:직원|인력|기술자)|4대\s*보험\s*가입'
     b_pattern=re.compile(
-        r'(?:입찰\s*공고일|입찰\s*마감일|제안서\s*제출일).{0,105}'
-        r'(?:재직|소속|근무)|(?:재직|소속|근무).{0,105}'
-        r'(?:입찰\s*공고일|입찰\s*마감일|제안서\s*제출일)')
+        r'(?:'+cutoff+r').{0,105}(?:'+employed+r')|'
+        r'(?:'+employed+r').{0,105}(?:'+cutoff+r')')
     a_pattern=re.compile(
-        r'(?:낙찰\s*(?:후|이후)|계약\s*체결\s*후|착수\s*(?:전|일까지)|'
-        r'계약\s*체결\s*전까지).{0,110}'
-        r'(?:인력|기술자|개발자|전문가|사업\s*책임자).{0,50}'
-        r'(?:채용|확보|충원|고용)|'
-        r'(?:인력|기술자|개발자|전문가).{0,60}'
-        r'(?:채용|확보|충원).{0,80}'
-        r'(?:낙찰\s*(?:후|이후)|계약\s*체결\s*후|착수\s*(?:전|일까지))')
+        r'(?:낙찰\s*(?:후|이후)|계약\s*체결\s*(?:후|전까지)|'
+        r'착수\s*(?:전|일까지)|사업\s*착수\s*전|용역\s*개시\s*전)'
+        r'.{0,110}(?:인력|기술자|개발자|전문가|사업\s*책임자|PM)'
+        r'.{0,50}(?:채용|확보|충원|고용)|'
+        r'(?:인력|기술자|개발자|전문가).{0,60}(?:채용|확보|충원)'
+        r'.{0,80}(?:낙찰\s*(?:후|이후)|계약\s*체결\s*후|착수\s*(?:전|일까지))')
     c_pattern=re.compile(
         r'(?:입찰\s*참가\s*자격|본\s*사업).{0,70}'
         r'(?:투입\s*인력|인력\s*(?:조건|요건)).{0,40}'
         r'(?:없음|요구하지\s*않음|해당\s*없음)')
-    # One mandatory prior-employment condition is sufficient to rule out
-    # relying solely on a post-award recruit.
+    def answer(kind,reason,source):
+        return {'class':kind,'reason':reason,'evidence':source,
+                'requirements':requirements,'staffingConfirmed':False}
     for item in official:
         if b_pattern.search(item['text']) and re.search(
-                r'인력|기술자|개발자|책임자|PM|재직',item['text'],re.I):
-            return {'class':'B','reason':'입찰 시점 기존 재직·소속 조건 명시',
-                    'evidence':item}
+                r'인력|기술자|개발자|책임자|PM|재직|직원',item['text'],re.I):
+            return answer('B','입찰 시점 기존 재직·소속 조건 명시',item)
     for item in official:
         if a_pattern.search(item['text']):
-            return {'class':'A','reason':'낙찰·계약 후 또는 착수 전 인력 확보 시점 명시',
-                    'evidence':item}
+            return answer('A','낙찰·계약 후 또는 착수 전 인력 확보 시점 명시',item)
     for item in official:
         if c_pattern.search(item['text']):
-            return {'class':'C','reason':'공식 첨부에 별도 인력요건 없음 명시',
-                    'evidence':item}
+            return answer('C','공식 첨부에 별도 인력요건 없음 명시',item)
     if official:
-        return {'class':'D','reason':'인력 관련 조항은 있으나 확보 시점이 불명확',
-                'evidence':source}
+        return answer('D','인력 요건은 있으나 확보 기준일 미확인',official[0])
     if findings:
-        return {'class':'D','reason':'상주·전담·기술인력 관련 조건 일부 확인, 시점 미확인',
-                'evidence':{'text':findings[0][:220],
-                            'sourceUrl':str(performance.get('sourceUrl') or ''),
-                            'sourceFile':str(performance.get('sourceFile') or '')}}
-    return {'class':'D','reason':'인력조건을 판단할 공식 원문 근거 미확인',
-            'evidence':None}
+        return answer('D','상주·전담·기술인력 조건 일부 확인, 기준일 미확인',
+                      {'text':findings[0][:220],
+                       'sourceUrl':str(performance.get('sourceUrl') or ''),
+                       'sourceFile':str(performance.get('sourceFile') or '')})
+    return answer('D','인력조건을 판단할 공식 원문 근거 미확인',None)
 
-
-def latest_revisions(rows):
-    dedup={}
-    for row in rows:
-        ident=canonical(row)
-        if ident is None:continue
-        no,order=ident
-        if no not in dedup or int(order)>int(dedup[no]['_order']):
-            dedup[no]={**row,'_order':order}
-    return list(dedup.values())
 
 def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sme=None,direct=None):
     now=now or dt.datetime.now(KST)
@@ -497,12 +508,21 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
         if deadline_unknown:score-=60
         if price>=3_000_000_000:score-=12
         if purpose=='software_goods_review':score-=30
-        # Validated basic prechecks rank ahead of raw industry-code matches.
+        # Basic registrations alone cannot certify staffing feasibility.
         tier=(0 if precheck['state']=='documented_precheck' else
               1 if precheck['state']=='partial_review' else
               4 if precheck['state']=='confirmed_mismatch' else
               2 if scanned and screening=='published_industry_codes_match' else
               3)
+        staffing_risk=('prebid_staff_unverified' if staffing['class']=='B' else
+                       'onsite_staff_unverified' if staffing['requirements']['onSite'] else
+                       'none_identified')
+        if staffing_risk=='prebid_staff_unverified':
+            tier=max(tier,3)
+            score-=28
+        elif staffing_risk=='onsite_staff_unverified':
+            tier=max(tier,2)
+            score-=12
         bids.append({
             'bidNo':no,'order':order,'title':str(row.get('title') or ''),
             'org':str(row.get('org') or row.get('agency') or ''),
@@ -523,6 +543,7 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
             'historicalCompetition':historical,'reviewedNotice':human,
             'basicQualificationEvidence':precheck,
             'staffingClassification':staffing,
+            'staffingRisk':staffing_risk,
             'precheckState':precheck['state'],'priorityTier':tier,
             'precheckedMandatoryClauses':bool(human),
             'confirmedRegionalMismatch':human.get('state')=='explicit_mandatory_region_mismatch',
