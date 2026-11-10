@@ -26,6 +26,7 @@ DEST=ROOT/'startup-support/rfp-clauses.json'
 COVERAGE_DEST=ROOT/'startup-support/rfp-coverage-index.json'
 CHANGCOM_SOURCE=ROOT/'startup-support/changcom-actionable.json'
 CHANGCOM_EVIDENCE_DEST=ROOT/'startup-support/changcom-rfp-evidence.json'
+CHANGCOM_BACKFILL60=ROOT/'startup-support/audits/changcom-rfp-backfill-60-20261110.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
@@ -183,6 +184,31 @@ def changcom_targets(path=CHANGCOM_SOURCE):
     except (OSError,ValueError,TypeError,AttributeError):
         return set()
 
+def pending_changcom_backfill(path=CHANGCOM_BACKFILL60):
+    """Persisted 60-notice audit from the original 200-notice snapshot.
+
+    This is only a scan priority queue; every item remains unverified until the
+    official attached document is downloaded and its text successfully read.
+    """
+    try:
+        obj=json.loads(path.read_text(encoding='utf-8'))
+        items=obj.get('items') or []
+        if obj.get('originalUnscannedCount')!=60 or len(items)!=60:
+            raise ValueError('invalid_backfill_target_count')
+        found=set()
+        for entry in items:
+            key=str(entry.get('bidId') or '')
+            if not re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',key):
+                raise ValueError('invalid_backfill_bid_id')
+            found.add(key)
+        if len(found)!=60:raise ValueError('duplicate_backfill_bid_id')
+        return found
+    except (OSError,ValueError,TypeError,AttributeError) as error:
+        print('CHANGCOM_BACKFILL_QUEUE_UNAVAILABLE',type(error).__name__,
+              str(error)[:100],flush=True)
+        return set()
+
+
 def discover(limit,prior=None,targets=None,manifest_probe_out=None):
     """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
@@ -193,6 +219,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
     """
     prior=prior or {}
     targets=changcom_targets() if targets is None else targets
+    backfill=pending_changcom_backfill()
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -236,11 +263,14 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                                  str(v) for v in (row.get('codes') or []))
                              for row in (qual.get('requirements') or [])
                              if isinstance(row,dict))
+                # Requested 60 missing RFPs outrank generic live bids, without
+                # bypassing cached-source reuse, quota limits or retry cooldown.
                 # Urgent, unreviewed and official-license-matched bids first.
                 # Do not confuse a lack of matching metadata with a rejection.
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
-                rank=(0 if key in targets and temporal==0 else 1 if temporal==0 else
+                rank=(-1 if key in backfill and temporal==0 else
+                      0 if key in targets and temporal==0 else 1 if temporal==0 else
                       2 if key in targets else 3,
                       novel,0 if retry else 1,
                       0 if matching else 1,
