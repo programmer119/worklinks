@@ -636,6 +636,114 @@ def query_saved_bids(limit,offset,only_sw=False):
     finally:con.close()
 
 
+G2B_STD_DB_PATH = os.environ.get('G2B_STD_DB_PATH', '/app/data/g2b-standard.sqlite3')
+
+
+def open_standard_readonly():
+    """Never create an empty DB or emit a credential for public read-only routes."""
+    if not os.path.isfile(G2B_STD_DB_PATH):
+        return None
+    con=sqlite3.connect('file:'+G2B_STD_DB_PATH+'?mode=ro',uri=True,timeout=8)
+    con.execute('PRAGMA busy_timeout=8000')
+    return con
+
+
+def standard_sync_status():
+    con=open_standard_readonly()
+    if con is None:
+        return {'ok':True,'installed':False,'state':'not_collected','source':'조달청 공공데이터개방표준서비스'}
+    try:
+        check=con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='std_windows'").fetchone()
+        if not check:
+            return {'ok':True,'installed':False,'state':'not_collected'}
+        status=con.execute('''SELECT last_run,last_success,requests,windows,message
+          FROM std_run_status WHERE id=1''').fetchone()
+        windows=con.execute('''SELECT service,COUNT(*),MAX(day),SUM(received)
+          FROM std_windows GROUP BY service''').fetchall()
+        counts={}
+        for service,number,day,received in windows:
+            counts[service]={'completedDays':number,'latestDay':day,'officialRows':received}
+        return {'ok':True,'installed':True,'source':'나라장터 공공데이터개방표준서비스',
+          'lastRun':status[0] if status else None,
+          'lastSuccess':status[1] if status else None,
+          'requestsLastRun':status[2] if status else 0,
+          'completedWindowsLastRun':status[3] if status else 0,
+          'state':status[4] if status else 'initialized',
+          'coverage':counts,
+          'stored':{'B1':con.execute('SELECT COUNT(*) FROM std_notices').fetchone()[0],
+                    'B2':con.execute('SELECT COUNT(*) FROM std_awards').fetchone()[0],
+                    'B3':con.execute('SELECT COUNT(*) FROM std_contracts').fetchone()[0]},
+          'scopeNote':'완료된 조회 날짜만 표시. 낙찰과 계약 체결은 이행실적 증명이 아닙니다.'}
+    finally:
+        con.close()
+
+
+def standard_bid_evidence(bid_no):
+    """Read B1/B2/B3 independently, joined ONLY on an exact official bid number."""
+    if not re.fullmatch(r'[A-Za-z0-9-]{8,40}',str(bid_no)):
+        raise ApiError('invalid_bid_no',400)
+    result={'ok':True,'installed':False,'bidNo':bid_no,'source':'나라장터 공공데이터개방표준서비스',
+            'notice':None,'award':None,'contracts':[],
+            'scopeNote':'개별 공고번호가 정확히 일치할 때만 연결. 낙찰·계약은 이행완료 또는 실적증명서가 아닙니다.'}
+    con=open_standard_readonly()
+    if con is None:
+        return result
+    try:
+        if not con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='std_awards'").fetchone():
+            return result
+        result['installed']=True
+        notice=con.execute('''SELECT bid_ord,day,title,agency,contract_method,decision_method
+          FROM std_notices WHERE bid_no=? ORDER BY day DESC,bid_ord DESC LIMIT 1''',(bid_no,)).fetchone()
+        if notice:
+            result['notice']={'order':notice[0],'day':notice[1],
+             'title':notice[2],'agency':notice[3],
+             'contractMethod':notice[4],'decisionMethod':notice[5],
+             'source':'B1'}
+        award=con.execute('''SELECT bid_ord,day,title,division,identified_bidders,
+          all_bidders_identified,winner_bizno,winner_name,winner_amount,
+          winner_rate,winner_date,winner_conflict,sample_rows
+          FROM std_awards WHERE bid_no=?
+          ORDER BY day DESC,bid_ord DESC LIMIT 1''',(bid_no,)).fetchone()
+        winner_bizno=''
+        if award:
+            winner_bizno=award[6] if re.fullmatch(r'\d{10}',str(award[6] or '')) else ''
+            result['award']={'source':'B2','order':award[0],'openingDay':award[1],
+              'title':award[2],'division':award[3],
+              'identifiedBidders':award[4],
+              'completeBidderIdentity':bool(award[5]),
+              'winnerBizno':winner_bizno,
+              'winner':award[7] if winner_bizno else '',
+              'winnerAmount':award[8] if winner_bizno else None,
+              'winnerRate':award[9] if winner_bizno else None,
+              'winnerDate':award[10] if winner_bizno else '',
+              'winnerConflict':bool(award[11]),
+              'bidRows':award[12],
+              'bidderCountIsLowerBound':bool(award[4]) and not bool(award[5])}
+        rows=con.execute('''SELECT contract_no,contract_ord,day,bid_ord,contract_name,
+            company,company_bizno,amount,signed_date,conflict
+          FROM std_contracts WHERE bid_no=? ORDER BY day DESC,contract_no LIMIT 30''',(bid_no,)).fetchall()
+        seen=set()
+        contracts=[]
+        for r in rows:
+            if r[0] in seen:continue
+            seen.add(r[0])
+            biz=str(r[6] or '')
+            biz= biz if re.fullmatch(r'\d{10}',biz) else ''
+            contracts.append({'contractNo':r[0],'order':r[1],'day':r[2],
+              'bidOrder':r[3],'title':r[4],
+              'company':r[5] if biz else '',
+              'companyBizno':biz,'amount':None if r[9] else r[7],
+              'signedDate':r[8],
+              'companyIdentified':bool(biz),
+              'matchesAwardWinner':bool(biz and winner_bizno and biz==winner_bizno),
+              'dataConflict':bool(r[9]),'source':'B3'})
+        result['contracts']=contracts
+        result['contractCountShown']=len(contracts)
+        return result
+    finally:
+        con.close()
+
+
 def cached_historic_awards(limit=200,offset=0):
     """Read-only public snapshot: the worker stores exact positive official awards."""
     db=open_bid_db()
@@ -933,6 +1041,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,cached_historic_awards(limit,offset))
             if u.path == '/api/g2b/award-cache-status':
                 return self.reply(200,award_enricher_status())
+            if u.path == '/api/g2b/standard-status':
+                return self.reply(200,standard_sync_status())
+            if u.path == '/api/g2b/standard-bid':
+                return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
             if u.path == '/api/g2b/saved':
                 try: limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except ValueError: raise ApiError('invalid_saved_pagination',400)
