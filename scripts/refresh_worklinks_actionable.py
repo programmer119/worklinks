@@ -219,6 +219,63 @@ def comparable_competition(row,awards):
                         'source':'나라장터 과거 낙찰정보·유사 공고번호 대조'})
     return results[:3]
 
+def competition_outlook(historical):
+    """Only exact prior awards of independently matched repeat projects.
+
+    A low bid count is opportunity evidence, never an estimated win probability.
+    Missing competitor or winner facts cannot produce a positive signal.
+    """
+    comparable=[]
+    seen=set()
+    for item in historical:
+        try: count=int(item.get('participants') or 0);year=int(item.get('year') or 0)
+        except (ValueError,TypeError,AttributeError):continue
+        winner=str(item.get('winner') or '').strip()
+        no=str(item.get('pastBidNo') or '').strip()
+        if not (1<=count<=5000 and winner and 2022<=year<=2026 and no):
+            continue
+        if year in seen:continue
+        seen.add(year)
+        comparable.append((year,count,winner,no))
+    comparable.sort(reverse=True)
+    if len(comparable)<2:
+        return {'state':'insufficient','verifiedYears':len(comparable),
+                'bonus':0,'limitations':'과거 비교 가능한 서로 다른 연도 2건 이상 필요'}
+    sample=comparable[:3]
+    low=all(1<=row[1]<=2 for row in sample)
+    changed=len({row[2] for row in sample})>1
+    state=('low_changing_winners' if low and changed else
+           'low_same_incumbent' if low else 'mixed_or_competitive')
+    bonus=(16 if state=='low_changing_winners' else
+           -8 if state=='low_same_incumbent' else 0)
+    return {'state':state,'verifiedYears':len(sample),
+            'participantCounts':[row[1] for row in sample],
+            'winnerChanged':changed,'bonus':bonus,
+            'limitations':'과거 경쟁·낙찰 업체 변경만의 비교. 이번 경쟁사 수, 수행 가능성, 수주 확률은 미확정'}
+
+def supplemental_summary(row):
+    """Save compact exact-source API metadata without guessing a legal verdict."""
+    raw=row.get('supplementalBidFacts') or {}
+    if not isinstance(raw,dict):return {'state':'not_collected','sources':{}}
+    sources={}
+    for name,record in (raw.get('sources') or {}).items():
+        if name not in ('serviceProducts','mandatoryJointRegion','regionalIncentives'):
+            continue
+        if not isinstance(record,dict):continue
+        sources[name]={
+            'ok':record.get('ok') is True,
+            'complete':record.get('complete') is True,
+            'totalCount':record.get('totalCount'),
+            'operation':str(record.get('operation') or ''),
+            'error':str(record.get('error') or '')[:120],
+            'sample':record.get('items',[])[:2] if isinstance(record.get('items'),list) else []
+        }
+    return {'state':'collected' if raw.get('complete') is True else 'partial',
+            'checkedAt':str(raw.get('checkedAt') or ''),
+            'sources':sources,
+            'legalQualificationVerified':False}
+
+
 def load_verified_reviews(path=NOTICE_REVIEWS):
     """Human-checked notice-source observations. Never imply legal approval."""
     try:
@@ -483,6 +540,8 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
         cited_documents=evidence.get('files') if isinstance(evidence.get('files'),list) else []
         staffing=classify_staffing(evidence,human)
         historical=comparable_competition(row,awards)
+        competition=competition_outlook(historical)
+        supplemental=supplemental_summary(row)
         scanned=source.get('status')=='text_extracted_requires_review'
         hours=(end-now).total_seconds()/3600 if end is not None else None
         days=int((hours+23.999)//24) if hours is not None else None
@@ -533,6 +592,8 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
         elif staffing_risk=='onsite_staff_unverified':
             tier=max(tier,2)
             score-=12
+        # Competition bonuses are advisory and cannot override personnel gates.
+        score+=competition['bonus']
         bids.append({
             'bidNo':no,'order':order,'title':str(row.get('title') or ''),
             'org':str(row.get('org') or row.get('agency') or ''),
@@ -550,7 +611,8 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
             'officialClauseEvidence':evidence,
             'originalRequirementTypes':cited_types,
             'originalSourceDocumentCount':len(cited_documents),
-            'historicalCompetition':historical,'reviewedNotice':human,
+            'historicalCompetition':historical,'competitionOutlook':competition,
+            'supplementalBidFacts':supplemental,'reviewedNotice':human,
             'basicQualificationEvidence':precheck,
             'staffingClassification':staffing,
             'staffingRisk':staffing_risk,
