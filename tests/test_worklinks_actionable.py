@@ -181,6 +181,26 @@ staffed_output=mod.build([rows[0]],1,company,now=now,rfp=staffed_rfp)
 assert staffed_output['bids'][0]['staffingClassification']['class']=='B'
 assert staffed_output['verificationProgress']['staffingCounts']['B']==1
 assert staffed_output['bids'][0]['eligibilityVerified'] is False
+# Capture measurable personnel load without turning excerpts into certified eligibility.
+numbers=classify(staffing_clause(
+ '본 사업 수행기간 현장 상주 중급기술자 2명 배치, 총 투입공수 11.522MM, 관련 분야 경력 5년 이상, 4대보험 가입증명서 제출'),{})
+assert numbers['class']=='D' and numbers['requirements']['onSite'] is True,numbers
+assert numbers['requirements']['peopleMentioned']==[2],numbers
+assert numbers['requirements']['manMonthsMentioned']==[11.522],numbers
+assert numbers['requirements']['experienceYearsMentioned']==[5],numbers
+assert '4대보험' in numbers['requirements']['proofsMentioned'],numbers
+assert '중급기술자' in numbers['requirements']['gradesMentioned'],numbers
+# Clear pre-existing staff takes precedence over a separate post-award clause.
+existing2=classify(staffing_clause(
+ '제안서 제출일 현재 제안사 소속 개발자 1명 이상 재직하여야 한다.'),{})
+assert existing2['class']=='B',existing2
+# A B risk can never outrank a comparable eligibility precheck without personnel proof.
+staffed_checked=mod.build([rows[0]],1,company,now=now,rfp=staffed_rfp,
+                          reviews=reviewed,sme=sme,direct=direct)
+risk_row=staffed_checked['bids'][0]
+assert risk_row['staffingRisk']=='prebid_staff_unverified',risk_row
+assert risk_row['priorityTier']>=3 and risk_row['eligibilityVerified'] is False,risk_row
+print('WORKLINKS_STAFFING_FIELDS_AND_PRIORITY_GUARD=PASS')
 print('WORKLINKS_STAFFING_ADBC_CLASSIFICATION=PASS')
 
 print('WORKLINKS_SOURCE_BOUND_BASIC_PRECHECK=PASS')
