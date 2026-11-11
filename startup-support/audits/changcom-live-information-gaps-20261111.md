@@ -15,7 +15,12 @@ API 정보 누락은 '제한 없음'이 아니고, 파일 일부 텍스트 판�
 | license_needs_followup | 520 |
 | license_needs_official_license_api_or_rule_review | 520 |
 | license_no_published_license_restriction_detected_unverified | 145 |
+| license_raw_industry_rule_conflict_review | 491 |
+| license_raw_no_license_restriction_detected | 145 |
+| license_raw_official_license_unavailable | 29 |
+| license_raw_published_industry_codes_match | 581 |
 | missing_core_notice_fields | 185 |
+| missing_field_마감시각 | 185 |
 | previous_recommendations_present | 3 |
 | rfp_attachments_unreadable | 110 |
 | rfp_manifest_status_unknown_legacy | 213 |
