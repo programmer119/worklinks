@@ -6,6 +6,7 @@ Unknown/ambiguous evidence is retained in review buckets, not called ineligible.
 No model, third-party paid API, local production database access or secrets.
 """
 import argparse
+import os
 import datetime as dt
 import json
 import pathlib
@@ -22,7 +23,7 @@ DIRECT_CERT=ROOT/'startup-support/direct-production-snapshot.json'
 # Only exact mapped product names count as historical certificates; unknown codes stay pending.
 DIRECT_PRODUCT_CODES={'8111189901':'정보시스템유지관리서비스',
                       '8111159901':'정보시스템개발서비스'}
-API='https://api-suaveforge.suaveforge.com:18458/api/g2b'
+API=os.environ.get('WORKLINKS_G2B_API','https://api-suaveforge.suaveforge.com:18458/api/g2b').rstrip('/')
 BIZNO='1308185973'
 KST=dt.timezone(dt.timedelta(hours=9))
 SVC_PRODUCT=re.compile(r'8111159901|8111189901|8111179901|8111239901|정보시스템(?:개발|유지관리)서비스',re.I)
