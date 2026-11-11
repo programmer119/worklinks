@@ -1016,6 +1016,7 @@ def compact_coverage(item):
         'hwpxReaderVersion':item.get('hwpxReaderVersion',0),
         'reviewComplete':False,
         'attachmentManifestCount':item.get('attachmentManifestCount'),
+        'manifestComplete':item.get('manifestComplete'),
         'readableDocumentCount':item.get('readableDocumentCount',0),
         'unreadableDocumentCount':item.get('unreadableDocumentCount',0),
         'files':[{
@@ -1024,6 +1025,7 @@ def compact_coverage(item):
             'sourceSha256':str(f.get('sourceSha256') or '')[:64],
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
+            'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
             'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
             'clauseCandidateCount':len(f.get('clauseCandidates') or [])
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
