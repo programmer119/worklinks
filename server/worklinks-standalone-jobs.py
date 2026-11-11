@@ -131,9 +131,9 @@ def test_source(root):
             return False,result
     return True,result
 
-def test_diagnostics(root):
+def test_diagnostics(root, commands):
     checks=[]
-    for command in SUPPLEMENTAL_QA:
+    for command in commands:
         argv=[sys.executable if x=='python' else x for x in command]
         if not (root/command[1]).is_file():
             checks.append({'name':command[1],'ok':False,'error':'test_source_missing'})
@@ -284,7 +284,8 @@ def iterate(now=None):
                 st['lastQa']={'ok':good,'head':sha,'results':results}
                 if good:
                     st['checkedHead']=sha
-                    st['lastSupplementalQa']={'head':sha,'results':test_diagnostics(SRC)}
+                    st['lastSupplementalQa']={'head':sha,'results':[],
+                                              'complete':False}
                 else:log('WORKLINKS_STANDALONE_SOURCE_QA_FAILED',sha,results[-1])
             st['sourceHead']=sha
         except Exception as exc:
@@ -312,6 +313,16 @@ def iterate(now=None):
             record['error']=type(exc).__name__+': '+str(exc)[:190]
             log('WORKLINKS_STANDALONE_FAILED',job,record['error'])
         st[job]=record
+        state_save(st)
+    # Optional source gates are metered one per cycle, AFTER critical collectors.
+    extra=st.get('lastSupplementalQa') or {}
+    if (extra.get('head')==st.get('checkedHead') and
+            not extra.get('complete') and
+            len(extra.get('results') or [])<len(SUPPLEMENTAL_QA)):
+        idx=len(extra.get('results') or [])
+        extra['results']=(extra.get('results') or [])+test_diagnostics(SRC,[SUPPLEMENTAL_QA[idx]])
+        extra['complete']=len(extra['results'])==len(SUPPLEMENTAL_QA)
+        st['lastSupplementalQa']=extra
         state_save(st)
     return st
 
