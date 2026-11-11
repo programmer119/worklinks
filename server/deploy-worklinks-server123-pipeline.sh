@@ -154,9 +154,22 @@ install -m 0644 "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIP
 install -m 0644 "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py"
 install -m 0644 "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py"
 start_worker "$IMAGE"
-sleep 4
-test "$(dk inspect -f '{{.State.Running}}' "$WORKER")" = true
-dk logs --tail 60 "$WORKER" 2>&1 | grep -q 'PIPELINE_SERVER123_STARTED'
+# Startup validates large (100MB+) RFP checkpoints before the STARTED log.
+# Four seconds previously triggered a false failure and rolled back a healthy image.
+ready=0
+for attempt in $(seq 1 30);do
+  test "$(dk inspect -f '{{.State.Running}}' "$WORKER")" = true || {
+    echo 'RFP_PIPELINE_WORKER_STOPPED_DURING_PREFLIGHT'
+    dk logs --tail 18 "$WORKER" 2>&1 | cut -c1-220 || true
+    exit 9
+  }
+  if dk logs --tail 80 "$WORKER" 2>&1 | grep -q 'PIPELINE_SERVER123_STARTED';then
+    ready=1
+    break
+  fi
+  sleep 2
+done
+test "$ready" = 1 || { echo 'PIPELINE_STARTUP_PREFLIGHT_TIMEOUT';exit 9; }
 for name in changcom-actionable g2b-award-fields-open rfp-clauses rfp-coverage-index;do
   code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 \
       "http://127.0.0.1:18192/api/g2b/snapshot?name=$name")"
