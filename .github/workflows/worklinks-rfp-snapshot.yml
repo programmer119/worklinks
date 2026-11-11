@@ -1,17 +1,8 @@
+# Server123 container now owns periodic work. This workflow is manual recovery ONLY.
 # re-run after server123 G2B quota-classification API deployment 2026-11-11
 name: WorkLinks official RFP eligibility snippets
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/worklinks-rfp-snapshot.yml'
-      - 'scripts/refresh_worklinks_rfp.py'
-      - 'tests/test_rfp_failures.py'
-      - 'tests/test_rfp_rolling_coverage.py'
-      - 'tests/test_rfp_quota_budget.py'
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
 permissions:
   contents: write
   actions: read
