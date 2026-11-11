@@ -683,7 +683,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 <script src="./kimse-fit.js?v=20261107-1"></script>
 <script src="./kimse-intake.js?v=20261107-1"></script>
 <script>
-var WORKLINKS_PAGE_REVISION='20261111-server123-snapshot-read-v1';
+var WORKLINKS_PAGE_REVISION='20261111-all-collectors-server123-v1';
 function worklinksPartnerAccess(){
  return window.worklinksMemberAuthenticated===true&&
    document.documentElement.dataset.worklinksPartnerAccess==='granted';
@@ -937,7 +937,7 @@ async function refreshPartnerProduction(p){
     data=await g2bFetch('/direct-production?bizno='+encodeURIComponent(bizno));
     p.productionDataSource='실제 공공데이터 API';
    }catch(e){
-    const response=await fetch('./direct-production-snapshot.json',{cache:'no-store'});
+    const response=await fetchServer123Snapshot('direct-production-snapshot','./direct-production-snapshot.json');
     if(!response.ok)throw Error('API 실패 · 공개자료도 조회 불가: '+String(e.message||e));
     const source=await response.json();
     if(!source.ok||source.complete!==true||!source.recordsByBizno||!Object.prototype.hasOwnProperty.call(source.recordsByBizno,bizno))throw Error('공개자료 불완전');
@@ -1035,7 +1035,7 @@ async function refreshPartnerSme(p){
  if(p.smePromise)return p.smePromise;
  p.smePromise=(async function(){
   try{
-   const res=await fetch('./sme-cert-snapshot.json',{cache:'no-store'});
+   const res=await fetchServer123Snapshot('sme-cert-snapshot','./sme-cert-snapshot.json');
    if(!res.ok)throw Error('SMPP 공개조회 자료 HTTP '+res.status);
    const data=await res.json();
    const bizno=p.businessNo.replace(/\D/g,'');
@@ -3710,7 +3710,7 @@ var items=[{"id":"pnuh-healthcare-incubator-20261130","category":"general","moni
 var localBudgetSourceState='확인 중';
 async function loadLocalBudgetDiscoveries(){
  try{
-  var response=await fetch('./year-end-local-budget.json?v='+Date.now(),{cache:'no-store'});
+  var response=await fetchServer123Snapshot('year-end-local-budget','./year-end-local-budget.json?v='+Date.now());
   if(!response.ok)throw Error('HTTP '+response.status);
   var data=await response.json();
   if(!data||!Array.isArray(data.opportunities)||!data.stats)throw Error('invalid snapshot');
@@ -3902,7 +3902,7 @@ function quickWinHintHtml(x){
 async function loadKimseSnapshotOpportunities(){
  if(!window.WorkLinksKimseIntake)return;
  try{
-  var response=await fetch('./investment-opportunities.json?v='+Date.now(),{cache:'no-store'});
+  var response=await fetchServer123Snapshot('investment-opportunities','./investment-opportunities.json?v='+Date.now());
   if(!response.ok)throw Error('HTTP '+response.status);
   var data=await response.json();
   var candidates=window.WorkLinksKimseIntake.select(data,items.concat(pendingSupportCandidates),new Date());
