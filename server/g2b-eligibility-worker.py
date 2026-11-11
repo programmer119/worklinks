@@ -18,6 +18,7 @@ DB=os.environ.get('G2B_DB_PATH','/app/data/bids.sqlite3')
 API=os.environ.get('G2B_LOCAL_API','http://127.0.0.1:18192/api/g2b')
 POLL=max(60,int(os.environ.get('G2B_QUAL_POLL','180')))
 BATCH=max(20,min(350,int(os.environ.get('G2B_QUAL_BATCH','200'))))
+# Completed evidence is reused until the source notice changes (not a 7-day timer).
 TTL=dt.timedelta(days=7)
 EXTRA_POLL=max(1800,int(os.environ.get('G2B_EXTRA_POLL','1800')))
 EXTRA_SUCCESS_TTL=dt.timedelta(hours=72)
@@ -36,13 +37,24 @@ def datepart(value):
  try:return dt.date(int(m.group(1)),int(m.group(2)),int(m.group(3)))
  except ValueError:return None
 
-def checked_and_complete(raw,checked_at,cutoff):
- """A partial official API response is never a completed screening."""
+def source_changed(checked_at,changed_at):
+ """Only a source payload revision AFTER the saved lookup invalidates a success."""
+ if not changed_at:return False
+ try:
+  last=dt.datetime.fromisoformat(str(checked_at).replace('Z','+00:00'))
+  revision=dt.datetime.fromisoformat(str(changed_at).replace('Z','+00:00'))
+  return last.tzinfo is None or revision.tzinfo is None or revision>last
+ except (TypeError,ValueError,AttributeError):
+  return True
+
+def checked_and_complete(raw,checked_at,cutoff=None,changed_at=''):
+ """Reuse verified official facts unless the notice changed; partial is pending."""
  if not raw or not checked_at:return False
  try:
   stamp=dt.datetime.fromisoformat(str(checked_at).replace('Z','+00:00'))
   result=json.loads(raw)
-  return (stamp.tzinfo is not None and stamp>=cutoff
+  return (stamp.tzinfo is not None and
+   (cutoff is None or stamp>=cutoff) and not source_changed(checked_at,changed_at)
    and result.get('ok') is True and result.get('complete') is True)
  except (TypeError,ValueError,AttributeError):
   return False
@@ -54,11 +66,10 @@ def targets(conn,retry_after=None,at_monotonic=None):
  restrictions collector. The index is a *discovery* heuristic, not a decision.
  The lookup is data enrichment; ambiguous results never block bids.
  """
- cutoff=now()-TTL
  retry_after=retry_after or {}
  clock=time.monotonic() if at_monotonic is None else at_monotonic
  rows=conn.execute("""
-  SELECT b.kind,b.bid_no,b.bid_ord,b.payload,q.payload,q.checked_at
+  SELECT b.kind,b.bid_no,b.bid_ord,b.payload,q.payload,q.checked_at,b.changed_at
   FROM bid_notices b
   LEFT JOIN bid_license_cache q ON q.bid_no=b.bid_no
    AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER))
@@ -68,24 +79,23 @@ def targets(conn,retry_after=None,at_monotonic=None):
  today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
  ranked=[]
  seen=set()
- for kind,no,order,payload,qualified,checked_at in rows:
+ for kind,no,order,payload,qualified,checked_at,changed_at in rows:
   order=str(order or '').strip()
   if not re.fullmatch(r'\d{1,3}',order):continue
   canonical=order.zfill(3)
   key=(str(no),canonical)
   if key in seen:continue
   seen.add(key)
-  if checked_and_complete(qualified,checked_at,cutoff):continue
+  if checked_and_complete(qualified,checked_at,changed_at=changed_at):continue
   if retry_after.get(key,0)>clock:continue
   try:meta=json.loads(payload)
   except (ValueError,TypeError):meta={}
   expires=datepart(meta.get('closes'))
-  active=expires is None or expires>=today
-  days=max(0,(expires-today).days) if expires and active else 99999
-  # Unchecked/open notices first, then stale; never spend quota on already
-  # cached complete results until their seven-day refresh is due.
-  rank=(0 if active else 1,0 if qualified is None else 1,days,
-        str(no),canonical)
+  # No quota on expired notices: the current task is to repair still-open
+  # opportunities, not retrospectively re-run legal qualification checks.
+  if expires is not None and expires<today:continue
+  days=max(0,(expires-today).days) if expires else 99999
+  rank=(0 if qualified is None else 1,days,str(no),canonical)
   ranked.append((rank,kind,str(no),canonical))
  ranked.sort(key=lambda x:x[0])
  return [(kind,no,ordn) for _,kind,no,ordn in ranked[:BATCH]]
@@ -98,7 +108,7 @@ def extra_target(conn):
  """
  conn.execute('CREATE TABLE IF NOT EXISTS bid_extra_cache(bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
  rows=conn.execute("""
-  SELECT b.bid_no,b.bid_ord,b.payload,e.payload,e.checked_at
+  SELECT b.bid_no,b.bid_ord,b.payload,e.payload,e.checked_at,b.changed_at
   FROM bid_notices b LEFT JOIN bid_extra_cache e
    ON b.bid_no=e.bid_no AND e.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER))
   WHERE b.sw_candidate=1 AND b.kind='servc'
@@ -107,7 +117,7 @@ def extra_target(conn):
  seen=set()
  candidates=[]
  today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
- for no,order,payload,cached,checked_at in rows:
+ for no,order,payload,cached,checked_at,changed_at in rows:
   try: canonical=str(order or '').zfill(3)
   except (ValueError,TypeError):continue
   if not re.fullmatch(r'\d{3}',canonical) or (no,canonical) in seen:continue
@@ -120,8 +130,11 @@ def extra_target(conn):
    try:
     stamp=dt.datetime.fromisoformat(checked_at.replace('Z','+00:00'))
     data=json.loads(cached or '{}')
-    limit=EXTRA_SUCCESS_TTL if data.get('complete') is True else EXTRA_PARTIAL_TTL
-    if stamp.tzinfo is not None and now()-stamp<limit:continue
+    if stamp.tzinfo is not None:
+     if data.get('complete') is True and not source_changed(checked_at,changed_at):
+      continue
+     if data.get('complete') is not True and not source_changed(checked_at,changed_at) and now()-stamp<EXTRA_PARTIAL_TTL:
+      continue
    except (ValueError,TypeError,AttributeError):pass
   remaining=(end-today).days if end is not None else 99999
   candidates.append(((remaining,0 if not checked_at else 1,no),no,canonical))
@@ -154,6 +167,9 @@ def main():
  conn.execute('PRAGMA busy_timeout=30000')
  conn.execute('PRAGMA journal_mode=WAL')
  conn.execute('CREATE TABLE IF NOT EXISTS bid_license_cache (bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
+ cols=[row[1] for row in conn.execute('PRAGMA table_info(bid_notices)').fetchall()]
+ if 'changed_at' not in cols:
+  conn.execute("ALTER TABLE bid_notices ADD COLUMN changed_at TEXT NOT NULL DEFAULT ''")
  conn.commit()
  retry_after={}
  attempts={}
