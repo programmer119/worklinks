@@ -54,7 +54,8 @@ with tempfile.TemporaryDirectory() as temporary:
     assert another['rfp']['attemptEpoch']==1700000000
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
     (m.SEEDS/'rfp-coverage-index.json').write_text(json.dumps(historical))
-    target=m.DATA/'test-regressed.json'
+    (m.DATA/'bad').mkdir()
+    target=m.DATA/'bad'/'rfp-coverage-index.json'
     target.write_text(json.dumps(original))
     try:
         m.quality_guard('rfp',[target])
