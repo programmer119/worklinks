@@ -4,6 +4,7 @@ and mobile Jobs loads saved public tenders in bounded, user-expandable pages.
 Run after playwright/chromium installation.
 """
 import json
+import os
 import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -84,7 +85,9 @@ def main():
     base = "http://127.0.0.1:%d/startup-support/" % server.server_port
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=True, **(
+                {"executable_path":os.environ["WORKLINKS_CHROMIUM_PATH"]}
+                if os.environ.get("WORKLINKS_CHROMIUM_PATH") else {}))
             page = browser.new_page(
                 viewport={"width": 390, "height": 844},
                 device_scale_factor=1, is_mobile=True, has_touch=True,
