@@ -272,9 +272,38 @@ def run_job(job):
         sha=publish(job,body)
         log('WORKLINKS_STANDALONE_PUBLISHED',job,info['output'],'bytes',len(body),'sha',sha[:12])
 
+# Popen children let the parent keep polling Git and collecting independent
+# sources even while one official site stalls for its configured timeout.
+RUNNING = {}
+MAX_CONCURRENT = 2
+
+def start_job(job):
+    if job not in JOBS:
+        raise ValueError('unknown_worklinks_job')
+    return subprocess.Popen([sys.executable, os.path.abspath(__file__), '--single', job],
+                            cwd=str(SRC), env=dict(os.environ))
+
 def iterate(now=None):
     now=time.time() if now is None else now
     st=state_load()
+    # Child completion must update durable status before new decisions are made.
+    for job,child in list(RUNNING.items()):
+        code=child.poll()
+        if code is None:
+            continue
+        record=st.get(job) or {}
+        if code==0:
+            record['status']='ok'
+            record['lastSuccessEpoch']=time.time()
+            record.pop('error',None)
+            log('WORKLINKS_STANDALONE_CHILD_OK',job)
+        else:
+            record['status']='failed'
+            record['error']='collector_child_exit_'+str(code)
+            log('WORKLINKS_STANDALONE_CHILD_FAILED',job,code)
+        st[job]=record
+        del RUNNING[job]
+        state_save(st)
     if now-float(st.get('_lastSourcePoll') or 0)>300 or not SRC.exists():
         st['_lastSourcePoll']=now
         try:
@@ -298,6 +327,10 @@ def iterate(now=None):
     # Jobs are staggered in this order to feed KIMSE verified dates to investment.
     order=('localBudget','kimseDeep','investment','smeCert','directProduction','healthLive')
     for job in order:
+        if job in RUNNING:
+            continue
+        if len(RUNNING)>=MAX_CONCURRENT:
+            break
         prev=st.get(job) or {}
         period=JOBS[job]['period']
         # A killed process leaves status=started. Retry it after a short
@@ -310,15 +343,14 @@ def iterate(now=None):
         st[job]=record
         state_save(st)
         try:
-            run_job(job)
-            record['status']='ok'
-            record['lastSuccessEpoch']=time.time()
+            RUNNING[job]=start_job(job)
+            log('WORKLINKS_STANDALONE_CHILD_STARTED',job,'pid',RUNNING[job].pid)
         except Exception as exc:
             record['status']='failed'
             record['error']=type(exc).__name__+': '+str(exc)[:190]
             log('WORKLINKS_STANDALONE_FAILED',job,record['error'])
-        st[job]=record
-        state_save(st)
+            st[job]=record
+            state_save(st)
     # Optional source gates are metered one per cycle, AFTER critical collectors.
     extra=st.get('lastSupplementalQa') or {}
     if (extra.get('head')==st.get('checkedHead') and
@@ -346,4 +378,14 @@ def main():
                 log('WORKLINKS_STANDALONE_LOOP_FAILED',type(exc).__name__,str(exc)[:250])
             time.sleep(80)
 if __name__=='__main__':
-    sys.exit(main())
+    if len(sys.argv)==3 and sys.argv[1]=='--single':
+        if sys.argv[2] not in JOBS:
+            raise SystemExit(2)
+        try:
+            run_job(sys.argv[2])
+        except Exception as exc:
+            log('WORKLINKS_STANDALONE_SINGLE_FAILED',sys.argv[2],
+                type(exc).__name__,str(exc)[:170])
+            raise SystemExit(1)
+    else:
+        sys.exit(main())
