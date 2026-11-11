@@ -8,6 +8,7 @@ directory and is served without extra procurement API calls.
 import datetime as dt
 import fcntl
 import gzip
+import csv
 import hashlib
 import json
 import os
@@ -31,6 +32,8 @@ CHROMIUM=os.environ.get('WORKLINKS_CHROMIUM_PATH','/usr/bin/chromium')
 JOBS={
     'localBudget':{'period':3600,'timeout':1140,'script':'worklinks_local_budget.py',
                    'output':'year-end-local-budget.json'},
+    'changcom200':{'period':10800,'timeout':240,'script':'build_changcom_200_source_audit.py',
+                    'output':'audits/changcom-200-official-evidence-20261111.csv'},
     'kimseDeep':{'period':43200,'timeout':1980,'script':'worklinks_kimse_deep_audit.py',
                  'output':'kimse-deep-audit.json'},
     'investment':{'period':43200,'timeout':1560,'script':'refresh_worklinks_investment.py',
@@ -48,7 +51,9 @@ SEED_FILES=('startup-support/index.html',
             'startup-support/year-end-local-budget.json',
             'startup-support/kimse-deep-audit.json',
             'startup-support/sme-cert-snapshot.json',
-            'startup-support/direct-production-snapshot.json')
+            'startup-support/direct-production-snapshot.json',
+            'startup-support/audits/changcom-200-screening-20261110.csv',
+            'startup-support/audits/changcom-200-personnel-blockers-20261110.csv')
 CI_TESTS=(
     ('python','-m','py_compile',
      'server/g2b-proxy.py',
@@ -188,7 +193,12 @@ def prepare_workspace(tmp):
         name=info['output']
         source=SNAP/name
         if source.is_file():
-            shutil.copy2(source,root/'startup-support'/name)
+            target=root/'startup-support'/name
+            target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(source,target)
+    coverage=SNAP/'rfp-coverage-index.json'
+    if coverage.is_file():
+        shutil.copy2(coverage,root/'startup-support/rfp-coverage-index.json')
     return root
 
 def validate(job,data):
@@ -264,6 +274,33 @@ def run_job(job):
         p=call(cmd,cwd=str(root),timeout=info['timeout'],env=env)
         if p.returncode!=0:
             raise RuntimeError('collector_exit_'+str(p.returncode)+' '+(p.stderr or p.stdout)[-200:])
+        if job=='changcom200':
+            report=root/'startup-support/audits/changcom-200-official-evidence-20261111.csv'
+            md=root/'startup-support/audits/changcom-200-official-evidence-20261111.md'
+            if not report.is_file() or not md.is_file():
+                raise ValueError('changcom_200_source_audit_outputs_missing')
+            with report.open(encoding='utf-8-sig',newline='') as input_csv:
+                rows=list(csv.DictReader(input_csv))
+            if (len(rows)!=200 or
+                    len({str(x.get('공고번호') or '') for x in rows})!=200 or
+                    [int(x.get('원본순위') or 0) for x in rows]!=list(range(1,201))):
+                raise ValueError('changcom_200_membership_or_order_invalid')
+            for item in (report,md):
+                rel=item.relative_to(root/'startup-support')
+                dest=SNAP/rel
+                blob=item.read_bytes()
+                archive=dest.with_name(dest.name+'.gz.next')
+                dest.parent.mkdir(parents=True,exist_ok=True)
+                try:
+                    with gzip.open(archive,'wb',compresslevel=6) as out:out.write(blob)
+                    write_atomic(dest,blob)
+                    os.replace(archive,str(dest)+'.gz')
+                finally:
+                    try:archive.unlink()
+                    except FileNotFoundError:pass
+            log('WORKLINKS_STANDALONE_CHANGCOM_200_PUBLISHED',len(rows),
+                'citable',sum(int(row.get('공식원문발췌수') or 0)>0 for row in rows))
+            return
         if info.get('stdout'):
             from json import JSONDecoder
             payload=p.stdout.lstrip()
@@ -331,7 +368,8 @@ def iterate(now=None):
         return st
     # Insert each attempt timestamp BEFORE execution to prevent unlimited restart loops.
     # Jobs are staggered in this order to feed KIMSE verified dates to investment.
-    order=('localBudget','kimseDeep','investment','smeCert','directProduction','healthLive')
+    order=('localBudget','changcom200','kimseDeep','investment',
+           'smeCert','directProduction','healthLive')
     for job in order:
         if job in RUNNING:
             continue
