@@ -36,18 +36,54 @@ if ! dk image inspect "$IMAGE" >/dev/null 2>&1;then
 fi
 dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && python -c "import pypdf; print(\"PIPELINE_PDF_HWP_READY=PASS\")"'
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
-# GitHub Pages files are seed-only. An existing 123 snapshot is never overwritten.
-for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json \
-    changcom-bid-review.json sme-cert-snapshot.json direct-production-snapshot.json \
-    official-awards-snapshot.json;do
+# Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
+for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json;do
   if test ! -s "$SNAPSHOTS/$name" && test -s "$ROOT/startup-support/$name";then
     cp -p "$ROOT/startup-support/$name" "$SNAPSHOTS/$name"
   fi
 done
-BACKFILL=audits/changcom-rfp-backfill-60-20261110.json
-if test ! -s "$SNAPSHOTS/$BACKFILL" && test -s "$ROOT/startup-support/$BACKFILL";then
-  cp -p "$ROOT/startup-support/$BACKFILL" "$SNAPSHOTS/$BACKFILL"
-fi
+# The following reference inputs are repo-owned and may change after initial
+# cutover. Validate before atomic refresh; never publish a partial/malformed file.
+dk run --rm -i \
+  -v "$ROOT/startup-support:/app/source:ro" \
+  -v "$SNAPSHOTS:/app/snapshots" \
+  python:3.11-alpine python - <<'PY'
+import json,os,pathlib
+source=pathlib.Path('/app/source')
+target=pathlib.Path('/app/snapshots')
+names=(
+ 'changcom-bid-review.json','sme-cert-snapshot.json',
+ 'direct-production-snapshot.json','official-awards-snapshot.json',
+ 'audits/changcom-rfp-backfill-60-20261110.json'
+)
+for name in names:
+    src=source/name
+    if not src.is_file():raise SystemExit('PIPELINE_REFERENCE_INPUT_MISSING '+name)
+    data=src.read_bytes()
+    try: doc=json.loads(data)
+    except (ValueError,UnicodeDecodeError):raise SystemExit('PIPELINE_REFERENCE_JSON_INVALID '+name)
+    good=isinstance(doc,dict)
+    if name=='changcom-bid-review.json':
+        good=good and doc.get('schemaVersion')==1 and isinstance(doc.get('byNotice'),dict)
+    elif name in ('sme-cert-snapshot.json','direct-production-snapshot.json'):
+        good=good and doc.get('ok') is True and isinstance(doc.get('recordsByBizno'),dict)
+    elif name=='official-awards-snapshot.json':
+        good=good and doc.get('schemaVersion')==1 and isinstance(doc.get('records'),list)
+    else:
+        good=good and len(doc.get('items') or [])==60
+    if not good:raise SystemExit('PIPELINE_REFERENCE_CONTENT_INVALID '+name)
+    dest=target/name
+    dest.parent.mkdir(parents=True,exist_ok=True)
+    if dest.is_file() and dest.read_bytes()==data:continue
+    tmp=dest.with_name(dest.name+'.next')
+    try:
+        tmp.write_bytes(data)
+        os.replace(tmp,dest)
+        print('PIPELINE_REFERENCE_INPUT_REFRESHED',name,flush=True)
+    finally:
+        try:tmp.unlink()
+        except FileNotFoundError:pass
+PY
 # Initial gzip publication does not touch the source JSON.
 dk run --rm -i -v "$SNAPSHOTS:/app/snapshots" python:3.11-alpine python - <<'PY'
 import gzip,os,pathlib,shutil
