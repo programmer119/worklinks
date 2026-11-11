@@ -12,6 +12,12 @@ on:
       - 'server/worklinks-server123-pipeline.py'
       - 'scripts/refresh_worklinks_open_award_fallback.py'
       - 'tests/test_worklinks_open_award_fallback.py'
+      - 'server/worklinks-standalone-jobs.py'
+      - 'server/Dockerfile.worklinks-standalone'
+      - 'server/deploy-worklinks-standalone.sh'
+      - 'tests/test_worklinks_standalone_jobs.py'
+      - 'scripts/worklinks_sme_cert_snapshot.py'
+      - 'scripts/worklinks_direct_production_snapshot.py'
       - 'server/deploy-worklinks-server123-pipeline.sh'
       - 'server/Dockerfile.worklinks-pipeline'
       - 'tests/test_worklinks_server123_pipeline.py'
@@ -58,6 +64,8 @@ jobs:
           python3 tests/test_bid_extra.py
           python3 tests/test_worklinks_server123_pipeline.py
           python3 tests/test_worklinks_open_award_fallback.py
+          python3 tests/test_worklinks_standalone_jobs.py
+          bash -n server/deploy-worklinks-standalone.sh
           python3 tests/test_worklinks_pipeline_snapshot_api.py
           bash -n server/deploy-worklinks-server123-pipeline.sh
           python3 tests/test_rfp_failures.py
