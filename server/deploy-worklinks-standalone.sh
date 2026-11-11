@@ -33,6 +33,26 @@ if cmp -s "$SCRIPT" "$TARGET" &&
   echo STANDALONE_ALREADY_CURRENT=PASS
   exit 0
 fi
+# Never kill an active source collector to upgrade a Python script. Defer to
+# the next independent source-poll cycle; old worker stays healthy.
+if test "$(dk inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null || true)" = true;then
+  busy="$(dk run --rm -v "$BASE/data/standalone:/state:ro" python:3.11-alpine python -c '
+import json,datetime
+try:d=json.load(open("/state/standalone-jobs-state.json"))
+except (OSError,ValueError):d={}
+now=datetime.datetime.now(datetime.timezone.utc).timestamp()
+limits={"localBudget":1140,"kimseDeep":1980,"investment":1560,
+        "healthLive":340,"smeCert":420,"directProduction":600}
+active=[name for name,timeout in limits.items() if
+ (d.get(name) or {}).get("status")=="started" and
+ 0<=now-float((d.get(name) or {}).get("attemptEpoch") or 0)<timeout+180]
+print(",".join(active))
+' 2>/dev/null || true)"
+  if test -n "$busy";then
+    echo "WORKLINKS_STANDALONE_UPDATE_DEFERRED_ACTIVE=$busy"
+    exit 75
+  fi
+fi
 if test -s "$TARGET";then cp -p "$TARGET" "$TARGET.rollback";fi
 PREVIOUS="$(dk inspect -f '{{.Config.Image}}' "$CONTAINER" 2>/dev/null || true)"
 start_container(){
