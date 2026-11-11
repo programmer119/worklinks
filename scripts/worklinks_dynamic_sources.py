@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import os
 import re
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
@@ -393,7 +394,9 @@ def scan_browser_sources():
         return all_rows,states
     try:
         with sync_playwright() as tool:
-            browser=tool.chromium.launch(headless=True,args=["--no-sandbox"])
+            browser=tool.chromium.launch(headless=True,args=["--no-sandbox"],
+                **({"executable_path":os.environ["WORKLINKS_CHROMIUM_PATH"]}
+                   if os.environ.get("WORKLINKS_CHROMIUM_PATH") else {}))
             try:
                 records,debug={},[]
                 page=browser.new_page(locale="ko-KR",timezone_id="Asia/Seoul")
