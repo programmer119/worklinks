@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "scope": "User-requested previously shortlisted three active Changcom bids with no RFP scan; priority is for downloading evidence, not final eligibility",
+  "createdAt": "2026-11-11",
+  "items": [
+    {
+      "bidId": "R26BK01816467:000",
+      "reason": "AI demand forecasting and on-site PoC; prior real Colab/Kaggle test"
+    },
+    {
+      "bidId": "R26BK01816907:000",
+      "reason": "5,000만원 homepage fixes; prior overlooked candidate"
+    },
+    {
+      "bidId": "R26BK01804703:000",
+      "reason": "3,300만원 systems upgrade; prior rejection confused delivery window with onsite obligation"
+    }
+  ]
+}
