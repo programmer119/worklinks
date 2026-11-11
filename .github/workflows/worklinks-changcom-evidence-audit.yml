@@ -10,8 +10,7 @@ on:
       - 'startup-support/rfp-coverage-index.json'
       - 'startup-support/rfp-clauses.json'
   workflow_dispatch:
-  schedule:
-    - cron: '43 0,12 * * *'
+  # Scheduled audits of the stale GitHub seed are disabled after server123 cutover.
 permissions:
   contents: read
 concurrency:
