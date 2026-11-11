@@ -1,4 +1,4 @@
-# 창컴 마감 전 후보 API·RFP 데이터 완전성 점검
+# 창컴 마감 전·마감 미확인 후보 API·RFP 데이터 완전성 점검
 
 생성 기준: 2026-11-11T12:30:20+09:00
 
@@ -9,7 +9,8 @@ API 정보 누락은 '제한 없음'이 아니고, 파일 일부 텍스트 판�
 
 | 상태 | 건수 |
 |---|---:|
-| active | 1246 |
+| confirmed_open | 1061 |
+| deadline_unknown_separate_recheck | 185 |
 | extra_partial | 1246 |
 | license_confirmed_basic_code_match | 581 |
 | license_needs_followup | 520 |
@@ -19,6 +20,7 @@ API 정보 누락은 '제한 없음'이 아니고, 파일 일부 텍스트 판�
 | license_raw_no_license_restriction_detected | 145 |
 | license_raw_official_license_unavailable | 29 |
 | license_raw_published_industry_codes_match | 581 |
+| listed_total | 1246 |
 | missing_core_notice_fields | 185 |
 | missing_field_마감시각 | 185 |
 | previous_recommendations_present | 3 |
