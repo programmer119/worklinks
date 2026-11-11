@@ -61,7 +61,7 @@ def frozen_targets(snap, state):
         if (not isinstance(saved, list) or len(saved) != 500 or
                 len(set(saved)) != 500 or not set(original).issubset(saved)):
             raise RuntimeError('FROZEN_500_CHECKPOINT_INVALID')
-        return saved, 'saved_frozen_keys'
+        return saved, 'saved_frozen_keys', []
 
     action = load(snap.parent / 'startup-support' / 'changcom-actionable.json')
     if not (isinstance(action, dict) and action.get('ok') is True and
@@ -75,13 +75,13 @@ def frozen_targets(snap, state):
     keys = [key_for(item) for item in eligible[:500]]
     if len(keys) != 500 or len(set(keys)) != 500:
         raise RuntimeError('FROZEN_500_SHORTLIST_NOT_UNIQUE_OR_SHORT')
-    # If the shortlist has moved since the first batch, it is NOT possible
-    # to recover the exact 166 from a newer snapshot. Fail, do not invent.
-    missing_from_shortlist = set(original) - set(keys)
-    if missing_from_shortlist:
-        raise RuntimeError('FROZEN_500_SHORTLIST_DRIFT_' +
-                           str(len(missing_from_shortlist)))
-    return keys, 'recovered_from_ranked_shortlist'
+    # The original one-shot batch persisted only the 334 new scans and no
+    # immutable original 500-key cohort. A later shortlist can legitimately
+    # change. Preserve ALL those records in a separate archive and explicitly
+    # label this as a new current top-500 cohort (never call it original).
+    missing_from_shortlist = sorted(set(original) - set(keys))
+    return (keys, 'current_ranked_top500_after_unfrozen_initial_batch',
+            missing_from_shortlist)
 
 
 def bootstrap_scans(snap, keys, existing):
@@ -119,19 +119,28 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
             isinstance(meta, dict) and meta.get('ok') is True and
             isinstance(meta.get('byNotice'), dict)):
         raise RuntimeError('BATCH_REPAIR_SOURCE_CHECKPOINT_UNAVAILABLE')
-    keys, identity_source = frozen_targets(snap, state)
-    scans, recovered = bootstrap_scans(snap, keys, state['scans'])
+    keys, identity_source, outdated_keys = frozen_targets(snap, state)
+    previous_scans = state['scans']
+    archived = dict(state.get('archivedOutOfScopeScans') or {})
+    for key in outdated_keys:
+        archived.setdefault(key, previous_scans[key])
+    frozen_set = set(keys)
+    current_scans = {key: row for key, row in previous_scans.items()
+                     if key in frozen_set}
+    scans, recovered = bootstrap_scans(snap, keys, current_scans)
     by_notice = dict(meta['byNotice'])
     history = dict(state.get('repairAttempts') or {})
-    pending = [key for key, row in scans.items() if incomplete(row)]
+    pending = [key for key in keys if incomplete(scans.get(key))]
     selected = [key for key in pending if attempts(history, key) < max_attempts][:limit]
     print('RFP_REPAIR_PLAN FROZEN', len(keys), 'SCAN_ROWS', len(scans),
           'RECOVERED', recovered, 'IDENTITY', identity_source,
+          'ARCHIVED_OUT_OF_SCOPE', len(outdated_keys),
           'INCOMPLETE', len(pending),
           'QUEUED', len(selected), flush=True)
     if not execute:
         return {'ok': True, 'dryRun': True, 'frozen': len(keys),
                 'recovered': recovered, 'identitySource': identity_source,
+                'archivedOutOfScope': len(outdated_keys),
                 'incomplete': len(pending), 'queued': selected}
     timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
     repaired = {}
@@ -189,9 +198,10 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
 
     state.update(ok=True, generatedAt=timestamp, scans=scans,
                  frozenNoticeKeys=keys, frozenIdentitySource=identity_source,
+                 archivedOutOfScopeScans=archived,
                  repairAttempts=history)
     meta.update(ok=True, byNotice=by_notice, lastRepairMetadataCheckAt=timestamp)
-    still_pending = [key for key, row in scans.items() if incomplete(row)]
+    still_pending = [key for key in keys if incomplete(scans.get(key))]
     blocked = [key for key in still_pending if attempts(history, key) >= max_attempts]
     statuses = collections.Counter(str(row.get('status') or 'unknown')
                                    for row in scans.values())
@@ -205,6 +215,7 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
         'completedDocumentReview': False, 'finalEligibilityVerified': False,
         'targetSavedScans': len(scans), 'frozenTargetCount': len(keys),
         'frozenIdentitySource': identity_source, 'recoveredExisting': recovered,
+        'archivedOutOfScopeCount': len(archived),
         'repairAttemptedThisRun': len(selected),
         'updatedScanResults': len(repaired),
         'incompleteNoticeCount': len(still_pending),
