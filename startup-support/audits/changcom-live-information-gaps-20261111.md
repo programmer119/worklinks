@@ -17,7 +17,8 @@ API 정보 누락은 '제한 없음'이 아니고, 파일 일부 텍스트 판�
 | license_no_published_license_restriction_detected_unverified | 145 |
 | missing_core_notice_fields | 185 |
 | previous_recommendations_present | 3 |
-| rfp_manifest_status_unknown_legacy | 323 |
+| rfp_attachments_unreadable | 110 |
+| rfp_manifest_status_unknown_legacy | 213 |
 | rfp_needs_followup | 1246 |
 | rfp_no_readable_text:no_official_attachment_metadata | 8 |
 | rfp_not_scanned | 915 |
