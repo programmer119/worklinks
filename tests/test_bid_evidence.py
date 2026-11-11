@@ -182,6 +182,32 @@ finally:
     globals_api['get_key']=old_key
     globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
 
+# Regression: short per-second limits and unknown HTTP 429 must not be
+# mislabeled as a daily quota, and should never get 30-minute cooldowns.
+for body,expected in [
+    (b'LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR','per_second'),
+    (b'LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR','daily_quota'),
+    (b'gateway temporarily busy','unknown_429')]:
+    calls=[]
+    def limited(request,timeout):
+        calls.append(1)
+        raise HttpRateError('https://apis.data.go.kr/1230000/example',429,
+            'rate limited',{},io.BytesIO(body))
+    globals_api['urlopen']=limited
+    globals_api['get_key']=lambda:'unit-test-key'
+    globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
+    try:p['request_api'](api_base,'getBidPblancListInfoServc02',{})
+    except p['ApiError']:pass
+    else:raise AssertionError('upstream error swallowed')
+    details=globals_api['cache'][('upstream-rate-context',api_base)]
+    assert details['kind']==expected,details
+    seconds=globals_api['cache'][('upstream-rate-cooldown',api_base)]-globals_api['time'].time()
+    assert 0<seconds<=({'daily_quota':1800,'per_second':3,'unknown_429':5}[expected]+1)
+    globals_api['cache'].pop(('upstream-rate-cooldown',api_base),None)
+globals_api['urlopen']=old_open
+globals_api['get_key']=old_key
+assert p['upstream_rate_diagnostics']()['notProviderAccountUsage'] is True
+
 # Reusing successful exact-notice awards must not consume repeat upstream calls.
 award_calls=[]
 def mock_award(base,op,params):

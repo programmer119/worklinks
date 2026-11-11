@@ -73,6 +73,57 @@ def classify_upstream_http_error(e):
             return 'upstream_http_%s_%s'%(status,value)
     return 'upstream_http_%s'%status
 
+def upstream_limit_scope(error):
+    """Provider code 22 is daily; 23 is per-second; bare HTTP 429 is unknown."""
+    value=str(error or '')
+    if ('PER_SECOND_EXCEEDS_ERROR' in value or
+            value.startswith('upstream_result_23') or
+            value.endswith('_per_second')):
+        return 'per_second'
+    if ('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR' in value or
+            value.startswith('upstream_result_22') or
+            value.endswith('_daily_quota')):
+        return 'daily_quota'
+    if value.startswith('upstream_http_429') or value.endswith('_unknown_429'):
+        return 'unknown_429'
+    return ''
+
+def record_upstream_limit(base,operation,reason):
+    """Log the ORIGINAL provider response, without a URL, service key or token."""
+    scope=upstream_limit_scope(reason)
+    if not scope:return
+    seconds={'daily_quota':1800,'per_second':3,'unknown_429':5}[scope]
+    now=time.time()
+    details={'kind':scope,'sourceError':str(reason)[:110],
+             'operation':operation[:90],
+             'observedAtUTC':datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+             'cooldownSeconds':seconds}
+    with lock:
+        cache[('upstream-rate-cooldown',base)]=now+seconds
+        cache[('upstream-rate-kind',base)]=scope
+        cache[('upstream-rate-context',base)]=details
+    print('G2B_UPSTREAM_ORIGINAL_LIMIT',json.dumps(details,separators=(',',':')))
+    sys.stdout.flush()
+
+def upstream_rate_diagnostics():
+    """Process-local measurements, NOT the provider's account-wide daily quota."""
+    today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    names=[('bids',API_BASE),('awards',AWARD_BASE),
+           ('contracts',CONTRACT_BASE),('contract_process',CONTRACT_PROCESS_BASE),
+           ('company',COMPANY_BASE)]
+    now=time.time()
+    records={}
+    with lock:
+        for label,base in names:
+            expires=float(cache.get(('upstream-rate-cooldown',base),0))
+            records[label]={
+                'requestsObservedThisProcessUTCDate':cache.get(('upstream-calls',base,today),0),
+                'cooldownRemainingSeconds':max(0,int(expires-now)),
+                'lastProviderLimit':cache.get(('upstream-rate-context',base))
+            }
+    return {'ok':True,'source':'in_process_only',
+            'notProviderAccountUsage':True,'utcDate':today,'services':records}
+
 def request_api(base, operation, params):
     token = get_key()
     if not token: raise ApiError('secret_not_configured', 503)
@@ -83,7 +134,14 @@ def request_api(base, operation, params):
     # During provider quota exhaustion do not multiply futile calls across notices.
     with lock:
         cooldown=cache.get(('upstream-rate-cooldown',base),0)
-    if cooldown>time.time():raise ApiError('upstream_temporarily_rate_limited')
+        limit_kind=cache.get(('upstream-rate-kind',base),'unknown_429')
+    if cooldown>time.time():
+        raise ApiError('upstream_temporarily_rate_limited_'+limit_kind)
+    # Counts only calls made by this process. The same key can be used elsewhere.
+    day=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    with lock:
+        k=('upstream-calls',base,day)
+        cache[k]=cache.get(k,0)+1
     try:
         response = urlopen(Request(url, headers={
             'Accept':'application/json', 'User-Agent':'WorkLinksG2B/1.0'
@@ -91,10 +149,7 @@ def request_api(base, operation, params):
         raw = response.read()
     except HTTPError as e:
         error=classify_upstream_http_error(e)
-        if (getattr(e,'code',0)==429 or
-                'LIMITED_NUMBER_OF_SERVICE_REQUESTS' in error):
-            with lock:
-                cache[('upstream-rate-cooldown',base)]=time.time()+1800
+        record_upstream_limit(base,operation,error)
         raise ApiError(error)
     except (URLError, IOError, ValueError): raise ApiError('upstream_unreachable')
     try: doc = json.loads(raw.decode('utf-8'))
@@ -111,7 +166,14 @@ def request_api(base, operation, params):
     if not isinstance(hdr,dict) or 'resultCode' not in hdr:
         raise ApiError('upstream_missing_result_code')
     rc = str(hdr['resultCode'])
-    if rc not in ('00','0'): raise ApiError('upstream_result_' + re.sub(r'[^a-zA-Z0-9_]','',rc)[:20])
+    if rc not in ('00','0'):
+        code=re.sub(r'[^a-zA-Z0-9_]','',rc)[:20]
+        reason='upstream_result_'+code
+        # A provider may return HTTP 200 with gateway resultCode 22 or 23.
+        if code in ('22','23'):
+            reason+=('_daily_quota' if code=='22' else '_per_second')
+            record_upstream_limit(base,operation,reason)
+        raise ApiError(reason)
     body = envelope.get('body', {})
     items = body.get('items') or []
     if isinstance(items, dict): items = items.get('item') or []
@@ -1118,6 +1180,8 @@ class Handler(BaseHTTPRequestHandler):
                 project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
                 return self.reply(200, worklinks_state_get(project, user_id))
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/upstream-rate-status':
+                return self.reply(200,upstream_rate_diagnostics())
             if u.path == '/api/g2b/crawl-status':
                 return self.reply(200,crawler_state())
             if u.path == '/api/g2b/award-cache':
@@ -1304,8 +1368,18 @@ class Handler(BaseHTTPRequestHandler):
                 # 429 is handled by the shared cooldown above, not a false
                 # negative qualification verdict.
                 complete=(result.get('region') or {}).get('complete') and (result.get('attachments') or {}).get('complete') and (result.get('noticeDocuments') or {}).get('complete')
-                lifetime=6*3600 if complete else 600
-                with lock:cache[ck]=(time.time()+lifetime,result)
+                errors=[str(section.get('error') or '') for section in
+                        (result.get('region') or {},result.get('attachments') or {},
+                         result.get('noticeDocuments') or {})]
+                is_rate_error=any(('upstream_temporarily_rate_limited' in error or
+                    'upstream_http_429' in error or 'upstream_result_22' in error or
+                    'upstream_result_23' in error or
+                    'LIMITED_NUMBER_OF_SERVICE_REQUESTS' in error) for error in errors)
+                lifetime=6*3600 if complete else (0 if is_rate_error else 600)
+                # Do not cache a 3-second throttle as an unavailable document
+                # for 10 minutes. The next probe must be able to retry.
+                if lifetime:
+                    with lock:cache[ck]=(time.time()+lifetime,result)
                 return self.reply(200,result)
             if u.path == '/api/g2b/eligibility':
                 bid_no=get('bidNo').strip()

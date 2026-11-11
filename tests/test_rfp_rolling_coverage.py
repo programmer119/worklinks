@@ -204,5 +204,35 @@ loaded=preflight(todo,fetcher=partly_healthy)
 assert len(attempts)==4 and len(loaded)==4
 assert loaded[todo[0]]['attachments']['complete'] is True
 assert preflight([],fetcher=bad_upstream)=={}
+# Confirm a short transient limit gets exactly one bounded retry.
+def briefly_limited(url):
+    attempts.append(url)
+    if len(attempts)==1:
+        return {'attachments':{'ok':False,'complete':False,
+            'error':'upstream_temporarily_rate_limited_per_second'},
+            'noticeDocuments':{'ok':False,'complete':False}}
+    return {'attachments':{'ok':True,'complete':True,'items':[]},
+            'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+import time as _test_time
+_orig_sleep=_test_time.sleep
+try:
+    _test_time.sleep=lambda _:None
+    attempts.clear()
+    retried=preflight(todo[:1],fetcher=briefly_limited)
+    assert len(attempts)==2 and retried[todo[0]]['attachments']['ok']
+finally:
+    _test_time.sleep=_orig_sleep
+attempts.clear()
+def actual_daily_limit(url):
+    attempts.append(url)
+    return {'attachments':{'ok':False,'complete':False,
+        'error':'upstream_result_22_daily_quota'}}
+try:
+    preflight(todo[:1],fetcher=actual_daily_limit)
+    raise AssertionError('provider code 22 must abort immediately')
+except RuntimeError as err:
+    assert str(err)=='RFP_UPSTREAM_DAILY_QUOTA_PREFLIGHT',err
+assert len(attempts)==1
+
 print('WORKLINKS_RFP_UPSTREAM_CIRCUIT_BREAKER=PASS')
 print('WORKLINKS_RFP_ROLLING_CORPUS=PASS','total',len(rows),'batch',220,'cumulative_archive',True)

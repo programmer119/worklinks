@@ -874,34 +874,47 @@ def normalize_extracted_text(content):
 
 
 def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
-    """Prevent a broad SW scan when the official attachment endpoint is down.
-
-    Metadata-only probes are reused in the real scan; neither rejected calls
-    nor their transient errors can be treated as a missing legal condition.
-    """
+    """Distinguish daily quota from brief bursts before downloading RFPs."""
     fetcher=fetch_json if fetcher is None else fetcher
     staged={}
     valid=0
     for no,ordn in unscanned[:sample_size]:
+        url=BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn})
         try:
-            data=fetcher(BASE+'bid-evidence?'+urllib.parse.urlencode(
-                {'bidNo':no,'order':ordn}))
-            attachments=data.get('attachments') or {}
-            notice=data.get('noticeDocuments') or {}
-            if ('upstream_temporarily_rate_limited' in
-                    (str(attachments.get('error') or ''),
-                     str(notice.get('error') or ''),
-                     str(data.get('error') or ''))):
-                print('RFP_UPSTREAM_RATE_LIMITED','FIRST_DETECTED',no+':'+ordn,
-                      'SKIP_REMAINING_PROBES',flush=True)
-                # A proxy-enforced 30-minute cooldown must not be multiplied
-                # into four requests, nor mistaken for a zero-document RFP.
-                raise RuntimeError('RFP_UPSTREAM_RATE_LIMITED_PREFLIGHT')
+            for attempt in range(2):
+                data=fetcher(url)
+                attachments=data.get('attachments') or {}
+                notice=data.get('noticeDocuments') or {}
+                errors=[str(attachments.get('error') or ''),
+                        str(notice.get('error') or ''),str(data.get('error') or '')]
+                daily=any('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR' in e or
+                          'upstream_result_22' in e or
+                          e.endswith('_daily_quota') for e in errors)
+                transient=any('upstream_temporarily_rate_limited' in e or
+                              'upstream_http_429' in e or
+                              'PER_SECOND_EXCEEDS_ERROR' in e or
+                              'upstream_result_23' in e for e in errors)
+                if daily:
+                    print('RFP_UPSTREAM_CONFIRMED_DAILY_LIMIT',no+':'+ordn,
+                          'ORIGIN',','.join(x for x in errors if x)[:180],flush=True)
+                    raise RuntimeError('RFP_UPSTREAM_DAILY_QUOTA_PREFLIGHT')
+                # Legacy unsuffixed cooldown cannot establish the provider's
+                # category. Preserve fail-safe behavior in old deployments.
+                if 'upstream_temporarily_rate_limited' in errors:
+                    print('RFP_UPSTREAM_LEGACY_COOLDOWN',no+':'+ordn,flush=True)
+                    raise RuntimeError('RFP_UPSTREAM_RATE_LIMITED_PREFLIGHT')
+                if transient and attempt==0:
+                    print('RFP_UPSTREAM_SHORT_LIMIT_RETRY',no+':'+ordn,flush=True)
+                    time.sleep(6)
+                    continue
+                if transient:
+                    raise RuntimeError('RFP_UPSTREAM_TRANSIENT_LIMIT_PREFLIGHT')
+                break
             valid+=int(attachments.get('ok') is True and
                        attachments.get('complete') is True)
             staged[(no,ordn)]=data
         except RuntimeError as err:
-            if str(err)=='RFP_UPSTREAM_RATE_LIMITED_PREFLIGHT':
+            if str(err).startswith('RFP_UPSTREAM_'):
                 raise
             staged[(no,ordn)]={'attachments':{
                 'ok':False,'complete':False,'error':'preflight_RuntimeError'}}
@@ -913,10 +926,8 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
     print('RFP_METADATA_PREFLIGHT','TESTED',len(staged),
           'COMPLETE',valid,'UPSTREAM_UNAVAILABLE',len(staged)-valid,flush=True)
     if staged and not valid:
-        # Do not spend another 200+ requests or increment scan coverage.
         raise RuntimeError('RFP_UPSTREAM_METADATA_UNAVAILABLE_PREFLIGHT')
     return staged
-
 
 def process(no,ordn,metadata=None):
     data=(metadata if metadata is not None else fetch_json(
