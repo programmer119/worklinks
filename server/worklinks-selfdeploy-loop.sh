@@ -61,8 +61,10 @@ sync_standard_daily(){
  last="$(read_stamp "$STATE/b123-last-attempt-epoch")"
  if test $((now-last)) -lt 21600;then return 0;fi
  printf '%s\n' "$now" > "$STATE/b123-last-attempt-epoch"
- test -s "$BASE/secrets/g2b-standard.env" || return 1
- run_py tests/test_g2b_standard_worker.py || return 1
+ log B123_SCHEDULED_START
+ test -s "$BASE/secrets/g2b-standard.env" || { log B123_CREDENTIAL_FILE_MISSING;return 1; }
+ run_py tests/test_g2b_standard_worker.py || { log B123_OFFLINE_TEST_FAILED;return 1; }
+ log B123_OFFLINE_TEST_COMPLETE
  dk run --rm --network host \
    -e G2B_STANDARD_DB=/app/data/g2b-standard.sqlite3 \
    -e G2B_STANDARD_KEY_PATH=/run/secrets/g2b-standard.env \
@@ -70,7 +72,8 @@ sync_standard_daily(){
    -v "$BASE/secrets/g2b-standard.env:/run/secrets/g2b-standard.env:ro" \
    -v "$BASE/data:/app/data" \
    python:3.11-alpine python -u /app/g2b-standard-worker.py \
-     --days 5 --max-requests 145 || return 1
+     --days 5 --max-requests 145 || { log B123_COLLECTOR_FAILED;return 1; }
+ log B123_COLLECTOR_COMPLETE
  dk run --rm -v "$BASE/data:/app/data" python:3.11-alpine python -c '
 import sqlite3
 db=sqlite3.connect("file:/app/data/g2b-standard.sqlite3?mode=ro",uri=True)
@@ -79,7 +82,7 @@ services=set(x[0] for x in db.execute("SELECT DISTINCT service FROM std_windows"
 assert {"B1","B2","B3"}.issubset(services)
 assert all(db.execute("SELECT COUNT(*) FROM "+t).fetchone()[0]>0
  for t in ("std_notices","std_awards","std_contracts"))
-print("B123_DAILY_123_COMPLETE=PASS")' || return 1
+print("B123_DAILY_123_COMPLETE=PASS")' || { log B123_DB_INTEGRITY_FAILED;return 1; }
  printf '%s\n' "$now" > "$STATE/b123-last-success-epoch"
  log B123_DAILY_SYNC_COMPLETE
 }
@@ -96,5 +99,5 @@ while true;do
   flock -u 9
  else log LOCK_BUSY
  fi
- sleep 1800
+ if test -s "$STATE/last-deployed-sha";then sleep 1800;else sleep 300;fi
 done
