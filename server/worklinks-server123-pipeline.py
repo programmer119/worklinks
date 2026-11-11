@@ -24,9 +24,11 @@ STATE = DATA / 'pipeline-scheduler-state.json'
 SOURCE_API = os.environ.get('WORKLINKS_G2B_API', 'http://127.0.0.1:18192/api/g2b')
 RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
+AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
 READ_FILES = (
     'changcom-actionable.json',
+    'g2b-award-fields-open.json',
     'rfp-clauses.json',
     'rfp-coverage-index.json',
     'changcom-bid-review.json',
@@ -37,9 +39,10 @@ READ_FILES = (
 )
 PUBLISHED = {
     'rfp': ('rfp-clauses.json', 'rfp-coverage-index.json'),
-    'actionable': ('changcom-actionable.json',)
+    'actionable': ('changcom-actionable.json',),
+    'awardFallback': ('g2b-award-fields-open.json',)
 }
-TIMEOUT = {'rfp': 2100, 'actionable': 540}
+TIMEOUT = {'rfp': 2100, 'actionable': 540, 'awardFallback': 540}
 
 
 def log(*values):
@@ -100,17 +103,28 @@ def quality_guard(kind, outputs):
                 if path.name == 'rfp-coverage-index.json' and not set(old_history).issubset(history):
                     raise ValueError('pipeline_rfp_archived_notice_regression')
         if kind == 'actionable':
-            if content.get('bizno') != '1308185973' or not isinstance(content.get('bids'), list):
+            bids=content.get('bids')
+            counts=content.get('counts') or {}
+            if content.get('bizno') != '1308185973' or not isinstance(bids,list):
                 raise ValueError('pipeline_invalid_changcom_identity')
-            if int((content.get('counts') or {}).get('indexedSWTotal') or 0) < 100:
+            if int(counts.get('indexedSWTotal') or 0) < 100 or int(counts.get('softwareService') or 0)<1:
                 raise ValueError('pipeline_suspect_shortlist_size')
+            if not bids or len(bids) < int(counts.get('softwareService') or 0):
+                raise ValueError('pipeline_partial_or_empty_changcom_bids')
+        if kind == 'awardFallback':
+            indexed=content.get('byNotice')
+            if (not isinstance(indexed,dict) or
+                    int(content.get('totalSavedSw') or 0)<100 or
+                    content.get('count')!=len(indexed)):
+                raise ValueError('pipeline_bad_award_fallback')
     return True
 
 
 def stage_workspace(path):
     root = path / 'worklinks'
     (root / 'scripts').mkdir(parents=True)
-    for name in ('refresh_worklinks_rfp.py', 'refresh_worklinks_actionable.py'):
+    for name in ('refresh_worklinks_rfp.py', 'refresh_worklinks_actionable.py',
+                 'refresh_worklinks_open_award_fallback.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in READ_FILES:
         source = SEEDS / name
@@ -131,6 +145,8 @@ def run_once(kind, runner=None):
         if kind == 'rfp':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_rfp.py'),
                        '--limit', str(RFP_LIMIT)]
+        elif kind == 'awardFallback':
+            command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_open_award_fallback.py')]
         else:
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_actionable.py')]
         if runner is None:
@@ -156,7 +172,7 @@ def iteration(current=None, runner=None):
     now = float(time.time() if current is None else current)
     state = read_state()
     # Persistent timestamps, not sleep-only, protect against restart loops.
-    jobs = (('actionable', SHORTLIST_PERIOD), ('rfp', RFP_PERIOD))
+    jobs = (('actionable', SHORTLIST_PERIOD), ('awardFallback', AWARD_FALLBACK_PERIOD), ('rfp', RFP_PERIOD))
     for kind, period in jobs:
         previous = float((state.get(kind) or {}).get('attemptEpoch') or 0)
         if now - previous < period:
@@ -188,7 +204,8 @@ def main():
         if not (SCRIPTS / 'refresh_worklinks_actionable.py').is_file():
             raise RuntimeError('pipeline_scripts_missing')
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
-            'shortlistPeriod', SHORTLIST_PERIOD, 'rfpLimit', RFP_LIMIT)
+            'shortlistPeriod', SHORTLIST_PERIOD, 'openAwardPeriod', AWARD_FALLBACK_PERIOD,
+            'rfpLimit', RFP_LIMIT)
         while True:
             iteration()
             time.sleep(90)
