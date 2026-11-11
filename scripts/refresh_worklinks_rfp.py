@@ -936,16 +936,23 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
                 errors=[str(attachments.get('error') or ''),
                         str(notice.get('error') or ''),str(data.get('error') or '')]
                 daily=any('LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR' in e or
-                          'upstream_result_22' in e or
-                          e.endswith('_daily_quota') for e in errors)
+                          'upstream_result_22' in e for e in errors)
+                cached_daily=any(e=='upstream_temporarily_rate_limited_daily_quota'
+                                 for e in errors)
                 transient=any('upstream_temporarily_rate_limited' in e or
                               'upstream_http_429' in e or
                               'PER_SECOND_EXCEEDS_ERROR' in e or
                               'upstream_result_23' in e for e in errors)
                 if daily:
-                    print('RFP_UPSTREAM_CONFIRMED_DAILY_LIMIT',no+':'+ordn,
+                    print('RFP_UPSTREAM_ORIGINAL_DAILY_LIMIT',no+':'+ordn,
                           'ORIGIN',','.join(x for x in errors if x)[:180],flush=True)
                     raise RuntimeError('RFP_UPSTREAM_DAILY_QUOTA_PREFLIGHT')
+                if cached_daily:
+                    # The proxy's cached flag is NOT a fresh original provider
+                    # response and cannot establish account-wide quota usage.
+                    print('RFP_PROXY_CACHED_DAILY_COOLDOWN_UNVERIFIED',no+':'+ordn,
+                          flush=True)
+                    raise RuntimeError('RFP_PROXY_CACHED_DAILY_COOLDOWN_PREFLIGHT')
                 # Legacy unsuffixed cooldown cannot establish the provider's
                 # category. Preserve fail-safe behavior in old deployments.
                 if 'upstream_temporarily_rate_limited' in errors:
