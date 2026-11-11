@@ -27,8 +27,12 @@ def rfp_state(record):
     if record.get("status") != "text_extracted_requires_review":
         return "no_readable_text:"+str(record.get("status") or "unknown")
     files=record.get("files") or []
-    if not record.get("manifestComplete"):
+    if record.get("manifestChangePending"):
+        return "manifest_change_pending"
+    if record.get("manifestComplete") is False:
         return "manifest_incomplete"
+    if record.get("manifestComplete") is None:
+        return "manifest_status_unknown_legacy"
     if int(record.get("unreadableDocumentCount") or 0)>0:
         return "attachments_unreadable"
     if not files or int(record.get("readableDocumentCount") or 0)<=0:
