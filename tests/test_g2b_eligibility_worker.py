@@ -50,7 +50,7 @@ with tempfile.TemporaryDirectory(prefix='worklinks-eligibility-backfill-') as te
  cache.append(('R26BK00005197','000',fresh,
                (mod['now']()-dt.timedelta(days=9)).isoformat()))
  rows.append(('servc','R26BK99999998','0','{}',timestamp,0,'')) # not in SW index
- con.executemany('INSERT INTO bid_notices VALUES (?,?,?,?,?,?)',rows)
+ con.executemany('INSERT INTO bid_notices VALUES (?,?,?,?,?,?,?)',rows)
  con.executemany('INSERT INTO bid_license_cache VALUES (?,?,?,?)',cache)
  con.commit()
  result=mod['targets'](con)
