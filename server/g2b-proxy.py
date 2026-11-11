@@ -1147,6 +1147,7 @@ class ThreadedServer(ThreadingMixIn,HTTPServer):
 SNAPSHOT_ROOT = os.environ.get('WORKLINKS_SNAPSHOT_DIR', '/app/data/snapshots')
 SNAPSHOT_NAMES = {
     'changcom-actionable': 'changcom-actionable.json',
+    'g2b-award-fields-open': 'g2b-award-fields-open.json',
     'rfp-clauses': 'rfp-clauses.json',
     'rfp-coverage-index': 'rfp-coverage-index.json'
 }
