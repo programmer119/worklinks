@@ -43,6 +43,12 @@ jobs:
                     'aligned_first200_in_fixed',len(first200&fixed),'full_first200_in_fixed',len(firstN&fixed))
               print('ALIGNED_HEAD',[f"{x.get('bidNo')}:{x.get('order')}" for _,x in aligned[:12]])
               print('COHORT_HEAD',[x['공고번호'] for x in cohort[:12]])
+              selected_ranks=[(i+1,x) for i,x in enumerate(bids) if x.get('bidNo')+':'+str(x.get('order') or '000').zfill(3) in fixed]
+              out_of_top=[(rank,x.get('bidNo'),x.get('priorityTier'),x.get('rfpTextScanned')) for rank,x in selected_ranks if rank>200]
+              print('ORIGINAL_200_RANK_STATS',tag,'present',len(selected_ranks),'past_top200',len(out_of_top),'examples',out_of_top[:35],
+                    'tier_counts', {str(k):sum(x.get('priorityTier')==k for _,x in selected_ranks) for k in [0,1,2,3,4]},
+                    'rfp_scanned_in_200',sum(x.get('rfpTextScanned') is True for _,x in selected_ranks))
+
               for no in wanted:
                   hits=[(i+1,x) for i,x in enumerate(bids) if x.get('bidNo')==no]
                   if not hits:
@@ -59,6 +65,9 @@ jobs:
                         'budget':r.get('budget'),'scope':r.get('scope'),
                         'screening':r.get('screening'),'priorityTier':r.get('priorityTier'),
                         'priorityScore':r.get('priorityScore'),
+                        'rfpTextScanned':r.get('rfpTextScanned'),
+                        'rfpScanStatus':r.get('rfpScanStatus'),
+                        'officialClauseEvidenceSize':len((r.get('officialClauseEvidence') or {}).get('clauseCandidates') or {}),
                         'requiredCodes':r.get('requiredCodes'),
                         'codesNotInCurrentRegistry':r.get('codesNotInCurrentRegistry'),
                         'staffingRisk':r.get('staffingRisk'),
