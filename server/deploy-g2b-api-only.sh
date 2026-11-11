@@ -19,7 +19,9 @@ test "$(dk inspect -f '{{.State.Running}}' "$API")" = true
 test "$(dk inspect -f '{{.HostConfig.NetworkMode}}' "$API")" = host
 # The API runs against the existing DB and read-only secrets; validate in a
 # disposable container BEFORE changing the production service.
-NEXT="$TARGET.next"
+# Use a unique temporary FILE. A leftover .next directory from an earlier
+# interrupted deploy must not silently become the bind-mounted Python path.
+NEXT="$(mktemp "$TARGET.pending.XXXXXXXX")"
 cp -p "$SRC" "$NEXT"
 trap 'rm -f "$NEXT"' EXIT
 dk run --rm -v "$NEXT:/app/api.py:ro" "$IMG" python -m py_compile /app/api.py
