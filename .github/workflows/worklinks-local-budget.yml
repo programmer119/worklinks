@@ -1,16 +1,8 @@
 name: WorkLinks year-end small municipality opportunities
+# Server123 independent scheduler confirmed its first successful 17-row output.
+# GitHub workflow retained for explicit manual rollback only.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/worklinks_local_budget.py'
-      - 'tests/test_worklinks_local_budget.py'
-      - 'startup-support/quickwin-ranking.js'
-      - 'tests/test_worklinks_quickwin.cjs'
-      - '.github/workflows/worklinks-local-budget.yml'
 permissions:
   contents: write
 concurrency:
