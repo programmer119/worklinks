@@ -20,12 +20,18 @@ with tempfile.TemporaryDirectory() as temporary:
     m.SEEDS.mkdir()
     m.SCRIPTS.mkdir()
     for script in ('refresh_worklinks_rfp.py','refresh_worklinks_actionable.py',
-                   'refresh_worklinks_open_award_fallback.py'):
+                   'refresh_worklinks_open_award_fallback.py',
+                   'batch_backfill_changcom_top500_rfp.py',
+                   'repair_changcom_top500_rfp.py'):
         (m.SCRIPTS/script).write_text('# test fixture\n',encoding='utf-8')
     original={'ok':True,'generatedAt':'2026-11-01','byNotice':{
         'R26BK01808709:000':{'status':'text_extracted_requires_review'}}}
     for filename in ('rfp-clauses.json','rfp-coverage-index.json'):
         (m.SEEDS/filename).write_text(json.dumps(original),encoding='utf-8')
+    (m.SEEDS/'rfp-top500-batch-state-20261111.json').write_text(json.dumps(
+        {'ok':True,'scans':{},'metadataCalls':47}),encoding='utf-8')
+    (m.SEEDS/'rfp-top500-batch-metadata-20261111.json').write_text(json.dumps(
+        {'ok':True,'byNotice':{},'targets':[]}),encoding='utf-8')
     (m.SEEDS/'changcom-actionable.json').write_text(json.dumps({
         'ok':True,'bizno':'1308185973',
         'counts':{'indexedSWTotal':6000,'softwareService':1},'bids':[{'bidNo':'R26BK01808709'}]}),encoding='utf-8')
@@ -33,7 +39,12 @@ with tempfile.TemporaryDirectory() as temporary:
         assert env['WORKLINKS_G2B_API'].startswith('http://127.0.0.1:')
         assert 'serviceKey=' not in str(args)
         p=Path(cwd)/'startup-support'
-        if 'refresh_worklinks_rfp.py' in args[1]:
+        if 'repair_changcom_top500_rfp.py' in args[1]:
+            assert '--execute' in args and '--data-dir' in args
+            (Path(cwd)/'snapshots'/'rfp-top500-repair-report-20261111.json').write_text(
+                json.dumps({'ok':True,'targetSavedScans':0,
+                  'repairAttemptedThisRun':0}),encoding='utf-8')
+        elif 'refresh_worklinks_rfp.py' in args[1]:
             updated={'ok':True,'generatedAt':'2026-11-11','byNotice':{
                'R26BK01808709:000':{'status':'text_extracted_requires_review'},
                'R26BK01809647:000':{'status':'text_extracted_requires_review'}}}
@@ -55,9 +66,14 @@ with tempfile.TemporaryDirectory() as temporary:
         assert len(json.load(f)['byNotice'])==2
     m.run_once('actionable',mock_runner)
     m.run_once('awardFallback',mock_runner)
+    m.run_once('rfpRepair',mock_runner)
+    report=m.SEEDS/'rfp-top500-repair-report-20261111.json'
+    assert json.loads(report.read_text())['ok'] is True
+    with gzip.open(str(report)+'.gz','rb') as f:
+        assert json.load(f)['repairAttemptedThisRun']==0
     assert json.loads((m.SEEDS/'g2b-award-fields-open.json').read_text())['count']==1
     state=m.iteration(1700000000,mock_runner)
-    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback'))
+    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback','rfpRepair'))
     another=m.iteration(1700000001,mock_runner)
     assert another['rfp']['attemptEpoch']==1700000000
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
