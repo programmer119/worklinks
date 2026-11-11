@@ -69,7 +69,7 @@ with tempfile.TemporaryDirectory() as tmp:
     m.update_source=lambda:(True,'def456')
     m.source_head=lambda:'def456'
     m.test_source=lambda root:(False,[{'ok':False,'tail':'bad source test'}])
-    st=m.iterate(1700000400)
+    st=m.iterate(1700000900)
     assert st['checkedHead']=='abcdef123'
     assert not st['lastQa']['ok']
     assert len(received)==len(m.JOBS)+1,'failed source QA executed new jobs'
