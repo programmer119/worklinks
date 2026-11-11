@@ -63,6 +63,8 @@ CI_TESTS=(
     ('python','tests/test_worklinks_open_award_fallback.py'),
     ('python','tests/test_worklinks_server123_pipeline.py'),
     ('python','tests/test_rfp_failures.py'),
+    ('python','tests/test_worklinks_standalone_jobs.py'),
+    ('python','tests/test_worklinks_site_mirror.py'),
     ('node','tests/worklinks-jobs-regression.cjs'),
 )
 
@@ -83,6 +85,10 @@ SUPPLEMENTAL_QA=(
  ('python','tests/test_g2b_eligibility_worker.py'),
  ('node','tests/test_worklinks_kimse_intake.cjs'),
  ('node','tests/test_worklinks_support_sort.cjs'),
+ ('python','tests/test_worklinks_mobile_bootstrap.py'),
+ ('python','tests/test_worklinks_guest_auto_migration.py'),
+ ('python','tests/test_worklinks_live_auth_state_api.py'),
+ ('python','tests/test_worklinks_user_state.py'),
 )
 
 def log(*args):
