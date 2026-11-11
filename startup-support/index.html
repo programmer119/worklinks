@@ -3265,7 +3265,7 @@ async function loadG2bAwardFallback(){
  g2bAwardFallbackLoadState='loading';
  try{
   // Published from the server123 saved DB, not queried from the official upstream API.
-  const response=await fetch('./g2b-award-fields-open.json',{cache:'no-store'});
+  const response=await fetchServer123Snapshot('g2b-award-fields-open','./g2b-award-fields-open.json');
   if(!response.ok)throw Error('HTTP '+response.status);
   const snapshot=await response.json();
   if(snapshot.ok!==true||!snapshot.byNotice||Array.isArray(snapshot.byNotice))throw Error('bad snapshot');
