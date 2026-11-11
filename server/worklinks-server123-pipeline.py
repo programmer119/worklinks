@@ -35,7 +35,8 @@ READ_FILES = (
     'sme-cert-snapshot.json',
     'direct-production-snapshot.json',
     'official-awards-snapshot.json',
-    'audits/changcom-rfp-backfill-60-20261110.json'
+    'audits/changcom-rfp-backfill-60-20261110.json',
+    'audits/changcom-priority-rfp-recovery-20261111.json'
 )
 PUBLISHED = {
     'rfp': ('rfp-clauses.json', 'rfp-coverage-index.json'),
