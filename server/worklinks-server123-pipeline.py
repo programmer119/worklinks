@@ -152,6 +152,36 @@ def stage_workspace(path):
     return root
 
 
+def repair_preflight():
+    """Read-only on-server source diagnosis; no G2B requests or writes to RFP data."""
+    result = {'checkedAt': dt.datetime.now(dt.timezone.utc).isoformat()}
+    required = ('rfp-top500-batch-state-20261111.json',
+                'rfp-top500-batch-metadata-20261111.json',
+                'changcom-actionable.json',
+                'rfp-coverage-index.json')
+    result['checkpointFiles'] = {name: (SEEDS / name).is_file() for name in required}
+    try:
+        with tempfile.TemporaryDirectory(prefix='worklinks-rfp-preflight-', dir=str(DATA)) as temp:
+            root = stage_workspace(Path(temp))
+            cmd = [sys.executable,
+                   str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
+                   '--data-dir', str(root)]
+            completed = subprocess.run(cmd, cwd=str(root),
+                                       capture_output=True, text=True, timeout=150,
+                                       env=dict(os.environ, WORKLINKS_G2B_API=SOURCE_API))
+            if completed.returncode:
+                lines = (completed.stderr or completed.stdout or '').strip().splitlines()
+                return dict(result, status='failed',
+                            failureReason=(lines[-1][:220] if lines else 'unknown_exit'),
+                            exitCode=completed.returncode)
+            lines = (completed.stdout or '').strip().splitlines()
+            return dict(result, status='ok', summary=(lines[-1][:800] if lines else ''),
+                        exitCode=completed.returncode)
+    except Exception as exc:
+        return dict(result, status='failed',
+                    failureReason=type(exc).__name__ + ': ' + str(exc)[:180])
+
+
 def run_once(kind, runner=None):
     """Run one job in an isolated writable workspace, atomic publish on success."""
     if kind not in PUBLISHED:
@@ -178,7 +208,9 @@ def run_once(kind, runner=None):
         if completed.returncode != 0:
             log('PIPELINE_FAILED', kind, 'exit', completed.returncode,
                 'tail', (completed.stderr or '')[-300:].replace('\n', ' '))
-            raise RuntimeError('pipeline_' + kind + '_failed')
+            details = (completed.stderr or completed.stdout or '').strip().splitlines()
+            reason = details[-1][:130] if details else 'missing_child_diagnostics'
+            raise RuntimeError('pipeline_' + kind + '_failed: ' + reason)
         outputs = [root / ('snapshots' if kind == 'rfpRepair' else 'startup-support') / name
                    for name in PUBLISHED[kind]]
         quality_guard(kind, outputs)
@@ -225,6 +257,10 @@ def main():
             return 1
         if not (SCRIPTS / 'refresh_worklinks_actionable.py').is_file():
             raise RuntimeError('pipeline_scripts_missing')
+        state = read_state()
+        state['rfpRepairPreflight'] = repair_preflight()
+        publish_state(state)
+        log('PIPELINE_REPAIR_PREFLIGHT', state['rfpRepairPreflight'])
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
             'shortlistPeriod', SHORTLIST_PERIOD, 'openAwardPeriod', AWARD_FALLBACK_PERIOD,
             'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT)
