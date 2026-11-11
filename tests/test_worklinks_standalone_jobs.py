@@ -60,11 +60,17 @@ with tempfile.TemporaryDirectory() as tmp:
     assert all(state[k]['status']=='ok' for k in m.JOBS)
     m.iterate(1700000001)
     assert len(received)==len(m.JOBS),'second loop executed jobs twice'
+    # Restart-interrupted job must retry within minutes, not after the full day.
+    restart=m.state_load()
+    restart['localBudget']['status']='started'
+    m.state_save(restart)
+    m.iterate(1700000800)
+    assert received.count('localBudget')==2,'interrupted local collector did not recover'
     m.update_source=lambda:(True,'def456')
     m.source_head=lambda:'def456'
     m.test_source=lambda root:(False,[{'ok':False,'tail':'bad source test'}])
     st=m.iterate(1700000400)
     assert st['checkedHead']=='abcdef123'
     assert not st['lastQa']['ok']
-    assert len(received)==len(m.JOBS),'failed source QA executed new jobs'
+    assert len(received)==len(m.JOBS)+1,'failed source QA executed new jobs'
 print('WORKLINKS_STANDALONE_NO_NETWORK_CADENCE_AND_SAFETY=PASS')
