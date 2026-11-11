@@ -66,6 +66,25 @@ CI_TESTS=(
     ('node','tests/worklinks-jobs-regression.cjs'),
 )
 
+# Former GitHub push-triggered gates. These remain independently visible but
+# cannot suppress unrelated collection because a third-party website is down.
+SUPPLEMENTAL_QA=(
+ ('python','tests/test_worklinks_user_state.py'),
+ ('python','tests/test_worklinks_priority_health.py'),
+ ('python','tests/test_worklinks_health_sources.py'),
+ ('python','tests/test_worklinks_kimse_deep_audit.py'),
+ ('python','tests/test_dynamic_sources.py'),
+ ('python','tests/test_investment_monitor.py'),
+ ('python','tests/test_global_accelerators.py'),
+ ('python','tests/test_kised.py'),
+ ('python','tests/test_worklinks_kimse_merge_audit.py'),
+ ('python','tests/test_worklinks_rfp_coverage.py'),
+ ('python','tests/test_bid_evidence.py'),
+ ('python','tests/test_g2b_eligibility_worker.py'),
+ ('node','tests/test_worklinks_kimse_intake.cjs'),
+ ('node','tests/test_worklinks_support_sort.cjs'),
+)
+
 def log(*args):
     print(dt.datetime.now(dt.timezone.utc).isoformat(),*args,flush=True)
 
@@ -111,6 +130,22 @@ def test_source(root):
             result.append({'command':str(command[0]),'ok':False,'error':type(exc).__name__})
             return False,result
     return True,result
+
+def test_diagnostics(root):
+    checks=[]
+    for command in SUPPLEMENTAL_QA:
+        argv=[sys.executable if x=='python' else x for x in command]
+        if not (root/command[1]).is_file():
+            checks.append({'name':command[1],'ok':False,'error':'test_source_missing'})
+            continue
+        try:
+            result=call(argv,cwd=str(root),timeout=100)
+            checks.append({'name':command[1],'ok':result.returncode==0,
+                           'tail':(result.stderr or result.stdout)[-180:]})
+        except (OSError,subprocess.TimeoutExpired) as err:
+            checks.append({'name':command[1],'ok':False,
+                           'error':type(err).__name__})
+    return checks
 
 def update_source():
     """Read-only GitHub source synchronization; no credentials or git pushes."""
@@ -247,7 +282,9 @@ def iterate(now=None):
             if changed or not st.get('checkedHead'):
                 good,results=test_source(SRC)
                 st['lastQa']={'ok':good,'head':sha,'results':results}
-                if good:st['checkedHead']=sha
+                if good:
+                    st['checkedHead']=sha
+                    st['lastSupplementalQa']={'head':sha,'results':test_diagnostics(SRC)}
                 else:log('WORKLINKS_STANDALONE_SOURCE_QA_FAILED',sha,results[-1])
             st['sourceHead']=sha
         except Exception as exc:
@@ -258,7 +295,7 @@ def iterate(now=None):
         return st
     # Insert each attempt timestamp BEFORE execution to prevent unlimited restart loops.
     # Jobs are staggered in this order to feed KIMSE verified dates to investment.
-    order=('kimseDeep','investment','localBudget','smeCert','directProduction','healthLive')
+    order=('localBudget','kimseDeep','investment','smeCert','directProduction','healthLive')
     for job in order:
         prev=st.get(job) or {}
         if now-float(prev.get('attemptEpoch') or 0)<JOBS[job]['period']:continue
