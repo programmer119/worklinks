@@ -1160,6 +1160,38 @@ SNAPSHOT_NAMES = {
 }
 
 class Handler(BaseHTTPRequestHandler):
+    def reply_changcom_200_report(self, requested_format):
+        """200-item audit is public evidence, never a bidder eligibility verdict."""
+        basename={
+            'csv':'changcom-200-official-evidence-20261111.csv',
+            'md':'changcom-200-official-evidence-20261111.md'
+        }.get(requested_format)
+        if not basename:
+            return self.reply(400,{'ok':False,'error':'invalid_audit_format'})
+        path=os.path.join(SNAPSHOT_ROOT,'audits',basename)
+        if not os.path.isfile(path):
+            return self.reply(404,{'ok':False,'error':'audit_not_generated'})
+        size=os.path.getsize(path)
+        if size<32 or size>20000000:
+            return self.reply(503,{'ok':False,'error':'audit_size_invalid'})
+        mime=('text/csv; charset=utf-8' if requested_format=='csv'
+              else 'text/markdown; charset=utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type',mime)
+        self.send_header('Content-Length',str(size))
+        self.send_header('Cache-Control','public, max-age=120')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.send_header('Content-Disposition','attachment; filename="'+basename+'"')
+        origin=self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+        self.end_headers()
+        with open(path,'rb') as file:
+            while True:
+                chunk=file.read(1024*1024)
+                if not chunk:break
+                self.wfile.write(chunk)
+
     def reply_worklinks_site(self, route):
         """Optional read-only server123 site mirror, no upstream or secret access."""
         if route in ('/','/startup-support','/startup-support/'):
@@ -1275,6 +1307,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if u.path in ('/','/startup-support','/startup-support/') or u.path.startswith('/startup-support/'):
                 return self.reply_worklinks_site(u.path)
+            if u.path == '/api/g2b/changcom-200-report':
+                return self.reply_changcom_200_report(get('format','csv'))
             if u.path == '/api/g2b/snapshot':
                 return self.reply_snapshot(get('name'))
             if u.path == '/api/g2b/pipeline-status':
