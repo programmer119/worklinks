@@ -565,7 +565,7 @@ def bid_extra_query(bid_no, order, collect=True):
     con=open_bid_db()
     try:
         # Only enrich an already-indexed SW service notice, never arbitrary IDs.
-        indexed=con.execute("SELECT 1 FROM bid_notices WHERE kind='servc' AND bid_no=? AND sw_candidate=1 AND printf('%03d',CAST(bid_ord AS INTEGER))=? LIMIT 1",
+        indexed=con.execute("SELECT changed_at FROM bid_notices WHERE kind='servc' AND bid_no=? AND sw_candidate=1 AND printf('%03d',CAST(bid_ord AS INTEGER))=? LIMIT 1",
                             (bid_no,order)).fetchone()
         saved=con.execute('SELECT payload,checked_at FROM bid_extra_cache WHERE bid_no=? AND bid_ord=?',
                           (bid_no,order)).fetchone()
@@ -579,8 +579,15 @@ def bid_extra_query(bid_no, order, collect=True):
             prior=json.loads(saved[0])
             timestamp=datetime.datetime.fromisoformat(str(saved[1]).replace('Z','+00:00'))
             age=(datetime.datetime.now(datetime.timezone.utc)-timestamp).total_seconds()
-            ttl=EXTRA_TTL_SUCCESS if prior.get('complete') else EXTRA_TTL_PARTIAL
-            if 0<=age<ttl:
+            changed=str(indexed[0] or '')
+            notice_modified=False
+            if changed:
+                revision=datetime.datetime.fromisoformat(changed.replace('Z','+00:00'))
+                notice_modified=revision.tzinfo is None or revision>timestamp
+            # Completed supplemental facts stay cached until the official
+            # notice changes; partial results retain a bounded retry TTL.
+            if not notice_modified and (prior.get('complete') is True or
+                                        0<=age<EXTRA_TTL_PARTIAL):
                 return {**prior,'cached':True}
         except (TypeError,ValueError,AttributeError):
             pass
@@ -715,6 +722,8 @@ def open_bid_db():
                 except (TypeError,ValueError): found=False
                 con.execute('UPDATE bid_notices SET sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',
                             (int(found),kind,no,order))
+    if 'changed_at' not in [r[1] for r in con.execute('PRAGMA table_info(bid_notices)').fetchall()]:
+        con.execute("ALTER TABLE bid_notices ADD COLUMN changed_at TEXT NOT NULL DEFAULT ''")
     con.execute('CREATE INDEX IF NOT EXISTS bid_notices_sw_seen_idx ON bid_notices(sw_candidate,last_seen DESC)')
     con.execute('CREATE TABLE IF NOT EXISTS bid_license_cache (bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(bid_no,bid_ord))')
     # Supplemental facts never overwrite the notice or its official license state.
@@ -735,7 +744,11 @@ def persist_bids(items):
                     continue
                 payload=json.dumps(x, ensure_ascii=False, separators=(',',':'))
                 con.execute('INSERT OR IGNORE INTO bid_notices (kind,bid_no,bid_ord,payload,first_seen,last_seen) VALUES (?,?,?,?,?,?)',(kind,no,order,payload,now,now))
-                con.execute('UPDATE bid_notices SET payload=?,last_seen=?,sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',(payload,now,int(sw_candidate(x)),kind,no,order))
+                con.execute('''UPDATE bid_notices
+                    SET changed_at=CASE WHEN payload<>? THEN ? ELSE changed_at END,
+                        payload=?,last_seen=?,sw_candidate=?
+                    WHERE kind=? AND bid_no=? AND bid_ord=?''',
+                    (payload,now,payload,now,int(sw_candidate(x)),kind,no,order))
                 changed+=1
             total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
         return {'received':changed,'storedTotal':total}
