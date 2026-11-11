@@ -95,7 +95,9 @@ def main():
             "원문수집완료와법적검토구분":"법적적격 미확정",
         }
         output.append(record)
-        count["active"]+=1
+        count["listed_total"]+=1
+        count["confirmed_open"]+=int(bid.get("deadlineState")=="open")
+        count["deadline_unknown_separate_recheck"]+=int(bid.get("deadlineState")=="unknown")
         count["rfp_"+status]+=1
         count["license_"+license_state]+=1
         count["license_raw_"+screening]+=1
@@ -121,7 +123,7 @@ def main():
         writer.writeheader()
         writer.writerows(output)
     summary=[
-        "# 창컴 마감 전 후보 API·RFP 데이터 완전성 점검",
+        "# 창컴 마감 전·마감 미확인 후보 API·RFP 데이터 완전성 점검",
         "",
         "생성 기준: "+str(bids.get("generatedAt")),
         "",
