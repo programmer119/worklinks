@@ -54,7 +54,8 @@ target=pathlib.Path('/app/snapshots')
 names=(
  'changcom-bid-review.json','sme-cert-snapshot.json',
  'direct-production-snapshot.json','official-awards-snapshot.json',
- 'audits/changcom-rfp-backfill-60-20261110.json'
+ 'audits/changcom-rfp-backfill-60-20261110.json',
+ 'audits/changcom-priority-rfp-recovery-20261111.json'
 )
 for name in names:
     src=source/name
@@ -69,6 +70,8 @@ for name in names:
         good=good and doc.get('ok') is True and isinstance(doc.get('recordsByBizno'),dict)
     elif name=='official-awards-snapshot.json':
         good=good and doc.get('schemaVersion')==1 and isinstance(doc.get('records'),list)
+    elif name=='audits/changcom-priority-rfp-recovery-20261111.json':
+        good=good and doc.get('schemaVersion')==1 and len(doc.get('items') or [])==3
     else:
         good=good and len(doc.get('items') or [])==60
     if not good:raise SystemExit('PIPELINE_REFERENCE_CONTENT_INVALID '+name)
