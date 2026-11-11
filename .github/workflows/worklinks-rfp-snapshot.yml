@@ -2,6 +2,10 @@
 # re-run after server123 G2B quota-classification API deployment 2026-11-11
 name: WorkLinks official RFP eligibility snippets
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-rfp-snapshot.yml
   workflow_dispatch:
 permissions:
   contents: write
@@ -81,6 +85,11 @@ jobs:
                 "$HEAD_COMMIT_MSG" == CHANGCOM_BACKFILL_ONCE:* ]]; then
             limit=28
             echo 'ONE_SHOT_FIXED_COHORT_BACKFILL=28'
+          fi
+          if [[ "$GITHUB_EVENT_NAME" == "push" &&
+                "$HEAD_COMMIT_MSG" == LIVE_RFP_FIX_ONCE:* ]]; then
+            limit=3
+            echo 'LIVE_RFP_FIX_ONCE=3_PRIORITY_OFFICIAL_SCANS'
           fi
           python3 scripts/refresh_worklinks_rfp.py --limit "$limit"
       - name: Checkpoint extracted RFP records before push
