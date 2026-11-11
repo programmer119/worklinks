@@ -683,7 +683,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 <script src="./kimse-fit.js?v=20261107-1"></script>
 <script src="./kimse-intake.js?v=20261107-1"></script>
 <script>
-var WORKLINKS_PAGE_REVISION='20261110-bid-facts-v3';
+var WORKLINKS_PAGE_REVISION='20261111-server123-snapshot-read-v1';
 function worklinksPartnerAccess(){
  return window.worklinksMemberAuthenticated===true&&
    document.documentElement.dataset.worklinksPartnerAccess==='granted';
@@ -1330,6 +1330,15 @@ function partnerJobInfo(x){
 
 /* 공개 페이지에 API 키를 두지 않는다. 서버123 HTTPS API URL만 저장 (인증키 아님). */
 var G2B_DEFAULT_URL='https://api-suaveforge.suaveforge.com:18458/api/g2b';
+// Pages only reads already-published files from server123; this route MUST NOT
+// invoke G2B upstream. Preserve the prior checked-in snapshots as a fallback.
+async function fetchServer123Snapshot(name, fallback){
+ try{
+  const response=await fetch(G2B_DEFAULT_URL+'/snapshot?name='+encodeURIComponent(name),{cache:'no-store'});
+  if(response.ok)return response;
+ }catch(error){/* Server temporarily unavailable; retain last published snapshot. */}
+ return fetch(fallback,{cache:'no-store'});
+}
 var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL;
 var g2bLiveJobs=[],g2bLoading=false,g2bOffset=0,g2bSavedTotal=0,g2bServerAvailable=false;
 var g2bLoadedOffset=0,g2bSavedLoadRunning=false;
@@ -1693,7 +1702,7 @@ async function loadChangcomActionable(force=false){
  changcomActionableRequest=(async function(){
   try{
    const [response,reviewResponse]=await Promise.all([
-    fetch('./changcom-actionable.json',{cache:'no-store'}),
+    fetchServer123Snapshot('changcom-actionable','./changcom-actionable.json'),
     fetch('./changcom-bid-review.json',{cache:'no-store'}).catch(()=>null)
    ]);
    if(!response.ok)throw Error('HTTP '+response.status);
@@ -2323,7 +2332,7 @@ function rfpSnapshotForJob(x){
 }
 async function refreshRfpSnapshot(){
  try{
-  const response=await fetch('./rfp-clauses.json',{cache:'no-store'});
+  const response=await fetchServer123Snapshot('rfp-clauses','./rfp-clauses.json');
   if(!response.ok)return;
   const source=await response.json();
   if(source.ok!==true||!source.byNotice)return;
