@@ -98,6 +98,12 @@ def main():
         count["active"]+=1
         count["rfp_"+status]+=1
         count["license_"+license_state]+=1
+        count["license_raw_"+screening]+=1
+        for missing_label in missing:
+            count["missing_field_"+missing_label]+=1
+        for name,source_part in (supplement.get("sources") or {}).items():
+            if isinstance(source_part,dict):
+                count["extra_source_"+str(name)+("_complete" if source_part.get("ok") is True and source_part.get("complete") is True else "_partial_or_failed")]+=1
         count["extra_"+extra]+=1
         if missing:count["missing_core_notice_fields"]+=1
         if status!="text_scanned_all_files_not_legally_reviewed":count["rfp_needs_followup"]+=1
