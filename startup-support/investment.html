@@ -62,6 +62,9 @@ $('sources').innerHTML=(state.sources||[]).map(x=>'<div class="source"><strong>'
 $('targets').innerHTML=(state.watchTargets||[]).map(x=>'<div class="source"><strong>'+esc(x.name)+' · '+esc(x.type)+'</strong><p>'+esc(x.mode||'참고 링크')+'</p><a href="'+esc(safe(x.url))+'" target="_blank" rel="noopener">공식 사이트 ↗</a></div>').join('')}
 if(new URLSearchParams(location.search).get('review')==='kimse')$('reviewOnly').checked=true;
 ['search','kind','status','ended','reviewOnly'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',draw));
-fetch('./investment-opportunities.json?cache='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{if(!Array.isArray(d.opportunities))throw Error('데이터 형식 오류');state=d;draw()}).catch(e=>{$('error').textContent='수집 목록 확인 실패: '+e.message;$('cards').innerHTML='<div class="empty">수집 데이터를 읽을 수 없습니다.</div>'});
+fetch('https://api-suaveforge.suaveforge.com:18458/api/g2b/snapshot?name=investment-opportunities',{cache:'no-store'})
+.catch(()=>fetch('./investment-opportunities.json?cache='+Date.now(),{cache:'no-store'}))
+.then(r=>r.ok?r:fetch('./investment-opportunities.json?cache='+Date.now(),{cache:'no-store'}))
+.then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{if(!Array.isArray(d.opportunities))throw Error('데이터 형식 오류');state=d;draw()}).catch(e=>{$('error').textContent='수집 목록 확인 실패: '+e.message;$('cards').innerHTML='<div class="empty">수집 데이터를 읽을 수 없습니다.</div>'});
 })();
 </script></body></html>
