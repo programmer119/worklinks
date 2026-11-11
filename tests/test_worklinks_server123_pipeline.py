@@ -19,7 +19,8 @@ with tempfile.TemporaryDirectory() as temporary:
     m.STATE=root/'scheduler.json'
     m.SEEDS.mkdir()
     m.SCRIPTS.mkdir()
-    for script in ('refresh_worklinks_rfp.py','refresh_worklinks_actionable.py'):
+    for script in ('refresh_worklinks_rfp.py','refresh_worklinks_actionable.py',
+                   'refresh_worklinks_open_award_fallback.py'):
         (m.SCRIPTS/script).write_text('# test fixture\n',encoding='utf-8')
     original={'ok':True,'generatedAt':'2026-11-01','byNotice':{
         'R26BK01808709:000':{'status':'text_extracted_requires_review'}}}
@@ -27,7 +28,7 @@ with tempfile.TemporaryDirectory() as temporary:
         (m.SEEDS/filename).write_text(json.dumps(original),encoding='utf-8')
     (m.SEEDS/'changcom-actionable.json').write_text(json.dumps({
         'ok':True,'bizno':'1308185973',
-        'counts':{'indexedSWTotal':6000},'bids':[]}),encoding='utf-8')
+        'counts':{'indexedSWTotal':6000,'softwareService':1},'bids':[{'bidNo':'R26BK01808709'}]}),encoding='utf-8')
     def mock_runner(args,cwd,env,capture_output,text,timeout):
         assert env['WORKLINKS_G2B_API'].startswith('http://127.0.0.1:')
         assert 'serviceKey=' not in str(args)
@@ -38,9 +39,14 @@ with tempfile.TemporaryDirectory() as temporary:
                'R26BK01809647:000':{'status':'text_extracted_requires_review'}}}
             for filename in ('rfp-clauses.json','rfp-coverage-index.json'):
                 (p/filename).write_text(json.dumps(updated),encoding='utf-8')
+        elif 'refresh_worklinks_open_award_fallback.py' in args[1]:
+            updated={'ok':True,'totalSavedSw':6001,'count':1,'byNotice':{
+                'R26BK01808709:000':{'awardMethod':'협상에 의한 계약'}}}
+            (p/'g2b-award-fields-open.json').write_text(json.dumps(updated),encoding='utf-8')
         else:
             updated={'ok':True,'bizno':'1308185973',
-                     'counts':{'indexedSWTotal':6001},'bids':[]}
+                     'counts':{'indexedSWTotal':6001,'softwareService':1},
+                     'bids':[{'bidNo':'R26BK01808709'}]}
             (p/'changcom-actionable.json').write_text(json.dumps(updated),encoding='utf-8')
         return SimpleNamespace(returncode=0,stdout='mock=ok',stderr='')
     m.run_once('rfp',mock_runner)
@@ -48,8 +54,10 @@ with tempfile.TemporaryDirectory() as temporary:
     with gzip.open(str(m.SEEDS/'rfp-coverage-index.json')+'.gz','rb') as f:
         assert len(json.load(f)['byNotice'])==2
     m.run_once('actionable',mock_runner)
+    m.run_once('awardFallback',mock_runner)
+    assert json.loads((m.SEEDS/'g2b-award-fields-open.json').read_text())['count']==1
     state=m.iteration(1700000000,mock_runner)
-    assert state['actionable']['status']=='ok' and state['rfp']['status']=='ok'
+    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback'))
     another=m.iteration(1700000001,mock_runner)
     assert another['rfp']['attemptEpoch']==1700000000
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
