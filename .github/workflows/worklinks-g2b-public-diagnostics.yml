@@ -14,6 +14,9 @@ on:
       - 'tests/test_worklinks_open_award_fallback.py'
       - 'server/worklinks-standalone-jobs.py'
       - 'server/Dockerfile.worklinks-standalone'
+      - 'server/worklinks-selfdeploy-loop.sh'
+      - 'server/Dockerfile.worklinks-selfdeploy'
+      - 'server/deploy-worklinks-selfdeploy.sh'
       - 'server/deploy-worklinks-standalone.sh'
       - 'tests/test_worklinks_standalone_jobs.py'
       - 'scripts/worklinks_sme_cert_snapshot.py'
@@ -66,6 +69,8 @@ jobs:
           python3 tests/test_worklinks_open_award_fallback.py
           python3 tests/test_worklinks_standalone_jobs.py
           bash -n server/deploy-worklinks-standalone.sh
+          bash -n server/worklinks-selfdeploy-loop.sh
+          bash -n server/deploy-worklinks-selfdeploy.sh
           python3 tests/test_worklinks_pipeline_snapshot_api.py
           bash -n server/deploy-worklinks-server123-pipeline.sh
           python3 tests/test_rfp_failures.py
