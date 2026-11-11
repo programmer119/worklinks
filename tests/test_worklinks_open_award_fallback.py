@@ -14,11 +14,11 @@ def notice(bid='R26BK01808709',close='2026-11-30 23:59',method='협상에 의한
             'contract':'제한경쟁','awardMethodCode':'낙010001','awardFloorRate':'87.745'}
 def fake(offset):
     assert offset==0
-    return {'ok':True,'persisted':True,'totalCount':3,
+    return {'ok':True,'persisted':True,'totalCount':100,
             'items':[notice(),notice(bid='R26BK01811111',close='2026-11-10 23:59'),
-                     notice(bid='INVALID')]}
+                     *[notice(bid='INVALID') for _ in range(98)]]}
 data=m.collect(fake,now=t)
-assert data['ok'] and data['totalSavedSw']==3
+assert data['ok'] and data['totalSavedSw']==100
 assert data['count']==1 and 'R26BK01808709:000' in data['byNotice']
 assert data['byNotice']['R26BK01808709:000']['awardFloorRate']=='87.745'
 def fail(offset):
