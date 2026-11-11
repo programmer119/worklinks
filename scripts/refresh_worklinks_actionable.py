@@ -492,7 +492,7 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
     sme=sme or {}
     direct=direct or {}
     selected=latest_revisions(rows)
-    groups={'open':0,'expired':0,'deadline_unknown':0,'openService':0,
+    groups={'open':0,'expired':0,'deadline_within_24h':0,'deadline_unknown':0,'openService':0,
         'softwareService':0,'publishedIndustryAligned':0,'servicePendingReview':0,
         'serviceCodeConflict':0,'otherOrSpecialist':0,'softwareGoodsReview':0,
         'unknownDeadlineRelevant':0}
@@ -504,6 +504,10 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
             groups['deadline_unknown']+=1
         elif end<=now:
             groups['expired']+=1
+            continue
+        elif end-now<dt.timedelta(hours=24):
+            # Too close to submit a complete proposal; exclude instead of penalizing.
+            groups['deadline_within_24h']+=1
             continue
         else:
             groups['open']+=1
@@ -555,7 +559,6 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
                25 if screening=='official_license_unavailable' else
                15 if screening=='official_license_ambiguous' else 0)
         score+=20 if has_svc else 0
-        score+=10 if hours is not None and 48<=hours<=14*24 else 0
         score+=8 if scanned else 0
         score+=5 if 0<price<=300_000_000 else 0
         # Practical contract value is distinct from minimum legal registration.
@@ -574,8 +577,6 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
             score+=12
         if 50_000_000<=price<=300_000_000:score+=12
         elif price>1_000_000_000:score-=22
-        if hours is not None and hours<24:score-=18
-        if deadline_unknown:score-=60
         if price>=3_000_000_000:score-=12
         if purpose=='software_goods_review':score-=30
         # Basic registrations alone cannot certify staffing feasibility.
@@ -636,7 +637,7 @@ def build(rows,total_count,company,now=None,rfp=None,awards=None,reviews=None,sm
     bids.sort(key=lambda x:(2 if x['deadlineState']=='unknown' else
         0 if x['scope']=='software_service' else 1,
         x['priorityTier'],order.get(x['screening'],5),-x['priorityScore'],
-        x['closes'] or '9999',x['bidNo']))
+        x['bidNo']))
     observed=len(rows)
     tracked=len(bids)
     progress={
