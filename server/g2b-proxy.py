@@ -1149,7 +1149,13 @@ SNAPSHOT_NAMES = {
     'changcom-actionable': 'changcom-actionable.json',
     'g2b-award-fields-open': 'g2b-award-fields-open.json',
     'rfp-clauses': 'rfp-clauses.json',
-    'rfp-coverage-index': 'rfp-coverage-index.json'
+    'rfp-coverage-index': 'rfp-coverage-index.json',
+    'investment-opportunities': 'investment-opportunities.json',
+    'year-end-local-budget': 'year-end-local-budget.json',
+    'kimse-deep-audit': 'kimse-deep-audit.json',
+    'sme-cert-snapshot': 'sme-cert-snapshot.json',
+    'direct-production-snapshot': 'direct-production-snapshot.json',
+    'health-live-audit': 'health-live-audit.json'
 }
 
 class Handler(BaseHTTPRequestHandler):
@@ -1234,8 +1240,16 @@ class Handler(BaseHTTPRequestHandler):
                     state={}
                 ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
                            for key,value in SNAPSHOT_NAMES.items())
-                return self.reply(200,{'ok':True,'scheduler':state,'snapshotsReady':ready,
-                                       'upstreamCalls':0})
+                autonomous_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),
+                                             'standalone','standalone-jobs-state.json')
+                try:
+                    with open(autonomous_path,'r') as stream:
+                        autonomous=json.load(stream)
+                    if not isinstance(autonomous,dict):autonomous={}
+                except (IOError,OSError,ValueError):
+                    autonomous={}
+                return self.reply(200,{'ok':True,'scheduler':state,'autonomousJobs':autonomous,
+                                       'snapshotsReady':ready,'upstreamCalls':0})
             if u.path in ('/health','/api/g2b/status'):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
                     'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
