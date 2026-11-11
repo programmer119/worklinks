@@ -51,6 +51,23 @@ with tempfile.TemporaryDirectory(prefix='worklinks-extra-') as d:
         assert listing['items'][0]['supplementalBidFacts']['sources']['serviceProducts']['ok']
         assert listing['items'][0]['supplementalBidFacts']['complete'] is False
         assert len(calls)==3,'saved listing triggered provider requests'
+        # Completed records never re-fetch just because 72 hours elapsed.
+        db=mod['open_bid_db']()
+        try:
+            with db:
+                db.execute("UPDATE bid_extra_cache SET payload=?,checked_at=? WHERE bid_no=?",
+                    (json.dumps({**result,'complete':True,'ok':True}),
+                     '2026-10-01T00:00:00+00:00',no))
+        finally:
+            db.close()
+        done=mod['bid_extra_query'](no,'000')
+        assert done['cached'] and len(calls)==3,'completed record fetched on timer'
+        # An actual notice amendment is the one reason to invalidate success.
+        mod['persist_bids']([{'kind':'servc','bidNo':no,'order':'0',
+             'title':'정보시스템 기능 개선 정정','closes':'2026-12-01'}])
+        refreshed=mod['bid_extra_query'](no,'000')
+        assert refreshed.get('cached') is False
+        assert len(calls)==6,'changed notice not revalidated'
         print('WORKLINKS_SUPPLEMENTAL_SQLITE_CACHE=PASS',len(calls))
     finally:
         g['request_api']=original
