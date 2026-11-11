@@ -24,7 +24,7 @@ jobs:
           raw=urllib.request.urlopen(historical_url,timeout=75).read()
           old=json.loads(raw.decode('utf8'))
           new=json.loads(Path('startup-support/changcom-actionable.json').read_text(encoding='utf8'))
-          with open('startup-support/audits/changcom-200-screening-20261110.csv',encoding='utf8-sig',newline='') as f:
+          with open('startup-support/audits/changcom-200-screening-20261110.csv',encoding='utf-8-sig',newline='') as f:
               cohort=list(csv.DictReader(f))
           fixed={x['공고번호'] for x in cohort}
           wanted=['R26BK01816467','R26BK01816907','R26BK01804703']
