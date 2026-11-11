@@ -1239,7 +1239,11 @@ class Handler(BaseHTTPRequestHandler):
                 except (IOError,OSError,ValueError):
                     state={}
                 ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
-                           for key,value in SNAPSHOT_NAMES.items())
+                           for key,value in SNAPSHOT_NAMES.items()
+                           if key in ('changcom-actionable','g2b-award-fields-open',
+                                      'rfp-clauses','rfp-coverage-index'))
+                other_ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
+                                 for key,value in SNAPSHOT_NAMES.items() if key not in ready)
                 autonomous_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),
                                              'standalone','standalone-jobs-state.json')
                 try:
@@ -1249,7 +1253,8 @@ class Handler(BaseHTTPRequestHandler):
                 except (IOError,OSError,ValueError):
                     autonomous={}
                 return self.reply(200,{'ok':True,'scheduler':state,'autonomousJobs':autonomous,
-                                       'snapshotsReady':ready,'upstreamCalls':0})
+                                       'snapshotsReady':ready,
+                                       'autonomousSnapshotsReady':other_ready,'upstreamCalls':0})
             if u.path in ('/health','/api/g2b/status'):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
                     'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
