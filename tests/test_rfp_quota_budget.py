@@ -3,9 +3,12 @@
 import pathlib,re,runpy
 root=pathlib.Path(__file__).resolve().parents[1]
 workflow=(root/'.github/workflows/worklinks-rfp-snapshot.yml').read_text(encoding='utf-8')
-m=re.search(r'python3 scripts/refresh_worklinks_rfp.py --limit (\d+)',workflow)
-assert m,'missing quota-bound scan invocation'
+m=re.search(r"RFP_HOURLY_DEFAULT_LIMIT:\\s*['\\\"]?(\\d+)",workflow)
+assert m,'missing default hourly quota limit'
 per_hour=int(m.group(1))
+assert 'ONE_SHOT_FIXED_COHORT_BACKFILL=28' in workflow
+assert 'HEAD_COMMIT_MSG' in workflow and 'GITHUB_EVENT_NAME' in workflow
+assert 28*3+2*3<=720,'one-off batch must also fit below an entire daily budget'
 r=runpy.run_path(str(root/'scripts/refresh_worklinks_rfp.py'),run_name='test_quota')
 probes=r['MAX_MANIFEST_PROBES_PER_RUN']
 # Server bid_evidence_query makes three official requests per notice:
