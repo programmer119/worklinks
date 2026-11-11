@@ -20,7 +20,7 @@ import urllib.error
 import xml.etree.ElementTree as ET
 import zipfile
 
-BASE='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+BASE=os.environ.get('WORKLINKS_G2B_API','https://api-suaveforge.suaveforge.com:18458/api/g2b').rstrip('/')+'/'
 ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'startup-support/rfp-clauses.json'
 COVERAGE_DEST=ROOT/'startup-support/rfp-coverage-index.json'
