@@ -27,6 +27,7 @@ COVERAGE_DEST=ROOT/'startup-support/rfp-coverage-index.json'
 CHANGCOM_SOURCE=ROOT/'startup-support/changcom-actionable.json'
 CHANGCOM_EVIDENCE_DEST=ROOT/'startup-support/changcom-rfp-evidence.json'
 CHANGCOM_BACKFILL60=ROOT/'startup-support/audits/changcom-rfp-backfill-60-20261110.json'
+CHANGCOM_URGENT_RECOVERY=ROOT/'startup-support/audits/changcom-priority-rfp-recovery-20261111.json'
 MAX_FILE=12_000_000
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
@@ -209,6 +210,20 @@ def pending_changcom_backfill(path=CHANGCOM_BACKFILL60):
         return set()
 
 
+def pending_urgent_recovery(path=CHANGCOM_URGENT_RECOVERY):
+    """Data-driven, user-requested RFP recovery queue, never a legal preference."""
+    try:
+        obj=json.loads(path.read_text(encoding='utf-8'))
+        if obj.get('schemaVersion')!=1:return set()
+        ids=[str(item.get('bidId') or '') for item in obj.get('items') or []]
+        if not ids or len(ids)!=len(set(ids)) or any(
+                not re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',key) for key in ids):
+            raise ValueError('invalid_urgent_queue')
+        return set(ids)
+    except (OSError,ValueError,TypeError,AttributeError) as ex:
+        print('RFP_URGENT_QUEUE_UNAVAILABLE',type(ex).__name__,flush=True)
+        return set()
+
 def discover(limit,prior=None,targets=None,manifest_probe_out=None):
     """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
@@ -220,6 +235,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
     prior=prior or {}
     targets=changcom_targets() if targets is None else targets
     backfill=pending_changcom_backfill()
+    urgent=pending_urgent_recovery()
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -269,7 +285,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                 # Do not confuse a lack of matching metadata with a rejection.
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
-                rank=(-1 if key in backfill and temporal==0 else
+                rank=(-2 if key in urgent and key in targets and temporal==0 else
+                      -1 if key in backfill and temporal==0 else
                       0 if key in targets and temporal==0 else 1 if temporal==0 else
                       2 if key in targets else 3,
                       novel,0 if retry else 1,
