@@ -70,7 +70,9 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
         old = scans.get(key) or {}
         source = by_notice.get(key)
         live = None
-        if old.get('status') in RECHECK or not isinstance(source, dict):
+        if (old.get('status') in RECHECK or not isinstance(source, dict) or
+                (source.get('attachments') or {}).get('complete') is not True or
+                (source.get('noticeDocuments') or {}).get('complete') is not True):
             no, order = key.rsplit(':', 1)
             live = fetch_json(BASE + 'bid-evidence?' +
                               urllib.parse.urlencode({'bidNo': no, 'order': order}))
