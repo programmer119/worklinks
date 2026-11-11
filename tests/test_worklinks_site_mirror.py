@@ -41,6 +41,17 @@ with tempfile.TemporaryDirectory() as t:
     h.reply_worklinks_site('/startup-support/investment-opportunities.json')
     assert h.status==200
     assert json.loads(h.output.getvalue())['schemaVersion']==1
+    audit_dir=snapshot/'audits'
+    audit_dir.mkdir()
+    csv_text='원본순위,공고번호\n1,R26BK01808709:000\n'.encode()
+    (audit_dir/'changcom-200-official-evidence-20261111.csv').write_bytes(csv_text)
+    h=Handler()
+    h.reply_changcom_200_report('csv')
+    assert h.status==200 and h.output.getvalue()==csv_text
+    for fmt in ('../../secrets/g2b.env','json',''):
+        h=Handler()
+        h.reply_changcom_200_report(fmt)
+        assert h.status==400
     for path in ('/startup-support/.git/config',
                  '/startup-support/../secrets/g2b.env',
                  '/startup-support/%2e%2e/secrets/g2b.env',
