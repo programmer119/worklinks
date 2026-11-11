@@ -1,0 +1,68 @@
+name: Changcom read-only exact three omissions diagnostic 20261111
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/changcom-3-omissions-exact-cause-20261111.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare original 200 cutoff to three former recommendations
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import csv,json,urllib.request,io
+          from pathlib import Path
+          historical_url='https://raw.githubusercontent.com/programmer119/worklinks/a89ab8eadcc3/startup-support/changcom-actionable.json'
+          raw=urllib.request.urlopen(historical_url,timeout=75).read()
+          old=json.loads(raw.decode('utf8'))
+          new=json.loads(Path('startup-support/changcom-actionable.json').read_text(encoding='utf8'))
+          with open('startup-support/audits/changcom-200-screening-20261110.csv',encoding='utf8-sig',newline='') as f:
+              cohort=list(csv.DictReader(f))
+          fixed={x['공고번호'] for x in cohort}
+          wanted=['R26BK01816467','R26BK01816907','R26BK01804703']
+          print('SOURCES old_sha=a89ab8eadcc3 old_generated=',old.get('generatedAt'),
+                'current_generated=',new.get('generatedAt'),
+                'old_counts=',json.dumps(old.get('counts',{}),ensure_ascii=False))
+          for tag,snapshot in [('2026-11-10_15h40',old),('latest',new)]:
+              bids=snapshot.get('bids') or []
+              aligned=[(i+1,x) for i,x in enumerate(bids)
+                        if x.get('scope')=='software_service'
+                        and x.get('screening')=='published_industry_codes_match'
+                        and x.get('deadlineState')=='open']
+              first200={x['bidNo']+':'+str(x.get('order') or '000').zfill(3) for _,x in aligned[:200]}
+              firstN={x['bidNo']+':'+str(x.get('order') or '000').zfill(3) for x in bids[:200]}
+              print('SNAPSHOT',tag,'total_bids',len(bids),'aligned',len(aligned),
+                    'aligned_first200_in_fixed',len(first200&fixed),'full_first200_in_fixed',len(firstN&fixed))
+              print('ALIGNED_HEAD',[f"{x.get('bidNo')}:{x.get('order')}" for _,x in aligned[:12]])
+              print('COHORT_HEAD',[x['공고번호'] for x in cohort[:12]])
+              for no in wanted:
+                  hits=[(i+1,x) for i,x in enumerate(bids) if x.get('bidNo')==no]
+                  if not hits:
+                      print('TARGET',tag,no,'NOT_IN_ACTIONABLE_SNAPSHOT')
+                      continue
+                  for rank,r in hits:
+                      arank=next((k+1 for k,(_,x) in enumerate(aligned) if x is r),None)
+                      print('TARGET',tag,no,json.dumps({
+                        'rank_all':rank,'rank_aligned':arank,
+                        'in_fixed_200':no+':'+str(r.get('order') or '000').zfill(3) in fixed,
+                        'in_aligned_first200':no+':'+str(r.get('order') or '000').zfill(3) in first200,
+                        'title':r.get('title'),'kind':r.get('kind'),
+                        'closes':r.get('closes'),'deadlineState':r.get('deadlineState'),
+                        'budget':r.get('budget'),'scope':r.get('scope'),
+                        'screening':r.get('screening'),'priorityTier':r.get('priorityTier'),
+                        'priorityScore':r.get('priorityScore'),
+                        'requiredCodes':r.get('requiredCodes'),
+                        'codesNotInCurrentRegistry':r.get('codesNotInCurrentRegistry'),
+                        'staffingRisk':r.get('staffingRisk'),
+                        'precheckState':r.get('precheckState'),
+                        'reviewedNoticeState':(r.get('reviewedNotice') or {}).get('state')
+                      },ensure_ascii=False))
+          PY
