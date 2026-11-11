@@ -299,7 +299,12 @@ def iterate(now=None):
     order=('localBudget','kimseDeep','investment','smeCert','directProduction','healthLive')
     for job in order:
         prev=st.get(job) or {}
-        if now-float(prev.get('attemptEpoch') or 0)<JOBS[job]['period']:continue
+        period=JOBS[job]['period']
+        # A killed process leaves status=started. Retry it after a short
+        # bounded cooldown, not a full month or a 12-hour schedule.
+        delay=(period if prev.get('status')=='ok' else
+               min(21600,max(300,period//6)))
+        if now-float(prev.get('attemptEpoch') or 0)<delay:continue
         record={'attemptEpoch':now,'status':'started','sourceHead':st['checkedHead'],
                 'lastSuccessEpoch':prev.get('lastSuccessEpoch')}
         st[job]=record
