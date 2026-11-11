@@ -3,7 +3,7 @@
 import pathlib,re,runpy
 root=pathlib.Path(__file__).resolve().parents[1]
 workflow=(root/'.github/workflows/worklinks-rfp-snapshot.yml').read_text(encoding='utf-8')
-m=re.search(r"RFP_HOURLY_DEFAULT_LIMIT:\\s*['\\\"]?(\\d+)",workflow)
+m=re.search(r"RFP_HOURLY_DEFAULT_LIMIT:\s*['\"]?(\d+)",workflow)
 assert m,'missing default hourly quota limit'
 per_hour=int(m.group(1))
 assert 'ONE_SHOT_FIXED_COHORT_BACKFILL=28' in workflow
