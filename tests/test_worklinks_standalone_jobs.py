@@ -19,6 +19,7 @@ with tempfile.TemporaryDirectory() as tmp:
     m.STATE=root/'standalone-jobs-state.json'
     m.LOCK=root/'standalone-jobs.lock'
     m.SNAP.mkdir()
+    m.SRC.mkdir()
     m.validate('localBudget',{
         'opportunities':[],'stats':{},'sources':[{'status':'ok'}]})
     m.validate('investment',{
@@ -51,26 +52,39 @@ with tempfile.TemporaryDirectory() as tmp:
     assert (m.SNAP/'sme-cert-snapshot.json').read_bytes()==body
     m.update_source=lambda:(True,'abcdef123')
     m.test_source=lambda root:(True,[{'ok':True}])
+    m.test_diagnostics=lambda root,cmd:[{'ok':True}]
     m.source_head=lambda:'abcdef123'
     received=[]
-    m.run_job=lambda job:received.append(job)
+    class FakeProcess:
+        pid=123
+        def poll(self):return 0
+    m.start_job=lambda job:received.append(job) or FakeProcess()
+    # Two concurrent source collectors: first run is nonblocking and launches
+    # only the first two while the Git poll loop remains responsive.
     state=m.iterate(1700000000)
-    assert len(received)==len(m.JOBS),(received,m.JOBS)
+    assert len(received)==2,received
+    assert len(m.RUNNING)==2
     assert state['checkedHead']=='abcdef123'
+    for tick in range(1,4):
+        state=m.iterate(1700000000+tick)
+    assert len(received)==len(m.JOBS),(received,m.JOBS)
     assert all(state[k]['status']=='ok' for k in m.JOBS)
-    m.iterate(1700000001)
-    assert len(received)==len(m.JOBS),'second loop executed jobs twice'
-    # Restart-interrupted job must retry within minutes, not after the full day.
+    assert not m.RUNNING
+    m.iterate(1700000004)
+    assert len(received)==len(m.JOBS),'repeat loop launched duplicate jobs'
+    # Restart-interrupted job must retry in minutes, not after a full day.
     restart=m.state_load()
     restart['localBudget']['status']='started'
     m.state_save(restart)
     m.iterate(1700000800)
-    assert received.count('localBudget')==2,'interrupted local collector did not recover'
+    assert received.count('localBudget')==2,'interrupted collector never restarted'
+    m.iterate(1700000801)
+    assert m.state_load()['localBudget']['status']=='ok'
     m.update_source=lambda:(True,'def456')
     m.source_head=lambda:'def456'
     m.test_source=lambda root:(False,[{'ok':False,'tail':'bad source test'}])
     st=m.iterate(1700000900)
     assert st['checkedHead']=='abcdef123'
     assert not st['lastQa']['ok']
-    assert len(received)==len(m.JOBS)+1,'failed source QA executed new jobs'
+    assert len(received)==len(m.JOBS)+1,'failed source QA ran new collectors'
 print('WORKLINKS_STANDALONE_NO_NETWORK_CADENCE_AND_SAFETY=PASS')
