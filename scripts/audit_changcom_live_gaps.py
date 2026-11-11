@@ -29,20 +29,18 @@ def rfp_state(record):
     files=record.get("files") or []
     if record.get("manifestChangePending"):
         return "manifest_change_pending"
+    if int(record.get("unreadableDocumentCount") or 0)>0:
+        return "attachments_unreadable"
+    if files and any(not f.get("sourceTextScanComplete") for f in files):
+        return "qualification_excerpt_incomplete"
+    if files and any(f.get("qualificationScanTruncated") for f in files):
+        return "qualification_excerpt_truncated"
     if record.get("manifestComplete") is False:
         return "manifest_incomplete"
     if record.get("manifestComplete") is None:
         return "manifest_status_unknown_legacy"
-    if int(record.get("unreadableDocumentCount") or 0)>0:
-        return "attachments_unreadable"
     if not files or int(record.get("readableDocumentCount") or 0)<=0:
         return "source_count_inconsistent"
-    if any(not f.get("sourceTextScanComplete") for f in files):
-        return "qualification_excerpt_incomplete"
-    if any(f.get("qualificationScanTruncated") for f in files):
-        return "qualification_excerpt_truncated"
-    if record.get("manifestChangePending"):
-        return "manifest_change_pending"
     return "text_scanned_all_files_not_legally_reviewed"
 
 def main():
