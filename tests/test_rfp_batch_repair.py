@@ -36,8 +36,16 @@ try:
                 {'name':'good.pdf','readable':True,'sourceSha256':'c'*64}]},
           'R26BK00000003:000':{'status':'no_official_attachment_metadata','files':[]}
         }
+        complete = {'status':'text_extracted_requires_review',
+                    'manifestComplete':True,
+                    'files':[{'name':'verified.pdf','readable':True,
+                              'sourceSha256':'c'*64}]}
+        extra = ['R26BK%08d:000' % n for n in range(4, 501)]
+        records.update({key:dict(complete) for key in extra})
+        all_keys = list(records)
         (snap/repair.STATE_NAME).write_text(json.dumps(
-            {'ok':True,'scans':records,'metadataCalls':47}))
+            {'ok':True,'scans':records,'metadataCalls':47,
+             'frozenNoticeKeys':all_keys}))
         (snap/repair.META_NAME).write_text(json.dumps({
             'ok':True,'byNotice':{key:{
               'attachments':{'ok':True,'complete':True,'items':[]},
@@ -48,9 +56,9 @@ try:
         for path in ('rfp-clauses.json','rfp-coverage-index.json'):
             (snap/path).write_text(json.dumps(old))
         dry=repair.run(td)
-        assert dry['frozen']==3 and dry['incomplete']==2 and not calls
+        assert dry['frozen']==500 and dry['incomplete']==2 and not calls
         done=repair.run(td,execute=True)
-        assert done['readableDocumentCount']==3 and done['incompleteNoticeCount']==1
+        assert done['readableDocumentCount']==500 and done['incompleteNoticeCount']==1
         assert sum(t=='metadata' for t,_ in calls)==1
         assert not any(x==('extract','R26BK00000002') for x in calls)
         state=json.loads((snap/repair.STATE_NAME).read_text())
