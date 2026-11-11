@@ -39,7 +39,7 @@ if ! dk image inspect "$IMAGE" >/dev/null 2>&1;then
   dk build --pull=false -f "$ROOT/server/Dockerfile.worklinks-pipeline" \
       -t "$IMAGE" "$ROOT/server"
 fi
-dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && python -c "import pypdf; print(\"PIPELINE_PDF_HWP_READY=PASS\")"'
+dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && python -c "import pypdf, six, hwp5.hwp5txt; print(\"PIPELINE_PDF_HWP_READY=PASS\")"'
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
 for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json;do
