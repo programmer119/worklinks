@@ -1,5 +1,6 @@
 """Live WorkLinks page + simulated AuthHub user: automatic guest migration regression."""
 import json
+import os
 from playwright.sync_api import sync_playwright
 
 SITE = 'https://worklinks.suaveforge.com/startup-support/'
@@ -27,7 +28,9 @@ def check(predicate, description):
     if not predicate: raise AssertionError(description)
 
 with sync_playwright() as p:
-    browser=p.chromium.launch(headless=True)
+    browser=p.chromium.launch(headless=True, **(
+        {"executable_path":os.environ["WORKLINKS_CHROMIUM_PATH"]}
+        if os.environ.get("WORKLINKS_CHROMIUM_PATH") else {}))
     ctx=browser.new_context()
     page=ctx.new_page()
     who=['worklinks-qa-account-a']
