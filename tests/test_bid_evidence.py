@@ -168,7 +168,7 @@ try:
     else:raise AssertionError('upstream quota exhaustion not detected')
     try:p['request_api'](api_base,'getBidPblancListInfoPrtcptPsblRgn02',{'bidNtceNo':'R26BK01756420'})
     except p['ApiError'] as e:
-        assert e.msg=='upstream_temporarily_rate_limited'
+        assert e.msg=='upstream_temporarily_rate_limited_daily_quota'
     else:raise AssertionError('quota circuit breaker absent')
     assert len(attempts)==1,'one 429 should suppress further upstream requests'
     globals_api['cache'][('upstream-rate-cooldown',api_base)]=0
