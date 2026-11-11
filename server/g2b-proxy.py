@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 """WorkLinks G2B API proxy. CentOS 7 / Python 2.7+ standard library only."""
 from __future__ import print_function
-import os, sys, re, json, time, datetime, threading, ssl, sqlite3, base64
+import os, sys, re, json, time, datetime, threading, ssl, sqlite3, base64, mimetypes
 try:
     from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
     from SocketServer import ThreadingMixIn
     from urlparse import urlparse, parse_qs
-    from urllib import urlencode
+    from urllib import urlencode, unquote
     from urllib2 import Request, urlopen, HTTPError, URLError
 except ImportError:
     from http.server import HTTPServer, BaseHTTPRequestHandler
     from socketserver import ThreadingMixIn
-    from urllib.parse import urlparse, parse_qs, urlencode
+    from urllib.parse import urlparse, parse_qs, urlencode, unquote
     from urllib.request import Request, urlopen
     from urllib.error import HTTPError, URLError
 
@@ -1145,6 +1145,7 @@ class ThreadedServer(ThreadingMixIn,HTTPServer):
     daemon_threads = True
 
 SNAPSHOT_ROOT = os.environ.get('WORKLINKS_SNAPSHOT_DIR', '/app/data/snapshots')
+STATIC_WORKTREE = os.environ.get('WORKLINKS_STATIC_WORKTREE','/app/data/standalone/standalone-worktree')
 SNAPSHOT_NAMES = {
     'changcom-actionable': 'changcom-actionable.json',
     'g2b-award-fields-open': 'g2b-award-fields-open.json',
@@ -1159,6 +1160,50 @@ SNAPSHOT_NAMES = {
 }
 
 class Handler(BaseHTTPRequestHandler):
+    def reply_worklinks_site(self, route):
+        """Optional read-only server123 site mirror, no upstream or secret access."""
+        if route in ('/','/startup-support','/startup-support/'):
+            route='/startup-support/index.html'
+        raw=unquote(route)
+        if '\x00' in raw or '\\' in raw:
+            return self.reply(400,{'ok':False,'error':'invalid_site_path'})
+        rel=raw.lstrip('/')
+        if not rel.startswith('startup-support/'):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        parts=rel.split('/')
+        if any(p.startswith('.') or p in ('.','..','') for p in parts):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        ext=os.path.splitext(rel)[1].lower()
+        if ext not in ('.html','.js','.css','.json','.png','.jpg','.jpeg',
+                        '.webp','.svg','.ico','.txt','.woff','.woff2'):
+            return self.reply(404,{'ok':False,'error':'site_filetype_unavailable'})
+        stem=os.path.splitext(os.path.basename(rel))[0]
+        if ext=='.json' and stem in SNAPSHOT_NAMES:
+            return self.reply_snapshot(stem)
+        root=os.path.realpath(STATIC_WORKTREE)
+        target=os.path.realpath(os.path.join(root,rel))
+        if not target.startswith(root+os.sep):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        if not os.path.isfile(target):
+            return self.reply(404,{'ok':False,'error':'site_asset_missing'})
+        length=os.path.getsize(target)
+        if not 1<=length<=90000000:
+            return self.reply(503,{'ok':False,'error':'site_asset_invalid'})
+        mime=mimetypes.guess_type(target)[0] or 'application/octet-stream'
+        if ext in ('.html','.js','.css','.json','.svg','.txt'):
+            mime+='; charset=utf-8'
+        self.send_response(200)
+        self.send_header('Content-Type',mime)
+        self.send_header('Content-Length',str(length))
+        self.send_header('Cache-Control','public, max-age=60')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.end_headers()
+        with open(target,'rb') as source:
+            while True:
+                chunk=source.read(1024*1024)
+                if not chunk:break
+                self.wfile.write(chunk)
+
     def reply_snapshot(self, name):
         """Serve only published, immutable-at-read local snapshots. No G2B calls."""
         filename = SNAPSHOT_NAMES.get(name)
@@ -1228,6 +1273,8 @@ class Handler(BaseHTTPRequestHandler):
         p = parse_qs(u.query)
         def get(name, default=''): return p.get(name,[default])[0]
         try:
+            if u.path in ('/','/startup-support','/startup-support/') or u.path.startswith('/startup-support/'):
+                return self.reply_worklinks_site(u.path)
             if u.path == '/api/g2b/snapshot':
                 return self.reply_snapshot(get('name'))
             if u.path == '/api/g2b/pipeline-status':
