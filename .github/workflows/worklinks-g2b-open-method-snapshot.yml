@@ -1,13 +1,8 @@
 name: WorkLinks open G2B award metadata fallback snapshot
 # One-time sync after verified A02 production backfill: 2026-11-10.
+# Static fallback is now server123-owned; manual replay only.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/worklinks-g2b-open-method-snapshot.yml'
   workflow_dispatch:
-  schedule:
-    - cron: '17 */4 * * *'
 permissions:
   contents: write
 concurrency:
