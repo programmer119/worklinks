@@ -101,6 +101,35 @@ def reusable_rfp_extraction(record):
     return any(f.get('readable') is True and f.get('sourceSha256')
                for f in (record.get('files') or []) if isinstance(f,dict))
 
+def partial_retry_due(record,utc=None):
+    """Retry only transient missing files / incomplete official manifests.
+
+    A PDF image, unsupported HWP or oversized file will not become readable
+    merely by repeating the same API request. Successful partial documents
+    remain available; no legal-completeness claim follows from this retry.
+    """
+    if not isinstance(record,dict) or record.get('status')!='text_extracted_requires_review':
+        return False
+    if int(record.get('partialRetryCount') or 0)>=2:
+        return False
+    failures=[str(f.get('errorCategory') or '') for f in
+              (record.get('files') or []) if isinstance(f,dict)
+              and f.get('readable') is not True]
+    retryable=any(v in ('file_download_connection_error',
+                        'file_download_http_429','file_download_http_500',
+                        'file_download_http_502','file_download_http_503',
+                        'file_download_http_504') for v in failures)
+    retryable=retryable or record.get('manifestComplete') is False
+    if not retryable:return False
+    last=str(record.get('checkedAt') or '')
+    if not last:return True
+    try:
+        when=dt.datetime.fromisoformat(last.replace('Z','+00:00'))
+        now=utc or dt.datetime.now(dt.timezone.utc)
+        return when.tzinfo is None or now-when>=dt.timedelta(hours=24)
+    except (ValueError,TypeError):
+        return True
+
 # Only attachment METADATA is periodically compared. Unchanged documents
 # never need to be downloaded. Same-order binary changes with identical
 # metadata cannot be proven without a separate, explicit hash audit.
@@ -258,7 +287,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                 cached=prior.get(key) or {}
                 retry=needs_hwpx_reader_retry(cached)
                 if cached.get('reviewComplete') is True:continue
-                if reusable_rfp_extraction(cached):
+                partially_retryable=partial_retry_due(cached,utc)
+                if reusable_rfp_extraction(cached) and not partially_retryable:
                     if (manifest_probe_out is not None and date and date>=today and
                             manifest_probe_due(cached,utc)):
                         last=str(cached.get('manifestCheckedAt') or cached.get('checkedAt') or '')
@@ -287,6 +317,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
                 rank=(-2 if key in urgent and key in targets and temporal==0 else
                       -1 if key in backfill and temporal==0 else
+                      -1 if partially_retryable and key in targets and temporal==0 else
                       0 if key in targets and temporal==0 else 1 if temporal==0 else
                       2 if key in targets else 3,
                       novel,0 if retry else 1,
@@ -1031,6 +1062,7 @@ def compact_coverage(item):
         'checkedAt':item.get('checkedAt') or '',
         'classificationVersion':item.get('classificationVersion',0),
         'hwpxReaderVersion':item.get('hwpxReaderVersion',0),
+        'partialRetryCount':item.get('partialRetryCount',0),
         'reviewComplete':False,
         'attachmentManifestCount':item.get('attachmentManifestCount'),
         'manifestComplete':item.get('manifestComplete'),
@@ -1170,7 +1202,9 @@ def main():
     for no,ordn,_ in selected:
         key=no+':'+ordn
         cached=old.get(key)
+        cached_source=prior_index.get(key) or cached
         if (not (prior_index.get(key) or {}).get('manifestChangePending') and
+                not partial_retry_due(cached_source,now) and
                 (reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key)))):
             print('RFP_REUSE_PREVIOUS_EXTRACTION',key)
             continue
@@ -1200,6 +1234,9 @@ def main():
                 data['checkedAt']=now.isoformat()
                 data['classificationVersion']=CLASSIFICATION_VERSION
                 data['hwpxReaderVersion']=HWPX_READER_VERSION
+                previous=prior_index.get(key) or old.get(key) or {}
+                if partial_retry_due(previous,now):
+                    data['partialRetryCount']=int(previous.get('partialRetryCount') or 0)+1
                 if (reusable_rfp_extraction(old.get(key)) and
                         data['status']!='text_extracted_requires_review'):
                     results[key]=old[key]
