@@ -69,6 +69,10 @@ def connect():
                 try: flag=is_sw(json.loads(payload))
                 except Exception: flag=0
                 db.execute('UPDATE bid_notices SET sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',(flag,kind,no,order))
+    # A change marker is advanced only when the original notice payload changes,
+    # never merely because the same notice was polled again.
+    if 'changed_at' not in [r[1] for r in db.execute('PRAGMA table_info(bid_notices)').fetchall()]:
+        db.execute("ALTER TABLE bid_notices ADD COLUMN changed_at TEXT NOT NULL DEFAULT ''")
     db.execute('CREATE INDEX IF NOT EXISTS bid_notices_sw_seen_idx ON bid_notices(sw_candidate,last_seen DESC)')
     db.execute('CREATE TABLE IF NOT EXISTS crawl_windows (kind TEXT NOT NULL,day TEXT NOT NULL,expected INTEGER NOT NULL,received INTEGER NOT NULL,pages INTEGER NOT NULL,checked_at TEXT NOT NULL,PRIMARY KEY(kind,day))')
     db.execute('CREATE TABLE IF NOT EXISTS crawl_status (id INTEGER PRIMARY KEY CHECK(id=1),state TEXT NOT NULL,run_started TEXT,run_finished TEXT,last_success TEXT,request_count INTEGER NOT NULL DEFAULT 0,error_count INTEGER NOT NULL DEFAULT 0,message TEXT)')
@@ -149,8 +153,11 @@ def save(db,items):
     if not values:return 0
     with db:
         db.executemany('INSERT OR IGNORE INTO bid_notices (kind,bid_no,bid_ord,payload,first_seen,last_seen) VALUES(?,?,?,?,?,?)',values)
-        db.executemany('UPDATE bid_notices SET payload=?,last_seen=?,sw_candidate=? WHERE kind=? AND bid_no=? AND bid_ord=?',
-                       [(v[3],now,is_sw(json.loads(v[3])),v[0],v[1],v[2]) for v in values])
+        db.executemany('''UPDATE bid_notices
+          SET changed_at=CASE WHEN payload<>? THEN ? ELSE changed_at END,
+              payload=?,last_seen=?,sw_candidate=?
+          WHERE kind=? AND bid_no=? AND bid_ord=?''',
+          [(v[3],now,v[3],now,is_sw(json.loads(v[3])),v[0],v[1],v[2]) for v in values])
     return len(values)
 
 def scan_day(db,key,kind,day):
@@ -183,14 +190,39 @@ def dates(count):
     kst=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
     return [(kst-dt.timedelta(days=i)).strftime('%Y%m%d') for i in range(count-1,-1,-1)]
 
+def window_due(db,kind,day,today,at=None):
+    """Retry incomplete windows; do not re-fetch finalized historical days hourly.
+
+    The current day stays fresh hourly; each of the previous REFRESH_DAYS-1
+    days is checked once every 24 hours for retrospective corrections.
+    Completed older backfill windows are immutable for this collector.
+    """
+    found=db.execute('SELECT checked_at FROM crawl_windows WHERE kind=? AND day=?',
+                     (kind,day)).fetchone()
+    if not found:return True
+    if day < (today-dt.timedelta(days=REFRESH_DAYS-1)).strftime('%Y%m%d'):
+        return False
+    try:
+        checked=dt.datetime.fromisoformat(str(found[0]).replace('Z','+00:00'))
+        right_now=at or dt.datetime.now(dt.timezone.utc)
+        interval=INTERVAL if day==today.strftime('%Y%m%d') else 24*3600
+        return checked.tzinfo is None or (right_now-checked).total_seconds()>=interval
+    except (ValueError,TypeError):
+        return True
+
+
 def scan(db,key,days,reason):
     state(db,'running',reason)
     db.execute('UPDATE crawl_status SET run_started=?,request_count=0,error_count=0 WHERE id=1',(ts(),))
     db.commit()
     errors=[]
     scanned=0
+    due_windows=0
+    today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
     for day in dates(days):
         for kind in OPERATIONS:
+            if not window_due(db,kind,day,today):continue
+            due_windows+=1
             if SHUTDOWN:
                 state(db,'stopping','received_signal',finished=True)
                 return False
@@ -208,7 +240,7 @@ def scan(db,key,days,reason):
                     return False
             time.sleep(PER_REQUEST_DELAY)
     total=db.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
-    message='reason=%s;windows=%d;received=%d;unique_total=%d;errors=%d'%(reason,days*4,scanned,total,len(errors))
+    message='reason=%s;windows=%d;received=%d;unique_total=%d;errors=%d'%(reason,due_windows,scanned,total,len(errors))
     if errors:
         state(db,'partial',message+';first='+errors[0],finished=True)
         return False
@@ -224,8 +256,10 @@ def main():
         while not SHUTDOWN:
             start=dt.datetime.now(dt.timezone.utc)
             windows=db.execute('SELECT COUNT(*) FROM crawl_windows').fetchone()[0]
-            count=BACKFILL_DAYS if windows<4*BACKFILL_DAYS else REFRESH_DAYS
-            success=scan(db,key,count,'initial_backfill' if count==BACKFILL_DAYS else 'hourly_refresh')
+            # All historical windows remain visible: a failed one is retried,
+            # while every already completed window is skipped until due.
+            success=scan(db,key,BACKFILL_DAYS,
+                         'initial_backfill' if windows<4*BACKFILL_DAYS else 'incremental_refresh')
             if not success:log('RETRY_ON_NEXT_CYCLE')
             remaining=INTERVAL-(dt.datetime.now(dt.timezone.utc)-start).total_seconds()
             # Never spin after long runs; wait at least 90 seconds.
