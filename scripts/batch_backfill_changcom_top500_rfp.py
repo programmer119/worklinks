@@ -111,8 +111,8 @@ class Provider:
         self.failed=0
         self.rows=collections.Counter()
         self.pages={}
-    def request(self,op,start,end,page):
-        params={'serviceKey':self.key,'type':'json','pageNo':page,'numOfRows':PAGE_SIZE,
+    def request(self,op,start,end,page,page_size=PAGE_SIZE):
+        params={'serviceKey':self.key,'type':'json','pageNo':page,'numOfRows':page_size,
                 'inqryDiv':1,'inqryBgnDt':start+'0000','inqryEndDt':end+'2359'}
         if op=='ordinary':params['bsnsDivCd']=5
         url=API+dict(OPS)[op]+'?'+urllib.parse.urlencode(params)
@@ -149,10 +149,10 @@ class Provider:
         self.failed+=1
         raise RuntimeError('OFFICIAL_BATCH_API_FAILED '+op+' '+start+'-'+end+
                            ' page='+str(page)+' '+type(error).__name__+':'+str(error)[:120])
-    def gather(self,op,window,needed):
+    def _gather(self,op,window,needed,page_size=PAGE_SIZE):
         start,end=window
-        first_total,first=self.request(op,start,end,1)
-        expected=math.ceil(first_total/PAGE_SIZE) if first_total else 0
+        first_total,first=self.request(op,start,end,1,page_size)
+        expected=math.ceil(first_total/page_size) if first_total else 0
         if first_total and len(first)==0:raise RuntimeError('EMPTY_FIRST_PAGE_NONZERO')
         got=0
         result=collections.defaultdict(list)
@@ -167,7 +167,7 @@ class Provider:
         store(first)
         for page in range(2,expected+1):
             time.sleep(.32)
-            total,rows=self.request(op,start,end,page)
+            total,rows=self.request(op,start,end,page,page_size)
             if total!=first_total:
                 raise RuntimeError('PAGINATION_TOTAL_MOVED '+op+' '+start)
             if not rows:raise RuntimeError('EMPTY_INTERMEDIATE_PAGE '+op+' '+start)
@@ -181,6 +181,30 @@ class Provider:
         print('BATCH_SOURCE_COMPLETE',op,start,end,'PAGES',max(1,expected),
               'ROWS',got,'TARGET_NOTICE_HITS',len(result),flush=True)
         return result
+
+    def gather(self,op,window,needed,page_size=PAGE_SIZE):
+        try:
+            return self._gather(op,window,needed,page_size)
+        except RuntimeError as e:
+            start,end=window
+            if start<end:
+                a=dt.datetime.strptime(start,'%Y%m%d').date()
+                b=dt.datetime.strptime(end,'%Y%m%d').date()
+                mid=a+(b-a)//2
+                next_day=mid+dt.timedelta(days=1)
+                print('BATCH_PROVIDER_FALLBACK_SPLIT',op,start,end,
+                      'CAUSE',str(e)[:110],flush=True)
+                combined=collections.defaultdict(list)
+                for lower,upper in ((start,mid.strftime('%Y%m%d')),
+                                    (next_day.strftime('%Y%m%d'),end)):
+                    for ident,rows in self.gather(op,(lower,upper),needed,page_size).items():
+                        combined[ident].extend(rows)
+                return combined
+            if page_size==PAGE_SIZE:
+                print('BATCH_PROVIDER_FALLBACK_SMALL_PAGE',op,start,'PAGE_SIZE',250,
+                      'CAUSE',str(e)[:100],flush=True)
+                return self.gather(op,window,needed,250)
+            raise
 
 def normalize(meta,day,now):
     ordinary=meta['ordinary']
@@ -282,14 +306,31 @@ def main():
     needed={key_for(b):dated[key_for(b)] for b in remaining}
     provider=Provider(secret(args.secret))
     grouped={key:{k:[] for k,_ in OPS} for key in needed}
+    cache_path=data/'snapshots/rfp-top500-batch-source-checkpoint-20261111.json'
+    cache=load(cache_path) or {'ok':True,'groups':{}}
+    if not isinstance(cache.get('groups'),dict):raise RuntimeError('INVALID_SOURCE_CACHE')
+    reused=0
     for op,_ in OPS:
         for window in WINDOWS:
             subset={key:date for key,date in needed.items() if window[0]<=date<=window[1]}
             if not subset:continue
-            hits=provider.gather(op,window,subset)
+            bucket=op+'_'+window[0]+'_'+window[1]
+            prior=cache['groups'].get(bucket) or {}
+            if prior.get('complete') is True and set(subset).issubset(set(prior.get('targetKeys') or [])):
+                hits=prior.get('rows') or {}
+                reused+=1
+                print('BATCH_REUSE_COMPLETED_SOURCE_WINDOW',bucket,'TARGETS',len(subset),flush=True)
+            else:
+                hits=provider.gather(op,window,subset)
+                cache['groups'][bucket]={
+                  'complete':True,'targetKeys':sorted(subset),'rows':hits,
+                  'checkedAt':dt.datetime.now(dt.timezone.utc).isoformat()}
+                atomic_json(cache_path,cache)
+                print('BATCH_SOURCE_CHECKPOINT_SAVED',bucket,flush=True)
+                time.sleep(.45)
             for key,rows in hits.items():
-                grouped[key][op].extend(rows)
-            time.sleep(.45)
+                if key in grouped:grouped[key][op].extend(rows)
+    print('BATCH_SOURCE_CHECKPOINT_REUSED_GROUPS',reused,flush=True)
     metadata={}
     by_source=collections.Counter()
     for key,group in grouped.items():
