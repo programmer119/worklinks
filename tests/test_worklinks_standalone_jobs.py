@@ -65,9 +65,10 @@ with tempfile.TemporaryDirectory() as tmp:
     assert len(received)==2,received
     assert len(m.RUNNING)==2
     assert state['checkedHead']=='abcdef123'
-    for tick in range(1,4):
+    for tick in range(1,5):
         state=m.iterate(1700000000+tick)
     assert len(received)==len(m.JOBS),(received,m.JOBS)
+    assert 'changcom200' in received,'original Changcom 200 audit not scheduled'
     assert all(state[k]['status']=='ok' for k in m.JOBS)
     assert not m.RUNNING
     m.iterate(1700000004)
