@@ -63,7 +63,7 @@ def frozen_targets(snap, state):
             raise RuntimeError('FROZEN_500_CHECKPOINT_INVALID')
         return saved, 'saved_frozen_keys'
 
-    action = load(snap / 'changcom-actionable.json')
+    action = load(snap.parent / 'startup-support' / 'changcom-actionable.json')
     if not (isinstance(action, dict) and action.get('ok') is True and
             action.get('bizno') == '1308185973' and
             isinstance(action.get('bids'), list)):
