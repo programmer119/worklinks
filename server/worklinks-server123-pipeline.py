@@ -259,6 +259,16 @@ def main():
             raise RuntimeError('pipeline_scripts_missing')
         state = read_state()
         state['rfpRepairPreflight'] = repair_preflight()
+        # After a new worker deployment, retry one previously failed repair
+        # immediately ONLY when a fresh read-only preflight succeeds.
+        if (state['rfpRepairPreflight'].get('status') == 'ok' and
+                (state.get('rfpRepair') or {}).get('status') == 'failed'):
+            state['rfpRepairRetryAfterDeploy'] = {
+                'requestedAt': dt.datetime.now(dt.timezone.utc).isoformat(),
+                'previousFailure': (state.get('rfpRepair') or {}).get('error', '')
+            }
+            state['rfpRepair'] = {'status': 'retry_after_verified_preflight',
+                                  'attemptEpoch': 0}
         publish_state(state)
         log('PIPELINE_REPAIR_PREFLIGHT', state['rfpRepairPreflight'])
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
