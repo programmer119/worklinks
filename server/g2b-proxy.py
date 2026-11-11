@@ -1144,7 +1144,59 @@ def worklinks_state_put(project, user_id, data):
 class ThreadedServer(ThreadingMixIn,HTTPServer):
     daemon_threads = True
 
+SNAPSHOT_ROOT = os.environ.get('WORKLINKS_SNAPSHOT_DIR', '/app/data/snapshots')
+SNAPSHOT_NAMES = {
+    'changcom-actionable': 'changcom-actionable.json',
+    'rfp-clauses': 'rfp-clauses.json',
+    'rfp-coverage-index': 'rfp-coverage-index.json'
+}
+
 class Handler(BaseHTTPRequestHandler):
+    def reply_snapshot(self, name):
+        """Serve only published, immutable-at-read local snapshots. No G2B calls."""
+        filename = SNAPSHOT_NAMES.get(name)
+        if not filename:
+            return self.reply(400, {'ok':False,'error':'unknown_snapshot'})
+        path = os.path.join(SNAPSHOT_ROOT, filename)
+        accepts_gzip = 'gzip' in self.headers.get('Accept-Encoding','').lower()
+        compressed = path + '.gz'
+        if accepts_gzip and os.path.isfile(compressed):
+            path = compressed
+            gzipped = True
+        else:
+            gzipped = False
+        if not os.path.isfile(path):
+            return self.reply(404,{'ok':False,'error':'snapshot_not_generated'})
+        st = os.stat(path)
+        if st.st_size < 2 or st.st_size > 100000000:
+            return self.reply(503,{'ok':False,'error':'snapshot_size_invalid'})
+        tag = '"%s-%s-%s"' % (name, int(st.st_mtime), st.st_size)
+        if self.headers.get('If-None-Match','') == tag:
+            self.send_response(304)
+            self.send_header('ETag',tag)
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header('Content-Type','application/json; charset=utf-8')
+        if gzipped:
+            self.send_header('Content-Encoding','gzip')
+        self.send_header('Cache-Control','public, max-age=120')
+        self.send_header('ETag',tag)
+        self.send_header('Vary','Origin, Accept-Encoding')
+        self.send_header('X-Content-Type-Options','nosniff')
+        origin = self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+            self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+        self.send_header('Content-Length',str(st.st_size))
+        self.end_headers()
+        with open(path,'rb') as handle:
+            while True:
+                chunk=handle.read(1024*1024)
+                if not chunk: break
+                self.wfile.write(chunk)
+
     def reply(self, status, data):
         body = json.dumps(data,ensure_ascii=False,separators=(',',':')).encode('utf-8')
         self.send_response(status)
@@ -1169,6 +1221,20 @@ class Handler(BaseHTTPRequestHandler):
         p = parse_qs(u.query)
         def get(name, default=''): return p.get(name,[default])[0]
         try:
+            if u.path == '/api/g2b/snapshot':
+                return self.reply_snapshot(get('name'))
+            if u.path == '/api/g2b/pipeline-status':
+                state_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),'pipeline-scheduler-state.json')
+                try:
+                    with open(state_path,'r') as stream:
+                        state=json.load(stream)
+                    if not isinstance(state,dict):state={}
+                except (IOError,OSError,ValueError):
+                    state={}
+                ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
+                           for key,value in SNAPSHOT_NAMES.items())
+                return self.reply(200,{'ok':True,'scheduler':state,'snapshotsReady':ready,
+                                       'upstreamCalls':0})
             if u.path in ('/health','/api/g2b/status'):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
                     'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
