@@ -984,7 +984,7 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
         raise RuntimeError('RFP_UPSTREAM_METADATA_UNAVAILABLE_PREFLIGHT')
     return staged
 
-def process(no,ordn,metadata=None):
+def process(no,ordn,metadata=None,previous=None):
     data=(metadata if metadata is not None else fetch_json(
         BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn})))
     docs=data.get('attachments') or {}
@@ -1005,6 +1005,19 @@ def process(no,ordn,metadata=None):
                 'files':[],'reviewComplete':False,
                 'contractPerformanceVerified':False}
     saved=[]
+    # Reuse the EXACT successfully parsed attachment when a retry is needed
+    # only for another failed file or a newly added file. Never download all
+    # previous successes again just because one sibling attachment failed.
+    reusable={}
+    if (isinstance(previous,dict) and
+            previous.get('classificationVersion')==CLASSIFICATION_VERSION and
+            previous.get('hwpxReaderVersion')==HWPX_READER_VERSION):
+        for old_file in previous.get('files') or []:
+            if (isinstance(old_file,dict) and
+                    old_file.get('readable') is True and
+                    old_file.get('sourceSha256') and
+                    old_file.get('sourceUrl')):
+                reusable[(old_file.get('name'),old_file.get('sourceUrl'))]=old_file
     manifest=docs.get('items') or []
     for item in manifest[:MAX_DOCUMENTS]:
         public=legal_file(item)
@@ -1013,6 +1026,10 @@ def process(no,ordn,metadata=None):
                           'errorCategory':invalid_file_reason(item)})
             continue
         name,url=public
+        retained=reusable.get((name,url))
+        if retained:
+            saved.append(dict(retained))
+            continue
         record={'name':name,'sourceUrl':url,'readable':False}
         try:
             raw=download(url)
@@ -1231,7 +1248,8 @@ def main():
     # so one unavailable PDF does not starve the entire 16-minute job.
     preloaded=preflight_rfp_metadata(uncached)
     with ThreadPoolExecutor(max_workers=4) as pool:
-        tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn))):
+        tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn)),
+                           old.get(no+':'+ordn)):
                (no,ordn) for no,ordn in uncached}
         for future in as_completed(tasks):
             no,ordn=tasks[future]
