@@ -77,6 +77,23 @@ preferred,omitted=bound({'GOOD:000':good,'FAIL:000':outage},
                          max_records=1,max_bytes=100000)
 assert set(preferred)=={'GOOD:000'} and omitted==1,preferred
 print('WORKLINKS_RFP_GITHUB_BLOB_GUARD=PASS','selected',len(selected),'omitted',omitted)
+# Partially extracted documents are retried only when a transient failure
+# can plausibly recover. Hard-format errors do not burn the API quota.
+retry_part=module['partial_retry_due']
+transient={'status':'text_extracted_requires_review',
+           'checkedAt':(utc-dt.timedelta(days=2)).isoformat(),
+           'unreadableDocumentCount':1,'partialRetryCount':0,
+           'files':[{'name':'good.hwpx','readable':True,'sourceSha256':'e'*64},
+                    {'name':'lost.pdf','readable':False,
+                     'errorCategory':'file_download_http_503'}]}
+assert retry_part(transient,utc)
+assert not retry_part({**transient,'partialRetryCount':2},utc)
+assert not retry_part({**transient,'checkedAt':utc.isoformat()},utc)
+assert not retry_part({**transient,'files':[{
+    'name':'image.pdf','readable':False,'errorCategory':'pdf_unreadable_page'}]},utc)
+assert retry_part({**transient,'files':[], 'manifestComplete':False},utc)
+print('WORKLINKS_RFP_BOUNDED_PARTIAL_RETRY=PASS')
+
 # An extracted but not legally reviewed RFP is NOT a new download job
 # after 24 hours. Cumulative scans are distinct from participation verdicts.
 old_scan=(utc-dt.timedelta(days=15)).isoformat()
