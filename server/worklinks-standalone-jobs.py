@@ -21,7 +21,7 @@ import time
 
 DATA=Path(os.environ.get('WORKLINKS_DATA','/app/data'))
 SRC=DATA/'standalone-worktree'
-SNAP=DATA/'snapshots'
+SNAP=Path(os.environ.get('WORKLINKS_SNAPSHOT_DIR',str(DATA/'snapshots')))
 STATE=DATA/'standalone-jobs-state.json'
 LOCK=DATA/'standalone-jobs.lock'
 REPO_URL=os.environ.get('WORKLINKS_SOURCE_REPO','https://github.com/programmer119/worklinks.git')
