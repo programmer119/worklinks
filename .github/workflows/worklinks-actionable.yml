@@ -1,14 +1,7 @@
+# Server123 container now owns periodic work. This workflow is manual recovery ONLY.
 name: WorkLinks Changcom actionable bid shortlist
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/refresh_worklinks_actionable.py'
-      - 'tests/test_worklinks_actionable.py'
-      - '.github/workflows/worklinks-actionable.yml'
   workflow_dispatch:
-  schedule:
-    - cron: '5 */3 * * *'
 permissions:
   contents: write
 concurrency:
