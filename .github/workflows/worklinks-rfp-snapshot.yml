@@ -75,6 +75,7 @@ jobs:
       # approved key quota is verified, budget 8 new scans + 2 metadata-only
       # change checks per hour: <= 720 upstream calls/day for THIS job only.
       # Other G2B consumers share upstream access and need separate budgets.
+      # Verified server123 original-notice metadata probe OK 2026-11-11 11:38 KST.
       # Normal hourly jobs remain 8. The unique source commit runs exactly
       # one 28-notice backfill and never increases the recurring schedule.
       - name: Extract quota-budgeted official RFP eligibility text
