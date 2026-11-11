@@ -26,6 +26,8 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
+RFP_REPAIR_PERIOD = max(3600, int(os.environ.get('G2B_RFP_REPAIR_PERIOD', 3600)))
+RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48))))
 READ_FILES = (
     'changcom-actionable.json',
     'g2b-award-fields-open.json',
@@ -40,10 +42,14 @@ READ_FILES = (
 )
 PUBLISHED = {
     'rfp': ('rfp-clauses.json', 'rfp-coverage-index.json'),
+    'rfpRepair': ('rfp-clauses.json', 'rfp-coverage-index.json',
+                  'rfp-top500-batch-state-20261111.json',
+                  'rfp-top500-batch-metadata-20261111.json',
+                  'rfp-top500-repair-report-20261111.json'),
     'actionable': ('changcom-actionable.json',),
     'awardFallback': ('g2b-award-fields-open.json',)
 }
-TIMEOUT = {'rfp': 2100, 'actionable': 540, 'awardFallback': 540}
+TIMEOUT = {'rfp': 2100, 'rfpRepair': 2100, 'actionable': 540, 'awardFallback': 540}
 
 
 def log(*values):
@@ -92,7 +98,7 @@ def quality_guard(kind, outputs):
         content = json.loads(path.read_text(encoding='utf-8'))
         if not isinstance(content, dict) or content.get('ok') is not True:
             raise ValueError('pipeline_incomplete_json_' + path.name)
-        if kind == 'rfp':
+        if kind in ('rfp','rfpRepair') and path.name in ('rfp-clauses.json','rfp-coverage-index.json'):
             history = content.get('byNotice')
             if not isinstance(history, dict):
                 raise ValueError('pipeline_missing_rfp_byNotice')
@@ -125,12 +131,22 @@ def stage_workspace(path):
     root = path / 'worklinks'
     (root / 'scripts').mkdir(parents=True)
     for name in ('refresh_worklinks_rfp.py', 'refresh_worklinks_actionable.py',
-                 'refresh_worklinks_open_award_fallback.py'):
+                 'refresh_worklinks_open_award_fallback.py',
+                 'batch_backfill_changcom_top500_rfp.py',
+                 'repair_changcom_top500_rfp.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in READ_FILES:
         source = SEEDS / name
         if source.is_file():
             dest = root / 'startup-support' / name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
+    for name in ('rfp-clauses.json', 'rfp-coverage-index.json',
+                 'rfp-top500-batch-state-20261111.json',
+                 'rfp-top500-batch-metadata-20261111.json'):
+        source = SEEDS / name
+        if source.is_file():
+            dest = root / 'snapshots' / name
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, dest)
     return root
@@ -146,6 +162,9 @@ def run_once(kind, runner=None):
         if kind == 'rfp':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_rfp.py'),
                        '--limit', str(RFP_LIMIT)]
+        elif kind == 'rfpRepair':
+            command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
+                       '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
         elif kind == 'awardFallback':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_open_award_fallback.py')]
         else:
@@ -160,7 +179,8 @@ def run_once(kind, runner=None):
             log('PIPELINE_FAILED', kind, 'exit', completed.returncode,
                 'tail', (completed.stderr or '')[-300:].replace('\n', ' '))
             raise RuntimeError('pipeline_' + kind + '_failed')
-        outputs = [root / 'startup-support' / name for name in PUBLISHED[kind]]
+        outputs = [root / ('snapshots' if kind == 'rfpRepair' else 'startup-support') / name
+                   for name in PUBLISHED[kind]]
         quality_guard(kind, outputs)
         for result in outputs:
             publish_atomic(result, SEEDS / result.name)
@@ -173,7 +193,8 @@ def iteration(current=None, runner=None):
     now = float(time.time() if current is None else current)
     state = read_state()
     # Persistent timestamps, not sleep-only, protect against restart loops.
-    jobs = (('actionable', SHORTLIST_PERIOD), ('awardFallback', AWARD_FALLBACK_PERIOD), ('rfp', RFP_PERIOD))
+    jobs = (('actionable', SHORTLIST_PERIOD), ('awardFallback', AWARD_FALLBACK_PERIOD),
+            ('rfp', RFP_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD))
     for kind, period in jobs:
         previous = float((state.get(kind) or {}).get('attemptEpoch') or 0)
         if now - previous < period:
@@ -206,7 +227,7 @@ def main():
             raise RuntimeError('pipeline_scripts_missing')
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
             'shortlistPeriod', SHORTLIST_PERIOD, 'openAwardPeriod', AWARD_FALLBACK_PERIOD,
-            'rfpLimit', RFP_LIMIT)
+            'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT)
         while True:
             iteration()
             time.sleep(90)
