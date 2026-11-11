@@ -75,6 +75,24 @@ assert 'R26BK01760009' not in byNo
 assert byNo['R26BK01760010']['deadlineState']=='unknown'
 assert byNo['R26BK01760010']['closes'] is None
 assert byNo['R26BK01760010']['needsFullNoticeReview'] is True
+# Time-only policy: closed or under 24h are excluded; 24h+ have zero time score.
+def close_after(hours):
+    return (now+dt.timedelta(hours=hours)).isoformat()
+timed=[
+    sample('R26BK09999101','servc','2027년 플랫폼 개발',['1468'],closes=close_after(24)),
+    sample('R26BK09999102','servc','2027년 플랫폼 개발',['1468'],closes=close_after(48)),
+    sample('R26BK09999103','servc','2027년 플랫폼 개발',['1468'],closes=close_after(336)),
+    sample('R26BK09999104','servc','2027년 플랫폼 개발',['1468'],closes=close_after(360)),
+    sample('R26BK09999105','servc','2027년 플랫폼 개발',['1468'],closes=close_after(23.99)),
+    sample('R26BK09999106','servc','2027년 플랫폼 개발',['1468'],closes=close_after(-1)),
+]
+times=mod.build(timed,len(timed),company,now=now)
+ids=[b['bidNo'] for b in times['bids']]
+assert ids==['R26BK09999101','R26BK09999102','R26BK09999103','R26BK09999104'],ids
+assert len({b['priorityScore'] for b in times['bids']})==1,times['bids']
+assert times['counts']['deadline_within_24h']==1,times['counts']
+assert times['counts']['expired']==1,times['counts']
+print('WORKLINKS_DEADLINE_24H_ONLY_EXCLUSION_NO_RANK_BONUS=PASS')
 assert all(x['needsFullNoticeReview'] for x in out['bids'])
 assert all(x['eligibilityVerified'] is False for x in out['bids'])
 progress=out['verificationProgress']
