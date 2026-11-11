@@ -1,0 +1,48 @@
+name: WorkLinks active Changcom API RFP completeness audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/audit_changcom_live_gaps.py
+      - startup-support/changcom-actionable.json
+      - startup-support/rfp-coverage-index.json
+      - .github/workflows/worklinks-live-completeness-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-live-completeness-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit every active Changcom candidate without upstream requests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 -m py_compile scripts/audit_changcom_live_gaps.py
+            python3 scripts/audit_changcom_live_gaps.py
+            git add startup-support/audits/changcom-live-information-gaps-20261111.csv \
+                    startup-support/audits/changcom-live-information-gaps-20261111.md
+            if git diff --cached --quiet; then
+              echo "CHANGCOM_LIVE_COMPLETENESS_ALREADY_CURRENT"
+              exit 0
+            fi
+            git commit -m "data: publish active Changcom RFP and API gap census"
+            if git push origin HEAD:main; then
+              echo "CHANGCOM_LIVE_COMPLETENESS_PUBLISHED=PASS"
+              exit 0
+            fi
+            echo "CHANGCOM_LIVE_COMPLETENESS_CONFLICT_RETRY_$attempt"
+            sleep 2
+          done
+          echo "CHANGCOM_LIVE_COMPLETENESS_PUBLISH_FAILED"
+          exit 1
