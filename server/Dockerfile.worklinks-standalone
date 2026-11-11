@@ -1,0 +1,8 @@
+FROM python:3.11-slim-bookworm
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 WORKLINKS_CHROMIUM_PATH=/usr/bin/chromium
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git nodejs npm chromium fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/*
+RUN python -m pip install --no-cache-dir 'requests>=2.31,<3' 'beautifulsoup4>=4.12,<5' 'certifi>=2024.2' 'playwright>=1.50,<2' pyhwp pypdf
+WORKDIR /app
+CMD ["python","-u","/app/worklinks-standalone-jobs.py"]
