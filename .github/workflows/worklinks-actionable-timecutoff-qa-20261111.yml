@@ -1,0 +1,63 @@
+name: WorkLinks 24h cutoff policy validation and refresh 20261111
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-actionable-timecutoff-qa-20261111.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-changcom-actionable
+  cancel-in-progress: false
+jobs:
+  verify-refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify script compiles and no-network regression suite
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_actionable.py
+          python3 tests/test_worklinks_actionable.py
+      - name: Rebuild Changcom actionable snapshot from complete published G2B API
+        run: |
+          python3 scripts/refresh_worklinks_actionable.py
+          cp startup-support/changcom-actionable.json /tmp/worklinks-changcom-timecutoff.json
+      - name: Verify 24h exclusion on actual rebuilt snapshot
+        run: |
+          python3 - <<'PY'
+          import json,datetime as dt
+          from pathlib import Path
+          d=json.loads(Path('/tmp/worklinks-changcom-timecutoff.json').read_text(encoding='utf-8'))
+          assert d['ok'] is True
+          assert d['counts']['indexedSWTotal']>100
+          assert 'deadline_within_24h' in d['counts']
+          generated=dt.datetime.fromisoformat(d['generatedAt'])
+          for x in d['bids']:
+              if x['deadlineState']=='open':
+                  end=dt.datetime.fromisoformat(x['closes'])
+                  assert end-generated>=dt.timedelta(hours=24),x['bidNo']
+          print('WORKLINKS_24H_CUTOFF_REAL_SNAPSHOT=PASS',
+                'active_bids',len(d['bids']),
+                'under_24h_removed',d['counts']['deadline_within_24h'],
+                'expired_removed',d['counts']['expired'])
+          PY
+      - name: Publish full-corpus snapshot only after validation
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/worklinks-changcom-timecutoff.json startup-support/changcom-actionable.json
+            git add startup-support/changcom-actionable.json
+            if git diff --cached --quiet; then echo 'WORKLINKS_24H_SNAPSHOT_UNCHANGED'; exit 0; fi
+            git commit -m 'data: refresh Changcom shortlist using 24h cutoff without time bonus'
+            if git push origin HEAD:main; then echo 'WORKLINKS_24H_SNAPSHOT_PUBLISHED=PASS'; exit 0; fi
+            echo "WORKLINKS_24H_SNAPSHOT_PUBLISH_RETRY_$attempt"
+            sleep 2
+          done
+          exit 1
