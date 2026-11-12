@@ -38,6 +38,12 @@ with tempfile.TemporaryDirectory() as temporary:
     (m.SEEDS/'changcom-actionable.json').write_text(json.dumps({
         'ok':True,'bizno':'1308185973',
         'counts':{'indexedSWTotal':6000,'softwareService':1},'bids':[{'bidNo':'R26BK01808709'}]}),encoding='utf-8')
+    with tempfile.TemporaryDirectory() as staging_dir:
+        staged=m.stage_workspace(Path(staging_dir),minimal=True)
+        assert (staged/'snapshots'/'rfp-clauses.json').is_symlink()
+        assert (staged/'snapshots'/'rfp-top500-batch-metadata-20261111.json').is_symlink()
+        assert not (staged/'snapshots'/'rfp-coverage-index.json').is_symlink()
+        assert not (staged/'startup-support').exists()
     def mock_runner(args,cwd,env,capture_output,text,timeout):
         assert env['WORKLINKS_G2B_API'].startswith('http://127.0.0.1:')
         assert 'serviceKey=' not in str(args)
@@ -49,6 +55,8 @@ with tempfile.TemporaryDirectory() as temporary:
                   'repairAttemptedThisRun':0}),encoding='utf-8')
         elif 'repair_open_rfp_cached_attachments.py' in args[1]:
             assert '--execute' in args and '--data-dir' in args
+            assert args[args.index('--limit')+1]=='4'
+            assert args[args.index('--max-files')+1]=='8'
             assert 'serviceKey=' not in env['WORKLINKS_G2B_API']
             # The staged snapshot is intentionally unchanged for this fixture.
         elif 'refresh_worklinks_rfp.py' in args[1]:
