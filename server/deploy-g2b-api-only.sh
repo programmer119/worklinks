@@ -60,8 +60,10 @@ start_api(){
  dk run -d --name "$API" --restart unless-stopped --network host \
   -e PORT=18192 -e G2B_SECRET_PATH=/run/secrets/g2b.env \
   -e G2B_DB_PATH=/app/data/bids.sqlite3 \
+  -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
   -e G2B_QUAL_REPORT=/app/reports/qualification-year.json \
   -v "$TARGET:/app/g2b-proxy.py:ro" \
+  -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
   -v "$SECRET:/run/secrets/g2b.env:ro" \
   -v "$BASE/data:/app/data" \
   -v "$BASE/reports:/app/reports:ro" \
