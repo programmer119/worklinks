@@ -148,7 +148,7 @@ def quality_guard(kind, outputs):
     return True
 
 
-def stage_workspace(path):
+def stage_workspace(path,minimal=False):
     root = path / 'worklinks'
     (root / 'scripts').mkdir(parents=True)
     for name in ('refresh_worklinks_rfp.py', 'analyze_worklinks_rfp_ai.py', 'refresh_worklinks_actionable.py',
@@ -158,7 +158,7 @@ def stage_workspace(path):
                  'repair_open_rfp_cached_attachments.py',
                  'rfp_call_ledger.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
-    for name in READ_FILES:
+    for name in (() if minimal else READ_FILES):
         source = SEEDS / name
         if source.is_file():
             dest = root / 'startup-support' / name
@@ -215,7 +215,7 @@ def run_once(kind, runner=None):
     if kind not in PUBLISHED:
         raise ValueError('unknown_pipeline_kind')
     with tempfile.TemporaryDirectory(prefix='worklinks-pipeline-', dir=str(DATA)) as tmp:
-        root = stage_workspace(Path(tmp))
+        root = stage_workspace(Path(tmp),minimal=(kind=='rfpOpenRepair'))
         env = dict(os.environ, WORKLINKS_G2B_API=SOURCE_API,
                    WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'))
         if kind == 'rfp':
@@ -298,6 +298,17 @@ def main():
         if not (SCRIPTS / 'refresh_worklinks_actionable.py').is_file():
             raise RuntimeError('pipeline_scripts_missing')
         state = read_state()
+        # A "started" entry from disk can only belong to a process that
+        # terminated before publishing its result; this worker owns the
+        # exclusive scheduler lock. Re-run immediately, never treat it as
+        # a successful cooldown after a restart/deployment.
+        for kind in PUBLISHED:
+            entry=state.get(kind) or {}
+            if entry.get('status')=='started':
+                state[kind]={'status':'interrupted_retry_on_restart',
+                             'attemptEpoch':0,
+                             'interruptedAttemptEpoch':entry.get('attemptEpoch')}
+                log('PIPELINE_INTERRUPTED_JOB_RETRY_IMMEDIATE',kind)
         # Each new OCR reader version gets one immediate on-server repair pass.
         # The file-level version gate prevents repeat downloads afterwards.
         if state.get('rfpOpenReaderVersion') != RFP_OPEN_READER_VERSION:
