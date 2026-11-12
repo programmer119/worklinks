@@ -821,7 +821,7 @@ def persist_bids(items):
     finally:
         con.close()
 
-def query_saved_bids(limit,offset,only_sw=False):
+def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
     try:
         total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
@@ -835,9 +835,25 @@ def query_saved_bids(limit,offset,only_sw=False):
         # Join on the normalized ordinal without mutating existing DB primary keys.
         from_sql+="LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
         from_sql+="LEFT JOIN bid_extra_cache x ON b.bid_no=x.bid_no AND x.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
-        where='WHERE b.sw_candidate=1 ' if only_sw else ''
+        query=str(query or '').strip().lower()
+        if len(query)>80:
+            raise ApiError('invalid_saved_search_query',400)
+        clauses=[]
+        values=[]
+        if only_sw:
+            clauses.append('b.sw_candidate=1')
+        if query:
+            # Search already-stored rows ONLY. No call to any government API.
+            # instr() treats %, quotes and underscores as literal text.
+            clauses.append('(instr(lower(b.bid_no),?)>0 OR instr(lower(b.payload),?)>0)')
+            values.extend((query,query))
+        where=(' WHERE '+' AND '.join(clauses)) if clauses else ''
         rows=con.execute('SELECT '+sel+from_sql+where+
-            'ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',(limit,offset)).fetchall()
+            ' ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC LIMIT ? OFFSET ?',
+            tuple(values)+(limit,offset)).fetchall()
+        result_count=(con.execute('SELECT COUNT(*)'+from_sql+where,
+                       tuple(values)).fetchone()[0] if query else
+                      matching if only_sw else total)
         items=[]
         for payload,series,years,qualification,extra in rows:
             obj=json.loads(payload)
@@ -857,10 +873,11 @@ def query_saved_bids(limit,offset,only_sw=False):
         linked=con.execute("SELECT COUNT(*) FROM bid_notices b INNER JOIN bid_license_cache q "
             "ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
             "WHERE b.sw_candidate=1").fetchone()[0]
-        return {'ok':True,'items':items,'totalCount':matching if only_sw else total,
+        return {'ok':True,'items':items,'totalCount':result_count,
                 'storedTotal':total,'candidateTotal':matching,'eligibilityChecked':checked,
                 'eligibilityLinked':linked,
-                'limit':limit,'offset':offset,'persisted':True}
+                'limit':limit,'offset':offset,'persisted':True,
+                'searchMode':'saved_only' if query else 'none'}
     finally:con.close()
 
 
@@ -1466,7 +1483,7 @@ class Handler(BaseHTTPRequestHandler):
                 except ValueError: raise ApiError('invalid_saved_pagination',400)
                 if not (1<=limit<=500 and 0<=offset<=100000):
                     raise ApiError('invalid_saved_pagination',400)
-                return self.reply(200,query_saved_bids(limit,offset,get('sw','0')=='1'))
+                return self.reply(200,query_saved_bids(limit,offset,get('sw','0')=='1',get('q','')))
             if u.path == '/api/g2b/qualifications':
                 # Aggregated public counts, no keys or raw sensitive data in report.
                 try:
