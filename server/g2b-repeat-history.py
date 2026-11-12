@@ -28,19 +28,46 @@ def request(op,key,params):
  args={'serviceKey':key,'pageNo':1,'numOfRows':100,'type':'json'}
  args.update(params)
  u=op+'?'+urllib.parse.urlencode(args)
+ ledger=None
+ request_key=None
+ notice=str(params.get('bidNtceNo') or '')
+ if os.environ.get('WORKLINKS_RFP_LEDGER_DB'):
+  from rfp_call_ledger import CallLedger,cache_key
+  ledger=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+  request_key=cache_key('history_v1',op,
+                        sorted((str(k),str(v)) for k,v in params.items()))
+  previous=ledger.get_json(request_key,max_age_seconds=6*3600)
+  if (isinstance(previous,dict) and isinstance(previous.get('data'),list)
+      and isinstance(previous.get('total'),int)):
+   ledger.record('history',request_key,'verified_page_reused',notice_key=notice+':000' if notice else None)
+   return previous['data'],previous['total']
  for trial in range(3):
   try:
    with urllib.request.urlopen(urllib.request.Request(u,headers={'Accept':'application/json'}),timeout=18) as r:
+    status=getattr(r,'status',200)
     obj=json.loads(r.read().decode('utf8'))
    head=obj.get('response',{}).get('header',{})
-   if str(head.get('resultCode')) not in ('00','0'):raise RuntimeError('upstream_result_'+str(head.get('resultCode')))
+   if str(head.get('resultCode')) not in ('00','0'):
+    raise RuntimeError('upstream_result_'+str(head.get('resultCode')))
    body=obj['response'].get('body',{})
    data=body.get('items') or []
    if isinstance(data,dict):data=data.get('item') or []
    if not isinstance(data,list):data=[data]
+   total=int(body.get('totalCount') or 0)
+   if ledger is not None:
+    ledger.record('history_http',request_key,'http_verified',http_status=status,
+                  notice_key=notice+':000' if notice else None)
+    if total==0 or data:
+     ledger.save_json(request_key,{'data':data,'total':total},max_bytes=20_000_000)
+    else:
+     ledger.record('history_http',request_key,'partial_not_cached')
    time.sleep(DELAY)
-   return data,int(body.get('totalCount') or 0)
+   return data,total
   except Exception as e:
+   if ledger is not None:
+    ledger.record('history_http',request_key,'http_failed',
+                  notice_key=notice+':000' if notice else None,
+                  http_status=getattr(e,'code',None),error_class=type(e).__name__)
    if trial==2:raise RuntimeError('request_failed_'+type(e).__name__)
    time.sleep(1+trial)
 def search_year(key,term,year):
