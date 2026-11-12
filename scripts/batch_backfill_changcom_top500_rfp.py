@@ -22,7 +22,9 @@ import time
 import urllib.parse
 import urllib.request
 import urllib.error
+import hashlib
 
+from rfp_call_ledger import CallLedger, cache_key, ledger_path
 from refresh_worklinks_rfp import (
     process, compact_coverage, compact_changcom_evidence,
     bounded_detail_snapshot, CLASSIFICATION_VERSION, HWPX_READER_VERSION,
@@ -105,13 +107,23 @@ def secret(path):
     raise RuntimeError('G2B_SERVICE_KEY_MISSING')
 
 class Provider:
-    def __init__(self,key):
+    def __init__(self,key,ledger=None):
         self.key=key
+        self.ledger=ledger
         self.calls=0
         self.failed=0
+        self.cache_hits=0
         self.rows=collections.Counter()
         self.pages={}
     def request(self,op,start,end,page,page_size=PAGE_SIZE):
+        # Cache identity excludes the serviceKey. Once a valid page is saved,
+        # rerunning the batch never generates another physical HTTP request.
+        request_key=cache_key('official_batch_v1',op,start,end,page,page_size)
+        if self.ledger:
+            cached=self.ledger.get_json(request_key)
+            if isinstance(cached,dict) and isinstance(cached.get('items'),list) and isinstance(cached.get('total'),int):
+                self.cache_hits+=1
+                return cached['total'],cached['items']
         params={'serviceKey':self.key,'type':'json','pageNo':page,'numOfRows':page_size,
                 'inqryDiv':1,'inqryBgnDt':start+'0000','inqryEndDt':end+'2359'}
         if op=='ordinary':params['bsnsDivCd']=5
@@ -123,6 +135,7 @@ class Provider:
                 req=urllib.request.Request(url,headers={
                     'Accept':'application/json','User-Agent':'WorkLinks-Top500-Batch/20261111'})
                 with urllib.request.urlopen(req,timeout=30) as response:
+                    http_status=getattr(response,'status',200)
                     raw=response.read(20_000_000)
                     if len(raw)>=20_000_000:raise RuntimeError('RESPONSE_TOO_LARGE')
                 root=json.loads(raw.decode('utf-8'))
@@ -137,9 +150,18 @@ class Provider:
                 if isinstance(items,dict): items=[items]
                 if not isinstance(items,list):raise RuntimeError('UNEXPECTED_ITEMS_TYPE')
                 if total>PAGE_SIZE*300:raise RuntimeError('PAGINATION_SIZE_GUARD')
+                if self.ledger:
+                    self.ledger.record('official_batch_http',request_key,'http_ok',
+                                       http_status=http_status,
+                                       response_sha256=hashlib.sha256(raw).hexdigest())
+                    self.ledger.save_json(request_key,{'total':total,'items':items})
                 return total,items
             except (urllib.error.HTTPError,urllib.error.URLError,TimeoutError,RuntimeError,ValueError) as exc:
                 error=exc
+                if self.ledger:
+                    self.ledger.record('official_batch_http',request_key,'http_failed',
+                                       http_status=getattr(exc,'code',None),
+                                       error_class=type(exc).__name__)
                 typ=str(exc)
                 if 'PROVIDER_RESULT_CODE_22' in typ or 'PROVIDER_RESULT_CODE_23' in typ:
                     break
@@ -304,7 +326,8 @@ def main():
     saved_scans=existing.get('scans') or {}
     remaining=[b for b in target if not reusable_rfp_extraction(saved_scans.get(key_for(b)))]
     needed={key_for(b):dated[key_for(b)] for b in remaining}
-    provider=Provider(secret(args.secret))
+    ledger=CallLedger(ledger_path(data))
+    provider=Provider(secret(args.secret),ledger=ledger)
     grouped={key:{k:[] for k,_ in OPS} for key in needed}
     cache_path=data/'snapshots/rfp-top500-batch-source-checkpoint-20261111.json'
     cache=load(cache_path) or {'ok':True,'groups':{}}
@@ -339,6 +362,7 @@ def main():
         metadata[key]=normalize(group,dated[key],now)
     print('BATCH_METADATA_FINISHED',json.dumps({
        'officialCalls':provider.calls,'failedCalls':provider.failed,
+       'verifiedPageCacheHits':provider.cache_hits,
        'totalPages':provider.pages,'targets':len(needed),
        'targetNoticeHitsBySource':dict(by_source),
        'withAnyOfficialRow':sum(int(v['ok']) for v in metadata.values()),
@@ -401,6 +425,8 @@ def main():
     report={'ok':True,'asOfKST':dt.datetime.now(KST).isoformat(timespec='seconds'),
        'top500':len(top),'targetMissingAtStart':len(target),
        'targetScannedThisRun':len(needed),'officialMetadataApiCalls':provider.calls,
+       'verifiedPageCacheHits':provider.cache_hits,
+       'requestLedger':ledger.stats(),
        'providerFailures':provider.failed,'sourcePages':provider.pages,
        'targetNoticeHitsBySource':dict(by_source),
        'statuses':dict(statuses),'readableDocuments':readable,
