@@ -685,7 +685,8 @@ assert.ok(source.includes('opportunityMarkup'));
 assert.ok(source.includes('bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(a.x)))'));
 assert.ok(source.includes('value="competition"'));
 assert.ok(source.includes("document.querySelectorAll('[data-verdict-filter]')"));
-assert.ok(source.includes("scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter))"));
+assert.ok(source.includes("let list=scopeRows.filter(o=>") &&
+  source.includes("matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&"));
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 assert.ok(!source.includes("if(jobSoftwareScope(x)!=='candidate')return '';"),'cannot leave thumbnail without bidder status');
 const unscoped=verdictMod.participationVerdict({kind:'thng'},bidder);
