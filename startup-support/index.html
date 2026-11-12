@@ -3169,6 +3169,7 @@ document.getElementById('jobDetailBody').addEventListener('click',function(e){
 function jobPageStep(){return g2bCompactScreen()?24:100}
 var jobFilter="all",jobRenderLimit=jobPageStep(),selectedPartnerId="all",partnerFilterOptionsKey="",jobVerdictFilter="all";
 var jobSearchText='',jobSearchRemote=[],jobSearchTimer=null,jobSearchSerial=0,jobSearchServerTotal=null;
+var jobSearchRfpState=new Map();
 function jobSearchNormalized(value){
  return String(value||'').normalize('NFKC').toLocaleLowerCase('ko-KR').replace(/\s+/g,' ').trim();
 }
@@ -3184,13 +3185,17 @@ function jobCollectionFlags(x){
  const pre=changcomPrecheckByNotice.get(key);
  const extra=g2bSupplementalCache.get(key)||pre?.supplementalBidFacts;
  const rfp=rfpSnapshotByNotice.get(key);
+ const rfpFromSearch=jobSearchRfpState.get(key);
  const files=Array.isArray(rfp?.files)?rfp.files:null;
  const licenceStatus=!lic?'absent':lic.ok===true&&lic.complete===true?'done':'partial';
  const extraStatus=!extra?'absent':extra.ok===true&&extra.complete===true?'done':'partial';
  const rfpDone=!!(rfp&&rfp.manifestComplete===true&&
   rfp.status==='text_extracted_requires_review'&&files&&files.length&&
   files.every(f=>f.readable===true&&f.sourceTextScanComplete!==false&&f.qualificationScanTruncated!==true));
- const rfpStatus=!rfp?'absent':rfpDone?'done':'partial';
+ const rfpStatus=rfpFromSearch?
+  (!rfpFromSearch.sourceAvailable?'partial':
+   !rfpFromSearch.seen?'absent':rfpFromSearch.complete?'done':'partial'):
+  !rfp?'absent':rfpDone?'done':'partial';
  const statuses=[{label:'업종·면허',state:licenceStatus},{label:'추가정보',state:extraStatus},
                  {label:'첨부·원문',state:rfpStatus}];
  return {statuses,done:statuses.filter(t=>t.state==='done').length};
@@ -3222,6 +3227,7 @@ async function jobRunRemoteSearch(query){
    const key=String(row.bidNo||'')+':'+String(row.order||'000').padStart(3,'0');
    if(row.bidEligibility)bidEligibilityCache.set(key,row.bidEligibility);
    if(row.supplementalBidFacts)g2bSupplementalCache.set(key,row.supplementalBidFacts);
+   if(row.rfpSavedState)jobSearchRfpState.set(key,row.rfpSavedState);
    const item=g2bCardFromServer(row);
    if(item)next.push(item);
   }
@@ -3241,8 +3247,12 @@ function updateJobSearchInput(){
  jobSearchSerial++;
  jobSearchText=next;
  jobRenderLimit=jobPageStep();
- jobSearchRemote=[];jobSearchServerTotal=null;
+ jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRfpState.clear();
  document.getElementById('jobSearchClear').hidden=!next;
+ if(!next&&jobsBootstrapStarted&&!g2bServerAvailable&&!g2bSavedLoadRunning){
+  g2bLoadSaved(false);
+  if(!rfpSnapshotCheckedAt)refreshRfpSnapshot();
+ }
  // Search spans both open and closed notices and never triggers an official API call.
  if(next){jobFilter='all';jobVerdictFilter='all'}
  scheduleJobsRender();
@@ -3480,7 +3490,7 @@ function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
- if(!jobsInitialDataReady){
+ if(!jobsInitialDataReady&&!(jobSearchText&&jobSearchServerTotal!==null)){
   jobRenderDirty=true;
   el.innerHTML='<div class="emptycard">서버 DB에 저장된 공고를 불러오는 중입니다. 수집은 서버에서 별도로 진행됩니다.</div>';
   const summary=document.getElementById('partnerSummary');
@@ -3755,13 +3765,16 @@ function startJobsDataWhenVisible(){
    if(jobsBootstrapStarted||!document.getElementById('jobsView').classList.contains('on'))return;
    jobsBootstrapStarted=true;
    loadG2bAwardFallback();g2bCheckStatus();g2bLoadCrawlStatus();
-   const initialLoads=[g2bLoadSaved(false)];
+   // Direct search reads only the requested saved DB rows, not 8,000+ pages.
+   const initialLoads=jobSearchText?[]:[g2bLoadSaved(false)];
    if(worklinksPartnerAccess())initialLoads.push(loadChangcomActionable());
    Promise.allSettled(initialLoads).then(function(){
     jobsInitialDataReady=true;
     scheduleJobsRender();
    });
-   loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();refreshRfpSnapshot();
+   loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();
+   // Saved-search responses carry compact RFP status; skip the 74MB source in search mode.
+   if(!jobSearchText)refreshRfpSnapshot();
   },0);
  });
 }
