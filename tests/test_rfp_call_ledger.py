@@ -30,6 +30,11 @@ with tempfile.TemporaryDirectory() as tmp:
     assert ledger.get_json(k) is None
     ledger.save_json(k,document)
     assert ledger.get_json(k)==document
+    # A 2MB+ permitted official attachment must be reusable without HTTP.
+    large=bytes((i % 251 for i in range(2_100_123)))
+    large_key=cache_key('official_attachment','large-verified-test')
+    assert ledger.save_bytes(large_key,large)
+    assert ledger.get_bytes(large_key)==large
     ledger.record('notice_metadata',k,'metadata_unconfirmed',
                   notice_key='R26BK01811411:000')
     assert ledger.get_json(k)==document
