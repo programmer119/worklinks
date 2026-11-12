@@ -18,32 +18,54 @@ def business_numbers(source):
                       re.findall(r'businessNo:"([0-9-]{10,15})"',source)))
 
 def official_lookup(bizno):
+    ledger=None
+    request_key=None
+    if __import__('os').environ.get('WORKLINKS_RFP_LEDGER_DB'):
+        from rfp_call_ledger import CallLedger,cache_key
+        ledger=CallLedger(__import__('os').environ['WORKLINKS_RFP_LEDGER_DB'])
+        request_key=cache_key('official_smpp_business',bizno)
+        cached=ledger.get_json(request_key,max_age_seconds=12*3600)
+        if isinstance(cached,dict) and cached.get('verified') is True:
+            ledger.record('smpp',request_key,'verified_snapshot_reused')
+            return cached.get('record')
     data=urlencode({'searchBsnmNo':bizno,'pageIndex':'1','menuId':'1050506','vCheck':'Y'}).encode()
     req=Request(PAGE,data=data,headers={
         'User-Agent':'Mozilla/5.0 (compatible; WorkLinks-Server123-SME/1.0)',
         'Content-Type':'application/x-www-form-urlencoded','Referer':PAGE})
-    with urlopen(req,timeout=35) as response:
-        if response.status!=200:raise RuntimeError('SMPP_HTTP_'+str(response.status))
-        body=response.read(5000000).decode('utf-8')
-    start=body.find('<div class="board list pc_tbl">')
-    if start<0:raise RuntimeError('SMPP_DESKTOP_RESULTS_MISSING')
-    table=body[start:body.find('</table>',start)]
-    tb=re.search(r'<tbody[^>]*>(.*?)</tbody>',table,re.S|re.I)
-    if not tb:raise RuntimeError('SMPP_TABLE_BODY_MISSING')
-    found=[]
-    for row in re.findall(r'<tr[^>]*>(.*?)</tr>',tb.group(1),re.S|re.I):
-        cells=[' '.join(html.unescape(re.sub(r'<[^>]*>',' ',c)).split())
-               for c in re.findall(r'<td[^>]*>(.*?)</td>',row,re.S|re.I)]
-        if len(cells)>=5 and cells[3]:
-            found.append({'company':cells[3],'agency':cells[1],
-                          'issuedAt':cells[2],'size':cells[4]})
-    if len(found)>1:raise RuntimeError('SMPP_AMBIGUOUS_RESULTS_'+bizno)
-    record=found[0] if found else None
-    if record and (record['agency']!='중소벤처기업부' or
-                   record['size'] not in ('중기업','소기업','소상공인') or
-                   not re.fullmatch(r'\d{4}-\d{2}-\d{2}',record['issuedAt'])):
-        raise RuntimeError('SMPP_UNRECOGNIZED_RECORD_'+bizno)
-    if record:record['validState']='valid'
+    status=None
+    try:
+        with urlopen(req,timeout=35) as response:
+            status=getattr(response,'status',200)
+            if status!=200:raise RuntimeError('SMPP_HTTP_'+str(status))
+            body=response.read(5000000).decode('utf-8')
+        start=body.find('<div class="board list pc_tbl">')
+        if start<0:raise RuntimeError('SMPP_DESKTOP_RESULTS_MISSING')
+        table=body[start:body.find('</table>',start)]
+        tb=re.search(r'<tbody[^>]*>(.*?)</tbody>',table,re.S|re.I)
+        if not tb:raise RuntimeError('SMPP_TABLE_BODY_MISSING')
+        found=[]
+        for row in re.findall(r'<tr[^>]*>(.*?)</tr>',tb.group(1),re.S|re.I):
+            cells=[' '.join(html.unescape(re.sub(r'<[^>]*>',' ',c)).split())
+                   for c in re.findall(r'<td[^>]*>(.*?)</td>',row,re.S|re.I)]
+            if len(cells)>=5 and cells[3]:
+                found.append({'company':cells[3],'agency':cells[1],
+                              'issuedAt':cells[2],'size':cells[4]})
+        if len(found)>1:raise RuntimeError('SMPP_AMBIGUOUS_RESULTS_'+bizno)
+        record=found[0] if found else None
+        if record and (record['agency']!='중소벤처기업부' or
+                       record['size'] not in ('중기업','소기업','소상공인') or
+                       not re.fullmatch(r'\d{4}-\d{2}-\d{2}',record['issuedAt'])):
+            raise RuntimeError('SMPP_UNRECOGNIZED_RECORD_'+bizno)
+        if record:record['validState']='valid'
+    except Exception as exc:
+        if ledger is not None:
+            ledger.record('smpp_http',request_key,'http_or_parse_failed',
+                          http_status=getattr(exc,'code',status),
+                          error_class=type(exc).__name__)
+        raise
+    if ledger is not None:
+        ledger.record('smpp_http',request_key,'http_verified',http_status=status)
+        ledger.save_json(request_key,{'verified':True,'record':record})
     return record
 
 def main():
