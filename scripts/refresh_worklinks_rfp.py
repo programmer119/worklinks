@@ -140,6 +140,42 @@ def needs_hwpx_reader_retry(record):
                (Path(f.get('name') or '').suffix.lower() in ('.hwpx',''))
                for f in (record or {}).get('files') or [])
 
+def staffing_effective_file_complete(file, files):
+    """An expressly skipped, same-stem official HWP uses the scanned PDF instead.
+
+    This does NOT assert that the HWP binary was examined or byte-identical.
+    The cited PDF, verified by SHA in the SAME manifest, is the effective source.
+    """
+    if not isinstance(file, dict):return False
+    if (file.get('readable') is True and
+            file.get('sourceTextScanComplete') is True and
+            int(file.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+            file.get('staffingRoleScanTruncated') is not True):
+        return True
+    return (file.get('skippedDuplicateFormat') is True and
+            file.get('readable') is not True and
+            hwp_covered_by_staffing_verified_pdf(file, files))
+
+
+def hwp_covered_by_staffing_verified_pdf(file, files):
+    pdf=verified_pdf_companion(file, files)
+    return bool(pdf and file.get('alternatePdfEvidence')==pdf.get('name')
+        and file.get('alternatePdfSourceSha256')==pdf.get('sourceSha256')
+        and int(pdf.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION
+        and pdf.get('staffingRoleScanTruncated') is not True)
+
+
+def staffing_source_is_general_example(filename, quote=''):
+    """Legal templates and score examples are not project staffing demands."""
+    name=str(filename or '')
+    source=str(quote or '')
+    if re.search(r'(?:행안부\s*예규|행정안전부\s*예규|지방자치단체\s*입찰시\s*낙찰자\s*결정기준|입찰\s*및\s*계약집행기준)',name,re.I):
+        return True
+    if re.search(r'(?:산정\s*예시|산정\s*사례|평가\s*예시|배점\s*예시)',source):
+        return True
+    return False
+
+
 def staffing_scan_pending(record):
     """A prior qualification scan is not proof that roles/headcounts were scanned.
 
@@ -915,6 +951,7 @@ _STAFF_MM=re.compile(r'(?<!\d)(\d{1,3}(?:\.\d{1,2})?)\s*(?:MM|M/M|맨먼스)\b',
 def staffing_role_is_grounded(row):
     """Reject score, annex and years-of-experience numbers disguised as people."""
     quote=' '.join(str(row.get('sourceText') or '').split())
+    if staffing_source_is_general_example(row.get('sourceFile'), quote):return False
     role=' '.join(str(row.get('role') or '').split())
     count=int(row.get('count') or 0)
     if not role or not quote or not 1<=count<=99:return False
@@ -945,6 +982,7 @@ def extract_staffing_roles(text, filename, source_url='', excerpt_only=False):
     No automatic summing of different roles, grades, documents, or alternative
     staffing plans. An unsupported number is never assumed to be a headcount.
     """
+    if staffing_source_is_general_example(filename):return []
     text=str(text or '')[:STAFFING_ROLE_TEXT_LIMIT]
     lines=[' '.join(part.split())[:550] for part in text.splitlines()]
     result=[]
@@ -1607,6 +1645,9 @@ def staffing_summary(item):
             if not 1<=count<=99:continue
             role=str(row.get('role') or '').strip()
             if not _STAFF_ROLE.fullmatch(role):continue
+            if staffing_source_is_general_example(
+                    row.get('sourceFile') or f.get('name'),
+                    row.get('sourceText')):continue
             grade=str(row.get('grade') or '')[:12]
             onsite=str(row.get('onsite') or '')[:12]
             signature=(role.lower(),grade,count,onsite,
@@ -1710,9 +1751,7 @@ def compact_coverage(item):
     compact['staffingRoles']=staffing_summary(item)
     compact['staffingRoleScanComplete']=bool(
         item.get('manifestComplete') is True and compact['files'] and
-        all(f.get('readable') is True and
-            int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
-            f.get('staffingRoleScanTruncated') is not True
+        all(staffing_effective_file_complete(f,item.get('files') or [])
             for f in (item.get('files') or [])))
     for field in ('manifestSignature','manifestCheckedAt',
                   'manifestChangePending','manifestPendingSignature',
@@ -1980,6 +2019,23 @@ def main():
                 if prev.get('files'):
                     update['files']=prev['files']
             coverage[key]=update
+    # When an old file already passed the role parser, update only the derived
+    # completion/role summary. No additional file downloads or government calls.
+    # The revision also drops previously misidentified general scoring examples.
+    for key,item in coverage.items():
+        if not isinstance(item,dict):continue
+        files=item.get('files') or []
+        if not files:continue
+        complete=(item.get('manifestComplete') is True and
+                  all(staffing_effective_file_complete(f,files) for f in files))
+        if item.get('staffingRoleScanComplete') is not complete:
+            item['staffingRoleScanComplete']=complete
+        rows=item.get('staffingRoles') or []
+        filtered=[row for row in rows if not staffing_source_is_general_example(
+            row.get('sourceFile') if isinstance(row,dict) else '',
+            row.get('sourceText') if isinstance(row,dict) else '')]
+        if len(filtered)!=len(rows):item['staffingRoles']=filtered
+
     # Re-probe only a small rotating batch of already-extracted, open bids.
     # The metadata fetch does not download any PDF/HWPX bytes.
     for _,no,ordn in sorted(manifest_probes,key=lambda x:x[0])[:MAX_MANIFEST_PROBES_PER_RUN]:
