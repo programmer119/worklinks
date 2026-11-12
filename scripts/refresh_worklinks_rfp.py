@@ -9,6 +9,7 @@ import hashlib
 import io
 import json
 import os
+import threading
 from pathlib import Path
 import re
 import subprocess
@@ -19,6 +20,23 @@ import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
 import zipfile
+from rfp_call_ledger import CallLedger, cache_key
+
+_LEDGER_LOCK=threading.Lock()
+_LEDGER_INSTANCE=None
+_LEDGER_PATH=None
+
+def active_rfp_ledger():
+    """Only server123 opts in; local no-network regression remains isolated."""
+    global _LEDGER_INSTANCE, _LEDGER_PATH
+    path=os.environ.get('WORKLINKS_RFP_LEDGER_DB')
+    if not path:return None
+    if path!=_LEDGER_PATH:
+        with _LEDGER_LOCK:
+            if path!=_LEDGER_PATH:
+                _LEDGER_INSTANCE=CallLedger(path)
+                _LEDGER_PATH=path
+    return _LEDGER_INSTANCE
 
 BASE=os.environ.get('WORKLINKS_G2B_API','https://api-suaveforge.suaveforge.com:18458/api/g2b').rstrip('/')+'/'
 ROOT=Path(__file__).resolve().parents[1]
@@ -64,20 +82,36 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 OPENER=urllib.request.build_opener(NoRedirect)
 def fetch_json(url):
-    # The evidence API occasionally responds 503 during parallel scans. Retry
-    # only transient transport failures; never reinterpret a failed fetch as
-    # confirmation that a tender has no official attachments.
+    # Every physical proxy request is logged; cache reuse is handled by the
+    # verified per-notice snapshot/ledger, never by pretending HTTP was called.
     request=urllib.request.Request(url,headers=AGENTS)
+    ledger=active_rfp_ledger()
+    parts=urllib.parse.urlsplit(url)
+    safe_query=[(k,v) for k,v in urllib.parse.parse_qsl(parts.query)
+                if k.lower() not in ('servicekey','apikey','token','key')]
+    reqkey=cache_key('proxy',parts.path,sorted(safe_query))
     for attempt in range(4):
         try:
             with OPENER.open(request,timeout=24) as r:
                 data=r.read(2_000_000)
+                status=getattr(r,'status',200)
                 if len(data)>=2_000_000:raise ValueError('oversize_json')
-                return json.loads(data.decode('utf-8'))
-        except urllib.error.HTTPError as ex:
-            if ex.code not in (429,500,502,503,504) or attempt==3:raise
-        except (TimeoutError,ConnectionError,urllib.error.URLError):
-            if attempt==3:raise
+                parsed=json.loads(data.decode('utf-8'))
+            if ledger:
+                ledger.record('proxy_http',reqkey,'http_ok',http_status=status,
+                              response_sha256=hashlib.sha256(data).hexdigest())
+            return parsed
+        except (urllib.error.HTTPError,TimeoutError,ConnectionError,
+                urllib.error.URLError,ValueError,UnicodeError) as ex:
+            if ledger:
+                ledger.record('proxy_http',reqkey,'http_failed',
+                              http_status=getattr(ex,'code',None),
+                              error_class=type(ex).__name__)
+            if isinstance(ex,urllib.error.HTTPError):
+                retry=ex.code in (429,500,502,503,504)
+            else:
+                retry=isinstance(ex,(TimeoutError,ConnectionError,urllib.error.URLError))
+            if not retry or attempt==3:raise
         time.sleep(min(8,1.5*(2**attempt)))
 def needs_hwpx_reader_retry(record):
     if (record or {}).get('hwpxReaderVersion',0)>=HWPX_READER_VERSION:
@@ -382,19 +416,38 @@ def invalid_file_reason(item):
 
 
 def download(url):
+    # Persist small official binaries even if text extraction later fails.
+    # A parser-only retry can then reuse the exact bytes without an HTTP call.
+    ledger=active_rfp_ledger()
+    reqkey=cache_key('official_attachment',url)
+    if ledger and not os.environ.get('WORKLINKS_RFP_FORCE_REDOWNLOAD'):
+        reusable=ledger.get_bytes(reqkey,max_age_seconds=7*24*3600)
+        if reusable is not None:return reusable
     request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
     for attempt in range(3):
         try:
             with OPENER.open(request,timeout=35) as r:
+                status=getattr(r,'status',200)
                 size=int(r.headers.get('Content-Length') or '0')
                 if size>MAX_FILE:raise ValueError('large_file')
                 raw=r.read(MAX_FILE+1)
                 if len(raw)>MAX_FILE:raise ValueError('large_file')
-                return raw
-        except urllib.error.HTTPError as ex:
-            if ex.code not in (429,500,502,503,504) or attempt==2:raise
-        except (TimeoutError,ConnectionError,urllib.error.URLError):
-            if attempt==2:raise
+            if ledger:
+                ledger.record('attachment_http',reqkey,'http_ok',http_status=status,
+                              response_sha256=hashlib.sha256(raw).hexdigest())
+                ledger.save_bytes(reqkey,raw)
+            return raw
+        except (urllib.error.HTTPError,TimeoutError,ConnectionError,
+                urllib.error.URLError,ValueError) as ex:
+            if ledger:
+                ledger.record('attachment_http',reqkey,'http_failed',
+                              http_status=getattr(ex,'code',None),
+                              error_class=type(ex).__name__)
+            if isinstance(ex,urllib.error.HTTPError):
+                retry=ex.code in (429,500,502,503,504)
+            else:
+                retry=isinstance(ex,(TimeoutError,ConnectionError,urllib.error.URLError))
+            if not retry or attempt==2:raise
         time.sleep(1.5*(attempt+1))
 def extract(name,raw):
     n=name.lower()
