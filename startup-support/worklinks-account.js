@@ -1,4 +1,5 @@
 import { AuthHubClient } from './authhub-client.js';
+import { renderWorklinksHeaderAuth } from './worklinks-header-auth.js';
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
@@ -336,49 +337,31 @@ async function reconcileServer(){
     }
   }finally{state.loading=false;}
 }
-function hosted(mode){
-  const u=new URL('https://authhub.suaveforge.com/login/');
-  u.searchParams.set('project',state.project);
-  u.searchParams.set('environment','production');
-  u.searchParams.set('redirect_uri',CALLBACK);
-  u.searchParams.set('state','/startup-support/');
-  u.searchParams.set('mode',mode);
-  return u.toString();
-}
 function buttons(session){
-  const box=$('worklinks-auth-controls');if(!box)return;
-  box.replaceChildren();
-  if(session){
-    const label=document.createElement('span');label.textContent=session.email||'AuthHub 회원';
-    label.className='worklinks-auth-user';box.append(label);
-
-    const logout=document.createElement('button');logout.type='button';logout.className='worklinks-auth-button';
-    logout.textContent='로그아웃';logout.addEventListener('click',async()=>{
-      try{await state.client.logout()}catch{}
+  const root=$('worklinks-auth-header');
+  if(!root)return; // OAuth callback has a separate, minimal status page.
+  renderWorklinksHeaderAuth({
+    root,session,
+    onLogout:async()=>{
+      try{if(state.client)await state.client.logout()}catch{}
       guestRestore();buttons(null);show('비회원 · 이 브라우저에만 저장');
-    });box.append(logout);
-    const recover=document.createElement('button');
-    recover.type='button';recover.className='worklinks-auth-button';
-    recover.textContent='지원기록 점검';
-    recover.addEventListener('click',()=>{
+    },
+    onRecover:session?()=>{
+      // Support-record recovery stays within the support workspace, not the header.
+      const slot=$('worklinks-auth-recovery-slot');
+      if(!slot)return;
+      document.querySelector('.workspace-tab[data-view="support"]')?.click();
       let panel=$('worklinks-applied-recovery');
       if(!panel){
         panel=document.createElement('section');
         panel.id='worklinks-applied-recovery';
-        panel.style.cssText='flex:1 0 100%;min-width:0;padding:10px;border:1px solid #d7e2ee;background:#fff;border-radius:9px';
-        document.querySelector('.worklinks-auth-panel')?.append(panel);
+        panel.style.cssText='padding:12px;border:1px solid #d7e2ee;background:#fff;border-radius:10px';
+        slot.append(panel);
       }else panel.hidden=!panel.hidden;
       renderAppliedRecovery();
-    });box.append(recover);
-  }else{
-    for(const mode of ['login','signup']){
-      const button=document.createElement('button');button.type='button';
-      button.className='worklinks-auth-button';
-      button.textContent=mode==='login'?'로그인':'회원가입';
-      button.addEventListener('click',()=>location.assign(hosted(mode)));
-      box.append(button);
-    }
-  }
+      if(!panel.hidden)panel.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }:null
+  });
 }
 const AUTHHUB_CONFIG_API = 'https://api-authhub.suaveforge.com';
 const WORKLINKS_AUTH_PROJECT = 'p47';
@@ -457,4 +440,5 @@ window.addEventListener('storage',event=>{
     guestRestore();buttons(null);show('다른 탭에서 로그아웃됨');
   }
 });
+if(document.getElementById('worklinks-auth-header'))buttons(null);
 bootstrap().catch(error=>{console.warn('WorkLinks AuthHub bootstrap',error);show('브라우저 저장 유지 · 인증 서버 확인 필요')});
