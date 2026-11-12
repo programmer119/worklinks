@@ -25,6 +25,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
+READER_ATTEMPT_VERSION='pdf-ocr-kor-20261112-v1'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -77,6 +78,11 @@ def failed_files(scan):
        and (f.get('readable') is not True or f.get('sourceTextScanComplete') is not True
             or f.get('qualificationScanTruncated') is True
             or int(f.get('unmatchedQualificationAnchorCount') or 0)>0)]
+
+
+def reader_retry_files(scan):
+    return [f for f in failed_files(scan)
+            if f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION]
 
 
 def metadata_valid(metadata,scan):
@@ -193,7 +199,10 @@ def process_one(key,scan,meta,ledger):
     counts=Counter()
     counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
     for f in scan['files']:
-        if f not in failed_files({'files':[f]}):continue
+        if f not in reader_retry_files({'files':[f]}):continue
+        f['lastReaderAttemptVersion']=READER_ATTEMPT_VERSION
+        f['lastReaderAttemptAt']=dt.datetime.now(dt.timezone.utc).isoformat()
+        counts['reader_attempt_recorded']+=1
         label=str(f.get('name') or '')
         item=paired[id(f)]
         if f.get('alternatePdfEvidence') and str(f.get('errorCategory') or '') in (
@@ -321,6 +330,10 @@ def run(data_dir,limit,execute=False,max_files=400):
         if not broken:
             categories['all_readable']+=1;continue
         categories['partial']+=1
+        broken=reader_retry_files(scan)
+        if not broken:
+            categories['already_attempted_this_reader_version']+=1
+            continue
         meta,src=metadata_for(key,scan,stored,ledger,known_full)
         if not meta:
             categories['metadata_missing']+=1;continue
@@ -369,6 +382,9 @@ def run(data_dir,limit,execute=False,max_files=400):
                     for field in ('errorCategory','lastHttpStatus','extractionEvidence',
                                   'partialTextChars'):
                         if field in entry:live[field]=entry[field]
+                if live.get('readable') is not True or live.get('sourceTextScanComplete') is not True:
+                    for field in ('lastReaderAttemptVersion','lastReaderAttemptAt'):
+                        if entry.get(field):live[field]=entry[field]
                 for field in ('alternatePdfEvidence','alternatePdfSourceSha256',
                               'alternatePdfEvidenceMode'):
                     if entry.get(field):live[field]=entry[field]
@@ -397,13 +413,13 @@ def run(data_dir,limit,execute=False,max_files=400):
             latest=read_json(coverage_path).get('byNotice',{}).get(key)
             if not isinstance(latest,dict) or not metadata_valid(meta,latest):
                 tally['changed_while_repairing']+=1;continue
-            if not failed_files(latest):continue
+            if not reader_retry_files(latest):continue
             work=json.loads(json.dumps(latest,ensure_ascii=False))
             additions,counters=process_one(key,work,meta,ledger)
             tally.update(counters)
             if not additions and not any(counters.get(k) for k in (
                  'official_attachment_reference_missing_422','pdf_ocr_incomplete',
-                 'alternate_pdf_evidence')):continue
+                 'alternate_pdf_evidence','reader_attempt_recorded')):continue
             pending[key]=(work,additions)
             if len(pending)>=8:flush_pending()
         flush_pending()
