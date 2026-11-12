@@ -751,6 +751,86 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  #jobsView[data-job-mode="partner"] #jobVerdictFilter>.job-vf{font-size:14px;padding:7px 8px}
  #jobsView[data-job-mode="partner"] .job-sort-row select{max-width:135px}
 }
+
+/* Procurement: one real inline toolbar; never allocate a full-width search row.
+   The top navigation already supplies the screen title. */
+#jobsView[data-job-mode="partner"]>.panel{
+ display:flex!important;flex-flow:row wrap!important;align-items:center!important;
+ column-gap:7px!important;row-gap:6px!important;
+ padding:9px 12px!important;margin:0 0 8px!important;min-height:0!important
+}
+#jobsView[data-job-mode="partner"] #jobListTitle,
+#jobsView[data-job-mode="partner"] #jobSearchLabel{display:none!important}
+#jobsView[data-job-mode="partner"] .job-titlebar,
+#jobsView[data-job-mode="partner"] .job-title-actions{display:contents!important}
+#jobsView[data-job-mode="partner"] .job-quick-search{
+ order:1!important;display:flex!important;flex:0 1 242px!important;
+ width:242px!important;min-width:185px!important;max-width:255px!important;
+ height:36px!important;min-height:36px!important;margin:0!important;
+ padding:0!important;border:0!important;background:none!important;
+ box-shadow:none!important;gap:0!important
+}
+#jobsView[data-job-mode="partner"] #jobQuickSearch{
+ box-sizing:border-box!important;flex:1 1 auto!important;min-width:0!important;
+ width:100%!important;height:36px!important;min-height:36px!important;
+ padding:6px 10px!important;font-size:15px!important;
+ border:1px solid #cbd5e1!important;border-radius:8px!important
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters{
+ order:2!important;flex:0 0 auto!important;width:auto!important;
+ margin:0!important;padding:0!important;gap:4px!important;
+ white-space:nowrap!important;flex-wrap:nowrap!important
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter{
+ order:3!important;flex:1 1 auto!important;width:auto!important;
+ min-width:0!important;margin:0!important;padding:0!important;
+ display:flex!important;flex-wrap:wrap!important;gap:5px!important;
+ justify-content:flex-start!important;align-items:center!important
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter[hidden]{display:none!important}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter>.job-vf{
+ margin:0!important;min-height:36px!important;padding:6px 10px!important;
+ font-size:14px!important;white-space:nowrap!important
+}
+#jobsView[data-job-mode="partner"] .job-info-fold{
+ order:4!important;flex:0 0 35px!important;margin:0!important
+}
+#jobsView[data-job-mode="partner"] .job-info-fold>summary{
+ width:35px!important;height:35px!important
+}
+#jobsView[data-job-mode="partner"] #jobExtraFilters{margin:0!important}
+#jobsView[data-job-mode="partner"] #jobExtraFilters>summary{
+ min-height:36px!important;padding:6px 9px!important
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter .job-sort-row{
+ margin:0 0 0 auto!important;gap:0!important;flex:0 0 auto!important;
+ display:flex!important;align-items:center!important
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter .job-sort-row select{
+ min-height:36px!important;padding:6px 8px!important;
+ font-size:14px!important;max-width:144px!important
+}
+#jobsView[data-job-mode="partner"] .job-sort-row label,
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-count-label{
+ display:none!important
+}
+@media(max-width:1110px){
+ #jobsView[data-job-mode="partner"] .job-quick-search{
+  flex:0 1 225px!important;width:225px!important
+ }
+ #jobsView[data-job-mode="partner"] #jobVerdictFilter{flex:1 1 100%!important}
+}
+@media(max-width:660px){
+ #jobsView[data-job-mode="partner"]>.panel{padding:8px!important}
+ #jobsView[data-job-mode="partner"] .job-quick-search{
+  flex:1 1 calc(100% - 48px)!important;max-width:none!important;width:auto!important
+ }
+ #jobsView[data-job-mode="partner"] .job-info-fold{order:2!important}
+ #jobsView[data-job-mode="partner"] #changcomJobFilters{
+  order:3!important;flex-wrap:wrap!important;white-space:normal!important
+ }
+ #jobsView[data-job-mode="partner"] #jobVerdictFilter{order:4!important}
+}
 </style>
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
 </head>
@@ -4734,6 +4814,8 @@ function setWorkspaceView(view){
   jobVerdictFilter=partnerMode?jobPartnerVerdictFilter:'all';
   target.dataset.jobMode=partnerMode?'partner':'general';
   document.getElementById('jobListTitle').textContent=partnerMode?'공공입찰·창컴협업':'일반 일감';
+  document.getElementById('jobListTitle').hidden=partnerMode;
+  document.getElementById('jobSearchLabel').hidden=partnerMode;
   document.getElementById('jobSearchLabel').textContent=partnerMode?'공공입찰 검색':'일감 검색';
   const sorter=document.getElementById('jobSort');
   if(sorter)sorter.value=partnerMode&&worklinksPartnerAccess()?
