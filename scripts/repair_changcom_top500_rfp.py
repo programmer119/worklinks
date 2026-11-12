@@ -8,6 +8,7 @@ from pathlib import Path
 import urllib.parse
 
 from batch_backfill_changcom_top500_rfp import load, atomic_json, merge_coverage, key_for, close_of
+from rfp_call_ledger import CallLedger, cache_key, ledger_path
 from refresh_worklinks_rfp import (
     BASE, fetch_json, process, CLASSIFICATION_VERSION, HWPX_READER_VERSION
 )
@@ -110,6 +111,17 @@ def bootstrap_scans(snap, keys, existing):
                    'notPreviouslyScanned': unknown}
 
 
+def metadata_confirmed(row):
+    if not isinstance(row,dict):
+        return False
+    attachment=row.get('attachments') or {}
+    notice=row.get('noticeDocuments') or {}
+    return (attachment.get('ok') is True and
+            attachment.get('complete') is True and
+            notice.get('ok') is True and
+            notice.get('complete') is True)
+
+
 def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
     snap = Path(data_dir) / 'snapshots'
     state_path, meta_path = snap / STATE_NAME, snap / META_NAME
@@ -143,26 +155,44 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
                 'archivedOutOfScope': len(outdated_keys),
                 'incomplete': len(pending), 'queued': selected}
     timestamp = dt.datetime.now(dt.timezone.utc).isoformat()
+    # This SQLite database is persistent outside isolated snapshots on server123.
+    # Creating it is deliberately delayed until --execute (dry-run is read-only).
+    ledger=CallLedger(ledger_path(data_dir))
     repaired = {}
 
     def repair(key):
         old = scans.get(key) or {}
         source = by_notice.get(key)
         live = None
-        if (old.get('status') in RECHECK or not isinstance(source, dict) or
-                (source.get('attachments') or {}).get('complete') is not True or
-                (source.get('noticeDocuments') or {}).get('complete') is not True):
-            no, order = key.rsplit(':', 1)
-            live = fetch_json(BASE + 'bid-evidence?' +
-                              urllib.parse.urlencode({'bidNo': no, 'order': order}))
-            fields = live.get('attachments') or {}
-            notice = live.get('noticeDocuments') or {}
-            if (fields.get('ok') is not True or fields.get('complete') is not True or
-                    notice.get('ok') is not True or notice.get('complete') is not True):
-                raise RuntimeError('OFFICIAL_METADATA_RECHECK_UNCONFIRMED')
-            source = live
-        if not isinstance(source, dict):
-            raise RuntimeError('BATCH_REPAIR_METADATA_MISSING')
+        request_key=cache_key('bid_evidence',key)
+        if metadata_confirmed(source):
+            # Persist previously retrieved official metadata, without
+            # claiming a historical upstream HTTP attempt took place now.
+            if ledger.get_json(request_key) is None:
+                ledger.save_json(request_key,source)
+            ledger.record('notice_metadata',request_key,'existing_verified_reused',
+                          notice_key=key)
+        else:
+            # A prior verified response can survive a snapshot interruption.
+            cached=ledger.get_json(request_key,max_age_seconds=36*3600)
+            if metadata_confirmed(cached):
+                source=cached
+                ledger.record('notice_metadata',request_key,'verified_cache_reused',
+                              notice_key=key)
+            else:
+                no, order = key.rsplit(':', 1)
+                live = fetch_json(BASE + 'bid-evidence?' +
+                                  urllib.parse.urlencode({'bidNo': no, 'order': order}))
+                if not metadata_confirmed(live):
+                    ledger.record('notice_metadata',request_key,'metadata_unconfirmed',
+                                  notice_key=key)
+                    raise RuntimeError('OFFICIAL_METADATA_RECHECK_UNCONFIRMED')
+                ledger.save_json(request_key,live)
+                ledger.record('notice_metadata',request_key,'fresh_metadata_verified',
+                              notice_key=key)
+                source=live
+        if not metadata_confirmed(source):
+            raise RuntimeError('BATCH_REPAIR_METADATA_MISSING_OR_PARTIAL')
         no, order = key.rsplit(':', 1)
         new = process(no, order, metadata=source, previous=old)
         if not isinstance(new, dict):
@@ -191,6 +221,10 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
             except Exception as error:
                 outcome = 'retry_failed_' + type(error).__name__
                 print('RFP_REPAIR_FAILED', key, outcome, str(error)[:100], flush=True)
+            ledger.record('repair_attempt',cache_key('repair',key),outcome,
+                          notice_key=key,
+                          detail='readable='+str(readable(scans.get(key) or {}))+
+                                 ';unreadable='+str(unreadable(scans.get(key) or {})))
             history[key] = {'count': attempts(history, key) + 1,
                             'classificationVersion': CLASSIFICATION_VERSION,
                             'hwpxReaderVersion': HWPX_READER_VERSION,
@@ -230,6 +264,7 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
                 f.get('qualificationScanTruncated') is True)
             for f in (row.get('files') or [])) for row in scans.values()),
         'statuses': dict(statuses), 'failureCategories': dict(errors),
+        'requestLedger': ledger.stats(),
         'unresolvedNoticeKeys': still_pending,
         'warning': 'Metadata/parsed text does not prove legal bidder eligibility.'
     }
