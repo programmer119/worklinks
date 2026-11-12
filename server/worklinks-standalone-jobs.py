@@ -73,6 +73,7 @@ CI_TESTS=(
     ('python','tests/test_rfp_call_ledger.py'),
     ('python','tests/test_g2b_shared_ledger.py'),
     ('python','tests/test_g2b_standard_worker.py'),
+    ('python','tests/test_g2b_standalone_ledger.py'),
     ('python','tests/test_worklinks_standalone_jobs.py'),
     ('python','tests/test_worklinks_site_mirror.py'),
     ('node','tests/worklinks-jobs-regression.cjs'),
@@ -134,10 +135,13 @@ def source_head():
 def test_source(root):
     """Run source checks on change; never publish collector results from failed QA."""
     result=[]
+    # Source QA must never mutate the live shared procurement ledger.
+    qa_env=dict(os.environ)
+    qa_env.pop('WORKLINKS_RFP_LEDGER_DB',None)
     for command in CI_TESTS:
         cmd=[sys.executable if x=='python' else x for x in command]
         try:
-            p=call(cmd,cwd=str(root),timeout=160)
+            p=call(cmd,cwd=str(root),timeout=160,env=qa_env)
             result.append({'command':command[1] if len(command)>1 else command[0],
                            'ok':p.returncode==0,'tail':(p.stderr or p.stdout)[-240:]})
             if p.returncode!=0:
@@ -149,13 +153,15 @@ def test_source(root):
 
 def test_diagnostics(root, commands):
     checks=[]
+    qa_env=dict(os.environ)
+    qa_env.pop('WORKLINKS_RFP_LEDGER_DB',None)
     for command in commands:
         argv=[sys.executable if x=='python' else x for x in command]
         if not (root/command[1]).is_file():
             checks.append({'name':command[1],'ok':False,'error':'test_source_missing'})
             continue
         try:
-            result=call(argv,cwd=str(root),timeout=100)
+            result=call(argv,cwd=str(root),timeout=100,env=qa_env)
             checks.append({'name':command[1],'ok':result.returncode==0,
                            'tail':(result.stderr or result.stdout)[-180:]})
         except (OSError,subprocess.TimeoutExpired) as err:
