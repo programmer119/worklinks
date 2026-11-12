@@ -1086,15 +1086,34 @@ def prod_query(bizno):
     for page in range(1,21):
         url=PROD_API+'?'+urlencode({'serviceKey':key,'page':page,'perPage':1000,
                                      'cond['+u'사업자번호'+'::EQ]':bizno})
-        try:
-            response=urlopen(Request(url,headers={'Accept':'application/json',
-                                      'User-Agent':'WorkLinksProduction/1.0'}),timeout=18)
-            doc=json.loads(response.read().decode('utf-8'))
-        except HTTPError as e:raise ApiError('production_upstream_http_'+str(e.code),502)
-        except (URLError,IOError,ValueError,UnicodeError):
-            raise ApiError('production_upstream_unavailable_or_invalid',502)
-        if not isinstance(doc,dict) or not isinstance(doc.get('data'),list):
-            raise ApiError('production_upstream_unexpected_response',502)
+        ledger=api_request_ledger()
+        request_key=stable_api_key('production_company',bizno,page) if ledger is not None else None
+        doc=(ledger.get_json(request_key,max_age_seconds=12*3600)
+             if ledger is not None else None)
+        if not (isinstance(doc,dict) and isinstance(doc.get('data'),list)):
+            try:
+                response=urlopen(Request(url,headers={'Accept':'application/json',
+                                           'User-Agent':'WorkLinksProduction/1.0'}),timeout=18)
+                http_status=getattr(response,'status',200)
+                doc=json.loads(response.read().decode('utf-8'))
+            except HTTPError as e:
+                api_ledger_event(ledger,'production_http',request_key,'http_failed',
+                                 http_status=e.code,error_class='HTTPError')
+                raise ApiError('production_upstream_http_'+str(e.code),502)
+            except (URLError,IOError,ValueError,UnicodeError) as exc:
+                api_ledger_event(ledger,'production_http',request_key,'http_failed',
+                                 error_class=type(exc).__name__)
+                raise ApiError('production_upstream_unavailable_or_invalid',502)
+            if not isinstance(doc,dict) or not isinstance(doc.get('data'),list):
+                api_ledger_event(ledger,'production_http',request_key,'invalid_response',
+                                 http_status=http_status)
+                raise ApiError('production_upstream_unexpected_response',502)
+            if ledger is not None:
+                api_ledger_event(ledger,'production_http',request_key,'http_verified',
+                                 http_status=http_status)
+                ledger.save_json(request_key,doc,max_bytes=20_000_000)
+        elif ledger is not None:
+            api_ledger_event(ledger,'production_http',request_key,'verified_cache_reused')
         batch=doc['data']
         if match_count is None:
             try:match_count=int(doc.get('matchCount',len(batch)))
