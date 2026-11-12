@@ -475,7 +475,8 @@
 #jobCards .job-req-trigger{border:1px solid #d5dfe9;border-radius:8px;background:#f8fafc;display:inline-flex;gap:6px;align-items:center;padding:6px 9px;font-weight:700;font-size:13px;line-height:1.35;font-family:inherit;color:#334155;cursor:help;min-height:32px}
 #jobCards .job-req-trigger:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 #jobCards .job-req-icon{font-weight:900;font-size:13px;line-height:19px;font-family:inherit;display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#e2e8f0;color:#475569}
-#jobCards .job-req-item[data-state="failed"] .job-req-icon{background:#fee2e2;color:#b91c1c}
+#jobCards .job-req-item[data-state="failed"] .job-req-icon{background:#fef3c7;color:#92400e}
+#jobCards .job-req-item[data-state="checking"] .job-req-icon{background:#e2e8f0;color:#475569}
 #jobCards .job-req-item[data-state="required"] .job-req-icon{background:#fef3c7;color:#92400e}
 #jobCards .job-req-item[data-state="required_at_bid"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="not_required"] .job-req-icon{background:#dcfce7;color:#166534}
@@ -2576,7 +2577,7 @@ async function refreshQualificationReview(){
   scheduleJobsRender();
  }catch(e){/* No completed review is inferred when snapshot unavailable. */}
 }
-var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='';
+var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='',rfpSnapshotLoading=false;
 var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved database pages.
 // Qualification checking uses official G2B evidence and the RFP source snapshot, not AI classifications.
 function rfpSnapshotForJob(x){
@@ -2584,6 +2585,7 @@ function rfpSnapshotForJob(x){
  return id?rfpSnapshotByNotice.get(id.bidNo+':'+id.order):null;
 }
 async function refreshRfpSnapshot(){
+ rfpSnapshotLoading=true;
  try{
   const response=await fetchServer123Snapshot('rfp-clauses','./rfp-clauses.json');
   if(!response.ok)return;
@@ -2596,6 +2598,9 @@ async function refreshRfpSnapshot(){
   if(partnerScopedJob)renderPartnerJobContext();
  }catch(e){
   // A missing or stale snapshot is not evidence of absent eligibility clauses.
+ }finally{
+  rfpSnapshotLoading=false;
+  scheduleJobsRender();
  }
 }
 var bidEvidenceCache=new Map(),bidEvidenceLoading=new Set();
@@ -3549,6 +3554,7 @@ function jobRequirementEvidence(x){
    return {key:'required',label:'사전 필요',reason:'공고일 기준 등 입찰 전에 이미 충족해야 하는 조건이 원문에 명시됨'};
   if(positive&&bidStage.test(positive.text))
    return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
+  if(rfpSnapshotLoading&&!full)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
   if(sourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
    return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
@@ -3584,7 +3590,8 @@ function jobRequirementEvidence(x){
  function onsiteChoice(){
    if(onsiteConfirmed)return {key:'onsite',label:'상주',
      reason:'공식 문서에서 발주처 상시 근무·상주 의무가 명시됨 (인력 소속 기준일과는 별도)'};
-   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
+   if(rfpSnapshotLoading&&!full)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 상주 여부 미확정'};
+    if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
    if(!sourceReadComplete)return {key:'failed',label:'확인실패',
      reason:'원문·첨부 전체 수집·판독이 완료되지 않아 상주 여부를 확정할 수 없음'};
    return {key:'offsite',label:'비상주',
@@ -3625,13 +3632,13 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,lines,code){
-   const label=code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name;
+   const label=(v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name);
    const tooltip=[name+' · '+v.label,v.reason].concat(lines).filter(Boolean).join('\n');
   return '<span class="job-req-item" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
      htmlEscape(name+' '+v.label+'. '+tooltip)+'" aria-expanded="false">'+
      htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
-     ({not_checked:'?',failed:'×',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓'})[v.key]+'</span></button>'+
+     ({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓'})[v.key]+'</span></button>'+
    '<span class="job-req-tip" role="tooltip">'+htmlEscape(tooltip)+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험과 상주 요구조건">'+
