@@ -1,0 +1,103 @@
+name: WorkLinks official 422 retry and real parser error examples
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-http422-two-parser-evidence-20261112.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Readers and direct HTTP repeat (five exact official files)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m pip -q install pypdf pyhwp six
+          python3 - <<'PY'
+          import hashlib,io,json,subprocess,tempfile,urllib.error,urllib.request
+          from pathlib import Path
+          from pypdf import PdfReader
+          from zipfile import ZipFile
+          refs=[
+            ('http422_1','R26BK01808323','남양주시 긴급입찰 사유서 HWP',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00060250&rfpOrd=000&rfpUntyAtchFileNo=1'),
+            ('http422_2','R26BK01815061','울산교육청 긴급입찰사유서 PDF',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00061447&rfpOrd=000&rfpUntyAtchFileNo=1'),
+            ('http422_3','R26BK01804199','e-푸른바다 긴급입찰 요청 사유서 PDF',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062439&rfpOrd=000&rfpUntyAtchFileNo=1'),
+            ('pdf_unreadable_page','R26BK01805702','치안대학원 기술지원협약서 PDF',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805702&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03'),
+            ('no_searchable_text','R26BK01811303','공고문 입찰공고 HWP',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01811303&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03')
+          ]
+          headersets=[
+            {'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'},
+            {'User-Agent':'Mozilla/5.0'}
+          ]
+          def probe(url,h):
+            req=urllib.request.Request(url,headers=h)
+            try:
+              with urllib.request.urlopen(req,timeout=30) as response:
+                sample=response.read(12000001)
+                return {'http':response.status,'contentType':response.headers.get('Content-Type'),
+                    'declaredBytes':response.headers.get('Content-Length'),
+                    'receivedBytes':len(sample),'magic':sample[:12].hex(),
+                    'sha256':hashlib.sha256(sample).hexdigest()[:24],
+                    'data':sample}
+            except urllib.error.HTTPError as e:
+              body=e.read(1800)
+              return {'http':e.code,'contentType':e.headers.get('Content-Type'),
+                'responseBody':body.decode('utf-8','replace')[:750],
+                'responseMagic':body[:12].hex(),'responseLength':e.headers.get('Content-Length'),
+                'errorType':'HTTPError'}
+            except Exception as e:
+              return {'errorType':type(e).__name__,'error':str(e)[:350]}
+          for kind,bid,name,url in refs:
+            attempts=[]
+            for i,headers in enumerate(headersets[:2 if kind.startswith('http422') else 1]):
+              attempt=probe(url,headers)
+              raw=attempt.pop('data',None)
+              attempt['headerVariant']='useragent_referer' if i==0 else 'useragent_only'
+              attempts.append(attempt)
+              if raw is None:continue
+              if kind=='pdf_unreadable_page':
+                try:
+                  pdf=PdfReader(io.BytesIO(raw))
+                  counts=[];images=[];pages_empty=[]
+                  for index,page in enumerate(pdf.pages):
+                    content=page.extract_text() or ''
+                    counts.append(len(content.strip()))
+                    if len(content.strip())==0:pages_empty.append(index+1)
+                    try: images.append(len(page.images))
+                    except Exception: images.append(None)
+                  attempt.update({'pdfPages':len(pdf.pages),'textCharsByPage':counts[:30],
+                    'blankTextPages':pages_empty[:40],
+                    'imageCountsByPage':images[:30],
+                    'allTextChars':sum(counts),'pdfFailureReproduced':bool(pages_empty),
+                    'textPreview':str((pdf.pages[0].extract_text() or '')[:130])})
+                except Exception as exc:
+                  attempt.update({'parseException':type(exc).__name__,
+                                  'parseDetail':str(exc)[:280]})
+              if kind=='no_searchable_text':
+                try:
+                  with tempfile.TemporaryDirectory() as folder:
+                    file=Path(folder)/'source.hwp'
+                    file.write_bytes(raw)
+                    cmd=subprocess.run(['hwp5txt',str(file)],capture_output=True,timeout=40)
+                    decoded=cmd.stdout.decode('utf-8','replace')
+                    attempt.update({'hwp5ExitCode':cmd.returncode,
+                      'hwp5TextLength':len(decoded),'hwp5NonblankLength':len(decoded.strip()),
+                      'hwp5Stderr':cmd.stderr.decode('utf-8','replace')[:280],
+                      'hwpTextPreview':decoded[:240]})
+                except Exception as exc:
+                  attempt.update({'parseException':type(exc).__name__,
+                                  'parseDetail':str(exc)[:280]})
+            print('WORKLINKS_ACTUAL_RECHECK '+json.dumps({
+               'kind':kind,'bidNo':bid,'name':name,'url':url,
+               'attempts':attempts},ensure_ascii=False),flush=True)
+          PY
