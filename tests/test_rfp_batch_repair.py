@@ -51,6 +51,12 @@ try:
               'attachments':{'ok':True,'complete':True,'items':[]},
               'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
               for key in records},'targets':list(records)}))
+        # Third notice has an incomplete official metadata response: one real
+        # request is required, then the verified result must be persisted.
+        meta_path=snap/repair.META_NAME
+        meta_doc=json.loads(meta_path.read_text())
+        meta_doc['byNotice']['R26BK00000003:000']['attachments']['complete']=False
+        meta_path.write_text(json.dumps(meta_doc))
         old={'ok':True,'byNotice':{'HISTORIC:000':{
              'status':'text_extracted_requires_review'}}}
         for path in ('rfp-clauses.json','rfp-coverage-index.json'):
@@ -60,6 +66,10 @@ try:
         done=repair.run(td,execute=True)
         assert done['readableDocumentCount']==500 and done['incompleteNoticeCount']==1
         assert sum(t=='metadata' for t,_ in calls)==1
+        from rfp_call_ledger import CallLedger
+        ledger=CallLedger(Path(td)/'rfp-request-ledger.sqlite3')
+        assert ledger.stats()['counts']['notice_metadata:fresh_metadata_verified']==1
+        assert ledger.stats()['counts']['repair_attempt:processed']>=1
         assert not any(x==('extract','R26BK00000002') for x in calls)
         state=json.loads((snap/repair.STATE_NAME).read_text())
         assert state['metadataCalls']==47
@@ -71,6 +81,10 @@ try:
         stopped=repair.run(td,execute=True)
         assert stopped['repairAttemptedThisRun']==0
         assert stopped['attemptLimitReached']==1
+        # A restart or repeated question cannot trigger the same verified
+        # official metadata API call again.
+        assert sum(t=='metadata' for t,_ in calls)==1
+        assert ledger.stats()['counts']['notice_metadata:fresh_metadata_verified']==1
         assert 'R26BK00000003:000' in stopped['unresolvedNoticeKeys']
 finally:
     repair.process, repair.fetch_json = original_process, original_fetch
