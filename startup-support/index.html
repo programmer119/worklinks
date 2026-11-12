@@ -463,6 +463,10 @@
    stays in its original metadata row. Keep full notice titles readable. */
 #jobCards .job-mini .job-headline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:9px;width:100%;min-width:0}
 #jobCards .job-mini .job-headline h3{min-width:0;width:100%}
+/* Price belongs to a fixed right column, not after the variable-height title. */
+#jobCards .job-mini .job-headline-side{display:flex;flex-direction:column;align-items:flex-end;justify-self:end;min-width:0}
+#jobCards .job-mini .job-headline-badge{min-height:39px;display:flex;align-items:flex-start;justify-content:flex-end}
+#jobCards .job-mini .job-headline-side .job-amount{display:block;margin:0;font-size:14px;line-height:1.5;text-align:right;max-width:none;white-space:nowrap}
 #jobCards .job-mini .job-business-area{display:inline-flex;align-items:center;justify-content:center;max-width:146px;min-height:27px;padding:4px 9px;border:1px solid #d9e1eb;border-radius:7px;background:#f8fafc;color:#334155;font-size:13px;font-weight:750;line-height:1.35;white-space:normal;text-align:center;overflow-wrap:anywhere}
 @media(max-width:490px){#jobCards .job-mini .job-headline{gap:7px}#jobCards .job-mini .job-business-area{max-width:105px;font-size:12px;padding:4px 7px}}
 
@@ -4721,9 +4725,9 @@ function renderJobs(){
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+jobInstitutionBadges(x)+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+bidBusinessArea(x)+'</div>'+
-       '<div class="job-meta-row">'+
-        '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
+       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+
+       '<div class="job-headline-side"><div class="job-headline-badge">'+bidBusinessArea(x)+'</div>'+
+       '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div></div>'+
        bidMethodCardMarkup(x)+
        jobCollectionMarkup(x)+
        jobRequirementBadges(x)+
