@@ -1381,6 +1381,7 @@ SNAPSHOT_NAMES = {
     'g2b-award-fields-open': 'g2b-award-fields-open.json',
     'rfp-clauses': 'rfp-clauses.json',
     'rfp-coverage-index': 'rfp-coverage-index.json',
+    'qualification-review': 'qualification-review.json',
     'investment-opportunities': 'investment-opportunities.json',
     'year-end-local-budget': 'year-end-local-budget.json',
     'kimse-deep-audit': 'kimse-deep-audit.json',
