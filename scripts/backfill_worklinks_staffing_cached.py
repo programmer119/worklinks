@@ -15,6 +15,8 @@ import re
 import sqlite3
 import time
 import zlib
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 
 from refresh_worklinks_rfp import (
     STAFFING_ROLE_SCAN_VERSION,
