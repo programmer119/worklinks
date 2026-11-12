@@ -5,6 +5,7 @@ Only records actually observed after installation; historical totals remain hist
 A 'cache_hit' is never counted as a fresh upstream HTTP call.
 """
 import datetime as dt
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -59,10 +60,15 @@ class CallLedger:
                 source_revision TEXT NOT NULL DEFAULT ''
             )''')
 
+    @contextmanager
     def _connect(self):
         conn=sqlite3.connect(str(self.path),timeout=30)
         conn.execute('PRAGMA busy_timeout=30000')
-        return conn
+        try:
+            yield conn
+            conn.commit()
+        finally:
+            conn.close()
 
     def record(self,kind,request_key,outcome,*,notice_key=None,
                http_status=None,response_sha256=None,error_class=None,detail=None):
