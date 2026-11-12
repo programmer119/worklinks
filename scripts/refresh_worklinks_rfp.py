@@ -820,6 +820,114 @@ def parse_clauses(text):
         snippets.append({'topic':match,'text':clean})
         if len(snippets)>=16:break
     return triggers,snippets
+
+# A separate, source-grounded staffing scan. Qualification snippets alone miss
+# tables such as "직무 / 등급 / 인원" and wrapped DOCX/PDF/HWPX rows.
+STAFFING_ROLE_SCAN_VERSION=1
+STAFFING_ROLE_TEXT_LIMIT=350_000
+_STAFF_ROLE=re.compile(
+    r'(?<![가-힣A-Za-z0-9])(?:사업\s*책임자|총괄\s*책임자|프로젝트\s*관리자|'
+    r'프로젝트\s*리더|PM\b|PL\b|DBA\b|QA\b|'
+    r'프론트\s*엔드\s*개발자|백\s*엔드\s*개발자|웹\s*개발자|'
+    r'소프트웨어\s*개발자|시스템\s*개발자|개발자|'
+    r'시스템\s*운영자|운영\s*인력|운영자|유지\s*보수\s*인력|'
+    r'시스템\s*엔지니어|기술\s*지원\s*인력|기술자|'
+    r'정보\s*보안\s*담당자|보안\s*담당자|데이터\s*분석가|'
+    r'품질\s*관리자|테스터|디자이너|퍼블리셔)'
+    r'(?![가-힣A-Za-z0-9])', re.I)
+_STAFF_HEADER=re.compile(
+    r'(?:인원|인력|투입\s*인원|인원\s*수|인원\s*계획)'
+    r'.{0,45}(?:직무|역할|직종|등급|구분|분야)|'
+    r'(?:직무|역할|직종|등급|구분|분야).{0,45}'
+    r'(?:인원|인력|투입\s*인원|인원\s*수)', re.I)
+_STAFF_COUNT=re.compile(r'(?<!\d)([1-9]\d?)\s*(?:명|인)(?![가-힣A-Za-z])')
+_STAFF_TABLE_COUNT=re.compile(
+    r'(?<!\d)([1-9]\d?)(?!\d|\s*(?:MM|M/M|년|개월|일|건|회|원|%|호))', re.I)
+_STAFF_GRADE=re.compile(r'(?<![가-힣])(?:특급|고급|중급|초급)(?![가-힣])')
+_STAFF_MM=re.compile(r'(?<!\d)(\d{1,3}(?:\.\d{1,2})?)\s*(?:MM|M/M|맨먼스)\b', re.I)
+
+def extract_staffing_roles(text, filename, source_url='', excerpt_only=False):
+    """Extract explicit role/count pairs, including line-wrapped staffing tables.
+
+    No automatic summing of different roles, grades, documents, or alternative
+    staffing plans. An unsupported number is never assumed to be a headcount.
+    """
+    text=str(text or '')[:STAFFING_ROLE_TEXT_LIMIT]
+    lines=[' '.join(part.split())[:550] for part in text.splitlines()]
+    result=[]
+    seen=set()
+    header_at=-1000
+    def parse(fragment, lineno, table=False):
+        matches=list(_STAFF_ROLE.finditer(fragment))
+        if not matches:return
+        for n,match in enumerate(matches):
+            end=matches[n+1].start() if n+1<len(matches) else len(fragment)
+            span=fragment[match.start():end][:130]
+            tail=fragment[match.end():end][:100]
+            counted=_STAFF_COUNT.search(tail)
+            if not counted and table and len(span)<110:
+                counted=_STAFF_TABLE_COUNT.search(tail)
+            if not counted:continue
+            count=int(counted.group(1))
+            if count<1 or count>99:continue
+            role=' '.join(match.group(0).split())
+            grade=(_STAFF_GRADE.search(span) or _STAFF_GRADE.search(fragment[max(0,match.start()-12):match.start()]))
+            grade=grade.group(0) if grade else ''
+            onsite=('비상주' if re.search(r'비\s*상주',span) else
+                    '상주' if re.search(r'(?<!비)\s*상주',span) else '')
+            mm=_STAFF_MM.search(span)
+            kind='minimum' if re.search(r'(?:최소|이상|적어도)\s*$|'
+                                        r'(?<!미)\s*이상|(?:최소|이상).{0,10}'+re.escape(counted.group(0)),span) else 'specified'
+            key=(role.lower(),grade,count,onsite,kind)
+            if key in seen:continue
+            seen.add(key)
+            result.append({'role':role,'grade':grade,'count':count,
+                           'countKind':kind,'onsite':onsite,
+                           'manMonths':float(mm.group(1)) if mm else None,
+                           'sourceFile':str(filename or '')[:140],
+                           'sourceUrl':source_url if str(source_url).startswith('https://www.g2b.go.kr/') else '',
+                           'sourceLine':lineno,'sourceText':fragment[:240],
+                           'scope':'excerpt' if excerpt_only else 'document'})
+            if len(result)>=20:return
+    for idx,line in enumerate(lines):
+        if idx>=STAFFING_ROLE_TEXT_LIMIT//2 or len(result)>=20:break
+        if _STAFF_HEADER.search(line):header_at=idx
+        if not _STAFF_ROLE.search(line):continue
+        table=idx-header_at<=18
+        before=len(result)
+        parse(line,idx+1,table)
+        if len(result)>before or not table:continue
+        # DOCX/HWPX table cells and PDF extraction can emit role, grade, count
+        # as separate short lines. Never span across another role or heading.
+        parts=[line]
+        for extra in lines[idx+1:idx+4]:
+            if len(extra)>38 or _STAFF_ROLE.search(extra) or _STAFF_HEADER.search(extra):
+                break
+            parts.append(extra)
+            combined=' | '.join(parts)
+            previous=len(result)
+            parse(combined,idx+1,True)
+            if len(result)>previous:break
+    return result
+
+def staffing_from_saved_excerpts(file):
+    """Best-effort recovery from stored 270-char quotes; NOT a full text scan."""
+    if not isinstance(file,dict):return []
+    clauses=file.get('clauseCandidates') or []
+    output=[]
+    seen=set()
+    for clause in clauses:
+        if not isinstance(clause,dict):continue
+        text=str(clause.get('sourceText') or '')
+        if not _STAFF_ROLE.search(text):continue
+        for item in extract_staffing_roles(text,file.get('name') or
+                                          clause.get('sourceFile') or '',
+                                          file.get('sourceUrl') or '',True):
+            key=(item['role'].lower(),item['grade'],item['count'],item['onsite'])
+            if key not in seen and len(output)<20:
+                seen.add(key);output.append(item)
+    return output
+
 def extract_rule_candidates(text,filename):
     """Capture cited clauses without silently truncating long HWPX paragraphs.
 
@@ -1336,6 +1444,7 @@ def process(no,ordn,metadata=None,previous=None):
                 raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
+            staffing_roles=extract_staffing_roles(content,name,url)
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
             record.update({'readable':True,'textChars':len(content),
                            **scan,
@@ -1346,6 +1455,9 @@ def process(no,ordn,metadata=None,previous=None):
                            'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
                            'qualificationScanTruncated':len(content)>350_000,
                            'clauseCandidatesTruncated':False,
+                           'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
+                           'staffingRoleScanTruncated':len(content)>STAFFING_ROLE_TEXT_LIMIT,
+                           'staffingRoles':staffing_roles,
                            'topics':triggers,'snippets':snippets,
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
