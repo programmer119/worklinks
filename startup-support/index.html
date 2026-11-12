@@ -3531,7 +3531,8 @@ function jobRequirementEvidence(x){
  // A readable 100%-of-attachment index is an extraction success even if
  // the 74MB rolling detailed-cache omits this particular notice.
  const savedReadComplete=saved?.status==='text_extracted_requires_review'&&
-   saved?.complete===true&&Number(saved.documentCount)>0&&
+   saved?.complete===true&&saved?.scanComplete===true&&
+   Number(saved.documentCount)>0&&
    Number(saved.readableCount)===Number(saved.documentCount);
  const sourceReadComplete=fullScanComplete||savedReadComplete;
  const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
