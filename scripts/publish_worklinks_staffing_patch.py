@@ -36,6 +36,8 @@ def defensible_staffing_row(item):
         return True
     # Avoid annex numbers, year-of-experience values, MM and evaluation scores.
     # A tabular bare integer requires role, grade and 3 pipe-delimited cells.
+    if re.fullmatch(re.escape(role)+r'\s+(?:특급|고급|중급|초급)\s+'+str(count),text):
+        return True
     if len(text)>110 or text.count('|')<2 or re.search(r'경력|별지|서식|항목|번호|평가|점|년',text):
         return False
     segments=[x.strip() for x in text.split('|')]
