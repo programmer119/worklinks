@@ -429,6 +429,16 @@
 /* Bid evidence is a scan aid, not the main sentence of the card.
    Never clamp title, decision reasoning or required follow-up evidence. */
 #jobCards .job-highlights{gap:5px 6px}
+/* Keep the research priority in the same right-hand column on every card. */
+#jobCards .job-highlights{display:grid;grid-template-columns:minmax(0,1fr) 265px;align-items:start;column-gap:8px}
+#jobCards .job-highlight-tags{display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px;min-width:0}
+#jobCards .job-highlights .job-advantage{grid-column:2;grid-row:1;display:grid;grid-template-columns:13px minmax(0,1fr);column-gap:6px;align-items:center;justify-self:start;margin:0;min-width:0}
+#jobCards .job-highlights .advantage-pills{display:flex;flex-direction:column;gap:2px;grid-column:1;grid-row:1/3;align-self:center}
+#jobCards .job-highlights .advantage-pill{display:block;width:12px;height:7px;background:#e2e8f0;border-radius:4px}
+#jobCards .job-highlights .advantage-pill.is-filled{background:currentColor}
+#jobCards .job-highlights .advantage-label{grid-column:2;grid-row:1;font-size:12px;line-height:1.3}
+#jobCards .job-highlights .advantage-reason{grid-column:2;grid-row:2;line-height:1.3;margin:0;min-width:0}
+@media(max-width:680px){#jobCards .job-highlights{grid-template-columns:minmax(0,1fr) 185px;column-gap:6px}#jobCards .job-highlights .advantage-reason{font-size:10px}}
 #jobCards .job-highlights .job-advantage{
  flex:0 1 auto;min-width:0;gap:3px 5px
 }
@@ -436,7 +446,7 @@
  flex:0 1 auto;max-width:100%;color:#526174;
  overflow-wrap:anywhere
 }
-#jobCards .job-highlights>.tag,#jobCards .job-highlights>.job-repeat{min-height:23px;padding:3px 6px}
+#jobCards .job-highlight-tags>.tag,#jobCards .job-highlight-tags>.job-repeat{min-height:23px;padding:3px 6px}
 #jobCards .job-verdict-row .job-verdict-why{order:1}
 #jobCards .job-verdict-row .job-verdict-checks{order:2}
 @media(max-width:1100px){#jobCards.cards{grid-template-columns:1fr}}
@@ -444,7 +454,7 @@
  #jobCards .job-day{padding:8px 11px;font-size:15px}
  #jobCards .job-day .job-date{font-size:11px}
  #jobCards .job-core{padding:12px 11px;gap:8px}
- #jobCards .job-highlights .job-advantage{flex-basis:100%}
+ #jobCards .job-highlights .job-advantage{flex-basis:auto}
  #jobCards .job-mini .job-footer{flex-wrap:wrap}
  #jobCards .job-mini .job-meta-row{font-size:12px}
 }
@@ -2534,7 +2544,7 @@ function bidAdvantageMarkup(z,eligible){
  const t=bidAdvantageFromHistory(z);
  // Unverified historical advantage is blank, not a negative score.
  if(!t.level)return '';
- const n=t.level, chips=Array.from({length:n},()=>'<i class="advantage-pill"></i>').join('');
+ const n=t.level, chips=Array.from({length:3},(_,i)=>'<i class="advantage-pill'+(i<n?' is-filled':'')+'"></i>').join('');
  const note='과거 기록 기반 유리도 '+t.label+(n?' '+n+'/3칩':' · 미평가')+
   ' · '+t.reason+' · 현재 입찰 낙찰 가능성을 보장하지 않음';
  const brief=t.kind==='high'?'최근 2년 각 1~2개사 · 낙찰 사업자번호 상이':
@@ -4705,7 +4715,8 @@ function renderJobs(){
      }).join(' · ')+'</div>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
-    const highlights=basicBidMarkup(x)+repeat+competitionLabel+extras+opportunityMarkup;
+    const highlightTags=basicBidMarkup(x)+repeat+competitionLabel+extras;
+     const highlights=highlightTags||opportunityMarkup?'<div class="job-highlight-tags">'+highlightTags+'</div>'+opportunityMarkup:'';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+jobInstitutionBadges(x)+'</div>'+
