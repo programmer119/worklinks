@@ -140,6 +140,23 @@ def needs_hwpx_reader_retry(record):
                (Path(f.get('name') or '').suffix.lower() in ('.hwpx',''))
                for f in (record or {}).get('files') or [])
 
+def staffing_scan_pending(record):
+    """A prior qualification scan is not proof that roles/headcounts were scanned.
+
+    Return True only for reusable, readable attachments missing current staffing
+    provenance. An invalid/missing record is handled by ordinary RFP discovery.
+    """
+    if not isinstance(record,dict) or record.get('status')!='text_extracted_requires_review':
+        return False
+    files=[f for f in record.get('files') or [] if isinstance(f,dict)]
+    if not files:return False
+    if record.get('staffingRoleScanComplete') is True:return False
+    return any(f.get('readable') is True and
+               (int(f.get('staffingRoleScanVersion') or 0)<STAFFING_ROLE_SCAN_VERSION
+                or f.get('staffingRoleScanTruncated') is True)
+               for f in files)
+
+
 def reusable_rfp_extraction(record):
     """Reuse a sourced RFP scan; legal qualification review is a separate gate.
 
@@ -342,7 +359,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                 retry=needs_hwpx_reader_retry(cached)
                 if cached.get('reviewComplete') is True:continue
                 partially_retryable=partial_retry_due(cached,utc)
-                if reusable_rfp_extraction(cached) and not partially_retryable:
+                if (reusable_rfp_extraction(cached) and not partially_retryable
+                        and not staffing_scan_pending(cached)):
                     if (manifest_probe_out is not None and date and date>=today and
                             manifest_probe_due(cached,utc)):
                         last=str(cached.get('manifestCheckedAt') or cached.get('checkedAt') or '')
@@ -352,7 +370,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                         manifest_probe_out.append((rank,no,order))
                     continue
                 if (cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry
-                        and not cached.get('manifestChangePending')):
+                        and not cached.get('manifestChangePending') and
+                        not staffing_scan_pending(cached)):
                     try:
                         checked=dt.datetime.fromisoformat(str(cached.get('checkedAt','')).replace('Z','+00:00'))
                         if checked.tzinfo and (utc-checked).total_seconds()<24*3600:
@@ -369,7 +388,9 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                 # Do not confuse a lack of matching metadata with a rejection.
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
+                staff_missing=staffing_scan_pending(cached)
                 rank=(-2 if key in urgent and key in targets and temporal==0 else
+                      -1 if staff_missing and key in targets and temporal==0 else
                       -1 if key in backfill and temporal==0 else
                       -1 if partially_retryable and key in targets and temporal==0 else
                       0 if key in targets and temporal==0 else 1 if temporal==0 else
@@ -1797,7 +1818,7 @@ def main():
     results=dict(old)
     # Parse already-stored binaries first; an older record is never re-downloaded
     # just to populate the staffing column.
-    cached_staffing_upgrades=backfill_cached_staffing(results)
+    cached_staffing_upgrades=backfill_cached_staffing(results,max_files=96)
     if cached_staffing_upgrades:
         print('RFP_CACHED_STAFFING_REPARSED',cached_staffing_upgrades,flush=True)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
@@ -1817,7 +1838,8 @@ def main():
         cached_source=prior_index.get(key) or cached
         if (not (prior_index.get(key) or {}).get('manifestChangePending') and
                 not partial_retry_due(cached_source,now) and
-                (reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key)))):
+                (reusable_rfp_extraction(cached) or reusable_rfp_extraction(prior_index.get(key))) and
+                not staffing_scan_pending(cached_source)):
             print('RFP_REUSE_PREVIOUS_EXTRACTION',key)
             continue
         # A confirmed manifest change is more important than the old 6-hour
@@ -1826,8 +1848,8 @@ def main():
             try:
                 checked=dt.datetime.fromisoformat(cached.get('checkedAt','').replace('Z','+00:00'))
                 if (cached.get('classificationVersion')==CLASSIFICATION_VERSION and
-                        not needs_hwpx_reader_retry(cached) and checked.tzinfo and
-                        (now-checked).total_seconds()<6*3600):
+                        not needs_hwpx_reader_retry(cached) and not staffing_scan_pending(cached_source) and
+                        checked.tzinfo and (now-checked).total_seconds()<6*3600):
                     print('RFP_CACHE_HIT',key)
                     continue
             except (ValueError,TypeError):pass
