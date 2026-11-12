@@ -30,6 +30,7 @@ RFP_REPAIR_PERIOD = max(3600, int(os.environ.get('G2B_RFP_REPAIR_PERIOD', 3600))
 RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48))))
 # Local OCR repair uses only stored source URLs, no government metadata API calls.
 RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900)))
+RFP_OPEN_READER_VERSION='pdf-ocr-kor-300dpi-pdf-first-v2'
 RFP_OPEN_OCR_LIMIT = max(1, min(35, int(os.environ.get('G2B_RFP_OPEN_OCR_LIMIT', 20))))
 QUALIFICATION_PERIOD = max(3600, int(os.environ.get('G2B_QUALIFICATION_PERIOD', 3600)))
 QUALIFICATION_BATCH = max(1, min(300, int(os.environ.get('G2B_QUALIFICATION_BATCH', 120))))
@@ -297,6 +298,12 @@ def main():
         if not (SCRIPTS / 'refresh_worklinks_actionable.py').is_file():
             raise RuntimeError('pipeline_scripts_missing')
         state = read_state()
+        # Each new OCR reader version gets one immediate on-server repair pass.
+        # The file-level version gate prevents repeat downloads afterwards.
+        if state.get('rfpOpenReaderVersion') != RFP_OPEN_READER_VERSION:
+            state['rfpOpenReaderVersion'] = RFP_OPEN_READER_VERSION
+            state['rfpOpenRepair'] = {'status':'reader_version_changed_run_now',
+                                      'attemptEpoch':0}
         state['rfpRepairPreflight'] = repair_preflight()
         # After a new worker deployment, retry one previously failed repair
         # immediately ONLY when a fresh read-only preflight succeeds.
