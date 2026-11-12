@@ -1520,7 +1520,12 @@ def process(no,ordn,metadata=None,previous=None):
                 'alternatePdfEvidenceMode':'same_basename_not_proven_identical'}
             continue
         retained=reusable.get((name,url))
-        if retained:
+        # Qualification text can be reused ONLY if its separate staffing-table
+        # pass was completed as well. Older read-only qualification scans must
+        # reparse this official file (cached bytes if present, otherwise download).
+        if (retained and
+                int(retained.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+                retained.get('staffingRoleScanTruncated') is not True):
             saved_slots[position]=dict(retained)
             continue
         record={'name':name,'sourceUrl':url,'readable':False}
