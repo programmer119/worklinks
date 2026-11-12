@@ -135,4 +135,46 @@ assert not year_ns['_is_stale_eorder_reason']('2025년 긴급입찰 사유서',2
 assert not year_ns['_is_stale_eorder_reason']('2026년 긴급입찰 사유서',2027,2026)
 
 
+# v3: OCR more than the old 8-page cap, without silently clearing any
+# unrecognized image page.
+multi=PdfWriter()
+for _ in range(11):
+    p=multi.add_blank_page(width=595,height=842)
+    stream=DecodedStreamObject()
+    stream.set_data(b'q 0 0 1 rg 10 10 90 50 re f Q')
+    p[NameObject('/Contents')]=multi._add_object(stream)
+out=io.BytesIO();multi.write(out)
+with patch.object(rfp,'_ocr_pdf_page',return_value='입찰공고 등록 및 신고서 첨부 조건입니다.'):
+    recovered,details=rfp.extract_with_source_status('eleven-pages.pdf',out.getvalue())
+    assert details['ocrRecoveredPages']==11 and details['sourceComplete'] is True,details
+    assert details['unresolvedPages']==0
+assert rfp.MAX_PDF_OCR_PAGES>=11
+
+# Real valid PNG bytes are locally OCRed. No remote OCR/cloud/API.
+from PIL import Image
+fake_image=Image.new('RGB',(430,190),'white')
+png=io.BytesIO();fake_image.save(png,format='PNG')
+from types import SimpleNamespace
+with patch.object(rfp.subprocess,'run',return_value=SimpleNamespace(
+       returncode=0,stdout='과업심의 결과 확인 문서입니다.'.encode(),stderr=b'')) as tesseract:
+    image_text=rfp.extract('공고 과업심의결과서.PNG',png.getvalue())
+    assert '과업심의' in image_text
+    assert tesseract.call_args.args[0][0]=='tesseract'
+    assert tesseract.call_args.args[0][2]=='stdout'
+
+# Nested ZIPs: one additional level only, no unbounded recursion.
+import zipfile
+leaf=io.BytesIO()
+with zipfile.ZipFile(leaf,'w') as z:z.writestr('document.txt','입찰공고 첨부 사유서입니다.'.encode())
+middle=io.BytesIO()
+with zipfile.ZipFile(middle,'w') as z:z.writestr('inner.zip',leaf.getvalue())
+assert '입찰공고' in rfp.extract('outer.zip',middle.getvalue())
+top=io.BytesIO()
+with zipfile.ZipFile(top,'w') as z:z.writestr('middle.zip',middle.getvalue())
+try:
+    rfp.extract('outer.zip',top.getvalue())
+    raise AssertionError('nested ZIP recursion guard failed')
+except ValueError as ex:
+    assert str(ex)=='nested_archive_requires_review'
+
 print('WORKLINKS_PDF_OCR_422_SIBLING_REGRESSION=PASS')
