@@ -795,4 +795,41 @@ for(const [key,field] of [['contract','cntrctCnclsMthdNm'],['awardMethodCode','s
  ['awardMethod','sucsfbidMthdNm'],['awardFloorRate','sucsfbidLwltRate']])
  assert.ok(sourceCrawler.includes("'"+key+"':get('"+field+"')"),'crawler must retain '+field);
 
+
+// Thumbnail: role-specific headcounts are independent of on-site work location.
+// Hover/click must show exact role, headcount, cited text and source file.
+const reqFns=new Function('jobBidIdentity','rfpSnapshotByNotice','jobSearchRfpState',
+ 'jobListRfpState','changcomPrecheckByNotice','rfpSnapshotLoading','rfpSnapshotCheckedAt',
+ 'htmlEscape',part('function jobRequirementEvidence(x){','function jobDetailRequirementGrid(x){')+
+ 'return {jobRequirementEvidence,jobRequirementBadges};'
+)(
+ x=>({bidNo:x.noticeNumber,order:x.noticeOrder||'000'}),
+ new Map([['R26BK55555555:000',{
+  status:'text_extracted_requires_review',manifestComplete:true,
+  files:[{name:'인력계획.pdf',readable:true,sourceTextScanComplete:true,
+   qualificationScanTruncated:false,clauseCandidatesTruncated:false,
+   clauseCandidates:[
+    {type:'staff_proof',sourceText:'PM 1명, 개발자 2명, 디자이너 1명 투입 계획',sourceFile:'인력계획.pdf'},
+    {type:'staff_proof',sourceText:'상주 인력은 발주처에서 상시 근무하여야 한다.',sourceFile:'인력계획.pdf'}
+   ]}]
+ }]]),new Map(),new Map(),new Map(),false,'',x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')
+);
+const roleBid={noticeNumber:'R26BK55555555',noticeOrder:'000'};
+const rolesEvidence=reqFns.jobRequirementEvidence(roleBid);
+assert.equal(rolesEvidence.roles.status.key,'role_found');
+assert.equal(rolesEvidence.roles.items.length,3);
+assert.ok(rolesEvidence.roles.items.some(x=>x.role==='PM 1명'));
+assert.ok(rolesEvidence.roles.items.some(x=>x.role==='개발자 2명'));
+assert.ok(rolesEvidence.roles.items.some(x=>x.role==='디자이너 1명'));
+assert.ok(rolesEvidence.roles.lines.includes('출처: 인력계획.pdf'));
+assert.ok(rolesEvidence.onsite.lines.every(x=>!x.startsWith('역할별 인원:')),
+ 'onsite hover must never include unrelated role counts');
+const roleMarkup=reqFns.jobRequirementBadges(roleBid);
+assert.ok(roleMarkup.includes('data-job-requirement="roles"'),'separate role badge');
+assert.ok(roleMarkup.includes('data-requirement="roles"'),'roles get separate hover placement');
+assert.ok(roleMarkup.includes('역할별 인원')&&roleMarkup.includes('개발자 2명'));
+assert.ok(source.includes('.job-req-item[data-requirement="roles"] .job-req-tip'));
+assert.ok(source.includes('e.roles.items.map(v=>v.role)'),'detail view also separates roles');
+console.log('Worklinks thumbnail role-count vs onsite evidence separation PASS');
+
 console.log('Worklinks job regression: deadlines, scope, qualification, bid-method metadata PASS');
