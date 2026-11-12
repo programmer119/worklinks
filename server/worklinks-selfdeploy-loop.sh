@@ -67,8 +67,10 @@ sync_standard_daily(){
  log B123_OFFLINE_TEST_COMPLETE
  dk run --rm --network host \
    -e G2B_STANDARD_DB=/app/data/g2b-standard.sqlite3 \
+   -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
    -e G2B_STANDARD_KEY_PATH=/run/secrets/g2b-standard.env \
    -v "$ROOT/server/g2b-standard-worker.py:/app/g2b-standard-worker.py:ro" \
+   -v "$ROOT/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
    -v "$BASE/secrets/g2b-standard.env:/run/secrets/g2b-standard.env:ro" \
    -v "$BASE/data:/app/data" \
    python:3.11-alpine python -u /app/g2b-standard-worker.py \
