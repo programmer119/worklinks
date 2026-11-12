@@ -17,6 +17,82 @@ const part=(from,to)=>{
  assert.ok(a>=0&&b>a,'missing source section '+from);
  return source.slice(a,b);
 };
+// Public jobs and AuthHub-gated Changcom use the same saved DB without
+// leaking either tab's filters, search or qualified-company context.
+assert.ok(source.includes('data-view="changcom">공공입찰·창컴협업</button>'));
+assert.ok(source.includes('data-view="jobs">일반 일감</button>'));
+assert.ok(!/<button[^>]*data-jobf="partner"/.test(source),
+ 'Changcom must not remain a nested job filter');
+assert.equal((source.match(/id="jobCards"/g)||[]).length,1,
+ 'Both top-level workspaces must share the same notice grid, not duplicate data');
+assert.ok(source.includes('id="changcomJobFilters"')&&source.includes('id="generalJobFilters"'));
+assert.ok(source.includes('.partner-jobs-only{display:none!important}'));
+assert.ok(source.includes('.general-jobs-only{display:none!important}'));
+const navClass=active=>{
+ const values=new Set(active?['on']:[]);
+ return {add:x=>values.add(x),remove:x=>values.delete(x),
+  contains:x=>values.has(x),toggle:(x,on)=>on?values.add(x):values.delete(x)};
+};
+const navElement=active=>({classList:navClass(active),dataset:{},value:'',textContent:'',
+ hidden:false,setAttribute:function(k,v){this[k]=v}});
+const navNodes={supportView:navElement(true),jobsView:navElement(),salesView:navElement(),
+ jobListTitle:navElement(),jobSearchLabel:navElement(),jobSort:navElement(),
+ jobQuickSearch:navElement(),jobSearchClear:navElement(),jobSearchStatus:navElement()};
+const navTabs=['support','changcom','jobs','sales'].map(k=>
+ Object.assign(navElement(k==='support'),{dataset:{view:k}}));
+const navDocument={
+ getElementById:id=>navNodes[id]||null,
+ querySelectorAll:sel=>sel.includes('.workspace-tab[data-view]')?navTabs:
+  sel==='.workspace-view'?[navNodes.supportView,navNodes.jobsView,navNodes.salesView]:
+  sel.includes('#jobSort option')?[navElement(),navElement()]:[]
+};
+const navLocation={href:'https://example.com/startup-support/?view=support'};
+const navHistory={state:null,replaceState:(state,title,url)=>{
+ navLocation.href='https://example.com'+url;
+}};
+let accessGranted=true;
+const navFactory=new Function('document','window','history','location','localStorage',
+ 'worklinksPartnerAccess','requestAnimationFrame','scheduleJobsRender',
+ 'startJobsDataWhenVisible','jobPageStep','jobRunRemoteSearch',
+ [
+ 'let workspaceActiveView="support",jobFilter="all",jobGeneralFilter="all";',
+ 'let jobPartnerVerdictFilter="all",jobVerdictFilter="all",jobPartnerShowClosed=false;',
+ 'let jobSortByWorkspace={jobs:"deadline",changcom:"qualified"};',
+ 'let jobSearchByWorkspace={jobs:"",changcom:""},requestedPartnerViewOnAuth=false;',
+ 'let jobRenderDirty=false,jobsFirstPaintScheduled=false;',
+ 'let jobSearchText="",jobSearchRemote=[],jobSearchServerTotal=null;',
+ 'let jobSearchSerial=0,jobSearchTimer=null,jobSearchRfpState=new Map(),jobRenderLimit=100;'
+ ].join('\n')+
+ part('function worklinksIsChangcomView(){',
+      "window.addEventListener('worklinks:partner-access'")+
+ 'return {setWorkspaceView,state:()=>({workspaceActiveView,jobFilter,jobGeneralFilter,jobVerdictFilter,requestedPartnerViewOnAuth}),'+
+ 'setFilter:v=>jobFilter=v,setVerdict:v=>jobVerdictFilter=v};'
+);
+const nav=navFactory(navDocument,{location:navLocation},navHistory,navLocation,
+ {setItem:()=>{}},()=>accessGranted,()=>{},()=>{},()=>{},()=>100,()=>{});
+nav.setWorkspaceView('jobs');
+assert.equal(nav.state().jobFilter,'all');
+assert.equal(navNodes.jobSort.value,'deadline');
+nav.setFilter('sole');
+nav.setWorkspaceView('changcom');
+assert.equal(nav.state().jobFilter,'partner');
+assert.equal(navNodes.jobSort.value,'qualified');
+assert.equal(navNodes.jobsView.dataset.jobMode,'partner');
+assert.ok(navTabs[1].classList.contains('on'));
+assert.ok(navLocation.href.includes('view=changcom'));
+nav.setVerdict('ready');
+nav.setWorkspaceView('jobs');
+assert.equal(nav.state().jobFilter,'sole','general filter must survive Changcom visit');
+assert.equal(navNodes.jobsView.dataset.jobMode,'general');
+nav.setWorkspaceView('changcom');
+assert.equal(nav.state().jobVerdictFilter,'ready','partner verdict survives general visit');
+accessGranted=false;
+nav.setWorkspaceView('jobs');
+nav.setWorkspaceView('changcom');
+assert.equal(nav.state().workspaceActiveView,'jobs','guest cannot open partner workspace');
+assert.equal(nav.state().requestedPartnerViewOnAuth,true);
+console.log('Worklinks separate Changcom top-level navigation and auth gate PASS');
+
 const time=new Function(
  'function kstNow(){return new Date(Date.UTC(2026,9,12,10,0))};'+
  "function kstISO(){return '2026-10-12'};"+
