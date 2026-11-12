@@ -1490,6 +1490,90 @@ def process(no,ordn,metadata=None,previous=None):
             'manifestSignature':official_manifest_signature(data),
             'manifestCheckedAt':dt.datetime.now(dt.timezone.utc).isoformat(),
             'manifestChangePending':False}
+
+def staffing_summary(item):
+    """Bounded, per-notice role evidence in the cumulative lightweight index."""
+    files=(item or {}).get('files') or []
+    seen=set()
+    rows=[]
+    for f in files:
+        if not isinstance(f,dict):continue
+        sources=f.get('staffingRoles')
+        if not isinstance(sources,list):
+            sources=staffing_from_saved_excerpts(f)
+        for row in sources:
+            if not isinstance(row,dict):continue
+            count=row.get('count')
+            try:count=int(count)
+            except (TypeError,ValueError):continue
+            if not 1<=count<=99:continue
+            role=str(row.get('role') or '').strip()
+            if not _STAFF_ROLE.fullmatch(role):continue
+            grade=str(row.get('grade') or '')[:12]
+            onsite=str(row.get('onsite') or '')[:12]
+            signature=(role.lower(),grade,count,onsite,
+                       str(row.get('countKind') or 'specified'))
+            if signature in seen:continue
+            seen.add(signature)
+            output={
+              'role':role,'grade':grade,'count':count,
+              'countKind':str(row.get('countKind') or 'specified')[:12],
+              'onsite':onsite,
+              'manMonths':row.get('manMonths'),
+              'sourceFile':str(row.get('sourceFile') or f.get('name') or '')[:140],
+              'sourceLine':int(row.get('sourceLine') or 0),
+              'sourceText':str(row.get('sourceText') or '')[:240],
+              'scope':str(row.get('scope') or 'excerpt')[:12]}
+            url=str(row.get('sourceUrl') or '')
+            if url.startswith('https://www.g2b.go.kr/'):
+                output['sourceUrl']=url
+            rows.append(output)
+            if len(rows)>=24:return rows
+    return rows
+
+def backfill_cached_staffing(records, max_files=24):
+    """Reparse verified local attachment bytes only; NEVER make an HTTP call.
+
+    Old detailed records without stored full text may retain quote-only
+    staffing evidence, explicitly marked scope='excerpt'. The persisted ledger
+    is optional; a missing binary is not a reason to download it again.
+    """
+    ledger=active_rfp_ledger()
+    parsed=0
+    for key,notice in sorted(records.items(),key=lambda entry:
+                             str((entry[1] or {}).get('checkedAt') or ''),
+                             reverse=True):
+        if not isinstance(notice,dict):continue
+        for f in notice.get('files') or []:
+            if not isinstance(f,dict) or f.get('readable') is not True:continue
+            if int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION:continue
+            name=str(f.get('name') or '')
+            url=str(f.get('sourceUrl') or '')
+            raw=None
+            if (ledger and parsed<max_files and
+                    url.startswith('https://www.g2b.go.kr/') and
+                    f.get('sourceSha256')):
+                raw=ledger.get_bytes(cache_key('official_attachment',url),
+                                     max_age_seconds=7*24*3600)
+                if raw and hashlib.sha256(raw).hexdigest()!=f['sourceSha256']:
+                    raw=None
+            if raw:
+                try:
+                    extracted,evidence=extract_with_source_status(name,raw)
+                    content=normalize_extracted_text(extracted)
+                    if not evidence.get('sourceComplete'):
+                        raise ValueError('cached_source_scan_incomplete')
+                    f['staffingRoles']=extract_staffing_roles(content,name,url)
+                    f['staffingRoleScanVersion']=STAFFING_ROLE_SCAN_VERSION
+                    f['staffingRoleScanTruncated']=len(content)>STAFFING_ROLE_TEXT_LIMIT
+                    parsed+=1
+                except Exception:
+                    # The original successful RFP qualification scan remains valid.
+                    f['staffingRoles']=staffing_from_saved_excerpts(f)
+            elif 'staffingRoles' not in f:
+                f['staffingRoles']=staffing_from_saved_excerpts(f)
+    return parsed
+
 def compact_coverage(item):
     """Keep cross-run scan provenance for every bid, not capped at 240.
 
@@ -1523,6 +1607,13 @@ def compact_coverage(item):
             'clauseCandidateCount':len(f.get('clauseCandidates') or [])
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
     }
+    compact['staffingRoles']=staffing_summary(item)
+    compact['staffingRoleScanComplete']=bool(
+        item.get('manifestComplete') is True and compact['files'] and
+        all(f.get('readable') is True and
+            int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+            f.get('staffingRoleScanTruncated') is not True
+            for f in (item.get('files') or [])))
     for field in ('manifestSignature','manifestCheckedAt',
                   'manifestChangePending','manifestPendingSignature',
                   'manifestBaselineUnverified'):
@@ -1632,6 +1723,11 @@ def main():
     manifest_probes=[]
     selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes)
     results=dict(old)
+    # Parse already-stored binaries first; an older record is never re-downloaded
+    # just to populate the staffing column.
+    cached_staffing_upgrades=backfill_cached_staffing(results)
+    if cached_staffing_upgrades:
+        print('RFP_CACHED_STAFFING_REPARSED',cached_staffing_upgrades,flush=True)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
     # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
     for key,prior in results.items():
@@ -1716,10 +1812,29 @@ def main():
     if DEST.stat().st_size>MAX_PUBLISHED_RFP_BYTES:
         raise SystemExit('RFP_DETAIL_SNAPSHOT_FILE_TOO_LARGE')
     coverage=dict(prior_index)
+    # Legacy cumulative rows can retain cited staffing snippets even if their
+    # large rolling detail is no longer available. Do not mark the scan complete.
+    for key,legacy in coverage.items():
+        if not isinstance(legacy,dict) or legacy.get('staffingRoles'):continue
+        references=((legacy.get('changcomClauseEvidence') or {})
+                    .get('clauseCandidates') or {}).get('staff_proof') or []
+        saved=[]
+        for ref in references:
+            if not isinstance(ref,dict):continue
+            quoted={'name':ref.get('sourceFile') or '',
+                    'sourceUrl':ref.get('url') or '',
+                    'clauseCandidates':[{'sourceText':ref.get('text') or ''}]}
+            saved.extend(staffing_from_saved_excerpts(quoted))
+        if saved:legacy['staffingRoles']=saved[:24]
+        legacy.setdefault('staffingRoleScanComplete',False)
     for key,item in results.items():
         if not isinstance(item,dict):continue
         update=compact_coverage(item)
         prev=coverage.get(key) or {}
+        if (not update.get('staffingRoles') and prev.get('staffingRoles') and
+                item.get('status')!='text_extracted_requires_review'):
+            update['staffingRoles']=prev['staffingRoles']
+            update['staffingRoleScanComplete']=False
         if key in failed_refresh:
             update['lastAttemptStatus']=failed_refresh[key]
             update['lastAttemptAt']=now.isoformat()
