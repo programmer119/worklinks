@@ -1442,6 +1442,13 @@ async function g2bLoadCrawlStatus(){
 function g2bCardFromServer(x){
  if(!x||!x.bidNo)return null;
  const id='g2b-'+x.kind+'-'+x.bidNo+'-'+x.order;
+ const lic=x.bidEligibility;
+ const requirements=lic?.ok===true&&lic?.complete===true&&Array.isArray(lic.requirements)?
+  lic.requirements.filter(r=>r&&String(r.name||'').trim()):[];
+ const savedCondition=requirements.length?
+  '공식 업종·면허 조회: '+requirements.map(r=>String(r.name||'')).slice(0,8).join(' / ')+
+  ' · 그 외 원문 조건·인력·실적은 별도 검토':
+  '참가자격 세부요건 저장 기록 없음 · 공식 원문 확인 필요';
  return {id,entry:'business',type:'나라장터 · DB 저장',title:x.title||'(제목 없음)',
   startAt:x.posted||'',endAt:x.closes||'',state:x.state||'',noticeNumber:x.bidNo,noticeOrder:x.order,kind:x.kind,repeatHistory:Array.isArray(x.repeatHistory)?x.repeatHistory:[],
   contract:x.contract||'',awardMethodCode:x.awardMethodCode||'',
@@ -1451,8 +1458,8 @@ function g2bCardFromServer(x){
   period:x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요',
   amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',
   reason:'나라장터 공식 API에서 자동 수집 후 서버123 DB에 저장한 SW·DB·AI 관련 후보',
-  condition:'참가자격 세부요건 미수집 · 공고 원문 및 첨부문서 필요',
-  partnerBidMode:'허용 방식 미수집',
+  condition:savedCondition,
+  partnerBidMode:'공동수급 허용 여부는 별도 공식 원문 확인 필요',
   partnerScope:'SW·데이터·AI 관련 제목 또는 발주품목 후보',partnerVerified:false};
 }
 var g2bLinkedEligibility=null;
@@ -3128,7 +3135,7 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
- document.getElementById('jobDetailBody').innerHTML=base+reviewNote+docLinks+
+ document.getElementById('jobDetailBody').innerHTML=base+reviewNote+savedResearchMarkup(x)+docLinks+
   (extractHTML?'<details class="job-detail-advanced"><summary>RFP 원문 발췌·검토 내용 보기</summary>'+extractHTML+'</details>':'')+
   '<section class="job-detail-section"><h3>공식 개찰·낙찰·계약 이력</h3>'+standardBidMarkup(x)+'</section>'+
   '<details class="job-detail-advanced"><summary>공고 변경·기초금액 조회</summary>'+bidChangePriceMarkup(x)+'</details>'+variantLinks+actions;
@@ -3199,6 +3206,45 @@ function jobCollectionFlags(x){
  const statuses=[{label:'업종·면허',state:licenceStatus},{label:'추가정보',state:extraStatus},
                  {label:'첨부·원문',state:rfpStatus}];
  return {statuses,done:statuses.filter(t=>t.state==='done').length};
+}
+function savedResearchMarkup(x){
+ if(!jobSearchText)return '';
+ const bid=jobBidIdentity(x);if(!bid)return '';
+ const key=bid.bidNo+':'+bid.order;
+ const stored=jobSearchRfpState.get(key);
+ const license=bidEligibilityCache.get(key);
+ const extra=g2bSupplementalCache.get(key);
+ const groups=[];
+ if(license?.ok===true&&license?.complete===true){
+  const requirements=Array.isArray(license.requirements)?license.requirements:[];
+  groups.push('<section class="job-detail-section"><h3>저장된 공식 업종·면허 조사</h3>'+
+   (requirements.length?requirements.slice(0,12).map(v=>
+    '<p><strong>'+htmlEscape(v.name||'업종')+'</strong>'+
+    (Array.isArray(v.codes)&&v.codes.length?' · '+htmlEscape(v.codes.join(', ')):'')+'</p>').join(''):
+    '<p>공식 응답 완료 · 등록업종 목록 0건 (입찰 제한 없음으로 단정 불가)</p>')+
+   '<p class="job-detail-secondary">업종 조회 결과이며, 실제 입찰자격 적격판정은 아닙니다.</p></section>');
+ }
+ const excerpts=Array.isArray(stored?.excerpts)?stored.excerpts:[];
+ if(excerpts.length){
+  const labels={industry_code:'업종·면허',direct_production:'직접생산',sme_certificate:'기업규모',
+   performance_proof:'실적',staff_proof:'인력·재직',region_restriction:'지역',
+   joint_participation:'공동수급',submission_required:'제출서류',
+   eligibility_cutoff:'기준일',legal_exclusion:'제한',bid_security:'입찰보증'};
+  groups.push('<section class="job-detail-section"><h3>공식 첨부문서에서 실제 추출된 문구</h3>'+
+   '<p>저장된 원문 발췌 '+excerpts.length+'개 · 문서 판독 '+Number(stored.readableCount||0)+'/'+Number(stored.documentCount||0)+'개</p>'+
+   excerpts.slice(0,10).map(v=>'<div class="job-match-row">'+
+    '<div class="job-match-main"><strong>'+htmlEscape(labels[v.type]||'원문 문구')+'</strong>'+
+    '<p>'+htmlEscape(v.text||'')+'</p>'+
+    '<small>출처: '+htmlEscape(v.sourceFile||'공식 첨부문서')+'</small></div></div>').join('')+
+   '<p class="job-detail-secondary">자동 추출한 문구입니다. 적용 여부는 원문에서 최종 확인해야 합니다.</p></section>');
+ }
+ if(extra?.ok===true&&extra?.complete===true){
+  groups.push('<section class="job-detail-section"><h3>추가정보 조회</h3>'+
+   '<p>공식 추가정보 응답이 정상 저장돼 있습니다. 상세 조건은 원문을 확인하세요.</p></section>');
+ }
+ if(!groups.length)groups.push('<section class="job-detail-section"><h3>실제 수집된 상세자료</h3>'+
+  '<p>검색된 공고의 상세 조사 결과는 아직 저장돼 있지 않습니다. 공고 기본정보만 있습니다.</p></section>');
+ return groups.join('');
 }
 function jobCollectionMarkup(x){
  if(!jobSearchText)return '';
