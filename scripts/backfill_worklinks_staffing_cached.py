@@ -77,7 +77,7 @@ def uniq_roles(rows):
     return result
 
 def run(index_path, detail_path, ledger_path, patch_path, report_path,
-        max_files=120, max_seconds=700):
+        max_files=120, max_seconds=700, priority_only=False):
     started=time.monotonic()
     snapshot=read_json(index_path,{})
     index=snapshot.get('byNotice') or {}
@@ -91,6 +91,7 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
     missing_sha=0
     for key,row in index.items():
         if not isinstance(row,dict):continue
+        if priority_only and key not in PRIORITY:continue
         if row.get('status')!='text_extracted_requires_review':continue
         if row.get('staffingRoleScanComplete') is True:continue
         eligible_records+=1
@@ -272,8 +273,9 @@ def main():
     p.add_argument('--report',required=True,type=Path)
     p.add_argument('--max-files',type=int,default=120)
     p.add_argument('--max-seconds',type=int,default=700)
+    p.add_argument('--priority-only',action='store_true')
     a=p.parse_args()
     run(a.index,a.detail,a.ledger,a.patch,a.report,
-        max(1,min(a.max_files,500)),max(20,min(a.max_seconds,1800)))
+        max(1,min(a.max_files,500)),max(20,min(a.max_seconds,1800)),a.priority_only)
 
 if __name__=='__main__':main()
