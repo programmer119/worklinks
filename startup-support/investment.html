@@ -16,8 +16,10 @@ main{max-width:1200px;margin:auto;padding:22px 18px 65px}a{color:#215e98}header{
 .empty{padding:24px;background:#fff;border:1px dashed #b8c5d6;border-radius:12px;color:#63748b}.section-note{font-size:12px;color:#617087}
 @media(max-width:720px){main{padding:13px 11px 36px}.hero{padding:20px}.hero h1{font-size:23px}.metrics{grid-template-columns:repeat(2,1fr);gap:7px}.metric{padding:13px}.cards,.sources{grid-template-columns:1fr}.controls>*{width:100%}}
 </style>  <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
+<link rel="stylesheet" href="./worklinks-header-auth.css?v=20261112-2">
+<style>header{flex-wrap:wrap}header #worklinks-auth-header{margin-left:auto}</style>
 </head>
-<body><main><header><a href="./?view=support" aria-label="WorkLinks 홈으로 이동">WorkLinks / 창업지원</a><a href="./?view=support">← 창업지원 목록</a></header>
+<body><main><header><a href="./?view=support" aria-label="WorkLinks 홈으로 이동">WorkLinks / 창업지원</a><a href="./?view=support">← 창업지원 목록</a><div id="worklinks-auth-header" class="worklinks-account-nav" aria-label="WorkLinks 계정"></div></header>
 <section class="hero"><small>WORKLINKS · INVESTMENT DISCOVERY</small><h1>투자유치 · 사회적기업 성장지원</h1><p>엔젤 · AC · VC · CVC · TIPS · IR 및 재단법인 밴드의 창업지원·공간·교육·PoC 공고를 직접 확인합니다. 자동 수집과 참고 링크를 구분하며, 공고의 신청자격은 첨부 원문 확인 전까지 확정하지 않습니다.</p></section>
 <div class="metrics">
 <div class="metric"><span>이번 실행에서 발견</span><strong id="countLive">—</strong></div>
@@ -67,4 +69,5 @@ fetch('https://api-suaveforge.suaveforge.com:18458/api/g2b/snapshot?name=investm
 .then(r=>r.ok?r:fetch('./investment-opportunities.json?cache='+Date.now(),{cache:'no-store'}))
 .then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{if(!Array.isArray(d.opportunities))throw Error('데이터 형식 오류');state=d;draw()}).catch(e=>{$('error').textContent='수집 목록 확인 실패: '+e.message;$('cards').innerHTML='<div class="empty">수집 데이터를 읽을 수 없습니다.</div>'});
 })();
-</script></body></html>
+</script><script type="module" src="./worklinks-header-auth.js?v=20261112-2"></script>
+</body></html>
