@@ -9,6 +9,7 @@ import hashlib
 import io
 import json
 import os
+import shutil
 import threading
 from pathlib import Path
 import re
@@ -32,6 +33,7 @@ except ModuleNotFoundError as exc:
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
+_DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
@@ -56,6 +58,9 @@ CHANGCOM_EVIDENCE_DEST=ROOT/'startup-support/changcom-rfp-evidence.json'
 CHANGCOM_BACKFILL60=ROOT/'startup-support/audits/changcom-rfp-backfill-60-20261110.json'
 CHANGCOM_URGENT_RECOVERY=ROOT/'startup-support/audits/changcom-priority-rfp-recovery-20261111.json'
 MAX_FILE=12_000_000
+# OCR is local-only and bounded to prevent runaway attachment processing.
+MAX_PDF_OCR_PAGES=8
+MAX_PDF_OCR_PIXELS=8_000_000
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
 # 3MB per member was rejecting real official documents before text extraction.
@@ -403,7 +408,120 @@ def legal_file(item):
     name=str(item.get('name') or '')[:160]
     lower=name.lower()
     return name,url
+class OfficialAttachmentReferenceMissing(ValueError):
+    """An official download URL is listed but the server denies its file ID."""
+
+
+def official_missing_reference(error):
+    """True only for a verified 422 JSON response from G2B."""
+    if not isinstance(error, urllib.error.HTTPError) or error.code != 422:
+        return False
+    try:
+        body=error.read(2048)
+        data=json.loads(body.decode('utf-8','replace'))
+        return (isinstance(data,dict) and data.get('ErrorCode')==-1
+                and data.get('ErrorMsg')=='파일이 존재하지 않습니다.')
+    except (OSError,ValueError,UnicodeError):
+        return False
+
+
+def _ocr_pdf_page(raw,index):
+    """Render one image-only page and OCR with installed local Korean Tesseract."""
+    if not shutil.which('tesseract'):
+        raise ValueError('pdf_ocr_engine_unavailable')
+    try:
+        import pymupdf
+    except ImportError as exc:
+        raise ValueError('pdf_ocr_renderer_unavailable') from exc
+    with pymupdf.open(stream=raw,filetype='pdf') as document:
+        page=document.load_page(index)
+        zoom=min(2.0,(MAX_PDF_OCR_PIXELS/max(1.0,page.rect.width*page.rect.height))**.5)
+        pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
+        if pix.width*pix.height>MAX_PDF_OCR_PIXELS:
+            raise ValueError('pdf_ocr_page_too_large')
+        png=pix.tobytes('png')
+    result=subprocess.run(
+        ['tesseract','stdin','stdout','-l','kor+eng','--psm','3'],
+        input=png,capture_output=True,timeout=22,check=False)
+    if result.returncode:
+        raise ValueError('pdf_ocr_engine_failed')
+    return result.stdout.decode('utf-8','replace')
+
+
+def _extract_pdf_with_audit(raw):
+    """Keep readable native pages; OCR only pages lacking native text."""
+    from pypdf import PdfReader
+    document=PdfReader(io.BytesIO(raw))
+    if len(document.pages)>220:raise ValueError('pdf_over_page_limit')
+    parts=[];missing=[];attempted=[];recovered=[];untouched_blanks=[]
+    for i,page in enumerate(document.pages):
+        try:
+            natural=page.extract_text() or ''
+        except Exception:
+            natural=''
+        if natural.strip():
+            parts.append(natural)
+            continue
+        has_content=page.get_contents() is not None
+        try:
+            has_images=bool(page.images)
+        except Exception:
+            has_images=True
+        if not has_content and not has_images:
+            untouched_blanks.append(i+1)
+            continue
+        if len(attempted)>=MAX_PDF_OCR_PAGES:
+            missing.append(i+1)
+            continue
+        attempted.append(i+1)
+        try:
+            value=_ocr_pdf_page(raw,i)
+        except (ValueError,subprocess.TimeoutExpired):
+            missing.append(i+1)
+            continue
+        # A short recognition artifact must not clear legal evidence.
+        if sum(c.isalnum() for c in value)<12:
+            missing.append(i+1)
+            continue
+        parts.append(value)
+        recovered.append(i+1)
+    text='\n'.join(parts)
+    info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
+          'ocrRecoveredPages':len(recovered),'unresolvedPages':missing[:30],
+          'genuinelyBlankPages':len(untouched_blanks),
+          'sourceComplete':not missing,
+          'extractionMethod':'pdf_native_ocr' if attempted else 'pdf_native'}
+    if not text.strip():
+        raise ValueError('pdf_ocr_incomplete' if missing else 'no_searchable_text')
+    return text,info
+
+
+def extract_with_source_status(name,raw):
+    """Record mixed PDF/OCR provenance including PDFs nested in a ZIP."""
+    previous=getattr(_DOCUMENT_SCAN,'pdf',None)
+    _DOCUMENT_SCAN.pdf=[]
+    try:
+        data=extract(name,raw)
+        pdf_stats=list(_DOCUMENT_SCAN.pdf)
+        complete=all(x.get('sourceComplete') is True for x in pdf_stats)
+        return data,{'sourceComplete':complete,'pdfFiles':len(pdf_stats),
+                     'pdfPages':sum(x['pdfPages'] for x in pdf_stats),
+                     'ocrAttemptedPages':sum(x['ocrAttemptedPages'] for x in pdf_stats),
+                     'ocrRecoveredPages':sum(x['ocrRecoveredPages'] for x in pdf_stats),
+                     'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
+                     'extractionMethod':'pdf_native_ocr' if
+                        any(x['ocrAttemptedPages'] for x in pdf_stats)
+                        else 'native'}
+    finally:
+        if previous is None:
+            try:del _DOCUMENT_SCAN.pdf
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.pdf=previous
+
+
 def classify_failure(error):
+    if isinstance(error,OfficialAttachmentReferenceMissing):
+        return 'official_attachment_reference_missing_422'
     if isinstance(error,urllib.error.HTTPError):
         return 'file_download_http_'+str(error.code)
     if isinstance(error,(TimeoutError,ConnectionError,urllib.error.URLError)):
@@ -413,7 +531,8 @@ def classify_failure(error):
            'pdf_over_100_pages','pdf_over_page_limit','pdf_unreadable_page','no_searchable_text','unsupported_format',
            'redirect_forbidden','oversize_json','egg_archive_requires_converter',
            'nested_archive_requires_review','unknown_archive_member_requires_review',
-           'archive_no_searchable_documents','unsafe_archive_path','large_xml_section')
+           'archive_no_searchable_documents','unsafe_archive_path','large_xml_section',
+            'pdf_ocr_incomplete','pdf_ocr_engine_unavailable','pdf_ocr_renderer_unavailable')
     return next((v for v in known if v in detail),'file_extract_failure')
 
 
@@ -466,6 +585,9 @@ def download(url):
                               http_status=getattr(ex,'code',None),
                               error_class=type(ex).__name__)
             if isinstance(ex,urllib.error.HTTPError):
+                if official_missing_reference(ex):
+                    raise OfficialAttachmentReferenceMissing(
+                        'official_attachment_reference_missing_422') from ex
                 retry=ex.code in (429,500,502,503,504)
             else:
                 retry=isinstance(ex,(TimeoutError,ConnectionError,urllib.error.URLError))
@@ -616,12 +738,10 @@ def extract(name,raw):
                 data.extend(paragraphs)
             return '\n'.join(data)
     if n.endswith('.pdf'):
-        from pypdf import PdfReader
-        pdf=PdfReader(io.BytesIO(raw))
-        if len(pdf.pages)>220:raise ValueError('pdf_over_page_limit')
-        pages=[page.extract_text() or '' for page in pdf.pages]
-        if any(not p.strip() for p in pages):raise ValueError('pdf_unreadable_page')
-        return '\n'.join(pages)
+        text,details=_extract_pdf_with_audit(raw)
+        attached=getattr(_DOCUMENT_SCAN,'pdf',None)
+        if attached is not None:attached.append(details)
+        return text
     raise ValueError('unsupported_format')
 def parse_clauses(text):
     text=re.sub(r'[\u200b\ufeff\x00]','',text)
@@ -1132,7 +1252,8 @@ def process(no,ordn,metadata=None,previous=None):
                 raw=download(url)
             finally:
                 _NOTICE_CONTEXT.notice_key=None
-            content=normalize_extracted_text(extract(name,raw))
+            extracted,source_evidence=extract_with_source_status(name,raw)
+            content=normalize_extracted_text(extracted)
             if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx')) else 100):
                 raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
@@ -1140,6 +1261,9 @@ def process(no,ordn,metadata=None,previous=None):
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
             record.update({'readable':True,'textChars':len(content),
                            **scan,
+                           'sourceTextScanComplete':scan.get('sourceTextScanComplete') is True and
+                                                    source_evidence['sourceComplete'],
+                           'extractionEvidence':source_evidence,
                            'sourceSha256':hashlib.sha256(raw).hexdigest(),
                            'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
                            'qualificationScanTruncated':len(content)>350_000,
@@ -1195,6 +1319,8 @@ def compact_coverage(item):
             'name':str(f.get('name') or '')[:160],
             'readable':f.get('readable') is True,
             'sourceSha256':str(f.get('sourceSha256') or '')[:64],
+            'alternatePdfEvidence':str(f.get('alternatePdfEvidence') or '')[:160],
+            'extractionEvidence':f.get('extractionEvidence') or {},
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
             'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
