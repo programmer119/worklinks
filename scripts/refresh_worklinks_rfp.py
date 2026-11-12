@@ -157,7 +157,8 @@ def staffing_effective_file_complete(file, files):
     if not isinstance(file, dict):return False
     # Generic nationwide contract-law archives are outside the project-specific
     # staffing scope; preserve their separate qualification extraction failure.
-    if staffing_general_annex_file(file.get('name')):return True
+    if (staffing_general_annex_file(file.get('name')) or
+            staffing_source_is_general_example(file.get('name'))):return True
     if (file.get('readable') is True and
             file.get('sourceTextScanComplete') is True and
             int(file.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
@@ -1755,9 +1756,13 @@ def compact_coverage(item):
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
             'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
-            'staffingScopeExcluded':staffing_general_annex_file(f.get('name')),
-            'staffingScopeReason':('일반 계약·입찰 규정 ZIP (사업별 투입인력 요건 아님)'
-                                  if staffing_general_annex_file(f.get('name')) else ''),
+            'staffingScopeExcluded':bool(
+                staffing_general_annex_file(f.get('name')) or
+                staffing_source_is_general_example(f.get('name'))),
+            'staffingScopeReason':(
+                '공통 입찰·계약 규정 또는 일반 낙찰기준 (사업별 인원요건 아님)'
+                if staffing_general_annex_file(f.get('name')) or
+                   staffing_source_is_general_example(f.get('name')) else ''),
             'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') is True,
             'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
             'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
