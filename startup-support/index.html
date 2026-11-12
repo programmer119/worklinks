@@ -2304,7 +2304,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.ge
    tender attachments, license alternatives, documentation and delivery rules have been verified. */
 var bidEligibilityCache=new Map(),activeDetailJobId=null,jobDetailPriorFocus=null,eligibilityLoading=new Set();
 function getJobById(id){
- const regular=jobs.concat(g2bLiveJobs).find(function(x){return x.id===id});
+ const regular=jobs.concat(g2bLiveJobs,jobSearchRemote).find(function(x){return x.id===id});
  if(regular)return regular;
  // Evidence-backed shortlist items can be shown before the paginated archive
  // reaches them; keep their detail view reachable via the normal card action.
@@ -3143,8 +3143,8 @@ function openJobDetail(id){
  const p=partners.find(function(p){return partnerIdsOfJob(x).includes(p.id)});
  // Company qualification data belongs in company management, not the tender detail.
  loadStandardBidEvidence(x);
- loadJobEligibility(x);
- loadJobEvidence(x);
+ // Search comparison must inspect SAVED results without initiating new upstream calls.
+ if(!jobSearchText){loadJobEligibility(x);loadJobEvidence(x)}
 }
 function closeJobDetail(){
  const m=document.getElementById('jobDetailModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');
@@ -3502,7 +3502,7 @@ function renderJobs(){
  }
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
- const raw=jobs.concat(g2bLiveJobs);
+ const raw=jobs.concat(g2bLiveJobs,jobSearchText?jobSearchRemote:[]);
  // Use the verified static index without fetching tender bodies or parsing RFP text.
  // Add a bounded set to the SAME standard card grid when server paging is incomplete.
  if(member&&changcomActionableData?.bids){
@@ -3612,14 +3612,17 @@ function renderJobs(){
  }else{
   const sort=document.getElementById('jobSort').value;
   const selectedCompany=filter==='partner'&&selectedPartnerId!=='all'?partners.find(p=>p.id===selectedPartnerId):null;
-  const scopeRows=(filter==='closed'?closed:active).filter(function(o){
+  const scopeRows=(jobSearchText?all.map(function(x){return {x,time:jobTimeInfo(x)}}):
+   filter==='closed'?closed:active).filter(function(o){
     const x=o.x;
     if(filter==='all'||filter==='closed')return true;
     if(filter==='partner')return jobMatchesSelectedPartner(x,selectedPartnerId);
     return x.entry===filter;
   });
   if(member)refreshVerdictFilters(scopeRows,selectedCompany);
-  let list=scopeRows.filter(o=>matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter));
+  let list=scopeRows.filter(o=>
+   matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&
+   (!jobSearchText||jobSearchMatches(o.x,jobSearchNormalized(jobSearchText))));
   list.sort(function(a,b){
     if(filter==='closed')return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
     if(sort==='qualified'){
@@ -3717,12 +3720,14 @@ function renderJobs(){
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        bidMethodCardMarkup(x)+
+       jobCollectionMarkup(x)+
        (member?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
        (highlights?'<div class="job-highlights">'+highlights+'</div>':'')+
        '<div class="job-footer">'+partner+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
        '</div></div></article>';
-  }).join(''):'<div class="emptycard">이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.</div>';
+  }).join(''):'<div class="emptycard">'+
+   (jobSearchText?'검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.':'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
  }
  if(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal){
   const progress=' · 현재 로드 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 기준 (더 보기 가능)';
