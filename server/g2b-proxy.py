@@ -704,6 +704,22 @@ def bid_extra_query(bid_no, order, collect=True):
         con.close()
     return result
 
+def _source_document_year(text):
+    """Extract explicit business document year, not the bidding notice number."""
+    years=[int(v) for v in re.findall(r'(?<!\\d)(20\\d{2})\\s*년',str(text or ''))]
+    years=[v for v in years if 2020<=v<=2039]
+    return max(years) if years else None
+
+
+def _is_stale_eorder_reason(name,latest_business_year):
+    """Skip only explicitly outdated e-order emergency-reason attachments."""
+    text=str(name or '')
+    if not latest_business_year or not re.search(r'긴급.*(?:입찰|발주|요청).*사유|긴급.*사유',text):
+        return False
+    years=[int(v) for v in re.findall(r'(?<!\\d)(20\\d{2})\\s*년',text)]
+    return bool(years and max(years)<latest_business_year)
+
+
 def bid_evidence_query(bid_no, order):
     """Four official A02 sources; include ordinary attachments beyond e-order."""
     regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
@@ -719,10 +735,24 @@ def bid_evidence_query(bid_no, order):
         if name or code:normalized_regions.append({'name':name,'code':code})
     normalized_attachments=[]
     seen_urls=set()
+    # The API may return e-order documents retained from earlier projects.
+    # Determine the current document year from all official names, then drop
+    # ONLY explicitly older emergency-reason attachments; keep unique RFPs.
+    all_names=[_pick(row,['atchFileNm','atchFileName','fileNm',
+                          'fileName','eorderAtchFileNm'])
+               for source in (ordinary,attachments) for row in source['items']]
+    all_names.extend(str(v.get('name') or '') for v in notice_docs['items'])
+    years=[_source_document_year(name) for name in all_names]
+    current_document_year=max((y for y in years if y),default=None)
+    skipped_outdated=[]
     for source,origin in ((ordinary,'notice_attachment_api'),(attachments,'eorder')):
         for row in source['items']:
             name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName','eorderAtchFileNm'])
             url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl','fileDownloadUrl','eorderAtchFileUrl'])
+            if origin=='eorder' and _is_stale_eorder_reason(name,current_document_year):
+                skipped_outdated.append({'name':name,'source':'eorder',
+                                         'reason':'past_project_year'})
+                continue
             # Only allow HTTPS links; download-time validation restricts host/path.
             if url and not re.match(r'^https://',url,re.I):url=''
             if url and url in seen_urls:continue
@@ -747,6 +777,8 @@ def bid_evidence_query(bid_no, order):
                        'count':len(normalized_attachments),'items':normalized_attachments,
                        'generalCount':ordinary['count'],
                        'eorderCount':attachments['count'],
+                       'skippedOutdatedEorderCount':len(skipped_outdated),
+                       'skippedOutdatedEorderItems':skipped_outdated[:12],
                        'noticeDetailDocumentCount':len(notice_docs['items']),
                        'rawFields':sorted(ordinary['items'][0].keys()) if ordinary['items']
                            else sorted(attachments['items'][0].keys()) if attachments['items'] else [],
