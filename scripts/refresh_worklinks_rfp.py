@@ -20,7 +20,15 @@ import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
 import zipfile
-from rfp_call_ledger import CallLedger, cache_key
+try:
+    from rfp_call_ledger import CallLedger, cache_key
+except ModuleNotFoundError as exc:
+    if exc.name!='rfp_call_ledger':raise
+    # importlib.spec_from_file_location/runpy do not put the source
+    # directory on sys.path, although this script's sibling is present.
+    import sys
+    sys.path.insert(0,str(Path(__file__).resolve().parent))
+    from rfp_call_ledger import CallLedger, cache_key
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
