@@ -3333,7 +3333,7 @@ function savedResearchMarkup(x){
  return out.join('');
 }
 
-/* Official document requirement summary. Do not treat "text not found" as "not required". */
+/* Absence of a requirement is conclusive only after every official attachment is read and scanned completely. */
 function jobRequirementEvidence(x){
  const id=jobBidIdentity(x);if(!id)return null;
  const key=id.bidNo+':'+id.order;
@@ -3358,10 +3358,14 @@ function jobRequirementEvidence(x){
  const scanFailed=tried&&(status!=='text_extracted_requires_review'||full?.manifestComplete===false||
    (Array.isArray(full?.files)&&full.files.some(f=>f.readable!==true||f.sourceTextScanComplete===false))||
    (saved?.documentCount>0&&saved.readableCount<saved.documentCount));
- const fullyReviewed=full?.reviewComplete===true&&full?.requiredConditionsComplete===true&&
+ // A complete machine scan is sufficient to report "requirement not detected".
+ // Manual reviewComplete flags are reserved for final eligibility judgements.
+ const fullScanComplete=full?.status==='text_extracted_requires_review'&&
    full?.manifestComplete===true&&Array.isArray(full.files)&&full.files.length>0&&
    full.files.every(f=>f.readable===true&&f.sourceTextScanComplete===true&&
      f.qualificationScanTruncated!==true&&f.clauseCandidatesTruncated!==true);
+ const fullyReviewed=fullScanComplete&&full.reviewComplete===true&&
+   full.requiredConditionsComplete===true;
  const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
  const insurance=/(?:4\s*대\s*(?:사회\s*)?보험|사대\s*보험|사회\s*보험\s*가입\s*(?:자|증명)|건강\s*보험\s*(?:자격득실|가입자명부)|고용\s*보험\s*가입\s*(?:증명|확인))/i;
  const onsite=/상주|현장\s*(?:근무|배치)|전담\s*근무/i;
@@ -3374,13 +3378,15 @@ function jobRequirementEvidence(x){
  function choice(positive,mentioned){
   if(positive)return {key:'required',label:'필요',reason:'공식 문서에서 요구 문구 확인 (대상·시점은 원문 확인)'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
-  if(mentioned.length&&mentioned.every(c=>negative.test(c.text))&&fullyReviewed)
-   return {key:'not_required',label:'필요없음',reason:'공식 문서 전체 검토 결과 해당 요건 없음 확인'};
-  if(!mentioned.length&&fullyReviewed)
-   return {key:'not_required',label:'필요없음',reason:'공식 문서 전체 검토 결과 해당 요건 없음 확인'};
+  if(fullScanComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
+   return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
+  if(fullScanComplete&&!mentioned.length)
+   return {key:'not_required',label:'필요없음',reason:'공식 원문·첨부 전체 정상 판독 · 요구 문구 미검출 (해당 문서 기준)'};
+  if(fullScanComplete)
+   return {key:'failed',label:'확인실패',reason:'관련 문구는 있으나 필수 요구 여부가 모호해 판정 보류'};
   return {key:'failed',label:'확인실패',reason:scanFailed?
-    'API 시도 후 일부 첨부 수집·판독 실패. 원문 재검증 필요':
-    'API 수집 후 해당 요건 확정 실패. 발췌 부족·조건 모호성·전체 검토 미완료'};
+    '원문·첨부 수집 또는 판독이 불완전해 미검출로 단정 불가':
+    '공식 원문·첨부 전체 판독 미완료 · 필요 여부 미확정'};
  }
  const coverage=(rfpSnapshotCheckedAt||saved||full||staff)?'':'원문 저장정보 불러오는 중';
 
