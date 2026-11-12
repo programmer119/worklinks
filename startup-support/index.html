@@ -3948,6 +3948,11 @@ function jobRequirementEvidence(x){
    if(Array.isArray(f?.staffingRoles))candidates.push(...f.staffingRoles);
   }
   for(const record of candidates){
+   // A nationwide score-calculation example is not this contract's staffing.
+   const roleFile=String(record?.sourceFile||'');
+   const roleText=String(record?.sourceText||'');
+   if(/행안부\s*예규|행정안전부\s*예규|지방자치단체\s*입찰시\s*낙찰자\s*결정기준|입찰\s*및\s*계약집행기준/i.test(roleFile)||
+      /산정\s*예시|산정\s*사례|평가\s*예시|배점\s*예시/.test(roleText))continue;
    const role=String(record?.role||'').trim(),count=Number(record?.count);
    if(!role||!Number.isInteger(count)||count<1||count>99)continue;
    const grade=String(record.grade||'').trim(),onsite=String(record.onsite||'').trim();
@@ -3989,7 +3994,7 @@ function jobRequirementEvidence(x){
   {key:'role_found',label:roles.length+'개 역할',reason:'원문에서 역할과 인원이 함께 적힌 근거만 발췌. 전체 인원·상주 인원 합계가 아님'}:
   rfpSnapshotLoading&&!full?{key:'checking',label:'확인중',reason:'원문 판독자료를 불러오는 중'}:
   !tried?{key:'not_checked',label:'확인안함',reason:'원문 수집·검증 기록 없음'}:
-  staffingScanComplete&&sourceReadComplete?{key:'role_unspecified',label:'미검출',reason:'인력표 전체 스캔에서 역할·인원 동시 기재 미검출. 인력 요건 없음의 확정은 아님'}:
+  staffingScanComplete?{key:'role_unspecified',label:'미검출',reason:'사업별 인원 요건이 있는 문서 검사 완료 · 역할·인원 동시 기재 미검출 (일반 법령·평가기준은 제외, 인력 요건 없음의 확정은 아님)'}:
   sourceReadComplete&&!staffingScanComplete?{key:'not_checked',label:'인원표 미검증',reason:'기존 문서는 자격조건만 스캔한 자료로 인원표 전체 스캔 기록 없음'}:
   {key:'failed',label:'확인실패',reason:'원문·첨부 판독이 불완전하여 인력 구성을 확정할 수 없음'};
  const roleLines=[
