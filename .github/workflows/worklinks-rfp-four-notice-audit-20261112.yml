@@ -1,0 +1,36 @@
+name: WorkLinks four-notice RFP read-only audit 20261112
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-rfp-four-notice-audit-20261112.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect exactly four known RFP records without upstream requests
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          src=json.loads(Path("startup-support/rfp-coverage-index.json").read_text(encoding="utf-8"))
+          rows=src.get("byNotice") or {}
+          for number in ("R26BK01807134:000","R26BK01783957:000","R26BK01818412:000","R26BK01797739:000"):
+              obj=rows.get(number)
+              if not isinstance(obj,dict):
+                  print("WORKLINKS_RFP_AUDIT "+json.dumps({"id":number,"found":False},ensure_ascii=False))
+                  continue
+              files=[]
+              for f in (obj.get("files") or []):
+                  files.append({k:f.get(k) for k in ("name","readable","errorCategory","sourceTextScanComplete","qualificationScanTruncated","unmatchedQualificationAnchorCount","clauseCandidateCount","sourceSha256")})
+              ev=obj.get("changcomClauseEvidence") or {}
+              clauseTypes={k:len(v) for k,v in (ev.get("clauseCandidates") or {}).items() if isinstance(v,list)}
+              out={"id":number,"found":True,"status":obj.get("status"),"reasonCode":obj.get("reasonCode"),"checkedAt":obj.get("checkedAt"),"manifestComplete":obj.get("manifestComplete"),"attachmentManifestCount":obj.get("attachmentManifestCount"),"readableDocumentCount":obj.get("readableDocumentCount"),"unreadableDocumentCount":obj.get("unreadableDocumentCount"),"manifestChangePending":obj.get("manifestChangePending"),"files":files,"clauseTypes":clauseTypes}
+              print("WORKLINKS_RFP_AUDIT "+json.dumps(out,ensure_ascii=False))
+          PY
