@@ -30,9 +30,11 @@ restore(){
 start_worker(){
  dk run -d --name "$WORKER" --restart unless-stopped --network host \
   -e G2B_DB_PATH=/app/data/bids.sqlite3 \
+  -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
   -e G2B_LOCAL_API=http://127.0.0.1:18192/api/g2b \
   -e G2B_QUAL_BATCH=200 -e G2B_QUAL_POLL=180 \
   -v "$TARGET:/app/g2b-eligibility-worker.py:ro" \
+  -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
   -v "$BASE/data:/app/data" \
   "$IMG" python -u /app/g2b-eligibility-worker.py >/dev/null
 }
