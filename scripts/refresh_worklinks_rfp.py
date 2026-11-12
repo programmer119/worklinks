@@ -486,9 +486,13 @@ def extract(name,raw):
             members=set(probe.namelist())
         if 'word/document.xml' in members:
             n='.docx'
-        elif 'xl/workbook.xml' in members:
+        elif 'xl/workbook.xml' in members or any(
+                m.startswith('xl/worksheets/') and m.endswith('.xml')
+                for m in members):
             n='.xlsx'
-        elif 'ppt/presentation.xml' in members:
+        elif 'ppt/presentation.xml' in members or any(
+                m.startswith('ppt/slides/') and m.endswith('.xml')
+                for m in members):
             n='.pptx'
         elif any(p.startswith('Contents/') and p.endswith('.xml') for p in members):
             n='.hwpx'
