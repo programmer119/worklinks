@@ -770,7 +770,7 @@ assert.ok(precheckMarkup.includes('협상에의한계약'),'static DB fallback m
 assert.ok(precheckMarkup.includes('제한경쟁'),'static DB fallback must restore contract method');
 const sampleMethod=methodView({id:'g2b-servc-R26BK00000100-000',noticeNumber:'R26BK00000100',
  contract:'제한경쟁',awardMethod:'협상에 의한 계약',awardMethodCode:'낙010001',awardFloorRate:'87.745'});
-for(const term of ['계약방법','낙찰방법','하한율','제한경쟁','협상에 의한 계약','낙010001','87.745%'])
+for(const term of ['계약방법','낙찰방식','하한율','제한경쟁','협상에 의한 계약','낙010001','87.745%'])
  assert.ok(sampleMethod.includes(term),'render missing metadata '+term);
 assert.ok(sampleMethod.includes('title="낙찰코드: 낙010001"'),'award code is available on hover');
 assert.ok(!sampleMethod.includes('>낙찰코드<'),'award code must not take a visible cell');
