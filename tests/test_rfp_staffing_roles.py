@@ -44,7 +44,7 @@ assert {x['role']:x['count'] for x in table}=={'PM':1,'DBA':2},table
 
 item={'status':'text_extracted_requires_review','manifestComplete':True,
       'files':[{'name':'제안요청서.pdf','readable':True,
-                'staffingRoleScanVersion':1,'staffingRoleScanTruncated':False,
+                'staffingRoleScanVersion':2,'staffingRoleScanTruncated':False,
                 'staffingRoles':roles}]}
 summed=summary(item)
 assert len(summed)==4,summed
@@ -70,4 +70,7 @@ dirty=dict(index)
 dirty['staffingRoles']=list(index['staffingRoles'])+[dict(index['staffingRoles'][0],sourceUrl='https://evil.example/rfp')]
 safe=api['saved_rfp_search_state'](dirty,compact=False)
 assert safe['staffingRoles'][-1]['sourceUrl']=='',safe
+assert not parse('직무 기술등급 인원\nPM(사업총괄) 경력 5년 이상 | 12','인력표.pdf')
+assert not parse('투입인력 기술등급 인원\n기술자 부문 배점 20점 이상 6.0','인력표.pdf')
+assert not parse('사업관리자(PM)를 지정하고 전담유지보수 1명을 상주시킨다','인력표.pdf')
 print('RFP_STAFFING_ROLE_SOURCE_BACKED_EXTRACTION=PASS')
