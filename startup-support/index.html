@@ -476,6 +476,7 @@
 #jobCards .job-req-icon{font-weight:900;font-size:13px;line-height:19px;font-family:inherit;display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#e2e8f0;color:#475569}
 #jobCards .job-req-item[data-state="failed"] .job-req-icon{background:#fee2e2;color:#b91c1c}
 #jobCards .job-req-item[data-state="required"] .job-req-icon{background:#fef3c7;color:#92400e}
+#jobCards .job-req-item[data-state="required_at_bid"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="not_required"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 35px));padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.18);color:#1e293b;font-size:13px;font-weight:500;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
@@ -3384,14 +3385,22 @@ function jobRequirementEvidence(x){
  // An explicit requirement due only after award/contract is not a bid-time eligibility gate.
  // Do not turn an incomplete document scan into a "not required" result.
  const contractStage=/(?:계약\s*(?:체결|시|후|이후|일|단계|전)|낙찰\s*(?:후|이후)|사업\s*착수|과업\s*(?:수행|착수)|수행\s*(?:중|시|기간)|착수\s*(?:시|후|이후)|계약\s*상대자)/i;
- const bidStage=/(?:입찰\s*(?:참가\s*(?:시|전|자격|신청\s*(?:시|전))|마감|서\s*제출\s*(?:시|전)|자격|시점|당시|시\b)|공고일\s*(?:현재|기준)|제안서\s*제출\s*(?:시|전)|투찰\s*(?:시|전)|입찰\s*서류\s*제출\s*(?:시|전))/i;
+ const bidStage=/(?:입찰\s*(?:참가\s*(?:시|전|자격|신청\s*(?:시|전))|마감|서\s*제출\s*(?:시|전)|자격|시점|당시|시(?=\s|점|에|:|$))|공고일\s*(?:현재|기준)|제안서\s*제출\s*(?:시|전)|투찰\s*(?:시|전)|입찰\s*서류\s*제출\s*(?:시|전))/i;
+ const preExistingStage=/(?:입찰\s*)?공고\s*일\s*(?:기준|현재|당시|이전|전(?:날)?|부터)|(?:입찰\s*)?공고\s*일\s*\d+\s*(?:일|개월|년)\s*전|공고\s*(?:게시\s*)?전(?:부터|까지|에)?/i;
  const deferredToContract=c=>contractStage.test(c.text)&&!bidStage.test(c.text);
- const insurer=foundInsurance.find(c=>!negative.test(c.text)&&!deferredToContract(c)&&
+ const insuranceMust=foundInsurance.filter(c=>!negative.test(c.text)&&!deferredToContract(c)&&
     (c.required||/반드시|필수|제출\s*(?:하여야|해야|서류|대상)|제출서류|가입\s*(?:증명|확인)|증빙\s*(?:서류|필수)|4\s*대\s*보험\s*가입\s*의무/i.test(c.text)));
- const onsiteMust=foundOnsite.find(c=>!negative.test(c.text)&&!deferredToContract(c)&&
+ const insurer=insuranceMust.find(c=>preExistingStage.test(c.text))||
+    insuranceMust.find(c=>bidStage.test(c.text))||insuranceMust[0];
+ const onsiteMustCandidates=foundOnsite.filter(c=>!negative.test(c.text)&&!deferredToContract(c)&&
     /(?:상주|현장\s*(?:근무|배치)|전담\s*근무).{0,70}(?:필수|의무|필요|해야|하여야|배치|투입|[1-9]\d?\s*(?:명|인))|(?:필수|반드시|의무).{0,45}(?:상주|현장\s*(?:근무|배치))/i.test(c.text));
+ const onsiteMust=onsiteMustCandidates.find(c=>preExistingStage.test(c.text))||
+    onsiteMustCandidates.find(c=>bidStage.test(c.text))||onsiteMustCandidates[0];
  function choice(positive,mentioned){
-  if(positive)return {key:'required',label:'필요',reason:'공식 문서에서 요구 문구 확인 (대상·시점은 원문 확인)'};
+  if(positive&&preExistingStage.test(positive.text))
+   return {key:'required',label:'사전 필요',reason:'공고일 기준 등 입찰 전에 이미 충족해야 하는 조건이 원문에 명시됨'};
+  if(positive&&bidStage.test(positive.text))
+   return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
   if(fullScanComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
    return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
@@ -3452,7 +3461,7 @@ function jobRequirementBadges(x){
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
      htmlEscape(name+' '+v.label+'. '+tooltip)+'" aria-expanded="false">'+
      htmlEscape(name)+' <span class="job-req-icon" aria-hidden="true">'+
-     ({not_checked:'?',failed:'×',required:'!',not_required:'✓'})[v.key]+'</span></button>'+
+     ({not_checked:'?',failed:'×',required:'!',required_at_bid:'!',not_required:'✓'})[v.key]+'</span></button>'+
    '<span class="job-req-tip" role="tooltip">'+htmlEscape(tooltip)+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험과 상주 요구조건">'+
