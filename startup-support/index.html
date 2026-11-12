@@ -511,6 +511,34 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobDetailModal .job-detail-advanced>.job-detail-section{margin-top:12px;border-top:0;padding-top:4px}
 #jobDetailModal .job-detail-actions{padding-top:14px;border-top:1px solid #e5e7eb;margin-top:8px}
 @media(max-width:620px){#jobDetailModal #jobDetailTitle{font-size:20px}#jobDetailModal .job-detail-meta-grid{grid-template-columns:1fr}#jobDetailModal .job-detail-meta-item{padding:12px 13px}}
+
+/* Procurement reading view: no dead file-name rows or unnecessary explanatory sections. */
+#jobDetailModal .job-evidence-section{padding:21px 0}
+#jobDetailModal .job-evidence-section h3{font-size:19px;line-height:1.4;margin-bottom:13px}
+#jobDetailModal .job-evidence-licenses{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:9px}
+#jobDetailModal .job-evidence-license{padding:12px 14px;background:#f8fafc;border:1px solid #dce4ee;border-radius:9px;color:#0f172a;font-size:16px;font-weight:700;line-height:1.55}
+#jobDetailModal .job-evidence-count{font-size:15px;font-weight:650;color:#475569;margin-bottom:15px}
+#jobDetailModal .job-evidence-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;align-items:start}
+#jobDetailModal .job-evidence-group{padding:15px;border:1px solid #dce4ee;border-radius:11px;background:#fff;min-width:0}
+#jobDetailModal .job-evidence-group h4{font-size:17px;line-height:1.45;color:#0f172a;margin:0 0 10px;font-weight:800}
+#jobDetailModal .job-evidence-group h4 span{font-size:14px;font-weight:600;color:#64748b}
+#jobDetailModal .job-evidence-quote{padding:0 0 10px;margin:0 0 10px;border-bottom:1px solid #edf2f7}
+#jobDetailModal .job-evidence-quote:last-child{border-bottom:0;margin:0;padding:0}
+#jobDetailModal .job-evidence-quote p{font-size:15.5px;line-height:1.7;color:#1e293b;margin:0 0 5px;overflow-wrap:anywhere;word-break:keep-all}
+#jobDetailModal .job-evidence-source a{font-size:14px;line-height:1.6;text-decoration:underline;text-underline-offset:3px}
+#jobDetailModal .job-evidence-more{margin-top:10px}
+#jobDetailModal .job-evidence-more summary{font-size:15px;color:#1d4ed8;font-weight:750;line-height:1.55;cursor:pointer;padding:7px 0}
+#jobDetailModal .job-evidence-more[open] .job-evidence-quote{padding-top:10px}
+#jobDetailModal .job-source-files{display:grid;gap:8px}
+#jobDetailModal .job-source-file{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border:1px solid #dce4ee;border-radius:10px;background:#fff;color:#123765;font-size:16px;line-height:1.55;text-decoration:none}
+#jobDetailModal .job-source-file:hover{background:#eff6ff;border-color:#93b4df}
+#jobDetailModal .job-source-filename{min-width:0;overflow-wrap:anywhere}
+#jobDetailModal .job-source-action{white-space:nowrap;font-size:14px;color:#1d4ed8;font-weight:800}
+#jobDetailModal .job-change-quick{padding-top:13px;border-top:1px solid #e5e7eb}
+#jobDetailModal .job-change-quick button{font-size:15px;padding:10px 16px;min-height:43px}
+#jobDetailModal .job-change-facts{margin-bottom:12px}
+#jobDetailModal .job-change-facts p{margin:0 0 8px;font-size:15px;line-height:1.6;color:#334155}
+@media(max-width:720px){#jobDetailModal .job-evidence-groups{grid-template-columns:1fr}#jobDetailModal .job-source-file{align-items:flex-start;flex-direction:column;gap:5px}}
 </style>
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
 </head>
@@ -3091,20 +3119,24 @@ function renderJobDetail(x){
  const compareList=[];
  const m='';
  const docs=jobEvidenceData(x)?.attachments;
- const bidId=jobBidIdentity(x);
- const savedState=bidId?jobSearchRfpState.get(bidId.bidNo+':'+bidId.order):null;
- const savedNames=[...new Set((savedState?.excerpts||[]).map(v=>String(v.sourceFile||'').trim()).filter(Boolean))];
- const confirmedDocs=docs?.ok===true&&Array.isArray(docs.items)?docs.items.filter(f=>f&&f.name):[];
- // Render only actual official filenames, not speculative empty manifest text.
- const docLinks=confirmedDocs.length?
-  '<section class="job-detail-section"><h3>공식 첨부파일</h3>'+
-  confirmedDocs.map(function(file){
-   const label=htmlEscape(file.name);
-   const safe=/^https:\/\/(?:[a-z0-9-]+\.)*(?:g2b\.go\.kr|pps\.go\.kr)(?:\/|$)/i.test(file.url||'');
-   return '<p>'+(safe?'<a href="'+htmlEscape(file.url)+'" target="_blank" rel="noopener noreferrer">'+label+' ↗</a>':label)+'</p>';
-  }).join('')+'</section>':
-  savedNames.length?'<section class="job-detail-section"><h3>확인된 첨부문서</h3>'+
-   savedNames.map(name=>'<p>'+htmlEscape(name)+'</p>').join('')+'</section>':'';
+ const id=jobBidIdentity(x);
+ const snapshot=id?jobSearchRfpState.get(id.bidNo+':'+id.order):null;
+ const officialFiles=Array.isArray(snapshot?.officialFiles)?snapshot.officialFiles:[];
+ const apiFiles=docs?.ok===true&&Array.isArray(docs.items)?docs.items:[];
+ const validFileLink=url=>/^https:\/\/(?:[a-z0-9-]+\.)*(?:g2b\.go\.kr|pps\.go\.kr)(?:\/|$)/i.test(String(url||''));
+ const verifiedLinks=new Map();
+ for(const file of [...officialFiles,...apiFiles]){
+  const name=String(file?.name||'').trim(),url=String(file?.url||'').trim();
+  if(name&&validFileLink(url)&&!verifiedLinks.has(url))verifiedLinks.set(url,name);
+ }
+ const docLinks=verifiedLinks.size?
+  '<section class="job-detail-section job-evidence-section"><h3>공식 첨부파일</h3>'+
+  '<div class="job-source-files">'+[...verifiedLinks].map(([url,name])=>
+   '<a class="job-source-file" href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">'+
+   '<span class="job-source-filename">'+htmlEscape(name)+'</span>'+
+   '<span class="job-source-action">파일 열기 ↗</span></a>').join('')+
+  '</div></section>':'';
+
  const extracted=rfpSnapshotForJob(x);
 
  const readable=(extracted?.files||[]).filter(f=>f.readable);
@@ -3129,10 +3161,11 @@ function renderJobDetail(x){
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
+ const confirmedHistory=standardBidMarkup(x);
  document.getElementById('jobDetailBody').innerHTML=base+reviewNote+savedResearchMarkup(x)+docLinks+
-  (extractHTML?'<details class="job-detail-advanced"><summary>RFP 원문 발췌·검토 내용 보기</summary>'+extractHTML+'</details>':'')+
-  '<section class="job-detail-section"><h3>공식 개찰·낙찰·계약 이력</h3>'+standardBidMarkup(x)+'</section>'+
-  '<details class="job-detail-advanced"><summary>공고 변경·기초금액 조회</summary>'+bidChangePriceMarkup(x)+'</details>'+variantLinks+actions;
+  (extractHTML&&!jobSearchText?'<details class="job-detail-advanced"><summary>RFP 원문 발췌 보기</summary>'+extractHTML+'</details>':'')+
+  (confirmedHistory?'<section class="job-detail-section"><h3>개찰·낙찰·계약 이력</h3>'+confirmedHistory+'</section>':'')+
+  bidChangePriceMarkup(x)+variantLinks+actions;
 }
 function openJobDetail(id){
  const x=getJobById(id);if(!x)return;
