@@ -593,6 +593,40 @@ def download(url):
                 retry=isinstance(ex,(TimeoutError,ConnectionError,urllib.error.URLError))
             if not retry or attempt==2:raise
         time.sleep(1.5*(attempt+1))
+def annotate_official_pdf_siblings(files):
+    """Use a successfully scanned same-title PDF as alternate official evidence.
+
+    Never claim the HWP itself was read or that two formats are byte-identical.
+    The PDF's own clause citations remain the authoritative extracted source.
+    """
+    def stem(name):
+        p=Path(str(name or '')).name
+        return re.sub(r'[\W_]+','',Path(p).stem.lower())
+    bystem={}
+    for f in files:
+        if not isinstance(f,dict):continue
+        if (str(f.get('name') or '').lower().endswith('.pdf')
+                and f.get('readable') is True
+                and f.get('sourceTextScanComplete') is True
+                and f.get('sourceSha256')):
+            bystem.setdefault(stem(f['name']),f)
+    updated=0
+    for f in files:
+        if not isinstance(f,dict):continue
+        label=str(f.get('name') or '')
+        if not label.lower().endswith(('.hwp','.hwpx')):continue
+        if f.get('readable') is True and f.get('sourceTextScanComplete') is True:
+            continue
+        other=bystem.get(stem(label))
+        if not other or other is f:continue
+        if f.get('alternatePdfEvidence')!=other.get('name'):
+            updated+=1
+        f['alternatePdfEvidence']=other['name']
+        f['alternatePdfSourceSha256']=other['sourceSha256']
+        f['alternatePdfEvidenceMode']='same_basename_not_proven_identical'
+    return updated
+
+
 def extract(name,raw):
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
@@ -1275,6 +1309,7 @@ def process(no,ordn,metadata=None,previous=None):
             record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
         saved.append(record)
+    annotate_official_pdf_siblings(saved)
     for item in manifest[MAX_DOCUMENTS:]:
         saved.append({'name':str(item.get('name') or '')[:160], 'readable':False,
                       'errorCategory':'manifest_documents_over_limit'})
@@ -1320,6 +1355,7 @@ def compact_coverage(item):
             'readable':f.get('readable') is True,
             'sourceSha256':str(f.get('sourceSha256') or '')[:64],
             'alternatePdfEvidence':str(f.get('alternatePdfEvidence') or '')[:160],
+            'alternatePdfEvidenceMode':str(f.get('alternatePdfEvidenceMode') or '')[:50],
             'extractionEvidence':f.get('extractionEvidence') or {},
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
