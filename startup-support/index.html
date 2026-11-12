@@ -1456,6 +1456,7 @@ function g2bCardFromServer(x){
   partnerScope:'SW·데이터·AI 관련 제목 또는 발주품목 후보',partnerVerified:false};
 }
 var g2bLinkedEligibility=null;
+var g2bSupplementalCache=new Map();
 // Official all-indexed G2B shortlist. Do not infer final legal eligibility
 // from license-match labels, and never hide unknown-deadline opportunities.
 var changcomActionableData=null,changcomActionableMode='verified',changcomActionableLimit=24;
@@ -1793,7 +1794,11 @@ async function g2bLoadSaved(append){
    if(Number.isFinite(Number(data.eligibilityLinked)))linkedOnServer=Number(data.eligibilityLinked);
    const records=Array.isArray(data.items)?data.items:[];
    for(const row of records){
-    if(row.bidEligibility?.ok&&row.bidNo){
+    if(row.supplementalBidFacts&&row.bidNo){
+      const extKey=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
+      g2bSupplementalCache.set(extKey,row.supplementalBidFacts);
+     }
+     if(row.bidEligibility?.ok&&row.bidNo){
      const key=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
      bidEligibilityCache.set(key,row.bidEligibility);
     }
