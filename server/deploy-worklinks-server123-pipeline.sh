@@ -20,6 +20,7 @@ for item in "$SOURCE" "$ROOT/server/Dockerfile.worklinks-pipeline" \
     "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" \
     "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" \
     "$ROOT/scripts/repair_changcom_top500_rfp.py" \
+    "$ROOT/scripts/repair_open_rfp_cached_attachments.py" \
     "$ROOT/scripts/rfp_call_ledger.py" \
     "$ROOT/tests/test_rfp_call_ledger.py" \
     "$ROOT/tests/test_worklinks_server123_pipeline.py" \
@@ -47,7 +48,7 @@ if ! dk image inspect "$IMAGE" >/dev/null 2>&1;then
   dk build --pull=false -f "$ROOT/server/Dockerfile.worklinks-pipeline" \
       -t "$IMAGE" "$ROOT/server"
 fi
-dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && python -c "import pypdf, six, hwp5.hwp5txt; print(\"PIPELINE_PDF_HWP_READY=PASS\")"'
+dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && command -v tesseract >/dev/null && tesseract --list-langs 2>&1 | grep -q kor && python -c "import pypdf, pymupdf, six, hwp5.hwp5txt; print(\"PIPELINE_PDF_HWP_KOREAN_OCR_READY=PASS\")"'
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
 for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json qualification-review.json;do
@@ -122,6 +123,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
    cmp -s "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" &&
    cmp -s "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" &&
    cmp -s "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" &&
+   cmp -s "$ROOT/scripts/repair_open_rfp_cached_attachments.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" &&
    cmp -s "$ROOT/scripts/rfp_call_ledger.py" "$SCRIPTS/rfp_call_ledger.py" &&
    test "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" = true &&
    test "$(dk inspect -f '{{.Config.Image}}' "$WORKER" 2>/dev/null || true)" = "$IMAGE";then
@@ -130,7 +132,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
 fi
 mkdir -p "$BASE/pipeline/backup"
 for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/rfp_call_ledger.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py";do
   test ! -s "$f" || cp -p "$f" "$BASE/pipeline/backup/$(basename "$f")"
 done
 PREVIOUS="$(dk inspect -f '{{.Config.Image}}' "$WORKER" 2>/dev/null || true)"
@@ -150,7 +152,7 @@ rollback(){
   echo 'PIPELINE_DEPLOY_ROLLBACK_ATTEMPT'
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
   for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/rfp_call_ledger.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py";do
     saved="$BASE/pipeline/backup/$(basename "$f")"
     if test -s "$saved";then cp -p "$saved" "$f";else rm -f "$f";fi
   done
@@ -164,6 +166,7 @@ install -m 0644 "$ROOT/scripts/analyze_worklinks_rfp_ai.py" "$SCRIPTS/analyze_wo
 install -m 0644 "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py"
 install -m 0644 "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py"
 install -m 0644 "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py"
+install -m 0644 "$ROOT/scripts/repair_open_rfp_cached_attachments.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py"
 install -m 0644 "$ROOT/scripts/rfp_call_ledger.py" "$SCRIPTS/rfp_call_ledger.py"
 start_worker "$IMAGE"
 # Startup validates large (100MB+) RFP checkpoints before the STARTED log.
