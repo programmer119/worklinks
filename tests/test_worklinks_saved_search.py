@@ -12,7 +12,11 @@ with tempfile.TemporaryDirectory() as t:
     (pathlib.Path(t)/'snapshots'/'rfp-coverage-index.json').write_text(
       json.dumps({'ok':True,'byNotice':{
         'R26BK01792736:000':{'status':'text_extracted_requires_review',
-          'manifestComplete':True,'files':[{'readable':True}]}}}))
+          'manifestComplete':True,'files':[{'readable':True}],
+          'changcomClauseEvidence':{'clauseCandidates':{
+            'industry_code':[{'text':'입찰참가자격: 컴퓨터관련서비스사업 1468 등록 필수',
+                               'sourceFile':'공식입찰공고.pdf','codes':['1468']}]
+          }}}}}))
     try:
         m=runpy.run_path(str(root/'server/g2b-proxy.py'),run_name='offline_search_test')
         persist=m['persist_bids']
@@ -33,6 +37,9 @@ with tempfile.TemporaryDirectory() as t:
         assert exact['searchMode']=='saved_only'
         assert exact['totalCount']==1 and exact['items'][0]['bidNo']==a,exact
         assert exact['items'][0]['rfpSavedState']['complete'] is True,exact
+        quotes=exact['items'][0]['rfpSavedState']['excerpts']
+        assert len(quotes)==1 and '1468' in quotes[0]['text'],exact
+        assert quotes[0]['sourceFile']=='공식입찰공고.pdf'
         korean=search(10,0,True,'문서처리')
         assert korean['totalCount']==1 and korean['items'][0]['bidNo']==b,korean
         assert korean['items'][0]['rfpSavedState']['seen'] is False,korean
