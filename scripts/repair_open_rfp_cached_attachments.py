@@ -111,11 +111,37 @@ def cached_metadata(dbpath,key):
     except (ValueError,zlib.error,UnicodeError):return None
 
 
-def metadata_for(key,scan,stored,ledgerpath):
+def metadata_for(key,scan,stored,ledgerpath,archive=None):
+    # A detected source-manifest revision must never use historical file URLs.
+    if scan.get('manifestChangePending') is True:
+        return None,'manifest_changed'
     metadata=stored.get(key)
     if metadata_valid(metadata,scan):return metadata,'saved_metadata'
     prior=cached_metadata(ledgerpath,key)
     if metadata_valid(prior,scan):return prior,'verified_ledger'
+    # Old full extraction records retain sourceUrl even when the compact
+    # cumulative index strips it. Recover from those URLs without an A02 call.
+    for source,origin in archive or []:
+        rec=source.get(key)
+        if not isinstance(rec,dict) or rec.get('manifestComplete') is not True:
+            continue
+        files=rec.get('files') or []
+        if (len(files)!=len(scan.get('files') or []) or
+            [str(f.get('name') or '') for f in files]!=
+            [str(f.get('name') or '') for f in scan.get('files') or []]):
+            continue
+        if any(not rfp.legal_file({'name':f.get('name'),'url':f.get('sourceUrl')})
+               for f in files if f.get('readable') is not True or
+               f.get('sourceTextScanComplete') is not True):
+            continue
+        recovered={'attachments':{'ok':True,'complete':True,
+                    'items':[{'name':f.get('name') or '',
+                              'url':f.get('sourceUrl') or ''}
+                             for f in files]},
+                   'noticeDocuments':{'ok':True,'complete':True},
+                   '_source':'previously_verified_full_rfp_scan'}
+        if metadata_valid(recovered,scan):
+            return recovered,origin
     return None,'metadata_missing'
 
 
@@ -246,6 +272,12 @@ def run(data_dir,limit,execute=False,max_files=400):
     coverage_path=snap/'rfp-coverage-index.json'
     meta_doc=read_json(snap/'rfp-top500-batch-metadata-20261111.json')
     stored=meta_doc.get('byNotice') or {}
+    detail=read_json(snap/'rfp-clauses.json').get('byNotice') or {}
+    batch=read_json(snap/'rfp-top500-batch-state-20261111.json')
+    older=batch.get('scans') or {}
+    archived=batch.get('archivedOutOfScopeScans') or {}
+    known_full=[(detail,'rolling_full_scan'),(older,'prior_batch_scan'),
+                (archived,'archived_batch_scan')]
     ledger=root/'rfp-request-ledger.sqlite3'
     entries=read_json(coverage_path).get('byNotice') or {}
     now=dt.datetime.now(dt.timezone.utc)
@@ -261,7 +293,7 @@ def run(data_dir,limit,execute=False,max_files=400):
         if not broken:
             categories['all_readable']+=1;continue
         categories['partial']+=1
-        meta,src=metadata_for(key,scan,stored,ledger)
+        meta,src=metadata_for(key,scan,stored,ledger,known_full)
         if not meta:
             categories['metadata_missing']+=1;continue
         categories['ready']+=1
