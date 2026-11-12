@@ -103,6 +103,15 @@ legacy_example={'manifestComplete':True,'files':[{'name':general,
   'staffingRoleScanVersion':2,'staffingRoles':[{
     'role':'기술자','count':1,'sourceFile':general,'sourceText':example}]}]}
 assert p['staffing_summary'](legacy_example)==[]
+# 350k+ characters of generic legal guidance cannot prevent a complete
+# project-only role inspection. Do not pretend that guidance was fully read.
+generic_law={'name':general,'readable':True,'sourceTextScanComplete':False,
+             'staffingRoleScanVersion':2,'staffingRoleScanTruncated':True}
+scope_law={'manifestComplete':True,'files':[generic_law,pdf]}
+law_index=p['compact_coverage'](scope_law)
+assert law_index['staffingRoleScanComplete'] is True
+assert law_index['files'][0]['staffingScopeExcluded'] is True
+assert law_index['files'][0]['sourceTextScanComplete'] is False
 
 # A nationwide standard-contract ZIP is not a missing project staffing spec.
 # Preserve its unreadable fact, with explicit provenance of the exclusion.
