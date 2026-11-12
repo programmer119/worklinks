@@ -30,6 +30,7 @@ jobs:
           python3 -m py_compile server/g2b-proxy.py
           python3 tests/test_worklinks_deploy_runner_policy.py
           python3 tests/test_bid_evidence.py
+          python3 tests/test_rfp_staffing_roles.py
           python3 tests/test_bid_extra.py
           python3 tests/test_contract_evidence.py
           node tests/worklinks-jobs-regression.cjs
