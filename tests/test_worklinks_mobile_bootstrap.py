@@ -175,6 +175,32 @@ def main():
             assert page.evaluate("jobRenderLimit") == 24
             assert page.locator("#jobCards .job-mini").count() <= 24
 
+            # Real-browser regression: bid amounts share the same relative
+            # vertical baseline regardless of a one-line vs wrapped title.
+            amount_positions = page.evaluate("""() => {
+                const cards = [...document.querySelectorAll('#jobCards .job-mini')].slice(0,2);
+                if (cards.length !== 2) return null;
+                const titles = cards.map(c=>c.querySelector('.job-card-title'));
+                const original = titles.map(t=>t.textContent);
+                titles[0].textContent = '계룡시 유지관리';
+                titles[1].textContent = '수원시 상수도사업소 홈페이지 및 요금관리시스템 통합유지관리';
+                const rows = cards.map(c => {
+                    const title = c.querySelector('.job-card-title');
+                    const amount = c.querySelector('.job-headline-side .job-amount');
+                    if (!amount) return null;
+                    return {
+                        amountY: amount.getBoundingClientRect().top - c.getBoundingClientRect().top,
+                        titleHeight: title.getBoundingClientRect().height,
+                        inSide: !!amount.closest('.job-headline-side')
+                    };
+                });
+                titles.forEach((t,i)=>t.textContent=original[i]);
+                return rows;
+            }""")
+            assert amount_positions and all(v and v["inSide"] for v in amount_positions), amount_positions
+            assert abs(amount_positions[0]["amountY"] - amount_positions[1]["amountY"]) <= 1, amount_positions
+            assert amount_positions[1]["titleHeight"] > amount_positions[0]["titleHeight"], amount_positions
+
             # Source-checked bids must be rendered in the SAME standard cards,
             # never a second, overfull verification-only card grid.
             page.wait_for_function(
