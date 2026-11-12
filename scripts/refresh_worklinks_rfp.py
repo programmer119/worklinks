@@ -1292,16 +1292,35 @@ def process(no,ordn,metadata=None,previous=None):
                     old_file.get('sourceUrl')):
                 reusable[(old_file.get('name'),old_file.get('sourceUrl'))]=old_file
     manifest=docs.get('items') or []
-    for item in manifest[:MAX_DOCUMENTS]:
+    primary_manifest=manifest[:MAX_DOCUMENTS]
+    # Process PDF first, even when the official list puts HWP first.
+    # Restore official ordering in saved source evidence afterwards.
+    processing_order=sorted(range(len(primary_manifest)),
+        key=lambda i: 0 if str(primary_manifest[i].get('name') or '').lower().endswith('.pdf') else 1)
+    saved_slots={}
+    for position in processing_order:
+        item=primary_manifest[position]
         public=legal_file(item)
         if not public:
-            saved.append({'name':str(item.get('name') or '')[:160],'readable':False,
-                          'errorCategory':invalid_file_reason(item)})
+            saved_slots[position]={'name':str(item.get('name') or '')[:160],'readable':False,
+                          'errorCategory':invalid_file_reason(item)}
             continue
         name,url=public
+        # Same filename stem + verified PDF in this notice: use PDF only.
+        # Do not download the duplicate HWP and never mark it readable.
+        companion=verified_pdf_companion({'name':name},list(saved_slots.values()))
+        if companion:
+            saved_slots[position]={
+                'name':name,'sourceUrl':url,'readable':False,
+                'sourceTextScanComplete':False,
+                'skippedDuplicateFormat':True,
+                'alternatePdfEvidence':companion['name'],
+                'alternatePdfSourceSha256':companion['sourceSha256'],
+                'alternatePdfEvidenceMode':'same_basename_not_proven_identical'}
+            continue
         retained=reusable.get((name,url))
         if retained:
-            saved.append(dict(retained))
+            saved_slots[position]=dict(retained)
             continue
         record={'name':name,'sourceUrl':url,'readable':False}
         try:
@@ -1333,7 +1352,8 @@ def process(no,ordn,metadata=None,previous=None):
         except Exception as ex:
             record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
-        saved.append(record)
+        saved_slots[position]=record
+    saved=[saved_slots[i] for i in range(len(primary_manifest))]
     annotate_official_pdf_siblings(saved)
     for item in manifest[MAX_DOCUMENTS:]:
         saved.append({'name':str(item.get('name') or '')[:160], 'readable':False,
@@ -1380,7 +1400,9 @@ def compact_coverage(item):
             'readable':f.get('readable') is True,
             'sourceSha256':str(f.get('sourceSha256') or '')[:64],
             'alternatePdfEvidence':str(f.get('alternatePdfEvidence') or '')[:160],
+            'alternatePdfSourceSha256':str(f.get('alternatePdfSourceSha256') or '')[:64],
             'alternatePdfEvidenceMode':str(f.get('alternatePdfEvidenceMode') or '')[:50],
+            'skippedDuplicateFormat':f.get('skippedDuplicateFormat') is True,
             'extractionEvidence':f.get('extractionEvidence') or {},
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
