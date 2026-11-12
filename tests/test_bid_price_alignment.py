@@ -59,68 +59,117 @@ assert abs(rows[0]["amountRight"] - rows[1]["amountRight"]) <= 1, rows
 print("BID_PRICE_ALIGNMENT_BROWSER_PASS", rows)
 
 
-# The production markup, not just a mock, must put priority beside conditions,
-# and expose the G2B original as a modest text link instead of a large button.
-assert "job-eligibility-content" in render and "job-priority-slot" in render
-assert render.index("job-priority-slot") < render.index("job-highlights")
+# Production invariant: review priority is on the deadline band,
+# qualifications keep full width, original link remains a modest action.
+assert "job-priority-band" in render
+assert render.index("job-priority-band") < render.index("job-eligibility-row")
+assert "job-eligibility-content" in render
+assert "job-priority-slot" not in render, "right-side score must not squeeze requirements"
 assert "공고 원문 ↗</a>" in render and ">원문 ↗</a>" not in render
-assert "has-priority-slot" in render
 
-def layout_card(title, priority, details):
-    pills = ''.join('<i class="advantage-pill is-filled"></i>' for _ in range(3))
+def card(title, priority, badges, history):
+    pills = ''.join('<i class="advantage-pill is-filled"></i>' for _ in range(3 if priority=="우선 검토" else 2))
     return f"""
     <article class="card job-mini">
-      <div class="job-day"><strong>D-13</strong><span class="job-date">11.26 10:00</span></div>
+      <div class="job-day"><strong>D-13</strong><span class="job-date">11.26 10:00</span>
+        <div class="job-priority-band"><div class="job-advantage adv-high">
+        <span class="advantage-pills">{pills}</span>
+        <strong class="advantage-label">{priority}</strong></div></div>
+        <span class="job-institution-badges">
+          <span class="job-institution-badge">나</span>
+          <span class="job-institution-badge notice">조</span>
+          <span class="job-institution-badge demand">경</span>
+        </span>
+      </div>
       <div class="job-core">
         <div class="job-headline"><h3><button class="job-card-title">{title}</button></h3>
-          <div class="job-headline-side"><div class="job-headline-badge"><span class="job-business-area">SW사업</span></div>
-          <span class="job-amount">3억 1,102만원</span></div>
-        </div>
-        <div class="job-eligibility-row has-priority-slot">
-          <div class="job-eligibility-content"><span class="job-basic-signal adv-medium">등록업종 일치</span>
-            <div class="job-req-strip">{details}</div>
+          <div class="job-headline-side"><div class="job-headline-badge">
+            <span class="job-business-area">SW사업</span></div>
+            <span class="job-amount">3억 1,102만원</span>
           </div>
-          <div class="job-priority-slot">
-            <div class="job-advantage adv-high"><span class="advantage-pills">{pills}</span><strong class="advantage-label">{priority}</strong></div>
+        </div>
+        <div class="job-bid-methods">
+          <div class="job-bid-method-cell"><span class="job-bid-label">계약방법</span>
+            <span class="job-bid-value">제한경쟁</span></div>
+          <div class="job-bid-method-cell"><span class="job-bid-label">낙찰방식</span>
+            <span class="job-bid-value">협상계약</span></div>
+          <div class="job-bid-method-cell"><span class="job-bid-label">하한율</span>
+            <span class="job-bid-value">비적용</span></div>
+        </div>
+        <div class="job-eligibility-row">
+          <div class="job-eligibility-content">
+            <span class="job-basic-signal adv-medium">등록업종 일치</span>
+            <div class="job-req-strip">{badges}</div>
           </div>
         </div>
         <div class="job-highlights">
-          <div class="job-highlight-tags"><span class="tag">4년 연속</span><span class="tag">2025년 입찰참가 2개사</span></div>
-          <a class="job-source-link" href="https://www.g2b.go.kr/" target="_blank" rel="noopener noreferrer">공고 원문 ↗</a>
+          <div class="job-highlight-tags"><span class="tag">4년 연속</span>
+          <span class="tag">2025년 입찰참가 2개사</span>{history}</div>
+          <a class="job-source-link" href="https://www.g2b.go.kr/" target="_blank"
+             rel="noopener noreferrer">공고 원문 ↗</a>
         </div>
       </div>
     </article>
     """
-badges = '<button class="job-req-trigger">4대보험 ✓</button><button class="job-req-trigger">비상주 ✓</button>'
-long_badges = badges + '<button class="job-req-trigger">인원 미검증 ?</button>'
-layout_html = (
-    '<!doctype html><html lang="ko"><meta charset="utf-8"><style>' + css[0] +
-    '</style><body><div id="jobCards" class="cards" style="max-width:1380px">' +
-    layout_card("용인시 홈페이지 유지관리", "우선 검토", badges) +
-    layout_card("수원시 상수도 홈페이지 및 요금관리시스템 통합유지관리", "관심 검토", long_badges) +
-    '</div></body></html>'
+
+good='<button class="job-req-trigger">4대보험 ✓</button><button class="job-req-trigger">비상주 ✓</button><button class="job-req-trigger">인원 미검증 ?</button>'
+bad='<button class="job-req-trigger">4대보험 확인실패 ?</button><button class="job-req-trigger">상주 확인실패 ?</button><button class="job-req-trigger">인원 확인실패 ?</button>'
+cards_html=(
+    card("(긴급)2027년 용인시 홈페이지 기능개선 및 유지관리 용역","우선 검토",good,"")+
+    card("2027년 노후계획도시정비플랫폼 운영 및 유지관리","관심 검토",good,"")+
+    card("2027년 지휘훈련시스템 유지보수 용역","관심 검토",good,"")+
+    card("2027년 서울시 에너지정보 통합시스템 운영 및 유지관리 용역","관심 검토",bad,'<span class="tag">유사공고 3</span>')
+)
+html_layout=(
+ '<!doctype html><html lang="ko"><meta charset="utf-8">'
+ '<meta name="viewport" content="width=device-width,initial-scale=1">'
+ '<style>'+css[0]+'</style><body>'
+ '<div id="jobCards" class="cards" style="max-width:1320px;margin:auto">'
+ +cards_html+'</div></body></html>'
 )
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
-    for width in (1480, 390):
-        page = browser.new_page(viewport={"width":width,"height":860})
-        page.set_content(layout_html, wait_until="load")
-        aligned = page.evaluate("""() => [...document.querySelectorAll('#jobCards .job-mini')].map(c => {
-          const slot=c.querySelector('.job-priority-slot');
-          const a=c.querySelector('.job-source-link');
-          const r=c.getBoundingClientRect(), s=slot.getBoundingClientRect();
-          const k=getComputedStyle(a);
-          return {priorityRight:r.right-s.right, priorityWidth:s.width,
-            linkBorder:k.borderTopWidth, linkBackground:k.backgroundColor,
-            linkHeight:a.getBoundingClientRect().height,
-            linkText:a.textContent.trim(), external:a.target==='_blank',
-            overflow:c.scrollWidth>c.clientWidth+1};
+    browser=p.chromium.launch(headless=True)
+    for width in (1366, 390):
+        page=browser.new_page(viewport={"width":width,"height":940})
+        page.set_content(html_layout, wait_until="load")
+        data=page.evaluate("""() => [...document.querySelectorAll('#jobCards .job-mini')].map(card=>{
+          const bounds=card.getBoundingClientRect(),head=card.querySelector('.job-day');
+          const priority=head.querySelector('.job-priority-band').getBoundingClientRect();
+          const initials=head.querySelector('.job-institution-badges').getBoundingClientRect();
+          const req=card.querySelector('.job-eligibility-content').getBoundingClientRect();
+          const items=[...card.querySelectorAll('.job-eligibility-content > *, .job-req-strip .job-req-trigger')];
+          const badgeY=items.map(v=>Math.round(v.getBoundingClientRect().top));
+          const link=card.querySelector('.job-source-link'),lr=link.getBoundingClientRect();
+          const headline=card.querySelector('.job-card-title');
+          const methods=card.querySelector('.job-bid-methods');
+          const txt=getComputedStyle(headline);
+          return {height:Math.round(bounds.height),left:bounds.left,right:bounds.right,
+            priorityRight:Math.round(bounds.right-priority.right),
+            priorityTop:Math.round(priority.top-head.getBoundingClientRect().top),
+            priorityInitialsOverlap:priority.right>initials.left+1 &&
+              priority.left<initials.right-1 && priority.bottom>initials.top+1 &&
+              priority.top<initials.bottom-1,
+            requirements:badgeY,requirementRowHeight:Math.round(req.height),
+            titleFont:parseFloat(txt.fontSize),titleHeight:headline.getBoundingClientRect().height,
+            linkWidth:Math.round(lr.width),linkHeight:Math.round(lr.height),
+            linkBorder:getComputedStyle(link).borderTopWidth,
+            linkText:link.textContent.trim(), 
+            contractBackground:getComputedStyle(methods).backgroundColor,
+            overflow:card.scrollWidth>card.clientWidth+1,
+            pageOverflow:document.documentElement.scrollWidth>innerWidth+1};
         })""")
-        assert len(aligned) == 2, aligned
-        assert all(v["priorityWidth"]>=105 for v in aligned), aligned
-        assert abs(aligned[0]["priorityRight"]-aligned[1]["priorityRight"]) <= 1, (width,aligned)
-        assert all(v["linkBorder"]=="0px" and v["external"] and v["linkHeight"]>=36 and not v["overflow"] for v in aligned), (width,aligned)
-        assert all(v["linkText"]=="공고 원문 ↗" for v in aligned), (width,aligned)
+        assert len(data)==4,data
+        assert all(not d["overflow"] and not d["pageOverflow"] for d in data),(width,data)
+        assert all(not d["priorityInitialsOverlap"] for d in data),(width,data)
+        assert all(d["titleFont"]>=17 for d in data),(width,data)
+        assert all(d["linkBorder"]=="0px" and d["linkHeight"]>=32 and
+                   d["linkText"]=="공고 원문 ↗" for d in data),(width,data)
+        assert all(d["contractBackground"] in ("rgba(0, 0, 0, 0)","transparent") for d in data),(width,data)
+        if width==1366:
+            assert len(set(d["priorityRight"] for d in data))==1,data
+            assert data[3]["requirementRowHeight"]<=42,data
+            assert max(d["height"] for d in data)-min(d["height"] for d in data)<=48,data
+        print("BID_CARD_BROWSER",width,data,flush=True)
         page.close()
     browser.close()
-print("BID_CARD_PRIORITY_AND_SOURCE_LINK_PASS")
+print("BID_CARD_LAYOUT_PASS")
