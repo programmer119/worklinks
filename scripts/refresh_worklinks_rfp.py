@@ -727,12 +727,25 @@ def extract(name,raw):
                 if inner.startswith('/') or '..' in Path(inner).parts:
                     raise ValueError('unsafe_archive_path')
                 suffix=Path(inner).suffix.lower()
-                if suffix in {'.pdf','.hwp','.hwpx','.docx','.xlsx','.pptx'}:
+                if suffix in {'.pdf','.hwp','.hwpx','.docx','.xlsx','.pptx',
+                              '.png','.jpg','.jpeg','.bmp','.webp','.tif','.tiff'}:
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     value=extract(Path(inner).name,archive.read(entry))
                     if not value.strip():raise ValueError('no_searchable_text')
                     parts.append('FILE '+inner+'\n'+value)
-                elif suffix in {'.zip','.egg','.7z','.rar'}:
+                elif suffix=='.zip':
+                    # One additional nested ZIP level only; each archive
+                    # still has strict member, expanded-size and path limits.
+                    depth=getattr(_DOCUMENT_SCAN,'zip_depth',0)
+                    if depth>=1:raise ValueError('nested_archive_requires_review')
+                    if entry.file_size>MAX_FILE:raise ValueError('large_file')
+                    _DOCUMENT_SCAN.zip_depth=depth+1
+                    try:
+                        value=extract(Path(inner).name,archive.read(entry))
+                    finally:_DOCUMENT_SCAN.zip_depth=depth
+                    if not value.strip():raise ValueError('no_searchable_text')
+                    parts.append('FILE '+inner+'\n'+value)
+                elif suffix in {'.egg','.7z','.rar'}:
                     raise ValueError('nested_archive_requires_review')
                 elif suffix in {'.txt','.csv'}:
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
