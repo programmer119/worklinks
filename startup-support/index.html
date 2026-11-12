@@ -2726,8 +2726,9 @@ function officialReviewCoverage(rfp,evidence,x,p){
  // Accept its full-document audit only when its unchanged source/manifest matches
  // this exact notice. Every company requirement is still independently checked
  // by comparePartnerJob before a bidder can be marked verified.
- const identity=x?jobBidIdentity(x):null;
- const audit=identity?qualificationReviewByNotice.get(identity.bidNo+':'+identity.order):null;
+ const identity=x&&typeof jobBidIdentity==='function'?jobBidIdentity(x):null;
+ const audit=identity&&typeof qualificationReviewByNotice!=='undefined'?
+  qualificationReviewByNotice.get(identity.bidNo+':'+identity.order):null;
  if(audit?.reviewComplete===true&&audit.requiredConditionsComplete===true&&
     audit.automaticEligibilityApproved===false&&
     audit.manifestSignature&&audit.manifestSignature===rfp.manifestSignature&&
