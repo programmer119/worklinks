@@ -28,11 +28,14 @@ AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 1
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
 RFP_REPAIR_PERIOD = max(3600, int(os.environ.get('G2B_RFP_REPAIR_PERIOD', 3600)))
 RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48))))
+QUALIFICATION_PERIOD = max(3600, int(os.environ.get('G2B_QUALIFICATION_PERIOD', 3600)))
+QUALIFICATION_BATCH = max(1, min(300, int(os.environ.get('G2B_QUALIFICATION_BATCH', 120)))
 READ_FILES = (
     'changcom-actionable.json',
     'g2b-award-fields-open.json',
     'rfp-clauses.json',
     'rfp-coverage-index.json',
+    'qualification-review.json',
     'changcom-bid-review.json',
     'sme-cert-snapshot.json',
     'direct-production-snapshot.json',
@@ -46,10 +49,11 @@ PUBLISHED = {
                   'rfp-top500-batch-state-20261111.json',
                   'rfp-top500-batch-metadata-20261111.json',
                   'rfp-top500-repair-report-20261111.json'),
+    'qualification': ('qualification-review.json',),
     'actionable': ('changcom-actionable.json',),
     'awardFallback': ('g2b-award-fields-open.json',)
 }
-TIMEOUT = {'rfp': 2100, 'rfpRepair': 2100, 'actionable': 540, 'awardFallback': 540}
+TIMEOUT = {'rfp': 2100, 'rfpRepair': 2100, 'qualification': 750, 'actionable': 540, 'awardFallback': 540}
 
 
 def log(*values):
@@ -109,6 +113,18 @@ def quality_guard(kind, outputs):
                 # Every prior notice key must remain in the cumulative archive.
                 if path.name == 'rfp-coverage-index.json' and not set(old_history).issubset(history):
                     raise ValueError('pipeline_rfp_archived_notice_regression')
+        if kind == 'qualification':
+            if (content.get('schemaVersion') != 1 or
+                    not isinstance(content.get('byNotice'),dict) or
+                    content.get('mode') != 'rule_based' or
+                    any(v.get('automaticEligibilityApproved') is not False
+                        for v in content['byNotice'].values())):
+                raise ValueError('pipeline_invalid_qualification_summary')
+            priorpath=SEEDS / path.name
+            if priorpath.is_file():
+                prior=json.loads(priorpath.read_text(encoding='utf-8'))
+                if not set(prior.get('byNotice') or {}).issubset(content['byNotice']):
+                    raise ValueError('pipeline_qualification_history_regression')
         if kind == 'actionable':
             bids=content.get('bids')
             counts=content.get('counts') or {}
@@ -130,7 +146,7 @@ def quality_guard(kind, outputs):
 def stage_workspace(path):
     root = path / 'worklinks'
     (root / 'scripts').mkdir(parents=True)
-    for name in ('refresh_worklinks_rfp.py', 'refresh_worklinks_actionable.py',
+    for name in ('refresh_worklinks_rfp.py', 'analyze_worklinks_rfp_ai.py', 'refresh_worklinks_actionable.py',
                  'refresh_worklinks_open_award_fallback.py',
                  'batch_backfill_changcom_top500_rfp.py',
                  'repair_changcom_top500_rfp.py',
@@ -194,6 +210,11 @@ def run_once(kind, runner=None):
         if kind == 'rfp':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_rfp.py'),
                        '--limit', str(RFP_LIMIT)]
+        elif kind == 'qualification':
+            command = [sys.executable, str(root / 'scripts' / 'analyze_worklinks_rfp_ai.py'),
+                       '--input', str(root / 'startup-support' / 'rfp-clauses.json'),
+                       '--summary', str(root / 'startup-support' / 'qualification-review.json'),
+                       '--summary-only', '--rule-based', '--limit', str(QUALIFICATION_BATCH)]
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
                        '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
@@ -228,7 +249,8 @@ def iteration(current=None, runner=None):
     state = read_state()
     # Persistent timestamps, not sleep-only, protect against restart loops.
     jobs = (('actionable', SHORTLIST_PERIOD), ('awardFallback', AWARD_FALLBACK_PERIOD),
-            ('rfp', RFP_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD))
+            ('rfp', RFP_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD),
+            ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
         previous = float((state.get(kind) or {}).get('attemptEpoch') or 0)
         if now - previous < period:
@@ -275,7 +297,8 @@ def main():
         log('PIPELINE_REPAIR_PREFLIGHT', state['rfpRepairPreflight'])
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
             'shortlistPeriod', SHORTLIST_PERIOD, 'openAwardPeriod', AWARD_FALLBACK_PERIOD,
-            'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT)
+            'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT,
+             'qualificationBatch', QUALIFICATION_BATCH)
         while True:
             iteration()
             time.sleep(90)
