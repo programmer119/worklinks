@@ -80,10 +80,18 @@ with tempfile.TemporaryDirectory() as tmp:
     opener=reader.OPENER
     try:
         reader.OPENER=FileOpener()
+        reader._NOTICE_CONTEXT.notice_key='R26BK01811411:000'
         first=reader.download(source_url)
         second=reader.download(source_url)
+        reader._NOTICE_CONTEXT.notice_key=None
         assert first==second
         assert len(from_mock)==1,from_mock
+        class ProxyOpener:
+            def open(self,req,timeout=0):
+                return Response(json.dumps({'ok':True}).encode())
+        reader.OPENER=ProxyOpener()
+        assert reader.fetch_json(
+            'http://127.0.0.1:18192/api/g2b/bid-evidence?bidNo=R26BK01811411&order=000')['ok'] is True
         # The actual low-level response/request attempts are separately logged.
     finally:
         reader.OPENER=opener
@@ -94,12 +102,16 @@ with tempfile.TemporaryDirectory() as tmp:
     assert stat['counts']['official_batch_http:http_ok']==1
     assert stat['counts']['official_batch_http:http_failed']==1
     assert stat['counts']['attachment_http:http_ok']==1
+    assert stat['counts']['proxy_http:http_ok']==1
+    assert stat['counts']['attachment_reuse:verified_bytes_reused']==1
     assert stat['counts']['cache:cache_hit']>=4
     assert stat['events']>=9
     con=sqlite3.connect(dest)
     # Secrets MUST NOT be recorded even though they are used in the request.
     rows=con.execute("SELECT request_key,detail FROM call_events").fetchall()
     assert all('a-private-service-key' not in str(x) for x in rows)
+    mapped=con.execute("SELECT kind,notice_key FROM call_events WHERE kind IN ('attachment_http','attachment_reuse','proxy_http')").fetchall()
+    assert all(k=='R26BK01811411:000' for kind,k in mapped),mapped
     con.close()
 
 print('RFP_PERSISTENT_CALL_LEDGER_NO_DUPLICATE_HTTP=PASS')
