@@ -171,7 +171,12 @@ def stage_workspace(path,minimal=False):
         if source.is_file():
             dest = root / 'snapshots' / name
             dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, dest)
+            if minimal and name != 'rfp-coverage-index.json':
+                # Only the coverage index is modified by OCR repair. Large
+                # full-text archives stay linked read-only, not copied.
+                dest.symlink_to(source)
+            else:
+                shutil.copy2(source, dest)
     # Read-only live databases, with all output written to isolated snapshot stage.
     for name in ('bids.sqlite3','rfp-request-ledger.sqlite3'):
         source = DATA / name
@@ -210,10 +215,18 @@ def repair_preflight():
                     failureReason=type(exc).__name__ + ': ' + str(exc)[:180])
 
 
-def run_once(kind, runner=None):
+def run_once(kind, runner=None, _single=False):
     """Run one job in an isolated writable workspace, atomic publish on success."""
     if kind not in PUBLISHED:
         raise ValueError('unknown_pipeline_kind')
+    if kind == 'rfpOpenRepair' and runner is None and not _single:
+        # Publish every small batch independently. A later slow OCR file
+        # cannot erase the already verified, completed repair batches.
+        for batch in range(7):
+            more=run_once(kind,runner=None,_single=True)
+            log('PIPELINE_RFP_OCR_BATCH_COMMITTED',batch+1,'more',bool(more))
+            if not more:break
+        return True
     with tempfile.TemporaryDirectory(prefix='worklinks-pipeline-', dir=str(DATA)) as tmp:
         root = stage_workspace(Path(tmp),minimal=(kind=='rfpOpenRepair'))
         env = dict(os.environ, WORKLINKS_G2B_API=SOURCE_API,
@@ -228,8 +241,8 @@ def run_once(kind, runner=None):
                        '--summary-only', '--rule-based', '--limit', str(QUALIFICATION_BATCH)]
         elif kind == 'rfpOpenRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
-                       '--data-dir', str(root), '--limit', str(RFP_OPEN_OCR_LIMIT),
-                       '--max-files', str(RFP_OPEN_OCR_LIMIT * 2), '--execute']
+                       '--data-dir', str(root), '--limit', str(min(4,RFP_OPEN_OCR_LIMIT)),
+                       '--max-files', str(min(8,RFP_OPEN_OCR_LIMIT * 2)), '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
                        '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
@@ -256,6 +269,16 @@ def run_once(kind, runner=None):
             publish_atomic(result, SEEDS / result.name)
         log('PIPELINE_PUBLISHED', kind,
             'outputs', ','.join(result.name for result in outputs))
+        if kind=='rfpOpenRepair' and _single:
+            # Dry-run plan is source-derived and no upstream bid-metadata API
+            # was called; stop cycles when no repairable notice is left.
+            for line in (completed.stdout or '').splitlines():
+                if line.startswith('OPEN_RFP_CACHED_REPAIR_PLAN '):
+                    try:
+                        plan=json.loads(line.split(' ',1)[1])
+                        return int(plan.get('selectedNotices') or 0)>0
+                    except ValueError:
+                        break
     return True
 
 
