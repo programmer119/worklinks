@@ -371,7 +371,7 @@ def pending_urgent_recovery(path=CHANGCOM_URGENT_RECOVERY):
         print('RFP_URGENT_QUEUE_UNAVAILABLE',type(ex).__name__,flush=True)
         return set()
 
-def discover(limit,prior=None,targets=None,manifest_probe_out=None):
+def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None):
     """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
     The file snapshot only contains recent detailed snippets, while the
@@ -383,6 +383,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
     targets=changcom_targets() if targets is None else targets
     backfill=pending_changcom_backfill()
     urgent=pending_urgent_recovery()
+    priority=priority or set()
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -436,7 +437,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None):
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
                 staff_missing=staffing_scan_pending(cached)
-                rank=(-2 if key in urgent and key in targets and temporal==0 else
+                rank=(-3 if key in priority and staff_missing and temporal==0 else
+                      -2 if key in urgent and key in targets and temporal==0 else
                       -1 if staff_missing and key in targets and temporal==0 else
                       -1 if key in backfill and temporal==0 else
                       -1 if partially_retryable and key in targets and temporal==0 else
@@ -1874,7 +1876,12 @@ def main():
     prior={**old,**prior_index}
     targets=changcom_targets()
     manifest_probes=[]
-    selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes)
+    # One-time operator-selected RFP jobs; no hardcoded ranking of named
+    # agencies and no re-download once the requested scan is complete.
+    priority={k for k in os.environ.get('WORKLINKS_RFP_ROLE_PRIORITY_KEYS','').split(',')
+              if re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',k)}
+    selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
+                      priority=priority)
     results=dict(old)
     # Parse already-stored binaries first; an older record is never re-downloaded
     # just to populate the staffing column.
