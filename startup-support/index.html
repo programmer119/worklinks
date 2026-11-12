@@ -527,6 +527,30 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobDetailModal .job-detail-actions{padding-top:14px;border-top:1px solid #e5e7eb;margin-top:8px}
 @media(max-width:620px){#jobDetailModal #jobDetailTitle{font-size:20px}#jobDetailModal .job-detail-meta-grid{grid-template-columns:1fr}#jobDetailModal .job-detail-meta-item{padding:12px 13px}}
 
+
+/* Tender detail: concise, provenance-aware requirement grid. */
+#jobDetailModal .job-key-requirements{padding:18px 0 21px}
+#jobDetailModal .job-key-requirements>h3{font-size:19px;line-height:1.4;margin-bottom:5px}
+#jobDetailModal .job-key-intro{color:#64748b;font-size:14px;margin:0 0 14px;line-height:1.5}
+#jobDetailModal .job-key-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+#jobDetailModal .job-key-item{border:1px solid #dce4ee;background:#fff;border-radius:12px;padding:14px 15px;min-width:0}
+#jobDetailModal .job-key-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+#jobDetailModal .job-key-head strong{font-size:17px;font-weight:800;line-height:1.4;color:#0f172a}
+#jobDetailModal .job-key-state{display:inline-flex;align-items:center;gap:5px;border-radius:7px;border:1px solid #cbd5e1;padding:4px 8px;background:#f1f5f9;color:#475569;font-size:13px;font-weight:800;line-height:1.35;white-space:nowrap}
+#jobDetailModal .job-key-state[data-state="required"]{border-color:#fcd34d;background:#fffbeb;color:#92400e}
+#jobDetailModal .job-key-state[data-state="not_required"]{border-color:#86efac;background:#f0fdf4;color:#166534}
+#jobDetailModal .job-key-state[data-state="failed"]{border-color:#fca5a5;background:#fef2f2;color:#b91c1c}
+#jobDetailModal .job-key-state[data-state="evaluation"]{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
+#jobDetailModal .job-key-primary{font-size:15.5px;font-weight:700;line-height:1.55;color:#1e293b;margin:0 0 6px;overflow-wrap:anywhere}
+#jobDetailModal .job-key-secondary{font-size:14px;line-height:1.6;color:#475569;margin:0;overflow-wrap:anywhere}
+#jobDetailModal .job-key-item details{border-top:1px solid #edf2f7;margin-top:11px;padding-top:8px}
+#jobDetailModal .job-key-item details summary{cursor:pointer;font-size:14px;font-weight:750;color:#1d4ed8;line-height:1.6}
+#jobDetailModal .job-key-source{font-size:14px;line-height:1.6;color:#334155;padding:9px 0;border-bottom:1px solid #edf2f7;overflow-wrap:anywhere;white-space:normal}
+#jobDetailModal .job-key-source:last-child{border-bottom:0}
+#jobDetailModal .job-key-source small{display:block;font-size:13px;color:#64748b;margin-top:5px}
+#jobDetailModal .job-key-source a{font-size:13px;display:inline-block;margin-top:5px}
+@media(max-width:690px){#jobDetailModal .job-key-grid{grid-template-columns:1fr}#jobDetailModal .job-key-item{padding:13px 14px}}
+
 /* Procurement reading view: no dead file-name rows or unnecessary explanatory sections. */
 #jobDetailModal .job-evidence-section{padding:21px 0}
 #jobDetailModal .job-evidence-section h3{font-size:19px;line-height:1.4;margin-bottom:13px}
@@ -3189,7 +3213,7 @@ function renderJobDetail(x){
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
  const confirmedHistory=standardBidMarkup(x);
- document.getElementById('jobDetailBody').innerHTML=base+reviewNote+savedResearchMarkup(x)+docLinks+
+ document.getElementById('jobDetailBody').innerHTML=jobDetailRequirementGrid(x)+base+reviewNote+savedResearchMarkup(x)+docLinks+
   (extractHTML&&!jobSearchText?'<details class="job-detail-advanced"><summary>RFP 원문 발췌 보기</summary>'+extractHTML+'</details>':'')+
   (confirmedHistory?'<section class="job-detail-section"><h3>개찰·낙찰·계약 이력</h3>'+confirmedHistory+'</section>':'')+
   bidChangePriceMarkup(x)+variantLinks+actions;
@@ -3310,8 +3334,8 @@ function savedResearchMarkup(x){
 }
 
 /* Official document requirement summary. Do not treat "text not found" as "not required". */
-function jobRequirementBadges(x){
- const id=jobBidIdentity(x);if(!id)return '';
+function jobRequirementEvidence(x){
+ const id=jobBidIdentity(x);if(!id)return null;
  const key=id.bidNo+':'+id.order;
  const full=rfpSnapshotByNotice.get(key)||null;
  const saved=jobSearchRfpState.get(key)||null;
@@ -3359,15 +3383,7 @@ function jobRequirementBadges(x){
     'API 수집 후 해당 요건 확정 실패. 발췌 부족·조건 모호성·전체 검토 미완료'};
  }
  const coverage=(rfpSnapshotCheckedAt||saved||full||staff)?'':'원문 저장정보 불러오는 중';
- function marker(name,v,lines,code){
-  const tooltip=[name+' · '+v.label,v.reason].concat(lines).filter(Boolean).join('\n');
-  return '<span class="job-req-item" data-state="'+v.key+'">'+
-   '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
-     htmlEscape(name+' '+v.label+'. '+tooltip)+'" aria-expanded="false">'+
-     htmlEscape(name)+' <span class="job-req-icon" aria-hidden="true">'+
-     ({not_checked:'?',failed:'×',required:'!',not_required:'✓'})[v.key]+'</span></button>'+
-   '<span class="job-req-tip" role="tooltip">'+htmlEscape(tooltip)+'</span></span>';
- }
+
  const four=choice(insurer,foundInsurance);
  const srcInsurance=insurer||foundInsurance[0];
  const insLines=srcInsurance?[
@@ -3398,9 +3414,170 @@ function jobRequirementBadges(x){
  if(srcOnsite){siteLines.push('원문: '+srcOnsite.text.slice(0,240));
   siteLines.push('출처: '+(srcOnsite.file||'파일명 미확인'));}
  if(coverage)siteLines.unshift(coverage);
+ return {
+  insurance:{status:four,source:srcInsurance,lines:insLines},
+  onsite:{status:site,source:srcOnsite,lines:siteLines},
+  meta:{full,saved,staff,clauses,tried,scanFailed,fullyReviewed}
+ };
+}
+function jobRequirementBadges(x){
+ const evidence=jobRequirementEvidence(x);
+ if(!evidence)return '';
+ function marker(name,v,lines,code){
+  const tooltip=[name+' · '+v.label,v.reason].concat(lines).filter(Boolean).join('\n');
+  return '<span class="job-req-item" data-state="'+v.key+'">'+
+   '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
+     htmlEscape(name+' '+v.label+'. '+tooltip)+'" aria-expanded="false">'+
+     htmlEscape(name)+' <span class="job-req-icon" aria-hidden="true">'+
+     ({not_checked:'?',failed:'×',required:'!',not_required:'✓'})[v.key]+'</span></button>'+
+   '<span class="job-req-tip" role="tooltip">'+htmlEscape(tooltip)+'</span></span>';
+ }
  return '<div class="job-req-strip" aria-label="4대보험과 상주 요구조건">'+
-  marker('4대보험',four,insLines,'insurance')+
-  marker('상주',site,siteLines,'onsite')+'</div>';
+  marker('4대보험',evidence.insurance.status,evidence.insurance.lines,'insurance')+
+  marker('상주',evidence.onsite.status,evidence.onsite.lines,'onsite')+'</div>';
+}
+
+
+function jobDetailRequirementGrid(x){
+ const e=jobRequirementEvidence(x);
+ if(!e)return '';
+ const {full,saved,staff,tried,scanFailed,fullyReviewed}=e.meta;
+ const key=jobBidIdentity(x).bidNo+':'+jobBidIdentity(x).order;
+ const pre=changcomPrecheckByNotice.get(key)||null;
+ const validUrl=url=>/^https:\/\/(?:[a-z0-9-]+\.)*g2b\.go\.kr(?:\/|$)/i.test(String(url||''));
+ const all=[],seen=new Set();
+ function add(text,type,required,file,url){
+  const quote=String(text||'').replace(/\s+/g,' ').trim();
+  if(!quote)return;
+  const normalized=quote.replace(/[\s.,·()[\]「」]/g,'');
+  if(seen.has(type+'|'+normalized))return;
+  seen.add(type+'|'+normalized);
+  all.push({text:quote,type:String(type||''),required:required===true,
+    file:String(file||''),url:validUrl(url)?url:''});
+ }
+ if(Array.isArray(full?.files)){
+  for(const f of full.files)for(const c of f.clauseCandidates||[]){
+   add(c?.sourceText,c?.type,c?.explicitMust===true,c?.sourceFile||f.name,f.url||f.sourceUrl);
+  }
+ }
+ // The compact saved search is limited to 12 snippets: never interpret its
+ // omissions as proof that the procurement notice has no requirement.
+ if(Array.isArray(saved?.excerpts))for(const c of saved.excerpts)
+  add(c?.text,c?.type,false,c?.sourceFile,c?.sourceUrl);
+ const preClauses=pre?.officialClauseEvidence?.clauseCandidates||{};
+ for(const [kind,items] of Object.entries(preClauses)){
+  if(!Array.isArray(items))continue;
+  for(const c of items)add(c?.text,kind,false,c?.sourceFile,c?.url);
+ }
+ const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
+ const perf=/실적\s*(?:증명|기준|평가|요구|제출)|(?:수행|유사|납품|용역|사업)\s*실적|실적\s*[0-9]/i;
+ const direct=/직접\s*생산|세부\s*품명\s*번호|세부품명번호|직생/i;
+ const perfRows=all.filter(c=>c.type==='performance_proof'||perf.test(c.text));
+ const directRows=all.filter(c=>c.type==='direct_production'||direct.test(c.text));
+ const mandatoryPerf=perfRows.find(c=>!negative.test(c.text)&&
+   /(?:입찰\s*참가\s*자격|참가\s*자격|입찰\s*참가\s*조건|필수\s*(?:수행|유사)?\s*실적|최소\s*실적|실적.{0,24}(?:이상\s*(?:보유|수행)|미달.{0,12}참가\s*불가))/i.test(c.text)&&
+   !/(?:실적|수행)\s*(?:평가|배점|가점|점수)/i.test(c.text));
+ const evaluationPerf=perfRows.find(c=>/(?:실적|수행)\s*(?:평가|배점|가점|점수)|(?:평가|배점|가점|점수).{0,24}실적/i.test(c.text));
+ const mandatoryDirect=directRows.find(c=>!negative.test(c.text)&&
+   (c.required||/직접\s*생산.{0,65}(?:확인\s*(?:증명서|서)|필수|소지|제출|참가\s*자격)|(?:입찰\s*참가\s*자격|필수).{0,75}직접\s*생산/i.test(c.text))&&
+   !/(?:평가|가점|점수).{0,40}직접\s*생산/i.test(c.text));
+ function status(rows,required,evaluation){
+  if(required)return {key:'required',label:'요구 문구 확인'};
+  if(evaluation)return {key:'evaluation',label:'평가용 언급'};
+  if(rows.length)return {key:'review',label:'원문 판정 필요'};
+  if(!tried)return {key:'not_checked',label:'확인안함'};
+  if(fullyReviewed)return {key:'not_required',label:'요건 없음 확인'};
+  return scanFailed?{key:'failed',label:'확인실패'}:{key:'review',label:'원문 검토 필요'};
+ }
+ const prodCodes=[...new Set(directRows.flatMap(c=>
+  (c.text.match(/(?<!\d)\d{10}(?!\d)/g)||[])))].slice(0,6);
+ const perfHints=perfRows.flatMap(c=>{
+  const out=[];
+  const period=c.text.match(/최근\s*\d+\s*년(?:간|이내)?/);
+  const threshold=c.text.match(/\d+(?:,\d{3})*(?:\.\d+)?\s*(?:억\s*원|백만\s*원|만원|천만\s*원)\s*이상/);
+  if(period)out.push(period[0]);
+  if(threshold)out.push(threshold[0]);
+  return out;
+ });
+ const uniqHints=[...new Set(perfHints)].slice(0,3);
+ const stPerf=status(perfRows,mandatoryPerf,evaluationPerf);
+ const stDirect=status(directRows,mandatoryDirect,null);
+ const p=worklinksPartnerAccess()?partners.find(v=>v.id==='changcom'):null;
+ let prodCompany='';
+ if(p&&directRows.length){
+  const response=productionRequirementCheck(x,p);
+  prodCompany=response.applicable?'창컴 증빙: '+response.reason:
+   '창컴 증빙: 공고 요구 품목과의 현재 일치 여부 미확인';
+ }else if(p)prodCompany='창컴 증빙: 해당 공고의 직접생산 요구 여부 확정 전';
+ const staffReq=staff?.requirements||{};
+ const staffParts=[
+  staffReq.onSite?'현장 상주·전담 문구 검출':'',
+  (staffReq.peopleMentioned||[]).length?'언급 인원 '+staffReq.peopleMentioned.join('/')+'명 (합산 아님)':'',
+  (staffReq.gradesMentioned||[]).length?'기술등급 '+staffReq.gradesMentioned.join(' · '):'',
+  (staffReq.manMonthsMentioned||[]).length?'투입공수 '+staffReq.manMonthsMentioned.join('/')+'MM':''
+ ].filter(Boolean);
+ const concise=t=>String(t||'').replace(/\s+/g,' ').trim().slice(0,165);
+ const proofInsurance=e.insurance.source;
+ const proofOnsite=e.onsite.source;
+ const synopsis={
+  insurance:{
+   name:'4대보험',code:'insurance',s:e.insurance.status,
+   primary:proofInsurance?concise(proofInsurance.text):
+     (e.insurance.status.key==='not_required'?'해당 의무 없음 검토 완료':'가입·재직 증빙 요구 조건 미확정'),
+   sub:'필요 대상·제출기한은 공고 원문에서 별도 확인',
+   rows:all.filter(c=>/4\s*대\s*(?:사회\s*)?보험|사대\s*보험|건강\s*보험\s*자격득실|고용\s*보험\s*가입/i.test(c.text)).slice(0,4)
+  },
+  onsite:{
+   name:'상주',code:'onsite',s:e.onsite.status,
+   primary:staffParts.length?staffParts.join(' · '):
+     proofOnsite?concise(proofOnsite.text):'상주 대상·인원·근무 기간 미확정',
+   sub:'인원·역할별 배치 조건은 확인된 원문만 반영',
+   rows:all.filter(c=>/상주|현장\s*(?:근무|배치)|전담\s*근무/i.test(c.text)).slice(0,4)
+  },
+  performance:{
+   name:'수행실적',code:'performance',s:stPerf,
+   primary:mandatoryPerf?'입찰 필수조건 문구 검출'+(uniqHints.length?' · '+uniqHints.join(' · '):''):
+    evaluationPerf?'제안 평가용 실적 언급 · 입찰 필수실적과 별개':
+    perfRows.length?'실적 제출·요건 문구 확인 · 필수 여부 검토 필요':
+    (stPerf.key==='not_required'?'필수 실적 요건 없음 확인':'최소 실적·금액·기간 미확정'),
+   sub:p?'창컴 증빙: 해당 사업의 실적증명서·수행완료 여부 별도 대조 필요':
+    '계약·낙찰이력은 수행완료 실적증명서를 대체하지 않음',
+   rows:perfRows.slice(0,5)
+  },
+  production:{
+   name:'직접생산',code:'production',s:stDirect,
+   primary:prodCodes.length?'요구 관련 세부품명번호 '+prodCodes.join(' / '):
+    directRows.length?'직접생산 관련 원문 확인 · 필수 품목번호 검토 필요':
+    stDirect.key==='not_required'?'요구 없음 확인':'요구 품목·세부품명번호 미확정',
+   sub:prodCompany||'업체 발급이력과 현재 유효 여부는 별도 확인',
+   rows:directRows.slice(0,5)
+  }
+ };
+ // Scan metadata is honest about documents that could not be read.
+ const hasFiles=Array.isArray(full?.files)?full.files.length:Number(saved?.documentCount||0);
+ const readable=Array.isArray(full?.files)?full.files.filter(f=>f.readable===true).length:Number(saved?.readableCount||0);
+ const coverage=hasFiles?' · 판독 '+readable+'/'+hasFiles+'건':'';
+ function card(item){
+  const icon=({required:'!',not_required:'✓',failed:'×',evaluation:'~',review:'?',not_checked:'?'})[item.s.key]||'?';
+  const extra=item.rows.length?
+   '<details><summary>원문 근거 '+item.rows.length+'건 보기</summary>'+
+   item.rows.map(r=>'<div class="job-key-source">'+htmlEscape(r.text)+
+     '<small>출처: '+htmlEscape(r.file||'공고 원문')+'</small>'+
+     (r.url?'<a href="'+htmlEscape(r.url)+'" target="_blank" rel="noopener noreferrer">파일 열기 ↗</a>':'')+
+    '</div>').join('')+'</details>':'';
+  return '<article class="job-key-item" data-kind="'+item.code+'">'+
+   '<div class="job-key-head"><strong>'+htmlEscape(item.name)+'</strong>'+
+   '<span class="job-key-state" data-state="'+item.s.key+'">'+icon+' '+htmlEscape(item.s.label)+'</span></div>'+
+   '<p class="job-key-primary">'+htmlEscape(item.primary)+'</p>'+
+   '<p class="job-key-secondary">'+htmlEscape(item.sub)+'</p>'+
+   extra+'</article>';
+ }
+ return '<section class="job-detail-section job-key-requirements">'+
+  '<h3>입찰 핵심조건</h3>'+
+  '<p class="job-key-intro">공고별 원문 근거 기준'+coverage+' · 문구 검출과 최종 참가자격 판정은 구분합니다.</p>'+
+  '<div class="job-key-grid">'+
+  [synopsis.insurance,synopsis.onsite,synopsis.performance,synopsis.production].map(card).join('')+
+  '</div></section>';
 }
 
 function jobCollectionMarkup(x){
