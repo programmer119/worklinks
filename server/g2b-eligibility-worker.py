@@ -142,20 +142,41 @@ def extra_target(conn):
  candidates.sort(key=lambda x:x[0])
  return (candidates[0][1],candidates[0][2])
 
-def fetch_extra(no,order):
+def local_api_read(endpoint,no,order,timeout):
  query=urllib.parse.urlencode({'bidNo':no,'order':order})
- req=urllib.request.Request(API+'/bid-extra?'+query,headers={'Accept':'application/json'})
- with urllib.request.urlopen(req,timeout=38) as response:
-  data=json.loads(response.read().decode('utf8'))
+ req=urllib.request.Request(API+'/'+endpoint+'?'+query,headers={'Accept':'application/json'})
+ ledger=None
+ key=None
+ if os.environ.get('WORKLINKS_RFP_LEDGER_DB'):
+  from rfp_call_ledger import CallLedger,cache_key
+  ledger=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+  key=cache_key('qualification_local',endpoint,no,order)
+ try:
+  with urllib.request.urlopen(req,timeout=timeout) as response:
+   status=getattr(response,'status',200)
+   data=json.loads(response.read().decode('utf8'))
+  if ledger:
+   outcome='http_verified' if data.get('ok') is True and data.get('complete') is True else 'http_incomplete'
+   ledger.record('qualification_local_http',key,outcome,notice_key=no+':'+order,
+                 http_status=status)
+   if outcome=='http_verified':ledger.save_json(key,data,max_bytes=3_000_000)
+  return data
+ except Exception as error:
+  if ledger:
+   ledger.record('qualification_local_http',key,'http_failed',
+                 notice_key=no+':'+order,
+                 http_status=getattr(error,'code',None),
+                 error_class=type(error).__name__)
+  raise
+
+def fetch_extra(no,order):
+ data=local_api_read('bid-extra',no,order,38)
  if str(data.get('bidNo') or '')!=no or str(data.get('order') or '')!=order:
   raise ValueError('supplemental_notice_identity_mismatch')
  return data
 
 def verify(no,order):
- query=urllib.parse.urlencode({'bidNo':no,'order':order})
- req=urllib.request.Request(API+'/eligibility?'+query,headers={'Accept':'application/json'})
- with urllib.request.urlopen(req,timeout=27) as response:
-  data=json.loads(response.read().decode('utf8'))
+ data=local_api_read('eligibility',no,order,27)
  if not data.get('ok') or not data.get('complete'):
   raise ValueError('incomplete_eligibility')
  if str(data.get('bidNo') or '')!=no or str(data.get('order') or '').zfill(3)!=order:
