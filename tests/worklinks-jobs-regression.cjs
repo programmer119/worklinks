@@ -8,7 +8,10 @@ const source=fs.readFileSync(path.join(__dirname,'../startup-support/index.html'
 const inline=source.match(/<script>([\s\S]*?)<\/script>/i);
 assert.ok(inline&&inline[1],'inline WorkLinks application script exists');
 assert.doesNotThrow(()=>new Function(inline[1]),'all WorkLinks frontend JavaScript must parse');
-assert.ok(source.includes("const docLinks=docs?.ok?"),'bid detail must show official attachments');
+assert.ok(source.includes("const docLinks=verifiedLinks.size?") &&
+  source.includes("const officialFiles=Array.isArray(snapshot?.officialFiles)") &&
+  source.includes("validFileLink(url)"),
+  'bid detail must show source-verified official attachments');
 const part=(from,to)=>{
  const a=source.indexOf(from),b=source.indexOf(to,a+from.length);
  assert.ok(a>=0&&b>a,'missing source section '+from);
