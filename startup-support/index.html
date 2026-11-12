@@ -636,7 +636,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobsView .job-verdict-filter{margin:5px 0 4px;gap:7px;align-items:center}
 #jobsView .job-vf{font-size:15px;min-height:38px;padding:7px 12px;border-radius:9px;font-weight:750}
 #jobsView .job-vf [data-verdict-count]{font-size:15px}
-#jobsView .job-sort-row{margin:5px 0 2px;font-size:15px;gap:8px}
+#jobsView .job-sort-row{margin:0 0 0 auto;font-size:15px;gap:8px;display:flex;align-items:center}
 #jobsView .job-sort-row select{font-size:15px;min-height:38px;padding:6px 10px}
 #jobsView .job-info-pop .job-decision-summary{font-size:14px;font-weight:650;line-height:1.6;margin:10px 0;padding:10px 0;border-bottom:1px solid #e2e8f0}
 #jobsView .job-extra-filters{flex:0 0 auto;position:relative;margin-left:auto;min-width:0}
@@ -649,8 +649,9 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobsView .job-extra-panel .job-advantage-toolbar>strong{font-size:15px;flex:1 0 100%}
 #jobsView .job-extra-panel .job-vf{font-size:15px;min-height:38px;padding:7px 10px}
 #jobsView .job-extra-filters .job-competition-refresh{flex:0 0 auto}
+#jobsView .job-extra-filters.has-selection>summary{border-color:#2563eb;color:#1d4ed8;background:#eff6ff}
 #jobsView .job-verdict-filter>.job-vf{white-space:nowrap}
-#jobsView .job-decision-summary:not(.job-info-pop .job-decision-summary){display:none}
+
 @media(max-width:780px){
  #jobsView .panel{padding:12px}
  #jobsView .job-titlebar>b{font-size:20px}
@@ -841,7 +842,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  </div>
  <button type="button" class="job-vf job-competition-refresh" id="competitionLoadMore" title="서버에 저장된 과거 경쟁 자료만 다시 확인합니다. 새 정부 API 호출은 하지 않습니다">과거 경쟁 자료 갱신 <span id="competitionLoadStatus">(조회 전)</span></button>
  </div></details>
- </div><div class="job-sort-row"><label for="jobSort">정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순</option><option value="recent">최신순</option><option value="budget">금액 높은순</option><option value="competition">과거 경쟁 적은순</option></select></div>
+ <div class="job-sort-row"><label for="jobSort">정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순</option><option value="recent">최신순</option><option value="budget">금액 높은순</option><option value="competition">과거 경쟁 적은순</option></select></div>
+ </div>
 
 
   </div>
@@ -4083,6 +4085,9 @@ function refreshVerdictFilters(rows,selected){
  });
  const panel=document.getElementById('jobVerdictFilter');
  if(panel)panel.hidden=jobFilter==='sources';
+ const extra=document.getElementById('jobExtraFilters');
+ if(extra)extra.classList.toggle('has-selection',
+  !['all','ready','blocked','checking'].includes(jobVerdictFilter));
 }
 
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
@@ -4335,7 +4340,12 @@ function renderJobs(){
  const partialServerList=g2bSavedLoadRunning||!!g2bSavedLoadError||
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
    (!g2bServerAvailable&&g2bSavedKnownTotal>0);
- document.getElementById('partnerJobCount').textContent='('+candidateJobs.length+(partialServerList?' · 일부':'')+')';
+ document.getElementById('partnerJobCount').textContent=
+  candidateJobs.length+'건'+(partialServerList?' · 일부':'');
+ const partnerCountLabel=document.querySelector('#changcomJobFilters .partner-count-label');
+ if(partnerCountLabel)partnerCountLabel.title=partialServerList?
+  '서버 공고 중 현재 불러온 목록만 집계했습니다. 자세한 조회 오류는 오른쪽 !에서 확인하세요.':
+  '서버 DB에서 불러온 공고 중 현재 협업 후보로 분류된 건수';
  const knownServerCount=Math.max(g2bSavedKnownTotal,g2bSavedTotal);
  const listCoverageText=partialServerList?
   'DB '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+
