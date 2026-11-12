@@ -916,7 +916,7 @@ def saved_rfp_search_state(row, compact=False):
         'readable':f.get('readable') is True,
         'pdfAlternative':covered.get(i,'')[:140],
         'skippedDuplicateFormat':i in covered,
-        'errorCategory':str(f.get('errorCategory') or '')[:90],
+        'errorCategory':('' if i in covered else str(f.get('errorCategory') or '')[:90]),
         'textScanComplete':f.get('sourceTextScanComplete') is True,
         'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
         'unmatchedQualificationAnchorCount':int(f.get('unmatchedQualificationAnchorCount') or 0)
