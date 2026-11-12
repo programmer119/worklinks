@@ -73,4 +73,48 @@ assert safe['staffingRoles'][-1]['sourceUrl']=='',safe
 assert not parse('직무 기술등급 인원\nPM(사업총괄) 경력 5년 이상 | 12','인력표.pdf')
 assert not parse('투입인력 기술등급 인원\n기술자 부문 배점 20점 이상 6.0','인력표.pdf')
 assert not parse('사업관리자(PM)를 지정하고 전담유지보수 1명을 상주시킨다','인력표.pdf')
+# Same-stem official PDF can satisfy only the staffing scope of a
+# deliberately skipped HWP. The skipped source stays explicitly unreadable.
+pdf={'name':'공고서.pdf','readable':True,'sourceTextScanComplete':True,
+     'sourceSha256':'a'*64,'qualificationScanTruncated':False,
+     'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],
+     'staffingRoleScanTruncated':False,'staffingRoles':[]}
+hwp={'name':'공고서.hwpx','readable':False,'skippedDuplicateFormat':True,
+     'sourceTextScanComplete':False,'alternatePdfEvidence':'공고서.pdf',
+     'alternatePdfSourceSha256':'a'*64}
+bundle={'manifestComplete':True,'status':'text_extracted_requires_review',
+        'files':[hwp,pdf]}
+assert p['compact_coverage'](bundle)['staffingRoleScanComplete'] is True
+assert hwp['readable'] is False
+fake={'files':[dict(hwp,alternatePdfSourceSha256='0'*64),pdf],
+      'manifestComplete':True}
+assert p['compact_coverage'](fake)['staffingRoleScanComplete'] is False
+assert p['staffing_scan_pending'](bundle) is False
+
+# Generic legal boilerplate/award score examples do not state the current
+# project's named, committed staffing.
+general='(행안부예규) 지방자치단체 입찰시 낙찰자 결정기준(2026.11.2.).hwpx'
+example='산정예시 <기술자 보유> 특급기술자 1인 (경력․관리능력 3년)'
+assert parse(example,general)==[]
+assert parse('기술자 1명','제안요청서.hwpx')
+assert parse('산정예시 기술자 1명','제안요청서.hwpx')==[]
+legacy_example={'manifestComplete':True,'files':[{'name':general,
+  'readable':True,'sourceTextScanComplete':True,
+  'staffingRoleScanVersion':2,'staffingRoles':[{
+    'role':'기술자','count':1,'sourceFile':general,'sourceText':example}]}]}
+assert p['staffing_summary'](legacy_example)==[]
+
+# A nationwide standard-contract ZIP is not a missing project staffing spec.
+# Preserve its unreadable fact, with explicit provenance of the exclusion.
+packet={'name':'★[용역] 입찰유의서, 계약일반조건, 특수조건, 적격심사 및 협상기준(행안부).zip',
+        'readable':False,'sourceTextScanComplete':False,
+        'errorCategory':'pdf_over_page_limit'}
+assert p['staffing_general_annex_file'](packet['name'])
+scope={'manifestComplete':True,'files':[packet,pdf]}
+out=p['compact_coverage'](scope)
+assert out['staffingRoleScanComplete'] is True
+assert out['files'][0]['readable'] is False
+assert out['files'][0]['staffingScopeExcluded'] is True
+assert not p['staffing_general_annex_file']('2027년 사업 수행 인력 제안요청서.hwpx')
+
 print('RFP_STAFFING_ROLE_SOURCE_BACKED_EXTRACTION=PASS')
