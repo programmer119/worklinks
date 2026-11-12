@@ -1,0 +1,24 @@
+/* Shared, compact account entry for every WorkLinks page. */
+.worklinks-account-nav{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:none;min-width:0;position:relative;z-index:75}
+.worklinks-account-nav .worklinks-auth-button,
+.worklinks-account-nav .worklinks-auth-summary{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:34px;max-width:100%;padding:7px 13px;border:1px solid #c9d5e3;border-radius:9px;background:#fff;color:#163b66;font:750 13px/1.25 system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;box-shadow:0 1px 2px #142a4010}
+.worklinks-account-nav .worklinks-auth-button:hover,
+.worklinks-account-nav .worklinks-auth-summary:hover{border-color:#7ea6cf;background:#f2f7fc;text-decoration:none}
+.worklinks-account-nav .worklinks-auth-button:focus-visible,
+.worklinks-account-nav .worklinks-auth-summary:focus-visible{outline:2px solid #2563eb;outline-offset:3px}
+.worklinks-account-nav .worklinks-auth-primary{background:#173e6c;color:white;border-color:#173e6c}
+.worklinks-account-nav .worklinks-auth-primary:hover{background:#245589;color:white}
+.worklinks-account-nav .worklinks-auth-secondary{padding:7px 10px;border-color:transparent;background:transparent;color:#475569;box-shadow:none}
+.worklinks-account-nav .worklinks-auth-secondary:hover{border-color:#c9d5e3;background:#fff}
+.worklinks-account-nav .worklinks-auth-dropdown{position:relative}
+.worklinks-account-nav .worklinks-auth-summary{list-style:none;gap:5px}
+.worklinks-account-nav .worklinks-auth-summary::-webkit-details-marker{display:none}
+.worklinks-account-nav .worklinks-auth-dropdown[open] .worklinks-auth-summary{border-color:#7ea6cf;background:#f2f7fc}
+.worklinks-account-nav .worklinks-auth-popup{position:absolute;right:0;top:calc(100% + 8px);width:230px;max-width:calc(100vw - 24px);padding:10px;background:#fff;border:1px solid #d8e1ed;border-radius:12px;box-shadow:0 12px 30px #1c33542e;display:grid;gap:6px;z-index:200}
+.worklinks-account-nav .worklinks-auth-user{font-size:12px;line-height:1.5;color:#475569;overflow-wrap:anywhere;padding:5px 6px 9px;border-bottom:1px solid #e2e8f0}
+.worklinks-account-nav .worklinks-auth-popup .worklinks-auth-button,
+.worklinks-account-nav .worklinks-auth-popup a{width:100%;justify-content:flex-start;background:#fff;color:#173e6c;border-color:transparent;text-align:left;box-shadow:none}
+.worklinks-account-nav .worklinks-auth-popup .worklinks-auth-button:hover,
+.worklinks-account-nav .worklinks-auth-popup a:hover{background:#f2f7fc}
+.worklinks-auth-sr{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
+@media(max-width:550px){.worklinks-account-nav .worklinks-auth-button,.worklinks-account-nav .worklinks-auth-summary{font-size:13px;min-height:34px;padding:7px 10px}.worklinks-account-nav .worklinks-auth-secondary{padding:7px 6px}}
