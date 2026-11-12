@@ -639,6 +639,11 @@ def extract_rule_candidates(text,filename):
       'direct_production':r'직접\s*생산|세부\s*품명\s*번호|공간정보\s*DB\s*구축',
       'sme_certificate':r'소기업[\s․·/-]*소상공인\s*확인서|소기업.{0,150}소상공인.{0,60}확인서|중소기업\s*확인서|소기업\s*확인서|소기업.?소상공인.*소지|중소기업자\s*만|소기업\s*만|소상공인\s*만|중소기업자.{0,22}입찰',
       'staff_proof':(
+          # Onsite is a worksite mode, not a bidder staffing-date requirement.
+          # Preserve these clauses for the dedicated onsite/offsite UI judgment.
+          r'상주\s*(?:근무|배치|운영|유지관리)|현장\s*상주|'
+          r'(?:발주기관|발주처|수요기관|기관\s*내).{0,35}(?:상시\s*근무|상주\s*근무)|'
+          r'(?:상시\s*근무|상주\s*근무).{0,35}(?:발주기관|발주처|수요기관)|'
           r'재직.{0,12}경력|경력.{0,12}학력|자격.?증명서|투입\s*인력|'
           r'(?:상주|전담|현장\s*배치).{0,35}(?:인력|개발자|기술자|\d+\s*(?:명|인))|'
           r'(?:인력|개발자|기술자|\d+\s*(?:명|인)).{0,35}(?:상주|전담|현장\s*배치)|'
