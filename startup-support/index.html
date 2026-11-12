@@ -3379,9 +3379,14 @@ function jobRequirementEvidence(x){
  const onsite=/상주|현장\s*(?:근무|배치)|전담\s*근무/i;
  const foundInsurance=clauses.filter(c=>insurance.test(c.text));
  const foundOnsite=clauses.filter(c=>onsite.test(c.text));
- const insurer=foundInsurance.find(c=>!negative.test(c.text)&&
+ // An explicit requirement due only after award/contract is not a bid-time eligibility gate.
+ // Do not turn an incomplete document scan into a "not required" result.
+ const contractStage=/(?:계약\s*(?:체결|시|후|이후|일|단계|전)|낙찰\s*(?:후|이후)|사업\s*착수|과업\s*(?:수행|착수)|수행\s*(?:중|시|기간)|착수\s*(?:시|후|이후)|계약\s*상대자)/i;
+ const bidStage=/(?:입찰\s*(?:참가\s*(?:시|전|자격|신청\s*(?:시|전))|마감|서\s*제출\s*(?:시|전)|자격|시점|당시|시\b)|공고일\s*(?:현재|기준)|제안서\s*제출\s*(?:시|전)|투찰\s*(?:시|전)|입찰\s*서류\s*제출\s*(?:시|전))/i;
+ const deferredToContract=c=>contractStage.test(c.text)&&!bidStage.test(c.text);
+ const insurer=foundInsurance.find(c=>!negative.test(c.text)&&!deferredToContract(c)&&
     (c.required||/반드시|필수|제출\s*(?:하여야|해야|서류|대상)|제출서류|가입\s*(?:증명|확인)|증빙\s*(?:서류|필수)|4\s*대\s*보험\s*가입\s*의무/i.test(c.text)));
- const onsiteMust=foundOnsite.find(c=>!negative.test(c.text)&&
+ const onsiteMust=foundOnsite.find(c=>!negative.test(c.text)&&!deferredToContract(c)&&
     /(?:상주|현장\s*(?:근무|배치)|전담\s*근무).{0,70}(?:필수|의무|필요|해야|하여야|배치|투입|[1-9]\d?\s*(?:명|인))|(?:필수|반드시|의무).{0,45}(?:상주|현장\s*(?:근무|배치))/i.test(c.text));
  function choice(positive,mentioned){
   if(positive)return {key:'required',label:'필요',reason:'공식 문서에서 요구 문구 확인 (대상·시점은 원문 확인)'};
@@ -3391,7 +3396,9 @@ function jobRequirementEvidence(x){
   if(fullScanComplete&&!mentioned.length)
    return {key:'not_required',label:'필요없음',reason:'공식 원문·첨부 전체 정상 판독 · 요구 문구 미검출 (해당 문서 기준)'};
   if(fullScanComplete)
-   return {key:'failed',label:'확인실패',reason:'관련 문구는 있으나 필수 요구 여부가 모호해 판정 보류'};
+   return {key:'not_required',label:'필요없음',reason:mentioned.some(deferredToContract)?
+    '전체 문서 정상 판독 · 입찰 시 필수요건은 확인되지 않음 (계약·수행 단계 조건은 원문 확인 후 준비)':
+    '전체 문서 정상 판독 · 관련 문구는 있지만 입찰 시 명확한 필수요건은 확인되지 않음'};
   return {key:'failed',label:'확인실패',reason:scanFailed?
     '원문·첨부 수집 또는 판독이 불완전해 미검출로 단정 불가':
     '공식 원문·첨부 전체 판독 미완료 · 필요 여부 미확정'};
