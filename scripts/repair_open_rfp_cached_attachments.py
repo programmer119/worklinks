@@ -164,12 +164,19 @@ def fetch_verified_raw(source,ledgerpath):
     # Does NOT use bid-evidence, A02, or any public data API.
     req=rfp.urllib.request.Request(url,headers={
         'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
-    with rfp.OPENER.open(req,timeout=35) as response:
-        if int(response.headers.get('Content-Length') or 0)>rfp.MAX_FILE:
-            raise ValueError('large_file')
-        raw=response.read(rfp.MAX_FILE+1)
-        if len(raw)>rfp.MAX_FILE:raise ValueError('large_file')
-        if getattr(response,'status',200)!=200:raise ValueError('unexpected_http_status')
+    try:
+        with rfp.OPENER.open(req,timeout=35) as response:
+            if int(response.headers.get('Content-Length') or 0)>rfp.MAX_FILE:
+                raise ValueError('large_file')
+            raw=response.read(rfp.MAX_FILE+1)
+            if len(raw)>rfp.MAX_FILE:raise ValueError('large_file')
+            if getattr(response,'status',200)!=200:
+                raise ValueError('unexpected_http_status')
+    except rfp.urllib.error.HTTPError as ex:
+        if rfp.official_missing_reference(ex):
+            raise rfp.OfficialAttachmentReferenceMissing(
+                'official_attachment_reference_missing_422') from ex
+        raise
     return raw,'official_attachment_GET'
 
 
@@ -184,16 +191,29 @@ def process_one(key,scan,meta,ledger):
         paired[id(f)]=byname[label].pop(0)
     latest=[]
     counts=Counter()
+    counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
     for f in scan['files']:
         if f not in failed_files({'files':[f]}):continue
         label=str(f.get('name') or '')
         item=paired[id(f)]
+        if f.get('alternatePdfEvidence') and str(f.get('errorCategory') or '') in (
+                'file_extract_failure','no_searchable_text','hwp5txt_failed',
+                'invalid_hwp','pdf_ocr_incomplete'):
+            counts['same_title_official_pdf_reused']+=1
+            continue
         if not rfp.legal_file(item):
             counts['invalid_official_url']+=1
             continue
         try:
             raw,origin=fetch_verified_raw(item,ledger)
-            text=rfp.normalize_extracted_text(rfp.extract(label,raw))
+            extracted,evidence=rfp.extract_with_source_status(label,raw)
+            text=rfp.normalize_extracted_text(extracted)
+            if not evidence['sourceComplete']:
+                f['extractionEvidence']=evidence
+                f['partialTextChars']=len(text)
+                f['errorCategory']='pdf_ocr_incomplete'
+                counts['pdf_ocr_incomplete']+=1
+                continue
             if len(text.strip())<(30 if label.lower().endswith(('.xlsx','.pptx')) else 100):
                 raise ValueError('no_searchable_text')
             triggers,snippets=rfp.parse_clauses(text)
@@ -207,7 +227,8 @@ def process_one(key,scan,meta,ledger):
                       'sourceTextScanComplete':True,'qualificationScanTruncated':False,
                       'unmatchedQualificationAnchorCount':0,
                       'clauseCandidateCount':len(clauses),
-                      'textChars':len(text),'sourceUrl':item['url']})
+                      'textChars':len(text),'sourceUrl':item['url'],
+                      'extractionEvidence':evidence})
             f.pop('errorCategory',None)
             f.pop('error',None)
             latest.append({'name':label,'sourceUrl':item['url'],
@@ -215,10 +236,17 @@ def process_one(key,scan,meta,ledger):
             counts['file_repaired']+=1
             counts['cache_hit' if origin=='verified_cache' else 'official_file_GET']+=1
         except Exception as exc:
+            classification=rfp.classify_failure(exc)
+            if classification=='official_attachment_reference_missing_422':
+                f['errorCategory']=classification
+                f['lastHttpStatus']=422
+                counts['official_attachment_reference_missing_422']+=1
             counts['file_error_'+type(exc).__name__]+=1
             print('OPEN_RFP_FILE_FAILED',key,json.dumps({
-                'filename':label,'error':type(exc).__name__,'detail':str(exc)[:145]},
+                'filename':label,'error':type(exc).__name__,
+                'classification':classification,'detail':str(exc)[:145]},
                 ensure_ascii=False),flush=True)
+    counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
     return latest,counts
 
 
@@ -336,6 +364,14 @@ def run(data_dir,limit,execute=False,max_files=400):
                       (live.get('readable') is not True or
                        live.get('sourceTextScanComplete') is not True)):
                     live.update(entry)
+                elif entry.get('errorCategory') in (
+                       'official_attachment_reference_missing_422','pdf_ocr_incomplete'):
+                    for field in ('errorCategory','lastHttpStatus','extractionEvidence',
+                                  'partialTextChars'):
+                        if field in entry:live[field]=entry[field]
+                for field in ('alternatePdfEvidence','alternatePdfSourceSha256',
+                              'alternatePdfEvidenceMode'):
+                    if entry.get(field):live[field]=entry[field]
             update_counts(current,timestamp,additions)
             applied[key]={'readable':current['readableDocumentCount'],
                           'total':len(live_files),'repaired':len(additions)}
@@ -365,7 +401,9 @@ def run(data_dir,limit,execute=False,max_files=400):
             work=json.loads(json.dumps(latest,ensure_ascii=False))
             additions,counters=process_one(key,work,meta,ledger)
             tally.update(counters)
-            if not additions:continue
+            if not additions and not any(counters.get(k) for k in (
+                 'official_attachment_reference_missing_422','pdf_ocr_incomplete',
+                 'alternate_pdf_evidence')):continue
             pending[key]=(work,additions)
             if len(pending)>=8:flush_pending()
         flush_pending()
