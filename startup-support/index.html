@@ -3640,31 +3640,60 @@ function jobRequirementEvidence(x){
  // Consider cited staffing paragraphs across all attached documents, not only
  // passages that contain the word "상주". Never sum repeated or unrelated figures.
  const roles=[],roleSources=[],seenRoles=new Set();
- const roleRe=/(사업\s*책임자|프로젝트\s*관리자|\bPM\b|\bPL\b|개발자|운영\s*인력|운영자|기술자|디자이너|퍼블리셔|\bDBA\b|보안\s*담당자)\s*[:：-]?\s*(?:\(\s*)?(특급|고급|중급|초급)?\s*(?:\)\s*)?(\d{1,2})\s*(?:명|인)/gi;
- for(const c of clauses){
-  roleRe.lastIndex=0;let m;
-  while((m=roleRe.exec(c.text))!==null){
-   const role=m[1].replace(/\s+/g,' '),grade=m[2]||'',count=Number(m[3]);
-   if(count<1||count>99)continue;
-   const label=role+(grade?' ('+grade+')':'')+' '+count+'명';
-   if(seenRoles.has(label))continue;
-   seenRoles.add(label);
-   roles.push(label);
-   roleSources.push({role:label,text:c.text,file:c.file||'공고 원문'});
-   if(roles.length>=8)break;
+  // Dedicated full-text staffing extraction is stored with the RFP coverage index.
+  const candidates=[];
+  if(Array.isArray(saved?.staffingRoles))candidates.push(...saved.staffingRoles);
+  if(Array.isArray(full?.files))for(const f of full.files){
+   if(Array.isArray(f?.staffingRoles))candidates.push(...f.staffingRoles);
   }
-  if(roles.length>=8)break;
- }
- const mentioned=(sr.peopleMentioned||[]).filter(v=>Number.isFinite(Number(v))&&Number(v)>0).slice(0,8);
+  for(const record of candidates){
+   const role=String(record?.role||'').trim(),count=Number(record?.count);
+   if(!role||!Number.isInteger(count)||count<1||count>99)continue;
+   const grade=String(record.grade||'').trim(),onsite=String(record.onsite||'').trim();
+   const signature=[role,grade,count,record.countKind,onsite].join('|').toLowerCase();
+   if(seenRoles.has(signature))continue;
+   seenRoles.add(signature);
+   const label=role+(grade?' ('+grade+')':'')+' '+count+'명'+
+    (record.countKind==='minimum'?' 이상':'')+(onsite?' · '+onsite:'');
+   roles.push(label);
+   roleSources.push({role:label,text:String(record.sourceText||'').trim()||'인력표 근거',
+     file:String(record.sourceFile||'공고 첨부'),url:String(record.sourceUrl||''),
+     scope:record.scope==='document'?'전체 문서':'저장 발췌',mm:record.manMonths,
+     sourceLine:record.sourceLine||0});
+   if(roles.length>=24)break;
+  }
+  // Existing partial quote records remain usable, but NOT as full document scans.
+  if(!roles.length){
+   const roleRe=/(사업\s*책임자|프로젝트\s*관리자|\bPM\b|\bPL\b|개발자|운영\s*인력|운영자|기술자|디자이너|퍼블리셔|\bDBA\b|보안\s*담당자)\s*[:：-]?\s*(?:\(\s*)?(특급|고급|중급|초급)?\s*(?:\)\s*)?(\d{1,2})\s*(?:명|인)/gi;
+   for(const c of clauses){
+    roleRe.lastIndex=0;let m;
+    while((m=roleRe.exec(c.text))!==null){
+     const role=m[1].replace(/\s+/g,' '),grade=m[2]||'',count=Number(m[3]);
+     if(count<1||count>99)continue;
+     const label=role+(grade?' ('+grade+')':'')+' '+count+'명';
+     if(seenRoles.has(label))continue;
+     seenRoles.add(label);roles.push(label);
+     roleSources.push({role:label,text:c.text,file:c.file||'공고 원문',url:'',scope:'저장 발췌'});
+     if(roles.length>=8)break;
+    }
+    if(roles.length>=8)break;
+   }
+  }
+  const fullRoleScan=full?.manifestComplete===true&&Array.isArray(full.files)&&
+   full.files.length>0&&full.files.every(f=>f.readable===true&&
+    f.staffingRoleScanVersion>=1&&f.staffingRoleScanTruncated!==true);
+  const staffingScanComplete=saved?.staffingRoleScanComplete===true||fullRoleScan;
+  const mentioned=(sr.peopleMentioned||[]).filter(v=>Number.isFinite(Number(v))&&Number(v)>0).slice(0,8);
  const roleStatus=roles.length?
   {key:'role_found',label:roles.length+'개 역할',reason:'원문에서 역할과 인원이 함께 적힌 근거만 발췌. 전체 인원·상주 인원 합계가 아님'}:
   rfpSnapshotLoading&&!full?{key:'checking',label:'확인중',reason:'원문 판독자료를 불러오는 중'}:
   !tried?{key:'not_checked',label:'확인안함',reason:'원문 수집·검증 기록 없음'}:
-  sourceReadComplete?{key:'role_unspecified',label:'미검출',reason:'정상 판독한 문서에서 역할·인원 동시 기재를 찾지 못함. 인력 요건 없음의 확정은 아님'}:
+  staffingScanComplete&&sourceReadComplete?{key:'role_unspecified',label:'미검출',reason:'인력표 전체 스캔에서 역할·인원 동시 기재 미검출. 인력 요건 없음의 확정은 아님'}:
+  sourceReadComplete&&!staffingScanComplete?{key:'not_checked',label:'인원표 미검증',reason:'기존 문서는 자격조건만 스캔한 자료로 인원표 전체 스캔 기록 없음'}:
   {key:'failed',label:'확인실패',reason:'원문·첨부 판독이 불완전하여 인력 구성을 확정할 수 없음'};
  const roleLines=[
   roles.length?'역할별 인원: '+roles.join(' · '):'역할·인원 동시 기재: 미확인',
-  ...roleSources.flatMap(v=>['원문 ('+v.role+'): '+v.text.slice(0,170),'출처: '+v.file]),
+  ...roleSources.flatMap(v=>['원문 ('+v.role+'): '+v.text.slice(0,200),'출처: '+v.file+' · '+v.scope+(v.sourceLine?' · '+v.sourceLine+'행':'')+(v.mm!=null?' · '+v.mm+' MM':'')]),
   mentioned.length?'역할 미지정 인원 언급: '+mentioned.join(' / ')+'명 (합산 아님)':'',
   (sr.gradesMentioned||[]).length?'추가 기술등급: '+sr.gradesMentioned.join(' · '):'',
   (sr.manMonthsMentioned||[]).length?'투입공수: '+sr.manMonthsMentioned.join(' / ')+' MM':'',
@@ -3796,7 +3825,7 @@ function jobDetailRequirementGrid(x){
    name:'역할별 인원',code:'roles',s:e.roles.status,
    primary:e.roles.items.length?e.roles.items.map(v=>v.role).join(' · '):'역할·인원 동시 기재 미확인',
    sub:'원문에 기재된 역할별 인원 · 총원 및 상주인원으로 합산하지 않음',
-   rows:e.roles.items.map(v=>({text:v.text,file:v.file}))
+   rows:e.roles.items.map(v=>({text:v.text,file:v.file,url:v.url}))
   },
   performance:{
    name:'수행실적',code:'performance',s:stPerf,
