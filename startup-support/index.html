@@ -2722,6 +2722,17 @@ function officialReviewCoverage(rfp,evidence,x,p){
  if(!officialSourceCoverage(rfp,evidence))return false;
  // Existing independently reviewed documents remain valid when proven complete.
  if(rfp.reviewComplete===true&&rfp.requiredConditionsComplete===true)return true;
+ // The server123 classifier reviews the official source, never company credentials.
+ // Accept its full-document audit only when its unchanged source/manifest matches
+ // this exact notice. Every company requirement is still independently checked
+ // by comparePartnerJob before a bidder can be marked verified.
+ const identity=x?jobBidIdentity(x):null;
+ const audit=identity?qualificationReviewByNotice.get(identity.bidNo+':'+identity.order):null;
+ if(audit?.reviewComplete===true&&audit.requiredConditionsComplete===true&&
+    audit.automaticEligibilityApproved===false&&
+    audit.manifestSignature&&audit.manifestSignature===rfp.manifestSignature&&
+    audit.sourceCheckedAt===rfp.checkedAt&&
+    Array.isArray(audit.blockers)&&audit.blockers.length===0)return true;
  // A narrow deterministic route for simple notices: EVERY original cited
  // candidate must be a positively checked registration/SME/region requirement.
  // Never infer full review from mere text extraction, a missing AI report,
