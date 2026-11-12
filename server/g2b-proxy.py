@@ -859,7 +859,7 @@ def saved_rfp_search_state(row):
         if not isinstance(f,dict):continue
         file_url=str(f.get('url') or '').strip()
         file_name=str(f.get('name') or '').strip()[:140]
-        parsed=urllib.parse.urlsplit(file_url)
+        parsed=urlparse(file_url)
         host=(parsed.hostname or '').lower()
         if (parsed.scheme!='https' or not (host=='g2b.go.kr' or
                 host.endswith('.g2b.go.kr')) or not file_name):continue
