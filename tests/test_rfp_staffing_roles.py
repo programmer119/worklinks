@@ -59,6 +59,9 @@ assert excerpt and all(x['scope']=='excerpt' for x in excerpt),excerpt
 assert p['compact_coverage']({'manifestComplete':True,'files':[legacy]})['staffingRoleScanComplete'] is False
 
 api=runpy.run_path(str(root/'server/g2b-proxy.py'),run_name='test_staffing_api')
+unknown=api['saved_rfp_search_state'](None,compact=True)
+assert unknown['seen'] is False and unknown['staffingRoles']==[]
+assert unknown['staffingRoleScanComplete'] is False
 state=api['saved_rfp_search_state'](index,compact=True)
 assert state['staffingRoleScanComplete'] is True,state
 assert len(state['staffingRoles'])==4,state
