@@ -660,6 +660,97 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  #jobsView .job-extra-filters{margin-left:0}
  #jobsView .job-extra-panel{right:auto;left:0;width:min(680px,calc(100vw - 36px))}
 }
+
+/* One compact workbench toolbar. The top navigation already names this view. */
+#jobsView[data-job-mode="partner"]>.panel{
+ display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+ padding:8px 10px;margin-bottom:8px;overflow:visible;
+}
+#jobsView[data-job-mode="partner"] .job-titlebar,
+#jobsView[data-job-mode="partner"] .job-title-actions{display:contents}
+#jobsView[data-job-mode="partner"] #jobListTitle{display:none!important}
+#jobsView[data-job-mode="partner"] .job-info-fold{
+ order:4;flex:0 0 auto;position:relative;margin:0;z-index:41
+}
+#jobsView[data-job-mode="partner"] .job-info-fold>summary{
+ width:35px;height:35px;border:1px solid #cbd5e1;font-size:17px
+}
+#jobsView[data-job-mode="partner"] .job-info-pop{top:calc(100% + 7px);right:0}
+#jobsView[data-job-mode="partner"] .job-quick-search{
+ order:1;flex:1 1 188px;min-width:170px;max-width:none;
+ display:flex;align-items:center;gap:0;margin:0;padding:0;
+ border:0;border-radius:0;background:transparent
+}
+#jobsView[data-job-mode="partner"] #jobSearchLabel{display:none!important}
+#jobsView[data-job-mode="partner"] #jobQuickSearch{
+ flex:1 1 auto;min-width:0;width:100%;max-width:none;
+ font-size:15px;font-weight:600;height:37px;min-height:37px;
+ padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px
+}
+#jobsView[data-job-mode="partner"] #jobSearchClear{
+ padding:6px 9px;margin-left:4px;font-size:13px;min-height:35px
+}
+#jobsView[data-job-mode="partner"] #jobSearchStatus{
+ position:absolute!important;width:1px;height:1px;padding:0;overflow:hidden;
+ clip-path:inset(50%);white-space:nowrap
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters{
+ order:2;flex:0 1 auto;display:flex;align-items:center;gap:4px;
+ flex-wrap:nowrap;margin:0;padding:0
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-count-label{display:none}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-period{
+ min-height:37px;padding:7px 10px;font-size:14px;border-radius:8px
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-filter-control{
+ min-height:37px;padding:3px 5px 3px 8px;gap:5px;
+ border-radius:8px;font-size:14px;white-space:nowrap
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-filter-control select{
+ min-height:29px;max-width:105px;min-width:70px;
+ padding:4px 7px;font-size:14px
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter{
+ order:3;flex:0 1 auto;min-width:0;
+ display:flex;flex-wrap:wrap;align-items:center;gap:4px;
+ margin:0;padding:0
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter[hidden]{display:none!important}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter>.job-vf{
+ min-height:37px;padding:7px 9px;font-size:14px;font-weight:750;
+ border-radius:8px;white-space:nowrap;gap:4px
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter .job-vf [data-verdict-count]{
+ font-size:14px;font-weight:800
+}
+#jobsView[data-job-mode="partner"] #jobExtraFilters{margin:0}
+#jobsView[data-job-mode="partner"] #jobExtraFilters>summary{
+ min-height:37px;padding:7px 9px;font-size:14px;border-radius:8px
+}
+#jobsView[data-job-mode="partner"] #jobVerdictFilter .job-sort-row{
+ margin:0;gap:0;display:flex;flex-wrap:nowrap;align-items:center;
+}
+#jobsView[data-job-mode="partner"] .job-sort-row label{display:none}
+#jobsView[data-job-mode="partner"] .job-sort-row select{
+ min-height:37px;max-width:145px;
+ font-size:14px;padding:7px 8px;border-radius:8px
+}
+#jobsView[data-job-mode="partner"] #jobExtraFilters .job-extra-panel{
+ z-index:60
+}
+@media(max-width:1130px){
+ #jobsView[data-job-mode="partner"] .job-quick-search{flex:1 1 240px}
+ #jobsView[data-job-mode="partner"] #jobVerdictFilter{flex:1 1 auto}
+}
+@media(max-width:730px){
+ #jobsView[data-job-mode="partner"]>.panel{gap:6px;padding:8px}
+ #jobsView[data-job-mode="partner"] .job-quick-search{flex:1 1 calc(100% - 54px)}
+ #jobsView[data-job-mode="partner"] #changcomJobFilters{order:3;flex-wrap:wrap}
+ #jobsView[data-job-mode="partner"] #jobVerdictFilter{order:4;flex:1 1 100%;gap:5px}
+ #jobsView[data-job-mode="partner"] .job-info-fold{order:2}
+ #jobsView[data-job-mode="partner"] #jobVerdictFilter>.job-vf{font-size:14px;padding:7px 8px}
+ #jobsView[data-job-mode="partner"] .job-sort-row select{max-width:135px}
+}
 </style>
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
 </head>
@@ -798,7 +889,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 
     <div class="job-quick-search" role="search" aria-label="공고 검색 및 저장된 API 수집 상태 비교">
       <label id="jobSearchLabel" for="jobQuickSearch">일감 검색</label>
-      <input type="search" id="jobQuickSearch" placeholder="공고번호 · 공고명 · 발주기관 검색" autocomplete="off" spellcheck="false">
+      <input type="search" id="jobQuickSearch" placeholder="공고번호·공고명·기관 검색" autocomplete="off" spellcheck="false">
       <button type="button" id="jobSearchClear" hidden>지우기</button>
       <span class="job-search-status" id="jobSearchStatus" role="status" aria-live="polite"></span>
     </div>

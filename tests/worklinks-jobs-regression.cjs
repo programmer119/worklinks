@@ -114,6 +114,35 @@ assert.ok(source.includes('#jobsView .job-sort-row{margin:0 0 0 auto;'),
  'sorting must occupy the same row as primary conditions');
 console.log('Worklinks Changcom compact filters and diagnostics PASS');
 
+// The workspace navigation already names this view; search, active filters,
+// sorting and diagnostics should occupy one flex workbench, not stacked rows.
+assert.ok(source.includes('#jobsView[data-job-mode="partner"]>.panel{') &&
+ source.includes('display:flex;align-items:center;gap:6px;flex-wrap:wrap;'),
+ 'partner workbench must use a shared flex toolbar');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] #jobListTitle{display:none!important}'),
+ 'do not repeat a large title already shown in top navigation');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] #jobSearchLabel{display:none!important}'),
+ 'do not add a redundant search label beside the search input');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] .job-quick-search{') &&
+ source.includes('order:1;flex:1 1 188px;min-width:170px;max-width:none;'),
+ 'search input must be a compact control in the shared toolbar');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] #changcomJobFilters{') &&
+ source.includes('order:2;flex:0 1 auto;'),
+ 'open/closed and company filters must sit beside the search input');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] #jobVerdictFilter{') &&
+ source.includes('order:3;flex:0 1 auto;'),
+ 'the main bid status buttons and sorting should be in the same toolbar');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] .job-info-fold{') &&
+ source.includes('order:4;flex:0 0 auto;'),
+ 'diagnostic popup should share the toolbar instead of taking another heading row');
+assert.ok(source.includes('#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-count-label{display:none}'),
+ 'do not duplicate total number already shown by the all-status filter');
+assert.ok(source.includes('@media(max-width:730px){') &&
+ source.includes('#jobsView[data-job-mode="partner"] .job-quick-search{flex:1 1 calc(100% - 54px)}'),
+ 'on a narrow phone the search stays usable without horizontal overflow');
+console.log('Worklinks Changcom shared single-toolbar density PASS');
+
+
 const time=new Function(
  'function kstNow(){return new Date(Date.UTC(2026,9,12,10,0))};'+
  "function kstISO(){return '2026-10-12'};"+
