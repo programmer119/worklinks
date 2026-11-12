@@ -295,6 +295,20 @@ def main():
         except BlockingIOError:
             log('PIPELINE_LOCK_HELD_EXIT')
             return 1
+        # Exclusive lock means no other pipeline owner can be using these
+        # temporary scan workspaces. Remove crash/deploy leftovers (often
+        # hundreds of MB) before retrying interrupted work.
+        for abandoned in DATA.glob('worklinks-pipeline-*'):
+            if abandoned.is_symlink() or not abandoned.is_dir():
+                continue
+            if time.time()-abandoned.stat().st_mtime < 180:
+                continue
+            try:
+                shutil.rmtree(abandoned)
+                log('PIPELINE_INTERRUPTED_STAGE_REMOVED',abandoned.name)
+            except OSError as exc:
+                log('PIPELINE_INTERRUPTED_STAGE_CLEANUP_FAILED',
+                    abandoned.name,type(exc).__name__)
         if not (SCRIPTS / 'refresh_worklinks_actionable.py').is_file():
             raise RuntimeError('pipeline_scripts_missing')
         state = read_state()
