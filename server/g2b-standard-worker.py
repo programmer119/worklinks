@@ -34,7 +34,7 @@ def verified_page_cache(service,day,page):
     if ledger is None:return None
     from rfp_call_ledger import cache_key
     k=cache_key('standard_v1',service,day,page,B2_ROWS if service=='B2' else PAGE_ROWS)
-    cached=ledger.get_json(k,max_age_seconds=24*3600)
+    cached=ledger.get_json(k,max_age_seconds=6*3600)
     if (isinstance(cached,dict) and isinstance(cached.get('total'),int)
             and isinstance(cached.get('items'),list)):
         ledger.record('standard',k,'verified_page_reused',
