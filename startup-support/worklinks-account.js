@@ -380,10 +380,33 @@ function buttons(session){
     }
   }
 }
+const AUTHHUB_CONFIG_API = 'https://api-authhub.suaveforge.com';
+const WORKLINKS_AUTH_PROJECT = 'p47';
+// Verify the registered AuthHub project over standard HTTPS/443.
+// Partner access still requires a valid active /v1/me membership.
+async function loadAuthConfig(){
+  try{
+    const response=await fetch(
+      AUTHHUB_CONFIG_API+'/v1/config/'+encodeURIComponent(WORKLINKS_AUTH_PROJECT)+'?environment=production',
+      {headers:{Accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(8000)}
+    );
+    if(!response.ok)throw Error('AuthHub config HTTP '+response.status);
+    const config=await response.json();
+    if(config?.project?.slug!==WORKLINKS_AUTH_PROJECT||config?.environment!=='production')
+      throw Error('AuthHub project identity mismatch');
+    return {enabled:true,project:WORKLINKS_AUTH_PROJECT,authApi:AUTHHUB_CONFIG_API};
+  }catch(error){
+    // Compatibility fallback for a temporary AuthHub config outage.
+    const legacy=await api('/worklinks-auth-config');
+    if(legacy?.project!==WORKLINKS_AUTH_PROJECT||legacy?.authApi!==AUTHHUB_CONFIG_API)
+      throw Error('WorkLinks auth config identity mismatch');
+    return legacy;
+  }
+}
 async function bootstrap(){
   let config;
-  try{config=await api('/worklinks-auth-config')}
-  catch{show('비회원 · 브라우저 저장 (인증 서버 연결 대기)');return}
+  try{config=await loadAuthConfig()}
+  catch{show('비회원 · 브라우저 저장 (AuthHub 인증 설정 연결 실패)');return}
   state.project=config.project||'';
   if(!config.enabled){show('비회원 · 브라우저 저장 (AuthHub 프로젝트 등록 대기)');return}
   state.client=new AuthHubClient({apiBase:config.authApi,project:state.project,environment:'production'});
