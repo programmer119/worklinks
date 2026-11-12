@@ -478,6 +478,8 @@
 #jobCards .job-req-item[data-state="required"] .job-req-icon{background:#fef3c7;color:#92400e}
 #jobCards .job-req-item[data-state="required_at_bid"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="not_required"] .job-req-icon{background:#dcfce7;color:#166534}
+#jobCards .job-req-item[data-state="onsite"] .job-req-icon{background:#fef3c7;color:#92400e}
+#jobCards .job-req-item[data-state="offsite"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 35px));padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.18);color:#1e293b;font-size:13px;font-weight:500;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
 #jobCards .job-mini:has(.job-req-strip){overflow:visible}
@@ -3379,7 +3381,7 @@ function jobRequirementEvidence(x){
    full.requiredConditionsComplete===true;
  const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
  const insurance=/(?:4\s*대\s*(?:사회\s*)?보험|사대\s*보험|사회\s*보험\s*가입\s*(?:자|증명)|건강\s*보험\s*(?:자격득실|가입자명부)|고용\s*보험\s*가입\s*(?:증명|확인))/i;
- const onsite=/상주|현장\s*(?:근무|배치)|전담\s*근무/i;
+ const onsite=/상주|현장\s*(?:근무|배치)|전담\s*근무|(?:발주기관|발주처|수요기관).{0,25}상시\s*(?:근무|배치)/i;
  const foundInsurance=clauses.filter(c=>insurance.test(c.text));
  const foundOnsite=clauses.filter(c=>onsite.test(c.text));
  // An explicit requirement due only after award/contract is not a bid-time eligibility gate.
@@ -3421,7 +3423,28 @@ function jobRequirementEvidence(x){
  const insLines=srcInsurance?[
    '원문: '+srcInsurance.text.slice(0,240),
    '출처: '+(srcInsurance.file||'파일명 미확인')]:[];
- const site=choice(onsiteMust,foundOnsite);
+ // Residence is a workplace arrangement, NOT an employment or bid-date eligibility check.
+ // Only a clear duty to work continuously at the contracting agency counts as onsite.
+ const onsiteWording=/(?:상주\s*(?:인력|근무|투입|배치|운영|기술자|개발자|인원|요원)|(?:인력|직원|기술자|개발자|담당자|PM|PL).{0,35}상주|(?:발주기관|발주처|수요기관|현장).{0,40}상시\s*(?:근무|배치)|(?:현장|발주처|발주기관)\s*(?:상주|주재))/i;
+ const onsiteNotMandatory=/(?:비\s*상주|상주.{0,22}(?:불필요|하지\s*않|없음|없다|미\s*배치|필요\s*없|요구하지|명시되지|미\s*요구|권고|선택|선택적|가능|협의|검토)|상주.{0,12}여부.{0,22}(?:협의|미정)|(?:상주|현장\s*근무).{0,22}(?:의무\s*없|필수\s*아님)|(?:정기|수시)\s*(?:방문|점검).{0,20}(?:원칙|기본)|현장\s*(?:도착|출동|방문|점검))/i;
+ const onsiteDuty=/(?:상주.{0,65}(?:하여야|해야|필수|의무|수행|운영|근무|배치|투입|유지|원칙)|(?:필수|반드시|의무).{0,50}상주|상주\s*(?:인력|투입인력|유지관리인력).{0,55}(?:[1-9]\d?\s*(?:명|인)|자사\s*인력|제안사|복무규정)|(?:[1-9]\d?\s*(?:명|인)).{0,32}상주|(?:발주기관|발주처|수요기관|현장).{0,35}상시\s*(?:근무|배치))/i;
+ const onsiteConfirmed=foundOnsite.find(c=>{
+   // A paragraph may contain both a negative/negotiable example and a
+   // positive requirement. Prefer a concrete, cited affirmative clause.
+   const sentences=String(c.text).split(/[。;\n]|(?<=다)\.\s+/).filter(Boolean);
+   return sentences.some(sentence=>onsiteWording.test(sentence)&&onsiteDuty.test(sentence)&&
+      !onsiteNotMandatory.test(sentence));
+ });
+ function onsiteChoice(){
+   if(onsiteConfirmed)return {key:'onsite',label:'상주',
+     reason:'공식 문서에서 발주처 상시 근무·상주 의무가 명시됨 (인력 소속 기준일과는 별도)'};
+   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
+   if(!fullScanComplete)return {key:'failed',label:'확인실패',
+     reason:'원문·첨부 전체 수집·판독이 완료되지 않아 상주 여부를 확정할 수 없음'};
+   return {key:'offsite',label:'비상주',
+     reason:'공식 원문·첨부 전체 판독에서 발주처 상시 상주 의무 미확인 (현장 방문·장애 출동만으로는 상주가 아님)'};
+ }
+ const site=onsiteChoice();
  const sr=staff?.requirements||{};
  const quotes=[...foundOnsite.map(v=>v.text),String(staff?.evidence?.text||'')].filter(Boolean);
  const roles=[];
@@ -3442,7 +3465,7 @@ function jobRequirementEvidence(x){
   (sr.manMonthsMentioned||[]).length?'투입공수: '+sr.manMonthsMentioned.join(' / ')+' MM':'',
   (sr.experienceYearsMentioned||[]).length?'경력: '+sr.experienceYearsMentioned.join(' / ')+'년':''
  ];
- const srcOnsite=onsiteMust||foundOnsite[0];
+ const srcOnsite=onsiteConfirmed||foundOnsite[0];
  if(srcOnsite){siteLines.push('원문: '+srcOnsite.text.slice(0,240));
   siteLines.push('출처: '+(srcOnsite.file||'파일명 미확인'));}
  if(coverage)siteLines.unshift(coverage);
@@ -3456,12 +3479,13 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,lines,code){
-  const tooltip=[name+' · '+v.label,v.reason].concat(lines).filter(Boolean).join('\n');
+   const label=code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name;
+   const tooltip=[name+' · '+v.label,v.reason].concat(lines).filter(Boolean).join('\n');
   return '<span class="job-req-item" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
      htmlEscape(name+' '+v.label+'. '+tooltip)+'" aria-expanded="false">'+
-     htmlEscape(name)+' <span class="job-req-icon" aria-hidden="true">'+
-     ({not_checked:'?',failed:'×',required:'!',required_at_bid:'!',not_required:'✓'})[v.key]+'</span></button>'+
+     htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
+     ({not_checked:'?',failed:'×',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓'})[v.key]+'</span></button>'+
    '<span class="job-req-tip" role="tooltip">'+htmlEscape(tooltip)+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험과 상주 요구조건">'+
