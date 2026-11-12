@@ -2001,7 +2001,7 @@ async function g2bLoadSaved(append){
   return {total:g2bSavedTotal,loaded:g2bLoadedOffset};
  }catch(e){
   g2bSavedLoadError=String(e?.message||e).slice(0,120);
-  if(!preservePrior&&offset>0&&!published)publish();
+  if(!preservePrior&&offset>g2bLoadedOffset)publish(); // Preserve every received page at the failure boundary.
   // Never zero g2bSavedTotal, g2bLoadedOffset, or the previously fetched cards.
   const known=Math.max(g2bSavedTotal,g2bSavedKnownTotal,total);
   out.textContent='서버 DB 조회 중단: '+g2bSavedLoadError+
