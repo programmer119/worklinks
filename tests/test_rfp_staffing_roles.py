@@ -43,7 +43,7 @@ table=parse('직무 | 기술등급 | 투입인원\nPM | 고급 | 1\nDBA | 중급
 assert {x['role']:x['count'] for x in table}=={'PM':1,'DBA':2},table
 
 item={'status':'text_extracted_requires_review','manifestComplete':True,
-      'files':[{'name':'제안요청서.pdf','readable':True,
+      'files':[{'name':'제안요청서.pdf','readable':True,'sourceTextScanComplete':True,
                 'staffingRoleScanVersion':2,'staffingRoleScanTruncated':False,
                 'staffingRoles':roles}]}
 summed=summary(item)
