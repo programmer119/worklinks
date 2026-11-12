@@ -5,7 +5,14 @@ import json,os,pathlib,runpy,tempfile
 root=pathlib.Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as t:
     old=os.environ.get('G2B_DB_PATH')
+    old_snapshot=os.environ.get('WORKLINKS_SNAPSHOT_DIR')
     os.environ['G2B_DB_PATH']=str(pathlib.Path(t)/'saved.sqlite3')
+    os.environ['WORKLINKS_SNAPSHOT_DIR']=str(pathlib.Path(t)/'snapshots')
+    pathlib.Path(os.environ['WORKLINKS_SNAPSHOT_DIR']).mkdir()
+    (pathlib.Path(t)/'snapshots'/'rfp-coverage-index.json').write_text(
+      json.dumps({'ok':True,'byNotice':{
+        'R26BK01792736:000':{'status':'text_extracted_requires_review',
+          'manifestComplete':True,'files':[{'readable':True}]}}}))
     try:
         m=runpy.run_path(str(root/'server/g2b-proxy.py'),run_name='offline_search_test')
         persist=m['persist_bids']
@@ -25,8 +32,10 @@ with tempfile.TemporaryDirectory() as t:
         exact=search(10,0,True,a)
         assert exact['searchMode']=='saved_only'
         assert exact['totalCount']==1 and exact['items'][0]['bidNo']==a,exact
+        assert exact['items'][0]['rfpSavedState']['complete'] is True,exact
         korean=search(10,0,True,'문서처리')
         assert korean['totalCount']==1 and korean['items'][0]['bidNo']==b,korean
+        assert korean['items'][0]['rfpSavedState']['seen'] is False,korean
         org=search(10,0,True,'검증 발주기관')
         assert org['totalCount']==1 and org['items'][0]['bidNo']==a,org
         literal=search(10,0,True,'%')
@@ -41,4 +50,6 @@ with tempfile.TemporaryDirectory() as t:
     finally:
         if old is None:os.environ.pop('G2B_DB_PATH',None)
         else:os.environ['G2B_DB_PATH']=old
+        if old_snapshot is None:os.environ.pop('WORKLINKS_SNAPSHOT_DIR',None)
+        else:os.environ['WORKLINKS_SNAPSHOT_DIR']=old_snapshot
 print('WORKLINKS_READ_ONLY_SAVED_TENDER_SEARCH=PASS')
