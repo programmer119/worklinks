@@ -479,7 +479,7 @@ def extract(name,raw):
         n='.pdf'
     elif raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):
         n='.hwp'
-    elif raw.startswith(b'PK\\x03\\x04'):
+    elif raw.startswith(b'PK\x03\x04'):
         # Identify Office XML formats by internal paths. Otherwise this is
         # an ordinary attachment archive, regardless of its .pdf/.hwp name.
         with zipfile.ZipFile(io.BytesIO(raw)) as probe:
