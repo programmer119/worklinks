@@ -13,7 +13,11 @@ with tempfile.TemporaryDirectory() as t:
       json.dumps({'ok':True,'byNotice':{
         'R26BK01792736:000':{'status':'text_extracted_requires_review',
           'manifestComplete':True,'files':[{'readable':True}],
-          'changcomClauseEvidence':{'clauseCandidates':{
+          'changcomClauseEvidence':{
+            'files':[{'name':'공식입찰공고.pdf',
+                      'url':'https://www.g2b.go.kr/official/attachment.pdf'},
+                     {'name':'위조 파일','url':'https://untrusted.example.com/file.pdf'}],
+            'clauseCandidates':{
             'industry_code':[{'text':'입찰참가자격: 컴퓨터관련서비스사업 1468 등록 필수',
                                'sourceFile':'공식입찰공고.pdf','codes':['1468']}]
           }}}}}))
@@ -40,6 +44,10 @@ with tempfile.TemporaryDirectory() as t:
         quotes=exact['items'][0]['rfpSavedState']['excerpts']
         assert len(quotes)==1 and '1468' in quotes[0]['text'],exact
         assert quotes[0]['sourceFile']=='공식입찰공고.pdf'
+        assert quotes[0]['sourceUrl']=='https://www.g2b.go.kr/official/attachment.pdf'
+        linked=exact['items'][0]['rfpSavedState']['officialFiles']
+        assert len(linked)==1 and linked[0]['name']=='공식입찰공고.pdf',linked
+        assert linked[0]['url'].startswith('https://www.g2b.go.kr/'),linked
         korean=search(10,0,True,'문서처리')
         assert korean['totalCount']==1 and korean['items'][0]['bidNo']==b,korean
         assert korean['items'][0]['rfpSavedState']['seen'] is False,korean
