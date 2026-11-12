@@ -1,0 +1,67 @@
+name: WorkLinks open RFP read-only inventory from own API
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/worklinks-open-rfp-public-api-inventory-20261112.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Enumerate saved SW bids from WorkLinks API without government calls
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections,datetime,json,re,time,urllib.parse,urllib.request
+          kst=datetime.timezone(datetime.timedelta(hours=9))
+          now=datetime.datetime.now(datetime.timezone.utc)
+          cutoff=now+datetime.timedelta(hours=24)
+          categories=collections.Counter();errorTypes=collections.Counter()
+          examples=[];total=0;nonparse=0;pages=0
+          for offset in range(0,30000,500):
+              url='https://api-suaveforge.suaveforge.com:18458/api/g2b/saved?'+urllib.parse.urlencode({
+               'sw':'1','limit':500,'offset':offset})
+              with urllib.request.urlopen(url,timeout=35) as response:
+                  data=json.load(response)
+              assert data.get('ok') is True, data.get('error')
+              rows=data.get('items') or []
+              pages+=1
+              for row in rows:
+                  total+=1
+                  raw=str(row.get('closes') or '')
+                  try:
+                      deadline=datetime.datetime.fromisoformat(raw.replace('Z','+00:00'))
+                      if not deadline.tzinfo:deadline=deadline.replace(tzinfo=kst)
+                  except (ValueError,TypeError):
+                      nonparse+=1;continue
+                  if deadline.astimezone(datetime.timezone.utc)<=cutoff:
+                      categories['excluded_past_or_under_24h']+=1
+                      continue
+                  categories['open_over_24h']+=1
+                  state=row.get('rfpSavedState') or {}
+                  files=state.get('fileStatuses') or []
+                  if not state.get('seen'):
+                      categories['not_scanned']+=1
+                  elif state.get('scanComplete') and state.get('complete'):
+                      categories['all_readable']+=1
+                  else:
+                      categories['needs_read_or_parse_repair']+=1
+                      categories['problem_files']+=sum(not f.get('readable') or not f.get('textScanComplete') for f in files)
+                      for f in files:
+                          if not f.get('readable') or not f.get('textScanComplete'):
+                              errorTypes[f.get('errorCategory') or 'unclassified']+=1
+                      if len(examples)<20:
+                          examples.append({'id':row.get('bidNo'),
+                             'order':row.get('order'),'closes':raw,
+                             'status':state.get('status'),'read':state.get('readableCount'),
+                             'total':state.get('documentCount'),
+                             'bad':sum(not f.get('readable') or not f.get('textScanComplete') for f in files)})
+              if len(rows)<500 or offset+len(rows)>=int(data.get('totalCount') or 0):break
+              time.sleep(.2)
+          print('OPEN_SAVED_RFP_AUDIT '+json.dumps({'asOfUTC':now.isoformat(),
+             'cutoffUTC':cutoff.isoformat(),'totalReturned':total,'unknownDeadline':nonparse,
+             'pages':pages,'counts':dict(categories),'errors':dict(errorTypes),'examples':examples},ensure_ascii=False),flush=True)
+          PY
