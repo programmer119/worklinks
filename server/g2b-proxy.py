@@ -706,7 +706,7 @@ def bid_extra_query(bid_no, order, collect=True):
 
 def _source_document_year(text):
     """Extract explicit business document year, not the bidding notice number."""
-    years=[int(v) for v in re.findall(r'(?<!\\d)(20\\d{2})\\s*년',str(text or ''))]
+    years=[int(v) for v in re.findall(r'(?<!\d)(20\d{2})\s*년',str(text or ''))]
     years=[v for v in years if 2020<=v<=2039]
     return max(years) if years else None
 
@@ -716,7 +716,7 @@ def _is_stale_eorder_reason(name,latest_business_year):
     text=str(name or '')
     if not latest_business_year or not re.search(r'긴급.*(?:입찰|발주|요청).*사유|긴급.*사유',text):
         return False
-    years=[int(v) for v in re.findall(r'(?<!\\d)(20\\d{2})\\s*년',text)]
+    years=[int(v) for v in re.findall(r'(?<!\d)(20\d{2})\s*년',text)]
     return bool(years and max(years)<latest_business_year)
 
 
