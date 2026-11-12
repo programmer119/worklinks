@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          python3 -m py_compile server/g2b-proxy.py
+          python3 -m py_compile server/g2b-proxy.py scripts/refresh_worklinks_rfp.py
           python3 tests/test_worklinks_deploy_runner_policy.py
           python3 tests/test_bid_evidence.py
           python3 tests/test_rfp_staffing_roles.py
