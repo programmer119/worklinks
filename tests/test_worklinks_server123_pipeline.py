@@ -24,6 +24,7 @@ with tempfile.TemporaryDirectory() as temporary:
                    'refresh_worklinks_open_award_fallback.py',
                    'batch_backfill_changcom_top500_rfp.py',
                    'repair_changcom_top500_rfp.py',
+                   'repair_open_rfp_cached_attachments.py',
                    'rfp_call_ledger.py'):
         (m.SCRIPTS/script).write_text('# test fixture\n',encoding='utf-8')
     original={'ok':True,'generatedAt':'2026-11-01','byNotice':{
@@ -46,6 +47,10 @@ with tempfile.TemporaryDirectory() as temporary:
             (Path(cwd)/'snapshots'/'rfp-top500-repair-report-20261111.json').write_text(
                 json.dumps({'ok':True,'targetSavedScans':0,
                   'repairAttemptedThisRun':0}),encoding='utf-8')
+        elif 'repair_open_rfp_cached_attachments.py' in args[1]:
+            assert '--execute' in args and '--data-dir' in args
+            assert 'serviceKey=' not in env['WORKLINKS_G2B_API']
+            # The staged snapshot is intentionally unchanged for this fixture.
         elif 'refresh_worklinks_rfp.py' in args[1]:
             updated={'ok':True,'generatedAt':'2026-11-11','byNotice':{
                'R26BK01808709:000':{'status':'text_extracted_requires_review'},
@@ -75,6 +80,7 @@ with tempfile.TemporaryDirectory() as temporary:
     m.run_once('actionable',mock_runner)
     m.run_once('awardFallback',mock_runner)
     m.run_once('rfpRepair',mock_runner)
+    m.run_once('rfpOpenRepair',mock_runner)
     m.run_once('qualification',mock_runner)
     assert json.loads((m.SEEDS/'qualification-review.json').read_text())['byNotice']['R26BK01808709:000']['reviewComplete'] is False
     report=m.SEEDS/'rfp-top500-repair-report-20261111.json'
@@ -83,7 +89,7 @@ with tempfile.TemporaryDirectory() as temporary:
         assert json.load(f)['repairAttemptedThisRun']==0
     assert json.loads((m.SEEDS/'g2b-award-fields-open.json').read_text())['count']==1
     state=m.iteration(1700000000,mock_runner)
-    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback','rfpRepair','qualification'))
+    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback','rfpRepair','rfpOpenRepair','qualification'))
     another=m.iteration(1700000001,mock_runner)
     assert another['rfp']['attemptEpoch']==1700000000
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
