@@ -821,6 +821,40 @@ def persist_bids(items):
     finally:
         con.close()
 
+_SEARCH_RFP_SNAPSHOT_LOCK=threading.Lock()
+_SEARCH_RFP_SNAPSHOT={'modified':None,'byNotice':None}
+def read_saved_rfp_evidence_index():
+    """Read only server123 saved source index. Never call G2B upstream."""
+    path=os.path.join(SNAPSHOT_ROOT,'rfp-coverage-index.json')
+    try:
+        modified=os.stat(path).st_mtime
+    except (OSError,IOError):
+        return None
+    with _SEARCH_RFP_SNAPSHOT_LOCK:
+        if (_SEARCH_RFP_SNAPSHOT['modified']!=modified or
+                _SEARCH_RFP_SNAPSHOT['byNotice'] is None):
+            try:
+                with open(path,'r') as stream:
+                    doc=json.load(stream)
+                if doc.get('ok') is not True or not isinstance(doc.get('byNotice'),dict):
+                    return None
+            except (OSError,IOError,ValueError,TypeError):
+                return None
+            _SEARCH_RFP_SNAPSHOT.update(modified=modified,byNotice=doc['byNotice'])
+        return _SEARCH_RFP_SNAPSHOT['byNotice']
+
+def saved_rfp_search_state(row):
+    if not isinstance(row,dict):
+        return {'sourceAvailable':True,'seen':False}
+    files=row.get('files') if isinstance(row.get('files'),list) else []
+    good=bool(row.get('manifestComplete') is True and
+        row.get('status')=='text_extracted_requires_review' and
+        files and all(x.get('readable') is True for x in files))
+    return {'sourceAvailable':True,'seen':True,'complete':good,
+            'status':str(row.get('status') or 'unknown')[:48],
+            'documentCount':len(files),
+            'readableCount':sum(x.get('readable') is True for x in files)}
+
 def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
     try:
@@ -869,6 +903,13 @@ def query_saved_bids(limit,offset,only_sw=False,query=''):
                 try: obj['supplementalBidFacts']=json.loads(extra)
                 except (ValueError,TypeError): pass
             items.append(obj)
+        if query:
+            source=read_saved_rfp_evidence_index()
+            for obj in items:
+                key=str(obj.get('bidNo') or '')+':'+str(obj.get('order') or '000').zfill(3)
+                obj['rfpSavedState']=(saved_rfp_search_state(source.get(key))
+                                     if source is not None else
+                                     {'sourceAvailable':False,'seen':False})
         checked=con.execute('SELECT COUNT(*) FROM bid_license_cache').fetchone()[0]
         linked=con.execute("SELECT COUNT(*) FROM bid_notices b INNER JOIN bid_license_cache q "
             "ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
