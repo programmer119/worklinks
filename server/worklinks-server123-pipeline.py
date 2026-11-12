@@ -133,7 +133,8 @@ def stage_workspace(path):
     for name in ('refresh_worklinks_rfp.py', 'refresh_worklinks_actionable.py',
                  'refresh_worklinks_open_award_fallback.py',
                  'batch_backfill_changcom_top500_rfp.py',
-                 'repair_changcom_top500_rfp.py'):
+                 'repair_changcom_top500_rfp.py',
+                 'rfp_call_ledger.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in READ_FILES:
         source = SEEDS / name
@@ -188,7 +189,8 @@ def run_once(kind, runner=None):
         raise ValueError('unknown_pipeline_kind')
     with tempfile.TemporaryDirectory(prefix='worklinks-pipeline-', dir=str(DATA)) as tmp:
         root = stage_workspace(Path(tmp))
-        env = dict(os.environ, WORKLINKS_G2B_API=SOURCE_API)
+        env = dict(os.environ, WORKLINKS_G2B_API=SOURCE_API,
+                   WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'))
         if kind == 'rfp':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_rfp.py'),
                        '--limit', str(RFP_LIMIT)]
