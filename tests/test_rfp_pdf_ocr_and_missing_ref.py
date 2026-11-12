@@ -125,12 +125,14 @@ year_ns={'re':__import__('re')}
 exec(compile(ast.Module(body=year_functions,type_ignores=[]),
              str(root/'server/g2b-proxy.py'),'exec'),year_ns)
 assert year_ns['_source_document_year']('2027년 남양주시 긴급입찰 사유서')==2027
-assert year_ns['_is_stale_eorder_reason']('2025년도 긴급입찰 사유서',2027)
-assert year_ns['_is_stale_eorder_reason']('[긴급입찰사유서] 2025년 울산 교육청',2027)
-assert not year_ns['_is_stale_eorder_reason']('2027년 긴급입찰 사유서',2027)
-assert not year_ns['_is_stale_eorder_reason']('2025년 기술지원 관련 참고 문서',2027)
-assert not year_ns['_is_stale_eorder_reason']('[붙임5] 긴급입찰 요청 사유서.pdf',2027)
-assert not year_ns['_is_stale_eorder_reason']('2025년 긴급입찰 사유서',None)
+assert year_ns['_is_stale_eorder_reason']('2025년도 긴급입찰 사유서',2027,2026)
+assert year_ns['_is_stale_eorder_reason']('[긴급입찰사유서] 2025년 울산 교육청',2027,2026)
+assert not year_ns['_is_stale_eorder_reason']('2027년 긴급입찰 사유서',2027,2026)
+assert not year_ns['_is_stale_eorder_reason']('2025년 기술지원 관련 참고 문서',2027,2026)
+assert not year_ns['_is_stale_eorder_reason']('[붙임5] 긴급입찰 요청 사유서.pdf',2027,2026)
+assert not year_ns['_is_stale_eorder_reason']('2025년 긴급입찰 사유서',None,2026)
+assert not year_ns['_is_stale_eorder_reason']('2025년 긴급입찰 사유서',2027,None)
+assert not year_ns['_is_stale_eorder_reason']('2026년 긴급입찰 사유서',2027,2026)
 
 
 print('WORKLINKS_PDF_OCR_422_SIBLING_REGRESSION=PASS')
