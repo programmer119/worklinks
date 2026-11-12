@@ -15,6 +15,7 @@ import re
 import sqlite3
 import time
 import zlib
+from itertools import chain
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 
@@ -130,7 +131,17 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
     processed_sha=set()
     total_files=0
     cached_binary_match=0
-    for sha,payload in db.execute("SELECT sha256,payload FROM verified_cache WHERE media_type='bytes'"):
+    # A streaming cache table is stored in insertion order; explicitly fetch
+    # priority notices FIRST, or they can be starved by the max-files budget.
+    urgent_sha=[sha for sha in selected if any(ref[0] in PRIORITY for ref in candidates[sha])]
+    urgent_rows=[]
+    for sha in urgent_sha:
+        row=db.execute("SELECT sha256,payload FROM verified_cache WHERE media_type='bytes' AND sha256=? LIMIT 1",
+                       (sha,)).fetchone()
+        if row:urgent_rows.append(row)
+    source_rows=chain(urgent_rows,
+        db.execute("SELECT sha256,payload FROM verified_cache WHERE media_type='bytes'"))
+    for sha,payload in source_rows:
         if sha not in target or sha in processed_sha:continue
         if total_files>=max_files or time.monotonic()-started>max_seconds:break
         processed_sha.add(sha)
