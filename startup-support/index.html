@@ -3533,7 +3533,7 @@ function jobRequirementEvidence(x){
  const savedReadComplete=saved?.status==='text_extracted_requires_review'&&
    saved?.complete===true&&saved?.scanComplete===true&&
    Number(saved.documentCount)>0&&
-   Number(saved.readableCount)===Number(saved.documentCount);
+   Number(saved.effectiveReadableCount??saved.readableCount)===Number(saved.documentCount);
  const sourceReadComplete=fullScanComplete||savedReadComplete;
  const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
  const insurance=/(?:4\s*대\s*(?:사회\s*)?보험|사대\s*보험|사회\s*보험\s*가입\s*(?:자|증명)|건강\s*보험\s*(?:자격득실|가입자명부)|고용\s*보험\s*가입\s*(?:증명|확인))/i;
