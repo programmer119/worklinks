@@ -3168,6 +3168,98 @@ document.getElementById('jobDetailBody').addEventListener('click',function(e){
 // memory and remains accessible through incremental More controls.
 function jobPageStep(){return g2bCompactScreen()?24:100}
 var jobFilter="all",jobRenderLimit=jobPageStep(),selectedPartnerId="all",partnerFilterOptionsKey="",jobVerdictFilter="all";
+var jobSearchText='',jobSearchRemote=[],jobSearchTimer=null,jobSearchSerial=0,jobSearchServerTotal=null;
+function jobSearchNormalized(value){
+ return String(value||'').normalize('NFKC').toLocaleLowerCase('ko-KR').replace(/\s+/g,' ').trim();
+}
+function jobSearchMatches(x,term){
+ const fields=[x.title,x.noticeNumber,x.org,x.id,x.type];
+ if(Array.isArray(x.variants))fields.push(...x.variants.map(y=>[y.title,y.noticeNumber,y.id].join(' ')));
+ return jobSearchNormalized(fields.join(' ')).includes(term);
+}
+function jobCollectionFlags(x){
+ const id=jobBidIdentity(x);if(!id)return null;
+ const key=id.bidNo+':'+id.order;
+ const lic=bidEligibilityCache.get(key);
+ const pre=changcomPrecheckByNotice.get(key);
+ const extra=g2bSupplementalCache.get(key)||pre?.supplementalBidFacts;
+ const rfp=rfpSnapshotByNotice.get(key);
+ const files=Array.isArray(rfp?.files)?rfp.files:null;
+ const licenceStatus=!lic?'absent':lic.ok===true&&lic.complete===true?'done':'partial';
+ const extraStatus=!extra?'absent':extra.ok===true&&extra.complete===true?'done':'partial';
+ const rfpDone=!!(rfp&&rfp.manifestComplete===true&&
+  rfp.status==='text_extracted_requires_review'&&files&&files.length&&
+  files.every(f=>f.readable===true&&f.sourceTextScanComplete!==false&&f.qualificationScanTruncated!==true));
+ const rfpStatus=!rfp?'absent':rfpDone?'done':'partial';
+ const statuses=[{label:'업종·면허',state:licenceStatus},{label:'추가정보',state:extraStatus},
+                 {label:'첨부·원문',state:rfpStatus}];
+ return {statuses,done:statuses.filter(t=>t.state==='done').length};
+}
+function jobCollectionMarkup(x){
+ if(!jobSearchText)return '';
+ const flags=jobCollectionFlags(x);if(!flags)return '';
+ const message={done:'수집 완료',partial:'부분·오류',absent:'저장 기록 없음'};
+ const badges=flags.statuses.map(t=>
+  '<span class="api-state '+t.state+'" title="'+htmlEscape(t.label+' · '+message[t.state])+'">'+
+  htmlEscape(t.label)+' '+htmlEscape(message[t.state])+'</span>').join('');
+ return '<div class="job-api-evidence" aria-label="공고별 저장된 수집 결과 세 항목">'+
+  '<span class="api-state summary'+(flags.done===3?' complete':'')+'">수집 '+flags.done+'/3</span>'+
+  badges+'</div>';
+}
+async function jobRunRemoteSearch(query){
+ const requestId=++jobSearchSerial;
+ const status=document.getElementById('jobSearchStatus');
+ if(query.length<2){jobSearchRemote=[];jobSearchServerTotal=null;status.textContent=query?'두 글자 이상 입력':'';
+  scheduleJobsRender();return}
+ status.textContent='서버 저장 DB 검색 중…';
+ try{
+  // Searches saved SQLite only. No new official procurement API request.
+  const result=await g2bFetch('/saved?sw=1&limit=250&offset=0&q='+encodeURIComponent(query));
+  if(requestId!==jobSearchSerial||query!==jobSearchText)return;
+  if(result.searchMode!=='saved_only')throw Error('서버 검색 기능 미배포');
+  const next=[];
+  for(const row of result.items||[]){
+   const key=String(row.bidNo||'')+':'+String(row.order||'000').padStart(3,'0');
+   if(row.bidEligibility)bidEligibilityCache.set(key,row.bidEligibility);
+   if(row.supplementalBidFacts)g2bSupplementalCache.set(key,row.supplementalBidFacts);
+   const item=g2bCardFromServer(row);
+   if(item)next.push(item);
+  }
+  jobSearchRemote=next;
+  jobSearchServerTotal=Number(result.totalCount||0);
+  status.textContent='서버 DB '+next.length+' / '+jobSearchServerTotal+'건 · 신규 정부 API 호출 없음';
+ }catch(error){
+  if(requestId!==jobSearchSerial)return;
+  status.textContent='서버 검색 실패 · 불러온 목록에서 검색';
+  jobSearchRemote=[];jobSearchServerTotal=null;
+ }finally{if(requestId===jobSearchSerial)scheduleJobsRender()}
+}
+function updateJobSearchInput(){
+ const input=document.getElementById('jobQuickSearch');
+ const next=String(input.value||'').trim();
+ if(jobSearchTimer!==null)clearTimeout(jobSearchTimer);
+ jobSearchSerial++;
+ jobSearchText=next;
+ jobRenderLimit=jobPageStep();
+ jobSearchRemote=[];jobSearchServerTotal=null;
+ document.getElementById('jobSearchClear').hidden=!next;
+ // Search spans both open and closed notices and never triggers an official API call.
+ if(next){jobFilter='all';jobVerdictFilter='all'}
+ scheduleJobsRender();
+ const url=new URL(window.location.href);
+ if(next)url.searchParams.set('q',next);else url.searchParams.delete('q');
+ history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+ if(next.length>=2)jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),240);
+ else document.getElementById('jobSearchStatus').textContent=next?'두 글자 이상 입력':'';
+}
+document.getElementById('jobQuickSearch').addEventListener('input',updateJobSearchInput);
+document.getElementById('jobSearchClear').addEventListener('click',function(){
+ const input=document.getElementById('jobQuickSearch');input.value='';
+ updateJobSearchInput();input.focus()
+});
+const initialJobSearch=new URLSearchParams(location.search).get('q');
+if(initialJobSearch){document.getElementById('jobQuickSearch').value=initialJobSearch.slice(0,80);updateJobSearchInput()}
+
 localStorage.setItem("worklinks_job_filter_v1","all");
 function syncPartnerFilterChoices(){
  const select=document.getElementById('partnerFilter');
