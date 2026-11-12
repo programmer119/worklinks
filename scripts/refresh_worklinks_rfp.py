@@ -140,6 +140,14 @@ def needs_hwpx_reader_retry(record):
                (Path(f.get('name') or '').suffix.lower() in ('.hwpx',''))
                for f in (record or {}).get('files') or [])
 
+def staffing_general_annex_file(name):
+    """General legal-procedure packets, never a project staffing specification."""
+    label=str(name or '')
+    return bool(
+        re.search(r'입찰\s*유의서.{0,90}계약\s*일반\s*조건.{0,90}(?:특수\s*조건|적격\s*심사)',label,re.I)
+        and label.lower().endswith('.zip'))
+
+
 def staffing_effective_file_complete(file, files):
     """An expressly skipped, same-stem official HWP uses the scanned PDF instead.
 
@@ -147,6 +155,9 @@ def staffing_effective_file_complete(file, files):
     The cited PDF, verified by SHA in the SAME manifest, is the effective source.
     """
     if not isinstance(file, dict):return False
+    # Generic nationwide contract-law archives are outside the project-specific
+    # staffing scope; preserve their separate qualification extraction failure.
+    if staffing_general_annex_file(file.get('name')):return True
     if (file.get('readable') is True and
             file.get('sourceTextScanComplete') is True and
             int(file.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
@@ -982,7 +993,7 @@ def extract_staffing_roles(text, filename, source_url='', excerpt_only=False):
     No automatic summing of different roles, grades, documents, or alternative
     staffing plans. An unsupported number is never assumed to be a headcount.
     """
-    if staffing_source_is_general_example(filename):return []
+    if staffing_source_is_general_example(filename) or staffing_general_annex_file(filename):return []
     text=str(text or '')[:STAFFING_ROLE_TEXT_LIMIT]
     lines=[' '.join(part.split())[:550] for part in text.splitlines()]
     result=[]
@@ -1742,6 +1753,9 @@ def compact_coverage(item):
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
             'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
+            'staffingScopeExcluded':staffing_general_annex_file(f.get('name')),
+            'staffingScopeReason':('일반 계약·입찰 규정 ZIP (사업별 투입인력 요건 아님)'
+                                  if staffing_general_annex_file(f.get('name')) else ''),
             'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') is True,
             'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
             'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
