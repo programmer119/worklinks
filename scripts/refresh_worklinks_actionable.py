@@ -47,16 +47,38 @@ SOFTWARE_GOODS=re.compile(
     r'|(?:개발|고도화)\s*(?:용역|업무)',re.I)
 
 def get_json(path):
+    # The read is from our local archived G2B API, not a new upstream G2B call.
     url=API+path
+    ledger=None
+    request_key=None
+    if os.environ.get('WORKLINKS_RFP_LEDGER_DB'):
+        from rfp_call_ledger import CallLedger,cache_key
+        ledger=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+        request_key=cache_key('local_actionable',path)
+        cached=ledger.get_json(request_key,max_age_seconds=180)
+        if isinstance(cached,dict) and cached.get('ok') is True:
+            ledger.record('local_actionable',request_key,'verified_local_snapshot_reused')
+            return cached
     request=urllib.request.Request(url,headers={
         'User-Agent':'WorkLinks-Changcom-Actionable-ReadOnly/1.0','Accept':'application/json'})
-    with urllib.request.urlopen(request,timeout=35) as response:
-        raw=response.read(3_500_000)
-        if len(raw)>=3_500_000:raise ValueError('public_g2b_page_too_large')
-    result=json.loads(raw)
-    if not isinstance(result,dict) or result.get('ok') is not True:
-        raise ValueError('public_g2b_response_not_complete')
-    return result
+    try:
+        with urllib.request.urlopen(request,timeout=35) as response:
+            status=getattr(response,'status',200)
+            raw=response.read(3_500_000)
+            if len(raw)>=3_500_000:raise ValueError('public_g2b_page_too_large')
+        result=json.loads(raw)
+        if not isinstance(result,dict) or result.get('ok') is not True:
+            raise ValueError('public_g2b_response_not_complete')
+        if ledger is not None:
+            ledger.record('local_actionable_http',request_key,'http_ok',http_status=status)
+            ledger.save_json(request_key,result,max_bytes=3_500_000)
+        return result
+    except Exception as exc:
+        if ledger is not None:
+            ledger.record('local_actionable_http',request_key,'http_failed',
+                          http_status=getattr(exc,'code',None),
+                          error_class=type(exc).__name__)
+        raise
 
 def parse_close(value):
     value=str(value or '').strip()
