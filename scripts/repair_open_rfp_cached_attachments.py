@@ -247,78 +247,100 @@ def run(data_dir,limit,execute=False,max_files=400):
     meta_doc=read_json(snap/'rfp-top500-batch-metadata-20261111.json')
     stored=meta_doc.get('byNotice') or {}
     ledger=root/'rfp-request-ledger.sqlite3'
-    index=read_json(coverage_path)
-    entries=index.get('byNotice') or {}
+    entries=read_json(coverage_path).get('byNotice') or {}
     now=dt.datetime.now(dt.timezone.utc)
     open_rows=open_candidates(root,now)
-    selected=[];categories=Counter()
+    selected=[];categories=Counter();selected_file_count=0
     for key,ends in open_rows:
         scan=entries.get(key)
-        if not isinstance(scan,dict):categories['not_scanned']+=1;continue
-        if not scan.get('files'):categories['without_scannable_files']+=1;continue
+        if not isinstance(scan,dict):
+            categories['not_scanned']+=1;continue
+        if not scan.get('files'):
+            categories['without_scannable_files']+=1;continue
         broken=failed_files(scan)
-        if not broken:categories['all_readable']+=1;continue
+        if not broken:
+            categories['all_readable']+=1;continue
         categories['partial']+=1
         meta,src=metadata_for(key,scan,stored,ledger)
-        if not meta:categories['metadata_missing']+=1;continue
+        if not meta:
+            categories['metadata_missing']+=1;continue
         categories['ready']+=1
-        if len(selected)<limit and sum(len(x[2]) for x in selected)+len(broken)<=max_files:
-            selected.append((key,ends,broken,meta,src))
+        if len(selected)<limit and selected_file_count+len(broken)<=max_files:
+            selected.append((key,ends,meta,src))
+            selected_file_count+=len(broken)
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
-      'selectedProblemFiles':sum(len(x[2]) for x in selected),
-      'noMetadataAPIRequests':True},ensure_ascii=False),flush=True)
+      'selectedProblemFiles':selected_file_count,
+      'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
     if not execute:return {'plan':dict(categories),'selected':len(selected)}
     if not selected:return {'result':'no_eligible_cached_metadata'}
-    # One owner at a time. The ordinary WorkLinks pipeline is never stopped.
     lock=open(root/'rfp-open-repair.lock','a+')
     fcntl.flock(lock,fcntl.LOCK_EX)
-    results={};tally=Counter()
+    results={};tally=Counter();pending={}
+
+    def flush_pending():
+        if not pending:return
+        # Rebase every patch on the latest index so other notices are preserved.
+        latest_doc=read_json(coverage_path)
+        current_rows=latest_doc.get('byNotice') or {}
+        timestamp=dt.datetime.now(dt.timezone.utc).isoformat()
+        applied={}
+        for key,(work,additions) in pending.items():
+            current=current_rows.get(key)
+            if not isinstance(current,dict):
+                tally['changed_while_repairing']+=1;continue
+            live_files=current.get('files') or []
+            fixed_files=work.get('files') or []
+            if (len(live_files)!=len(fixed_files) or
+                [str(f.get('name') or '') for f in live_files]!=
+                [str(f.get('name') or '') for f in fixed_files]):
+                tally['changed_while_repairing']+=1;continue
+            for i,entry in enumerate(fixed_files):
+                live=live_files[i]
+                if (entry.get('readable') is True and
+                      entry.get('sourceTextScanComplete') is True and
+                      entry.get('sourceSha256') and
+                      (live.get('readable') is not True or
+                       live.get('sourceTextScanComplete') is not True)):
+                    live.update(entry)
+            update_counts(current,timestamp,additions)
+            applied[key]={'readable':current['readableDocumentCount'],
+                          'total':len(live_files),'repaired':len(additions)}
+        if applied:
+            latest_doc['generatedAt']=timestamp
+            raw=(json.dumps(latest_doc,ensure_ascii=False,indent=2)+'\n').encode('utf-8')
+            write_atomic(coverage_path,raw)
+            write_atomic(Path(str(coverage_path)+'.gz'),gzip.compress(raw,compresslevel=5,mtime=0))
+            results.update(applied)
+            tally['notices_updated']+=len(applied)
+            print('OPEN_RFP_CACHED_REPAIR_COMMITTED',json.dumps({
+                  'notices':len(applied),'totalUpdated':len(results),
+                  'filesRepaired':tally['file_repaired'],
+                  'allReadableNotices':sum(v['readable']==v['total'] for v in applied.values())},
+                  ensure_ascii=False),flush=True)
+        pending.clear()
+
     try:
-        for key,_,broken,meta,source in selected:
-            # Re-check deadline immediately before each new GET.
-            ends=next((end for k,end in open_candidates(root,dt.datetime.now(dt.timezone.utc)) if k==key),None)
-            if ends is None:tally['skipped_deadline']+=1;continue
+        for key,deadline,meta,src in selected:
+            if deadline.astimezone(dt.timezone.utc)<=dt.datetime.now(dt.timezone.utc)+dt.timedelta(hours=24):
+                tally['skipped_deadline']+=1;continue
+            # Do not use stale input to overwrite a reclassified manifest.
             latest=read_json(coverage_path).get('byNotice',{}).get(key)
             if not isinstance(latest,dict) or not metadata_valid(meta,latest):
                 tally['changed_while_repairing']+=1;continue
             if not failed_files(latest):continue
-            # Work on a detached copy; only merge after successful extraction.
             work=json.loads(json.dumps(latest,ensure_ascii=False))
             additions,counters=process_one(key,work,meta,ledger)
             tally.update(counters)
             if not additions:continue
-            timestamp=dt.datetime.now(dt.timezone.utc).isoformat()
-            update_counts(work,timestamp,additions)
-            # Rebase on the latest complete index so ordinary scheduler records
-            # from other notice keys are never overwritten by an old snapshot.
-            fresh=read_json(coverage_path)
-            by=fresh.get('byNotice') or {}
-            current=by.get(key) or {}
-            if (Counter(str(f.get('name') or '') for f in current.get('files') or [])!=
-                    Counter(str(f.get('name') or '') for f in work.get('files') or [])):
-                tally['changed_while_repairing']+=1;continue
-            current_files=current.get('files') or []
-            for i,entry in enumerate(work['files']):
-                if entry.get('readable') and entry.get('sourceSha256'):
-                    if (current_files[i].get('readable') is not True or
-                            current_files[i].get('sourceTextScanComplete') is not True):
-                        current_files[i].update(entry)
-            by[key]=current
-            update_counts(current,timestamp,additions)
-            fresh['generatedAt']=timestamp
-            raw=(json.dumps(fresh,ensure_ascii=False,indent=2)+'\n').encode('utf-8')
-            write_atomic(coverage_path,raw)
-            write_atomic(Path(str(coverage_path)+'.gz'),gzip.compress(raw,compresslevel=5,mtime=0))
-            results[key]={'readable':current['readableDocumentCount'],
-              'total':len(current_files),'repaired':len(additions)}
-            tally['notices_updated']+=1
-            print('OPEN_RFP_CACHED_REPAIR_NOTICE',key,results[key],flush=True)
+            pending[key]=(work,additions)
+            if len(pending)>=8:flush_pending()
+        flush_pending()
         print('OPEN_RFP_CACHED_REPAIR_RESULT',json.dumps({
           'noticesUpdated':len(results),'counters':dict(tally),
           'remainingWithoutSavedMetadata':categories['metadata_missing'],
-          'noGovMetadataAPIRequests':True},ensure_ascii=False),flush=True)
+          'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
         return results
     finally:
         fcntl.flock(lock,fcntl.LOCK_UN)
