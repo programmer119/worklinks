@@ -93,6 +93,27 @@ assert.equal(nav.state().workspaceActiveView,'jobs','guest cannot open partner w
 assert.equal(nav.state().requestedPartnerViewOnAuth,true);
 console.log('Worklinks separate Changcom top-level navigation and auth gate PASS');
 
+// Keep the default bidding screen concise without losing advanced evidence.
+const compactHead=source.indexOf('id="jobVerdictFilter"');
+const advancedHead=source.indexOf('id="jobExtraFilters"');
+const sortHead=source.indexOf('class="job-sort-row"',advancedHead);
+assert.ok(compactHead>0&&advancedHead>compactHead&&sortHead>advancedHead,
+ 'primary conditions, advanced conditions and sort must share the compact toolbar');
+assert.equal((source.slice(compactHead,advancedHead).match(/data-verdict-filter=/g)||[]).length,4,
+ 'only all, ready, blocked and checking status buttons may be always visible');
+assert.ok(source.includes('class="job-extra-panel"') &&
+ source.includes('id="competitionLoadMore"') &&
+ source.indexOf('id="competitionLoadMore"')>advancedHead &&
+ source.indexOf('id="competitionLoadMore"')<sortHead,
+ 'low-priority competition tools stay in the advanced disclosure');
+assert.ok(source.indexOf('id="jobDecisionSummary"')<source.indexOf('id="jobQuickSearch"'),
+ 'long operational status belongs in the info popover rather than in the search/results flow');
+assert.ok(source.includes('#jobsView .job-extra-panel{position:absolute;'),
+ 'opening extra conditions must overlay rather than push the bid list down');
+assert.ok(source.includes('#jobsView .job-sort-row{margin:0 0 0 auto;'),
+ 'sorting must occupy the same row as primary conditions');
+console.log('Worklinks Changcom compact filters and diagnostics PASS');
+
 const time=new Function(
  'function kstNow(){return new Date(Date.UTC(2026,9,12,10,0))};'+
  "function kstISO(){return '2026-10-12'};"+

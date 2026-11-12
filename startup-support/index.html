@@ -620,6 +620,46 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobCards .job-institution-badge:hover,#jobCards .job-institution-badge:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 #jobCards .job-mini .job-meta-row{justify-content:flex-end}
 @media(max-width:490px){#jobCards .job-day{padding-right:113px}#jobCards .job-institution-badges{right:10px;gap:4px}#jobCards .job-institution-badge{width:28px;height:28px;font-size:15px}}
+
+/* Compact workspace controls: only the actions needed to find a bid stay visible. */
+#jobsView .panel{padding:14px 18px}
+#jobsView .job-titlebar>b{font-size:21px;line-height:1.3}
+#jobsView .job-info-fold>summary{width:36px;height:36px;border-width:1px;font-size:18px}
+#jobsView .job-quick-search{margin:8px 0 9px;padding:8px 10px;gap:8px;border-width:1px;border-radius:10px}
+#jobsView .job-quick-search label{font-size:15px}
+#jobsView .job-quick-search input{font-size:15px;min-height:39px;padding:8px 10px;font-weight:600}
+#jobsView .jobfilters{margin:0 0 7px;gap:7px;align-items:center}
+#jobsView .partner-count-label{font-size:15px}
+#jobsView .partner-period{padding:7px 12px;font-size:15px}
+#jobsView .partner-filter-control{font-size:15px;padding:3px 6px 3px 9px;gap:6px}
+#jobsView .partner-filter-control select{font-size:15px;min-height:34px;padding:5px 9px}
+#jobsView .job-verdict-filter{margin:5px 0 4px;gap:7px;align-items:center}
+#jobsView .job-vf{font-size:15px;min-height:38px;padding:7px 12px;border-radius:9px;font-weight:750}
+#jobsView .job-vf [data-verdict-count]{font-size:15px}
+#jobsView .job-sort-row{margin:0 0 0 auto;font-size:15px;gap:8px;display:flex;align-items:center}
+#jobsView .job-sort-row select{font-size:15px;min-height:38px;padding:6px 10px}
+#jobsView .job-info-pop .job-decision-summary{font-size:14px;font-weight:650;line-height:1.6;margin:10px 0;padding:10px 0;border-bottom:1px solid #e2e8f0}
+#jobsView .job-extra-filters{flex:0 0 auto;position:relative;margin-left:auto;min-width:0}
+#jobsView .job-extra-filters>summary{list-style:none;cursor:pointer;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#334155;font-weight:750;font-size:15px;min-height:38px;padding:7px 12px}
+#jobsView .job-extra-filters>summary::-webkit-details-marker{display:none}
+#jobsView .job-extra-filters>summary::after{content:' ▾';color:#64748b}
+#jobsView .job-extra-filters[open]>summary{background:#eef4fc;border-color:#93b4dc}
+#jobsView .job-extra-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:35;width:min(710px,calc(100vw - 48px));max-height:65vh;overflow:auto;padding:13px;border:1px solid #cbd5e1;background:#fff;border-radius:11px;box-shadow:0 12px 28px rgba(15,23,42,.18);display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+#jobsView .job-extra-panel .job-advantage-toolbar{flex:1 0 100%;margin-top:3px;padding:10px 0 0;gap:7px}
+#jobsView .job-extra-panel .job-advantage-toolbar>strong{font-size:15px;flex:1 0 100%}
+#jobsView .job-extra-panel .job-vf{font-size:15px;min-height:38px;padding:7px 10px}
+#jobsView .job-extra-filters .job-competition-refresh{flex:0 0 auto}
+#jobsView .job-extra-filters.has-selection>summary{border-color:#2563eb;color:#1d4ed8;background:#eff6ff}
+#jobsView .job-verdict-filter>.job-vf{white-space:nowrap}
+
+@media(max-width:780px){
+ #jobsView .panel{padding:12px}
+ #jobsView .job-titlebar>b{font-size:20px}
+ #jobsView .job-verdict-filter{gap:6px}
+ #jobsView .job-verdict-filter>.job-vf{padding:7px 10px;font-size:14px}
+ #jobsView .job-extra-filters{margin-left:0}
+ #jobsView .job-extra-panel{right:auto;left:0;width:min(680px,calc(100vw - 36px))}
+}
 </style>
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
 </head>
@@ -716,7 +756,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
     <details class="job-info-fold" id="jobInfoFold">
       <summary title="일감 안내 · 검증 부족조건 · 수집 진단" aria-label="일감 검증 안내와 원자료 보기">!</summary>
       <div class="job-info-pop">
-        <h3>지원자격 부족조건 · 원자료</h3>
+        <h3>검증·수집 상세</h3>
+        <div id="jobDecisionSummary" class="job-decision-summary worklinks-partner-only partner-jobs-only" role="status">조건별 입찰자격 확인 중…</div>
         <div id="jobMissingInfo" class="job-missing-info worklinks-partner-only">미확인 조건을 집계 중입니다.</div>
         <details class="bid-guide" id="bidGuide">
       <summary aria-label="나라장터 낙찰방식 안내" title="나라장터 낙찰방식 안내">입찰방식·용어 자세히 보기 ▾</summary>
@@ -771,7 +812,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
       <button class="jobf" data-jobf="sources">수요처 탐색경로</button>
     </div>
     <div class="jobfilters partner-jobs-only worklinks-partner-only" id="changcomJobFilters" aria-label="창컴 공공입찰 필터">
-      <span class="partner-count-label">협업 공고 <span id="partnerJobCount"></span></span>
+      <span class="partner-count-label">공고 <span id="partnerJobCount"></span></span>
       <button type="button" class="partner-period on" data-partner-period="open" aria-pressed="true">진행중</button>
       <button type="button" class="partner-period" data-partner-period="closed" aria-pressed="false">마감</button>
       <label class="partner-filter-control" for="partnerFilter">협업 업체
@@ -781,12 +822,12 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 
 <!-- Source-verified shortlist is unified into standard job cards and sorted first. -->
 
-<div id="jobDecisionSummary" class="job-decision-summary worklinks-partner-only partner-jobs-only" role="status">조건별 입찰자격 확인 중…</div><div class="job-verdict-filter worklinks-partner-only partner-jobs-only" id="jobVerdictFilter" role="group" aria-label="업체별 지원 상태 필터">
- <strong>지원 상태</strong>
+<div class="job-verdict-filter worklinks-partner-only partner-jobs-only" id="jobVerdictFilter" role="group" aria-label="업체별 지원 상태 필터">
  <button type="button" class="job-vf on" data-verdict-filter="all" aria-pressed="true">전체 <span data-verdict-count="all">0</span></button>
  <button type="button" class="job-vf ready" data-verdict-filter="ready" aria-pressed="false">적격 후보 <span data-verdict-count="ready">0</span></button>
  <button type="button" class="job-vf blocked" data-verdict-filter="blocked" aria-pressed="false">지원 불가 <span data-verdict-count="blocked">0</span></button>
  <button type="button" class="job-vf checking" data-verdict-filter="checking" aria-pressed="false">검증 중 <span data-verdict-count="checking">0</span></button>
+ <details class="job-extra-filters" id="jobExtraFilters"><summary aria-label="상세 입찰 조건 필터 펼치기">상세 필터</summary><div class="job-extra-panel" role="group" aria-label="추가 입찰 조건 필터">
  <button type="button" class="job-vf" data-verdict-filter="registered" aria-pressed="false" title="업종등록에 한해 공식 조건과 일치 · 다른 입찰자격 미확정">등록업종 일치 <span data-verdict-count="registered">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="no-restriction" aria-pressed="false" title="공식 면허제한 API 정상조회 0건 · 다른 공고 참가조건 미확정">업종 제한 0건 <span data-verdict-count="no-restriction">0</span></button>
  <button type="button" class="job-vf" data-verdict-filter="repeat" aria-pressed="false" title="공식 공고번호와 동일 발주기관·유사 사업명이 확인된 2회차 이상 연속 발주">연속 2회차 이상 <span data-verdict-count="repeat">0</span></button>
@@ -798,10 +839,11 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   <button type="button" class="job-vf" data-verdict-filter="adv-3" aria-pressed="false" title="등록업종 및 직접생산 공개자료 기본대조 · 최종 자격 미확정">기초요건 대조 <span data-verdict-count="adv-3">0</span></button>
   <button type="button" class="job-vf" data-verdict-filter="adv-2" aria-pressed="false" title="나라장터 공개 등록업종 기본 일치 · 다른 요건은 미검증">등록업종 일치 <span data-verdict-count="adv-2">0</span></button>
   <button type="button" class="job-vf" data-verdict-filter="adv-1" aria-pressed="false" title="공식 공고상 지역제한 불일치가 확인된 경우">지역 제한 <span data-verdict-count="adv-1">0</span></button>
-  <span class="job-advantage-explain">공고·업체 구조화 자료 기준의 1차 선별입니다. 입찰자격 확정이나 실제 경쟁률이 아닙니다. 과거 개찰 수치는 확인된 공고에만 별도 표시합니다.</span>
  </div>
-
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf partner-jobs-only" id="competitionLoadMore" title="서버 DB에 저장된 공식 과거 낙찰 결과를 다시 읽습니다. 신규 조사는 서버 수집기가 시간당 최대 2건 수행합니다">과거 경쟁 캐시 새로고침 <span id="competitionLoadStatus">(조회 전)</span></button></div>
+ <button type="button" class="job-vf job-competition-refresh" id="competitionLoadMore" title="서버에 저장된 과거 경쟁 자료만 다시 확인합니다. 새 정부 API 호출은 하지 않습니다">과거 경쟁 자료 갱신 <span id="competitionLoadStatus">(조회 전)</span></button>
+ </div></details>
+ <div class="job-sort-row"><label for="jobSort">정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순</option><option value="recent">최신순</option><option value="budget">금액 높은순</option><option value="competition">과거 경쟁 적은순</option></select></div>
+ </div>
 
 
   </div>
@@ -4043,6 +4085,9 @@ function refreshVerdictFilters(rows,selected){
  });
  const panel=document.getElementById('jobVerdictFilter');
  if(panel)panel.hidden=jobFilter==='sources';
+ const extra=document.getElementById('jobExtraFilters');
+ if(extra)extra.classList.toggle('has-selection',
+  !['all','ready','blocked','checking'].includes(jobVerdictFilter));
 }
 
 function jobEntryLabel(v){return v==="general"?"일반":v==="sole"?"개인사업자":"사업자"}
@@ -4295,7 +4340,12 @@ function renderJobs(){
  const partialServerList=g2bSavedLoadRunning||!!g2bSavedLoadError||
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
    (!g2bServerAvailable&&g2bSavedKnownTotal>0);
- document.getElementById('partnerJobCount').textContent='('+candidateJobs.length+(partialServerList?' · 일부':'')+')';
+ document.getElementById('partnerJobCount').textContent=
+  candidateJobs.length+'건'+(partialServerList?' · 일부':'');
+ const partnerCountLabel=document.querySelector('#changcomJobFilters .partner-count-label');
+ if(partnerCountLabel)partnerCountLabel.title=partialServerList?
+  '서버 공고 중 현재 불러온 목록만 집계했습니다. 자세한 조회 오류는 오른쪽 !에서 확인하세요.':
+  '서버 DB에서 불러온 공고 중 현재 협업 후보로 분류된 건수';
  const knownServerCount=Math.max(g2bSavedKnownTotal,g2bSavedTotal);
  const listCoverageText=partialServerList?
   'DB '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+
