@@ -19,7 +19,8 @@ with tempfile.TemporaryDirectory() as temporary:
     m.STATE=root/'scheduler.json'
     m.SEEDS.mkdir()
     m.SCRIPTS.mkdir()
-    for script in ('refresh_worklinks_rfp.py','refresh_worklinks_actionable.py',
+    for script in ('refresh_worklinks_rfp.py','analyze_worklinks_rfp_ai.py',
+                   'refresh_worklinks_actionable.py',
                    'refresh_worklinks_open_award_fallback.py',
                    'batch_backfill_changcom_top500_rfp.py',
                    'repair_changcom_top500_rfp.py',
@@ -51,6 +52,12 @@ with tempfile.TemporaryDirectory() as temporary:
                'R26BK01809647:000':{'status':'text_extracted_requires_review'}}}
             for filename in ('rfp-clauses.json','rfp-coverage-index.json'):
                 (p/filename).write_text(json.dumps(updated),encoding='utf-8')
+        elif 'analyze_worklinks_rfp_ai.py' in args[1]:
+            assert '--summary-only' in args and '--rule-based' in args
+            (p/'qualification-review.json').write_text(json.dumps({
+               'ok':True,'schemaVersion':1,'mode':'rule_based','byNotice':{
+                  'R26BK01808709:000':{'reviewComplete':False,
+                       'automaticEligibilityApproved':False}}}),encoding='utf-8')
         elif 'refresh_worklinks_open_award_fallback.py' in args[1]:
             updated={'ok':True,'totalSavedSw':6001,'count':1,'byNotice':{
                 'R26BK01808709:000':{'awardMethod':'협상에 의한 계약'}}}
@@ -68,13 +75,15 @@ with tempfile.TemporaryDirectory() as temporary:
     m.run_once('actionable',mock_runner)
     m.run_once('awardFallback',mock_runner)
     m.run_once('rfpRepair',mock_runner)
+    m.run_once('qualification',mock_runner)
+    assert json.loads((m.SEEDS/'qualification-review.json').read_text())['byNotice']['R26BK01808709:000']['reviewComplete'] is False
     report=m.SEEDS/'rfp-top500-repair-report-20261111.json'
     assert json.loads(report.read_text())['ok'] is True
     with gzip.open(str(report)+'.gz','rb') as f:
         assert json.load(f)['repairAttemptedThisRun']==0
     assert json.loads((m.SEEDS/'g2b-award-fields-open.json').read_text())['count']==1
     state=m.iteration(1700000000,mock_runner)
-    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback','rfpRepair'))
+    assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback','rfpRepair','qualification'))
     another=m.iteration(1700000001,mock_runner)
     assert another['rfp']['attemptEpoch']==1700000000
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
