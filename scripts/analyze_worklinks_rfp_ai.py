@@ -655,20 +655,111 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
         "limitations":"모든 검색가능 문서의 기계검토가 완료되어도 업체 보유증빙/공고일 기준 자격/투찰마감의 확인은 별도. 검토 미완료 항목은 최종 적격으로 표시하지 않음"
     }
 
+
+def run_summary_only(source, summary_path, limit):
+    """Incrementally review official RFP clauses without paid API calls or full-text duplication.
+
+    The compact index is a document-review progress ledger, NOT an assertion that
+    any company has the valid certificates, staffing, or tender eligibility.
+    """
+    path=Path(summary_path)
+    try:
+        old=json.loads(path.read_text(encoding="utf8")) if path.exists() else {}
+    except (OSError, ValueError):
+        raise RuntimeError("qualification_summary_corrupt")
+    previous=old.get("byNotice") or {}
+    if not isinstance(previous,dict):
+        raise RuntimeError("qualification_summary_invalid")
+    indexed=dict(previous)
+    notices=source.get("byNotice") or {}
+    if not isinstance(notices,dict):
+        raise RuntimeError("qualification_source_invalid")
+    candidates=[]
+    for key, notice in notices.items():
+        if not isinstance(notice,dict):continue
+        clauses=source_candidates(notice)
+        if not clauses:continue
+        item=indexed.get(key) or {}
+        if (item.get("classifierVersion")==VERSION
+                and item.get("sourceSha256")==evidence_hash(clauses)
+                and item.get("coverageSignature")==qualification_coverage_signature(notice)
+                and item.get("sourceCheckedAt")==notice.get("checkedAt","")):
+            continue
+        candidates.append((key,notice,len(clauses)))
+    candidates.sort(key=lambda row:(-row[2],row[0]))
+    successes=0
+    errors=0
+    for key,notice,_ in candidates[:max(0,min(limit,300))]:
+        try:
+            reviewed=process_one(key,notice,None,rule_based_interpret,mode="rule_based")
+            if reviewed is None:continue
+            audit=reviewed.get("fullDocumentAudit") or {}
+            indexed[key]={
+                "classifierVersion":VERSION,
+                "analysisStatus":"rule_based",
+                "sourceSha256":reviewed["sourceSha256"],
+                "coverageSignature":reviewed["coverageSignature"],
+                "sourceCheckedAt":notice.get("checkedAt",""),
+                "manifestSignature":notice.get("manifestSignature",""),
+                "reviewComplete":reviewed.get("reviewComplete") is True,
+                "requiredConditionsComplete":reviewed.get("requiredConditionsComplete") is True,
+                "reviewedDocuments":audit.get("reviewedDocuments",0),
+                "manifestDocuments":audit.get("manifestDocuments"),
+                "interpretedClauses":audit.get("interpretedClauses",0),
+                "blockers":audit.get("blockers") or [],
+                "checkedAt":reviewed.get("checkedAt"),
+                "automaticEligibilityApproved":False
+            }
+            successes+=1
+        except (ValueError,RuntimeError,TypeError,KeyError) as error:
+            errors+=1
+            print("QUALIFICATION_REVIEW_RETRY",key,type(error).__name__,flush=True)
+    current=[indexed[key] for key in notices if key in indexed]
+    result={
+        "ok":True,"schemaVersion":1,
+        "generatedAt":dt.datetime.now(dt.timezone.utc).isoformat(),
+        "sourceGeneratedAt":source.get("generatedAt",""),
+        "sourceNoticeCount":len(notices),
+        "analyzedCount":len(current),
+        "reviewCompleteCount":sum(x.get("reviewComplete") is True for x in current),
+        "remainingWithClauses":max(0,len(candidates)-successes),
+        "mode":"rule_based",
+        "limitations":"원문 참가조건 기계 판독 진도. 회사별 입찰자격 확정 아님.",
+        "byNotice":indexed
+    }
+    if errors and not successes:raise RuntimeError("qualification_review_all_failed")
+    path.parent.mkdir(parents=True,exist_ok=True)
+    temp=path.with_name(path.name+".next")
+    try:
+        temp.write_text(json.dumps(result,ensure_ascii=False,separators=(",",":"))+"\\n",encoding="utf8")
+        os.replace(temp,path)
+    finally:
+        try:temp.unlink()
+        except FileNotFoundError:pass
+    print("QUALIFICATION_REVIEW_SUMMARY",json.dumps({
+        "analyzed":result["analyzedCount"],"reviewComplete":result["reviewCompleteCount"],
+        "processed":successes,"errors":errors,"remaining":result["remainingWithClauses"]}),flush=True)
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--input",default="startup-support/rfp-clauses.json")
     p.add_argument("--output",default="startup-support/ai-qualification.json")
     p.add_argument("--limit",type=int,default=4)
     p.add_argument("--model",default=os.getenv("WORKLINKS_AI_MODEL",DEFAULT_MODEL))
+    p.add_argument("--summary",default="startup-support/qualification-review.json")
+    p.add_argument("--summary-only",action="store_true",help="Publish compact local-only document review status")
+    p.add_argument("--rule-based",action="store_true",help="Never call a paid external classifier")
     args=p.parse_args()
     source=json.loads(Path(args.input).read_text(encoding="utf8"))
+    if args.summary_only:
+        run_summary_only(source,args.summary,args.limit)
+        return
     path=Path(args.output)
     old=json.loads(path.read_text(encoding="utf8")) if path.exists() else {"byNotice":{}}
     existing=old.get("byNotice") or {}
     updated=dict(existing)
     token=os.environ.get("OPENAI_API_KEY") or ""
-    use_model=bool(token)
+    use_model=bool(token) and not args.rule_based
     mode="classified" if use_model else "rule_based"
     candidates=[]
     for key,notice in (source.get("byNotice") or {}).items():
