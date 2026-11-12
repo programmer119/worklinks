@@ -23,6 +23,7 @@ import zipfile
 from rfp_call_ledger import CallLedger, cache_key
 
 _LEDGER_LOCK=threading.Lock()
+_NOTICE_CONTEXT=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
@@ -87,8 +88,11 @@ def fetch_json(url):
     request=urllib.request.Request(url,headers=AGENTS)
     ledger=active_rfp_ledger()
     parts=urllib.parse.urlsplit(url)
-    safe_query=[(k,v) for k,v in urllib.parse.parse_qsl(parts.query)
+    query=dict(urllib.parse.parse_qsl(parts.query))
+    safe_query=[(k,v) for k,v in query.items()
                 if k.lower() not in ('servicekey','apikey','token','key')]
+    notice_key=(str(query['bidNo'])+':'+str(query.get('order') or '0').zfill(3)
+                if query.get('bidNo') and 'bid-evidence' in parts.path else None)
     reqkey=cache_key('proxy',parts.path,sorted(safe_query))
     for attempt in range(4):
         try:
@@ -99,12 +103,14 @@ def fetch_json(url):
                 parsed=json.loads(data.decode('utf-8'))
             if ledger:
                 ledger.record('proxy_http',reqkey,'http_ok',http_status=status,
+                              notice_key=notice_key,
                               response_sha256=hashlib.sha256(data).hexdigest())
             return parsed
         except (urllib.error.HTTPError,TimeoutError,ConnectionError,
                 urllib.error.URLError,ValueError,UnicodeError) as ex:
             if ledger:
                 ledger.record('proxy_http',reqkey,'http_failed',
+                              notice_key=notice_key,
                               http_status=getattr(ex,'code',None),
                               error_class=type(ex).__name__)
             if isinstance(ex,urllib.error.HTTPError):
@@ -420,9 +426,14 @@ def download(url):
     # A parser-only retry can then reuse the exact bytes without an HTTP call.
     ledger=active_rfp_ledger()
     reqkey=cache_key('official_attachment',url)
+    notice_key=getattr(_NOTICE_CONTEXT,'notice_key',None)
     if ledger and not os.environ.get('WORKLINKS_RFP_FORCE_REDOWNLOAD'):
         reusable=ledger.get_bytes(reqkey,max_age_seconds=7*24*3600)
-        if reusable is not None:return reusable
+        if reusable is not None:
+            ledger.record('attachment_reuse',reqkey,'verified_bytes_reused',
+                          notice_key=notice_key,
+                          response_sha256=hashlib.sha256(reusable).hexdigest())
+            return reusable
     request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
     for attempt in range(3):
         try:
@@ -434,13 +445,16 @@ def download(url):
                 if len(raw)>MAX_FILE:raise ValueError('large_file')
             if ledger:
                 ledger.record('attachment_http',reqkey,'http_ok',http_status=status,
-                              response_sha256=hashlib.sha256(raw).hexdigest())
+                              notice_key=notice_key,
+                              response_sha256=hashlib.sha256(raw).hexdigest(),
+                              detail='bytes='+str(len(raw)))
                 ledger.save_bytes(reqkey,raw)
             return raw
         except (urllib.error.HTTPError,TimeoutError,ConnectionError,
                 urllib.error.URLError,ValueError) as ex:
             if ledger:
                 ledger.record('attachment_http',reqkey,'http_failed',
+                              notice_key=notice_key,
                               http_status=getattr(ex,'code',None),
                               error_class=type(ex).__name__)
             if isinstance(ex,urllib.error.HTTPError):
@@ -1085,7 +1099,12 @@ def process(no,ordn,metadata=None,previous=None):
             continue
         record={'name':name,'sourceUrl':url,'readable':False}
         try:
-            raw=download(url)
+            # Tie even a failed binary download to its exact public notice.
+            try:
+                _NOTICE_CONTEXT.notice_key=no+':'+ordn
+                raw=download(url)
+            finally:
+                _NOTICE_CONTEXT.notice_key=None
             content=normalize_extracted_text(extract(name,raw))
             if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx')) else 100):
                 raise ValueError('no_searchable_text')
