@@ -1453,7 +1453,14 @@ class Handler(BaseHTTPRequestHandler):
         tag = '"%s-%s-%s"' % (name, int(st.st_mtime), st.st_size)
         if self.headers.get('If-None-Match','') == tag:
             self.send_response(304)
+            self.send_header('Cache-Control','public, max-age=120')
             self.send_header('ETag',tag)
+            self.send_header('Vary','Origin, Accept-Encoding')
+            origin = self.headers.get('Origin','')
+            if origin in ORIGINS:
+                self.send_header('Access-Control-Allow-Origin',origin)
+                self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
             self.end_headers()
             return
         self.send_response(200)
