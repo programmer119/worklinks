@@ -429,12 +429,22 @@
 /* Bid evidence is a scan aid, not the main sentence of the card.
    Never clamp title, decision reasoning or required follow-up evidence. */
 /* Bid card: qualification / history / review priority / original link */
-#jobCards .job-eligibility-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+#jobCards .job-eligibility-row{display:flex;align-items:center;gap:6px;min-width:0}
+#jobCards .job-eligibility-row.has-priority-slot{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:10px;align-items:center}
+#jobCards .job-eligibility-content{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+#jobCards .job-priority-slot{display:flex;align-items:center;justify-content:flex-start;width:120px;min-height:32px;min-width:0}
+#jobCards .job-priority-slot .job-advantage{display:flex;align-items:center;gap:7px;min-width:0;white-space:nowrap}
+#jobCards .job-priority-slot .advantage-pills{display:flex;flex-direction:column;gap:2px;flex:none}
+#jobCards .job-priority-slot .advantage-pill{display:block;width:12px;height:7px;background:#e2e8f0;border-radius:4px}
+#jobCards .job-priority-slot .advantage-pill.is-filled{background:currentColor}
+#jobCards .job-priority-slot .advantage-label{font-size:13px;line-height:1.3;font-weight:800;white-space:nowrap}
+#jobCards .job-priority-slot .advantage-reason{display:none!important}
+@media(max-width:520px){#jobCards .job-eligibility-row.has-priority-slot{grid-template-columns:minmax(0,1fr) 110px;gap:6px}#jobCards .job-priority-slot{width:110px}#jobCards .job-priority-slot .advantage-label{font-size:12px}}
 #jobCards .job-eligibility-row .job-req-strip{margin:0;gap:6px}
 #jobCards .job-eligibility-row .job-basic-signal{min-height:32px;padding:5px 9px;font-size:13px;line-height:1.3;white-space:nowrap}
 #jobCards .job-eligibility-row .job-basic-signal.adv-medium{color:#166534;background:#f0fdf4;border-color:#86efac}
 #jobCards .job-eligibility-row .job-partners{flex:0 1 auto;max-width:none;white-space:normal}
-#jobCards .job-highlights{display:grid;grid-template-columns:minmax(0,1fr) 112px auto;align-items:center;column-gap:8px;row-gap:4px;min-width:0;gap:4px 8px}
+#jobCards .job-highlights{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;min-width:0;gap:4px 10px}
 #jobCards .job-highlight-tags{display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px;min-width:0}
 #jobCards .job-highlights .job-advantage{display:flex;align-items:center;justify-self:start;grid-column:2;gap:6px;min-width:0}
 #jobCards .job-highlights .advantage-pills{display:flex;flex-direction:column;gap:2px;flex:none}
@@ -442,9 +452,10 @@
 #jobCards .job-highlights .advantage-pill.is-filled{background:currentColor}
 #jobCards .job-highlights .advantage-label{font-size:12px;line-height:1.3;white-space:nowrap;font-weight:850}
 #jobCards .job-highlights .advantage-reason,#jobCards .job-advantage .advantage-reason{display:none!important}
-#jobCards .job-highlights .job-source-link{grid-column:3;justify-self:end;align-self:center;margin:0;padding:5px 9px;font-size:12px;min-height:30px}
+#jobCards .job-highlights .job-source-link{grid-column:2;justify-self:end;align-self:center;margin:0;display:inline-flex;align-items:center;min-height:36px;padding:5px 0 5px 9px;font-size:13px;font-weight:750;line-height:1.4;white-space:nowrap;border:0;border-radius:0;background:transparent;color:#285b90;text-decoration:underline;text-decoration-color:#94b0ca;text-underline-offset:3px;box-shadow:none}
+#jobCards .job-highlights .job-source-link:hover,#jobCards .job-highlights .job-source-link:focus-visible{background:transparent;color:#0c3e70;text-decoration-color:currentColor}
 #jobCards .job-highlight-tags>.tag,#jobCards .job-highlight-tags>.job-repeat{min-height:23px;padding:3px 6px}
-@media(max-width:560px){#jobCards .job-highlights{grid-template-columns:minmax(0,1fr) 100px auto;column-gap:5px}#jobCards .job-highlights .job-source-link{font-size:11px;padding:5px 6px}}
+@media(max-width:560px){#jobCards .job-highlights{grid-template-columns:minmax(0,1fr) auto;column-gap:6px}#jobCards .job-highlights .job-source-link{font-size:12px;padding:5px 0 5px 7px}}
 #jobCards .job-verdict-row .job-verdict-why{order:1}
 #jobCards .job-verdict-row .job-verdict-checks{order:2}
 @media(max-width:1100px){#jobCards.cards{grid-template-columns:1fr}}
@@ -4714,7 +4725,7 @@ function renderJobs(){
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
     const qualification=basicBidMarkup(x);
     const highlightTags=repeat+competitionLabel+extras;
-    const highlights='<div class="job-highlight-tags">'+highlightTags+'</div>'+opportunityMarkup;
+    const historyMarkup='<div class="job-highlight-tags">'+highlightTags+'</div>';
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+jobInstitutionBadges(x)+'</div>'+
@@ -4724,10 +4735,11 @@ function renderJobs(){
        '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div></div>'+
        bidMethodCardMarkup(x)+
        jobCollectionMarkup(x)+
-       '<div class="job-eligibility-row">'+qualification+jobRequirementBadges(x)+partner+'</div>'+
+       '<div class="job-eligibility-row'+(member&&partnerMode?' has-priority-slot':'')+'"><div class="job-eligibility-content">'+qualification+jobRequirementBadges(x)+partner+'</div>'+
+       (member&&partnerMode?'<div class="job-priority-slot" aria-label="공고 검토 우선순위">'+opportunityMarkup+'</div>':'')+'</div>'+
        (member&&partnerMode?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
-       '<div class="job-highlights">'+highlights+
-         '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
+       '<div class="job-highlights">'+historyMarkup+
+         '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 나라장터 공고 원문을 새 탭에서 열기" title="공고 원문 새 탭에서 열기">공고 원문 ↗</a>'+
        '</div></div></article>';
   }).join(''):'<div class="emptycard">'+
    (jobSearchText?'검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.':'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
