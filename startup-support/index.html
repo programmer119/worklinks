@@ -1441,11 +1441,13 @@ var G2B_DEFAULT_URL='https://api-suaveforge.suaveforge.com:18458/api/g2b';
 // Pages only reads already-published files from server123; this route MUST NOT
 // invoke G2B upstream. Preserve the prior checked-in snapshots as a fallback.
 async function fetchServer123Snapshot(name, fallback){
+ // Revalidate large RFP aggregate with ETag/304; keep other snapshots always fresh.
+ const fetchCacheMode=name==='rfp-clauses'?'no-cache':'no-store';
  try{
-  const response=await fetch(G2B_DEFAULT_URL+'/snapshot?name='+encodeURIComponent(name),{cache:'no-store'});
+  const response=await fetch(G2B_DEFAULT_URL+'/snapshot?name='+encodeURIComponent(name),{cache:fetchCacheMode});
   if(response.ok)return response;
  }catch(error){/* Server temporarily unavailable; retain last published snapshot. */}
- return fetch(fallback,{cache:'no-store'});
+ return fetch(fallback,{cache:fetchCacheMode});
 }
 var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL;
 var g2bLiveJobs=[],g2bLoading=false,g2bOffset=0,g2bSavedTotal=0,g2bServerAvailable=false;
