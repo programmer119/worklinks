@@ -18,6 +18,16 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import hashlib
+
+_G2B_LEDGER=None
+def shared_ledger():
+    global _G2B_LEDGER
+    if not os.environ.get('WORKLINKS_RFP_LEDGER_DB'):return None
+    if _G2B_LEDGER is None:
+        from rfp_call_ledger import CallLedger
+        _G2B_LEDGER=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+    return _G2B_LEDGER
 
 DB_PATH=os.environ.get('G2B_DB_PATH','/app/data/bids.sqlite3')
 KEY_FILE=os.environ.get('G2B_SECRET_PATH','/run/secrets/g2b.env')
@@ -92,13 +102,28 @@ def call(key,kind,day,page):
     params={'serviceKey':key,'type':'json','pageNo':page,'numOfRows':ROWS,'inqryDiv':1,
             'inqryBgnDt':day+'0000','inqryEndDt':day+'2359'}
     url=API_ROOT+'/'+OPERATIONS[kind]+'?'+urllib.parse.urlencode(params)
+    ledger=shared_ledger()
+    request_key=None
+    if ledger is not None:
+        from rfp_call_ledger import cache_key
+        request_key=cache_key('crawler_v1',kind,day,page,ROWS)
+        max_age=(3600 if day==dt.datetime.now(
+            dt.timezone(dt.timedelta(hours=9))).strftime('%Y%m%d') else 24*3600)
+        cached=ledger.get_json(request_key,max_age_seconds=max_age)
+        if (isinstance(cached,dict) and isinstance(cached.get('total'),int)
+                and isinstance(cached.get('items'),list)):
+            ledger.record('crawler',request_key,'verified_page_reused',
+                          detail=kind+':'+day+':'+str(page))
+            return cached['total'],cached['items']
     last=None
     for attempt in range(1,5):
         if SHUTDOWN:raise RuntimeError('stopping')
         try:
             req=urllib.request.Request(url,headers={'Accept':'application/json','User-Agent':'WorkLinksCollector/1.0'})
             with urllib.request.urlopen(req,timeout=24) as response:
-                doc=json.loads(response.read().decode('utf-8'))
+                status=getattr(response,'status',200)
+                raw=response.read()
+                doc=json.loads(raw.decode('utf-8'))
             header=doc.get('response',{}).get('header',{})
             if str(header.get('resultCode','?')) not in ('0','00'):
                 raise ValueError('G2B_result_'+str(header.get('resultCode','unknown')))
@@ -106,8 +131,20 @@ def call(key,kind,day,page):
             items=body.get('items') or []
             if isinstance(items,dict):items=items.get('item') or []
             if not isinstance(items,list):items=[items]
-            return int(body.get('totalCount') or 0),items
+            total=int(body.get('totalCount') or 0)
+            if ledger is not None:
+                ledger.record('crawler_http',request_key,'http_ok',http_status=status,
+                              response_sha256=hashlib.sha256(raw).hexdigest(),
+                              detail=kind+':'+day+':'+str(page))
+                ledger.save_json(request_key,{'total':total,'items':items},
+                                 max_bytes=20_000_000)
+            return total,items
         except (urllib.error.HTTPError,urllib.error.URLError,TimeoutError,ValueError,KeyError,OSError) as e:
+            if ledger is not None:
+                ledger.record('crawler_http',request_key,'http_failed',
+                              http_status=getattr(e,'code',None),
+                              error_class=type(e).__name__,
+                              detail=kind+':'+day+':'+str(page))
             # Never include URL: it contains the service key.
             if isinstance(e,urllib.error.HTTPError) and e.code == 429:
                 # Quota exhaustion: no retries, and no further date/kind requests this cycle.
