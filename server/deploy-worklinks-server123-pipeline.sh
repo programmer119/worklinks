@@ -15,6 +15,7 @@ TARGET="$BASE/pipeline/worklinks-server123-pipeline.py"
 dk(){ "$DOCKER" -H "$SOCKET" "$@"; }
 for item in "$SOURCE" "$ROOT/server/Dockerfile.worklinks-pipeline" \
     "$ROOT/scripts/refresh_worklinks_rfp.py" \
+    "$ROOT/scripts/analyze_worklinks_rfp_ai.py" \
     "$ROOT/scripts/refresh_worklinks_actionable.py" \
     "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" \
     "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" \
@@ -46,7 +47,7 @@ fi
 dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && python -c "import pypdf, six, hwp5.hwp5txt; print(\"PIPELINE_PDF_HWP_READY=PASS\")"'
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
-for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json;do
+for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json qualification-review.json;do
   if test ! -s "$SNAPSHOTS/$name" && test -s "$ROOT/startup-support/$name";then
     cp -p "$ROOT/startup-support/$name" "$SNAPSHOTS/$name"
   fi
@@ -100,7 +101,7 @@ PY
 dk run --rm -i -v "$SNAPSHOTS:/app/snapshots" python:3.11-alpine python - <<'PY'
 import gzip,os,pathlib,shutil
 base=pathlib.Path('/app/snapshots')
-for name in ('changcom-actionable.json','g2b-award-fields-open.json','rfp-clauses.json','rfp-coverage-index.json'):
+for name in ('changcom-actionable.json','g2b-award-fields-open.json','rfp-clauses.json','rfp-coverage-index.json','qualification-review.json'):
     src=base/name
     dst=base/(name+'.gz')
     if not src.is_file() or dst.is_file():continue
@@ -114,6 +115,7 @@ PY
 if cmp -s "$SOURCE" "$TARGET" &&
    cmp -s "$ROOT/scripts/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_actionable.py" &&
    cmp -s "$ROOT/scripts/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_worklinks_rfp.py" &&
+   cmp -s "$ROOT/scripts/analyze_worklinks_rfp_ai.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" &&
    cmp -s "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" &&
    cmp -s "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" &&
    cmp -s "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" &&
@@ -124,7 +126,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
   exit 0
 fi
 mkdir -p "$BASE/pipeline/backup"
-for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
+for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
     "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/rfp_call_ledger.py";do
   test ! -s "$f" || cp -p "$f" "$BASE/pipeline/backup/$(basename "$f")"
 done
@@ -144,7 +146,7 @@ start_worker(){
 rollback(){
   echo 'PIPELINE_DEPLOY_ROLLBACK_ATTEMPT'
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
-  for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
+  for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
     "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/rfp_call_ledger.py";do
     saved="$BASE/pipeline/backup/$(basename "$f")"
     if test -s "$saved";then cp -p "$saved" "$f";else rm -f "$f";fi
@@ -155,6 +157,7 @@ trap rollback ERR
 install -m 0644 "$SOURCE" "$TARGET"
 install -m 0644 "$ROOT/scripts/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_actionable.py"
 install -m 0644 "$ROOT/scripts/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_worklinks_rfp.py"
+install -m 0644 "$ROOT/scripts/analyze_worklinks_rfp_ai.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py"
 install -m 0644 "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py"
 install -m 0644 "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py"
 install -m 0644 "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py"
