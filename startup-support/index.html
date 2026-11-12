@@ -2433,7 +2433,7 @@ var bidChangePriceCache=new Map(),bidChangePriceLoading=new Set();
 async function loadBidChangePrice(x){
  const id=jobBidIdentity(x);if(!id)return;
  const key=id.bidNo+':'+id.order;
- if(bidChangePriceLoading.has(key)||bidChangePriceCache.has(key))return;
+ if(bidChangePriceLoading.has(key))return;
  bidChangePriceLoading.add(key);
  if(activeDetailJobId===x.id)renderJobDetail(x);
  try{
