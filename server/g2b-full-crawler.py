@@ -136,8 +136,12 @@ def call(key,kind,day,page):
                 ledger.record('crawler_http',request_key,'http_ok',http_status=status,
                               response_sha256=hashlib.sha256(raw).hexdigest(),
                               detail=kind+':'+day+':'+str(page))
-                ledger.save_json(request_key,{'total':total,'items':items},
-                                 max_bytes=20_000_000)
+                if total==0 or items:
+                    ledger.save_json(request_key,{'total':total,'items':items},
+                                     max_bytes=20_000_000)
+                else:
+                    ledger.record('crawler_http',request_key,'partial_page_not_cached',
+                                  detail=kind+':'+day+':'+str(page))
             return total,items
         except (urllib.error.HTTPError,urllib.error.URLError,TimeoutError,ValueError,KeyError,OSError) as e:
             if ledger is not None:
