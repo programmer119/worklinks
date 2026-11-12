@@ -23,6 +23,7 @@ for item in "$SOURCE" "$ROOT/server/Dockerfile.worklinks-pipeline" \
     "$ROOT/scripts/rfp_call_ledger.py" \
     "$ROOT/tests/test_rfp_call_ledger.py" \
     "$ROOT/tests/test_worklinks_server123_pipeline.py" \
+    "$ROOT/tests/test_worklinks_qualification_summary.py" \
     "$ROOT/tests/test_rfp_batch_repair.py" \
     "$DOCKER" "$BASE/data/bids.sqlite3";do
   test -s "$item" || { echo "PIPELINE_REQUIRED_FILE_MISSING"; exit 5; }
@@ -36,6 +37,8 @@ dk run --rm \
     -v "$SOURCE:/app/server/worklinks-server123-pipeline.py:ro" \
     -v "$ROOT/tests/test_worklinks_server123_pipeline.py:/app/tests/test_worklinks_server123_pipeline.py:ro" \
     python:3.11-alpine python /app/tests/test_worklinks_server123_pipeline.py
+dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
+  python /work/tests/test_worklinks_qualification_summary.py
 dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
   python /work/tests/test_rfp_batch_repair.py
 dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
