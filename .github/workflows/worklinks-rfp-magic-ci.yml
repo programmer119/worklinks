@@ -9,6 +9,9 @@ on:
       - tests/test_open_cached_rfp_repair.py
       - tests/test_rfp_pdf_ocr_and_missing_ref.py
       - server/Dockerfile.worklinks-pipeline
+      - server/worklinks-server123-pipeline.py
+      - server/deploy-worklinks-server123-pipeline.sh
+      - tests/test_worklinks_server123_pipeline.py
       - .github/workflows/worklinks-rfp-magic-ci.yml
   workflow_dispatch:
 permissions:
@@ -32,3 +35,5 @@ jobs:
           python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py
           python3 tests/test_open_cached_rfp_repair.py
           python3 tests/test_rfp_pdf_ocr_and_missing_ref.py
+          bash -n server/deploy-worklinks-server123-pipeline.sh
+          python3 tests/test_worklinks_server123_pipeline.py
