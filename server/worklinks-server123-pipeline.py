@@ -32,7 +32,9 @@ RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48
 RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900)))
 RFP_OPEN_READER_VERSION='pdf24-image-zip-hwpx-v3'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
-RFP_STAFFING_READER_VERSION='v2-role-source-reparse-20261113'
+RFP_STAFFING_READER_VERSION='v3-project-role-and-covered-pdf-20261113'
+# Explicit short-lived recovery selection; candidates rotate out once fully scanned.
+RFP_STAFFING_PRIORITY_KEYS='R26BK01807134:000,R26BK01783957:000,R26BK01818412:000,R26BK01797739:000,R26BK01810885:000,R26BK01803834:000'
 RFP_OPEN_OCR_LIMIT = max(1, min(35, int(os.environ.get('G2B_RFP_OPEN_OCR_LIMIT', 20))))
 QUALIFICATION_PERIOD = max(3600, int(os.environ.get('G2B_QUALIFICATION_PERIOD', 3600)))
 QUALIFICATION_BATCH = max(1, min(300, int(os.environ.get('G2B_QUALIFICATION_BATCH', 120))))
@@ -232,6 +234,7 @@ def run_once(kind, runner=None, _single=False):
     with tempfile.TemporaryDirectory(prefix='worklinks-pipeline-', dir=str(DATA)) as tmp:
         root = stage_workspace(Path(tmp),minimal=(kind=='rfpOpenRepair'))
         env = dict(os.environ, WORKLINKS_G2B_API=SOURCE_API,
+                   WORKLINKS_RFP_ROLE_PRIORITY_KEYS=RFP_STAFFING_PRIORITY_KEYS,
                    WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'))
         if kind == 'rfp':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_rfp.py'),
