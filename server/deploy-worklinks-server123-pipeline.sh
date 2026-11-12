@@ -19,6 +19,8 @@ for item in "$SOURCE" "$ROOT/server/Dockerfile.worklinks-pipeline" \
     "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" \
     "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" \
     "$ROOT/scripts/repair_changcom_top500_rfp.py" \
+    "$ROOT/scripts/rfp_call_ledger.py" \
+    "$ROOT/tests/test_rfp_call_ledger.py" \
     "$ROOT/tests/test_worklinks_server123_pipeline.py" \
     "$ROOT/tests/test_rfp_batch_repair.py" \
     "$DOCKER" "$BASE/data/bids.sqlite3";do
@@ -35,6 +37,8 @@ dk run --rm \
     python:3.11-alpine python /app/tests/test_worklinks_server123_pipeline.py
 dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
   python /work/tests/test_rfp_batch_repair.py
+dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
+  python /work/tests/test_rfp_call_ledger.py
 if ! dk image inspect "$IMAGE" >/dev/null 2>&1;then
   dk build --pull=false -f "$ROOT/server/Dockerfile.worklinks-pipeline" \
       -t "$IMAGE" "$ROOT/server"
@@ -113,6 +117,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
    cmp -s "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" &&
    cmp -s "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" &&
    cmp -s "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" &&
+   cmp -s "$ROOT/scripts/rfp_call_ledger.py" "$SCRIPTS/rfp_call_ledger.py" &&
    test "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" = true &&
    test "$(dk inspect -f '{{.Config.Image}}' "$WORKER" 2>/dev/null || true)" = "$IMAGE";then
   echo 'WORKLINKS_SERVER123_PIPELINE_ALREADY_CURRENT=PASS'
@@ -120,7 +125,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
 fi
 mkdir -p "$BASE/pipeline/backup"
 for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/rfp_call_ledger.py";do
   test ! -s "$f" || cp -p "$f" "$BASE/pipeline/backup/$(basename "$f")"
 done
 PREVIOUS="$(dk inspect -f '{{.Config.Image}}' "$WORKER" 2>/dev/null || true)"
@@ -140,7 +145,7 @@ rollback(){
   echo 'PIPELINE_DEPLOY_ROLLBACK_ATTEMPT'
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
   for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/rfp_call_ledger.py";do
     saved="$BASE/pipeline/backup/$(basename "$f")"
     if test -s "$saved";then cp -p "$saved" "$f";else rm -f "$f";fi
   done
@@ -153,6 +158,7 @@ install -m 0644 "$ROOT/scripts/refresh_worklinks_rfp.py" "$SCRIPTS/refresh_workl
 install -m 0644 "$ROOT/scripts/refresh_worklinks_open_award_fallback.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py"
 install -m 0644 "$ROOT/scripts/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/batch_backfill_changcom_top500_rfp.py"
 install -m 0644 "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py"
+install -m 0644 "$ROOT/scripts/rfp_call_ledger.py" "$SCRIPTS/rfp_call_ledger.py"
 start_worker "$IMAGE"
 # Startup validates large (100MB+) RFP checkpoints before the STARTED log.
 # Four seconds previously triggered a false failure and rolled back a healthy image.
