@@ -5,6 +5,8 @@ on:
     paths:
       - scripts/refresh_worklinks_rfp.py
       - tests/test_rfp_magic.py
+      - scripts/repair_open_rfp_cached_attachments.py
+      - tests/test_open_cached_rfp_repair.py
       - .github/workflows/worklinks-rfp-magic-ci.yml
   workflow_dispatch:
 permissions:
@@ -24,3 +26,5 @@ jobs:
           python3 tests/test_rfp_failures.py
           python3 -m py_compile scripts/repair_yongin_signature_files_once.py
           python3 tests/test_yongin_repair.py
+          python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py
+          python3 tests/test_open_cached_rfp_repair.py
