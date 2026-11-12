@@ -31,6 +31,8 @@ RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48
 # Local OCR repair uses only stored source URLs, no government metadata API calls.
 RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900)))
 RFP_OPEN_READER_VERSION='pdf24-image-zip-hwpx-v3'
+# Enqueue one bounded official RFP pass after staffing-role parser upgrades.
+RFP_STAFFING_READER_VERSION='v2-role-source-reparse-20261113'
 RFP_OPEN_OCR_LIMIT = max(1, min(35, int(os.environ.get('G2B_RFP_OPEN_OCR_LIMIT', 20))))
 QUALIFICATION_PERIOD = max(3600, int(os.environ.get('G2B_QUALIFICATION_PERIOD', 3600)))
 QUALIFICATION_BATCH = max(1, min(300, int(os.environ.get('G2B_QUALIFICATION_BATCH', 120))))
@@ -286,9 +288,9 @@ def iteration(current=None, runner=None):
     now = float(time.time() if current is None else current)
     state = read_state()
     # Persistent timestamps, not sleep-only, protect against restart loops.
-    jobs = (('actionable', SHORTLIST_PERIOD), ('awardFallback', AWARD_FALLBACK_PERIOD),
-            ('rfpOpenRepair', RFP_OPEN_OCR_PERIOD),
-            ('rfp', RFP_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD),
+    jobs = (('rfp', RFP_PERIOD), ('actionable', SHORTLIST_PERIOD),
+            ('awardFallback', AWARD_FALLBACK_PERIOD),
+            ('rfpOpenRepair', RFP_OPEN_OCR_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD),
             ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
         previous = float((state.get(kind) or {}).get('attemptEpoch') or 0)
@@ -352,6 +354,16 @@ def main():
             state['rfpOpenReaderVersion'] = RFP_OPEN_READER_VERSION
             state['rfpOpenRepair'] = {'status':'reader_version_changed_run_now',
                                       'attemptEpoch':0}
+        if state.get('rfpStaffingReaderVersion') != RFP_STAFFING_READER_VERSION:
+            # Keep existing completed/partial RFP evidence, but have the
+            # scheduler perform exactly one bounded pass with the new role
+            # parser immediately after deployment. This uses normal quota
+            # preflight and the existing exclusive worker lock.
+            state['rfpStaffingReaderVersion'] = RFP_STAFFING_READER_VERSION
+            state['rfp'] = {'status':'staffing_parser_upgrade_run_now',
+                            'attemptEpoch':0}
+            log('PIPELINE_STAFFING_ROLE_UPGRADE_RESCAN_ENQUEUED',
+                RFP_STAFFING_READER_VERSION)
         state['rfpRepairPreflight'] = repair_preflight()
         # After a new worker deployment, retry one previously failed repair
         # immediately ONLY when a fresh read-only preflight succeeds.
