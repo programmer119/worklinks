@@ -5,6 +5,8 @@ import datetime as dt
 import html
 import io
 import json
+import os
+import hashlib
 from pathlib import Path
 import re
 from urllib.request import Request,urlopen
@@ -14,9 +16,38 @@ PAGE='https://www.data.go.kr/data/3061008/fileData.do'
 OUTPUT=ROOT/'startup-support/direct-production-snapshot.json'
 
 def read(url):
+    ledger=None
+    request_key=None
+    if os.environ.get('WORKLINKS_RFP_LEDGER_DB'):
+        from rfp_call_ledger import CallLedger,cache_key
+        ledger=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+        request_key=cache_key('direct_production_public_file',url)
+        if url==PAGE:
+            cached=ledger.get_bytes(request_key,max_age_seconds=6*3600)
+            if cached is not None:
+                ledger.record('direct_production',request_key,'verified_page_reused')
+                return cached
     req=Request(url,headers={'User-Agent':'Mozilla/5.0 (WorkLinks/123)',
                              'Referer':PAGE})
-    with urlopen(req,timeout=65) as f:return f.read(150000000)
+    try:
+        with urlopen(req,timeout=65) as f:
+            status=getattr(f,'status',200)
+            raw=f.read(150000000)
+        if status!=200:raise RuntimeError('DIRECT_PRODUCTION_HTTP_'+str(status))
+        if ledger is not None:
+            ledger.record('direct_production_http',request_key,'http_received',
+                          http_status=status,
+                          response_sha256=hashlib.sha256(raw).hexdigest(),
+                          detail='bytes='+str(len(raw)))
+            if url==PAGE:
+                ledger.save_bytes(request_key,raw)
+        return raw
+    except Exception as exc:
+        if ledger is not None:
+            ledger.record('direct_production_http',request_key,'http_failed',
+                          http_status=getattr(exc,'code',None),
+                          error_class=type(exc).__name__)
+        raise
 
 def collect():
     webpage=read(PAGE).decode('utf-8')
