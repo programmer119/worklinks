@@ -165,16 +165,21 @@ def run(data_dir, execute=False, limit=48, workers=5, max_attempts=3):
         source = by_notice.get(key)
         live = None
         request_key=cache_key('bid_evidence',key)
-        if metadata_confirmed(source):
+        # Explicit official manifest changes always invalidate the cached
+        # response, even when the older metadata was once verified complete.
+        source_changed=old.get('manifestChangePending') is True
+        if metadata_confirmed(source) and not source_changed:
             # Persist previously retrieved official metadata, without
             # claiming a historical upstream HTTP attempt took place now.
-            if ledger.get_json(request_key) is None:
+            cached_source=ledger.get_json(request_key)
+            if cached_source != source:
                 ledger.save_json(request_key,source)
             ledger.record('notice_metadata',request_key,'existing_verified_reused',
                           notice_key=key)
         else:
             # A prior verified response can survive a snapshot interruption.
-            cached=ledger.get_json(request_key,max_age_seconds=36*3600)
+            cached=(None if source_changed else
+                    ledger.get_json(request_key,max_age_seconds=36*3600))
             if metadata_confirmed(cached):
                 source=cached
                 ledger.record('notice_metadata',request_key,'verified_cache_reused',
