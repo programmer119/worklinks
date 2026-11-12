@@ -24,6 +24,8 @@ on:
       - 'server/deploy-worklinks-server123-pipeline.sh'
       - 'server/Dockerfile.worklinks-pipeline'
       - 'tests/test_worklinks_server123_pipeline.py'
+      - 'scripts/analyze_worklinks_rfp_ai.py'
+      - 'tests/test_worklinks_qualification_summary.py'
       - 'tests/test_worklinks_pipeline_snapshot_api.py'
       - 'tests/test_worklinks_site_mirror.py'
       - 'server/deploy-g2b-eligibility-worker-only.sh'
@@ -67,6 +69,8 @@ jobs:
           python3 tests/test_bid_evidence.py
           python3 tests/test_bid_extra.py
           python3 tests/test_worklinks_server123_pipeline.py
+          python3 tests/test_worklinks_qualification_summary.py
+          python3 -m py_compile scripts/analyze_worklinks_rfp_ai.py
           python3 tests/test_worklinks_open_award_fallback.py
           python3 tests/test_worklinks_standalone_jobs.py
           bash -n server/deploy-worklinks-standalone.sh
