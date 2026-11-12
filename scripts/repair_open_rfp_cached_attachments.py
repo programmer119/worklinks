@@ -25,7 +25,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf-ocr-kor-300dpi-pdf-first-v2'
+READER_ATTEMPT_VERSION='pdf24-image-zip-hwpx-v3'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -227,7 +227,7 @@ def process_one(key,scan,meta,ledger):
                 f['errorCategory']='pdf_ocr_incomplete'
                 counts['pdf_ocr_incomplete']+=1
                 continue
-            if len(text.strip())<(30 if label.lower().endswith(('.xlsx','.pptx')) else 100):
+            if len(text.strip())<(30 if label.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')) else 100):
                 raise ValueError('no_searchable_text')
             triggers,snippets=rfp.parse_clauses(text)
             clauses=rfp.extract_rule_candidates(text,label)
