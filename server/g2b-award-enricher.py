@@ -147,10 +147,21 @@ def as_award(bid_no, response, now=None):
 def http_awards(bid_no):
     req = Request(LOCAL_API + '/awards?bidNo=' + quote(bid_no, safe=''),
                   headers={'Accept':'application/json', 'User-Agent':'WorkLinksAwardEnricher/1.0'})
+    ledger=None
+    request_key=None
+    if os.environ.get('WORKLINKS_RFP_LEDGER_DB'):
+        from rfp_call_ledger import CallLedger,cache_key
+        ledger=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+        request_key=cache_key('award_enricher',bid_no)
     try:
         with urlopen(req, timeout=20) as res:
+            status=getattr(res,'status',200)
             result = json.load(res)
     except HTTPError as err:
+        if ledger is not None:
+            ledger.record('award_enricher_http',request_key,'http_failed',
+                          notice_key=bid_no+':000',
+                          http_status=err.code,error_class='HTTPError')
         try:
             data = json.load(err)
             code = str(data.get('error', '')).lower()
@@ -159,11 +170,23 @@ def http_awards(bid_no):
         rate = err.code == 429 or '429' in code or 'rate_limited' in code or 'limited_number' in code
         raise RemoteError('rate_limited' if rate else 'internal_api_unavailable', rate)
     except (URLError, ValueError, OSError) as exc:
+        if ledger is not None:
+            ledger.record('award_enricher_http',request_key,'http_failed',
+                          notice_key=bid_no+':000',error_class=type(exc).__name__)
         raise RemoteError('internal_api_unavailable')
     if not isinstance(result, dict):
+        if ledger is not None:
+            ledger.record('award_enricher_http',request_key,'http_invalid',
+                          notice_key=bid_no+':000',http_status=status)
         raise RemoteError('malformed_award_response')
-    return as_award(bid_no, result)
-
+    verified=as_award(bid_no,result)
+    if ledger is not None:
+        outcome='verified_award' if verified is not None else 'no_verified_award'
+        ledger.record('award_enricher_http',request_key,outcome,
+                      notice_key=bid_no+':000',http_status=status)
+        if verified is not None:
+            ledger.save_json(request_key,verified,max_bytes=20_000)
+    return verified
 
 def eligible_history_numbers(db, now=None):
     """Only exact, verified historic notices of ACTIVE recurring SW tenders."""
