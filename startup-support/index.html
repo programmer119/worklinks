@@ -1932,6 +1932,7 @@ async function g2bLoadSaved(append){
   g2bLiveJobs=[...seen.values()];
   g2bLoadedOffset=offset;g2bSavedTotal=total;g2bLinkedEligibility=linkedOnServer;
   g2bServerAvailable=true;published=true;
+  jobsInitialDataReady=true; // Show the first verified DB page without waiting for all 8k records.
   scheduleJobsRender();
  }
  function showProgress(message){
