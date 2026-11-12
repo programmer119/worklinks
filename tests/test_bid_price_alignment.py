@@ -35,12 +35,12 @@ for title, amount in zip(titles, amounts):
       </article>
     ''')
 html = '<!doctype html><html lang="ko"><meta charset="utf-8"><style>' + css[0] + (
-    '</style><body><div id="jobCards" class="cards" style="width:1880px">'
+    '</style><body><div id="jobCards" class="cards" style="width:1380px">'
     + ''.join(cards) + '</div></body></html>'
 )
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
-    page = browser.new_page(viewport={"width": 1980, "height": 600})
+    page = browser.new_page(viewport={"width": 1480, "height": 600})
     page.set_content(html, wait_until="load")
     rows = page.evaluate("""() => [...document.querySelectorAll('#jobCards .job-mini')].map(card => {
       const a = card.querySelector('.job-amount');
