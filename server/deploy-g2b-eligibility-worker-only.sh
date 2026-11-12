@@ -5,7 +5,7 @@ set -Eeuo pipefail
 DK=/home/ggul-docker/bin/docker
 SOCKET=unix:///home/ggul-docker/run/docker.sock
 BASE=/home/worklinks/g2b
-SOURCE="$GITHUB_WORKSPACE/worklinks/server/g2b-eligibility-worker.py"
+SOURCE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/server/g2b-eligibility-worker.py"
 TARGET="$BASE/g2b-eligibility-worker.py"
 BACKUP="$BASE/g2b-eligibility-worker.py.pre-backfill-fix"
 WORKER=worklinks-g2b-eligibility
