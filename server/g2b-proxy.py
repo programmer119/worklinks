@@ -880,7 +880,8 @@ def read_saved_rfp_evidence_index():
 def saved_rfp_search_state(row, compact=False):
     """Expose persisted RFP scan provenance; never call official API on page load."""
     if not isinstance(row,dict):
-        return {'sourceAvailable':True,'seen':False}
+        return {'sourceAvailable':True,'seen':False,
+                'staffingRoles':[],'staffingRoleScanComplete':False}
     files=row.get('files') if isinstance(row.get('files'),list) else []
     # Official filenames can contain both an HWP and a PDF of the same
     # document. Prefer only the fully-scanned PDF, but never lie that the
