@@ -5,6 +5,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr tesseract-ocr-kor tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/* \
-    && python -m pip install --no-cache-dir pyhwp pypdf six pymupdf
+    && python -m pip install --no-cache-dir pyhwp pypdf six pymupdf Pillow
 WORKDIR /app
 CMD ["python","-u","/app/worklinks-server123-pipeline.py"]
