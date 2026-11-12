@@ -706,7 +706,8 @@ assert.ok(source.includes('바로 입찰 가능 확정은 아닙니다.'));
 assert.ok(source.includes("htmlEscape(p.short||p.name)"));
 
 // Partner selector is sourced from the registry and includes *separately labeled* pending candidates.
-const filterSection=part('function jobPageStep(){','function jobEntryLabel(v){');
+const filterSection=part('function jobPageStep(){','function jobSearchNormalized(value){')+
+  part('function syncPartnerFilterChoices(){','function partnerVerdictTypes(x,selected){');
 const filterSelect={
  value:'all',innerHTML:'',closest:()=>({classList:{toggle:()=>{}}})
 };
