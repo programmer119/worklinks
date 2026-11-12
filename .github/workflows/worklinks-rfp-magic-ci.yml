@@ -22,3 +22,5 @@ jobs:
           python3 -m py_compile scripts/refresh_worklinks_rfp.py
           python3 tests/test_rfp_magic.py
           python3 tests/test_rfp_failures.py
+          python3 -m py_compile scripts/repair_yongin_signature_files_once.py
+          python3 tests/test_yongin_repair.py
