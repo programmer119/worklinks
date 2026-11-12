@@ -3767,7 +3767,7 @@ function jobDetailRequirementGrid(x){
  const readable=Array.isArray(full?.files)?full.files.filter(f=>f.readable===true).length:Number(saved?.readableCount||0);
  const coverage=hasFiles?' · 판독 '+readable+'/'+hasFiles+'건':'';
  function card(item){
-  const icon=({required:'!',not_required:'✓',failed:'×',evaluation:'~',review:'?',not_checked:'?'})[item.s.key]||'?';
+  const icon=({required:'!',required_at_bid:'!',not_required:'✓',failed:'?',checking:'…',onsite:'●',offsite:'✓',evaluation:'~',review:'?',not_checked:'?'})[item.s.key]||'?';
   const extra=item.rows.length?
    '<details><summary>원문 근거 '+item.rows.length+'건 보기</summary>'+
    item.rows.map(r=>'<div class="job-key-source">'+htmlEscape(r.text)+
