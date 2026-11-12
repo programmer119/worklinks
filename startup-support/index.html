@@ -2463,6 +2463,19 @@ async function loadJobEligibility(x){
 }
 
 
+var qualificationReviewByNotice=new Map(),qualificationReviewLoaded=false;
+async function refreshQualificationReview(){
+ try{
+  const response=await fetchServer123Snapshot('qualification-review','./qualification-review.json');
+  if(!response.ok)return;
+  const source=await response.json();
+  if(source.ok!==true||source.schemaVersion!==1||source.mode!=='rule_based'||
+     !source.byNotice||typeof source.byNotice!=='object')return;
+  qualificationReviewByNotice=new Map(Object.entries(source.byNotice));
+  qualificationReviewLoaded=true;
+  scheduleJobsRender();
+ }catch(e){/* No completed review is inferred when snapshot unavailable. */}
+}
 var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='';
 var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved database pages.
 // Qualification checking uses official G2B evidence and the RFP source snapshot, not AI classifications.
@@ -3708,6 +3721,7 @@ function updateJobSearchInput(){
  document.getElementById('jobSearchClear').hidden=!next;
  if(!next&&jobsBootstrapStarted&&!g2bServerAvailable&&!g2bSavedLoadRunning){
   g2bLoadSaved(false);
+  if(!qualificationReviewLoaded)refreshQualificationReview();
   if(!rfpSnapshotCheckedAt)refreshRfpSnapshot();
  }
  // Search spans both open and closed notices and never triggers an official API call.
@@ -4076,7 +4090,11 @@ function renderJobs(){
  const summaryEl=document.getElementById('jobDecisionSummary');
  if(summaryEl)summaryEl.textContent=
   '적격 후보 '+readyCount+'건 · 자격 확인 완료 '+verifiedCount+
-  '건 · 확인된 제외 '+statusTotal('blocked')+
+  '건 · 원문 기계검토 '+(qualificationReviewLoaded?
+   considered.filter(o=>{const id=jobBidIdentity(o.x);return id&&qualificationReviewByNotice.has(id.bidNo+':'+id.order)}).length+'건':'집계 대기')+
+  ' · 원문 검토 완료 '+(qualificationReviewLoaded?
+   considered.filter(o=>{const id=jobBidIdentity(o.x);return id&&qualificationReviewByNotice.get(id.bidNo+':'+id.order)?.reviewComplete===true}).length+'건':'집계 대기')+
+  ' · 확인된 제외 '+statusTotal('blocked')+
   '건 · 등록업종 일치 '+industryMatched+'건 · 업종 제한 0건 '+
   industryUnrestricted+'건 · 연속 2회차 이상 '+repeatCount+
   '건 · 과거 1~2개사 '+lowBidCount+'건 · 원문 스캔 '+sourceScanCount+'건';
@@ -4283,6 +4301,7 @@ function startJobsDataWhenVisible(){
    });
    loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();
    // Saved-search responses carry compact RFP status; skip the 74MB source in search mode.
+   refreshQualificationReview();
    if(!jobSearchText)refreshRfpSnapshot();
   },0);
  });
