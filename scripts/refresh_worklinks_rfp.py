@@ -60,7 +60,8 @@ CHANGCOM_URGENT_RECOVERY=ROOT/'startup-support/audits/changcom-priority-rfp-reco
 MAX_FILE=12_000_000
 # OCR is local-only and bounded to prevent runaway attachment processing.
 MAX_PDF_OCR_PAGES=8
-MAX_PDF_OCR_PIXELS=8_000_000
+MAX_PDF_OCR_PIXELS=12_000_000
+PDF_OCR_TARGET_DPI=300
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
 # 3MB per member was rejecting real official documents before text extraction.
@@ -435,13 +436,15 @@ def _ocr_pdf_page(raw,index):
         raise ValueError('pdf_ocr_renderer_unavailable') from exc
     with pymupdf.open(stream=raw,filetype='pdf') as document:
         page=document.load_page(index)
-        zoom=min(2.0,(MAX_PDF_OCR_PIXELS/max(1.0,page.rect.width*page.rect.height))**.5)
+        zoom=min(PDF_OCR_TARGET_DPI/72.0,
+                 (MAX_PDF_OCR_PIXELS/max(1.0,page.rect.width*page.rect.height))**.5)
         pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
         if pix.width*pix.height>MAX_PDF_OCR_PIXELS:
             raise ValueError('pdf_ocr_page_too_large')
         png=pix.tobytes('png')
     result=subprocess.run(
-        ['tesseract','stdin','stdout','-l','kor+eng','--psm','3'],
+        ['tesseract','stdin','stdout','-l','kor+eng','--psm','3',
+         '--dpi',str(max(72,int(72*zoom)))],
         input=png,capture_output=True,timeout=22,check=False)
     if result.returncode:
         raise ValueError('pdf_ocr_engine_failed')
