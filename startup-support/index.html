@@ -82,6 +82,21 @@
 .partner-summary{font-size:12px;color:#64748b;margin:8px 0}
 @media(max-width:700px){.head-actions{gap:6px}.partner-launch{padding:8px 10px}.partner-modal{padding:8px}.partner-sheet{max-height:calc(100dvh - 16px);padding:14px}.partner-quals{grid-template-columns:1fr}.partner-sheet-head h2{font-size:19px}}
 
+/* 저장된 수집 이력 확인: 실제 API 호출을 일으키지 않는 검색 */
+.job-quick-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;border:2px solid #cbd5e1;border-radius:13px;padding:12px 14px;margin:0 0 12px}
+.job-quick-search label{font-size:16px;font-weight:900;color:#0f172a;white-space:nowrap}
+.job-quick-search input{flex:1 1 350px;min-width:170px;font-size:16px;font-weight:750;color:#0f172a;padding:12px 14px;background:#fff;border:1px solid #94a3b8;border-radius:9px}
+.job-quick-search input:focus{outline:3px solid #bfdbfe;border-color:#2563eb}
+.job-quick-search button{padding:10px 14px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:9px;font-size:14px;font-weight:850;cursor:pointer}
+.job-search-status{font-size:13px;font-weight:750;color:#475569}
+.job-api-evidence{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 0 4px;min-width:0}
+.job-api-evidence .api-state{display:inline-flex;gap:5px;align-items:center;border:1px solid #cbd5e1;border-radius:8px;padding:5px 9px;font-size:13px;line-height:1.35;font-weight:850;white-space:nowrap;background:#f1f5f9;color:#475569}
+.job-api-evidence .api-state.done{background:#dcfce7;border-color:#86efac;color:#166534}
+.job-api-evidence .api-state.partial{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.job-api-evidence .api-state.absent{background:#f1f5f9;border-color:#cbd5e1;color:#64748b}
+.job-api-evidence .api-state.summary{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
+.job-api-evidence .api-state.summary.complete{background:#bbf7d0;border-color:#4ade80;color:#14532d}
+@media(max-width:700px){.job-quick-search{padding:10px;gap:8px}.job-quick-search label{font-size:15px}.job-quick-search input{flex-basis:100%;font-size:16px}.job-api-evidence .api-state{font-size:12.5px;padding:5px 7px}}
 /* 나라장터 API 테스트 · 정적 일감과 별도 */
 .g2b-panel{margin-top:12px;padding:13px 14px;border:1px solid #dbeafe;border-radius:13px;background:#f8fbff}
 .g2b-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -628,6 +643,12 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 </div></div>
 
 
+    <div class="job-quick-search" role="search" aria-label="공고 검색 및 저장된 API 수집 상태 비교">
+      <label for="jobQuickSearch">일감 검색</label>
+      <input type="search" id="jobQuickSearch" placeholder="공고번호 · 공고명 · 발주기관 검색" autocomplete="off" spellcheck="false">
+      <button type="button" id="jobSearchClear" hidden>지우기</button>
+      <span class="job-search-status" id="jobSearchStatus" role="status" aria-live="polite"></span>
+    </div>
     <div class="jobfilters">
       <button class="jobf on" data-jobf="all">전체 · 미마감</button>
       <button class="jobf worklinks-partner-only" data-jobf="partner">파트너 협업 <span id="partnerJobCount"></span></button>
