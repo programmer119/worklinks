@@ -237,10 +237,13 @@ def request_api(base, operation, params):
     if not isinstance(items, list): items = [items]
     result={'items':items,'totalCount':int(body.get('totalCount') or len(items))}
     if ledger is not None:
-        # Never cache a failed API envelope or a partial result as success.
-        api_ledger_event(ledger,'upstream_http',key,'http_ok',notice_key=identity,
-                         http_status=http_code)
-        ledger.save_json(key,result,max_bytes=20_000_000)
+        # An empty page when upstream declares rows is incomplete, not a verified zero.
+        complete_page=(result['totalCount']==0 or len(result['items'])>0)
+        api_ledger_event(ledger,'upstream_http',key,
+                         'http_verified' if complete_page else 'partial_page_not_cached',
+                         notice_key=identity,http_status=http_code)
+        if complete_page:
+            ledger.save_json(key,result,max_bytes=20_000_000)
     return result
 
 def cached_awards_query(bid_no):
