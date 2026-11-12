@@ -1903,6 +1903,10 @@ async function g2bLoadSaved(append){
    if(Number.isFinite(Number(data.eligibilityLinked)))linkedOnServer=Number(data.eligibilityLinked);
    const records=Array.isArray(data.items)?data.items:[];
    for(const row of records){
+    if(row.rfpSavedState&&row.bidNo){
+      const key=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
+      jobListRfpState.set(key,row.rfpSavedState);
+    }
     if(row.supplementalBidFacts&&row.bidNo){
       const extKey=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
       g2bSupplementalCache.set(extKey,row.supplementalBidFacts);
@@ -2460,6 +2464,7 @@ async function loadJobEligibility(x){
 
 
 var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='';
+var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved database pages.
 // Qualification checking uses official G2B evidence and the RFP source snapshot, not AI classifications.
 function rfpSnapshotForJob(x){
  const id=jobBidIdentity(x);
@@ -3361,7 +3366,7 @@ function jobRequirementEvidence(x){
  const id=jobBidIdentity(x);if(!id)return null;
  const key=id.bidNo+':'+id.order;
  const full=rfpSnapshotByNotice.get(key)||null;
- const saved=jobSearchRfpState.get(key)||null;
+ const saved=jobSearchRfpState.get(key)||jobListRfpState.get(key)||null;
  const partnerEvidence=changcomPrecheckByNotice.get(key)||null;
  const staff=partnerEvidence?.staffingClassification||null;
  const clauses=[];
@@ -3389,6 +3394,12 @@ function jobRequirementEvidence(x){
      f.qualificationScanTruncated!==true&&f.clauseCandidatesTruncated!==true);
  const fullyReviewed=fullScanComplete&&full.reviewComplete===true&&
    full.requiredConditionsComplete===true;
+ // A readable 100%-of-attachment index is an extraction success even if
+ // the 74MB rolling detailed-cache omits this particular notice.
+ const savedReadComplete=saved?.status==='text_extracted_requires_review'&&
+   saved?.complete===true&&Number(saved.documentCount)>0&&
+   Number(saved.readableCount)===Number(saved.documentCount);
+ const sourceReadComplete=fullScanComplete||savedReadComplete;
  const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
  const insurance=/(?:4\s*대\s*(?:사회\s*)?보험|사대\s*보험|사회\s*보험\s*가입\s*(?:자|증명)|건강\s*보험\s*(?:자격득실|가입자명부)|고용\s*보험\s*가입\s*(?:증명|확인))/i;
  const onsite=/상주|현장\s*(?:근무|배치)|전담\s*근무|(?:발주기관|발주처|수요기관).{0,25}상시\s*(?:근무|배치)/i;
@@ -3414,11 +3425,11 @@ function jobRequirementEvidence(x){
   if(positive&&bidStage.test(positive.text))
    return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
-  if(fullScanComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
+  if(sourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
    return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
-  if(fullScanComplete&&!mentioned.length)
+  if(sourceReadComplete&&!mentioned.length)
    return {key:'not_required',label:'필요없음',reason:'공식 원문·첨부 전체 정상 판독 · 요구 문구 미검출 (해당 문서 기준)'};
-  if(fullScanComplete)
+  if(sourceReadComplete)
    return {key:'not_required',label:'필요없음',reason:mentioned.some(deferredToContract)?
     '전체 문서 정상 판독 · 입찰 시 필수요건은 확인되지 않음 (계약·수행 단계 조건은 원문 확인 후 준비)':
     '전체 문서 정상 판독 · 관련 문구는 있지만 입찰 시 명확한 필수요건은 확인되지 않음'};
@@ -3449,7 +3460,7 @@ function jobRequirementEvidence(x){
    if(onsiteConfirmed)return {key:'onsite',label:'상주',
      reason:'공식 문서에서 발주처 상시 근무·상주 의무가 명시됨 (인력 소속 기준일과는 별도)'};
    if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
-   if(!fullScanComplete)return {key:'failed',label:'확인실패',
+   if(!sourceReadComplete)return {key:'failed',label:'확인실패',
      reason:'원문·첨부 전체 수집·판독이 완료되지 않아 상주 여부를 확정할 수 없음'};
    return {key:'offsite',label:'비상주',
      reason:'공식 원문·첨부 전체 판독에서 발주처 상시 상주 의무 미확인 (현장 방문·장애 출동만으로는 상주가 아님)'};
