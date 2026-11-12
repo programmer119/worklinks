@@ -1894,10 +1894,10 @@ document.getElementById('changcomActionableRefresh')?.addEventListener('click',f
 // Read ONLY saved SQLite data; never hit government APIs during UI pagination.
 // A temporary failure on page N must not discard successfully fetched pages 0..N-1.
 async function g2bFetchSavedPage(offset,preferredLimit){
- const sizes=[preferredLimit,Math.min(150,preferredLimit),50].filter((size,i,array)=>array.indexOf(size)===i);
+ const sizes=[preferredLimit,Math.min(50,preferredLimit),25].filter((size,i,array)=>array.indexOf(size)===i);
  let lastError=null;
  for(const size of sizes){
-  for(let attempt=0;attempt<(size===preferredLimit?2:1);attempt++){
+  for(let attempt=0;attempt<(size===preferredLimit?3:2);attempt++){
    try{
     const data=await g2bFetch('/saved?sw=1&limit='+size+'&offset='+offset);
     if(!Array.isArray(data.items)||!Number.isSafeInteger(Number(data.totalCount))||
@@ -1910,6 +1910,9 @@ async function g2bFetchSavedPage(offset,preferredLimit){
     lastError=error;
     if(/HTTP 4\d\d|invalid_saved_pagination|invalid_saved_search_query/.test(String(error?.message||error)))
      throw error;
+    // Give the high-port HTTP connection time to recover; immediate repeated fetches
+    // previously exhausted every fallback against a temporarily saturated origin.
+    await new Promise(resolve=>setTimeout(resolve,Math.min(1800,300*(attempt+1)+(size===preferredLimit?0:400))));
    }
   }
  }
@@ -1937,7 +1940,7 @@ async function g2bLoadSaved(append){
  let offset=incremental?g2bLoadedOffset:0;
  let total=incremental?g2bSavedTotal:0;
  let linkedOnServer=incremental?g2bLinkedEligibility:null;
- let preferredLimit=g2bCompactScreen()?120:300;
+ let preferredLimit=g2bCompactScreen()?50:100;
  let published=false;
  function publish(){
   g2bLiveJobs=[...seen.values()];
@@ -4412,18 +4415,23 @@ function startJobsDataWhenVisible(){
    jobsBootstrapQueued=false;
    if(jobsBootstrapStarted||!document.getElementById('jobsView').classList.contains('on'))return;
    jobsBootstrapStarted=true;
-   loadG2bAwardFallback();g2bCheckStatus();g2bLoadCrawlStatus();
-   // Direct search reads only the requested saved DB rows, not 8,000+ pages.
-   const initialLoads=jobSearchText?[]:[g2bLoadSaved(false)];
-   if(worklinksPartnerAccess())initialLoads.push(loadChangcomActionable());
-   Promise.allSettled(initialLoads).then(function(){
+   g2bCheckStatus();g2bLoadCrawlStatus();
+   // Prioritize the saved DB rows. Launching a 74MB RFP snapshot and multiple
+   // qualification/award requests simultaneously with /saved could exhaust
+   // browser connections to the high-port API before the second page.
+   // Direct search reads only the requested saved DB rows.
+   const savedLoad=jobSearchText?Promise.resolve(null):g2bLoadSaved(false);
+   savedLoad.catch(()=>null).finally(function(){
     jobsInitialDataReady=true;
     scheduleJobsRender();
+    // These are read-only, already-published caches. Never call official G2B
+    // from the browser. Load after listing instead of competing for bandwidth.
+    loadG2bAwardFallback();
+    loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();
+    refreshQualificationReview();
+    if(!jobSearchText)refreshRfpSnapshot();
+    if(worklinksPartnerAccess())loadChangcomActionable();
    });
-   loadOfficialAwardSnapshot();loadOfficialAwardCacheFromServer();
-   // Saved-search responses carry compact RFP status; skip the 74MB source in search mode.
-   refreshQualificationReview();
-   if(!jobSearchText)refreshRfpSnapshot();
   },0);
  });
 }
