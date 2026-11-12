@@ -1,0 +1,54 @@
+name: WorkLinks actual Korean scanned PDF OCR smoke 20261112
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-live-korean-ocr-smoke-20261112.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ocr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual local Korean OCR readers
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y --no-install-recommends tesseract-ocr tesseract-ocr-kor tesseract-ocr-eng
+          python3 -m pip install -q pyhwp six pypdf pymupdf
+          tesseract --list-langs
+      - name: Recheck real police academy scan-only PDF from exact published URL
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json,importlib.util,pathlib,urllib.request,hashlib
+          from pypdf import PdfReader
+          import io
+          url='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805702&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+          with urllib.request.urlopen(req,timeout=35) as res:
+              assert res.status==200
+              raw=res.read(1200001)
+          assert len(raw)==78080 and hashlib.sha256(raw).hexdigest().startswith('a17bdb48e67032bcbc51f4b8')
+          src=pathlib.Path('scripts/refresh_worklinks_rfp.py')
+          spec=importlib.util.spec_from_file_location('live_ocr',src)
+          rfp=importlib.util.module_from_spec(spec);spec.loader.exec_module(rfp)
+          old=PdfReader(io.BytesIO(raw))
+          before=sum(len((page.extract_text() or '').strip()) for page in old.pages)
+          text,meta=rfp.extract_with_source_status('기술지원협약서.pdf',raw)
+          verdict={'http':200,'bytes':len(raw),'pdfPages':len(old.pages),
+              'beforeNativeTextChars':before,'afterOcrTextChars':len(text.strip()),
+              'sourceComplete':meta['sourceComplete'],
+              'ocrAttemptedPages':meta['ocrAttemptedPages'],
+              'ocrRecoveredPages':meta['ocrRecoveredPages'],
+              'sourcePreview':text.strip()[:300]}
+          print('WORKLINKS_REAL_OCR '+json.dumps(verdict,ensure_ascii=False),flush=True)
+          assert before==0
+          assert len(text.strip())>=50
+          assert meta['sourceComplete'] is True and meta['ocrRecoveredPages']==1
+          PY
