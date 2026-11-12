@@ -202,8 +202,11 @@ def process_one(key,scan,meta,ledger):
     latest=[]
     counts=Counter()
     counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
+    # Examine all notice siblings together. The single-file wrapper here
+    # previously lost the verified PDF companion and retried covered HWP.
+    pending=reader_retry_files(scan)
     for f in scan['files']:
-        if f not in reader_retry_files({'files':[f]}):continue
+        if f not in pending:continue
         f['lastReaderAttemptVersion']=READER_ATTEMPT_VERSION
         f['lastReaderAttemptAt']=dt.datetime.now(dt.timezone.utc).isoformat()
         counts['reader_attempt_recorded']+=1
