@@ -557,6 +557,38 @@ def complete_qualification_review(notice, clauses, classified, truncated):
 
 
 
+def per_requirement_coverage(notice, requirements):
+    """Preserve verified clause evidence even when sibling attachments fail.
+
+    A cited requirement is NOT a complete notice scan or proof that the bidder
+    satisfies the condition. Never infer absence from an unreadable attachment.
+    """
+    files={str(f.get("name") or ""):f for f in notice.get("files") or []
+           if isinstance(f,dict)}
+    rows=[]
+    for q in requirements:
+        source=files.get(str(q.get("sourceFile") or ""))
+        covered=bool(source and source.get("readable") is True
+                     and source.get("sourceSha256") and source.get("textSha256")
+                     and source.get("sourceTextScanComplete") is True
+                     and source.get("unmatchedQualificationAnchorCount")==0
+                     and not source.get("qualificationScanTruncated")
+                     and not source.get("clauseCandidatesTruncated"))
+        interpreted=q.get("sourceVerified") is True and q.get("classification")!="unknown"
+        rows.append({
+            "index":q.get("index"),"type":q.get("type"),
+            "sourceFile":q.get("sourceFile"),
+            "classification":q.get("classification"),
+            "sourceClauseConfirmed":interpreted,
+            "sourceDocumentScanComplete":covered,
+            "status":("confirmed_in_scanned_document" if interpreted and covered
+                      else "cited_but_document_incomplete" if interpreted
+                      else "unresolved"),
+            "bidderEligibilityVerified":False
+        })
+    return rows
+
+
 def qualification_coverage_signature(notice):
     """Fingerprint *audit gates* independently from unchanged cited clauses."""
     fields = ("name", "readable", "sourceSha256", "textSha256",
@@ -617,6 +649,7 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
                 "requiredConditionsComplete":audit["complete"],
                 "documentInterpretationReviewed":audit["complete"],
                 "fullDocumentAudit":audit,
+                "requirementCoverage":per_requirement_coverage(notice,existing["requirements"]),
                 "sourceTruncated":truncated,
                 "automaticEligibilityApproved":False,
                 "checkedAt":dt.datetime.now(dt.timezone.utc).isoformat()}
@@ -646,6 +679,7 @@ def process_one(notice_id, notice, existing, infer_fn, mode="classified"):
         "coverageSignature":coverage,
         "reviewComplete":audit["complete"],"requiredConditionsComplete":audit["complete"],
         "documentInterpretationReviewed":audit["complete"],"fullDocumentAudit":audit,
+        "requirementCoverage":per_requirement_coverage(notice,output),
         "automaticEligibilityApproved":False,
         "interpretedCount":len(output),
         "totalSourceCandidates":len(clauses),
@@ -706,6 +740,17 @@ def run_summary_only(source, summary_path, limit):
                 "reviewedDocuments":audit.get("reviewedDocuments",0),
                 "manifestDocuments":audit.get("manifestDocuments"),
                 "interpretedClauses":audit.get("interpretedClauses",0),
+                "confirmedSourceClauses":sum(
+                    r.get("status")=="confirmed_in_scanned_document"
+                    for r in reviewed.get("requirementCoverage") or []),
+                "partialSourceClauses":sum(
+                    r.get("status")=="cited_but_document_incomplete"
+                    for r in reviewed.get("requirementCoverage") or []),
+                "unresolvedSourceClauses":sum(
+                    r.get("status")=="unresolved"
+                    for r in reviewed.get("requirementCoverage") or []),
+                "unreadableDocuments":sum(
+                    f.get("readable") is not True for f in notice.get("files") or []),
                 "blockers":audit.get("blockers") or [],
                 "checkedAt":reviewed.get("checkedAt"),
                 "automaticEligibilityApproved":False
