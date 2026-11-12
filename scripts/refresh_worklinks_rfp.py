@@ -472,20 +472,30 @@ def download(url):
             if not retry or attempt==2:raise
         time.sleep(1.5*(attempt+1))
 def extract(name,raw):
+    # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
+    # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
     n=name.lower()
-    # Official downloads occasionally have no extension; inspect bounded
-    # file signatures instead of falsely treating them as unreadable.
-    if not n.endswith(TEXT_FORMATS):
-        if raw.startswith(b'%PDF-'):n+='.pdf'
-        elif raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):n+='.hwp'
-        elif raw.startswith(b'PK\x03\x04'):
-            with zipfile.ZipFile(io.BytesIO(raw)) as probe:
-                members=set(probe.namelist())
-            n+=('.docx' if 'word/document.xml' in members else
-                '.xlsx' if 'xl/workbook.xml' in members else
-                '.pptx' if 'ppt/presentation.xml' in members else
-                '.hwpx' if any(x.startswith('Contents/') and x.endswith('.xml') for x in members)
-                else '.zip')
+    if raw.startswith(b'%PDF-'):
+        n='.pdf'
+    elif raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):
+        n='.hwp'
+    elif raw.startswith(b'PK\\x03\\x04'):
+        # Identify Office XML formats by internal paths. Otherwise this is
+        # an ordinary attachment archive, regardless of its .pdf/.hwp name.
+        with zipfile.ZipFile(io.BytesIO(raw)) as probe:
+            members=set(probe.namelist())
+        if 'word/document.xml' in members:
+            n='.docx'
+        elif 'xl/workbook.xml' in members:
+            n='.xlsx'
+        elif 'ppt/presentation.xml' in members:
+            n='.pptx'
+        elif any(p.startswith('Contents/') and p.endswith('.xml') for p in members):
+            n='.hwpx'
+        else:
+            n='.zip'
+    elif not n.endswith(TEXT_FORMATS):
+        raise ValueError('unsupported_format')
     if n.endswith('.egg'):
         raise ValueError('egg_archive_requires_converter')
     if n.endswith('.zip'):
