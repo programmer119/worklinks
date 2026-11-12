@@ -1,0 +1,61 @@
+name: WorkLinks actual Korean OCR 144 vs 300dpi evidence test
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-ocr-300dpi-live-audit-20261112.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Korean OCR and PDF renderer
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y --no-install-recommends tesseract-ocr tesseract-ocr-kor tesseract-ocr-eng
+          python3 -m pip install -q pypdf pymupdf
+      - name: Revisit real one-page 78KB G2B scan and compare 144/300 dpi
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,importlib.util,json,math,pathlib,subprocess,urllib.request
+          import pymupdf
+          source='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805702&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03'
+          req=urllib.request.Request(source,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+          with urllib.request.urlopen(req,timeout=35) as r:
+              assert r.status==200
+              raw=r.read(1000000)
+          assert len(raw)==78080
+          assert hashlib.sha256(raw).hexdigest().startswith('a17bdb48e67032bcbc51f4b8')
+          spec=importlib.util.spec_from_file_location('r','scripts/refresh_worklinks_rfp.py')
+          module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+          with pymupdf.open(stream=raw,filetype='pdf') as pdf:
+              p=pdf.load_page(0)
+              def render(zoom):
+                  pix=p.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
+                  run=subprocess.run(['tesseract','stdin','stdout','-l','kor+eng','--psm','3',
+                                       '--dpi',str(int(72*zoom))],input=pix.tobytes('png'),
+                                       capture_output=True,timeout=45)
+                  assert run.returncode==0,run.stderr[:220]
+                  return run.stdout.decode('utf-8','replace'),pix.width*pix.height
+              old,oldpx=render(2.0)
+              new,newpx=render(min(module.PDF_OCR_TARGET_DPI/72,
+                                    math.sqrt(module.MAX_PDF_OCR_PIXELS/(p.rect.width*p.rect.height))))
+          actual=module._ocr_pdf_page(raw,0)
+          assert actual==new
+          result={'oldPixels':oldpx,'newPixels':newpx,
+                  'oldChars':len(old.strip()),'newChars':len(new.strip()),
+                  'oldContainsProductSupply':'물품공급' in old,
+                  'newContainsProductSupply':'물품공급' in new,
+                  'oldHasCorruptProductSupply':'룰품공급' in old,
+                  'newHasCorruptProductSupply':'룰품공급' in new,
+                  'newPreview':new.strip()[:350]}
+          print('WORKLINKS_REAL_OCR_300DPI_COMPARISON '+json.dumps(result,ensure_ascii=False),flush=True)
+          assert newpx>oldpx and len(new.strip())>=100
+          PY
