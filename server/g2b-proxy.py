@@ -880,23 +880,47 @@ def saved_rfp_search_state(row, compact=False):
     if not isinstance(row,dict):
         return {'sourceAvailable':True,'seen':False}
     files=row.get('files') if isinstance(row.get('files'),list) else []
+    # Official filenames can contain both an HWP and a PDF of the same
+    # document. Prefer only the fully-scanned PDF, but never lie that the
+    # HWP binary was read. Keep both entries in the physical manifest.
+    def stem(name):
+        return re.sub(r'[\\W_]+','',os.path.splitext(os.path.basename(str(name or '').lower()))[0])
+    covered={}
+    for i,f in enumerate(files):
+        if not str(f.get('name') or '').lower().endswith(('.hwp','.hwpx')):
+            continue
+        this=stem(f.get('name'))
+        for candidate in files:
+            if (str(candidate.get('name') or '').lower().endswith('.pdf')
+                    and stem(candidate.get('name'))==this
+                    and candidate.get('readable') is True
+                    and candidate.get('sourceTextScanComplete') is True
+                    and candidate.get('qualificationScanTruncated') is not True
+                    and candidate.get('sourceSha256')):
+                covered[i]=str(candidate.get('name') or '')
+                break
     good=bool(row.get('manifestComplete') is True and
-        row.get('status')=='text_extracted_requires_review' and
-        files and all(x.get('readable') is True for x in files))
-    # File-level truth (download/parse errors vs. all files readable).
+        row.get('status')=='text_extracted_requires_review' and files and
+        all(f.get('readable') is True or i in covered
+            for i,f in enumerate(files)))
     scan_complete=bool(good and all(
-        f.get('sourceTextScanComplete') is True and
-        f.get('qualificationScanTruncated') is not True and
-        int(f.get('unmatchedQualificationAnchorCount') or 0)==0
-        for f in files))
+        i in covered or (
+          f.get('sourceTextScanComplete') is True and
+          f.get('qualificationScanTruncated') is not True and
+          int(f.get('unmatchedQualificationAnchorCount') or 0)==0)
+        for i,f in enumerate(files)))
+    effective_readable=sum(f.get('readable') is True or i in covered
+                           for i,f in enumerate(files))
     file_statuses=[{
         'name':str(f.get('name') or '')[:140],
         'readable':f.get('readable') is True,
+        'pdfAlternative':covered.get(i,'')[:140],
+        'skippedDuplicateFormat':i in covered,
         'errorCategory':str(f.get('errorCategory') or '')[:90],
         'textScanComplete':f.get('sourceTextScanComplete') is True,
         'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
         'unmatchedQualificationAnchorCount':int(f.get('unmatchedQualificationAnchorCount') or 0)
-    } for f in files[:16]]
+    } for i,f in enumerate(files[:16])]
     evidence=row.get('changcomClauseEvidence') or {}
     # These URLs were preserved from the OFFICIAL attachment manifests.
     # Do not invent URLs from filenames, and do not send untrusted hosts to UI.
@@ -930,6 +954,8 @@ def saved_rfp_search_state(row, compact=False):
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
             'readableCount':sum(x.get('readable') is True for x in files),
+            'pdfCoveredCount':len(covered),
+            'effectiveReadableCount':effective_readable,
             'excerpts':labels[:3]}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
     # NOT an interpretation that the bidder is qualified.
@@ -956,6 +982,8 @@ def saved_rfp_search_state(row, compact=False):
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
             'readableCount':sum(x.get('readable') is True for x in files),
+            'pdfCoveredCount':len(covered),
+            'effectiveReadableCount':effective_readable,
             'excerptCount':len(excerpts),
             'excerpts':excerpts,'officialFiles':official_files,
             'fileStatuses':file_statuses}
