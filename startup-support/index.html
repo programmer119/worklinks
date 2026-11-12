@@ -3693,7 +3693,7 @@ function jobRequirementEvidence(x){
   {key:'failed',label:'확인실패',reason:'원문·첨부 판독이 불완전하여 인력 구성을 확정할 수 없음'};
  const roleLines=[
   roles.length?'역할별 인원: '+roles.join(' · '):'역할·인원 동시 기재: 미확인',
-  ...roleSources.flatMap(v=>['원문 ('+v.role+'): '+v.text.slice(0,200),'출처: '+v.file+' · '+v.scope+(v.sourceLine?' · '+v.sourceLine+'행':'')+(v.mm!=null?' · '+v.mm+' MM':'')]),
+  ...roleSources.flatMap(v=>['원문 ('+v.role+'): '+v.text.slice(0,200),'출처: '+v.file,'근거 범위: '+v.scope+(v.sourceLine?' · '+v.sourceLine+'행':'')+(v.mm!=null?' · '+v.mm+' MM':'')]),
   mentioned.length?'역할 미지정 인원 언급: '+mentioned.join(' / ')+'명 (합산 아님)':'',
   (sr.gradesMentioned||[]).length?'추가 기술등급: '+sr.gradesMentioned.join(' · '):'',
   (sr.manMonthsMentioned||[]).length?'투입공수: '+sr.manMonthsMentioned.join(' / ')+' MM':'',
