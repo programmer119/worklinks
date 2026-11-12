@@ -25,10 +25,12 @@ nav{display:flex;gap:15px;flex-wrap:wrap;font-size:14px}p{line-height:1.65}
 button{cursor:pointer;border:1px solid #b4c7da;background:#edf5ff;border-radius:8px;padding:9px 13px;font-weight:750}
 @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}main{padding:15px 12px}.stat strong{font-size:24px}}
 </style>
+<link rel="stylesheet" href="./worklinks-header-auth.css?v=20261112-2">
+<style>header #worklinks-auth-header{margin-left:auto}</style>
 </head>
 <body><main>
 <header><div><h1>낌새 공식 공고 정밀검사</h1><p class="sub">공식 기관 목록·개별 공고·신청 마감일·신청자격 근거를 분리해 검증합니다.</p></div>
-<nav><a href="./?view=support">WorkLinks 홈</a><a href="./investment.html?review=kimse">검증대기 공고 목록</a></nav></header>
+<nav><a href="./?view=support">WorkLinks 홈</a><a href="./investment.html?review=kimse">검증대기 공고 목록</a></nav><div id="worklinks-auth-header" class="worklinks-account-nav" aria-label="WorkLinks 계정"></div></header>
 <p class="warn">공식 공고를 발견했다는 사실만으로 현재 접수 중이거나 낌새의 지원자격이 확인된 것은 아닙니다. 신청 전 기관 원문과 첨부 공고문 확인이 필요합니다.</p>
 <p id="updated" class="small">정밀검사 결과를 확인 중입니다.</p>
 <section class="grid">
@@ -101,4 +103,5 @@ fetch('./kimse-deep-audit.json?cache='+Date.now(),{cache:'no-store'})
   $('sources').textContent='데이터 없음';});
 })();
 </script>
+<script type="module" src="./worklinks-header-auth.js?v=20261112-2"></script>
 </body></html>
