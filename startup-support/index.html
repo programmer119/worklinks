@@ -1481,6 +1481,7 @@ async function fetchServer123Snapshot(name, fallback){
 var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL;
 var g2bLiveJobs=[],g2bLoading=false,g2bOffset=0,g2bSavedTotal=0,g2bServerAvailable=false;
 var g2bLoadedOffset=0,g2bSavedLoadRunning=false,g2bSavedLoadError='',g2bSavedKnownTotal=0;
+var g2bSavedAutoRetryTimer=null,g2bSavedAutoRetryFailures=0;
 function g2bCompactScreen(){return !!(window.matchMedia&&window.matchMedia('(max-width: 820px)').matches)}
 function g2bKoreaDay(offset){
  const kst=new Date(Date.now()+9*3600000);
@@ -1923,6 +1924,30 @@ async function g2bFetchSavedPage(offset,preferredLimit){
  }
  throw lastError||Error('저장 DB 조회 실패');
 }
+// Resume transient failures from the last confirmed SQLite offset, not from zero.
+function scheduleSavedBidResume(){
+ if(g2bSavedAutoRetryTimer||g2bSavedAutoRetryFailures>=4)return;
+ const delay=[8000,20000,45000,90000][g2bSavedAutoRetryFailures++];
+ g2bSavedAutoRetryTimer=setTimeout(function(){
+  g2bSavedAutoRetryTimer=null;
+  if(g2bSavedLoadRunning||!document.getElementById('jobsView')?.classList.contains('on'))return;
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return;
+  if(g2bSavedLoadError&&g2bLoadedOffset<g2bSavedTotal)g2bLoadSaved(true);
+ },delay);
+}
+function resetSavedBidResume(){
+ if(g2bSavedAutoRetryTimer){clearTimeout(g2bSavedAutoRetryTimer);g2bSavedAutoRetryTimer=null}
+ g2bSavedAutoRetryFailures=0;
+}
+window.addEventListener('online',function(){
+ if(g2bSavedLoadError&&g2bLoadedOffset<g2bSavedTotal&&
+   document.getElementById('jobsView')?.classList.contains('on'))scheduleSavedBidResume();
+});
+document.addEventListener('visibilitychange',function(){
+ if(!document.hidden&&g2bSavedLoadError&&!g2bSavedLoadRunning&&
+  g2bLoadedOffset<g2bSavedTotal&&document.getElementById('jobsView')?.classList.contains('on'))
+  scheduleSavedBidResume();
+});
 async function g2bLoadSaved(append){
  const out=document.getElementById('g2bApiResult'),more=document.getElementById('g2bMore');
  // The "more" button first expands local cards unless it is also a retry button.
@@ -1994,6 +2019,7 @@ async function g2bLoadSaved(append){
   }
   if(!published||preservePrior)publish();
   g2bSavedLoadError='';
+  resetSavedBidResume();
   const checked=[...bidEligibilityCache.values()];
   const ok=checked.filter(v=>v?.ok&&v?.complete),failed=checked.filter(v=>!v?.ok);
   const empty=ok.filter(v=>!Array.isArray(v.requirements)||v.requirements.length===0);
@@ -2012,7 +2038,9 @@ async function g2bLoadSaved(append){
   out.textContent='서버 DB 조회 중단: '+g2bSavedLoadError+
    ' · 현재 수신 '+g2bLoadedOffset.toLocaleString('ko-KR')+
    ' / '+(known?known.toLocaleString('ko-KR'):'전체 미확인')+
-   '건 · 목록은 일부만 표시 · 다시 불러오기 가능';
+   '건 · 목록은 일부만 표시 · '+(g2bSavedAutoRetryFailures>=4?
+    '자동 재시도 한도 도달 · 수동 재시도 가능':'자동으로 이어받기 재시도 예정');
+  scheduleSavedBidResume();
   scheduleJobsRender();
   return null;
  }finally{
@@ -2028,7 +2056,11 @@ async function g2bLoadBids(){
  btn.disabled=true;
  status.textContent='서버 자동수집 상태와 저장된 공고 조회 중…';
  try{
-  const [items]=await Promise.all([g2bLoadSaved(false),g2bLoadCrawlStatus()]);
+  resetSavedBidResume();
+  const [items]=await Promise.all([
+   g2bLoadSaved(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal),
+   g2bLoadCrawlStatus()
+  ]);
   status.textContent=items?'DB 공고 최신 목록 확인 완료 · 서버 자동수집은 별도 실행 중':'DB 접속 오류 · 저장된 공고 미확인';
  }finally{g2bLoading=false;btn.disabled=false}
 }
@@ -2039,7 +2071,7 @@ async function g2bLoadBids(){
   document.getElementById('g2bApiStatus').textContent='서버 연결 확인 중…';g2bCheckStatus()
  });
  document.getElementById('g2bLoad').addEventListener('click',g2bLoadBids);
- document.getElementById('g2bMore').addEventListener('click',function(){g2bLoadSaved(true)});
+ document.getElementById('g2bMore').addEventListener('click',function(){resetSavedBidResume();g2bLoadSaved(true)});
  // G2B boot is deferred until Jobs is opened, not on the startup-support homepage.
 })();
 
