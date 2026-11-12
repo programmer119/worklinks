@@ -170,6 +170,10 @@ with sync_playwright() as p:
             assert data[3]["requirementRowHeight"]<=42,data
             assert max(d["height"] for d in data)-min(d["height"] for d in data)<=48,data
         print("BID_CARD_BROWSER",width,data,flush=True)
+        if width == 1366:
+            import base64
+            image_bytes=page.screenshot(type="jpeg",quality=64,full_page=False)
+            print("BID_GRID_SCREENSHOT_B64="+base64.b64encode(image_bytes).decode("ascii"),flush=True)
         page.close()
     browser.close()
 print("BID_CARD_LAYOUT_PASS")
