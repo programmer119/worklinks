@@ -82,6 +82,7 @@ with tempfile.TemporaryDirectory() as tmp:
     assert recovered['unreadableDocumentCount']==0
     assert all(f.get('readable') and f.get('sourceTextScanComplete') for f in recovered['files'])
     assert recovered['files'][0]['sourceSha256']=='a'*64
+    assert 'errorCategory' not in recovered['files'][1],recovered['files'][1]
     assert recovered['reviewComplete'] is False
     assert stored['byNotice']['R26BK01234568:000']==base
     assert gzip.decompress((snap/'rfp-coverage-index.json.gz').read_bytes())==payload
