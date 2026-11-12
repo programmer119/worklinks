@@ -1464,7 +1464,7 @@ async function fetchServer123Snapshot(name, fallback){
 }
 var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL;
 var g2bLiveJobs=[],g2bLoading=false,g2bOffset=0,g2bSavedTotal=0,g2bServerAvailable=false;
-var g2bLoadedOffset=0,g2bSavedLoadRunning=false;
+var g2bLoadedOffset=0,g2bSavedLoadRunning=false,g2bSavedLoadError='',g2bSavedKnownTotal=0;
 function g2bCompactScreen(){return !!(window.matchMedia&&window.matchMedia('(max-width: 820px)').matches)}
 function g2bKoreaDay(offset){
  const kst=new Date(Date.now()+9*3600000);
@@ -1484,7 +1484,7 @@ function g2bSetEndpoint(s){
  }catch{return false}
 }
 async function g2bFetch(path){
- const c=new AbortController(),timeout=setTimeout(function(){c.abort()},14000);
+ const c=new AbortController(),timeout=setTimeout(function(){c.abort()},path.startsWith('/saved?')?22000:14000);
  try{
   const resp=await fetch(G2B_PROXY_URL+path,{signal:c.signal,cache:'no-store'});
   const json=await resp.json().catch(function(){throw Error('JSON 응답 아님 (HTTP '+resp.status+')')});
@@ -1534,6 +1534,7 @@ async function g2bLoadCrawlStatus(){
  try{
   const c=await g2bFetch('/crawl-status');
   if(!c.installed){place.textContent='자동수집기 배포 전 · DB에 저장된 공고 조회 가능';return}
+  g2bSavedKnownTotal=Math.max(0,Number(c.candidateTotal)||0);
   const label={running:'수집 중',completed:'정상 동작',partial:'일부 공고 재시도 대기',stopping:'종료 중'}[c.state]||c.state;
   place.textContent='자동수집 '+label+' · 전체 공고 '+Number(c.storedTotal||0).toLocaleString('ko-KR')+
    '건 · SW 관련 후보 '+Number(c.candidateTotal||0).toLocaleString('ko-KR')+
@@ -1879,39 +1880,85 @@ document.getElementById('changcomActionableRefresh')?.addEventListener('click',f
 });
 
 // Keep the complete G2B source in server SQLite; mobile downloads it incrementally.
+// Read ONLY saved SQLite data; never hit government APIs during UI pagination.
+// A temporary failure on page N must not discard successfully fetched pages 0..N-1.
+async function g2bFetchSavedPage(offset,preferredLimit){
+ const sizes=[preferredLimit,Math.min(150,preferredLimit),50].filter((size,i,array)=>array.indexOf(size)===i);
+ let lastError=null;
+ for(const size of sizes){
+  for(let attempt=0;attempt<(size===preferredLimit?2:1);attempt++){
+   try{
+    const data=await g2bFetch('/saved?sw=1&limit='+size+'&offset='+offset);
+    if(!Array.isArray(data.items)||!Number.isSafeInteger(Number(data.totalCount))||
+      Number(data.totalCount)<0||!data.persisted)
+     throw Error('저장 DB 응답 형식 오류');
+    if(!data.items.length&&offset<Number(data.totalCount))
+     throw Error('저장 DB 응답에 공고 목록 누락');
+    return {data,size};
+   }catch(error){
+    lastError=error;
+    if(/HTTP 4\d\d|invalid_saved_pagination|invalid_saved_search_query/.test(String(error?.message||error)))
+     throw error;
+   }
+  }
+ }
+ throw lastError||Error('저장 DB 조회 실패');
+}
 async function g2bLoadSaved(append){
  const out=document.getElementById('g2bApiResult'),more=document.getElementById('g2bMore');
- const compact=g2bCompactScreen();
- if(append&&jobRenderLimit<jobAvailableRows){
-  jobRenderLimit+=jobPageStep();renderJobs();return {total:g2bSavedTotal};
+ // The "more" button first expands local cards unless it is also a retry button.
+ if(append&&!g2bSavedLoadError&&jobRenderLimit<jobAvailableRows){
+  jobRenderLimit+=jobPageStep();renderJobs();return {total:g2bSavedTotal,loaded:g2bLoadedOffset};
  }
- if(append&&(!g2bServerAvailable||g2bLoadedOffset>=g2bSavedTotal)){
-  jobRenderLimit+=jobPageStep();renderJobs();return {total:g2bSavedTotal};
+ if(append&&!g2bSavedLoadError&&(!g2bServerAvailable||g2bLoadedOffset>=g2bSavedTotal)){
+  jobRenderLimit+=jobPageStep();renderJobs();return {total:g2bSavedTotal,loaded:g2bLoadedOffset};
  }
  if(g2bSavedLoadRunning)return null;
- g2bSavedLoadRunning=true;
+ const incremental=append&&g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal;
+ const oldComplete=g2bServerAvailable&&g2bSavedTotal>0&&g2bLoadedOffset>=g2bSavedTotal;
+ const preservePrior=!incremental&&oldComplete;
+ g2bSavedLoadRunning=true;g2bSavedLoadError='';
  if(more)more.disabled=true;
- if(append)jobRenderLimit+=jobPageStep();else{g2bLoadedOffset=0;jobRenderLimit=jobPageStep()}
+ if(append&&!incremental)jobRenderLimit=jobPageStep();
+ else if(append)jobRenderLimit+=jobPageStep();
+ else if(!preservePrior)jobRenderLimit=jobPageStep();
+ const seen=new Map(incremental?g2bLiveJobs.map(x=>[x.id,x]):[]);
+ let offset=incremental?g2bLoadedOffset:0;
+ let total=incremental?g2bSavedTotal:0;
+ let linkedOnServer=incremental?g2bLinkedEligibility:null;
+ let preferredLimit=g2bCompactScreen()?120:300;
+ let published=false;
+ function publish(){
+  g2bLiveJobs=[...seen.values()];
+  g2bLoadedOffset=offset;g2bSavedTotal=total;g2bLinkedEligibility=linkedOnServer;
+  g2bServerAvailable=true;published=true;
+  scheduleJobsRender();
+ }
+ function showProgress(message){
+  const known=Math.max(total,g2bSavedKnownTotal);
+  out.textContent='서버 DB SW 후보 '+offset.toLocaleString('ko-KR')+' / '+
+   (known?known.toLocaleString('ko-KR'):'집계 확인 중')+'건 수신'+message+
+   ' · 저장된 자료 조회만 실행 (정부 API 호출 없음)';
+ }
  try{
-  const pageSize=compact?160:500;
-  const seen=new Map(append?g2bLiveJobs.map(x=>[x.id,x]):[]);
-  let total=append?g2bSavedTotal:0,linkedOnServer=append?g2bLinkedEligibility:null;
-  let offset=append?g2bLoadedOffset:0;
   while(offset<100000){
-   const data=await g2bFetch('/saved?sw=1&limit='+pageSize+'&offset='+offset);
-   total=Number(data.totalCount||0);
+   const {data,size}=await g2bFetchSavedPage(offset,preferredLimit);
+   if(size<preferredLimit)preferredLimit=size; // Do not repeat a failing large page.
+   const nextTotal=Number(data.totalCount);
+   if(offset>0&&nextTotal!==total)throw Error('조회 중 DB 건수 변경 · 안전하게 재조회 필요');
+   total=nextTotal;
    if(Number.isFinite(Number(data.eligibilityLinked)))linkedOnServer=Number(data.eligibilityLinked);
-   const records=Array.isArray(data.items)?data.items:[];
+   const records=data.items;
    for(const row of records){
     if(row.rfpSavedState&&row.bidNo){
-      const key=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
-      jobListRfpState.set(key,row.rfpSavedState);
+     const key=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
+     jobListRfpState.set(key,row.rfpSavedState);
     }
     if(row.supplementalBidFacts&&row.bidNo){
-      const extKey=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
-      g2bSupplementalCache.set(extKey,row.supplementalBidFacts);
-     }
-     if(row.bidEligibility?.ok&&row.bidNo){
+     const key=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
+     g2bSupplementalCache.set(key,row.supplementalBidFacts);
+    }
+    if(row.bidEligibility?.ok&&row.bidNo){
      const key=String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0');
      bidEligibilityCache.set(key,row.bidEligibility);
     }
@@ -1919,31 +1966,40 @@ async function g2bLoadSaved(append){
     if(card)seen.set(card.id,card);
    }
    offset+=records.length;
-   if(!records.length||offset>=total||compact)break;
-   // Yield between desktop batches to keep the UI responsive.
+   // Publish the first page immediately, then in bounded chunks. Avoid 8k re-renders.
+   if(!preservePrior&&(offset===records.length||offset%1200<size||offset>=total))publish();
+   showProgress(offset>=total?' · 모두 수신':' · 이어서 읽는 중');
+   if(offset>=total||!records.length)break;
    await new Promise(resolve=>setTimeout(resolve,0));
   }
-  g2bLiveJobs=[...seen.values()];
-  g2bLoadedOffset=offset;g2bServerAvailable=true;
-  g2bSavedTotal=total;g2bLinkedEligibility=linkedOnServer;
-  scheduleJobsRender();
-  // UI reloads read stored data. Scheduled server workers own upstream enrichment.
+  if(!published||preservePrior)publish();
+  g2bSavedLoadError='';
   const checked=[...bidEligibilityCache.values()];
   const ok=checked.filter(v=>v?.ok&&v?.complete),failed=checked.filter(v=>!v?.ok);
   const empty=ok.filter(v=>!Array.isArray(v.requirements)||v.requirements.length===0);
-  const partial=g2bLoadedOffset<g2bSavedTotal;
   out.textContent='서버 DB SW 후보 '+Math.min(g2bLoadedOffset,g2bSavedTotal).toLocaleString('ko-KR')+
    ' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 불러옴'+
-   (partial?' · 나머지 공고는 더 보기에서 조회':' · 모두 조회')+
+   (g2bLoadedOffset<g2bSavedTotal?' · 목록 일부':' · 모두 조회')+
    ' · DB 업종요건 연결 '+(g2bLinkedEligibility===null?'미지원':g2bLinkedEligibility.toLocaleString('ko-KR')+'건')+
    ' · 업종조회 성공 '+ok.length+'건 (면허제한 없음 '+empty.length+'건) · 오류 '+failed.length+
-   '건 · 미조회 '+Math.max(0,g2bSavedTotal-checked.length)+'건. 업종 일치는 전체 입찰자격 확인이 아닙니다.';
+   '건 · 미조회 '+Math.max(0,g2bSavedTotal-checked.length)+'건';
   return {total:g2bSavedTotal,loaded:g2bLoadedOffset};
  }catch(e){
-  if(!append){g2bServerAvailable=false;g2bLoadedOffset=0;g2bSavedTotal=0;g2bLiveJobs=g2bLocalRead();renderJobs()}
-  out.textContent='서버 DB 재조회 실패: '+String(e.message||e).slice(0,100)+(append?' · 기존 공고 유지':'');
+  g2bSavedLoadError=String(e?.message||e).slice(0,120);
+  if(!preservePrior&&offset>0&&!published)publish();
+  // Never zero g2bSavedTotal, g2bLoadedOffset, or the previously fetched cards.
+  const known=Math.max(g2bSavedTotal,g2bSavedKnownTotal,total);
+  out.textContent='서버 DB 조회 중단: '+g2bSavedLoadError+
+   ' · 현재 수신 '+g2bLoadedOffset.toLocaleString('ko-KR')+
+   ' / '+(known?known.toLocaleString('ko-KR'):'전체 미확인')+
+   '건 · 목록은 일부만 표시 · 다시 불러오기 가능';
+  scheduleJobsRender();
   return null;
- }finally{g2bSavedLoadRunning=false;if(more)more.disabled=false}
+ }finally{
+  g2bSavedLoadRunning=false;
+  if(more)more.disabled=false;
+  scheduleJobsRender();
+ }
 }
 async function g2bLoadBids(){
  if(g2bLoading)return;
@@ -4079,7 +4135,10 @@ function renderJobs(){
  const repeatCount=candidateJobs.filter(o=>repeatYears(o.x)>=2).length;
  const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>verdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
- document.getElementById('partnerJobCount').textContent='('+candidateJobs.length+')';
+ const partialServerList=g2bSavedLoadRunning||!!g2bSavedLoadError||
+   (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
+   (!g2bServerAvailable&&g2bSavedKnownTotal>0);
+ document.getElementById('partnerJobCount').textContent='('+candidateJobs.length+(partialServerList?' · 일부':'')+')';
  // Always show nonzero officially verified BASIC qualifications outside the
  // collapsed diagnostics. Neither count is a full-document bid approval.
  document.getElementById('partnerSummary').textContent=
@@ -4234,10 +4293,10 @@ function renderJobs(){
     (selected?.registryError?' · 업체등록 오류: '+selected.registryError:'');
   }
   jobAvailableRows=list.length;
-  const serverMore=g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal;
+  const serverMore=!!g2bSavedLoadError||(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal);
   const more=document.getElementById('g2bMore');
   more.style.display=list.length>jobRenderLimit||serverMore?'inline-block':'none';
-  more.textContent=jobRenderLimit<list.length?
+  more.textContent=g2bSavedLoadError?'서버 공고 다시 불러오기 · 일부 목록만 표시':jobRenderLimit<list.length?
    '일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · '+jobPageStep()+'건 더 보기':
    '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지';
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
