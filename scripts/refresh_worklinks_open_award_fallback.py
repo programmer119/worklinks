@@ -28,10 +28,36 @@ def collect(fetch=None, now=None):
     if fetch is None:
         def fetch(offset):
             url=API+'/saved?sw=1&limit=500&offset='+str(offset)
+            ledger=None
+            request_key=None
+            if os.environ.get('WORKLINKS_RFP_LEDGER_DB'):
+                from rfp_call_ledger import CallLedger,cache_key
+                ledger=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+                request_key=cache_key('local_award_fallback',offset)
+                cache=ledger.get_json(request_key,max_age_seconds=180)
+                if (isinstance(cache,dict) and cache.get('ok') is True
+                        and cache.get('persisted') is True):
+                    ledger.record('local_award_fallback',request_key,'verified_snapshot_reused')
+                    return cache
             req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-Server123-AwardFallback/1.0',
                                                     'Accept':'application/json'})
-            with urllib.request.urlopen(req,timeout=35) as response:
-                return json.load(response)
+            try:
+                with urllib.request.urlopen(req,timeout=35) as response:
+                    status=getattr(response,'status',200)
+                    result=json.load(response)
+                if not result.get('ok') or result.get('persisted') is not True:
+                    raise ValueError('saved_bid_data_not_verified')
+                if ledger is not None:
+                    ledger.record('local_award_fallback_http',request_key,'http_ok',
+                                  http_status=status)
+                    ledger.save_json(request_key,result,max_bytes=4_000_000)
+                return result
+            except Exception as exc:
+                if ledger is not None:
+                    ledger.record('local_award_fallback_http',request_key,'http_failed',
+                                  http_status=getattr(exc,'code',None),
+                                  error_class=type(exc).__name__)
+                raise
     if now is None:
         now=dt.datetime.now(KST).replace(tzinfo=None)
     rows=[]
