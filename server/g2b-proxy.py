@@ -711,13 +711,13 @@ def _source_document_year(text):
     return max(years) if years else None
 
 
-def _is_stale_eorder_reason(name,latest_business_year):
-    """Skip only explicitly outdated e-order emergency-reason attachments."""
+def _is_stale_eorder_reason(name,latest_business_year,notice_year=None):
+    """Never drop a legitimate bid-year emergency reason for next-year service."""
     text=str(name or '')
-    if not latest_business_year or not re.search(r'긴급.*(?:입찰|발주|요청).*사유|긴급.*사유',text):
+    if not latest_business_year or not notice_year or not re.search(r'긴급.*(?:입찰|발주|요청).*사유|긴급.*사유',text):
         return False
     years=[int(v) for v in re.findall(r'(?<!\d)(20\d{2})\s*년',text)]
-    return bool(years and max(years)<latest_business_year)
+    return bool(years and max(years)<notice_year and max(years)<latest_business_year)
 
 
 def bid_evidence_query(bid_no, order):
@@ -744,12 +744,14 @@ def bid_evidence_query(bid_no, order):
     all_names.extend(str(v.get('name') or '') for v in notice_docs['items'])
     years=[_source_document_year(name) for name in all_names]
     current_document_year=max((y for y in years if y),default=None)
+    bid_year_match=re.match(r'^R(\d{2})',str(bid_no or ''))
+    notice_year=(2000+int(bid_year_match.group(1)) if bid_year_match else None)
     skipped_outdated=[]
     for source,origin in ((ordinary,'notice_attachment_api'),(attachments,'eorder')):
         for row in source['items']:
             name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName','eorderAtchFileNm'])
             url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl','fileDownloadUrl','eorderAtchFileUrl'])
-            if origin=='eorder' and _is_stale_eorder_reason(name,current_document_year):
+            if origin=='eorder' and _is_stale_eorder_reason(name,current_document_year,notice_year):
                 skipped_outdated.append({'name':name,'source':'eorder',
                                          'reason':'past_project_year'})
                 continue
