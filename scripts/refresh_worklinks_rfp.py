@@ -1695,6 +1695,8 @@ def compact_coverage(item):
             'extractionEvidence':f.get('extractionEvidence') or {},
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
+            'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
+            'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') is True,
             'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
             'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
             'clauseCandidateCount':len(f.get('clauseCandidates') or [])
