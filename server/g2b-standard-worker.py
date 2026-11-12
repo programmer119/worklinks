@@ -9,6 +9,7 @@ import argparse
 import collections
 import datetime as dt
 import json
+import hashlib
 import os
 import re
 import sqlite3
@@ -17,6 +18,29 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+
+
+_SHARED_LEDGER=None
+def shared_ledger():
+    global _SHARED_LEDGER
+    if not os.environ.get('WORKLINKS_RFP_LEDGER_DB'):return None
+    if _SHARED_LEDGER is None:
+        from rfp_call_ledger import CallLedger
+        _SHARED_LEDGER=CallLedger(os.environ['WORKLINKS_RFP_LEDGER_DB'])
+    return _SHARED_LEDGER
+
+def verified_page_cache(service,day,page):
+    ledger=shared_ledger()
+    if ledger is None:return None
+    from rfp_call_ledger import cache_key
+    k=cache_key('standard_v1',service,day,page,B2_ROWS if service=='B2' else PAGE_ROWS)
+    cached=ledger.get_json(k,max_age_seconds=24*3600)
+    if (isinstance(cached,dict) and isinstance(cached.get('total'),int)
+            and isinstance(cached.get('items'),list)):
+        ledger.record('standard',k,'verified_page_reused',
+                      detail=service+':'+day+':'+str(page))
+        return cached['total'],cached['items']
+    return None
 
 KST = dt.timezone(dt.timedelta(hours=9))
 ROOT = "https://apis.data.go.kr/1230000/ao/PubDataOpnStdService/"
@@ -98,6 +122,15 @@ def params(service, day):
 
 
 def request_page(service, day, page, key, fetch=None):
+    if fetch is None:
+        previous=verified_page_cache(service,day,page)
+        if previous is not None:return previous
+    ledger=(shared_ledger() if fetch is None else None)
+    request_key=None
+    if ledger is not None:
+        from rfp_call_ledger import cache_key
+        request_key=cache_key('standard_v1',service,day,page,
+                              B2_ROWS if service=='B2' else PAGE_ROWS)
     query = dict(params(service, day), pageNo=page, serviceKey=key, type="json")
     url = ROOT + OPERATIONS[service] + "?" + urllib.parse.urlencode(query)
     try:
@@ -105,12 +138,28 @@ def request_page(service, day, page, key, fetch=None):
             "Accept": "application/json", "User-Agent": "WorkLinksStandardDaily/1.0"})
         if fetch is None:
             with urllib.request.urlopen(req, timeout=36) as r:
-                doc = json.load(r)
+                status=getattr(r,'status',200)
+                raw=r.read(22_000_000)
+                if len(raw)>=22_000_000:raise ValueError('oversize_json')
+                doc=json.loads(raw.decode('utf-8'))
+            if ledger is not None:
+                ledger.record('standard_http',request_key,'http_received',
+                              http_status=status,
+                              response_sha256=hashlib.sha256(raw).hexdigest(),
+                              detail=service+':'+day+':'+str(page))
         else:
             doc = fetch(service, day, page, query)
     except urllib.error.HTTPError as err:
+        if ledger is not None:
+            ledger.record('standard_http',request_key,'http_failed',
+                          http_status=err.code,error_class='HTTPError',
+                          detail=service+':'+day+':'+str(page))
         raise ProviderFailure("upstream_http_" + str(err.code), err.code == 429) from None
-    except (OSError, ValueError, UnicodeError, TimeoutError):
+    except (OSError, ValueError, UnicodeError, TimeoutError) as exc:
+        if ledger is not None:
+            ledger.record('standard_http',request_key,'http_failed',
+                          error_class=type(exc).__name__,
+                          detail=service+':'+day+':'+str(page))
         raise ProviderFailure("upstream_transport_or_json") from None
     if not isinstance(doc, dict):
         raise ProviderFailure("non_object_response")
@@ -135,7 +184,13 @@ def request_page(service, day, page, key, fetch=None):
     requested_rows = B2_ROWS if service == "B2" else PAGE_ROWS
     if total < 0 or total > MAX_PAGES * requested_rows or len(items) > requested_rows:
         raise ProviderFailure("unbounded_window")
-    return total, [x for x in items if isinstance(x, dict)]
+    valid_items=[x for x in items if isinstance(x, dict)]
+    if ledger is not None:
+        ledger.save_json(request_key,{'total':total,'items':valid_items},
+                         max_bytes=20_000_000)
+        ledger.record('standard_http',request_key,'provider_verified',
+                      detail=service+':'+day+':'+str(page))
+    return total,valid_items
 
 
 def collect_window(service, day, key, budget, fetch=None):
@@ -160,6 +215,9 @@ def collect_window(service, day, key, budget, fetch=None):
 
 def request_budgeted(service, day, page, key, budget, fetch=None):
     """Count every attempted upstream call, including failures and single retry."""
+    if fetch is None:
+        previous=verified_page_cache(service,day,page)
+        if previous is not None:return previous
     if budget[0] >= budget[1]:
         raise ProviderFailure("request_budget_exhausted")
     budget[0] += 1
