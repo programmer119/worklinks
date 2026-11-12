@@ -844,16 +844,40 @@ def read_saved_rfp_evidence_index():
         return _SEARCH_RFP_SNAPSHOT['byNotice']
 
 def saved_rfp_search_state(row):
+    """Give UI *actual saved source excerpts*, never request another official API."""
     if not isinstance(row,dict):
         return {'sourceAvailable':True,'seen':False}
     files=row.get('files') if isinstance(row.get('files'),list) else []
     good=bool(row.get('manifestComplete') is True and
         row.get('status')=='text_extracted_requires_review' and
         files and all(x.get('readable') is True for x in files))
+    evidence=row.get('changcomClauseEvidence') or {}
+    clause_types=evidence.get('clauseCandidates') or {}
+    # A compact, source-labelled excerpt. This is OCR/extraction evidence,
+    # NOT an interpretation that the bidder is qualified.
+    excerpts=[]
+    seen=set()
+    if isinstance(clause_types,dict):
+        for category,items in clause_types.items():
+            if not isinstance(items,list):continue
+            for item in items[:3]:
+                if not isinstance(item,dict):continue
+                quote=' '.join(str(item.get('text') or '').split())[:440]
+                if not quote or quote in seen:continue
+                seen.add(quote)
+                excerpts.append({
+                    'type':str(category)[:48],
+                    'text':quote,
+                    'sourceFile':str(item.get('sourceFile') or '')[:140],
+                    'codes':[str(v)[:16] for v in (item.get('codes') or [])[:5]]})
+                if len(excerpts)>=12:break
+            if len(excerpts)>=12:break
     return {'sourceAvailable':True,'seen':True,'complete':good,
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
-            'readableCount':sum(x.get('readable') is True for x in files)}
+            'readableCount':sum(x.get('readable') is True for x in files),
+            'excerptCount':len(excerpts),
+            'excerpts':excerpts}
 
 def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
