@@ -18,13 +18,13 @@ titles = [
 ]
 amounts = ["2억 3,327만원", "2억 8,268만원"]
 cards = []
-for title, amount in zip(titles, amounts):
+for index, (title, amount) in enumerate(zip(titles, amounts)):
     cards.append(f'''
       <article class="card job-mini">
         <div class="job-day"><strong>D-14</strong><span class="job-date">11.26 10:00</span></div>
         <div class="job-core">
           <div class="job-headline">
-            <h3><button class="job-card-title" type="button">{title}</button></h3>
+            <h3><button class="job-card-title" style="max-width:{220 if index else 900}px" type="button">{title}</button></h3>
             <div class="job-headline-side">
               <div class="job-headline-badge"><span class="job-business-area">SW사업</span></div>
               <span class="job-amount">{amount}</span>
