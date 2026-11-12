@@ -907,6 +907,8 @@ def staffing_role_is_grounded(row):
         if re.search(r'전담\s*유지\s*보수|별도의?\s*담당자|기타\s*인력|부문별\s*대표자',middle):
             return False
         return len(middle)<=32 or bool(re.search(r'최소|이상|투입|필요|배치',middle))
+    if re.fullmatch(re.escape(role)+r'\s+(?:특급|고급|중급|초급)\s+'+str(count),quote):
+        return True
     if (len(quote)>110 or quote.count('|')<2 or
             re.search(r'경력|별지|서식|항목|번호|평가|점|년',quote)):
         return False
