@@ -13,6 +13,8 @@ prev={'classificationVersion':module['CLASSIFICATION_VERSION'],
       'hwpxReaderVersion':module['HWPX_READER_VERSION'],
       'files':[{'name':'original.pdf','sourceUrl':good,'readable':True,
                 'sourceSha256':'e'*64,'textSha256':'f'*64,
+                'staffingRoleScanVersion':module['STAFFING_ROLE_SCAN_VERSION'],
+                'staffingRoleScanTruncated':False,
                 'clauseCandidates':[{'type':'industry_code',
                                      'sourceText':'정보시스템 업종 1468'}]},
                {'name':'retry.pdf','sourceUrl':missing,'readable':False,
@@ -41,6 +43,18 @@ try:
     calls.clear()
     process('R26BK01816467','000',meta,prev)
     assert calls==[changed,missing],calls
+    # Existing qualification text WITHOUT a current role/table scan must
+    # reparse the exact source file, not reuse the old proof as full staffing.
+    meta['attachments']['items'][0]['url']=good
+    prev_without_staff=dict(prev)
+    prev_without_staff['files']=[dict(row) for row in prev['files']]
+    prev_without_staff['files'][0].pop('staffingRoleScanVersion')
+    prev_without_staff['files'][0].pop('staffingRoleScanTruncated')
+    calls.clear()
+    rescan=process('R26BK01816467','000',meta,prev_without_staff)
+    assert calls==[good,missing],calls
+    assert rescan['files'][0]['staffingRoleScanVersion']==module['STAFFING_ROLE_SCAN_VERSION']
+    print('RFP_MISSING_STAFFING_SOURCE_REPARSE=PASS')
     print('RFP_PARTIAL_ATTACHMENT_REUSE_NO_NETWORK=PASS')
 finally:
     g['download']=original_download
