@@ -3972,6 +3972,8 @@ function jobRequirementEvidence(x){
   if(!roles.length){
    const roleRe=/(사업\s*책임자|프로젝트\s*관리자|\bPM\b|\bPL\b|개발자|운영\s*인력|운영자|기술자|디자이너|퍼블리셔|\bDBA\b|보안\s*담당자)\s*[:：-]?\s*(?:\(\s*)?(특급|고급|중급|초급)?\s*(?:\)\s*)?(\d{1,2})\s*(?:명|인)/gi;
    for(const c of clauses){
+    if(/행안부\s*예규|행정안전부\s*예규|지방자치단체\s*입찰시\s*낙찰자\s*결정기준|입찰\s*및\s*계약집행기준/i.test(String(c.file||''))||
+       /산정\s*예시|산정\s*사례|평가\s*예시|배점\s*예시/.test(String(c.text||'')))continue;
     roleRe.lastIndex=0;let m;
     while((m=roleRe.exec(c.text))!==null){
      const role=m[1].replace(/\s+/g,' '),grade=m[2]||'',count=Number(m[3]);
