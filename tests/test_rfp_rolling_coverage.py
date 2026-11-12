@@ -104,11 +104,27 @@ def scanned_record():
             'reviewComplete':False,'readableDocumentCount':1,
             'unreadableDocumentCount':0,
             'files':[{'name':'official.hwpx','readable':True,
-                      'sourceSha256':'d'*64,'sourceTextScanComplete':True}]}
+                      'sourceSha256':'d'*64,'sourceTextScanComplete':True,
+                      'staffingRoleScanVersion':module['STAFFING_ROLE_SCAN_VERSION'],
+                      'staffingRoleScanTruncated':False}]}
 all_done={row['bidNo']+':'+row['order']:scanned_record() for row in rows}
 calls.clear()
 assert discover(220,all_done)==[], 'old successful RFP downloads must not repeat'
 assert len(calls)==7,calls
+# Even successfully extracted qualification text must be queued for a distinct
+# staffing full-document scan when that scan has no provenance.
+missing_staff={**scanned_record(),
+    'files':[{k:v for k,v in scanned_record()['files'][0].items()
+               if k not in ('staffingRoleScanVersion','staffingRoleScanTruncated')}]}
+missing_key=rows[0]['bidNo']+':000'
+staffing_waiting=dict(all_done)
+staffing_waiting[missing_key]=missing_staff
+missing_candidates=discover(2,staffing_waiting,targets={missing_key})
+assert missing_candidates==[(rows[0]['bidNo'],'000',
+    deadline[:4]+'-'+deadline[4:6]+'-'+deadline[6:8])],missing_candidates
+assert module['staffing_scan_pending'](missing_staff)
+assert not module['staffing_scan_pending'](scanned_record())
+print('WORKLINKS_STAFFING_MISSING_SCAN_RESCHEDULE=PASS')
 # Transient failures and parser upgrades remain legitimate, bounded retries.
 bad_key=rows[0]['bidNo']+':000'
 version_key=rows[1]['bidNo']+':000'
