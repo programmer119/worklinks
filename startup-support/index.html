@@ -440,6 +440,14 @@
  #jobCards .job-mini .job-footer{flex-wrap:wrap}
  #jobCards .job-mini .job-meta-row{font-size:12px}
 }
+
+/* Business area belongs at the top-right of each tender, while award method
+   stays in its original metadata row. Keep full notice titles readable. */
+#jobCards .job-mini .job-headline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:9px;width:100%;min-width:0}
+#jobCards .job-mini .job-headline h3{min-width:0;width:100%}
+#jobCards .job-mini .job-business-area{display:inline-flex;align-items:center;justify-content:center;max-width:146px;min-height:27px;padding:4px 9px;border:1px solid #d9e1eb;border-radius:7px;background:#f8fafc;color:#334155;font-size:13px;font-weight:750;line-height:1.35;white-space:normal;text-align:center;overflow-wrap:anywhere}
+@media(max-width:490px){#jobCards .job-mini .job-headline{gap:7px}#jobCards .job-mini .job-business-area{max-width:105px;font-size:12px;padding:4px 7px}}
+
 /* G2B contract and award metadata: four structured API fields, no RFP parsing. */
 #jobCards .job-bid-methods{
  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);
@@ -3849,13 +3857,64 @@ function g2bAwardFloorDisplay(metadata){
  return {value:'확인 필요',status:'unknown',
   reason:'공식 낙찰방법 코드를 받았지만 하한율 적용 여부의 검증된 분류가 없습니다.'};
 }
+
+/* A02 awardMethod is a compound field (method-detail / business-area).
+   Recognize only explicit business-area suffixes. Other parenthesized text
+   describes evaluation rules, NOT a business sector. */
+function bidBusinessArea(x){
+ if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
+ const metadata=g2bCardAwardMetadata(x);
+ const award=String(metadata.awardMethod||'');
+ const suffix=(award.match(/\(([^()]*)\)\s*$/)||[])[1]||'';
+ const explicit={
+  'SW사업':'SW사업',
+  '엔지니어링':'엔지니어링',
+  '건설엔지니어링':'건설엔지니어링',
+  '물품구매':'물품',
+  '물품제조':'물품',
+  '군,경,소방 안전물품사업':'안전물품',
+  '상용SW-3자단가':'상용SW'
+ };
+ const fromMethod=Object.prototype.hasOwnProperty.call(explicit,suffix);
+ const kind={servc:'용역',thng:'물품',cnstwk:'공사',frgcpt:'외자'};
+ const area=fromMethod?explicit[suffix]:(kind[String(x.kind||'')]||'');
+ if(!area)return '';
+ const note=fromMethod?'낙찰방법 원문에 명시된 사업분야: '+suffix:
+  '나라장터 공고 업무구분: '+area+' (세부 사업분야 별도 미확인)';
+ return '<span class="job-business-area" title="'+htmlEscape(note)+'" aria-label="'+htmlEscape('사업분야 '+area)+'">'+htmlEscape(area)+'</span>';
+}
+function compactBidMethod(meta){
+ const text=String(meta.awardMethod||'').trim();
+ if(!text)return '';
+ const major={
+  '낙030005':'협상계약',
+  '낙030002':'규격·가격 동시입찰',
+  '낙030001':'적격심사',
+  '낙030029':'소액수의견적',
+  '낙030009':'수의시담',
+  '낙030022':'제한적 최저가',
+  '낙030021':'최저가낙찰',
+  '낙030003':'2단계 경쟁입찰',
+  '낙030010':'2인 수의시담',
+  '낙030004':'다수공급자계약',
+  '낙030016':'기술제안입찰',
+  '낙030033':'안전점검 수행기관 지정',
+  '낙030011':'종합심사낙찰제',
+  '낙030018':'규격적합 최저가'
+ };
+ const code=String(meta.awardMethodCode||'').trim();
+ if(Object.prototype.hasOwnProperty.call(major,code))return major[code];
+ // Unknown codes are not guessed; show the source's leading method type.
+ return text.split('-')[0].trim()||text;
+}
+
 function bidMethodCardMarkup(x){
  if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
  const metadata=g2bCardAwardMetadata(x);
  const floor=g2bAwardFloorDisplay(metadata);
  const fields=[
   {label:'계약방법',value:metadata.contract},
-  {label:'낙찰방법',value:metadata.awardMethod,code:metadata.awardMethodCode},
+  {label:'낙찰방식',value:compactBidMethod(metadata),code:metadata.awardMethodCode,full:metadata.awardMethod},
   {label:'하한율',value:floor.value,status:floor.status,reason:floor.reason}
  ];
  return '<div class="job-bid-methods" aria-label="나라장터 공고 계약·낙찰 정보">'+
@@ -3864,7 +3923,7 @@ function bidMethodCardMarkup(x){
    const code=String(field.code||'').trim();
    const status=/^(?:error|source_missing|pending|unknown|not_applicable)$/.test(field.status||'')?
     ' '+field.status:'';
-   const tip=field.reason?field.reason:(code?'낙찰코드: '+code:'');
+   const tip=field.reason?field.reason:(field.full?'원문: '+field.full+(code?' · 낙찰코드: '+code:''):(code?'낙찰코드: '+code:''));
    const codeHint=tip?' title="'+htmlEscape(tip)+'" tabindex="0"':'';
    return '<div class="job-bid-method-cell'+(!value?' unknown':'')+status+'">'+
     '<span class="job-bid-label">'+htmlEscape(field.label)+'</span>'+
@@ -4112,7 +4171,7 @@ function renderJobs(){
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+'</div>'+
       '<div class="job-core">'+
-       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3></div>'+
+       '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+bidBusinessArea(x)+'</div>'+
        '<div class="job-meta-row"><span class="job-agency" title="'+htmlEscape(x.org||'발주기관 미확인')+'">'+htmlEscape(x.org||'발주기관 미확인')+'</span>'+
         '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div>'+
        bidMethodCardMarkup(x)+
