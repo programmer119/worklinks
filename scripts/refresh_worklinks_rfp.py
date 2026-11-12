@@ -868,7 +868,7 @@ def parse_clauses(text):
 
 # A separate, source-grounded staffing scan. Qualification snippets alone miss
 # tables such as "직무 / 등급 / 인원" and wrapped DOCX/PDF/HWPX rows.
-STAFFING_ROLE_SCAN_VERSION=1
+STAFFING_ROLE_SCAN_VERSION=2
 STAFFING_ROLE_TEXT_LIMIT=350_000
 _STAFF_ROLE=re.compile(
     r'(?<![가-힣A-Za-z0-9])(?:사업\s*책임자|총괄\s*책임자|프로젝트\s*관리자|'
@@ -890,6 +890,31 @@ _STAFF_TABLE_COUNT=re.compile(
     r'(?<!\d)([1-9]\d?)(?!\d|\s*(?:MM|M/M|년|개월|일|건|회|원|%|호))', re.I)
 _STAFF_GRADE=re.compile(r'(?<![가-힣])(?:특급|고급|중급|초급)(?![가-힣])')
 _STAFF_MM=re.compile(r'(?<!\d)(\d{1,3}(?:\.\d{1,2})?)\s*(?:MM|M/M|맨먼스)\b', re.I)
+
+def staffing_role_is_grounded(row):
+    """Reject score, annex and years-of-experience numbers disguised as people."""
+    quote=' '.join(str(row.get('sourceText') or '').split())
+    role=' '.join(str(row.get('role') or '').split())
+    count=int(row.get('count') or 0)
+    if not role or not quote or not 1<=count<=99:return False
+    if (re.search(r'평가\s*항목|평가\s*기준|배\s*점|점수|점\s*이상|산술한\s*수치',quote)
+            and ('|' in quote or role=='기술자')):
+        return False
+    match=re.search(re.escape(role)+r'(.{0,52}?)'+str(count)+
+        r'\s*(?:명|인)(?=\s|$|[.,()·:;]|이상|이하|투입|상주)',quote,re.I)
+    if match:
+        middle=match.group(1)
+        if re.search(r'전담\s*유지\s*보수|별도의?\s*담당자|기타\s*인력|부문별\s*대표자',middle):
+            return False
+        return len(middle)<=32 or bool(re.search(r'최소|이상|투입|필요|배치',middle))
+    if (len(quote)>110 or quote.count('|')<2 or
+            re.search(r'경력|별지|서식|항목|번호|평가|점|년',quote)):
+        return False
+    cells=[cell.strip() for cell in quote.split('|')]
+    return (len(cells)==3 and role in cells[0] and
+            re.search(r'특급|고급|중급|초급',cells[1]) is not None and
+            re.fullmatch(r'[1-9]\d?',cells[2]) is not None and
+            int(cells[2])==count)
 
 def extract_staffing_roles(text, filename, source_url='', excerpt_only=False):
     """Extract explicit role/count pairs, including line-wrapped staffing tables.
@@ -953,7 +978,7 @@ def extract_staffing_roles(text, filename, source_url='', excerpt_only=False):
             previous=len(result)
             parse(combined,idx+1,True)
             if len(result)>previous:break
-    return result
+    return [row for row in result if staffing_role_is_grounded(row)]
 
 def staffing_from_saved_excerpts(file):
     """Best-effort recovery from stored 270-char quotes; NOT a full text scan."""
