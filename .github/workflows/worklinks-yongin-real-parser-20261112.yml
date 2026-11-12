@@ -1,0 +1,46 @@
+name: WorkLinks Yongin real file parser once
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-yongin-real-parser-20261112.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-parse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install readers
+        run: python3 -m pip install -q pyhwp pypdf six
+      - name: Download the two mislabeled official files and check actual extraction
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,runpy,urllib.request,traceback,hashlib
+          m=runpy.run_path('scripts/refresh_worklinks_rfp.py',run_name='yongin_parser_once')
+          files=[
+            ('hwpx_as_hwp','입찰공고문.hwpx',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03'),
+            ('pdf_as_zip','물품공급 및 기술지원 협약서.pdf',
+             'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00062317&rfpOrd=000&rfpUntyAtchFileNo=13')
+          ]
+          for tag,name,url in files:
+            result={'kind':tag}
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+              with m['OPENER'].open(req,timeout=35) as r:
+                raw=r.read(12_000_001)
+                result.update(httpStatus=r.status,bytes=len(raw),magic=raw[:8].hex())
+              if len(raw)>12_000_000: raise ValueError('large_file')
+              data=m['normalize_extracted_text'](m['extract'](name,raw))
+              result.update(extractedChars=len(data),nonblankChars=len(data.strip()),
+                            sourceTextScanComplete=m['preserve_unclassified_qualification'](
+                              data,name,m['extract_rule_candidates'](data,name))['sourceTextScanComplete'],
+                            extractedFiles=data.count('FILE '))
+            except Exception as e:
+              result.update(error=type(e).__name__,message=str(e)[:400])
+            print('YONGIN_REAL_PARSER '+json.dumps(result,ensure_ascii=False),flush=True)
+          PY
