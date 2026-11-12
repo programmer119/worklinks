@@ -377,6 +377,11 @@ def run(data_dir,limit,execute=False,max_files=400):
                       (live.get('readable') is not True or
                        live.get('sourceTextScanComplete') is not True)):
                     live.update(entry)
+                    # dict.update does not delete a formerly failed file's
+                    # error key. A new verified success must remove it.
+                    live.pop('errorCategory',None)
+                    live.pop('error',None)
+                    live.pop('lastHttpStatus',None)
                 elif entry.get('errorCategory') in (
                        'official_attachment_reference_missing_422','pdf_ocr_incomplete'):
                     for field in ('errorCategory','lastHttpStatus','extractionEvidence',
