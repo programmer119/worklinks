@@ -131,6 +131,7 @@ class Provider:
         error=None
         for attempt in range(3):
             self.calls+=1
+            http_status=None
             try:
                 req=urllib.request.Request(url,headers={
                     'Accept':'application/json','User-Agent':'WorkLinks-Top500-Batch/20261111'})
@@ -153,15 +154,17 @@ class Provider:
                 if self.ledger:
                     self.ledger.record('official_batch_http',request_key,'http_ok',
                                        http_status=http_status,
-                                       response_sha256=hashlib.sha256(raw).hexdigest())
+                                       response_sha256=hashlib.sha256(raw).hexdigest(),
+                                       detail=op+':'+start+'-'+end+':page='+str(page))
                     self.ledger.save_json(request_key,{'total':total,'items':items})
                 return total,items
             except (urllib.error.HTTPError,urllib.error.URLError,TimeoutError,RuntimeError,ValueError) as exc:
                 error=exc
                 if self.ledger:
                     self.ledger.record('official_batch_http',request_key,'http_failed',
-                                       http_status=getattr(exc,'code',None),
-                                       error_class=type(exc).__name__)
+                                       http_status=getattr(exc,'code',http_status),
+                                       error_class=type(exc).__name__,
+                                       detail=op+':'+start+'-'+end+':page='+str(page))
                 typ=str(exc)
                 if 'PROVIDER_RESULT_CODE_22' in typ or 'PROVIDER_RESULT_CODE_23' in typ:
                     break
