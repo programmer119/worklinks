@@ -4140,6 +4140,15 @@ function renderJobs(){
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
    (!g2bServerAvailable&&g2bSavedKnownTotal>0);
  document.getElementById('partnerJobCount').textContent='('+candidateJobs.length+(partialServerList?' · 일부':'')+')';
+ const knownServerCount=Math.max(g2bSavedKnownTotal,g2bSavedTotal);
+ const listCoverageText=partialServerList?
+  'DB '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+
+   (knownServerCount?knownServerCount.toLocaleString('ko-KR'):'전체 미확인')+
+   '건 '+(g2bSavedLoadError?'조회 실패 · 재시도 가능':'수신 중')+' · ':'';
+ const partnerCountButton=document.querySelector('.jobf[data-jobf="partner"]');
+ if(partnerCountButton)partnerCountButton.title=partialServerList?
+  '현재 불러온 공고에서만 집계 중 · '+listCoverageText.trim():
+  '서버 DB 전체 조회 완료 기준 파트너 협업 공고';
  // Always show nonzero officially verified BASIC qualifications outside the
  // collapsed diagnostics. Neither count is a full-document bid approval.
  document.getElementById('partnerSummary').textContent=
@@ -4161,7 +4170,7 @@ function renderJobs(){
  }).length;
  const summaryEl=document.getElementById('jobDecisionSummary');
  if(summaryEl)summaryEl.textContent=
-  '적격 후보 '+readyCount+'건 · 자격 확인 완료 '+verifiedCount+
+  listCoverageText+'적격 후보 '+readyCount+'건 · 자격 확인 완료 '+verifiedCount+
   '건 · 원문 기계검토 '+(qualificationReviewLoaded?
    considered.filter(o=>{const id=jobBidIdentity(o.x);return id&&qualificationReviewByNotice.has(id.bidNo+':'+id.order)}).length+'건':'집계 대기')+
   ' · 원문 검토 완료 '+(qualificationReviewLoaded?
