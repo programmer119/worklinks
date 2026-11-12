@@ -85,4 +85,18 @@ with tempfile.TemporaryDirectory() as tmp:
     assert recovered['reviewComplete'] is False
     assert stored['byNotice']['R26BK01234568:000']==base
     assert gzip.decompress((snap/'rfp-coverage-index.json.gz').read_bytes())==payload
+
+# When the snapshot metadata index lacks a notice, archived official source URLs
+# are sufficient; the government metadata endpoint must NOT be called.
+lost={'manifestComplete':True,'files':[
+    {'name':file1,'readable':True,'sourceTextScanComplete':True,'sourceUrl':good_url},
+    {'name':file2,'readable':False,'sourceTextScanComplete':False,'sourceUrl':source_url}]}
+meta,origin=task.metadata_for(report_key,lost,{},Path('/nonexistent/ledger.sqlite3'),
+                               [({report_key:lost},'archived_full_scan')])
+assert origin=='archived_full_scan'
+assert task.metadata_valid(meta,lost)
+changed={**lost,'manifestChangePending':True}
+assert task.metadata_for(report_key,changed,{},Path('/nonexistent/ledger.sqlite3'),
+                         [({report_key:lost},'archive')])[0] is None
+
 print('WORKLINKS_OPEN_RFP_CACHED_REPAIR_TEST=PASS')
