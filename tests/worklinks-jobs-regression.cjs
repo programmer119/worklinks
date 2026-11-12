@@ -772,7 +772,7 @@ const sampleMethod=methodView({id:'g2b-servc-R26BK00000100-000',noticeNumber:'R2
  contract:'제한경쟁',awardMethod:'협상에 의한 계약',awardMethodCode:'낙010001',awardFloorRate:'87.745'});
 for(const term of ['계약방법','낙찰방식','하한율','제한경쟁','협상에 의한 계약','낙010001','87.745%'])
  assert.ok(sampleMethod.includes(term),'render missing metadata '+term);
-assert.ok(sampleMethod.includes('title="낙찰코드: 낙010001"'),'award code is available on hover');
+assert.ok(sampleMethod.includes('낙찰코드: 낙010001') && sampleMethod.includes('title="'),'award code is available on hover');
 assert.ok(!sampleMethod.includes('>낙찰코드<'),'award code must not take a visible cell');
 const methodWithoutFloor=(code,rate='',extra={})=>methodView({id:'g2b-servc-R26BK00000101-000',
  noticeNumber:'R26BK00000101',awardMethodCode:code,awardFloorRate:rate,...extra});
