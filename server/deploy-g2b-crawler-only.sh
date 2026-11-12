@@ -45,8 +45,10 @@ start_crawler(){
  dk run -d --name "$CRAWLER" --restart unless-stopped --network host \
   -e G2B_SECRET_PATH=/run/secrets/g2b.env \
   -e G2B_DB_PATH=/app/data/bids.sqlite3 \
+  -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
   -e G2B_BACKFILL_DAYS=14 -e G2B_REFRESH_DAYS=3 -e G2B_INTERVAL_SECONDS=3600 \
   -v "$TARGET:/app/g2b-full-crawler.py:ro" \
+  -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
   -v "$SECRET:/run/secrets/g2b.env:ro" \
   -v "$BASE/data:/app/data" \
   "$IMG" python -u /app/g2b-full-crawler.py >/dev/null
