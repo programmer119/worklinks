@@ -843,14 +843,28 @@ def read_saved_rfp_evidence_index():
             _SEARCH_RFP_SNAPSHOT.update(modified=modified,byNotice=doc['byNotice'])
         return _SEARCH_RFP_SNAPSHOT['byNotice']
 
-def saved_rfp_search_state(row):
-    """Give UI *actual saved source excerpts*, never request another official API."""
+def saved_rfp_search_state(row, compact=False):
+    """Expose persisted RFP scan provenance; never call official API on page load."""
     if not isinstance(row,dict):
         return {'sourceAvailable':True,'seen':False}
     files=row.get('files') if isinstance(row.get('files'),list) else []
     good=bool(row.get('manifestComplete') is True and
         row.get('status')=='text_extracted_requires_review' and
         files and all(x.get('readable') is True for x in files))
+    # File-level truth (download/parse errors vs. all files readable).
+    scan_complete=bool(good and all(
+        f.get('sourceTextScanComplete') is True and
+        f.get('qualificationScanTruncated') is not True and
+        int(f.get('unmatchedQualificationAnchorCount') or 0)==0
+        for f in files))
+    file_statuses=[{
+        'name':str(f.get('name') or '')[:140],
+        'readable':f.get('readable') is True,
+        'errorCategory':str(f.get('errorCategory') or '')[:90],
+        'textScanComplete':f.get('sourceTextScanComplete') is True,
+        'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
+        'unmatchedQualificationAnchorCount':int(f.get('unmatchedQualificationAnchorCount') or 0)
+    } for f in files[:16]]
     evidence=row.get('changcomClauseEvidence') or {}
     # These URLs were preserved from the OFFICIAL attachment manifests.
     # Do not invent URLs from filenames, and do not send untrusted hosts to UI.
@@ -868,6 +882,23 @@ def saved_rfp_search_state(row):
         if len(official_files)>=12:break
     official_by_name={v['name']:v['url'] for v in official_files}
     clause_types=evidence.get('clauseCandidates') or {}
+    # The ordinary list needs only a tiny, deterministic hint per row, not
+    # 23MB source JSON nor the full list of excerpts. This avoids a slow refresh.
+    if compact:
+        labels=[]
+        for typ in ('staff_proof',):
+            for item in ((evidence.get('clauseCandidates') or {}).get(typ) or [])[:3]:
+                if not isinstance(item,dict):continue
+                quote=' '.join(str(item.get('text') or '').split())[:330]
+                if not quote:continue
+                labels.append({'type':typ,'text':quote,
+                    'sourceFile':str(item.get('sourceFile') or '')[:140]})
+        return {'sourceAvailable':True,'seen':True,'complete':good,
+            'scanComplete':scan_complete,
+            'status':str(row.get('status') or 'unknown')[:48],
+            'documentCount':len(files),
+            'readableCount':sum(x.get('readable') is True for x in files),
+            'excerpts':labels[:3]}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
     # NOT an interpretation that the bidder is qualified.
     excerpts=[]
@@ -889,11 +920,13 @@ def saved_rfp_search_state(row):
                 if len(excerpts)>=12:break
             if len(excerpts)>=12:break
     return {'sourceAvailable':True,'seen':True,'complete':good,
+            'scanComplete':scan_complete,
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
             'readableCount':sum(x.get('readable') is True for x in files),
             'excerptCount':len(excerpts),
-            'excerpts':excerpts,'officialFiles':official_files}
+            'excerpts':excerpts,'officialFiles':official_files,
+            'fileStatuses':file_statuses}
 
 def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
@@ -943,13 +976,14 @@ def query_saved_bids(limit,offset,only_sw=False,query=''):
                 try: obj['supplementalBidFacts']=json.loads(extra)
                 except (ValueError,TypeError): pass
             items.append(obj)
-        if query:
-            source=read_saved_rfp_evidence_index()
-            for obj in items:
-                key=str(obj.get('bidNo') or '')+':'+str(obj.get('order') or '000').zfill(3)
-                obj['rfpSavedState']=(saved_rfp_search_state(source.get(key))
-                                     if source is not None else
-                                     {'sourceAvailable':False,'seen':False})
+        # This is a read-only lookup in an already downloaded local JSON index.
+        # Always publish a compact card state; search includes file-level causes.
+        source=read_saved_rfp_evidence_index()
+        for obj in items:
+            key=str(obj.get('bidNo') or '')+':'+str(obj.get('order') or '000').zfill(3)
+            obj['rfpSavedState']=(saved_rfp_search_state(source.get(key),compact=not bool(query))
+                                 if source is not None else
+                                 {'sourceAvailable':False,'seen':False})
         checked=con.execute('SELECT COUNT(*) FROM bid_license_cache').fetchone()[0]
         linked=con.execute("SELECT COUNT(*) FROM bid_notices b INNER JOIN bid_license_cache q "
             "ON b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
