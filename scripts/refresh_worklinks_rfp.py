@@ -57,19 +57,19 @@ CHANGCOM_SOURCE=ROOT/'startup-support/changcom-actionable.json'
 CHANGCOM_EVIDENCE_DEST=ROOT/'startup-support/changcom-rfp-evidence.json'
 CHANGCOM_BACKFILL60=ROOT/'startup-support/audits/changcom-rfp-backfill-60-20261110.json'
 CHANGCOM_URGENT_RECOVERY=ROOT/'startup-support/audits/changcom-priority-rfp-recovery-20261111.json'
-MAX_FILE=12_000_000
+MAX_FILE=24_000_000
 # OCR is local-only and bounded to prevent runaway attachment processing.
-MAX_PDF_OCR_PAGES=8
+MAX_PDF_OCR_PAGES=24
 MAX_PDF_OCR_PIXELS=12_000_000
 PDF_OCR_TARGET_DPI=300
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
 # 3MB per member was rejecting real official documents before text extraction.
-MAX_HWPX_XML_MEMBER=10_000_000
-MAX_HWPX_XML_TOTAL=45_000_000
-HWPX_READER_VERSION=2
+MAX_HWPX_XML_MEMBER=28_000_000
+MAX_HWPX_XML_TOTAL=90_000_000
+HWPX_READER_VERSION=3
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
-TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip')
+TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')
 CLASSIFICATION_VERSION=23
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
@@ -451,6 +451,34 @@ def _ocr_pdf_page(raw,index):
     return result.stdout.decode('utf-8','replace')
 
 
+def _extract_image_with_audit(raw):
+    """OCR a bounded, real raster image; fail closed on unreadable text."""
+    from PIL import Image,ImageOps,ImageFile
+    Image.MAX_IMAGE_PIXELS=12_000_000
+    ImageFile.LOAD_TRUNCATED_IMAGES=False
+    with Image.open(io.BytesIO(raw)) as source:
+        if source.width*source.height>12_000_000:
+            raise ValueError('image_ocr_page_too_large')
+        image=ImageOps.exif_transpose(source)
+        image=image.convert('RGB')
+        if min(image.size)<1150:
+            scale=min(2.5,1150/max(1,min(image.size)),
+                (12_000_000/max(1,image.width*image.height))**.5)
+            if scale>1.0:
+                image=image.resize((int(image.width*scale),int(image.height*scale)))
+        out=io.BytesIO()
+        image.save(out,format='PNG')
+    run=subprocess.run(['tesseract','stdin','stdout','-l','kor+eng',
+                        '--psm','3','--dpi','300'],input=out.getvalue(),
+                        capture_output=True,timeout=28,check=False)
+    if run.returncode:
+        raise ValueError('image_ocr_engine_failed')
+    text=run.stdout.decode('utf-8','replace')
+    if sum(c.isalnum() for c in text)<12:
+        raise ValueError('image_ocr_incomplete')
+    return text
+
+
 def _extract_pdf_with_audit(raw):
     """Keep readable native pages; OCR only pages lacking native text."""
     from pypdf import PdfReader
@@ -535,6 +563,7 @@ def classify_failure(error):
            'redirect_forbidden','oversize_json','egg_archive_requires_converter',
            'nested_archive_requires_review','unknown_archive_member_requires_review',
            'archive_no_searchable_documents','unsafe_archive_path','large_xml_section',
+            'image_ocr_incomplete','image_ocr_page_too_large','image_ocr_engine_failed',
             'pdf_ocr_incomplete','pdf_ocr_engine_unavailable','pdf_ocr_renderer_unavailable')
     return next((v for v in known if v in detail),'file_extract_failure')
 
@@ -681,6 +710,9 @@ def extract(name,raw):
             n='.zip'
     elif not n.endswith(TEXT_FORMATS):
         raise ValueError('unsupported_format')
+    # Verify actual magic and dimensions with Pillow before processing images.
+    if n.endswith(('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')):
+        return _extract_image_with_audit(raw)
     if n.endswith('.egg'):
         raise ValueError('egg_archive_requires_converter')
     if n.endswith('.zip'):
@@ -1440,7 +1472,7 @@ def process(no,ordn,metadata=None,previous=None):
                 _NOTICE_CONTEXT.notice_key=None
             extracted,source_evidence=extract_with_source_status(name,raw)
             content=normalize_extracted_text(extracted)
-            if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx')) else 100):
+            if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.webp')) else 100):
                 raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
