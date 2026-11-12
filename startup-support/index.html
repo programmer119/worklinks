@@ -428,25 +428,23 @@
 #jobCards .job-mini .job-source-link{flex:none;margin-left:auto}
 /* Bid evidence is a scan aid, not the main sentence of the card.
    Never clamp title, decision reasoning or required follow-up evidence. */
-#jobCards .job-highlights{gap:5px 6px}
-/* Keep the research priority in the same right-hand column on every card. */
-#jobCards .job-highlights{display:grid;grid-template-columns:minmax(0,1fr) 110px;align-items:start;column-gap:8px}
+/* Bid card: qualification / history / review priority / original link */
+#jobCards .job-eligibility-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+#jobCards .job-eligibility-row .job-req-strip{margin:0;gap:6px}
+#jobCards .job-eligibility-row .job-basic-signal{min-height:32px;padding:5px 9px;font-size:13px;line-height:1.3;white-space:nowrap}
+#jobCards .job-eligibility-row .job-basic-signal.adv-medium{color:#166534;background:#f0fdf4;border-color:#86efac}
+#jobCards .job-eligibility-row .job-partners{flex:0 1 auto;max-width:none;white-space:normal}
+#jobCards .job-highlights{display:grid;grid-template-columns:minmax(0,1fr) 112px auto;align-items:center;column-gap:8px;row-gap:4px;min-width:0;gap:4px 8px}
 #jobCards .job-highlight-tags{display:flex;flex-wrap:wrap;align-items:center;gap:5px 6px;min-width:0}
-#jobCards .job-highlights .job-advantage{grid-column:2;grid-row:1;display:grid;grid-template-columns:13px minmax(0,1fr);column-gap:6px;align-items:center;justify-self:start;margin:0;min-width:0}
-#jobCards .job-highlights .advantage-pills{display:flex;flex-direction:column;gap:2px;grid-column:1;grid-row:1/3;align-self:center}
+#jobCards .job-highlights .job-advantage{display:flex;align-items:center;justify-self:start;grid-column:2;gap:6px;min-width:0}
+#jobCards .job-highlights .advantage-pills{display:flex;flex-direction:column;gap:2px;flex:none}
 #jobCards .job-highlights .advantage-pill{display:block;width:12px;height:7px;background:#e2e8f0;border-radius:4px}
 #jobCards .job-highlights .advantage-pill.is-filled{background:currentColor}
-#jobCards .job-highlights .advantage-label{grid-column:2;grid-row:1;font-size:12px;line-height:1.3}
+#jobCards .job-highlights .advantage-label{font-size:12px;line-height:1.3;white-space:nowrap;font-weight:850}
 #jobCards .job-highlights .advantage-reason,#jobCards .job-advantage .advantage-reason{display:none!important}
-@media(max-width:680px){#jobCards .job-highlights{grid-template-columns:minmax(0,1fr) 110px;column-gap:6px}}
-#jobCards .job-highlights .job-advantage{
- flex:0 1 auto;min-width:0;gap:3px 5px
-}
-#jobCards .job-highlights .advantage-reason{
- flex:0 1 auto;max-width:100%;color:#526174;
- overflow-wrap:anywhere
-}
+#jobCards .job-highlights .job-source-link{grid-column:3;justify-self:end;align-self:center;margin:0;padding:5px 9px;font-size:12px;min-height:30px}
 #jobCards .job-highlight-tags>.tag,#jobCards .job-highlight-tags>.job-repeat{min-height:23px;padding:3px 6px}
+@media(max-width:560px){#jobCards .job-highlights{grid-template-columns:minmax(0,1fr) 100px auto;column-gap:5px}#jobCards .job-highlights .job-source-link{font-size:11px;padding:5px 6px}}
 #jobCards .job-verdict-row .job-verdict-why{order:1}
 #jobCards .job-verdict-row .job-verdict-checks{order:2}
 @media(max-width:1100px){#jobCards.cards{grid-template-columns:1fr}}
@@ -465,16 +463,16 @@
 #jobCards .job-mini .job-headline h3{min-width:0;width:100%}
 /* Price belongs to a fixed right column, not after the variable-height title. */
 #jobCards .job-mini .job-headline-side{display:flex;flex-direction:column;align-items:flex-end;justify-self:end;min-width:0}
-#jobCards .job-mini .job-headline-badge{min-height:39px;display:flex;align-items:flex-start;justify-content:flex-end}
+#jobCards .job-mini .job-headline-badge{min-height:31px;display:flex;align-items:flex-start;justify-content:flex-end}
 #jobCards .job-mini .job-headline-side .job-amount{display:block;margin:0;font-size:14px;line-height:1.5;text-align:right;max-width:none;white-space:nowrap}
 #jobCards .job-mini .job-business-area{display:inline-flex;align-items:center;justify-content:center;max-width:146px;min-height:27px;padding:4px 9px;border:1px solid #d9e1eb;border-radius:7px;background:#f8fafc;color:#334155;font-size:13px;font-weight:750;line-height:1.35;white-space:normal;text-align:center;overflow-wrap:anywhere}
 @media(max-width:490px){#jobCards .job-mini .job-headline{gap:7px}#jobCards .job-mini .job-business-area{max-width:105px;font-size:12px;padding:4px 7px}}
 
 /* G2B contract and award metadata: four structured API fields, no RFP parsing. */
 #jobCards .job-bid-methods{
- display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);
- gap:5px 10px;padding:8px 10px;border:1px solid #dfe7f0;
- border-radius:9px;background:#f8fafc;min-width:0
+ display:flex;flex-wrap:wrap;align-items:center;
+ gap:4px 16px;padding:6px 9px;border:1px solid #dfe7f0;
+ border-radius:8px;background:#f8fafc;min-width:0
 }
 #jobCards .job-bid-method-cell{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:12.5px;line-height:1.55}
 #jobCards .job-bid-label{flex:none;color:#64748b;font-weight:750;white-space:nowrap}
@@ -486,7 +484,7 @@
 #jobCards .job-bid-method-cell.pending .job-bid-value{color:#64748b}
 #jobCards .job-bid-method-cell.not_applicable .job-bid-value{color:#475569}
 @media(max-width:680px){
- #jobCards .job-bid-methods{grid-template-columns:1fr;gap:4px}
+ #jobCards .job-bid-methods{gap:4px 12px}
  #jobCards .job-bid-method-cell{font-size:13px}
 }
 
@@ -4362,7 +4360,7 @@ function g2bAwardFloorDisplay(metadata){
  // Non-applicable classification comes from verified official award-method codes,
  // not from a blank numeric value.
  if(/^(?:낙030002|낙030003|낙030004|낙030005|낙030006|낙030009|낙030011|낙030016|낙030018|낙030021)$/.test(code))
-  return {value:'하한율 비적용',status:'not_applicable',
+  return {value:'비적용',status:'not_applicable',
     reason:'낙찰방법 코드 '+code+'에 일반적인 숫자 낙찰하한율을 적용하지 않습니다. 원문 특약은 별도 확인'};
  if(metadata.fetchFailed)
   return {value:'수집 실패',status:'error',
@@ -4714,8 +4712,9 @@ function renderJobs(){
      }).join(' · ')+'</div>':'';
     const repeat=n?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'" aria-label="'+n+'년 연속 사업 연도별 업체 확인">'+n+'년 연속</button>':'';
     const extras=Array.isArray(x.variants)&&x.variants.length>1?'<span class="tag">유사공고 '+x.variants.length+'</span>':'';
-    const highlightTags=basicBidMarkup(x)+repeat+competitionLabel+extras;
-     const highlights=highlightTags||opportunityMarkup?'<div class="job-highlight-tags">'+highlightTags+'</div>'+opportunityMarkup:'';
+    const qualification=basicBidMarkup(x);
+    const highlightTags=repeat+competitionLabel+extras;
+    const highlights='<div class="job-highlight-tags">'+highlightTags+'</div>'+opportunityMarkup;
     return '<article class="card job-mini" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title)+' 상세보기">'+
       '<div class="job-day '+htmlEscape(day.kind)+'" title="'+htmlEscape(t.label)+' · '+htmlEscape(t.text)+'" aria-label="입찰마감 '+htmlEscape(day.label)+' · '+htmlEscape(jobDeadlineStamp(t))+'">'+
       '<strong>'+htmlEscape(day.label)+'</strong>'+(t.end===null?'':'<span class="job-date">'+htmlEscape(jobDeadlineStamp(t))+'</span>')+jobInstitutionBadges(x)+'</div>'+
@@ -4725,10 +4724,9 @@ function renderJobs(){
        '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div></div>'+
        bidMethodCardMarkup(x)+
        jobCollectionMarkup(x)+
-       jobRequirementBadges(x)+
+       '<div class="job-eligibility-row">'+qualification+jobRequirementBadges(x)+partner+'</div>'+
        (member&&partnerMode?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
-       (highlights?'<div class="job-highlights">'+highlights+'</div>':'')+
-       '<div class="job-footer">'+partner+
+       '<div class="job-highlights">'+highlights+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 원문 공고 새 탭으로 열기">원문 ↗</a>'+
        '</div></div></article>';
   }).join(''):'<div class="emptycard">'+
