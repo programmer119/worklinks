@@ -852,6 +852,21 @@ def saved_rfp_search_state(row):
         row.get('status')=='text_extracted_requires_review' and
         files and all(x.get('readable') is True for x in files))
     evidence=row.get('changcomClauseEvidence') or {}
+    # These URLs were preserved from the OFFICIAL attachment manifests.
+    # Do not invent URLs from filenames, and do not send untrusted hosts to UI.
+    official_files=[]
+    for f in (evidence.get('files') or []):
+        if not isinstance(f,dict):continue
+        file_url=str(f.get('url') or '').strip()
+        file_name=str(f.get('name') or '').strip()[:140]
+        parsed=urllib.parse.urlsplit(file_url)
+        host=(parsed.hostname or '').lower()
+        if (parsed.scheme!='https' or not (host=='g2b.go.kr' or
+                host.endswith('.g2b.go.kr')) or not file_name):continue
+        if file_url not in [v['url'] for v in official_files]:
+            official_files.append({'name':file_name,'url':file_url})
+        if len(official_files)>=12:break
+    official_by_name={v['name']:v['url'] for v in official_files}
     clause_types=evidence.get('clauseCandidates') or {}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
     # NOT an interpretation that the bidder is qualified.
@@ -869,6 +884,7 @@ def saved_rfp_search_state(row):
                     'type':str(category)[:48],
                     'text':quote,
                     'sourceFile':str(item.get('sourceFile') or '')[:140],
+                    'sourceUrl':official_by_name.get(str(item.get('sourceFile') or '')[:140], ''),
                     'codes':[str(v)[:16] for v in (item.get('codes') or [])[:5]]})
                 if len(excerpts)>=12:break
             if len(excerpts)>=12:break
@@ -877,7 +893,7 @@ def saved_rfp_search_state(row):
             'documentCount':len(files),
             'readableCount':sum(x.get('readable') is True for x in files),
             'excerptCount':len(excerpts),
-            'excerpts':excerpts}
+            'excerpts':excerpts,'officialFiles':official_files}
 
 def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
