@@ -663,13 +663,13 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
     <p class="partner-foot">※ 확인된 사업분야와 입찰 참가자격은 다릅니다. 업종코드·직접생산증명서는 유효한 원문 확인 전까지 보유로 표시하지 않습니다. 신규 파트너는 목록 데이터에 업체별로 추가합니다.</p>
   </div>
 </div>
-<div class="workspace-tabs" role="tablist" aria-label="WorkLinks">
-  <button class="workspace-tab on" data-view="support">창업지원</button>
-  <button class="workspace-tab worklinks-partner-only" data-view="changcom">공공입찰·창컴협업</button>
-  <button class="workspace-tab" data-view="jobs">일반 일감</button>
-  <button class="workspace-tab" data-view="sales">영업대행</button>
+<nav class="workspace-tabs" aria-label="WorkLinks 주요 메뉴">
+  <button type="button" class="workspace-tab on" data-view="support" aria-current="page">창업지원</button>
+  <button type="button" class="workspace-tab worklinks-partner-only" data-view="changcom">공공입찰·창컴협업</button>
+  <button type="button" class="workspace-tab" data-view="jobs">일반 일감</button>
+  <button type="button" class="workspace-tab" data-view="sales">영업대행</button>
   <a class="workspace-tab" href="./spaces.html" style="display:flex;align-items:center;justify-content:center;text-decoration:none">공간활용</a>
-</div>
+</nav>
 <section id="supportView" class="workspace-view on">
 <div class="panel"><div class="tabs"><button class="tab on" data-tab="all">전체</button><button class="tab" data-tab="general">일반</button><button class="tab" data-tab="patent">특허</button><button class="tab" data-tab="consulting">설명회·컨설팅</button><button class="tab" data-tab="yearEndLocalBudget">연말긴급지방예산</button><button class="tab" data-tab="business">사업자</button><button class="tab" data-tab="hidden">숨김</button></div><div class="filters"><button class="f on" data-f="all">전체</button><button class="f" data-f="eligible">지원가능</button><button class="f" data-f="ineligible">불가</button><button class="f" data-f="applied">지원완료</button><span class="stats" id="stats"></span></div><div class="support-history-search" role="search" aria-label="창업지원공고 찾기">
   <div class="support-search-row">
@@ -738,7 +738,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
         <p class="bid-guide-footer">※ 위 항목들은 이해를 위한 실무 분류예요. '소액수의 견적'은 낙찰 평가법이 아니라 별도의 계약 절차이며, 2단계 경쟁과 규격·가격 동시입찰도 절차가 달라요. 실제 참가자격·점수 비율·낙찰하한율·가격 산식은 <a href="https://www.g2b.go.kr/" target="_blank" rel="noopener noreferrer">나라장터 공고문</a>을 우선 확인하세요.</p>
       </div>
     </details>
-        <div class="note">업종과 발주기관 분야에 상관없이 SW·DB·데이터·AI 관련 발주를 탐색합니다. 파트너 협업에는 직접수주·공동수급·분담이행·공급/납품 참여 가능성을 구분해 표시하고, 미확인 자격 때문에 검색단계에서 제외하지 않습니다.</div>
+        <div class="note">업종과 발주기관 분야에 상관없이 SW·DB·데이터·AI 관련 발주를 탐색합니다. 공고별 원문과 입찰조건을 우선 확인합니다.</div>
         <div class="note"><b>자동확인 소스</b> · 개별 협회/학회/연맹/조합 홈페이지 · 네이버 카페 공개글 · BAND 공개페이지 · 업종 커뮤니티 · Facebook 공개그룹 · Discord 공개영역 · 일반 웹검색 <span class="warn">· 회원전용/비공개는 접근제한으로 표시</span></div>
         <div class="note worklinks-partner-only partner-jobs-only">파트너 협업은 분야 적합성으로 찾은 <b>검토후보</b>입니다. 공동수급 허용·하도급·업종코드·직접생산·기술인력·납기 등은 공고 원문과 파트너 증빙을 대조해야 하며, 자격 미확인을 불가로 단정하지 않습니다. 카페·BAND 등의 탐색경로는 별도 분류합니다.</div>
         <small class="job-vf-note worklinks-partner-only partner-jobs-only">업체별 자격·증빙 근거 기준 · 미확인 자료는 상세 화면에 표시하고, 명확한 탈락 사유가 확인될 때만 제외</small>
@@ -801,7 +801,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   <span class="job-advantage-explain">공고·업체 구조화 자료 기준의 1차 선별입니다. 입찰자격 확정이나 실제 경쟁률이 아닙니다. 과거 개찰 수치는 확인된 공고에만 별도 표시합니다.</span>
  </div>
 
- </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf" id="competitionLoadMore" title="서버 DB에 저장된 공식 과거 낙찰 결과를 다시 읽습니다. 신규 조사는 서버 수집기가 시간당 최대 2건 수행합니다">과거 경쟁 캐시 새로고침 <span id="competitionLoadStatus">(조회 전)</span></button></div>
+ </div><div class="job-sort-row"><label for="jobSort">일감 정렬</label><select id="jobSort"><option value="deadline">마감 임박순</option><option value="qualified" selected>1차 검토 우선순 (기본)</option><option value="recent">공고 최신순</option><option value="budget">예산 높은순</option><option value="competition">과거 경쟁 적은 순</option></select><button type="button" class="job-vf partner-jobs-only" id="competitionLoadMore" title="서버 DB에 저장된 공식 과거 낙찰 결과를 다시 읽습니다. 신규 조사는 서버 수집기가 시간당 최대 2건 수행합니다">과거 경쟁 캐시 새로고침 <span id="competitionLoadStatus">(조회 전)</span></button></div>
 
 
   </div>
@@ -4581,7 +4581,7 @@ function setWorkspaceView(view){
  if(changed){
   document.querySelectorAll(".workspace-tab[data-view]").forEach(b=>{
    const on=b.dataset.view===view;b.classList.toggle('on',on);
-   b.setAttribute('aria-selected',on?'true':'false');
+   b.setAttribute('aria-current',on?'page':'false');
   });
   document.querySelectorAll(".workspace-view").forEach(v=>v.classList.remove('on'));
   target.classList.add('on');
