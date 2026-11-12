@@ -74,7 +74,11 @@ def open_candidates(data_dir,now):
 
 
 def failed_files(scan):
-    return [f for f in scan.get('files') or [] if isinstance(f,dict)
+    files=scan.get('files') or []
+    # Do not download or retry an HWP that a fully read, same-name official
+    # PDF already covers. Keep the HWP binary explicitly unread.
+    return [f for f in files if isinstance(f,dict)
+       and not rfp.hwp_covered_by_verified_pdf(f,files)
        and (f.get('readable') is not True or f.get('sourceTextScanComplete') is not True
             or f.get('qualificationScanTruncated') is True
             or int(f.get('unmatchedQualificationAnchorCount') or 0)>0)]
