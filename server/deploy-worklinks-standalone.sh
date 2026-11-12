@@ -29,7 +29,9 @@ dk run --rm "$IMAGE" sh -c \
   'git --version; node --version; python -c "import requests,bs4,certifi,playwright;print(\"STANDALONE_RUNTIME_DEPS=PASS\")"; test -x /usr/bin/chromium'
 if cmp -s "$SCRIPT" "$TARGET" &&
    test "$(dk inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null || true)" = true &&
-   test "$(dk inspect -f '{{.Config.Image}}' "$CONTAINER" 2>/dev/null || true)" = "$IMAGE";then
+   test "$(dk inspect -f '{{.Config.Image}}' "$CONTAINER" 2>/dev/null || true)" = "$IMAGE" &&
+   dk inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$CONTAINER" |
+     grep -qx 'WORKLINKS_RFP_LEDGER_DB=/app/g2b-data/rfp-request-ledger.sqlite3';then
   echo STANDALONE_ALREADY_CURRENT=PASS
   exit 0
 fi
@@ -62,7 +64,9 @@ start_container(){
     -e WORKLINKS_DATA=/app/data \
     -e WORKLINKS_SNAPSHOT_DIR=/app/snapshots \
     -e WORKLINKS_CHROMIUM_PATH=/usr/bin/chromium \
+    -e WORKLINKS_RFP_LEDGER_DB=/app/g2b-data/rfp-request-ledger.sqlite3 \
     -v "$BASE/data/standalone:/app/data" \
+    -v "$BASE/data:/app/g2b-data" \
     -v "$BASE/data/snapshots:/app/snapshots" \
     -v "$TARGET:/app/worklinks-standalone-jobs.py:ro" \
     "$1" python -u /app/worklinks-standalone-jobs.py >/dev/null
