@@ -38,6 +38,28 @@ ORIGINS = ('https://worklinks.suaveforge.com', 'https://programmer119.github.io'
 cache = {}
 lock = threading.Lock()
 award_fetch_lock = threading.Lock()  # serialize identical official award requests
+_SHARED_LEDGER=None
+_SHARED_LEDGER_LOCK=threading.Lock()
+
+def api_request_ledger():
+    global _SHARED_LEDGER
+    path=os.environ.get('WORKLINKS_RFP_LEDGER_DB')
+    if not path or sys.version_info[0]<3:return None
+    if _SHARED_LEDGER is None:
+        with _SHARED_LEDGER_LOCK:
+            if _SHARED_LEDGER is None:
+                from rfp_call_ledger import CallLedger
+                _SHARED_LEDGER=CallLedger(path)
+    return _SHARED_LEDGER
+
+def stable_api_key(*values):
+    from rfp_call_ledger import cache_key
+    return cache_key(*values)
+
+def api_ledger_event(ledger,kind,key,outcome,**fields):
+    if ledger is not None:
+        ledger.record(kind,key,outcome,**fields)
+
 
 def get_key():
     k = os.environ.get('G2B_SERVICE_KEY', '').strip()
@@ -130,6 +152,23 @@ def request_api(base, operation, params):
     args = {'serviceKey':token, 'type':'json'}
     args.update(params)
     url = base + '/' + operation + '?' + urlencode(args)
+    ledger=api_request_ledger()
+    identity=(str(params.get('bidNtceNo') or params.get('bidNo') or '')+
+              ':'+str(params.get('bidNtceOrd') or params.get('order') or '000').zfill(3)
+              if params.get('bidNtceNo') or params.get('bidNo') else None)
+    key=(stable_api_key('upstream',base,operation,sorted(
+             (str(k),str(v)) for k,v in params.items()))
+         if ledger is not None else None)
+    if ledger is not None:
+        ttl=(12*3600 if base in (AWARD_BASE,CONTRACT_BASE,
+                                CONTRACT_PROCESS_BASE) else
+             3600 if base==API_BASE else 6*3600)
+        cached=ledger.get_json(key,max_age_seconds=ttl)
+        if (isinstance(cached,dict) and isinstance(cached.get('items'),list)
+                and isinstance(cached.get('totalCount'),int)):
+            api_ledger_event(ledger,'upstream_api',key,'verified_cache_reused',
+                             notice_key=identity)
+            return cached
     # Share one circuit breaker among all requests for this upstream service.
     # During provider quota exhaustion do not multiply futile calls across notices.
     with lock:
@@ -147,23 +186,39 @@ def request_api(base, operation, params):
             'Accept':'application/json', 'User-Agent':'WorkLinksG2B/1.0'
         }), timeout=14)
         raw = response.read()
+        http_code=getattr(response,'status',200)
     except HTTPError as e:
+        api_ledger_event(ledger,'upstream_http',key,'http_failed',
+                         notice_key=identity,http_status=e.code,
+                         error_class='HTTPError')
         error=classify_upstream_http_error(e)
         record_upstream_limit(base,operation,error)
         raise ApiError(error)
-    except (URLError, IOError, ValueError): raise ApiError('upstream_unreachable')
+    except (URLError, IOError, ValueError) as exc:
+        api_ledger_event(ledger,'upstream_http',key,'http_failed',
+                         notice_key=identity,error_class=type(exc).__name__)
+        raise ApiError('upstream_unreachable')
     try: doc = json.loads(raw.decode('utf-8'))
-    except (ValueError, UnicodeError): raise ApiError('upstream_not_json')
+    except (ValueError, UnicodeError):
+        api_ledger_event(ledger,'upstream_http',key,'invalid_json',
+                         notice_key=identity,http_status=http_code)
+        raise ApiError('upstream_not_json')
     # Bad request parameters may receive a valid HTTP 200 and a provider-specific
     # error envelope rather than the documented response/header structure.
     # Never interpret this response as an empty result or leak its free text.
-    if not isinstance(doc,dict):raise ApiError('upstream_malformed_response')
+    if not isinstance(doc,dict):
+        api_ledger_event(ledger,'upstream_http',key,'invalid_response',notice_key=identity,http_status=http_code)
+        raise ApiError('upstream_malformed_response')
     if 'nkoneps.com.response.ResponseError' in doc:
+        api_ledger_event(ledger,'upstream_http',key,'provider_error',notice_key=identity,http_status=http_code)
         raise ApiError('upstream_provider_response_error')
     envelope=doc.get('response')
-    if not isinstance(envelope,dict):raise ApiError('upstream_malformed_response')
+    if not isinstance(envelope,dict):
+        api_ledger_event(ledger,'upstream_http',key,'invalid_response',notice_key=identity,http_status=http_code)
+        raise ApiError('upstream_malformed_response')
     hdr=envelope.get('header')
     if not isinstance(hdr,dict) or 'resultCode' not in hdr:
+        api_ledger_event(ledger,'upstream_http',key,'invalid_response',notice_key=identity,http_status=http_code)
         raise ApiError('upstream_missing_result_code')
     rc = str(hdr['resultCode'])
     if rc not in ('00','0'):
@@ -173,12 +228,20 @@ def request_api(base, operation, params):
         if code in ('22','23'):
             reason+=('_daily_quota' if code=='22' else '_per_second')
             record_upstream_limit(base,operation,reason)
+        api_ledger_event(ledger,'upstream_http',key,'provider_error',
+                         notice_key=identity,http_status=http_code,error_class=reason)
         raise ApiError(reason)
     body = envelope.get('body', {})
     items = body.get('items') or []
     if isinstance(items, dict): items = items.get('item') or []
     if not isinstance(items, list): items = [items]
-    return {'items':items,'totalCount':int(body.get('totalCount') or len(items))}
+    result={'items':items,'totalCount':int(body.get('totalCount') or len(items))}
+    if ledger is not None:
+        # Never cache a failed API envelope or a partial result as success.
+        api_ledger_event(ledger,'upstream_http',key,'http_ok',notice_key=identity,
+                         http_status=http_code)
+        ledger.save_json(key,result,max_bytes=20_000_000)
+    return result
 
 def cached_awards_query(bid_no):
     """Cache a successful official historic award query by exact notice number."""
