@@ -44,11 +44,13 @@ start_worker(){
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
   dk run -d --name "$WORKER" --restart unless-stopped --network host \
     -e G2B_DB_PATH=/app/data/bids.sqlite3 \
+    -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
     -e G2B_AWARD_SEED_PATH=/app/official-awards-snapshot.json \
     -e AWARD_MAX_REQUESTS_PER_CYCLE=2 \
     -e AWARD_INTERVAL_SECONDS=3600 \
     -e AWARD_REQUEST_GAP_SECONDS=15 \
     -v "$TARGET:/app/g2b-award-enricher.py:ro" \
+    -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
     -v "$TARGET_SNAPSHOT:/app/official-awards-snapshot.json:ro" \
     -v "$BASE/data:/app/data" \
     "$IMG" python -u /app/g2b-award-enricher.py >/dev/null
