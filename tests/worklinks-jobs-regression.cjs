@@ -392,7 +392,8 @@ const changeMod=new Function('jobBidIdentity','jobEvidenceData','htmlEscape','jo
  v=>v+'원',null,()=>null,async()=>({}),()=>{});
 const extraBid={id:'g2b-servc-R26BK01756420-000'};
 assert.ok(changeMod.bidChangePriceMarkup(extraBid).includes('20260001234'));
-assert.ok(changeMod.bidChangePriceMarkup(extraBid).includes('조회 전'));
+assert.ok(changeMod.bidChangePriceMarkup(extraBid).includes('변경이력·기초금액 조회'));
+assert.ok(changeMod.bidChangePriceMarkup(extraBid).includes('data-bid-change='));
 changeMod.bidChangePriceCache.set('R26BK01756420:000',{
  changeHistory:{ok:true,complete:true,totalCount:1,records:[
   {order:'001',changedAt:'2026-10-12',reason:'제출기한 조정 <script>'}]},
