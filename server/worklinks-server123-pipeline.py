@@ -28,6 +28,9 @@ AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 1
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
 RFP_REPAIR_PERIOD = max(3600, int(os.environ.get('G2B_RFP_REPAIR_PERIOD', 3600)))
 RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48))))
+# Local OCR repair uses only stored source URLs, no government metadata API calls.
+RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900)))
+RFP_OPEN_OCR_LIMIT = max(1, min(35, int(os.environ.get('G2B_RFP_OPEN_OCR_LIMIT', 20))))
 QUALIFICATION_PERIOD = max(3600, int(os.environ.get('G2B_QUALIFICATION_PERIOD', 3600)))
 QUALIFICATION_BATCH = max(1, min(300, int(os.environ.get('G2B_QUALIFICATION_BATCH', 120))))
 READ_FILES = (
@@ -45,6 +48,7 @@ READ_FILES = (
 )
 PUBLISHED = {
     'rfp': ('rfp-clauses.json', 'rfp-coverage-index.json'),
+    'rfpOpenRepair': ('rfp-coverage-index.json',),
     'rfpRepair': ('rfp-clauses.json', 'rfp-coverage-index.json',
                   'rfp-top500-batch-state-20261111.json',
                   'rfp-top500-batch-metadata-20261111.json',
@@ -53,7 +57,7 @@ PUBLISHED = {
     'actionable': ('changcom-actionable.json',),
     'awardFallback': ('g2b-award-fields-open.json',)
 }
-TIMEOUT = {'rfp': 2100, 'rfpRepair': 2100, 'qualification': 750, 'actionable': 540, 'awardFallback': 540}
+TIMEOUT = {'rfp': 2100, 'rfpRepair': 2100, 'rfpOpenRepair': 1200, 'qualification': 750, 'actionable': 540, 'awardFallback': 540}
 
 
 def log(*values):
@@ -102,7 +106,7 @@ def quality_guard(kind, outputs):
         content = json.loads(path.read_text(encoding='utf-8'))
         if not isinstance(content, dict) or content.get('ok') is not True:
             raise ValueError('pipeline_incomplete_json_' + path.name)
-        if kind in ('rfp','rfpRepair') and path.name in ('rfp-clauses.json','rfp-coverage-index.json'):
+        if kind in ('rfp','rfpRepair','rfpOpenRepair') and path.name in ('rfp-clauses.json','rfp-coverage-index.json'):
             history = content.get('byNotice')
             if not isinstance(history, dict):
                 raise ValueError('pipeline_missing_rfp_byNotice')
@@ -150,6 +154,7 @@ def stage_workspace(path):
                  'refresh_worklinks_open_award_fallback.py',
                  'batch_backfill_changcom_top500_rfp.py',
                  'repair_changcom_top500_rfp.py',
+                 'repair_open_rfp_cached_attachments.py',
                  'rfp_call_ledger.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in READ_FILES:
@@ -166,6 +171,11 @@ def stage_workspace(path):
             dest = root / 'snapshots' / name
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, dest)
+    # Read-only live databases, with all output written to isolated snapshot stage.
+    for name in ('bids.sqlite3','rfp-request-ledger.sqlite3'):
+        source = DATA / name
+        if source.exists():
+            (root / name).symlink_to(source)
     return root
 
 
@@ -215,6 +225,10 @@ def run_once(kind, runner=None):
                        '--input', str(root / 'startup-support' / 'rfp-clauses.json'),
                        '--summary', str(root / 'startup-support' / 'qualification-review.json'),
                        '--summary-only', '--rule-based', '--limit', str(QUALIFICATION_BATCH)]
+        elif kind == 'rfpOpenRepair':
+            command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
+                       '--data-dir', str(root), '--limit', str(RFP_OPEN_OCR_LIMIT),
+                       '--max-files', str(RFP_OPEN_OCR_LIMIT * 2), '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
                        '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
@@ -234,7 +248,7 @@ def run_once(kind, runner=None):
             details = (completed.stderr or completed.stdout or '').strip().splitlines()
             reason = details[-1][:130] if details else 'missing_child_diagnostics'
             raise RuntimeError('pipeline_' + kind + '_failed: ' + reason)
-        outputs = [root / ('snapshots' if kind == 'rfpRepair' else 'startup-support') / name
+        outputs = [root / ('snapshots' if kind in ('rfpRepair','rfpOpenRepair') else 'startup-support') / name
                    for name in PUBLISHED[kind]]
         quality_guard(kind, outputs)
         for result in outputs:
@@ -249,6 +263,7 @@ def iteration(current=None, runner=None):
     state = read_state()
     # Persistent timestamps, not sleep-only, protect against restart loops.
     jobs = (('actionable', SHORTLIST_PERIOD), ('awardFallback', AWARD_FALLBACK_PERIOD),
+            ('rfpOpenRepair', RFP_OPEN_OCR_PERIOD),
             ('rfp', RFP_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD),
             ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
@@ -298,6 +313,7 @@ def main():
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
             'shortlistPeriod', SHORTLIST_PERIOD, 'openAwardPeriod', AWARD_FALLBACK_PERIOD,
             'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT,
+            'rfpOpenOcrLimit', RFP_OPEN_OCR_LIMIT,
              'qualificationBatch', QUALIFICATION_BATCH)
         while True:
             iteration()
