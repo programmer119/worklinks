@@ -21,6 +21,10 @@ jobs:
         run: |
           python3 -m pip install -q playwright
           python3 -m playwright install chromium
+      - name: Install Korean UI font for visual fidelity
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends fonts-noto-cjk > /dev/null
       - name: Verify bid amounts align across different title lengths (offline)
         run: python3 tests/test_bid_price_alignment.py
       - name: Validate mobile first paint and incremental saved bids
