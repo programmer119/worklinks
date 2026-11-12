@@ -884,7 +884,7 @@ def saved_rfp_search_state(row, compact=False):
     # document. Prefer only the fully-scanned PDF, but never lie that the
     # HWP binary was read. Keep both entries in the physical manifest.
     def stem(name):
-        return re.sub(r'[\\W_]+','',os.path.splitext(os.path.basename(str(name or '').lower()))[0])
+        return re.sub(r'[\W_]+','',os.path.splitext(os.path.basename(str(name or '').lower()))[0])
     covered={}
     for i,f in enumerate(files):
         if not str(f.get('name') or '').lower().endswith(('.hwp','.hwpx')):
