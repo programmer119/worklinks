@@ -238,8 +238,12 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         report['failureByReason'][reason]=report['failureByReason'].get(reason,0)+1
     patch_path.parent.mkdir(parents=True,exist_ok=True)
     report_path.parent.mkdir(parents=True,exist_ok=True)
+    fingerprints={key:[(str(f.get('name') or ''),str(f.get('sourceSha256') or ''))
+        for f in (index[key].get('files') or [])]
+        for key in updates}
     patch_path.write_text(json.dumps({'ok':True,'baseGeneratedAt':snapshot.get('generatedAt'),
-        'sourceKeys':len(index),'updates':updates},ensure_ascii=False,separators=(',',':'))+'\n')
+        'sourceKeys':len(index),'fingerprints':fingerprints,
+        'updates':updates},ensure_ascii=False,separators=(',',':'))+'\n')
     report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('STAFFING_REPARSE_REPORT',json.dumps(report,ensure_ascii=False),flush=True)
     if not total_files:
