@@ -86,13 +86,13 @@ assert.equal(nav.state().jobFilter,'sole','general filter must survive Changcom 
 assert.equal(navNodes.jobsView.dataset.jobMode,'general');
 nav.setWorkspaceView('changcom');
 assert.equal(nav.state().jobVerdictFilter,'ready','partner verdict survives general visit');
+assert.equal(navNodes.jobListTitle.hidden,true,'the top tab already names Changcom; no duplicate heading');
+assert.equal(navNodes.jobSearchLabel.hidden,true,'do not add a redundant search label');
 accessGranted=false;
 nav.setWorkspaceView('jobs');
 nav.setWorkspaceView('changcom');
 assert.equal(nav.state().workspaceActiveView,'jobs','guest cannot open partner workspace');
 assert.equal(nav.state().requestedPartnerViewOnAuth,true);
-assert.equal(navNodes.jobListTitle.hidden,true,'the top tab already names Changcom; no duplicate heading');
-assert.equal(navNodes.jobSearchLabel.hidden,true,'do not add a redundant search label');
 assert.ok(source.includes('max-width:255px!important')&&source.includes('flex:0 1 242px!important'),
  'search stays compact instead of occupying its own full-width row');
 assert.ok(source.includes('display:flex!important;flex-flow:row wrap!important'),
