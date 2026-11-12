@@ -596,37 +596,59 @@ def download(url):
                 retry=isinstance(ex,(TimeoutError,ConnectionError,urllib.error.URLError))
             if not retry or attempt==2:raise
         time.sleep(1.5*(attempt+1))
+def _document_stem(name):
+    # Only a matching filename stem inside the SAME official attachment
+    # manifest can stand in for a failed HWP; never fuzzy-match similar titles.
+    return re.sub(r'[\W_]+','',Path(str(name or '')).stem.lower())
+
+
+def verified_pdf_companion(hwp,files):
+    """Return fully scanned same-stem PDF, otherwise None."""
+    name=str(hwp.get('name') or '')
+    if not name.lower().endswith(('.hwp','.hwpx')):return None
+    stem=_document_stem(name)
+    if not stem:return None
+    for candidate in files:
+        if candidate is hwp or not isinstance(candidate,dict):continue
+        label=str(candidate.get('name') or '')
+        if (label.lower().endswith('.pdf') and
+            _document_stem(label)==stem and
+            candidate.get('readable') is True and
+            candidate.get('sourceTextScanComplete') is True and
+            candidate.get('qualificationScanTruncated') is not True and
+            candidate.get('sourceSha256')):
+            return candidate
+    return None
+
+
+def hwp_covered_by_verified_pdf(hwp,files):
+    """PDF-first selection, not a claim the HWP binary was read."""
+    return verified_pdf_companion(hwp,files) is not None
+
+
 def annotate_official_pdf_siblings(files):
     """Use a successfully scanned same-title PDF as alternate official evidence.
 
     Never claim the HWP itself was read or that two formats are byte-identical.
     The PDF's own clause citations remain the authoritative extracted source.
     """
-    def stem(name):
-        p=Path(str(name or '')).name
-        return re.sub(r'[\W_]+','',Path(p).stem.lower())
-    bystem={}
-    for f in files:
-        if not isinstance(f,dict):continue
-        if (str(f.get('name') or '').lower().endswith('.pdf')
-                and f.get('readable') is True
-                and f.get('sourceTextScanComplete') is True
-                and f.get('sourceSha256')):
-            bystem.setdefault(stem(f['name']),f)
     updated=0
     for f in files:
         if not isinstance(f,dict):continue
-        label=str(f.get('name') or '')
-        if not label.lower().endswith(('.hwp','.hwpx')):continue
         if f.get('readable') is True and f.get('sourceTextScanComplete') is True:
             continue
-        other=bystem.get(stem(label))
-        if not other or other is f:continue
+        other=verified_pdf_companion(f,files)
+        if not other:continue
         if f.get('alternatePdfEvidence')!=other.get('name'):
             updated+=1
         f['alternatePdfEvidence']=other['name']
         f['alternatePdfSourceSha256']=other['sourceSha256']
         f['alternatePdfEvidenceMode']='same_basename_not_proven_identical'
+        f['skippedDuplicateFormat']=True
+        # Do not retain a misleading failed HWP status when its same-title
+        # PDF is selected. The raw HWP remains explicitly *unread*.
+        f.pop('errorCategory',None)
+        f.pop('error',None)
     return updated
 
 
