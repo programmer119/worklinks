@@ -73,6 +73,21 @@ with tempfile.TemporaryDirectory() as tmp:
             assert eligibility.verify('R26BK01816467','000')['complete'] is True
         assert len(local)==1
 
+        # Older recurring-history enrichment is a distinct official G2B client.
+        history=load('g2b-repeat-history.py','g2b_history_shared_ledger_test')
+        history.DELAY=0
+        history_calls=[]
+        def historic_provider(req,timeout=0):
+            history_calls.append(req.full_url)
+            return Response({'response':{'header':{'resultCode':'00'},
+                'body':{'totalCount':1,'items':[{'bidNtceNo':'R26BK01816467'}]}}})
+        with mock.patch.object(history.urllib.request,'urlopen',historic_provider):
+            h1=history.request('https://apis.data.go.kr/history','private',
+                               {'bidNtceNo':'R26BK01816467'})
+            h2=history.request('https://apis.data.go.kr/history','private',
+                               {'bidNtceNo':'R26BK01816467'})
+        assert h1==h2 and len(history_calls)==1,history_calls
+
         ledger=CallLedger(dest)
         counts=ledger.stats()['counts']
         assert counts['upstream_http:http_verified']==1,counts
@@ -82,6 +97,8 @@ with tempfile.TemporaryDirectory() as tmp:
         assert counts['standard_http:provider_verified']==1,counts
         assert counts['standard:verified_page_reused']==1,counts
         assert counts['qualification_local_http:http_verified']==1,counts
+        assert counts['history_http:http_verified']==1,counts
+        assert counts['history:verified_page_reused']==1,counts
         with sqlite3.connect(dest) as conn:
             audit=json.dumps(conn.execute('SELECT kind,request_key,notice_key,error_class,detail FROM call_events').fetchall())
             assert 'secret-test-do-not-store' not in audit
