@@ -2429,7 +2429,11 @@ async function g2bLoadSaved(append){
  let offset=incremental?g2bLoadedOffset:0;
  let total=incremental?g2bSavedTotal:0;
  let linkedOnServer=incremental?g2bLinkedEligibility:null;
- let preferredLimit=g2bCompactScreen()?50:100;
+ // Mobile starts with only 160 saved notices in 40-row requests. Fetch the
+ // next bounded window only when More exhausts the already received cards.
+ const mobileSavedWindow=g2bCompactScreen()?160:Infinity;
+ const maxOffset=mobileSavedWindow===Infinity?Infinity:offset+mobileSavedWindow;
+ let preferredLimit=g2bCompactScreen()?40:100;
  let published=false;
  function publish(){
   g2bLiveJobs=[...seen.values()];
@@ -2445,8 +2449,8 @@ async function g2bLoadSaved(append){
    ' · 저장된 자료 조회만 실행 (정부 API 호출 없음)';
  }
  try{
-  while(offset<100000){
-   const {data,size}=await g2bFetchSavedPage(offset,preferredLimit);
+  while(offset<100000&&offset<maxOffset){
+   const {data,size}=await g2bFetchSavedPage(offset,Math.min(preferredLimit,maxOffset-offset));
    if(size<preferredLimit)preferredLimit=size; // Do not repeat a failing large page.
    const nextTotal=Number(data.totalCount);
    if(offset>0&&nextTotal!==total)throw Error('조회 중 DB 건수 변경 · 안전하게 재조회 필요');
@@ -2471,12 +2475,12 @@ async function g2bLoadSaved(append){
    }
    offset+=records.length;
    // Publish the first page immediately, then in bounded chunks. Avoid 8k re-renders.
-   if(!preservePrior&&(offset===records.length||offset%1200<size||offset>=total))publish();
+   if(!preservePrior&&(offset===records.length||offset%1200<size||offset>=total||offset>=maxOffset))publish();
    showProgress(offset>=total?' · 모두 수신':' · 이어서 읽는 중');
    if(offset>=total||!records.length)break;
    await new Promise(resolve=>setTimeout(resolve,0));
   }
-  if(!published||preservePrior)publish();
+  if(!published||preservePrior||offset!==g2bLoadedOffset)publish();
   g2bSavedLoadError='';
   resetSavedBidResume();
   const checked=[...bidEligibilityCache.values()];
