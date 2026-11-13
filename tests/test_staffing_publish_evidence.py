@@ -15,4 +15,14 @@ assert trust(row('PM',5,'사업관리자(PM) 이력 기재 방법 | 【별지 5�
 assert trust(row('기술자',20,'보유기술자 등급별 계수를 곱한 값(점) 평가20점 이상')) is False
 assert trust(row('PM',1,'사업관리자(PM)을 지정하고 전담유지보수 1명을 상주시킨다')) is False
 assert trust(row('PM',3,'PM | 경력 3년 이상 | 3')) is False
+fact_guard=r['defensible_staffing_fact']
+official={'kind':'staffing_requirement','requirementType':'onsite',
+  'label':'상주인력 근무·휴가 조건','headcount':None,'sourceLine':2133,
+  'sourceFile':'2. 제안요청서.hwpx',
+  'sourceText':'상주인력의 휴가 등은 사전 승인을 받고 업무상 차질이 없도록 하여야 함'}
+assert fact_guard(official),official
+assert not fact_guard({**official,'label':'상주 8명 필수'}),'invented counts must never publish'
+assert not fact_guard({**official,'headcount':8}),'source says no headcount'
+assert not fact_guard({**official,'sourceFile':'입찰유의서 계약일반조건.zip'}),'general-law annex cannot supply contract staffing'
+assert not fact_guard({**official,'sourceText':'사업과 무관한 안내 문구'}),'required matching source passage missing'
 print('STAFFING_ROLE_EVIDENCE_PUBLISH_GUARD=PASS')
