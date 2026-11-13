@@ -2130,6 +2130,12 @@ def main():
         if not isinstance(item,dict):continue
         files=item.get('files') or []
         if not files:continue
+        for f in files:
+            if staffing_ancillary_form_without_extractable_text(f):
+                f['staffingScopeExcluded']=True
+                f['staffingScopeReason']=(
+                    '입찰신청·서약 제출용 서식의 텍스트 미추출 '
+                    '(인력 판독 범위에서만 제외, 전체 문서 오류 유지)')
         complete=(item.get('manifestComplete') is True and
                   all(staffing_effective_file_complete(f,files) for f in files))
         if item.get('staffingRoleScanComplete') is not complete:
