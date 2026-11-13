@@ -1,0 +1,74 @@
+name: WorkLinks Yongin official workbook staffing facts
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-yongin-verified-workload-publish-20261113.yml
+permissions:
+  contents: write
+jobs:
+  verify-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install readers
+        run: python3 -m pip install -q pyhwp pypdf Pillow
+      - name: Re-download and independently verify original official staffing workbook
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import sys,hashlib,json,datetime,pathlib
+          sys.path.insert(0,'scripts')
+          import refresh_worklinks_rfp as p
+          from staffing_facts import extract_staffing_facts
+          url='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03'
+          name='공내역서.xlsx'
+          raw=p.download(url)
+          sha=hashlib.sha256(raw).hexdigest()
+          assert sha.startswith('7e93a5acc6d1d406'), 'official workbook unexpectedly changed: '+sha[:16]
+          parsed,meta=p.extract_with_source_status(name,raw)
+          assert meta.get('sourceComplete') is True,meta
+          lines=p.normalize_extracted_text(parsed)
+          facts=extract_staffing_facts(lines,name,url)
+          work=[x for x in facts if x['kind']=='workload_role']
+          totals=[x for x in facts if x['kind']=='workload_total']
+          assert len(work)==5,work
+          assert len(totals)==1 and abs(float(totals[0]['manMonths'])-11.522)<.002,totals
+          assert len([x for x in work if x.get('onsite') and x.get('role')=='응용SW 개발자'])==1
+          assert all(f.get('headcount') is None for f in work)
+          document={'ok':True,'schemaVersion':1,
+             'generatedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+             'byNotice':{'R26BK01807134:000':{
+                'verification':'official_attachment_sha256','sourceFile':name,
+                'sha256':sha,'sourceUrl':url,'staffingFacts':facts
+             }}}
+          pathlib.Path('/tmp/worklinks-yongin-source-verified.json').write_text(
+            json.dumps(document,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('YONGIN_OFFICIAL_FILE_VERIFIED',json.dumps({
+           'sha256':sha,'bytes':len(raw),'staffingRows':len(work),
+           'totalManMonths':totals[0]['manMonths'],'onsiteRows':sum(bool(x.get('onsite')) for x in work),
+           'governmentMetadataApiCalls':0},ensure_ascii=False))
+          PY
+      - name: Publish small validated source-backed facts without replacing server123 data
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/worklinks-yongin-source-verified.json startup-support/staffing-source-verified.json
+            git add startup-support/staffing-source-verified.json
+            if git diff --cached --quiet; then
+              echo YONGIN_VERIFIED_WORKLOAD_ALREADY_PUBLISHED=PASS
+              exit 0
+            fi
+            git commit -m "data: publish verified Yongin official workbook staffing facts"
+            if git push origin HEAD:main; then
+              echo YONGIN_VERIFIED_WORKLOAD_PUBLISHED=PASS
+              exit 0
+            fi
+          done
+          exit 1
