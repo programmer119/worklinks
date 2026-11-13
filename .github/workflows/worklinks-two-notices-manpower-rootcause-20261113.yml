@@ -71,4 +71,8 @@ jobs:
                   if any(re.search(p,l) for p in patterns):
                       selected.append((i+1,l[:240]))
               print('OFFICIAL_MATCHES',label,'count',len(selected),'snippets',json.dumps(selected[:55],ensure_ascii=False),flush=True)
+              windows=([(650,705),(1077,1097)] if label=='NORTH' else [(2125,2205),(2238,2253),(2293,2307)])
+              for start,end in windows:
+                  excerpts=[(i+1,' '.join(lines[i].split())[:320]) for i in range(start-1,min(end,len(lines))) if lines[i].strip()]
+                  print('OFFICIAL_CONTEXT',label,str(start)+'-'+str(end),json.dumps(excerpts[:95],ensure_ascii=False),flush=True)
           PY
