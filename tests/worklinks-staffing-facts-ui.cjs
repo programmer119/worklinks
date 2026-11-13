@@ -15,7 +15,9 @@ const states=new Map([
  ['Y:000',mk([f('workload_role',{role:'IT PM',headcount:null,manMonths:.342,durationMonths:3,allocationRate:.114}),
   f('workload_role',{role:'응용SW 개발자',headcount:null,manMonths:8.28,durationMonths:11.04,allocationRate:.75,onsite:true,sourceText:'(상주인력) 응용SW 개발자 평균 11.04 0.75 0',sourceFile:'공내역서.xlsx'}),
   f('workload_total',{manMonths:11.522})])],
- ['N:000',mk([f('headcount_recommended',{count:8,mandatory:false,minimum:true,onsite:true}),f('role_unspecified',{role:'사업관리자(PM)',headcount:null})])],
+ ['N:000',mk([f('headcount_recommended',{count:8,mandatory:false,minimum:true,onsite:true,
+  sourceText:'* 위 인원은 분야를 조정할 수 있으나, 상주인력 월평균 8명 이상을 유지 권고',
+  sourceFile:'붙임1_제안요청서.hwpx'}),f('role_unspecified',{role:'사업관리자(PM)',headcount:null})])],
  ['X:000',mk([f('staffing_plan_required',{headcount:null,mandatory:true})])],
  ['E:000',mk([])],
  ['M:000',mk([f('workload_role',{role:'응용SW 개발자',durationMonths:10,allocationRate:.5,onsite:true,sourceText:'(상주인력) 응용SW 개발자'}),
@@ -39,6 +41,17 @@ assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.items[0].count,1);
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.items[0].inferredFromWorkload,true);
 assert.equal(app.jobRequirementEvidence({bidNo:'M'}).roles.status.key,'role_workload','multiple onsite rows must not imply a single person');
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).onsite.status.key,'onsite_present');
+assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.key,'onsite_recommended');
+assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.label,'상주 8명 이상 권고');
+const northBadgeHtml=app.jobRequirementBadges({bidNo:'N'});
+assert.ok(northBadgeHtml.includes('상주 8명 이상 권고'),'onsite badge must show recommendation');
+const northTooltip=northBadgeHtml.slice(northBadgeHtml.indexOf('data-requirement="onsite"'),
+ northBadgeHtml.indexOf('data-requirement="roles"'));
+for(const fragment of ['상주인력 · 월평균','8명 이상','유지 권고 · 필수 인원 아님',
+ '상주인력 월평균 8명 이상을 유지 권고','붙임1_제안요청서.hwpx']){
+ assert.ok(northTooltip.includes(fragment),'missing sourced recommendation '+fragment);
+}
+assert.ok(!northTooltip.includes('상주 여부 미확정'),'known recommendation is not unknown');
 assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'not_specified');
 assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주 확인'));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('비상주 ✓'));
@@ -48,6 +61,12 @@ const yonginBadgeHtml=app.jobRequirementBadges({bidNo:'Y'});
 assert.ok(yonginBadgeHtml.includes('역할별 인원 1명'),'the thumbnail must show the person count');
 assert.ok(yonginBadgeHtml.includes('<strong>응용SW 개발자</strong>'),'the role detail must name the developer');
 assert.ok(yonginBadgeHtml.includes('job-req-tip-count">1명</strong>'),'the role detail must show one person');
+const onsiteYongin=yonginBadgeHtml.slice(yonginBadgeHtml.indexOf('data-requirement="onsite"'),
+ yonginBadgeHtml.indexOf('data-requirement="roles"'));
+for(const fragment of ['응용SW 개발자','job-req-onsite-count">1명</strong>',
+ '투입기간 11.04개월','투입률 75%','8.28MM','공내역서.xlsx']){
+ assert.ok(onsiteYongin.includes(fragment),'onsite tooltip missing '+fragment);
+}
 assert.ok(!yonginBadgeHtml.includes('공수 11.522MM'),'do not replace headcount with man-month effort');
 const onsiteBadge=yonginBadgeHtml.slice(yonginBadgeHtml.indexOf('data-requirement="onsite"'),yonginBadgeHtml.indexOf('data-requirement="roles"'));
 const workloadBadge=yonginBadgeHtml.slice(yonginBadgeHtml.indexOf('data-requirement="roles"'),yonginBadgeHtml.indexOf('<span class="job-req-tip" role="tooltip">',yonginBadgeHtml.indexOf('data-requirement="roles"')));
@@ -81,7 +100,13 @@ assert.equal(seoulEvidence.onsite.status.key,'onsite_present');
 assert.equal(seoulEvidence.roles.status.key,'role_requirements');
 assert.equal(seoulEvidence.insurance.status.key,'employment_proof');
 const seoulHtml=evidenceUI.jobRequirementBadges(seoul);
-for(const text of ['재직증빙 확인','상주조건 확인','PM 10년 경력','건강보험 자격득실'])assert.ok(seoulHtml.includes(text),text);
+for(const text of ['재직증빙 확인','상주 확인','PM 10년 경력','건강보험 자격득실'])assert.ok(seoulHtml.includes(text),text);
+const seoulOnsiteTip=seoulHtml.slice(seoulHtml.indexOf('data-requirement="onsite"'),
+ seoulHtml.indexOf('data-requirement="roles"'));
+for(const fragment of ['상주인력 근무·휴가 조건','2. 제안요청서.hwpx','상주인력의 휴가']){
+ assert.ok(seoulOnsiteTip.includes(fragment),'onsite requirement must show evidence: '+fragment);
+}
+assert.ok(!seoulHtml.includes('상주조건 확인'),'onsite confirmed labels must be unified');
 assert.ok(!seoulHtml.includes('확인실패'),'positive evidence must not become three failed statuses');
 // Generic legacy notices may have source excerpts, not yet structured facts.
 // Their card must show the original staffing requirement, not "미명시 ?".
