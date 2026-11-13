@@ -1,0 +1,93 @@
+name: Verify Changcom staffing live UI
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-staffing-live-verify-20261113.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium test tools
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Check actual production frontend, staffing data, and tooltip
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from playwright.sync_api import sync_playwright
+          bids=['R26BK01807134:000','R26BK01818412:000','R26BK01797739:000',
+                'R26BK01810095:001','R26BK01803834:000','R26BK01813685:000']
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True)
+            page=browser.new_page(viewport={'width':1440,'height':900})
+            errors=[]
+            page.on('pageerror',lambda error:errors.append(str(error)[:300]))
+            page.goto('https://worklinks.suaveforge.com/startup-support/?view=changcom',
+                      wait_until='domcontentloaded',timeout=60000)
+            page.wait_for_function("typeof jobRequirementBadges === 'function'",timeout=30000)
+            live_code=page.evaluate("jobRequirementBadges.toString()")
+            assertion={
+              'source_status_explicit': '원문 대조 전' in live_code,
+              'operational_staff_as_inference': '운영·유지관리 투입 인력으로 추정' in live_code,
+              'role_count_visible': 'job-req-tip-count' in live_code
+            }
+            print('DEPLOYED_SOURCE_ASSERTIONS',json.dumps(assertion,ensure_ascii=False))
+            assert all(assertion.values()),'Production still serves outdated staffing tooltip JS'
+            page.evaluate("""() => {
+              window.worklinksMemberAuthenticated=true;
+              document.documentElement.dataset.worklinksPartnerAccess='granted';
+              window.dispatchEvent(new Event('worklinks:partner-access'));
+            }""")
+            try: page.wait_for_function("window.g2bLiveJobs?.length > 100",timeout=75000)
+            except Exception as e: print('LIVE_ROWS_TIMEOUT',str(e)[:180])
+            try: page.wait_for_function("window.rfpSnapshotByNotice?.size > 0",timeout=75000)
+            except Exception as e: print('RFP_SNAPSHOT_TIMEOUT',str(e)[:180])
+            summary=page.evaluate("""() => {
+              const ids=%s;
+              const jobs=typeof g2bLiveJobs!=='undefined'?g2bLiveJobs:[];
+              const results=ids.map(key=>{
+                const x=jobs.find(j=>j.bidNo+':'+(j.order||'000')===key);
+                if(!x)return {notice:key,loaded:false};
+                const e=jobRequirementEvidence(x);
+                return {notice:key,loaded:true,title:x.title,roles:e?.roles?.status||null,
+                  roleRows:e?.roles?.items?.map(y=>({role:y.roleName,count:y.count,
+                    source:y.file,excerpt:y.text?.slice(0,130)}))||[],
+                  meta:e?.meta||null};
+              });
+              return {totalRows:jobs.length,rfpSnapshotSize:rfpSnapshotByNotice.size,
+                notices:results};
+            }""" % json.dumps(bids,ensure_ascii=False))
+            print('LIVE_PER_NOTICE_STAFFING',json.dumps(summary,ensure_ascii=False,default=str))
+            page.evaluate("""() => { const tab=document.querySelector('.workspace-tab[data-view="jobs"]'); if(tab)tab.click(); }""")
+            page.wait_for_timeout(1100)
+            tooltip=page.evaluate("""() => {
+              const buttons=[...document.querySelectorAll('[data-job-requirement="roles"]')];
+              const b=buttons.find(el=>el.closest('.job-mini')?.querySelector('[data-job-requirement="roles"]'));
+              if(!b)return {visibleButtons:buttons.length,reason:'No role badge currently rendered'};
+              const btn=b.querySelector('button');
+              const tip=b.querySelector('.job-req-tip');
+              if(!btn||!tip)return {visibleButtons:buttons.length,reason:'Missing button/tooltip'};
+              btn.click();
+              const rect=tip.getBoundingClientRect();
+              const css=getComputedStyle(tip);
+              return {visibleButtons:buttons.length,label:btn.getAttribute('aria-label'),
+                tipText:tip.textContent.trim().slice(0,500),display:css.display,
+                visibility:css.visibility,opacity:css.opacity,
+                rect:{x:Math.round(rect.x),y:Math.round(rect.y),
+                  width:Math.round(rect.width),height:Math.round(rect.height)},
+                viewport:{width:innerWidth,height:innerHeight}};
+            }""")
+            print('LIVE_ROLE_TOOLTIP',json.dumps(tooltip,ensure_ascii=False))
+            print('PAGE_ERRORS',json.dumps(errors[:15],ensure_ascii=False))
+            if summary['totalRows']<100: raise RuntimeError('Live saved bids did not load')
+            if not any(y['loaded'] for y in summary['notices']): raise RuntimeError('All target bids absent from UI data')
+            if tooltip.get('visibleButtons',0)<=0: raise RuntimeError('No role badge rendered')
+            browser.close()
+          PY
