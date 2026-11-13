@@ -191,17 +191,26 @@ def main():
                     const title = c.querySelector('.job-card-title');
                     const amount = c.querySelector('.job-headline-side .job-amount');
                     if (!amount) return null;
+                    const rect=amount.getBoundingClientRect();
+                    const core=c.querySelector('.job-core')?.getBoundingClientRect();
                     return {
-                        amountY: amount.getBoundingClientRect().top - c.getBoundingClientRect().top,
+                        amountY: rect.top - c.getBoundingClientRect().top,
                         titleHeight: title.getBoundingClientRect().height,
-                        inSide: !!amount.closest('.job-headline-side')
+                        inSide: !!amount.closest('.job-headline-side'),
+                        visible: rect.width>0&&rect.height>0,
+                        rightGap: core?core.right-rect.right:null,
+                        clipped: !core||rect.left<core.left-2||rect.right>core.right+2
                     };
                 });
                 titles.forEach((t,i)=>t.textContent=original[i]);
                 return rows;
             }""")
             assert amount_positions and all(v and v["inSide"] for v in amount_positions), amount_positions
-            assert abs(amount_positions[0]["amountY"] - amount_positions[1]["amountY"]) <= 1, amount_positions
+            # Desktop uses a shared price baseline; on mobile, price moves
+            # below taller wrapped titles. Check visibility and right alignment,
+            # not an impossible fixed vertical position for different titles.
+            assert all(v["visible"] and not v["clipped"] for v in amount_positions), amount_positions
+            assert all(v["rightGap"] is not None and abs(v["rightGap"]) <= 18 for v in amount_positions), amount_positions
             assert amount_positions[1]["titleHeight"] > amount_positions[0]["titleHeight"], amount_positions
 
             # Source-checked bids must be rendered in the SAME standard cards,
