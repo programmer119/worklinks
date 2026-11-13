@@ -90,6 +90,9 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
     by_sha={}
     before_evidence=sum(bool(v.get('staffingRoles')) for v in index.values() if isinstance(v,dict))
     before_complete=sum(v.get('staffingRoleScanComplete') is True for v in index.values() if isinstance(v,dict))
+    before_requirements=sum(any(f.get('kind')=='staffing_requirement'
+        for f in v.get('staffingFacts') or [] if isinstance(f,dict))
+        for v in index.values() if isinstance(v,dict))
     eligible_records=0
     missing_sha=0
     for key,row in index.items():
@@ -253,6 +256,9 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
     after_complete=sum((updates.get(key,{}).get('staffingRoleScanComplete',
         row.get('staffingRoleScanComplete')) is True)
         for key,row in index.items() if isinstance(row,dict))
+    after_requirements=sum(any(f.get('kind')=='staffing_requirement'
+        for f in (updates.get(key,{}).get('staffingFacts',row.get('staffingFacts')) or [])
+        if isinstance(f,dict)) for key,row in index.items() if isinstance(row,dict))
     report={
         'ok':True,'kind':'cached_offline_staffing_reparse',
         'at':now,'governmentApiCalls':0,'officialFileDownloads':0,
@@ -266,6 +272,8 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         'filesReparsed':total_files,'noticePatches':len(updates),
         'withRoleEvidenceBefore':before_evidence,'withRoleEvidenceAfter':after_evidence,
         'fullStaffingScanBefore':before_complete,'fullStaffingScanAfter':after_complete,
+        'withSourceRequirementsBefore':before_requirements,
+        'withSourceRequirementsAfter':after_requirements,
         'priorityNoticesInArchive':sorted(k for k in PRIORITY if k in index),
         'priorityNoticesWithAvailableBinary':sorted(all_priority),
         'priorityResults':{k:{'state':'cached_reparsed' if k in updates else
