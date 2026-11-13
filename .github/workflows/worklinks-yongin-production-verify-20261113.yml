@@ -97,3 +97,5 @@ jobs:
               browser.close()
           print('YONGIN_PRODUCTION_STAFFING_UI_AND_DATA=PASS',flush=True)
           PY
+
+# 2026-11-13: rerun real Chromium check after verified source facts reached API and GitHub Pages.
