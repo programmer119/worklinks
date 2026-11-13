@@ -6,6 +6,8 @@ on:
       - '.github/workflows/worklinks-yongin-staffing-regression.yml'
       - 'startup-support/index.html'
       - 'tests/worklinks-staffing-facts-ui.cjs'
+      - 'tests/worklinks-notice-collapse-chronology.cjs'
+      - 'startup-support/staffing-source-verified.json'
 permissions:
   contents: read
 jobs:
@@ -17,6 +19,7 @@ jobs:
       - name: Validate source-backed onsite role and headcount-independent workload UI
         run: |
           node tests/worklinks-staffing-facts-ui.cjs
+          node tests/worklinks-notice-collapse-chronology.cjs
           python3 tests/test_staffing_facts.py
           python3 tests/test_worklinks_server123_pipeline.py
           echo YONGIN_STAFFING_UI_AND_WORKER_REGRESSION_PASS
