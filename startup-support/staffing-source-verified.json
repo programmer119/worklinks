@@ -1,7 +1,7 @@
 {
   "ok": true,
   "schemaVersion": 1,
-  "generatedAt": "2026-11-13T08:45:05.895843+00:00",
+  "generatedAt": "2026-11-13T11:03:31+00:00",
   "byNotice": {
     "R26BK01807134:000": {
       "verification": "official_attachment_sha256",
@@ -16,7 +16,7 @@
           "sourceText": "기능개선 및 유지관리 사업 총괄관리 IT PM 협의 3 0.114 0",
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
           "role": "IT PM",
-          "durationMonths": 3.0,
+          "durationMonths": 3,
           "allocationRate": 0.114,
           "manMonths": 0.342,
           "onsite": false,
@@ -29,9 +29,9 @@
           "sourceText": "웹 콘텐츠 개발 및 유지관리 응용SW 개발자 평균 4 0.25 0",
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
           "role": "응용SW 개발자",
-          "durationMonths": 4.0,
+          "durationMonths": 4,
           "allocationRate": 0.25,
-          "manMonths": 1.0,
+          "manMonths": 1,
           "onsite": false,
           "headcount": null
         },
@@ -68,7 +68,7 @@
           "sourceText": "퍼블리싱 UI/UX 개발자 협의 3 0.4 0",
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
           "role": "UI/UX 개발자",
-          "durationMonths": 3.0,
+          "durationMonths": 3,
           "allocationRate": 0.4,
           "manMonths": 1.2,
           "onsite": false,
@@ -161,6 +161,25 @@
           "sourceFile": "2. 제안요청서.hwpx",
           "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01810885&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
           "sourceLine": 2300
+        }
+      ]
+    },
+    "R26BK01783957:000": {
+      "verification": "official_attachment_sha256",
+      "sourceFile": "붙임1_제안요청서(2027년_북한정보분석시스템_운영관리)최종.hwpx",
+      "sha256": "0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645",
+      "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00061128&rfpOrd=000&rfpUntyAtchFileNo=9",
+      "staffingFacts": [
+        {
+          "kind": "headcount_recommended",
+          "sourceFile": "붙임1_제안요청서(2027년_북한정보분석시스템_운영관리)최종.hwpx",
+          "sourceLine": 881,
+          "sourceText": "* 위 인원은 분야를 조정할 수 있으나, 상주인력 월평균 8명 이상을 유지 권고",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00061128&rfpOrd=000&rfpUntyAtchFileNo=9",
+          "count": 8,
+          "minimum": true,
+          "mandatory": false,
+          "onsite": true
         }
       ]
     }
