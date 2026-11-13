@@ -1,0 +1,74 @@
+name: Verify two exact tenders original staffing and archive failure
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-two-notices-manpower-rootcause-20261113.yml
+permissions:
+  contents: read
+jobs:
+  diagnosis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install official-document readers
+        run: python3 -m pip install -q pyhwp pypdf six
+      - name: Read original HWP and HWPX plus ZIP member page counts
+        run: |
+          python3 - <<'PY'
+          import io,os,re,sys,zipfile,json
+          from pypdf import PdfReader
+          sys.path.insert(0,'scripts')
+          from refresh_worklinks_rfp import download,extract_with_source_status,extract_staffing_roles,normalize_extracted_text
+          from staffing_facts import extract_staffing_facts
+          targets=[
+              ('NORTH','R26BK01818412',2,'제안요청서(2027년 노후계획도시정비플랫폼 운영 및 유지관리)_ver1.4.hwp'),
+              ('SEOUL','R26BK01810885',3,'2. 제안요청서.hwpx'),
+              ('SEOUL_ARCHIVE','R26BK01810885',1,'입찰유의서 등 공통서식.zip')
+          ]
+          for label,bid,seq,name in targets:
+              url='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo='+bid+'&bidPbancOrd=000&fileType=&fileSeq='+str(seq)+'&prcmBsneSeCd=03'
+              try: raw=download(url)
+              except Exception as exc:
+                  print('OFFICIAL_DOWNLOAD_ERROR',label,type(exc).__name__,str(exc)[:160],flush=True);continue
+              print('OFFICIAL_BYTES',label,len(raw),raw[:8].hex(),flush=True)
+              if label=='SEOUL_ARCHIVE':
+                  try:
+                      with zipfile.ZipFile(io.BytesIO(raw)) as arch:
+                          print('ZIP_MEMBER_COUNT',len(arch.infolist()),flush=True)
+                          for ent in arch.infolist():
+                              if ent.is_dir():continue
+                              ext=os.path.splitext(ent.filename)[1].lower()
+                              pages=None
+                              if ext=='.pdf' and ent.file_size<30_000_000:
+                                  try:pages=len(PdfReader(io.BytesIO(arch.read(ent))).pages)
+                                  except Exception as exc:pages='ERROR '+str(exc)[:80]
+                              print('ZIP_MEMBER',json.dumps({'name':ent.filename[:140],'size':ent.file_size,'pdfPages':pages},ensure_ascii=False),flush=True)
+                  except Exception as exc:print('ZIP_INSPECTION_ERROR',type(exc).__name__,str(exc)[:180],flush=True)
+                  try:extract_with_source_status(name,raw);print('WHOLE_ZIP_EXTRACT_OK')
+                  except Exception as exc:print('WHOLE_ZIP_EXTRACT_FAILED',type(exc).__name__,str(exc)[:190],flush=True)
+                  continue
+              try:
+                  extracted,meta=extract_with_source_status(name,raw)
+              except Exception as exc:
+                  print('OFFICIAL_EXTRACT_ERROR',label,type(exc).__name__,str(exc)[:180],flush=True);continue
+              text=normalize_extracted_text(extracted)
+              role_rows=extract_staffing_roles(text,name,url)
+              fact_rows=extract_staffing_facts(text,name,url)
+              print('OFFICIAL_READER',label,json.dumps({'charCount':len(text),'lines':len(text.splitlines()),
+                  'complete':meta.get('sourceComplete'),'roles':role_rows[:8],'facts':fact_rows[:12]},ensure_ascii=False),flush=True)
+              lines=text.splitlines()
+              patterns=[
+                  r'(?:투입|참여|운영|전담|상주|상시|필수|사업수행).{0,12}(?:인력|인원|인사|기술자|개발자)',
+                  r'(?:인력|인원|기술자|개발자).{0,15}(?:투입|배치|규모|구성|계획|명)',
+                  r'(?<!\\d)(?:[1-9][0-9]?)\\s*명',
+                  r'4\\s*대\\s*(?:사회)?보험|건강보험|고용보험'
+              ]
+              selected=[]
+              for i,line in enumerate(lines):
+                  l=' '.join(line.split())
+                  if any(re.search(p,l) for p in patterns):
+                      selected.append((i+1,l[:240]))
+              print('OFFICIAL_MATCHES',label,'count',len(selected),'snippets',json.dumps(selected[:55],ensure_ascii=False),flush=True)
+          PY
