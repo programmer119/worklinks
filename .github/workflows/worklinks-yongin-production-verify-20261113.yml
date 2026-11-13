@@ -80,6 +80,9 @@ jobs:
                   roleFacts:v.roles.factLines,source:v.onsite.source,
                   roleText:roleBtn.textContent,siteText:siteBtn.textContent,
                   tooltipText:roleTip.textContent,tooltipDisplay:display,
+                  onsiteGreyInfoIcons:siteBtn.querySelectorAll('.job-req-icon').length,
+                  workloadGreyInfoIcons:roleBtn.querySelectorAll('.job-req-icon').length,
+                  workloadTableRows:roleTip.querySelectorAll('table.job-req-effort-table tbody tr').length,
                   htmlHasFalseOffsite:html.includes('비상주 ✓')};
                 wrapper.remove();
                 return result;
@@ -92,6 +95,9 @@ jobs:
               assert '상주' in proof['siteText'],proof
               assert '응용SW 개발자' in proof['tooltipText'],proof
               assert proof['tooltipDisplay']=='block',proof
+              assert proof['onsiteGreyInfoIcons']==0,proof
+              assert proof['workloadGreyInfoIcons']==0,proof
+              assert proof['workloadTableRows']==5,proof
               assert not proof['htmlHasFalseOffsite'],proof
               assert not errors,errors
               browser.close()
