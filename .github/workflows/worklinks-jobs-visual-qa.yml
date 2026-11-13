@@ -50,7 +50,10 @@ jobs:
                 document.documentElement.dataset.worklinksPartnerAccess='granted';
                 window.dispatchEvent(new Event('worklinks:partner-access'));
               }""")
-              page.wait_for_function("worklinksPartnerAccess() && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
+              # The private screening summary belongs to the Changcom
+              # workspace, not the general public Jobs workspace.
+              page.evaluate("setWorkspaceView('changcom')")
+              page.wait_for_function("worklinksPartnerAccess() && workspaceActiveView==='changcom' && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",timeout=30000)
               page.wait_for_function("window.g2bServerAvailable===true && window.g2bLiveJobs?.length>100",timeout=45000)
               # Wait for the rendered count, not a made-up minimum of one.
               # The current saved page can legitimately contain zero repeats.
