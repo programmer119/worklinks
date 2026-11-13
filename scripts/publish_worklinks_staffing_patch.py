@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
+from staffing_facts import STAFF_REQUIREMENT_PATTERNS
 
 _CONFUSING_ROLE=re.compile(r'전담\s*유지\s*보수|별도의?\s*담당자|기타\s*인력|부문별\s*대표자')
 _OBVIOUS_SCORE=re.compile(r'평가\s*항목|평가\s*기준|배\s*점|점수|점\s*이상|산술한\s*수치')
@@ -77,6 +78,15 @@ def defensible_staffing_fact(fact):
         return fact.get('headcount') is None and fact.get('mandatory') is True
     if kind=='role_unspecified':
         return bool(fact.get('role') and fact.get('headcount') is None)
+    if kind=='staffing_requirement':
+        # A label without the corresponding official clause is NOT evidence.
+        # Re-run the exact generic source clause matcher before publication.
+        kind_label=str(fact.get('requirementType') or '')
+        label=str(fact.get('label') or '')
+        return (fact.get('headcount') is None and
+                int(fact.get('sourceLine') or 0)>0 and
+                any(kind_label==t and label==name and pattern.search(quote)
+                    for t,name,pattern in STAFF_REQUIREMENT_PATTERNS))
     return False
 
 
@@ -145,6 +155,14 @@ def merge(index_path,patch_paths,report_paths):
             old['staffingRoleScanComplete']=bool(
                 old.get('staffingRoleScanComplete') is True or
                 new.get('staffingRoleScanComplete') is True)
+            # Exactly those verified readable attachments reparsed from
+            # SHA-matched local bytes advance the independent fact version.
+            for index,version in (new.get('staffingFactScanVersions') or {}).items():
+                try:position=int(index)
+                except (TypeError,ValueError):continue
+                files=old.get('files') or []
+                if 0<=position<len(files) and files[position].get('readable') is True:
+                    files[position]['staffingFactScanVersion']=int(version)
             for field in ('staffingCachedReparseFiles','staffingCachedReparseAt',
                           'staffingCachedReparseVersion'):
                 if field in new:old[field]=new[field]
