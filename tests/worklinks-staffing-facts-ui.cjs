@@ -32,6 +32,13 @@ const states=new Map([
 const app=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),states,
  new Map(),new Map(),false,'',s=>String(s)
  .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
+const loadingApp=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),states,
+ new Map(),new Map(),true,'',s=>String(s)
+ .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
+assert.equal(loadingApp.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'offsite',
+ 'completed saved staffing scan must not be hidden by unrelated full-cache loading');
+assert.equal(loadingApp.jobRequirementEvidence({bidNo:'Y'}).onsite.status.key,'onsite',
+ 'saved official onsite effort should survive full-cache loading');
 const expected=[['Y','role_found','역할별 인원 1명'],
  ['N','role_recommended','8명 권고'],['X','role_count_unspecified','인원 수 미명시'],
  ['E','role_unspecified','인원표 미검출']];
