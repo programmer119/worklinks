@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'scripts/verify_three_live_staffing_sources.py'
+      - 'scripts/staffing_facts.py'
+      - 'tests/test_staffing_facts.py'
       - '.github/workflows/worklinks-three-real-staffing-20261113.yml'
   workflow_dispatch:
 permissions:
@@ -15,5 +17,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install real HWP PDF readers
         run: python3 -m pip install -q pyhwp pypdf Pillow
+      - name: Verify separate staffing-fact semantics
+        run: |
+          python3 -m py_compile scripts/staffing_facts.py
+          python3 tests/test_staffing_facts.py
       - name: Run new parser on exact official RFP bytes for three actual tenders
         run: python3 -u scripts/verify_three_live_staffing_sources.py
