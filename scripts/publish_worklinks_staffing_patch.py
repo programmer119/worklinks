@@ -85,10 +85,23 @@ def defensible_staffing_fact(fact):
         # Re-run the exact generic source clause matcher before publication.
         kind_label=str(fact.get('requirementType') or '')
         label=str(fact.get('label') or '')
-        return (fact.get('headcount') is None and
-                int(fact.get('sourceLine') or 0)>0 and
-                any(kind_label==t and label==name and pattern.search(quote)
-                    for t,name,pattern in STAFF_REQUIREMENT_PATTERNS))
+        if fact.get('headcount') is not None or int(fact.get('sourceLine') or 0)<=0:
+            return False
+        for typ,default_label,pattern in STAFF_REQUIREMENT_PATTERNS:
+            if kind_label!=typ or not pattern.search(quote):
+                continue
+            if label==default_label:
+                return True
+            # Permit a precise PM label ONLY when its years and allocation
+            # match both numbers literally present in the original clause.
+            if kind_label=='pm':
+                years=re.search(r'([1-9]\d?)\s*년\s*이상',quote)
+                rate=re.search(r'([1-9]\d?)\s*%\s*이상',quote)
+                if (years and rate and
+                        label=='PM '+str(int(years.group(1)))+'년 경력 · 참여율 '+
+                        str(int(rate.group(1)))+'% 이상'):
+                    return True
+        return False
     return False
 
 
