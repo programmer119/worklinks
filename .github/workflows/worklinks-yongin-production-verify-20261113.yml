@@ -1,0 +1,99 @@
+name: WorkLinks Yongin verified production staffing UI
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-yongin-production-verify-20261113.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Assert live Yongin saved RFP staffing facts and browser tooltip
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,time,urllib.request
+          from playwright.sync_api import sync_playwright
+          url='https://api-suaveforge.suaveforge.com:18458/api/g2b/saved?limit=2&q=R26BK01807134'
+          row=None
+          for attempt in range(35):
+              try:
+                  with urllib.request.urlopen(url,timeout=14) as response:
+                      payload=json.load(response)
+                  row=next((x for x in payload.get('items',[])
+                            if x.get('bidNo')=='R26BK01807134' and x.get('order')=='000'),None)
+                  facts=(row or {}).get('rfpSavedState',{}).get('staffingFacts') or []
+                  totals=[f for f in facts if f.get('kind')=='workload_total']
+                  sites=[f for f in facts if f.get('kind')=='workload_role' and f.get('onsite') is True]
+                  if (any(abs(float(f.get('manMonths',0))-11.522)<.002 for f in totals)
+                      and sites):
+                      break
+                  print('YONGIN_SAVED_FACTS_PENDING',attempt,
+                        {'facts':len(facts),'total':len(totals),'onsite':len(sites)},flush=True)
+              except Exception as error:
+                  print('YONGIN_SAVED_READ_ERROR',type(error).__name__,str(error)[:160],flush=True)
+              time.sleep(5)
+          else:
+              raise AssertionError('Yongin official staffing-fact scan is not yet published')
+          print('YONGIN_REAL_API_FACTS',json.dumps([
+              {'kind':f.get('kind'),'role':f.get('role'),'manMonths':f.get('manMonths'),
+               'onsite':f.get('onsite'),'sourceFile':f.get('sourceFile')}
+              for f in facts],ensure_ascii=False),flush=True)
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1440,'height':900})
+              errors=[]
+              page.on('pageerror',lambda e:errors.append(str(e)[:120]))
+              page.goto('https://worklinks.suaveforge.com/startup-support/?view=changcom',
+                        wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("typeof jobRequirementEvidence==='function' && typeof jobRequirementBadges==='function'",
+                                     timeout=30000)
+              proof=page.evaluate("""(record)=>{
+                const x={id:'g2b-servc-R26BK01807134-000',
+                  noticeNumber:'R26BK01807134',noticeOrder:'000',
+                  title:record.title,type:'나라장터 API'};
+                const identity=jobBidIdentity(x);
+                jobListRfpState.set('R26BK01807134:000',record.rfpSavedState);
+                const v=jobRequirementEvidence(x);
+                const html=jobRequirementBadges(x);
+                const host=document.querySelector('#jobCards');
+                const wrapper=document.createElement('div');
+                wrapper.className='job-mini';
+                wrapper.innerHTML=html;
+                host.appendChild(wrapper);
+                const roleBtn=wrapper.querySelector('[data-job-requirement="roles"]');
+                const roleTip=wrapper.querySelector('[data-requirement="roles"] .job-req-tip');
+                const siteBtn=wrapper.querySelector('[data-job-requirement="onsite"]');
+                roleBtn.focus();
+                roleBtn.click();
+                const display=getComputedStyle(roleTip).display;
+                const result={
+                  identity,roles:v.roles.status,onsite:v.onsite.status,
+                  roleFacts:v.roles.factLines,source:v.onsite.source,
+                  roleText:roleBtn.textContent,siteText:siteBtn.textContent,
+                  tooltipText:roleTip.textContent,tooltipDisplay:display,
+                  htmlHasFalseOffsite:html.includes('비상주 ✓')};
+                wrapper.remove();
+                return result;
+              }""",row)
+              print('YONGIN_PRODUCTION_BROWSER_RESULT',json.dumps(proof,ensure_ascii=False),flush=True)
+              assert proof['identity']['bidNo']=='R26BK01807134',proof
+              assert proof['roles']['key']=='role_workload',proof
+              assert '11.522MM' in proof['roleText'],proof
+              assert proof['onsite']['key'] in ('onsite_present','onsite'),proof
+              assert '상주' in proof['siteText'],proof
+              assert '응용SW 개발자' in proof['tooltipText'],proof
+              assert proof['tooltipDisplay']=='block',proof
+              assert not proof['htmlHasFalseOffsite'],proof
+              assert not errors,errors
+              browser.close()
+          print('YONGIN_PRODUCTION_STAFFING_UI_AND_DATA=PASS',flush=True)
+          PY
