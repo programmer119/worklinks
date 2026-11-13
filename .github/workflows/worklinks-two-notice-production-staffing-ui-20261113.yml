@@ -42,7 +42,7 @@ jobs:
               page.goto(root+'?view=changcom&v='+str(attempt),wait_until='domcontentloaded',timeout=30000)
               try:
                 page.wait_for_function("typeof jobRequirementEvidence==='function' && typeof collapseSimilarNotices==='function'",timeout=7000)
-                if page.evaluate("document.documentElement.outerHTML.includes('role_requirements') && document.documentElement.outerHTML.includes('newest cross-notice')"):
+                if page.evaluate("document.documentElement.outerHTML.includes('role_requirements') && document.documentElement.outerHTML.includes('Notice order is comparable ONLY')"):
                   break
               except Exception:pass
               print('LIVE_UI_PUBLISH_PENDING',attempt,flush=True)
