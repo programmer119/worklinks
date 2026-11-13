@@ -14,6 +14,7 @@ import tempfile
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from staffing_facts import STAFF_REQUIREMENT_PATTERNS, GENERIC_FILE_RE
+from refresh_worklinks_rfp import staffing_effective_file_complete
 
 _CONFUSING_ROLE=re.compile(r'전담\s*유지\s*보수|별도의?\s*담당자|기타\s*인력|부문별\s*대표자')
 _OBVIOUS_SCORE=re.compile(r'평가\s*항목|평가\s*기준|배\s*점|점수|점\s*이상|산술한\s*수치')
@@ -167,17 +168,25 @@ def merge(index_path,patch_paths,report_paths):
             old['staffingRoles']=unique_rows(trusted+prior)
             old['staffingFacts']=unique_facts(
                 (new.get('staffingFacts') or [])+(old.get('staffingFacts') or []))
-            old['staffingRoleScanComplete']=bool(
-                old.get('staffingRoleScanComplete') is True or
-                new.get('staffingRoleScanComplete') is True)
-            # Exactly those verified readable attachments reparsed from
-            # SHA-matched local bytes advance the independent fact version.
+            # Publish provenance for exact SHA-matched readable attachments.
+            # Do not accept a bare 'complete' flag without source coverage.
+            files=old.get('files') or []
+            for index,version in (new.get('staffingRoleScanVersions') or {}).items():
+                try:position=int(index)
+                except (TypeError,ValueError):continue
+                if 0<=position<len(files) and files[position].get('readable') is True:
+                    files[position]['staffingRoleScanVersion']=int(version)
+                    files[position]['staffingRoleScanTruncated']=(
+                        (new.get('staffingRoleScanTruncations') or {}).get(index) is True)
             for index,version in (new.get('staffingFactScanVersions') or {}).items():
                 try:position=int(index)
                 except (TypeError,ValueError):continue
-                files=old.get('files') or []
                 if 0<=position<len(files) and files[position].get('readable') is True:
                     files[position]['staffingFactScanVersion']=int(version)
+            valid_full=bool(old.get('manifestComplete') is True and files and
+                all(staffing_effective_file_complete(f,files) for f in files))
+            old['staffingRoleScanComplete']=bool(
+                old.get('staffingRoleScanComplete') is True or valid_full)
             for field in ('staffingCachedReparseFiles','staffingCachedReparseAt',
                           'staffingCachedReparseVersion'):
                 if field in new:old[field]=new[field]
