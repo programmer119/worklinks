@@ -986,12 +986,25 @@ def saved_rfp_search_state(row, compact=False):
         if urlparse(url).hostname=='www.g2b.go.kr' and urlparse(url).scheme=='https':
             datum['sourceUrl']=url
         facts.append(datum)
-    role_scan_complete=bool(row.get('staffingRoleScanComplete') is True and (
-        int(row.get('staffingCachedReparseVersion') or 0)>=4 or
-        all(f.get('staffingScopeExcluded') is True or
-            f.get('skippedDuplicateFormat') is True or
-            int(f.get('staffingRoleScanVersion') or 0)>=4
-            for f in files)))
+    # Scanner and public saved API must use the SAME narrow staffing scope.
+    # Source-verified RFP files are already scanned; a blank, unrelated
+    # bid-application/pledge form can retain its text-extraction failure without
+    # falsely invalidating an entire project's staffing-condition coverage.
+    def ancillary_blank_form(f):
+        return bool(f.get('readable') is not True and
+            f.get('errorCategory')=='no_searchable_text' and re.fullmatch(
+                r'(?:입찰\s*참가\s*신청서|서약서\s*[\(\[]\s*서식\s*[\)\]])\.(?:hwp|hwpx|pdf)',
+                os.path.basename(str(f.get('name') or '')).strip(),re.I))
+    role_scan_complete=bool(row.get('staffingRoleScanComplete') is True and files and
+        all(f.get('staffingScopeExcluded') is True or ancillary_blank_form(f) or
+            (i in covered and f.get('skippedDuplicateFormat') is True and
+             f.get('alternatePdfEvidence')==covered[i] and
+             bool(f.get('alternatePdfSourceSha256'))) or
+            (f.get('readable') is True and
+             f.get('sourceTextScanComplete') is True and
+             int(f.get('staffingRoleScanVersion') or 0)>=4 and
+             f.get('staffingRoleScanTruncated') is not True)
+            for i,f in enumerate(files)))
     # The ordinary list needs only a tiny, deterministic hint per row, not
     # 23MB source JSON nor the full list of excerpts. This avoids a slow refresh.
     if compact:
