@@ -1091,75 +1091,66 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{font-size:24px}
 }
 
-/* Align Changcom budget at right without squeezing long Korean titles. */
-#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-core{container:changcom-card / inline-size}
+/* Changcom: keep tender title on the left and budget anchored to the far right.
+   Use the available CARD width, not the entire browser viewport. */
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-core{
+ container:changcom-card / inline-size
+}
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
  display:grid;grid-template-columns:minmax(0,1fr) max-content;
- align-items:center;column-gap:14px;row-gap:0;min-height:75px
-}
-#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline h3,
-#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-card-title{
- word-break:keep-all;overflow-wrap:normal;hyphens:none
+ align-items:center;justify-content:stretch;
+ column-gap:14px;row-gap:0;min-width:0;min-height:78px
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline h3{
- width:auto;min-width:0;align-self:center;font-size:26px;line-height:1.38
+ min-width:0;width:auto;margin:0;
+ font-size:clamp(22px,2.7cqw,26px);line-height:1.4;
+ word-break:keep-all;overflow-wrap:break-word;hyphens:none;
+ align-self:center
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-card-title{
+ min-width:0;word-break:keep-all;overflow-wrap:break-word;hyphens:none
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
- display:flex;align-self:stretch;justify-self:end;align-items:center;justify-content:flex-end;
- width:auto;min-width:0;max-width:100%
+ display:flex;min-width:0;width:auto;max-width:100%;
+ align-self:center;justify-self:end;justify-content:flex-end;align-items:center
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
- display:block;width:auto;max-width:100%;margin:0;white-space:nowrap;
- overflow:visible;text-overflow:clip;
- font-size:clamp(36px,4.4cqw,44px);line-height:1.16;
+ display:block;flex:none;width:max-content;max-width:100%;
+ margin:0 0 0 auto;padding:0;
+ text-align:right;white-space:nowrap;overflow:visible;text-overflow:clip;
+ font-size:clamp(34px,4.5cqw,48px);line-height:1.18;
  font-weight:900;letter-spacing:-.7px;color:#102c53;
- text-align:right;font-variant-numeric:tabular-nums
+ font-variant-numeric:tabular-nums
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-bid-method-cell.job-business-meta{
- display:inline-flex;gap:0;align-items:baseline
+ display:inline-flex;align-items:baseline;gap:0
 }
-/* Card-width responsive: avoid mid-word clipping in compact cards. */
-@container changcom-card (max-width:850px){
+/* Only genuinely narrow cards stack price onto a separate right-aligned line. */
+@container changcom-card (max-width:520px){
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
-  grid-template-columns:minmax(0,1fr);row-gap:4px;min-height:0
+  grid-template-columns:minmax(0,1fr);row-gap:5px;min-height:0
  }
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
-  width:100%;justify-self:stretch;justify-content:flex-end;align-self:auto
+  width:100%;max-width:100%;justify-self:stretch;justify-content:flex-end;
+  align-self:auto
  }
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
-  font-size:clamp(29px,5.1cqw,38px);white-space:normal;word-break:keep-all
+  font-size:clamp(26px,7.2cqw,36px);margin-left:auto;
+  text-align:right;white-space:normal;word-break:keep-all
  }
 }
+/* Fallback in older browsers without container queries. */
 @supports not (container-type:inline-size){
- @media(max-width:950px), (min-width:1101px){
+ @media(max-width:560px){
   #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
-   grid-template-columns:minmax(0,1fr);row-gap:4px;min-height:0
+   grid-template-columns:minmax(0,1fr);row-gap:5px;min-height:0
   }
   #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
-   width:100%;justify-self:stretch;justify-content:flex-end;align-self:auto
+   width:100%;max-width:100%;justify-self:stretch;justify-content:flex-end
   }
   #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
-   font-size:34px;white-space:normal;word-break:keep-all
+   margin-left:auto;text-align:right;white-space:normal;font-size:28px
   }
- }
-}
-/* Compact Changcom cards: long Korean tender titles must never shift budget
-   horizontally. Keep amount on its own full-width, right-aligned row. */
-@media(max-width:520px){
- #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
-  display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0
- }
- #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline h3{
-  width:100%;min-width:0;flex:none
- }
- #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
-  display:flex;width:100%;min-width:0;align-self:stretch;
-  justify-content:flex-end;align-items:flex-end
- }
- #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
-  display:block;width:auto;max-width:100%;align-self:flex-end;
-  text-align:right;margin:0;line-height:1.2;white-space:nowrap;
-  font-size:clamp(26px,8vw,36px)
  }
 }
 </style>
