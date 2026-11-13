@@ -8,10 +8,14 @@ on:
       - 'scripts/backfill_worklinks_staffing_cached.py'
       - 'scripts/publish_worklinks_staffing_patch.py'
       - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'server/deploy-worklinks-server123-pipeline.sh'
       - 'startup-support/index.html'
       - 'tests/test_staffing_facts.py'
       - 'tests/test_rfp_staffing_roles.py'
       - 'tests/worklinks-staffing-facts-ui.cjs'
+      - 'tests/test_worklinks_server123_pipeline.py'
+      - 'tests/test_worklinks_deploy_runner_policy.py'
       - '.github/workflows/worklinks-three-real-staffing-20261113.yml'
   workflow_dispatch:
 permissions:
@@ -32,5 +36,8 @@ jobs:
           python3 tests/test_staffing_publish_evidence.py
           python3 tests/test_rfp_staffing_cached_backfill.py
           node tests/worklinks-staffing-facts-ui.cjs
+          bash -n server/deploy-worklinks-server123-pipeline.sh
+          python3 tests/test_worklinks_server123_pipeline.py
+          python3 tests/test_worklinks_deploy_runner_policy.py
       - name: Run new parser on exact official RFP bytes for three actual tenders
         run: python3 -u scripts/verify_three_live_staffing_sources.py
