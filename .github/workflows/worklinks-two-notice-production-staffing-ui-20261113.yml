@@ -48,6 +48,18 @@ jobs:
               print('LIVE_UI_PUBLISH_PENDING',attempt,flush=True)
               time.sleep(4)
             else:raise AssertionError('Updated staffing and notice-grouping HTML is not live')
+            page.wait_for_function("""()=>
+              ['R26BK01818412:000','R26BK01810885:000'].every(key=>
+                rfpSnapshotByNotice.get(key)?.staffingFacts?.some(f=>f.kind==='staffing_requirement'))
+            """,timeout=40000)
+            auto=page.evaluate("""()=>
+              ['R26BK01818412:000','R26BK01810885:000'].map(key=>({
+                notice:key,requirements:(rfpSnapshotByNotice.get(key)?.staffingFacts||[])
+                  .filter(f=>f.kind==='staffing_requirement').map(f=>f.label)
+              }))
+            """)
+            print('LIVE_AUTOMATIC_SOURCE_LOAD',json.dumps(auto,ensure_ascii=False),flush=True)
+            assert len(auto[0]['requirements'])==3 and len(auto[1]['requirements'])==4
             proof=page.evaluate("""(sources)=>{
              const {lx,seoul,earlier,verified}=sources;
              const notices=[...earlier,seoul].map(x=>({id:'g2b-servc-'+x.bidNo+'-'+x.order,
