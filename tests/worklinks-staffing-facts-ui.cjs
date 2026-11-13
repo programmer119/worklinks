@@ -36,6 +36,14 @@ assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'not_spec
 assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주인력 기재'));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('비상주 ✓'));
 assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('8.280MM'));
-assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('직무별 인원 수 미명시'));
+assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('인원 수는 별도 명시되지 않았습니다.'));
+const yonginBadgeHtml=app.jobRequirementBadges({bidNo:'Y'});
+assert.ok(yonginBadgeHtml.includes('<table class="job-req-effort-table">'),'workload must be a readable table');
+assert.ok(yonginBadgeHtml.includes('2개 투입항목'),'workload count is not a headcount');
+const onsiteBadge=yonginBadgeHtml.slice(yonginBadgeHtml.indexOf('data-requirement="onsite"'),yonginBadgeHtml.indexOf('data-requirement="roles"'));
+const workloadBadge=yonginBadgeHtml.slice(yonginBadgeHtml.indexOf('data-requirement="roles"'),yonginBadgeHtml.indexOf('<span class="job-req-tip" role="tooltip">',yonginBadgeHtml.indexOf('data-requirement="roles"')));
+assert.ok(!onsiteBadge.includes('job-req-icon'),'verified onsite source is not a grey failure/info circle');
+assert.ok(!workloadBadge.includes('job-req-icon'),'verified workload source is not a grey failure/info circle');
+assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.status.key,'role_workload');
 assert.ok(app.jobRequirementEvidence({bidNo:'N'}).roles.factLines[0].includes('필수 아님'));
 console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length);
