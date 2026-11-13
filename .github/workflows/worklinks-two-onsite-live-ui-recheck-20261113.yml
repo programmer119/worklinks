@@ -59,6 +59,7 @@ jobs:
           for item in result:
               assert item['staffingScopeRead'] is True,item
               assert item['onsite']['key']=='not_specified' and item['onsite']['label']=='상주 미확정',item
-              assert item['roles']['key'] not in ('failed','not_checked','checking'),item
-          print('TWO_ONSITE_SOURCE_MISSING_NOT_MISLABELLED_OFFSITE=PASS')
+              assert item['roles']['key']=='role_unspecified',item
+              assert item['insurance']['key']=='not_required' and item['insurance']['label']=='불필요',item
+          print('TWO_ONSITE_AND_INSURANCE_REEVALUATED_LIVE_JS=PASS')
           PY
