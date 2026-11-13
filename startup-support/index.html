@@ -4046,6 +4046,14 @@ function jobRequirementEvidence(x){
    Number(saved.documentCount)>0&&
    Number(saved.effectiveReadableCount??saved.readableCount)===Number(saved.documentCount);
  const sourceReadComplete=fullScanComplete||savedReadComplete;
+ // Staffing analysis excludes generic nationwide contract-law archives (and
+ // verified duplicate formats). A non-project ZIP extraction error cannot
+ // invalidate a complete scan of project-specific staffing sources.
+ const staffingSourceReadComplete=sourceReadComplete||
+   (saved?.staffingRoleScanComplete===true&&
+    saved?.status==='text_extracted_requires_review'&&
+    Number(saved.documentCount)>0&&
+    Number(saved.effectiveReadableCount??saved.readableCount)>0);
  const negative=/필요\s*없음|요구하지\s*않|제출\s*불필요|제출하지\s*않|의무\s*없음|해당\s*없음/i;
  const insurance=/(?:4\s*대\s*(?:사회\s*)?보험|사대\s*보험|사회\s*보험\s*가입\s*(?:자|증명)|건강\s*보험\s*(?:자격득실|가입자명부)|고용\s*보험\s*가입\s*(?:증명|확인))/i;
  const onsite=/상주|현장\s*(?:근무|배치)|전담\s*근무|(?:발주기관|발주처|수요기관).{0,25}상시\s*(?:근무|배치)/i;
@@ -4108,8 +4116,8 @@ function jobRequirementEvidence(x){
      reason:'공식 문서에서 발주처 상시 근무·상주 의무가 명시됨 (인력 소속 기준일과는 별도)'};
    if(rfpSnapshotLoading&&!full)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 상주 여부 미확정'};
     if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
-   if(!sourceReadComplete)return {key:'failed',label:'확인실패',
-     reason:'원문·첨부 전체 수집·판독이 완료되지 않아 상주 여부를 확정할 수 없음'};
+   if(!staffingSourceReadComplete)return {key:'failed',label:'확인실패',
+     reason:'사업별 인력 조건을 확인할 원문·첨부 수집 또는 판독이 완료되지 않음'};
    return {key:'not_specified',label:'상주 미확정',
      reason:'원문에 발주처 상주 의무가 확인되지 않음 · 비상주 확정 근거도 없음'};
  }
