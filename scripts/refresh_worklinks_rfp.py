@@ -198,7 +198,9 @@ def staffing_scan_pending(record):
         return False
     files=[f for f in record.get('files') or [] if isinstance(f,dict)]
     if not files:return False
-    if record.get('staffingRoleScanComplete') is True:return False
+    if (record.get('staffingRoleScanComplete') is True and
+            all(staffing_effective_file_complete(f,files) for f in files)):
+        return False
     return any(f.get('readable') is True and
                (int(f.get('staffingRoleScanVersion') or 0)<STAFFING_ROLE_SCAN_VERSION
                 or f.get('staffingRoleScanTruncated') is True)
@@ -939,8 +941,15 @@ def parse_clauses(text):
 
 # A separate, source-grounded staffing scan. Qualification snippets alone miss
 # tables such as "직무 / 등급 / 인원" and wrapped DOCX/PDF/HWPX rows.
-STAFFING_ROLE_SCAN_VERSION=2
+STAFFING_ROLE_SCAN_VERSION=4
 STAFFING_ROLE_TEXT_LIMIT=350_000
+try:
+    from staffing_facts import extract_staffing_facts
+except ModuleNotFoundError as exc:
+    if exc.name!='staffing_facts':raise
+    import sys
+    sys.path.insert(0,str(Path(__file__).resolve().parent))
+    from staffing_facts import extract_staffing_facts
 _STAFF_ROLE=re.compile(
     r'(?<![가-힣A-Za-z0-9])(?:사업\s*책임자|총괄\s*책임자|프로젝트\s*관리자|'
     r'프로젝트\s*리더|PM\b|PL\b|DBA\b|QA\b|'
@@ -949,7 +958,8 @@ _STAFF_ROLE=re.compile(
     r'시스템\s*운영자|운영\s*인력|운영자|유지\s*보수\s*인력|'
     r'시스템\s*엔지니어|기술\s*지원\s*인력|기술자|'
     r'정보\s*보안\s*담당자|보안\s*담당자|데이터\s*분석가|'
-    r'품질\s*관리자|테스터|디자이너|퍼블리셔)'
+    r'AI\s*전문가|인공\s*지능\s*전문가|포털\s*개발|'
+    r'인프라|개발|품질\s*관리자|테스터|디자이너|퍼블리셔)'
     r'(?![가-힣A-Za-z0-9])', re.I)
 _STAFF_HEADER=re.compile(
     r'(?:인원|인력|투입\s*인원|인원\s*수|인원\s*계획)'
@@ -1595,6 +1605,7 @@ def process(no,ordn,metadata=None,previous=None):
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
             staffing_roles=extract_staffing_roles(content,name,url)
+            staffing_facts=extract_staffing_facts(content,name,url)
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
             record.update({'readable':True,'textChars':len(content),
                            **scan,
@@ -1608,6 +1619,7 @@ def process(no,ordn,metadata=None,previous=None):
                            'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
                            'staffingRoleScanTruncated':len(content)>STAFFING_ROLE_TEXT_LIMIT,
                            'staffingRoles':staffing_roles,
+                           'staffingFacts':staffing_facts,
                            'topics':triggers,'snippets':snippets,
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
@@ -1684,6 +1696,39 @@ def staffing_summary(item):
             if len(rows)>=24:return rows
     return rows
 
+def staffing_fact_summary(item):
+    """Bounded source-provenanced workload/recommendation/role facts."""
+    result=[]
+    seen=set()
+    supported={'workload_role','workload_total','headcount_recommended',
+               'staffing_plan_required','role_unspecified'}
+    for f in (item or {}).get('files') or []:
+        if not isinstance(f,dict):continue
+        if staffing_source_is_general_example(f.get('name')):continue
+        for fact in f.get('staffingFacts') or []:
+            if not isinstance(fact,dict) or fact.get('kind') not in supported:continue
+            source=str(fact.get('sourceText') or '').strip()[:240]
+            role=str(fact.get('role') or '').strip()[:80]
+            if not source or not str(fact.get('sourceFile') or f.get('name') or '').strip():
+                continue
+            signature=(fact['kind'],role,str(fact.get('count')),str(fact.get('manMonths')),
+                       str(fact.get('allocationRate')),source)
+            if signature in seen:continue
+            seen.add(signature)
+            clean={'kind':fact['kind'],'role':role,'sourceText':source,
+                   'sourceFile':str(fact.get('sourceFile') or f.get('name'))[:140],
+                   'sourceLine':int(fact.get('sourceLine') or 0)}
+            for key in ('count','minimum','mandatory','onsite','headcount',
+                        'manMonths','durationMonths','allocationRate','verifiedRoleCount'):
+                if key in fact:clean[key]=fact[key]
+            url=str(fact.get('sourceUrl') or '')
+            if url.startswith('https://www.g2b.go.kr/'):
+                clean['sourceUrl']=url
+            result.append(clean)
+            if len(result)>=35:return result
+    return result
+
+
 def backfill_cached_staffing(records, max_files=24):
     """Reparse verified local attachment bytes only; NEVER make an HTTP call.
 
@@ -1717,6 +1762,7 @@ def backfill_cached_staffing(records, max_files=24):
                     if not evidence.get('sourceComplete'):
                         raise ValueError('cached_source_scan_incomplete')
                     f['staffingRoles']=extract_staffing_roles(content,name,url)
+                    f['staffingFacts']=extract_staffing_facts(content,name,url)
                     f['staffingRoleScanVersion']=STAFFING_ROLE_SCAN_VERSION
                     f['staffingRoleScanTruncated']=len(content)>STAFFING_ROLE_TEXT_LIMIT
                     parsed+=1
@@ -1770,6 +1816,7 @@ def compact_coverage(item):
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
     }
     compact['staffingRoles']=staffing_summary(item)
+    compact['staffingFacts']=staffing_fact_summary(item)
     compact['staffingRoleScanComplete']=bool(
         item.get('manifestComplete') is True and compact['files'] and
         all(staffing_effective_file_complete(f,item.get('files') or [])

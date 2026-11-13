@@ -23,6 +23,7 @@ from refresh_worklinks_rfp import (
     STAFFING_ROLE_SCAN_VERSION,
     STAFFING_ROLE_TEXT_LIMIT,
     extract_staffing_roles,
+    extract_staffing_facts,
     extract_with_source_status,
     normalize_extracted_text,
     staffing_from_saved_excerpts,
@@ -172,13 +173,14 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
                 failures[key+'#'+str(position)]=error
                 continue
             role_rows=extract_staffing_roles(text,name)
+            fact_rows=extract_staffing_facts(text,name)
             proof=next((f for f in (detailed.get(key) or {}).get('files',[])
                 if f.get('name')==name and f.get('sourceSha256')==sha),{})
             url=str(proof.get('sourceUrl') or '')
             if not url.startswith('https://www.g2b.go.kr/'):url=''
-            for row in role_rows:
+            for row in role_rows+fact_rows:
                 row['sourceUrl']=url
-            scanned[(key,position)]=dict(rows=role_rows,truncated=len(text)>STAFFING_ROLE_TEXT_LIMIT)
+            scanned[(key,position)]=dict(rows=role_rows,facts=fact_rows,truncated=len(text)>STAFFING_ROLE_TEXT_LIMIT)
             total_files+=1
         del raw
         if total_files%20==0 and total_files:
@@ -194,10 +196,25 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         performed=[scanned.get((key,i)) for i in range(len(files))]
         if not any(performed):continue
         new_roles=[]
+        new_facts=[]
         for info in performed:
-            if info:new_roles.extend(info['rows'])
+            if info:
+                new_roles.extend(info['rows'])
+                new_facts.extend(info['facts'])
         previous=uniq_roles(row.get('staffingRoles') or [])
         roles=uniq_roles(new_roles+previous)
+        prior_facts=[x for x in row.get('staffingFacts') or [] if isinstance(x,dict)]
+        facts=[]
+        seen_facts=set()
+        for fact in new_facts+prior_facts:
+            if not isinstance(fact,dict) or not fact.get('kind') or not fact.get('sourceText'):
+                continue
+            signature=(str(fact.get('kind')),str(fact.get('role')),
+                       str(fact.get('manMonths')),str(fact.get('sourceText')))
+            if signature in seen_facts:continue
+            seen_facts.add(signature)
+            facts.append(fact)
+            if len(facts)>=35:break
         # HWP counterpart deliberately skipped as a different format does not
         # prove identical legal content, so do not certify a full-document scan.
         complete=bool(row.get('manifestComplete') is True and len(files)>0 and
@@ -207,6 +224,7 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
                 for i,f in enumerate(files)))
         updates[key]={
             'staffingRoles':roles,
+            'staffingFacts':facts,
             'staffingRoleScanComplete':complete,
             'staffingCachedReparseFiles':sum(bool(x) for x in performed),
             'staffingCachedReparseAt':now,
@@ -215,7 +233,7 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         affected[key]={
             'scanned':sum(bool(x) for x in performed),
             'files':len(files),
-            'roles':len(roles),'full':complete,
+            'roles':len(roles),'facts':len(facts),'full':complete,
         }
     after_evidence=sum(bool(updates.get(key,{}).get('staffingRoles',row.get('staffingRoles')))
         for key,row in index.items() if isinstance(row,dict))

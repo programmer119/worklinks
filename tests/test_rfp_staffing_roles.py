@@ -44,7 +44,7 @@ assert {x['role']:x['count'] for x in table}=={'PM':1,'DBA':2},table
 
 item={'status':'text_extracted_requires_review','manifestComplete':True,
       'files':[{'name':'제안요청서.pdf','readable':True,'sourceTextScanComplete':True,
-                'staffingRoleScanVersion':2,'staffingRoleScanTruncated':False,
+                'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoleScanTruncated':False,
                 'staffingRoles':roles}]}
 summed=summary(item)
 assert len(summed)==4,summed
@@ -100,13 +100,13 @@ assert parse('기술자 1명','제안요청서.hwpx')
 assert parse('산정예시 기술자 1명','제안요청서.hwpx')==[]
 legacy_example={'manifestComplete':True,'files':[{'name':general,
   'readable':True,'sourceTextScanComplete':True,
-  'staffingRoleScanVersion':2,'staffingRoles':[{
+  'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoles':[{
     'role':'기술자','count':1,'sourceFile':general,'sourceText':example}]}]}
 assert p['staffing_summary'](legacy_example)==[]
 # 350k+ characters of generic legal guidance cannot prevent a complete
 # project-only role inspection. Do not pretend that guidance was fully read.
 generic_law={'name':general,'readable':True,'sourceTextScanComplete':False,
-             'staffingRoleScanVersion':2,'staffingRoleScanTruncated':True}
+             'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoleScanTruncated':True}
 scope_law={'manifestComplete':True,'files':[generic_law,pdf]}
 law_index=p['compact_coverage'](scope_law)
 assert law_index['staffingRoleScanComplete'] is True

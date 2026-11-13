@@ -965,7 +965,29 @@ def saved_rfp_search_state(row, compact=False):
             'sourceText':str(item.get('sourceText') or '')[:240],
             'sourceUrl':url,'scope':str(item.get('scope') or 'excerpt')[:12]
         })
-    role_scan_complete=row.get('staffingRoleScanComplete') is True
+    facts=[]
+    allowed={'workload_role','workload_total','headcount_recommended',
+             'staffing_plan_required','role_unspecified'}
+    for item in (row.get('staffingFacts') or [])[:35]:
+        if not isinstance(item,dict) or item.get('kind') not in allowed:continue
+        quote=' '.join(str(item.get('sourceText') or '').split())[:240]
+        if not quote:continue
+        datum={'kind':item['kind'],'role':str(item.get('role') or '')[:80],
+               'sourceText':quote,'sourceFile':str(item.get('sourceFile') or '')[:140],
+               'sourceLine':int(item.get('sourceLine') or 0)}
+        for field in ('count','minimum','mandatory','onsite','headcount',
+                      'manMonths','durationMonths','allocationRate','verifiedRoleCount'):
+            if field in item:datum[field]=item[field]
+        url=str(item.get('sourceUrl') or '')
+        if urlparse(url).hostname=='www.g2b.go.kr' and urlparse(url).scheme=='https':
+            datum['sourceUrl']=url
+        facts.append(datum)
+    role_scan_complete=bool(row.get('staffingRoleScanComplete') is True and (
+        int(row.get('staffingCachedReparseVersion') or 0)>=4 or
+        all(f.get('staffingScopeExcluded') is True or
+            f.get('skippedDuplicateFormat') is True or
+            int(f.get('staffingRoleScanVersion') or 0)>=4
+            for f in files)))
     # The ordinary list needs only a tiny, deterministic hint per row, not
     # 23MB source JSON nor the full list of excerpts. This avoids a slow refresh.
     if compact:
@@ -985,7 +1007,8 @@ def saved_rfp_search_state(row, compact=False):
             'pdfCoveredCount':len(covered),
             'effectiveReadableCount':effective_readable,
             'excerpts':labels[:3],
-            'staffingRoles':role_rows,'staffingRoleScanComplete':role_scan_complete}
+            'staffingRoles':role_rows,'staffingFacts':facts,
+            'staffingRoleScanComplete':role_scan_complete}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
     # NOT an interpretation that the bidder is qualified.
     excerpts=[]
@@ -1007,7 +1030,8 @@ def saved_rfp_search_state(row, compact=False):
                 if len(excerpts)>=12:break
             if len(excerpts)>=12:break
     return {'sourceAvailable':True,'seen':True,'complete':good,
-            'staffingRoles':role_rows,'staffingRoleScanComplete':role_scan_complete,
+            'staffingRoles':role_rows,'staffingFacts':facts,
+            'staffingRoleScanComplete':role_scan_complete,
             'scanComplete':scan_complete,
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
