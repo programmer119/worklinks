@@ -177,3 +177,61 @@ with sync_playwright() as p:
         page.close()
     browser.close()
 print("BID_CARD_LAYOUT_PASS")
+
+
+# Regression: exercise the ACTUAL Changcom mode, not just generic job cards.
+# A 640px partner card must keep the amount on the right BESIDE the title,
+# while a genuinely narrow phone card may stack it, still right-aligned.
+def changcom_card(title, amount):
+    return f'''<article class="card job-mini">
+      <div class="job-day"><strong>D-7</strong><span class="job-date">11.20 10:00</span></div>
+      <div class="job-core">
+        <div class="job-headline">
+          <h3><button class="job-card-title" type="button">{title}</button></h3>
+          <div class="job-headline-side">
+            <div class="job-headline-badge">SW사업</div>
+            <span class="job-amount">{amount}</span>
+          </div>
+        </div>
+      </div>
+    </article>'''
+
+partner_html = (
+    '<!doctype html><html lang="ko"><meta charset="utf-8">'
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    '<style>' + css[0] + '</style><body>'
+    '<div id="jobsView" class="workspace-view on" data-job-mode="partner"'
+    ' style="display:block">'
+    '<div id="jobCards" class="cards"'
+    ' style="width:640px;max-width:calc(100vw - 24px)">'
+    + changcom_card(
+        '2027년 노후계획도시정보플랫폼 운영 및 유지관리',
+        '1억 8,000만원')
+    + '</div></div></body></html>'
+)
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
+    for width, expected_stack in ((700, False), (390, True)):
+        page = browser.new_page(viewport={"width":width,"height":600})
+        page.set_content(partner_html, wait_until="load")
+        rect = page.evaluate("""() => {
+            const t = document.querySelector('#jobsView .job-card-title').getBoundingClientRect();
+            const a = document.querySelector('#jobsView .job-amount').getBoundingClientRect();
+            const h = document.querySelector('#jobsView .job-headline').getBoundingClientRect();
+            return {
+                titleLeft:t.left,titleRight:t.right,titleTop:t.top,titleBottom:t.bottom,
+                priceLeft:a.left,priceRight:a.right,priceTop:a.top,priceBottom:a.bottom,
+                headlineRight:h.right,
+                overflow:document.documentElement.scrollWidth>innerWidth+1
+            };
+        }""")
+        assert not rect["overflow"],(width,rect)
+        assert abs(rect["priceRight"]-rect["headlineRight"])<=2,(width,rect)
+        if expected_stack:
+            assert rect["priceTop"]>=rect["titleBottom"]-1,(width,rect)
+        else:
+            assert rect["priceLeft"]>=rect["titleRight"]-1,(width,rect)
+            assert rect["priceTop"]<rect["titleBottom"],(width,rect)
+        print("CHANGCOM_COMPACT_PRICE_LAYOUT_PASS",width,rect,flush=True)
+        page.close()
+    browser.close()
