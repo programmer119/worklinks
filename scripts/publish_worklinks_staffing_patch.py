@@ -11,6 +11,8 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 from staffing_facts import STAFF_REQUIREMENT_PATTERNS
 
 _CONFUSING_ROLE=re.compile(r'전담\s*유지\s*보수|별도의?\s*담당자|기타\s*인력|부문별\s*대표자')
