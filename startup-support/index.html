@@ -4091,18 +4091,19 @@ function jobRequirementEvidence(x){
     /(?:상주|현장\s*(?:근무|배치)|전담\s*근무).{0,70}(?:필수|의무|필요|해야|하여야|배치|투입|[1-9]\d?\s*(?:명|인))|(?:필수|반드시|의무).{0,45}(?:상주|현장\s*(?:근무|배치))/i.test(c.text));
  const onsiteMust=onsiteMustCandidates.find(c=>preExistingStage.test(c.text))||
     onsiteMustCandidates.find(c=>bidStage.test(c.text))||onsiteMustCandidates[0];
+ const insuranceSourceReadComplete=sourceReadComplete||staffingSourceReadComplete;
  function choice(positive,mentioned){
   if(positive&&preExistingStage.test(positive.text))
    return {key:'required',label:'사전 필요',reason:'공고일 기준 등 입찰 전에 이미 충족해야 하는 조건이 원문에 명시됨'};
   if(positive&&bidStage.test(positive.text))
    return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
-  if(rfpSnapshotLoading&&!full)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
+  if(rfpSnapshotLoading&&!full&&!insuranceSourceReadComplete)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
-  if(sourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
+  if(insuranceSourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
    return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
-  if(sourceReadComplete&&!mentioned.length)
-   return {key:'not_required',label:'필요없음',reason:'공식 원문·첨부 전체 정상 판독 · 요구 문구 미검출 (해당 문서 기준)'};
-  if(sourceReadComplete)
+  if(insuranceSourceReadComplete&&!mentioned.length)
+   return {key:'not_required',label:'불필요',reason:sourceReadComplete? '공식 원문·첨부 전체 정상 판독 · 4대보험 요구 문구 미검출 (해당 문서 기준)' : '사업별 인력조건 공식 문서 정상 판독 · 4대보험 가입·증빙 요구 미검출 (부속 제출서식 추출오류는 별도, 일반적인 법적 의무 면제 의미 아님)'};
+  if(insuranceSourceReadComplete)
    return {key:'not_required',label:'필요없음',reason:mentioned.some(deferredToContract)?
     '전체 문서 정상 판독 · 입찰 시 필수요건은 확인되지 않음 (계약·수행 단계 조건은 원문 확인 후 준비)':
     '전체 문서 정상 판독 · 관련 문구는 있지만 입찰 시 명확한 필수요건은 확인되지 않음'};
