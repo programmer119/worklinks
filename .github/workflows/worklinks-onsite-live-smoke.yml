@@ -1,0 +1,57 @@
+name: WorkLinks live onsite staffing badge verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - startup-support/index.html
+      - startup-support/staffing-source-verified.json
+      - .github/workflows/worklinks-onsite-live-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Verify public deployed UI and source-backed North recommendation
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base='https://worklinks.suaveforge.com/startup-support'
+          for i in $(seq 1 36); do
+            curl -fsSL --connect-timeout 6 --max-time 25 \
+              -H 'Cache-Control: no-cache' \
+              "$base/index.html?onsite_smoke=$GITHUB_RUN_ID-$i" -o /tmp/live-worklinks.html || true
+            curl -fsSL --connect-timeout 6 --max-time 25 \
+              -H 'Cache-Control: no-cache' \
+              "$base/staffing-source-verified.json?onsite_smoke=$GITHUB_RUN_ID-$i" -o /tmp/live-staffing.json || true
+            if python3 - <<'PY'
+          import json,pathlib
+          html=pathlib.Path('/tmp/live-worklinks.html')
+          facts=pathlib.Path('/tmp/live-staffing.json')
+          assert html.is_file() and facts.is_file()
+          page=html.read_text(encoding='utf-8')
+          data=json.loads(facts.read_text(encoding='utf-8'))
+          assert "site={key:'onsite_recommended'" in page
+          assert "job-req-onsite-person" in page
+          assert "상주인력 · 월평균" in page
+          assert "투입기간 " in page
+          north=data['byNotice']['R26BK01783957:000']
+          assert north['sha256']=='0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645'
+          assert any(f.get('kind')=='headcount_recommended' and
+                     f.get('count')==8 and f.get('mandatory') is False and
+                     f.get('onsite') is True and '월평균 8명 이상' in f.get('sourceText','')
+                     for f in north['staffingFacts'])
+          print('LIVE_WORKLINKS_ONSITE_HTML=PASS')
+          print('LIVE_WORKLINKS_NORTH_8_RECOMMENDATION=PASS')
+          PY
+            then
+              echo LIVE_WORKLINKS_ONSITE_RELEASE=PASS
+              exit 0
+            fi
+            echo "LIVE_WORKLINKS_ONSITE_RETRY=$i"
+            sleep 10
+          done
+          echo LIVE_WORKLINKS_ONSITE_RELEASE=FAIL
+          exit 1
