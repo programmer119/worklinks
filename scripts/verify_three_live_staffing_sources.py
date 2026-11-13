@@ -164,6 +164,16 @@ def run():
                         r"상주\s*인력|전문\s*기술\s*인력|투입.{0,12}인원|"
                         r"분야별\s*인원|인력\s*구성",re.I)
                     indices=[i for i,line in enumerate(lines) if terms.search(line)]
+                    # Inspect the full extracted staffing table region rather
+                    # than the first broad keyword matches.
+                    spans=([(825,900)] if name=="north" else [(325,365),(645,673)])
+                    table=[{"line":i+1,"text":" ".join(lines[i].split())[:330]}
+                           for low,high in spans
+                           for i in range(max(0,low-1),min(len(lines),high))
+                           if lines[i].strip()]
+                    print("STAFFING_TABLE_REGION "+json.dumps({
+                        "case":name,"file":f["name"],"lines":table
+                    },ensure_ascii=False),flush=True)
                     excerpts=[{"line":i+1,"context":" | ".join(
                         " ".join(z.split())[:250] for z in lines[max(0,i-1):i+2]
                     )[:620]} for i in indices[:38]]
