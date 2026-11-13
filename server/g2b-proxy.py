@@ -965,7 +965,15 @@ def saved_rfp_search_state(row, compact=False):
             'sourceText':str(item.get('sourceText') or '')[:240],
             'sourceUrl':url,'scope':str(item.get('scope') or 'excerpt')[:12]
         })
-    role_scan_complete=row.get('staffingRoleScanComplete') is True
+    # Old completed flags from pre-v3 role scans cannot certify no headcount.
+    # An offline cached reparse carries the explicit version at notice level.
+    role_scan_complete=bool(row.get('staffingRoleScanComplete') is True and (
+        int(row.get('staffingCachedReparseVersion') or 0)>=3 or
+        all((f.get('staffingScopeExcluded') is True or
+             f.get('skippedDuplicateFormat') is True or
+             (f.get('readable') is True and
+              int(f.get('staffingRoleScanVersion') or 0)>=3))
+            for f in files)))
     # The ordinary list needs only a tiny, deterministic hint per row, not
     # 23MB source JSON nor the full list of excerpts. This avoids a slow refresh.
     if compact:
