@@ -97,7 +97,8 @@ assert.ok(html.includes('[data-state="offsite"] .job-req-trigger{background:#dcf
 assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주 필수'));
 assert.ok(app.jobRequirementBadges({bidNo:'E'}).includes('상주 미확정'));
 assert.ok(!app.jobRequirementBadges({bidNo:'E'}).includes('비상주 ✓'));
-assert.ok(app.jobRequirementBadges({bidNo:'V'}).includes('비상주 ✓'));
+assert.ok(app.jobRequirementBadges({bidNo:'V'}).includes('data-state="offsite"'));
+assert.ok(app.jobRequirementBadges({bidNo:'V'}).includes('비상주 <span class="job-req-icon"'));
 assert.ok(!html.includes("label:'상주 확인'"));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('비상주 ✓'));
 assert.ok(app.jobRequirementEvidence({bidNo:'Y'}).roles.factLines.some(v=>v.includes('8.280MM')));
