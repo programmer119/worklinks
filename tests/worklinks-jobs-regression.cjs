@@ -425,14 +425,14 @@ past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'1234567890',win
 assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,true,
  'same verified contractor business ID across years is incumbent evidence');
 assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,1);
-assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/class="advantage-pill"/g)||[]).length,1);
+assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/advantage-pill is-filled/g)||[]).length,1);
 past.competitionByNotice.set('20241237450',{count:2,winnerBizno:'9999999999',winner:'다른 업체',checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).sameWinner,false,
  'different winner across years must not be called an incumbent');
 assert.equal(past.pastCompetitionSummary(pastBid).changedWinner,true);
 assert.equal(past.pastCompetitionSummary(pastBid).lowRecentPair,true);
 assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,3);
-assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/class="advantage-pill"/g)||[]).length,3);
+assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/advantage-pill is-filled/g)||[]).length,3);
 assert.equal(past.bidAdvantageOrder({level:3}),0);
 assert.ok(past.bidAdvantageOrder({level:2})<past.bidAdvantageOrder({level:1}));
 assert.ok(past.bidAdvantageOrder({level:1})<past.bidAdvantageOrder({level:null,kind:'unknown'}));
