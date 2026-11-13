@@ -1,0 +1,89 @@
+{
+  "ok": true,
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-13T04:42:42.850082+00:00",
+  "byNotice": {
+    "R26BK01807134:000": {
+      "verification": "official_attachment_sha256",
+      "sourceFile": "공내역서.xlsx",
+      "sha256": "7e93a5acc6d1d406afd95ebfcbd73a1df92c3733c2653748c931dd8eea1529d2",
+      "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+      "staffingFacts": [
+        {
+          "kind": "workload_role",
+          "sourceFile": "공내역서.xlsx",
+          "sourceLine": 17,
+          "sourceText": "기능개선 및 유지관리 사업 총괄관리 IT PM 협의 3 0.114 0",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "role": "IT PM",
+          "durationMonths": 3.0,
+          "allocationRate": 0.114,
+          "manMonths": 0.342,
+          "onsite": false,
+          "headcount": null
+        },
+        {
+          "kind": "workload_role",
+          "sourceFile": "공내역서.xlsx",
+          "sourceLine": 18,
+          "sourceText": "웹 콘텐츠 개발 및 유지관리 응용SW 개발자 평균 4 0.25 0",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "role": "응용SW 개발자",
+          "durationMonths": 4.0,
+          "allocationRate": 0.25,
+          "manMonths": 1.0,
+          "onsite": false,
+          "headcount": null
+        },
+        {
+          "kind": "workload_role",
+          "sourceFile": "공내역서.xlsx",
+          "sourceLine": 20,
+          "sourceText": "(상주인력) 응용SW 개발자 평균 11.04 0.75 0",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "role": "응용SW 개발자",
+          "durationMonths": 11.04,
+          "allocationRate": 0.75,
+          "manMonths": 8.28,
+          "onsite": true,
+          "headcount": null
+        },
+        {
+          "kind": "workload_role",
+          "sourceFile": "공내역서.xlsx",
+          "sourceLine": 21,
+          "sourceText": "웹 콘텐츠 디자인 UI/UX 디자이너 협의 3.5 0.2 0",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "role": "UI/UX 디자이너",
+          "durationMonths": 3.5,
+          "allocationRate": 0.2,
+          "manMonths": 0.7,
+          "onsite": false,
+          "headcount": null
+        },
+        {
+          "kind": "workload_role",
+          "sourceFile": "공내역서.xlsx",
+          "sourceLine": 22,
+          "sourceText": "퍼블리싱 UI/UX 개발자 협의 3 0.4 0",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "role": "UI/UX 개발자",
+          "durationMonths": 3.0,
+          "allocationRate": 0.4,
+          "manMonths": 1.2,
+          "onsite": false,
+          "headcount": null
+        },
+        {
+          "kind": "workload_total",
+          "sourceFile": "공내역서.xlsx",
+          "sourceLine": 23,
+          "sourceText": "총 투입공수 투입기간 * 투입률 11.521999999999998",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01807134&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+          "manMonths": 11.522,
+          "verifiedRoleCount": 5
+        }
+      ]
+    }
+  }
+}
