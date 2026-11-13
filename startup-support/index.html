@@ -521,7 +521,6 @@
 #jobCards .job-req-item[data-requirement="onsite"][data-state="onsite_recommended"] .job-req-trigger{background:#fff2e5;border-color:#fdba74;color:#c2410c}
 #jobCards .job-req-item[data-requirement="onsite"][data-state="onsite_negotiable"] .job-req-trigger{background:#ecfccb;border-color:#a3e635;color:#3f6212}
 #jobCards .job-req-item[data-requirement="onsite"][data-state="offsite"] .job-req-trigger{background:#dcfce7;border-color:#86efac;color:#166534}
-#jobCards .job-req-item[data-requirement="onsite"][data-state="not_specified"] .job-req-trigger{background:#f1f5f9;border-color:#cbd5e1;color:#334155}
 #jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 28px));padding:12px 14px;border:1px solid #cad5e3;border-radius:11px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.15);color:#1e293b;font-size:15px;font-weight:500;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
 #jobCards .job-req-item[data-requirement="roles"] .job-req-tip{width:min(570px,calc(100vw - 28px));right:0;left:auto;bottom:calc(100% + 7px);max-height:70vh;overflow-y:auto;padding:0}
@@ -4163,12 +4162,9 @@ function jobRequirementEvidence(x){
      reason:'공고 원문 API 수집·검증 호출 기록 없음'};
    if(!staffingSourceReadComplete)return {key:'failed',label:'확인실패',
      reason:'상주 조건을 확인할 원문·첨부 수집 또는 판독이 완료되지 않음'};
-   // Absence of an onsite duty never proves offsite work. Only the explicit
-   // offsite clause above may set the affirmative green offsite state.
-   return {key:'not_specified',label:'상주 미확정',
-     reason:foundOnsite.length?
-       '공식 문서에서 상주 배치 의무와 비상주 근무 모두 확정할 수 없음':
-       '공식 인력 문서에 상주·비상주 근무 형태가 명시되지 않음'};
+   // A completed source review without an onsite requirement is treated as offsite.
+   // Incomplete source reviews remain failed/checking/not_checked above.
+   return {key:'offsite',label:'비상주',reason:'상주 요구사항 미기재'};
  }
  let site=onsiteChoice();
  const sr=staff?.requirements||{};
@@ -4408,7 +4404,7 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,code){
-  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:((code==='onsite'&&['onsite','onsite_recommended','onsite_negotiable','not_specified','offsite'].includes(v.key))||(code==='insurance'&&v.key==='employment_proof')?v.label:name));
+  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:((code==='onsite'&&['onsite','onsite_recommended','onsite_negotiable','offsite'].includes(v.key))||(code==='insurance'&&v.key==='employment_proof')?v.label:name));
   const roles=code==='roles'?evidence.roles.items:[];
   const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
   const roleRows=roles.slice(0,4).map(record=>{
@@ -4433,7 +4429,7 @@ function jobRequirementBadges(x){
   const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
    insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',employment_proof:'건강보험 자격득실확인서 등 재직 증빙 요구 · 4대보험 전체 의무 확인과는 별도',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
-   onsite:{onsite:'발주처 상주 인력 배치 필요',onsite_recommended:'상주 근무인력 권고 · 필수 아님',onsite_negotiable:'발주기관과 상주 여부·인원 협의',not_specified:'상주·비상주 확정 근거 없음',offsite:'원문에 비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   onsite:{onsite:'발주처 상주 인력 배치 필요',onsite_recommended:'상주 근무인력 권고 · 필수 아님',onsite_negotiable:'발주기관과 상주 여부·인원 협의',offsite:'원문에 비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_workload:'투입공수 확인 · 인원 수 아님',role_recommended:'권고 인원 · 필수 아님',role_requirements:'원문 근거가 있는 인력 요구사항',role_count_unspecified:'인력 구성 확인 · 정확한 숫자는 별도',role_mentioned:'인원 언급 · 역할 미확정',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
   const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
@@ -4518,7 +4514,7 @@ function jobRequirementBadges(x){
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
     htmlEscape(header+' · '+ariaSummary)+'" aria-expanded="false">'+
     htmlEscape(label)+(['not_checked','checking','failed','required','required_at_bid','not_required','offsite','role_count_unspecified','role_unspecified'].includes(v.key)?
-     ' <span class="job-req-icon" aria-hidden="true">'+({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',not_specified:'?',offsite:'✓',role_count_unspecified:'?',role_unspecified:'?'})[v.key]+'</span>':'')+'</button>'+
+     ' <span class="job-req-icon" aria-hidden="true">'+({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_count_unspecified:'?',role_unspecified:'?'})[v.key]+'</span>':'')+'</button>'+
    '<span class="job-req-tip" role="tooltip">'+tip+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험, 상주 여부, 역할별 인원">'+
