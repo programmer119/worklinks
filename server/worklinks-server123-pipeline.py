@@ -155,7 +155,7 @@ def quality_guard(kind, outputs):
 def stage_workspace(path,minimal=False):
     root = path / 'worklinks'
     (root / 'scripts').mkdir(parents=True)
-    for name in ('refresh_worklinks_rfp.py', 'analyze_worklinks_rfp_ai.py', 'refresh_worklinks_actionable.py',
+    for name in ('refresh_worklinks_rfp.py', 'staffing_facts.py', 'analyze_worklinks_rfp_ai.py', 'refresh_worklinks_actionable.py',
                  'refresh_worklinks_open_award_fallback.py',
                  'batch_backfill_changcom_top500_rfp.py',
                  'repair_changcom_top500_rfp.py',
