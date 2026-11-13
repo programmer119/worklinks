@@ -44,7 +44,7 @@ assert {x['role']:x['count'] for x in table}=={'PM':1,'DBA':2},table
 
 item={'status':'text_extracted_requires_review','manifestComplete':True,
       'files':[{'name':'제안요청서.pdf','readable':True,'sourceTextScanComplete':True,
-                'staffingRoleScanVersion':2,'staffingRoleScanTruncated':False,
+                'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoleScanTruncated':False,
                 'staffingRoles':roles}]}
 summed=summary(item)
 assert len(summed)==4,summed
@@ -100,13 +100,13 @@ assert parse('기술자 1명','제안요청서.hwpx')
 assert parse('산정예시 기술자 1명','제안요청서.hwpx')==[]
 legacy_example={'manifestComplete':True,'files':[{'name':general,
   'readable':True,'sourceTextScanComplete':True,
-  'staffingRoleScanVersion':2,'staffingRoles':[{
+  'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoles':[{
     'role':'기술자','count':1,'sourceFile':general,'sourceText':example}]}]}
 assert p['staffing_summary'](legacy_example)==[]
 # 350k+ characters of generic legal guidance cannot prevent a complete
 # project-only role inspection. Do not pretend that guidance was fully read.
 generic_law={'name':general,'readable':True,'sourceTextScanComplete':False,
-             'staffingRoleScanVersion':2,'staffingRoleScanTruncated':True}
+             'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoleScanTruncated':True}
 scope_law={'manifestComplete':True,'files':[generic_law,pdf]}
 law_index=p['compact_coverage'](scope_law)
 assert law_index['staffingRoleScanComplete'] is True
@@ -125,5 +125,16 @@ assert out['staffingRoleScanComplete'] is True
 assert out['files'][0]['readable'] is False
 assert out['files'][0]['staffingScopeExcluded'] is True
 assert not p['staffing_general_annex_file']('2027년 사업 수행 인력 제안요청서.hwpx')
+
+
+# Regression fixtures for explicit table and named proposal roles.
+table_general=parse('직무 | 등급 | 인원\nPM | 고급 | 1\n개발 | 중급 | 2', '인원표.pdf')
+assert {(r['role'],r['count']) for r in table_general}=={('PM',1),('개발',2)},table_general
+team=parse('PM 1명, PL 2명, AI 전문가 2명, 포털 개발 2명, 인프라 1명','제안요청서.pdf')
+assert {(r['role'],r['count']) for r in team}=={('PM',1),('PL',2),('AI 전문가',2),('포털 개발',2),('인프라',1)},team
+assert parse('상주 개발인력 11개월, 투입률 75%', '공내역서.pdf')==[]
+stale=dict(item,staffingRoleScanComplete=True,
+           files=[dict(item['files'][0],staffingRoleScanVersion=2)])
+assert p['staffing_scan_pending'](stale) is True
 
 print('RFP_STAFFING_ROLE_SOURCE_BACKED_EXTRACTION=PASS')
