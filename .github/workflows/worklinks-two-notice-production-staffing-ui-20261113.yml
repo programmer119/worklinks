@@ -1,0 +1,97 @@
+name: WorkLinks LX Seoul real browser staffing verification
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/worklinks-two-notice-production-staffing-ui-20261113.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium and browser harness
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Check current production deployed JS, newest notice, and both real tenders
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,time,urllib.request,urllib.parse
+          from playwright.sync_api import sync_playwright
+          root='https://worklinks.suaveforge.com/startup-support/'
+          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/saved?limit=8&q='
+          def fetch(url):
+              request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(request,timeout=20) as response:return json.load(response)
+          def rows(bid):
+              return fetch(api+bid)['items']
+          lx=next(x for x in rows('R26BK01818412') if x['order']=='000')
+          seoul=next(x for x in rows('R26BK01810885') if x['order']=='000')
+          earlier=rows('R26BK01810095')
+          official=fetch(root+'staffing-source-verified.json')
+          assert all(k in official['byNotice'] for k in ('R26BK01818412:000','R26BK01810885:000'))
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True)
+            page=browser.new_page(viewport={'width':1400,'height':900})
+            failures=[]
+            page.on('pageerror',lambda e:failures.append(str(e)[:150]))
+            for attempt in range(30):
+              page.goto(root+'?view=changcom&v='+str(attempt),wait_until='domcontentloaded',timeout=30000)
+              try:
+                page.wait_for_function("typeof jobRequirementEvidence==='function' && typeof collapseSimilarNotices==='function'",timeout=7000)
+                if page.evaluate("document.documentElement.outerHTML.includes('role_requirements') && document.documentElement.outerHTML.includes('newest cross-notice')"):
+                  break
+              except Exception:pass
+              print('LIVE_UI_PUBLISH_PENDING',attempt,flush=True)
+              time.sleep(4)
+            else:raise AssertionError('Updated staffing and notice-grouping HTML is not live')
+            proof=page.evaluate("""(sources)=>{
+             const {lx,seoul,earlier,verified}=sources;
+             const notices=[...earlier,seoul].map(x=>({id:'g2b-servc-'+x.bidNo+'-'+x.order,
+                noticeNumber:x.bidNo,noticeOrder:x.order,title:x.title,
+                org:x.org,kind:'servc',amount:x.budget,posted:x.posted,closes:x.closes}));
+             const merged=collapseSimilarNotices(notices);
+             const actual=[];
+             for(const x of [lx,seoul]){
+              const key=x.bidNo+':'+x.order;
+              jobListRfpState.set(key,x.rfpSavedState);
+              const previous=rfpSnapshotByNotice.get(key)||{};
+              rfpSnapshotByNotice.set(key,{...previous,staffingFacts:verified[key].staffingFacts});
+              const job={id:'g2b-servc-'+x.bidNo+'-'+x.order,noticeNumber:x.bidNo,
+                noticeOrder:x.order,org:x.org,kind:'servc',title:x.title,
+                amount:x.budget,posted:x.posted};
+              const evidence=jobRequirementEvidence(job),html=jobRequirementBadges(job);
+              const tmp=document.createElement('div');
+              tmp.className='job-mini';tmp.innerHTML=html;
+              document.querySelector('#jobCards').appendChild(tmp);
+              const role=tmp.querySelector('[data-job-requirement="roles"]');
+              role.focus();role.click();
+              const tip=tmp.querySelector('[data-requirement="roles"] .job-req-tip');
+              const bounds=tip.getBoundingClientRect();
+              actual.push({notice:key,status:{insurance:evidence.insurance.status,
+                  onsite:evidence.onsite.status,roles:evidence.roles.status},
+               badgeText:tmp.querySelector('.job-req-strip').textContent,
+               roleTooltip:tip.textContent,hasRequirements:tip.querySelectorAll('.job-req-condition').length,
+               visible:getComputedStyle(tip).display,tooltipWidth:Math.round(bounds.width),
+               containsFailed:html.includes('확인실패')});
+              tmp.remove();
+             }
+             return {chosen:merged[0]?.noticeNumber,variants:merged[0]?.variants?.length,actual};
+            }""",{'lx':lx,'seoul':seoul,'earlier':earlier,'verified':official['byNotice']})
+            print('LIVE_REAL_TWO_NOTICES',json.dumps(proof,ensure_ascii=False),flush=True)
+            assert proof['chosen']=='R26BK01810885',proof
+            assert proof['variants']==3,proof
+            for detail,expected in zip(proof['actual'],[3,4]):
+              assert detail['hasRequirements']==expected,detail
+              assert detail['status']['roles']['key']=='role_requirements',detail
+              assert detail['visible']=='block' and detail['tooltipWidth']>=420,detail
+              assert not detail['containsFailed'],detail
+            assert proof['actual'][1]['status']['onsite']['key']=='onsite_present',proof
+            assert proof['actual'][1]['status']['insurance']['key']=='employment_proof',proof
+            assert not failures,failures
+            browser.close()
+          print('WORKLINKS_LX_SEOUL_PRODUCTION_BROWSER_PASS',flush=True)
+          PY
