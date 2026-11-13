@@ -55,3 +55,74 @@ jobs:
           done
           echo LIVE_WORKLINKS_ONSITE_RELEASE=FAIL
           exit 1
+      - name: Browser-check real deployed onsite badge clicks and tooltip content
+        shell: bash
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+          python3 - <<'PY'
+          import json
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1440,'height':900})
+              errors=[]
+              page.on('pageerror',lambda err: errors.append(str(err)[:180]))
+              page.goto('https://worklinks.suaveforge.com/startup-support/?view=changcom',
+                        wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("typeof jobRequirementBadges==='function'",timeout=45000)
+              page.wait_for_function("""() => {
+                const item=rfpSnapshotByNotice.get('R26BK01783957:000');
+                return item?.staffingFacts?.some(x=>x.kind==='headcount_recommended'&&x.count===8);
+              }""",timeout=45000)
+              page.evaluate("""() => {
+                document.querySelector('.workspace-tab[data-view="jobs"]')?.click();
+              }""")
+              output=page.evaluate("""() => {
+                const root=document.getElementById('jobCards');
+                if(!root)throw new Error('Job cards root missing');
+                const rows=[
+                  ['yongin','R26BK01807134'],
+                  ['north','R26BK01783957'],
+                  ['seoul','R26BK01810885']
+                ];
+                return rows.map(([name,bidNo])=>{
+                  const x={bidNo,order:'000'};
+                  const evidence=jobRequirementEvidence(x);
+                  const wrap=document.createElement('div');
+                  wrap.innerHTML=jobRequirementBadges(x);
+                  root.append(wrap);
+                  const badge=wrap.querySelector('[data-requirement="onsite"]');
+                  const button=badge?.querySelector('button');
+                  const tip=badge?.querySelector('.job-req-tip');
+                  if(!button||!tip)throw new Error(name+' onsite UI missing');
+                  button.click();
+                  const result={name,bidNo,siteKey:evidence.onsite.status.key,
+                    badge:button.textContent.trim(),
+                    tooltip:tip.textContent.replace(/\\s+/g,' ').trim(),
+                    expanded:button.getAttribute('aria-expanded'),
+                    display:getComputedStyle(tip).display,
+                    width:Math.round(tip.getBoundingClientRect().width)};
+                  wrap.remove();
+                  return result;
+                });
+              }""")
+              print('LIVE_ONSITE_BROWSER_REPORT',json.dumps(output,ensure_ascii=False))
+              print('LIVE_ONSITE_BROWSER_PAGE_ERRORS',json.dumps(errors[:5],ensure_ascii=False))
+              for row in output:
+                  assert row['expanded']=='true' and row['display']=='block' and row['width']>0,row
+                  if row['name']=='yongin':
+                      assert row['badge']=='상주 확인',row
+                      for term in ['응용SW 개발자','1명','11.04개월','75%','공내역서.xlsx']:
+                          assert term in row['tooltip'],(row,term)
+                  elif row['name']=='north':
+                      assert row['badge']=='상주 8명 이상 권고',row
+                      for term in ['월평균','8명 이상','필수 인원 아님','제안요청서']:
+                          assert term in row['tooltip'],(row,term)
+                  elif row['name']=='seoul':
+                      assert row['badge']=='상주 확인',row
+                      for term in ['상주인력 근무·휴가 조건','2. 제안요청서.hwpx']:
+                          assert term in row['tooltip'],(row,term)
+              browser.close()
+              print('LIVE_WORKLINKS_ONSITE_BROWSER_TOOLTIP=PASS')
+          PY
