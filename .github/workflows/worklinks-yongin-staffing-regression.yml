@@ -1,0 +1,20 @@
+name: WorkLinks Yongin staffing facts UI regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-yongin-staffing-regression.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source-backed onsite role and headcount-independent workload UI
+        run: |
+          node tests/worklinks-staffing-facts-ui.cjs
+          python3 tests/test_staffing_facts.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          echo YONGIN_STAFFING_UI_AND_WORKER_REGRESSION_PASS
