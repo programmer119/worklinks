@@ -26,7 +26,8 @@ with tempfile.TemporaryDirectory() as tmp:
     report=base/'report.json'
     index.write_text(json.dumps({'ok':True,'generatedAt':'test',
       'byNotice':{key:{'status':'text_extracted_requires_review',
-        'manifestComplete':True,'files':[{'name':'투입인력계획서.pdf',
+        'manifestComplete':True,'staffingRoleScanComplete':True,  # Legacy v2 claimed complete.
+        'files':[{'name':'투입인력계획서.pdf','staffingRoleScanVersion':2,
           'readable':True,'sourceSha256':sha,
           'sourceTextScanComplete':True}]}}},ensure_ascii=False))
     detail.write_text(json.dumps({'ok':True,'byNotice':{key:{'files':[
