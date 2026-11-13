@@ -83,4 +83,29 @@ assert.equal(seoulEvidence.insurance.status.key,'employment_proof');
 const seoulHtml=evidenceUI.jobRequirementBadges(seoul);
 for(const text of ['재직증빙 확인','상주조건 확인','PM 10년 경력','건강보험 자격득실'])assert.ok(seoulHtml.includes(text),text);
 assert.ok(!seoulHtml.includes('확인실패'),'positive evidence must not become three failed statuses');
-console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length,'source-backed notices',2);
+// Generic legacy notices may have source excerpts, not yet structured facts.
+// Their card must show the original staffing requirement, not "미명시 ?".
+const legacy=new Map([
+ ['G:000',{...mk([]),status:'text_extracted_requires_review',
+   staffingRoleScanComplete:true,documentCount:5,readableCount:3,
+   effectiveReadableCount:4,complete:false,scanComplete:false,
+   excerpts:[{text:'제안사는 투입될 인원 현황을 제시하여야 하며 업무 분장 내역을 제시해야 함',
+              type:'staff_proof',sourceFile:'제안요청서.hwpx'}]}],
+ ['H:000',{...mk([]),status:'text_extracted_requires_review',
+   staffingRoleScanComplete:true,documentCount:5,readableCount:3,
+   effectiveReadableCount:4,complete:false,scanComplete:false}]
+]);
+const legacyApp=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),legacy,
+  new Map(),new Map(),false,'',
+  s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
+const legacyReq=legacyApp.jobRequirementEvidence({bidNo:'G'});
+assert.equal(legacyReq.roles.status.key,'role_requirements');
+assert.ok(legacyReq.roles.requirements.some(x=>x.label==='인력 현황 제출'));
+const legacyHtml=legacyApp.jobRequirementBadges({bidNo:'G'});
+assert.ok(legacyHtml.includes('인력 현황 제출'));
+assert.ok(legacyHtml.includes('투입될 인원 현황'));
+assert.ok(!legacyHtml.includes('role_count_unspecified'));
+assert.equal(legacyApp.jobRequirementEvidence({bidNo:'H'}).onsite.status.key,'not_specified',
+ 'general contract archive failure must not invalidate completed project staffing scans');
+console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length,'source-backed notices',2,
+ 'legacy source fallback 1, scoped archive failure 1');
