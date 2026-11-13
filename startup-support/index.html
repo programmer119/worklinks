@@ -514,13 +514,16 @@
 #jobCards .job-req-item[data-state="offsite"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="role_found"] .job-req-icon{background:#dbeafe;color:#1d4ed8}
 #jobCards .job-req-item[data-state="role_unspecified"] .job-req-icon{background:#e2e8f0;color:#475569}
-#jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 35px));padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.18);color:#1e293b;font-size:13px;font-weight:500;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere;pointer-events:none}
+#jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 28px));padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.18);color:#0f172a;font-size:15px;font-weight:500;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
-#jobCards .job-req-item[data-requirement="roles"] .job-req-tip{right:0;left:auto;bottom:100%;width:min(320px,calc(100vw - 32px));max-height:none;overflow:visible;pointer-events:none}
-#jobCards .job-req-tip{padding:9px 11px;line-height:1.45;white-space:normal}
-#jobCards .job-req-tip-head{display:block;font-size:13px;font-weight:850;color:#0f172a;margin-bottom:4px}
-#jobCards .job-req-tip-row{display:block;margin:2px 0;font-size:13px;line-height:1.4}
-#jobCards .job-req-tip-sub{display:block;margin-top:4px;font-size:12px;line-height:1.4;color:#64748b}
+#jobCards .job-req-item[data-requirement="roles"] .job-req-tip{right:0;left:auto;bottom:calc(100% + 7px);width:min(375px,calc(100vw - 28px));max-height:none;overflow:visible}
+#jobCards .job-req-tip-head{display:block;font-size:16px;font-weight:850;color:#0f172a;margin:0 0 8px}
+#jobCards .job-req-tip-row{display:block;margin:0;font-size:15px;line-height:1.5}
+#jobCards .job-req-tip-role{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #e2e8f0}
+#jobCards .job-req-tip-role-name{font-size:15px;font-weight:700;color:#0f172a}
+#jobCards .job-req-tip-role-name small{display:block;font-size:13px;font-weight:500;color:#475569;margin-top:2px}
+#jobCards .job-req-tip-count{font-size:16px;font-weight:850;white-space:nowrap;color:#0f172a}
+#jobCards .job-req-tip-sub{display:block;margin-top:7px;font-size:13px;line-height:1.45;color:#475569}
 #jobCards .job-req-item[data-requirement="roles"] .job-req-trigger{white-space:nowrap}
 #jobCards .job-mini:has(.job-req-strip){overflow:visible}
 @media(hover:none){#jobCards .job-req-trigger{cursor:pointer}}
@@ -3966,7 +3969,8 @@ function jobRequirementEvidence(x){
    const label=role+(grade?' ('+grade+')':'')+' '+count+'명'+
     (record.countKind==='minimum'?' 이상':'')+(onsite?' · '+onsite:'');
    roles.push(label);
-   roleSources.push({role:label,text:String(record.sourceText||'').trim()||'인력표 근거',
+   roleSources.push({role:label,roleName:role,count,countKind:record.countKind==='minimum'?'minimum':'unspecified',
+     grade,onsite,text:String(record.sourceText||'').trim()||'인력표 근거',
      file:String(record.sourceFile||'공고 첨부'),url:String(record.sourceUrl||''),
      scope:record.scope==='document'?'전체 문서':'저장 발췌',mm:record.manMonths,
      sourceLine:record.sourceLine||0});
@@ -3985,7 +3989,8 @@ function jobRequirementEvidence(x){
      const label=role+(grade?' ('+grade+')':'')+' '+count+'명';
      if(seenRoles.has(label))continue;
      seenRoles.add(label);roles.push(label);
-     roleSources.push({role:label,text:c.text,file:c.file||'공고 원문',url:'',scope:'저장 발췌'});
+     roleSources.push({role:label,roleName:role,count,countKind:'unspecified',grade,onsite:'',
+       text:c.text,file:c.file||'공고 원문',url:'',scope:'저장 발췌'});
      if(roles.length>=8)break;
     }
     if(roles.length>=8)break;
@@ -4030,43 +4035,45 @@ function jobRequirementBadges(x){
  if(!evidence)return '';
  function marker(name,v,code){
   const label=code==='roles'?({role_found:'역할별 인원',role_unspecified:'인원 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name));
-  // Tooltip is for immediate decisions. Never include RFP/OCR quotes,
-  // filenames, extraction coverage, or paragraphs here.
+  // Show extracted per-role facts only; OCR prose does not prove which role
+  // an experience requirement belongs to. Keep quotes in the detail view.
   const roleItems=code==='roles'?evidence.roles.items:[];
-  const summarizeRole=record=>{
-   const title=String(record.role||'').trim();
-   const source=String(record.text||'');
-   const years=source.match(/(?:경력\s*[:：]?\s*)?(\d{1,2})\s*년\s*이상(?:\s*(?:의\s*)?경력)?/);
-   return title+(years&&!/\d+\s*년/.test(title)?' · 경력 '+years[1]+'년 이상':'');
-  };
-  const roleSummaries=roleItems.slice(0,4).map(summarizeRole);
+  const roleRows=roleItems.slice(0,4).map(record=>{
+   const roleName=String(record.roleName||record.role||'').trim();
+   const count=Number(record.count);
+   const countLabel=Number.isInteger(count)&&count>0
+    ?count+'명'+(record.countKind==='minimum'?' 이상':'')
+    :'인원 확인 필요';
+   const detail=[String(record.grade||'').trim(),String(record.onsite||'').trim()].filter(Boolean).join(' · ');
+   return {
+    title:roleName,
+    count:countLabel,
+    detail
+   };
+  });
   const remaining=Math.max(0,roleItems.length-4);
-  const header=code==='onsite'?'상주 여부':code==='roles'?'역할별 인원':'4대보험';
-  const facts={
-   insurance:{
-    required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',
-    not_required:'입찰 시 증빙 불필요',not_checked:'미검증',
-    checking:'확인 중',failed:'확인 실패'
-   },
-   onsite:{
-    onsite:'발주처 상주 근무 필요',offsite:'상주 의무 미확인',
-    not_checked:'미검증',checking:'확인 중',failed:'확인 실패'
-   },
-   roles:{
-    role_unspecified:'역할·인원 동시 기재 미검출',
-    not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'
-   }
+  const header=code==='onsite'?'상주 여부':code==='roles'?'역할별 요구 인원':'4대보험';
+  const messages={
+   insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   onsite:{onsite:'발주처 상주 근무 필요',offsite:'상주 의무 미확인',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   roles:{role_unspecified:'역할·인원 동시 기재 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
-  const factsForCode=facts[code]||{};
-  const rows=code==='roles'&&roleSummaries.length?roleSummaries:
-   [factsForCode[v.key]||'확인 필요'];
+  const status=(messages[code]||{})[v.key]||'원문에서 조건 확인 필요';
+  const roleBody=roleRows.map(row=>'<span class="job-req-tip-role">'+
+   '<span class="job-req-tip-role-name">'+htmlEscape(row.title)+
+    (row.detail?'<small>'+htmlEscape(row.detail)+'</small>':'')+'</span>'+
+   '<strong class="job-req-tip-count">'+htmlEscape(row.count)+'</strong></span>').join('');
   const tip='<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>'+
-   rows.map(line=>'<span class="job-req-tip-row">'+htmlEscape(line)+'</span>').join('')+
-   (remaining?'<span class="job-req-tip-sub">외 '+remaining+'개 역할은 상세에서 확인</span>':'');
-  const description=header+' · '+rows.join(' · ')+(remaining?' · 외 '+remaining+'개':'');
+   (code==='roles'&&roleRows.length?roleBody+
+    (roleItems.length>1?'<span class="job-req-tip-sub">역할 간 포함관계·총원 미확인</span>':'')+
+    (remaining?'<span class="job-req-tip-sub">그 외 '+remaining+'개 역할은 상세 화면에서 확인</span>':''):
+    '<span class="job-req-tip-row">'+htmlEscape(status)+'</span>');
+  const ariaSummary=code==='roles'&&roleRows.length?
+   roleRows.map(row=>row.title+' '+row.count+(row.detail?' '+row.detail:'')).join(', '):
+   status;
   return '<span class="job-req-item" data-requirement="'+code+'" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
-    htmlEscape(description)+'" aria-expanded="false">'+
+    htmlEscape(header+' · '+ariaSummary)+'" aria-expanded="false">'+
     htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
     ({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_found:'i',role_unspecified:'?'})[v.key]+'</span></button>'+
    '<span class="job-req-tip" role="tooltip">'+tip+'</span></span>';
