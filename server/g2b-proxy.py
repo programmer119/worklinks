@@ -967,7 +967,7 @@ def saved_rfp_search_state(row, compact=False):
         })
     facts=[]
     allowed={'workload_role','workload_total','headcount_recommended',
-             'staffing_plan_required','role_unspecified'}
+             'staffing_plan_required','role_unspecified','staffing_requirement'}
     for item in (row.get('staffingFacts') or [])[:35]:
         if not isinstance(item,dict) or item.get('kind') not in allowed:continue
         quote=' '.join(str(item.get('sourceText') or '').split())[:240]
@@ -978,6 +978,10 @@ def saved_rfp_search_state(row, compact=False):
         for field in ('count','minimum','mandatory','onsite','headcount',
                       'manMonths','durationMonths','allocationRate','verifiedRoleCount'):
             if field in item:datum[field]=item[field]
+        if item['kind']=='staffing_requirement':
+            datum['requirementType']=str(item.get('requirementType') or '')[:40]
+            datum['label']=str(item.get('label') or '')[:90]
+            datum['headcount']=None
         url=str(item.get('sourceUrl') or '')
         if urlparse(url).hostname=='www.g2b.go.kr' and urlparse(url).scheme=='https':
             datum['sourceUrl']=url
