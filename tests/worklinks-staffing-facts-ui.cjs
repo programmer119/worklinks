@@ -24,6 +24,8 @@ const states=new Map([
   sourceFile:'협의조건_제안요청서.pdf'}]}],
  ['L:000',{...mk([]),excerpts:[{text:'상주인력의 휴가 및 근무시간은 발주처와 협의하여 조정한다',
   sourceFile:'상주근무_안내서.pdf'}]}],
+ ['V:000',{...mk([]),excerpts:[{text:'해당 용역은 비상주 근무를 원칙으로 한다',
+  sourceFile:'비상주_제안요청서.pdf'}]}],
  ['F:000',{...mk([]),excerpts:[{text:'상주인력 2명 배치하여야 한다',
   sourceFile:'필수상주_제안요청서.pdf'}]}],
  ['M:000',mk([f('workload_role',{role:'응용SW 개발자',durationMonths:10,allocationRate:.5,onsite:true,sourceText:'(상주인력) 응용SW 개발자'}),
@@ -35,7 +37,7 @@ const app=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),states,
 const loadingApp=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),states,
  new Map(),new Map(),true,'',s=>String(s)
  .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
-assert.equal(loadingApp.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'offsite',
+assert.equal(loadingApp.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'not_specified',
  'completed saved staffing scan must not be hidden by unrelated full-cache loading');
 assert.equal(loadingApp.jobRequirementEvidence({bidNo:'Y'}).onsite.status.key,'onsite',
  'saved official onsite effort should survive full-cache loading');
@@ -66,13 +68,15 @@ for(const fragment of ['상주인력 · 월평균','8명 이상','유지 권고 
  assert.ok(northTooltip.includes(fragment),'missing sourced recommendation '+fragment);
 }
 assert.ok(!northTooltip.includes('상주 여부 미확정'),'known recommendation is not unknown');
-assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'offsite');
-assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.label,'비상주');
-assert.match(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.reason,/상주 관련 조건 미검출/);
-assert.equal(app.jobRequirementEvidence({bidNo:'X'}).onsite.status.key,'offsite');
+assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'not_specified');
+assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.label,'상주 미확정');
+assert.match(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.reason,/상주·비상주 근무 형태가 명시되지/);
+assert.equal(app.jobRequirementEvidence({bidNo:'X'}).onsite.status.key,'not_specified');
+assert.equal(app.jobRequirementEvidence({bidNo:'V'}).onsite.status.key,'offsite',
+ 'green offsite status is reserved for a cited explicit nonresident work clause');
 assert.equal(app.jobRequirementEvidence({bidNo:'C'}).onsite.status.key,'onsite_negotiable');
 assert.equal(app.jobRequirementEvidence({bidNo:'C'}).onsite.status.label,'상주 협의');
-assert.equal(app.jobRequirementEvidence({bidNo:'L'}).onsite.status.key,'offsite',
+assert.equal(app.jobRequirementEvidence({bidNo:'L'}).onsite.status.key,'not_specified',
  'negotiating leave or work hours does not imply negotiating onsite requirements');
 assert.equal(app.jobRequirementEvidence({bidNo:'F'}).onsite.status.key,'onsite');
 assert.equal(app.jobRequirementEvidence({bidNo:'F'}).onsite.status.label,'상주 필수');
@@ -91,9 +95,9 @@ assert.ok(html.includes('[data-state="onsite_recommended"] .job-req-trigger{back
 assert.ok(html.includes('[data-state="offsite"] .job-req-trigger{background:#dcfce7'),
  'offsite must be green');
 assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주 필수'));
-assert.ok(app.jobRequirementBadges({bidNo:'E'}).includes('비상주'));
-assert.ok(!app.jobRequirementBadges({bidNo:'E'}).includes('상주 미확정'));
-assert.ok(!html.includes("label:'상주 미확정'"));
+assert.ok(app.jobRequirementBadges({bidNo:'E'}).includes('상주 미확정'));
+assert.ok(!app.jobRequirementBadges({bidNo:'E'}).includes('비상주 ✓'));
+assert.ok(app.jobRequirementBadges({bidNo:'V'}).includes('비상주 ✓'));
 assert.ok(!html.includes("label:'상주 확인'"));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('비상주 ✓'));
 assert.ok(app.jobRequirementEvidence({bidNo:'Y'}).roles.factLines.some(v=>v.includes('8.280MM')));
@@ -135,6 +139,16 @@ const records=new Map([
   complete:false,scanComplete:false,documentCount:5,readableCount:3,effectiveReadableCount:4,
   staffingRoleScanComplete:true,staffingRoles:[],staffingFacts:[]}]
 ]);
+// The same official conditions can arrive with different-sized excerpts from
+// the saved DB and the separate SHA-verification feed. Display once only.
+const originalLx=verified['R26BK01818412:000'].staffingFacts;
+const partialDuplicated=originalLx.filter(f=>['workplace','proof'].includes(f.requirementType))
+ .map(f=>({...f,sourceText:'이전 판독기 발췌: '+f.label,sourceLine:0,sourceUrl:''}));
+records.get('R26BK01818412:000').staffingFacts=partialDuplicated;
+const originalSeoul=verified['R26BK01810885:000'].staffingFacts;
+records.get('R26BK01810885:000').staffingFacts=originalSeoul
+ .filter(f=>f.requirementType==='proof')
+ .map(f=>({...f,sourceText:'단축 발췌: '+f.label,sourceLine:0,sourceUrl:''}));
 const evidenceUI=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),docs,records,new Map(),new Map(),false,'',
  s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
 const lx={bidNo:'R26BK01818412'},seoul={bidNo:'R26BK01810885'};
@@ -144,6 +158,8 @@ assert.equal(recoveredNorth.onsite.status.label,'상주 권고');
 assert.ok(evidenceUI.jobRequirementBadges({bidNo:'R26BK01783957'}).includes('월평균'));
 assert.ok(evidenceUI.jobRequirementBadges({bidNo:'R26BK01783957'}).includes('붙임1_제안요청서'));
 assert.equal(evidenceUI.jobRequirementEvidence(lx).roles.status.key,'role_requirements');
+assert.equal(evidenceUI.jobRequirementEvidence(lx).roles.requirements.length,3,'same LX clauses must not appear twice');
+assert.equal(evidenceUI.jobRequirementEvidence(seoul).roles.requirements.length,4,'same Seoul clauses must not appear twice');
 const lxHtml=evidenceUI.jobRequirementBadges(lx);
 for(const label of ['인력 조건 확인','근무조건 협의','FP 산정 전문가 포함','참여인력 재직·경력 증빙'])assert.ok(lxHtml.includes(label),label);
 assert.ok(!lxHtml.includes('job-req-tip-total">인원 수 미명시'),'never headline non-information');
@@ -183,7 +199,7 @@ const legacyHtml=legacyApp.jobRequirementBadges({bidNo:'G'});
 assert.ok(legacyHtml.includes('인력 현황 제출'));
 assert.ok(legacyHtml.includes('투입될 인원 현황'));
 assert.ok(!legacyHtml.includes('role_count_unspecified'));
-assert.equal(legacyApp.jobRequirementEvidence({bidNo:'H'}).onsite.status.key,'offsite',
+assert.equal(legacyApp.jobRequirementEvidence({bidNo:'H'}).onsite.status.key,'not_specified',
  'general contract archive failure must not invalidate completed project staffing scans');
 console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length,'source-backed notices',2,
  'legacy source fallback 1, scoped archive failure 1');
