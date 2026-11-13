@@ -1010,6 +1010,52 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .support-manual-form button{flex:0 0 auto}
 .support-manual-form p{flex:1 0 100%;margin:0;min-height:16px}
 @media(max-width:480px){.support-history-search{padding:10px}.support-search-row label{width:100%}.support-search-row input{flex-basis:100%}.support-manual-form button{width:100%}}
+
+/* Changcom procurement-card hierarchy, 2026-11-13.
+   Only partner view: budget is the dominant standalone value;
+   source-backed business area lives with contract metadata. */
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
+ display:grid;grid-template-columns:minmax(0,1fr);gap:3px;align-items:start
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline h3{
+ width:100%;min-width:0
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
+ width:100%;min-width:0;display:block;justify-self:stretch;align-self:stretch
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-badge{
+ display:none!important
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
+ display:block;max-width:100%;width:100%;overflow:visible;text-overflow:clip;
+ margin:2px 0 1px;text-align:right;color:#102c53;font-size:29px;font-weight:900;
+ line-height:1.22;letter-spacing:-.65px;white-space:normal;overflow-wrap:normal;
+ word-break:keep-all;font-variant-numeric:tabular-nums
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-priority-band .advantage-label{
+ font-size:16px;font-weight:850;line-height:1.2
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-priority-band .job-advantage{gap:6px}
+#jobsView[data-job-mode="partner"] #jobCards .job-priority-band .advantage-pill{
+ width:9px;height:5px
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-priority-band .advantage-pills{gap:3px}
+#jobsView[data-job-mode="partner"] #jobCards .job-bid-method-cell.job-business-meta{
+ display:inline-flex;align-items:baseline;gap:6px;min-width:0
+}
+#jobsView[data-job-mode="partner"] #jobCards .job-bid-methods .job-business-area{
+ display:inline;margin:0;min-height:0;max-width:none;padding:0;
+ border:0;border-radius:0;background:transparent;color:#334155;
+ font-size:13px;font-weight:750;line-height:1.45;white-space:normal;
+ text-align:left;overflow-wrap:normal
+}
+@media(max-width:520px){
+ #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{font-size:26px}
+ #jobsView[data-job-mode="partner"] #jobCards .job-priority-band .advantage-label{font-size:15px}
+}
+@media(max-width:360px){
+ #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{font-size:24px}
+}
 </style>
 <div id="worklinks-auth-recovery-slot"></div>
 <div class="note">전체 탭에서 유형 구분 없이 모두 볼 수 있습니다. 오래 열려 있거나 사업자 준비 후 볼 공고는 각 항목의 '사업자' 버튼으로 직접 사업자 탭에 보낼 수 있습니다. 자동 분류하지 않습니다. 숨김 탭에서는 숨긴 항목을 한 번에 확인·복원할 수 있습니다. 지원가능에는 '확인 필요' 항목도 함께 표시합니다. 오늘 마감 → 조기 종료 가능(선착순·예산 소진) → 일반 마감 임박순이며, 이미 마감된 항목은 뒤로 보내며, 지원완료 항목은 일반 목록에서 바로 제외되고 상단 지원완료 필터에서 확인할 수 있습니다.</div></div>
@@ -4568,7 +4614,7 @@ function compactBidMethod(meta){
  return text.split('-')[0].trim()||text;
 }
 
-function bidMethodCardMarkup(x){
+function bidMethodCardMarkup(x,showBusinessArea=false){
  if(!/^g2b-/.test(String(x.id||''))||!jobBidIdentity(x))return '';
  const metadata=g2bCardAwardMetadata(x);
  const floor=g2bAwardFloorDisplay(metadata);
@@ -4589,7 +4635,7 @@ function bidMethodCardMarkup(x){
     '<span class="job-bid-label">'+htmlEscape(field.label)+'</span>'+
     '<strong class="job-bid-value'+(code?' has-method-code':'')+'"'+codeHint+'>'+
      htmlEscape(value||'정보 없음')+'</strong></div>';
-  }).join('')+'</div>';
+  }).join('')+(showBusinessArea&&bidBusinessArea(x)?'<div class="job-bid-method-cell job-business-meta"><span class="job-bid-label">사업분류</span>'+bidBusinessArea(x)+'</div>':'')+'</div>';
 }
 function renderJobs(){
  const el=document.getElementById('jobCards');
@@ -4860,7 +4906,7 @@ function renderJobs(){
        '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+
        '<div class="job-headline-side"><div class="job-headline-badge">'+bidBusinessArea(x)+'</div>'+
        '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div></div>'+
-       bidMethodCardMarkup(x)+
+       bidMethodCardMarkup(x,member&&partnerMode)+
        jobCollectionMarkup(x)+
        '<div class="job-eligibility-row"><div class="job-eligibility-content">'+qualification+jobRequirementBadges(x)+partner+'</div></div>'+
        (member&&partnerMode?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
