@@ -4313,7 +4313,7 @@ function jobRequirementBadges(x){
   const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
    insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',employment_proof:'건강보험 자격득실확인서 등 재직 증빙 요구 · 4대보험 전체 의무 확인과는 별도',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
-   onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'투입공수표에서 상주인력 확인 · 역할별 인원은 별도 항목',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'공식 문서에서 상주인력 또는 상주 근무조건 확인 · 인원 수는 별도 확인',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_workload:'투입공수 확인 · 인원 수 아님',role_recommended:'권고 인원 · 필수 아님',role_requirements:'원문 근거가 있는 인력 요구사항',role_count_unspecified:'인력 구성 확인 · 정확한 숫자는 별도',role_mentioned:'인원 언급 · 역할 미확정',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
   const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
