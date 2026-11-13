@@ -1701,7 +1701,7 @@ def staffing_fact_summary(item):
     result=[]
     seen=set()
     supported={'workload_role','workload_total','headcount_recommended',
-               'staffing_plan_required','role_unspecified'}
+               'staffing_plan_required','role_unspecified','staffing_requirement'}
     for f in (item or {}).get('files') or []:
         if not isinstance(f,dict):continue
         if staffing_source_is_general_example(f.get('name')):continue
@@ -1712,14 +1712,15 @@ def staffing_fact_summary(item):
             if not source or not str(fact.get('sourceFile') or f.get('name') or '').strip():
                 continue
             signature=(fact['kind'],role,str(fact.get('count')),str(fact.get('manMonths')),
-                       str(fact.get('allocationRate')),source)
+                       str(fact.get('allocationRate')),str(fact.get('requirementType')),source)
             if signature in seen:continue
             seen.add(signature)
             clean={'kind':fact['kind'],'role':role,'sourceText':source,
                    'sourceFile':str(fact.get('sourceFile') or f.get('name'))[:140],
                    'sourceLine':int(fact.get('sourceLine') or 0)}
             for key in ('count','minimum','mandatory','onsite','headcount',
-                        'manMonths','durationMonths','allocationRate','verifiedRoleCount'):
+                        'manMonths','durationMonths','allocationRate','verifiedRoleCount',
+                        'requirementType','label'):
                 if key in fact:clean[key]=fact[key]
             url=str(fact.get('sourceUrl') or '')
             if url.startswith('https://www.g2b.go.kr/'):
