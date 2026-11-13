@@ -87,7 +87,7 @@ jobs:
                   ['seoul','R26BK01810885']
                 ];
                 return rows.map(([name,bidNo])=>{
-                  const x={bidNo,order:'000'};
+                  const x={noticeNumber:bidNo,noticeOrder:'000'};
                   const evidence=jobRequirementEvidence(x);
                   const wrap=document.createElement('div');
                   wrap.innerHTML=jobRequirementBadges(x);
