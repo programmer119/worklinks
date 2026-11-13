@@ -8,6 +8,9 @@ on:
       - 'tests/worklinks-staffing-facts-ui.cjs'
       - 'tests/worklinks-notice-collapse-chronology.cjs'
       - 'startup-support/staffing-source-verified.json'
+      - 'scripts/staffing_facts.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_staffing_facts.py'
 permissions:
   contents: read
 jobs:
