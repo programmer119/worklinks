@@ -25,7 +25,7 @@ const app=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),states,
  new Map(),new Map(),false,'',s=>String(s)
  .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
 const expected=[['Y','role_found','역할별 인원 1명'],
- ['N','role_recommended','8명 권고'],['X','role_count_unspecified','인력 조건 확인'],
+ ['N','role_recommended','8명 권고'],['X','role_count_unspecified','인원 수 미명시'],
  ['E','role_unspecified','인원표 미검출']];
 for(const [bidNo,key,label] of expected){
  const row={bidNo};const result=app.jobRequirementEvidence(row);
