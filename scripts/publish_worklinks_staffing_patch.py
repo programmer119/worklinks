@@ -46,6 +46,55 @@ def defensible_staffing_row(item):
             re.fullmatch(r'[1-9]\d?',segments[-1]) is not None and
             int(segments[-1])==count)
 
+def defensible_staffing_fact(fact):
+    """Guard headcount semantics before publishing cached source-derived facts."""
+    if not isinstance(fact,dict):return False
+    kind=str(fact.get('kind') or '')
+    quote=' '.join(str(fact.get('sourceText') or '').split())
+    file=str(fact.get('sourceFile') or '')
+    if not quote or not file or len(quote)>240:return False
+    if re.search(r'산정\s*예시|평가\s*배점|평가\s*점수',quote):return False
+    if kind=='workload_role':
+        try:
+            months=float(fact['durationMonths'])
+            rate=float(fact['allocationRate'])
+            mm=float(fact['manMonths'])
+        except (ValueError,TypeError,KeyError):return False
+        return bool(fact.get('role') and fact.get('headcount') is None and
+                    0<months<=36 and 0<=rate<=1 and
+                    abs(months*rate-mm)<=0.0011)
+    if kind=='workload_total':
+        try:mm=float(fact['manMonths'])
+        except (TypeError,ValueError,KeyError):return False
+        return 0<mm<1000 and '총 투입공수' in quote
+    if kind=='headcount_recommended':
+        return bool(fact.get('mandatory') is False and
+                    fact.get('minimum') is True and
+                    isinstance(fact.get('count'),int) and
+                    1<=fact['count']<=99 and
+                    '권고' in quote)
+    if kind=='staffing_plan_required':
+        return fact.get('headcount') is None and fact.get('mandatory') is True
+    if kind=='role_unspecified':
+        return bool(fact.get('role') and fact.get('headcount') is None)
+    return False
+
+
+def unique_facts(rows):
+    result=[]
+    seen=set()
+    for fact in rows:
+        if not defensible_staffing_fact(fact):continue
+        key=(str(fact.get('kind')),str(fact.get('sourceFile')),
+             str(fact.get('role')),str(fact.get('manMonths')),
+             str(fact.get('sourceText')))
+        if key in seen:continue
+        seen.add(key)
+        result.append(fact)
+        if len(result)>=35:break
+    return result
+
+
 def unique_rows(rows):
     unique=[]
     seen=set()
@@ -91,6 +140,8 @@ def merge(index_path,patch_paths,report_paths):
             rejected+=len(proposed)-len(trusted)
             retained+=len(trusted)
             old['staffingRoles']=unique_rows(trusted+prior)
+            old['staffingFacts']=unique_facts(
+                (new.get('staffingFacts') or [])+(old.get('staffingFacts') or []))
             old['staffingRoleScanComplete']=bool(
                 old.get('staffingRoleScanComplete') is True or
                 new.get('staffingRoleScanComplete') is True)
