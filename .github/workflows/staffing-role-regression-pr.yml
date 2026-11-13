@@ -6,6 +6,7 @@ on:
       - 'scripts/backfill_worklinks_staffing_cached.py'
       - 'scripts/publish_worklinks_staffing_patch.py'
       - 'startup-support/index.html'
+      - 'server/g2b-proxy.py'
       - 'tests/test_rfp_staffing_roles.py'
       - 'tests/worklinks-jobs-regression.cjs'
       - '.github/workflows/staffing-role-regression-pr.yml'
@@ -19,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Python and offline staffing fixtures
         run: |
-          python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/backfill_worklinks_staffing_cached.py scripts/publish_worklinks_staffing_patch.py
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/backfill_worklinks_staffing_cached.py scripts/publish_worklinks_staffing_patch.py server/g2b-proxy.py
           python3 tests/test_rfp_staffing_roles.py
           python3 tests/test_staffing_publish_evidence.py
           python3 tests/test_rfp_staffing_cached_backfill.py
