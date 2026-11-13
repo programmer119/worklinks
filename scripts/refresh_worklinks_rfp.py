@@ -942,6 +942,9 @@ def parse_clauses(text):
 # A separate, source-grounded staffing scan. Qualification snippets alone miss
 # tables such as "직무 / 등급 / 인원" and wrapped DOCX/PDF/HWPX rows.
 STAFFING_ROLE_SCAN_VERSION=4
+# Independent of staffing role extraction: do not trigger fresh government API
+# calls merely because the presentation of source-backed conditions improved.
+STAFFING_FACT_SCAN_VERSION=2
 STAFFING_ROLE_TEXT_LIMIT=350_000
 try:
     from staffing_facts import extract_staffing_facts
@@ -1617,6 +1620,7 @@ def process(no,ordn,metadata=None,previous=None):
                            'qualificationScanTruncated':len(content)>350_000,
                            'clauseCandidatesTruncated':False,
                            'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
+                           'staffingFactScanVersion':STAFFING_FACT_SCAN_VERSION,
                            'staffingRoleScanTruncated':len(content)>STAFFING_ROLE_TEXT_LIMIT,
                            'staffingRoles':staffing_roles,
                            'staffingFacts':staffing_facts,
@@ -1745,7 +1749,9 @@ def backfill_cached_staffing(records, max_files=24):
         if not isinstance(notice,dict):continue
         for f in notice.get('files') or []:
             if not isinstance(f,dict) or f.get('readable') is not True:continue
-            if int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION:continue
+            if (int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+                    int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION):
+                continue
             name=str(f.get('name') or '')
             url=str(f.get('sourceUrl') or '')
             raw=None
@@ -1765,6 +1771,7 @@ def backfill_cached_staffing(records, max_files=24):
                     f['staffingRoles']=extract_staffing_roles(content,name,url)
                     f['staffingFacts']=extract_staffing_facts(content,name,url)
                     f['staffingRoleScanVersion']=STAFFING_ROLE_SCAN_VERSION
+                    f['staffingFactScanVersion']=STAFFING_FACT_SCAN_VERSION
                     f['staffingRoleScanTruncated']=len(content)>STAFFING_ROLE_TEXT_LIMIT
                     parsed+=1
                 except Exception:
@@ -1803,6 +1810,7 @@ def compact_coverage(item):
             'errorCategory':str(f.get('errorCategory') or '')[:60],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
             'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
+            'staffingFactScanVersion':int(f.get('staffingFactScanVersion') or 0),
             'staffingScopeExcluded':bool(
                 staffing_general_annex_file(f.get('name')) or
                 staffing_source_is_general_example(f.get('name'))),
