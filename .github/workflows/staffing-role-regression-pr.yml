@@ -10,13 +10,15 @@ on:
       - 'tests/test_rfp_staffing_roles.py'
       - 'tests/worklinks-jobs-regression.cjs'
       - 'tests/worklinks-staffing-regression.cjs'
+      - 'scripts/verify_three_live_staffing_sources.py'
+      - '.github/workflows/worklinks-three-real-staffing-20261113.yml'
       - '.github/workflows/staffing-role-regression-pr.yml'
 permissions:
   contents: read
 jobs:
   regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - name: Python and offline staffing fixtures
@@ -27,3 +29,7 @@ jobs:
           python3 tests/test_rfp_staffing_cached_backfill.py
       - name: Targeted staffing UI regression
         run: node tests/worklinks-staffing-regression.cjs
+      - name: Install real document readers
+        run: python3 -m pip install -q pyhwp pypdf Pillow
+      - name: Execute real official-file reparse for three named tenders
+        run: python3 -u scripts/verify_three_live_staffing_sources.py
