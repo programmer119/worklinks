@@ -31,6 +31,7 @@ jobs:
               [str(x) for x in list(sh.merged_cells.ranges)[:35]])
             for row in sh.iter_rows():
               cells=[f'{c.coordinate}={str(c.value)[:75]}' for c in row if c.value is not None]
+              if sh.title=='홈페이지' and cells: print('ORIGINAL_HOMEPAGE_ROW',row[0].row,' | '.join(cells[:18])[:1200])
               if cells and (any('투입' in x or '직무' in x or '상주' in x or '홈페이지' in x for x in cells) or len(cells)>6):
                 print('ORIGINAL_ROW',sh.title,' | '.join(cells[:18])[:1100])
           path=pathlib.Path('startup-support/audits/originals/R26BK01807134_공내역서_원본.xlsx')
