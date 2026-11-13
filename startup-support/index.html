@@ -4030,8 +4030,8 @@ function jobRequirementBadges(x){
  if(!evidence)return '';
  function marker(name,v,code){
   const label=code==='roles'?({role_found:'역할별 인원',role_unspecified:'인원 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name));
-  // The card hover is a short summary; document quotes, filenames and line
-  // evidence remain available in the full job detail.
+  // Tooltip is for immediate decisions. Never include RFP/OCR quotes,
+  // filenames, extraction coverage, or paragraphs here.
   const roleItems=code==='roles'?evidence.roles.items:[];
   const summarizeRole=record=>{
    const title=String(record.role||'').trim();
@@ -4041,17 +4041,34 @@ function jobRequirementBadges(x){
   };
   const roleSummaries=roleItems.slice(0,4).map(summarizeRole);
   const remaining=Math.max(0,roleItems.length-4);
-  const header=name+' · '+v.label;
-  const rows=code==='roles'&&roleSummaries.length?roleSummaries:[v.reason||'추가 확인 필요'];
+  const header=code==='onsite'?'상주 여부':code==='roles'?'역할별 인원':'4대보험';
+  const facts={
+   insurance:{
+    required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',
+    not_required:'입찰 시 증빙 불필요',not_checked:'미검증',
+    checking:'확인 중',failed:'확인 실패'
+   },
+   onsite:{
+    onsite:'발주처 상주 근무 필요',offsite:'상주 의무 미확인',
+    not_checked:'미검증',checking:'확인 중',failed:'확인 실패'
+   },
+   roles:{
+    role_unspecified:'역할·인원 동시 기재 미검출',
+    not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'
+   }
+  };
+  const factsForCode=facts[code]||{};
+  const rows=code==='roles'&&roleSummaries.length?roleSummaries:
+   [factsForCode[v.key]||'확인 필요'];
   const tip='<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>'+
    rows.map(line=>'<span class="job-req-tip-row">'+htmlEscape(line)+'</span>').join('')+
-   (remaining?'<span class="job-req-tip-sub">외 '+remaining+'개 역할은 상세보기</span>':'');
+   (remaining?'<span class="job-req-tip-sub">외 '+remaining+'개 역할은 상세에서 확인</span>':'');
   const description=header+' · '+rows.join(' · ')+(remaining?' · 외 '+remaining+'개':'');
   return '<span class="job-req-item" data-requirement="'+code+'" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
-     htmlEscape(description)+'" aria-expanded="false">'+
-     htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
-     ({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_found:'i',role_unspecified:'?'})[v.key]+'</span></button>'+
+    htmlEscape(description)+'" aria-expanded="false">'+
+    htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
+    ({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_found:'i',role_unspecified:'?'})[v.key]+'</span></button>'+
    '<span class="job-req-tip" role="tooltip">'+tip+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험, 상주 여부, 역할별 인원">'+
