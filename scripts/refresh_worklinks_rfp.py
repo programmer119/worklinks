@@ -148,6 +148,24 @@ def staffing_general_annex_file(name):
         and label.lower().endswith('.zip'))
 
 
+
+def staffing_ancillary_form_without_extractable_text(file):
+    """Exclude only known blank submission forms from the *staffing* scan.
+
+    A blank application/pledge form is not an RFP personnel specification.
+    Its extraction failure remains visible in general document coverage.
+    Never exempt an unreadable proposal, technical appendix, or unknown form.
+    """
+    if not isinstance(file, dict) or file.get('readable') is True:
+        return False
+    if str(file.get('errorCategory') or '') != 'no_searchable_text':
+        return False
+    name=Path(str(file.get('name') or '')).name.strip()
+    return bool(re.fullmatch(
+        r'(?:입찰\\s*참가\\s*신청서|서약서\\s*[\\(\\[]\\s*서식\\s*[\\)\\]])\\.(?:hwp|hwpx|pdf)',
+        name, re.I))
+
+
 def staffing_effective_file_complete(file, files):
     """An expressly skipped, same-stem official HWP uses the scanned PDF instead.
 
@@ -155,6 +173,7 @@ def staffing_effective_file_complete(file, files):
     The cited PDF, verified by SHA in the SAME manifest, is the effective source.
     """
     if not isinstance(file, dict):return False
+    if staffing_ancillary_form_without_extractable_text(file):return True
     # Generic nationwide contract-law archives are outside the project-specific
     # staffing scope; preserve their separate qualification extraction failure.
     if (staffing_general_annex_file(file.get('name')) or
@@ -1812,9 +1831,12 @@ def compact_coverage(item):
             'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
             'staffingFactScanVersion':int(f.get('staffingFactScanVersion') or 0),
             'staffingScopeExcluded':bool(
+                staffing_ancillary_form_without_extractable_text(f) or
                 staffing_general_annex_file(f.get('name')) or
                 staffing_source_is_general_example(f.get('name'))),
             'staffingScopeReason':(
+                '입찰신청·서약 제출용 서식의 텍스트 미추출 (인력 판독 범위에서만 제외, 전체 문서 오류 유지)'
+                if staffing_ancillary_form_without_extractable_text(f) else
                 '공통 입찰·계약 규정 또는 일반 낙찰기준 (사업별 인원요건 아님)'
                 if staffing_general_annex_file(f.get('name')) or
                    staffing_source_is_general_example(f.get('name')) else ''),
