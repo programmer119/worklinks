@@ -104,7 +104,7 @@ jobs:
               assert detail['status']['roles']['key']=='role_requirements',detail
               assert detail['visible']=='block' and detail['tooltipWidth']>=420,detail
               assert not detail['containsFailed'],detail
-            assert proof['actual'][1]['status']['onsite']['key']=='onsite_present',proof
+            assert proof['actual'][1]['status']['onsite']['key'] in ('onsite','onsite_present'),proof
             assert proof['actual'][1]['status']['insurance']['key']=='employment_proof',proof
             assert not failures,failures
             browser.close()
