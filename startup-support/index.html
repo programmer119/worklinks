@@ -3086,6 +3086,9 @@ async function refreshVerifiedStaffingFacts(){
   if(changed)scheduleJobsRender();
  }catch(e){/* A failed recovery fetch never proves the absence of staffing. */}
 }
+// This lightweight, read-only file must not depend on authentication, card-list
+// bootstrap or the 74MB rolling RFP cache being fetched first.
+void refreshVerifiedStaffingFacts();
 // Qualification checking uses official G2B evidence and the RFP source snapshot, not AI classifications.
 function rfpSnapshotForJob(x){
  const id=jobBidIdentity(x);
