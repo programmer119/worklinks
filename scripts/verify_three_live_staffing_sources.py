@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import refresh_worklinks_rfp as p
+from staffing_facts import extract_staffing_facts
 
 def read_json(name):
     with (ROOT/"startup-support"/name).open(encoding="utf-8") as handle:
@@ -181,8 +182,10 @@ def run():
                         "case":name,"file":f["name"],"matches":len(indices),
                         "excerpts":excerpts
                     },ensure_ascii=False),flush=True)
+                facts=extract_staffing_facts(text,f["name"],f["url"])
                 roles=p.extract_staffing_roles(text,f["name"],f["url"])
                 row.update(status="PARSED",chars=len(text),roleCount=len(roles),
+                           facts=[{k:v for k,v in x.items() if k!="sourceUrl"} for x in facts],
                            relevantLines=excerpt_lines(text))
                 for x in roles:
                     signature=(x["role"],x["grade"],x["count"],x["sourceFile"],x.get("onsite"))
@@ -191,6 +194,7 @@ def run():
                     report["roleEvidence"].append({k:x.get(k) for k in
                         ("role","grade","count","countKind","onsite","manMonths",
                          "sourceFile","sourceLine","sourceText")})
+                report.setdefault("facts",[]).extend(facts)
                 report["realDocumentsParsed"]+=1
             except Exception as exc:
                 row.update(status="SOURCE_OR_PARSER_ERROR",error=type(exc).__name__,
@@ -208,13 +212,37 @@ def run():
         report["status"]="ALL_MANIFEST_SOURCE_PARSED" if report["verified"] else (
             "PARTIAL_REAL_SOURCE_PARSED" if report["realDocumentsParsed"]
             else "NO_REAL_SOURCE_PARSED")
+        kinds=[x.get("kind") for x in report.get("facts") or []]
+        if name=="yongin":
+            report["factsOk"]=bool(
+                "workload_total" in kinds and
+                len([f for f in report.get("facts") or []
+                     if f["kind"]=="workload_role"])>=5 and
+                any(abs(f.get("manMonths",0)-11.522)<.0001
+                    for f in report.get("facts") or []
+                    if f["kind"]=="workload_total"))
+        elif name=="north":
+            report["factsOk"]=bool(
+                any(x.get("kind")=="headcount_recommended" and
+                    x.get("count")==8 and x.get("mandatory") is False
+                    for x in report.get("facts") or []) and
+                len([x for x in report.get("facts") or []
+                     if x.get("kind")=="role_unspecified"])>=4)
+        else:
+            report["factsOk"]=any(
+                x.get("kind")=="staffing_plan_required" and
+                x.get("headcount") is None
+                for x in report.get("facts") or [])
         all_results.append(report)
     for result in all_results:
         print("REAL_STAFFING_REPORT "+json.dumps(result,ensure_ascii=False),flush=True)
-    print("REAL_STAFFING_SUMMARY "+json.dumps({"realParsedCases":sum(
+    print("REAL_STAFFING_SUMMARY "+json.dumps({"factsOkCases":sum(x.get("factsOk") is True for x in all_results),
+        "realParsedCases":sum(
         x["realDocumentsParsed"]>0 for x in all_results),
         "completeCases":sum(x["verified"] for x in all_results),
         "cases":len(all_results)},ensure_ascii=False),flush=True)
+    if sum(x.get("factsOk") is True for x in all_results)!=3:
+        raise SystemExit("REAL_STAFFING_FACTS_INCOMPLETE")
 
 if __name__=="__main__":
     run()
