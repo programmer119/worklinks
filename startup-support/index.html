@@ -1795,11 +1795,18 @@ function collapseSimilarNotices(all){
  }
  return groups.map(function(group){
   if(group.length===1)return group[0];
-  // A correction / cancellation supersedes an older open order.
+  // Notice order is comparable ONLY within the same bid number.
+  // A reissue with a new bid number may have order 000 but be newer
+  // than a canceled order 001 from the preceding bid number.
   group.sort(function(a,b){
-   const ao=Number(a.noticeOrder||'0'),bo=Number(b.noticeOrder||'0');
-   return bo-ao||(jobTimeInfo(b).start||0)-(jobTimeInfo(a).start||0)||
-    Number(!!b.kind)-Number(!!a.kind);
+   const aTime=jobTimeInfo(a).start,bTime=jobTimeInfo(b).start;
+   if(aTime!==null&&bTime!==null&&aTime!==bTime)return bTime-aTime;
+   const ai=jobBidIdentity(a),bi=jobBidIdentity(b);
+   if(ai&&bi&&ai.bidNo===bi.bidNo){
+    const delta=Number(bi.order||0)-Number(ai.order||0);
+    if(delta)return delta;
+   }
+   return Number(!!b.kind)-Number(!!a.kind);
   });
   return {...group[0],variants:group.map(x=>({
    id:x.id,noticeNumber:x.noticeNumber,noticeOrder:x.noticeOrder,
