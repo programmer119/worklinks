@@ -38,6 +38,10 @@ jobs:
           assert "상주인력 · 월평균" in page
           assert "투입기간 " in page
           assert "[data-state=\"onsite_negotiable\"] .job-req-trigger{background:#ecfccb" in page
+          assert "site={key:'onsite',label:'상주 필수'" in page
+          assert "return {key:'offsite',label:'비상주'" in page
+          assert "label:'상주 확인'" not in page
+          assert "label:'상주 미확정'" not in page
           north=data['byNotice']['R26BK01783957:000']
           assert north['sha256']=='0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645'
           assert any(f.get('kind')=='headcount_recommended' and
@@ -92,6 +96,8 @@ jobs:
                 const rows=[
                   ['consult','R99BK12345678'],
                   ['yongin','R26BK01807134'],
+                  ['platform','R26BK01818412'],
+                  ['exercise','R26BK01797739'],
                   ['north','R26BK01783957'],
                   ['seoul','R26BK01810885']
                 ];
@@ -128,15 +134,20 @@ jobs:
                       for term in ['상주 여부·인원','협의조건_제안요청서.pdf']:
                           assert term in row['tooltip'],(row,term)
                   elif row['name']=='yongin':
-                      assert row['badge']=='상주 확인',row
+                      assert row['badge']=='상주 필수',row
+                      assert row['badgeBackground']=='rgb(254, 242, 242)',row
                       for term in ['응용SW 개발자','1명','11.04개월','75%','공내역서.xlsx']:
                           assert term in row['tooltip'],(row,term)
+                  elif row['name'] in ('platform','exercise'):
+                      assert row['badge'] not in ('상주 확인','상주 미확정'),row
+                      assert row['siteKey']!='not_specified',row
                   elif row['name']=='north':
                       assert row['badge']=='상주 권고',row
                       for term in ['월평균','8명 이상','필수 인원 아님','제안요청서']:
                           assert term in row['tooltip'],(row,term)
                   elif row['name']=='seoul':
-                      assert row['badge']=='상주 확인',row
+                      assert row['badge']=='상주 필수',row
+                      assert row['badgeBackground']=='rgb(254, 242, 242)',row
                       for term in ['상주인력 근무·휴가 조건','2. 제안요청서.hwpx']:
                           assert term in row['tooltip'],(row,term)
               browser.close()
