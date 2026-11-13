@@ -1,0 +1,27 @@
+name: Staffing role regression (offline)
+on:
+  pull_request:
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'scripts/backfill_worklinks_staffing_cached.py'
+      - 'scripts/publish_worklinks_staffing_patch.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_staffing_roles.py'
+      - 'tests/worklinks-jobs-regression.cjs'
+      - '.github/workflows/staffing-role-regression-pr.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python and offline staffing fixtures
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/backfill_worklinks_staffing_cached.py scripts/publish_worklinks_staffing_patch.py
+          python3 tests/test_rfp_staffing_roles.py
+          python3 tests/test_staffing_publish_evidence.py
+          python3 tests/test_rfp_staffing_cached_backfill.py
+      - name: Existing frontend regression
+        run: node tests/worklinks-jobs-regression.cjs
