@@ -21,6 +21,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 
 from refresh_worklinks_rfp import (
     STAFFING_ROLE_SCAN_VERSION,
+    STAFFING_FACT_SCAN_VERSION,
     STAFFING_ROLE_TEXT_LIMIT,
     extract_staffing_roles,
     extract_staffing_facts,
@@ -95,10 +96,19 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         if not isinstance(row,dict):continue
         if priority_only and key not in PRIORITY:continue
         if row.get('status')!='text_extracted_requires_review':continue
-        if row.get('staffingRoleScanComplete') is True and not staffing_scan_pending(row):continue
+        files=row.get('files') or []
+        facts_up_to_date=bool(files) and all(
+            not isinstance(f,dict) or f.get('readable') is not True or
+            int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION
+            for f in files)
+        if (row.get('staffingRoleScanComplete') is True and
+                not staffing_scan_pending(row) and facts_up_to_date):continue
         eligible_records+=1
         for position,f in enumerate(row.get('files') or []):
             if not isinstance(f,dict) or f.get('readable') is not True:continue
+            if (int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+                    int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION):
+                continue
             sha=str(f.get('sourceSha256') or '').lower()
             if not is_sha(sha):
                 missing_sha+=1
@@ -230,6 +240,8 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
             'staffingCachedReparseFiles':sum(bool(x) for x in performed),
             'staffingCachedReparseAt':now,
             'staffingCachedReparseVersion':STAFFING_ROLE_SCAN_VERSION,
+            'staffingFactScanVersions':{
+                str(i):STAFFING_FACT_SCAN_VERSION for i,v in enumerate(performed) if v},
         }
         affected[key]={
             'scanned':sum(bool(x) for x in performed),
