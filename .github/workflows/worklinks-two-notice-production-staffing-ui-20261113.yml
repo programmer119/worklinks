@@ -2,7 +2,10 @@ name: WorkLinks LX Seoul real browser staffing verification
 on:
   push:
     branches: [main]
-    paths: [.github/workflows/worklinks-two-notice-production-staffing-ui-20261113.yml]
+    paths:
+      - .github/workflows/worklinks-two-notice-production-staffing-ui-20261113.yml
+      - startup-support/index.html
+      - startup-support/staffing-source-verified.json
 permissions:
   contents: read
 jobs:
