@@ -43,7 +43,7 @@ jobs:
           assert "if(rfpSnapshotLoading&&!full&&!staffingSourceReadComplete)" in page
           assert "상주 여부</strong>" in page
           assert "label:'상주 확인'" not in page
-          assert "label:'상주 미확정'" not in page
+          assert "return {key:'not_specified',label:'상주 미확정'" in page
           north=data['byNotice']['R26BK01783957:000']
           assert north['sha256']=='0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645'
           assert any(f.get('kind')=='headcount_recommended' and
@@ -157,9 +157,10 @@ jobs:
                           assert term in row['tooltip'],(row,term)
                   elif row['name'] in ('platform','exercise'):
                       assert row['realRecord'] is True,row
-                      assert row['badge'].startswith('비상주'),row
-                      assert row['siteKey']=='offsite',row
-                      assert row['badgeBackground']=='rgb(220, 252, 231)',row
+                      assert row['badge']=='상주 미확정',row
+                      assert row['siteKey']=='not_specified',row
+                      assert row['badgeBackground']=='rgb(241, 245, 249)',row
+                      assert '상주·비상주' in row['tooltip'] or '확정할 수 없음' in row['tooltip'],row
                   elif row['name']=='north':
                       assert row['badge']=='상주 권고',row
                       for term in ['월평균','8명 이상','필수 인원 아님','제안요청서']:
