@@ -25,7 +25,7 @@ const app=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),new Map(),states,
  new Map(),new Map(),false,'',s=>String(s)
  .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
 const expected=[['Y','role_found','역할별 인원 1명'],
- ['N','role_recommended','8명 권고'],['X','role_count_unspecified','인원 수 미명시'],
+ ['N','role_recommended','8명 권고'],['X','role_count_unspecified','인력 조건 확인'],
  ['E','role_unspecified','인원표 미검출']];
 for(const [bidNo,key,label] of expected){
  const row={bidNo};const result=app.jobRequirementEvidence(row);
@@ -55,4 +55,32 @@ assert.ok(!onsiteBadge.includes('job-req-icon'),'verified onsite source is not a
 assert.ok(!workloadBadge.includes('job-req-icon'),'verified workload source is not a grey failure/info circle');
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.status.key,'role_found');
 assert.ok(app.jobRequirementEvidence({bidNo:'N'}).roles.factLines[0].includes('필수 아님'));
-console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length);
+const verified=JSON.parse(fs.readFileSync(path.join(__dirname,'../startup-support/staffing-source-verified.json'),'utf8')).byNotice;
+for(const [key,expectedCount] of [['R26BK01818412:000',3],['R26BK01810885:000',4]]){
+ const original=verified[key];
+ assert.ok(original&&original.verification==='official_attachment_sha256'&&original.staffingFacts.length===expectedCount,key);
+ assert.ok(original.staffingFacts.every(f=>f.kind==='staffing_requirement'&&f.sourceFile===original.sourceFile&&f.sourceLine>0));
+}
+const docs=new Map(Object.entries(verified).map(([key,value])=>[key,{staffingFacts:value.staffingFacts}]));
+const records=new Map([
+ ['R26BK01818412:000',mk([])],
+ ['R26BK01810885:000',{seen:true,status:'text_extracted_requires_review',
+  complete:false,scanComplete:false,documentCount:5,readableCount:3,effectiveReadableCount:4,
+  staffingRoleScanComplete:true,staffingRoles:[],staffingFacts:[]}]
+]);
+const evidenceUI=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),docs,records,new Map(),new Map(),false,'',
+ s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
+const lx={bidNo:'R26BK01818412'},seoul={bidNo:'R26BK01810885'};
+assert.equal(evidenceUI.jobRequirementEvidence(lx).roles.status.key,'role_requirements');
+const lxHtml=evidenceUI.jobRequirementBadges(lx);
+for(const label of ['인력 조건 확인','근무조건 협의','FP 산정 전문가 포함','참여인력 재직·경력 증빙'])assert.ok(lxHtml.includes(label),label);
+assert.ok(!lxHtml.includes('job-req-tip-total">인원 수 미명시'),'never headline non-information');
+assert.ok(!lxHtml.includes('role_requirements">?'),'verified conditions are not failure');
+const seoulEvidence=evidenceUI.jobRequirementEvidence(seoul);
+assert.equal(seoulEvidence.onsite.status.key,'onsite_present');
+assert.equal(seoulEvidence.roles.status.key,'role_requirements');
+assert.equal(seoulEvidence.insurance.status.key,'employment_proof');
+const seoulHtml=evidenceUI.jobRequirementBadges(seoul);
+for(const text of ['재직증빙 확인','상주조건 확인','PM 10년 경력','건강보험 자격득실'])assert.ok(seoulHtml.includes(text),text);
+assert.ok(!seoulHtml.includes('확인실패'),'positive evidence must not become three failed statuses');
+console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length,'source-backed notices',2);
