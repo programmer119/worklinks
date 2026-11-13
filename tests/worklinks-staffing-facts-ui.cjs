@@ -46,7 +46,8 @@ assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.items[0].roleName,'�
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.items[0].count,1);
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.items[0].inferredFromWorkload,true);
 assert.equal(app.jobRequirementEvidence({bidNo:'M'}).roles.status.key,'role_workload','multiple onsite rows must not imply a single person');
-assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).onsite.status.key,'onsite_present');
+assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).onsite.status.key,'onsite');
+assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).onsite.status.label,'상주 필수');
 assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.key,'onsite_recommended');
 assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.label,'상주 권고');
 const northBadgeHtml=app.jobRequirementBadges({bidNo:'N'});
@@ -58,10 +59,13 @@ for(const fragment of ['상주인력 · 월평균','8명 이상','유지 권고 
  assert.ok(northTooltip.includes(fragment),'missing sourced recommendation '+fragment);
 }
 assert.ok(!northTooltip.includes('상주 여부 미확정'),'known recommendation is not unknown');
-assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'not_specified');
+assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'offsite');
+assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.label,'비상주');
+assert.match(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.reason,/상주 관련 조건 미검출/);
+assert.equal(app.jobRequirementEvidence({bidNo:'X'}).onsite.status.key,'offsite');
 assert.equal(app.jobRequirementEvidence({bidNo:'C'}).onsite.status.key,'onsite_negotiable');
 assert.equal(app.jobRequirementEvidence({bidNo:'C'}).onsite.status.label,'상주 협의');
-assert.equal(app.jobRequirementEvidence({bidNo:'L'}).onsite.status.key,'not_specified',
+assert.equal(app.jobRequirementEvidence({bidNo:'L'}).onsite.status.key,'offsite',
  'negotiating leave or work hours does not imply negotiating onsite requirements');
 assert.equal(app.jobRequirementEvidence({bidNo:'F'}).onsite.status.key,'onsite');
 assert.equal(app.jobRequirementEvidence({bidNo:'F'}).onsite.status.label,'상주 필수');
@@ -79,7 +83,11 @@ assert.ok(html.includes('[data-state="onsite_recommended"] .job-req-trigger{back
  'recommended onsite must be orange');
 assert.ok(html.includes('[data-state="offsite"] .job-req-trigger{background:#dcfce7'),
  'offsite must be green');
-assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주 확인'));
+assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주 필수'));
+assert.ok(app.jobRequirementBadges({bidNo:'E'}).includes('비상주'));
+assert.ok(!app.jobRequirementBadges({bidNo:'E'}).includes('상주 미확정'));
+assert.ok(!html.includes("label:'상주 미확정'"));
+assert.ok(!html.includes("label:'상주 확인'"));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('비상주 ✓'));
 assert.ok(app.jobRequirementEvidence({bidNo:'Y'}).roles.factLines.some(v=>v.includes('8.280MM')));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('인원 미확인'));
@@ -134,11 +142,11 @@ for(const label of ['인력 조건 확인','근무조건 협의','FP 산정 전�
 assert.ok(!lxHtml.includes('job-req-tip-total">인원 수 미명시'),'never headline non-information');
 assert.ok(!lxHtml.includes('role_requirements">?'),'verified conditions are not failure');
 const seoulEvidence=evidenceUI.jobRequirementEvidence(seoul);
-assert.equal(seoulEvidence.onsite.status.key,'onsite_present');
+assert.equal(seoulEvidence.onsite.status.key,'onsite');
 assert.equal(seoulEvidence.roles.status.key,'role_requirements');
 assert.equal(seoulEvidence.insurance.status.key,'employment_proof');
 const seoulHtml=evidenceUI.jobRequirementBadges(seoul);
-for(const text of ['재직증빙 확인','상주 확인','PM 10년 경력','건강보험 자격득실'])assert.ok(seoulHtml.includes(text),text);
+for(const text of ['재직증빙 확인','상주 필수','PM 10년 경력','건강보험 자격득실'])assert.ok(seoulHtml.includes(text),text);
 const seoulOnsiteTip=seoulHtml.slice(seoulHtml.indexOf('data-requirement="onsite"'),
  seoulHtml.indexOf('data-requirement="roles"'));
 for(const fragment of ['상주인력 근무·휴가 조건','2. 제안요청서.hwpx','상주인력의 휴가']){
@@ -168,7 +176,7 @@ const legacyHtml=legacyApp.jobRequirementBadges({bidNo:'G'});
 assert.ok(legacyHtml.includes('인력 현황 제출'));
 assert.ok(legacyHtml.includes('투입될 인원 현황'));
 assert.ok(!legacyHtml.includes('role_count_unspecified'));
-assert.equal(legacyApp.jobRequirementEvidence({bidNo:'H'}).onsite.status.key,'not_specified',
+assert.equal(legacyApp.jobRequirementEvidence({bidNo:'H'}).onsite.status.key,'offsite',
  'general contract archive failure must not invalidate completed project staffing scans');
 console.log('WORKLINKS_STAFFING_FACTS_UI_PASS',expected.length,'source-backed notices',2,
  'legacy source fallback 1, scoped archive failure 1');
