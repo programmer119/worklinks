@@ -38,7 +38,7 @@ def notice_targets(actionable):
     hits=[]
     for item in actionable.get("bids") or []:
         title=str(item.get("title") or "")
-        if "북한" in title and ("정보" in title or "분석" in title):
+        if "북한정보분석시스템" in title:
             hits.append({"id":to_key(item),"title":title})
     chosen=list({row["id"]:row for row in hits}.values())
     print("REAL_STAFFING_NORTH_CANDIDATES "+json.dumps(chosen[:20],ensure_ascii=False),flush=True)
@@ -73,7 +73,8 @@ def official_sources(key,record,detail,government_api_fallback=True):
             data=p.fetch_json(p.BASE+"bid-evidence?"+urllib.parse.urlencode({"bidNo":no,"order":ordn}))
             docs=data.get("attachments") or {}
             metadata.update(ok=bool(docs.get("ok")),complete=bool(docs.get("complete")),
-                            count=docs.get("count"))
+                            count=docs.get("count"),
+                            names=[str(x.get("name") or "") for x in docs.get("items") or []])
             for item in docs.get("items") or []:
                 direct=p.legal_file(item)
                 if direct:
@@ -116,6 +117,8 @@ def run():
                       priorRecordedRoles=(record.get("staffingRoles") or [])[:8],
                       priorScanComplete=record.get("staffingRoleScanComplete"))
         sources,manifest,meta=official_sources(key,record,detail)
+        if not manifest and meta.get("ok") and meta.get("complete"):
+            manifest=meta.get("names") or []
         report["sourceManifestNames"]=manifest[:24]
         report["linkCount"]=len(sources)
         report["metadataLookup"]=meta
