@@ -71,6 +71,11 @@ def api_route(route):
     elif path.endswith("/bid-evidence"):
         payload = {"ok": True, "complete": False, "region": {},
                    "attachments": {}, "noticeDocuments": {}}
+    elif path.endswith("/snapshot") and parse_qs(url.query).get("name") == ["changcom-actionable"]:
+        # A successful but empty generic snapshot reply prevented the UI from
+        # falling back to its published Changcom shortlist. Use the real local
+        # repository fixture, not a fabricated authorization or shortlist.
+        payload = json.loads((ROOT / "startup-support" / "changcom-actionable.json").read_text(encoding="utf-8"))
     else:
         payload = {"ok": True, "totalCount": 0, "items": []}
     route.fulfill(status=200, content_type="application/json",
