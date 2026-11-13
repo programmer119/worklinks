@@ -93,7 +93,9 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         if not isinstance(row,dict):continue
         if priority_only and key not in PRIORITY:continue
         if row.get('status')!='text_extracted_requires_review':continue
-        if row.get('staffingRoleScanComplete') is True:continue
+        if (row.get('staffingRoleScanComplete') is True and
+                all(int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION
+                    for f in (row.get('files') or []) if isinstance(f,dict))):continue
         eligible_records+=1
         for position,f in enumerate(row.get('files') or []):
             if not isinstance(f,dict) or f.get('readable') is not True:continue
