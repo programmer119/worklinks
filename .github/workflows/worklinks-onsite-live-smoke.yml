@@ -40,6 +40,8 @@ jobs:
           assert "[data-state=\"onsite_negotiable\"] .job-req-trigger{background:#ecfccb" in page
           assert "site={key:'onsite',label:'상주 필수'" in page
           assert "return {key:'offsite',label:'비상주'" in page
+          assert "if(rfpSnapshotLoading&&!full&&!staffingSourceReadComplete)" in page
+          assert "상주 여부</strong>" in page
           assert "label:'상주 확인'" not in page
           assert "label:'상주 미확정'" not in page
           north=data['byNotice']['R26BK01783957:000']
