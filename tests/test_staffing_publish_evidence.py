@@ -25,4 +25,11 @@ assert not fact_guard({**official,'label':'상주 8명 필수'}),'invented count
 assert not fact_guard({**official,'headcount':8}),'source says no headcount'
 assert not fact_guard({**official,'sourceFile':'입찰유의서 계약일반조건.zip'}),'general-law annex cannot supply contract staffing'
 assert not fact_guard({**official,'sourceText':'사업과 무관한 안내 문구'}),'required matching source passage missing'
+pm={'kind':'staffing_requirement','requirementType':'pm',
+    'label':'PM 10년 경력 · 참여율 50% 이상','headcount':None,'sourceLine':2153,
+    'sourceFile':'2. 제안요청서.hwpx',
+    'sourceText':'사업총괄인력(PM)은 해당분야에서 10년 이상 업무를 수행한 자로서 계약일~12월까지 50%이상 참여해야 함'}
+assert fact_guard(pm),'explicit source values support the PM label'
+assert not fact_guard({**pm,'label':'PM 20년 경력 · 참여율 50% 이상'}),'cannot change 10 to 20 years'
+assert not fact_guard({**pm,'label':'PM 10년 경력 · 참여율 80% 이상'}),'cannot change 50 to 80 percent'
 print('STAFFING_ROLE_EVIDENCE_PUBLISH_GUARD=PASS')
