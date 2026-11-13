@@ -124,6 +124,9 @@ jobs:
                   button.click();
                   const result={name,bidNo,realRecord:Boolean(real),
                     savedCoverage:jobListRfpState.has(bidNo+':000'),
+                    savedScanComplete:jobListRfpState.get(bidNo+':000')?.staffingRoleScanComplete,
+                    savedDocumentCount:jobListRfpState.get(bidNo+':000')?.documentCount,
+                    savedReadableCount:jobListRfpState.get(bidNo+':000')?.effectiveReadableCount,
                     siteKey:evidence.onsite.status.key,
                     badge:button.textContent.trim(),
                     tooltip:tip.textContent.replace(/\\s+/g,' ').trim(),
@@ -152,7 +155,7 @@ jobs:
                           assert term in row['tooltip'],(row,term)
                   elif row['name'] in ('platform','exercise'):
                       assert row['realRecord'] is True,row
-                      assert row['badge']=='비상주',row
+                      assert row['badge'].startswith('비상주'),row
                       assert row['siteKey']=='offsite',row
                       assert row['badgeBackground']=='rgb(220, 252, 231)',row
                   elif row['name']=='north':

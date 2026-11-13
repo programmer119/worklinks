@@ -4139,8 +4139,8 @@ function jobRequirementEvidence(x){
      reason:'상주 여부 또는 배치 인원을 발주기관과 협의하여 결정'};
    if(explicitOffsite)return {key:'offsite',label:'비상주',
      reason:'공식 문서에서 비상주 근무 또는 상주 불필요를 명시'};
-   if(rfpSnapshotLoading&&!full)return {key:'checking',label:'확인중',
-     reason:'저장된 RFP 상세 판독자료를 불러오는 중'};
+   if(rfpSnapshotLoading&&!full&&!staffingSourceReadComplete)return {key:'checking',label:'확인중',
+     reason:'상주 조건 판독자료를 아직 확보하지 못해 확인 중'};
    if(!tried)return {key:'not_checked',label:'확인안함',
      reason:'공고 원문 API 수집·검증 호출 기록 없음'};
    if(!staffingSourceReadComplete)return {key:'failed',label:'확인실패',
@@ -4462,7 +4462,7 @@ function jobRequirementBadges(x){
    siteRequirement?
     '<div class="job-req-onsite-person"><strong>'+htmlEscape(String(siteRequirement.label||'상주 근무조건'))+'</strong></div>':
    '<div class="job-req-onsite-note">'+htmlEscape(status)+'</div>';
-  const onsiteDetails='<strong class="job-req-onsite-title">상주인력</strong>'+onsitePrimary+
+  const onsiteDetails='<strong class="job-req-onsite-title">상주 여부</strong>'+onsitePrimary+
    (onsiteSource?.text?
     '<div class="job-req-onsite-meta">'+htmlEscape(String(onsiteSource.text).replace(/\s+/g,' ').slice(0,210))+'</div>':'')+
    (onsiteSource?.file?'<div class="job-req-onsite-source">출처: '+
