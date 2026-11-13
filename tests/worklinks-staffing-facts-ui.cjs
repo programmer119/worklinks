@@ -75,6 +75,13 @@ assert.ok(!workloadBadge.includes('job-req-icon'),'verified workload source is n
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.status.key,'role_found');
 assert.ok(app.jobRequirementEvidence({bidNo:'N'}).roles.factLines[0].includes('필수 아님'));
 const verified=JSON.parse(fs.readFileSync(path.join(__dirname,'../startup-support/staffing-source-verified.json'),'utf8')).byNotice;
+const northOfficial=verified['R26BK01783957:000'];
+assert.ok(northOfficial&&northOfficial.verification==='official_attachment_sha256');
+assert.equal(northOfficial.sha256,'0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645');
+assert.equal(northOfficial.staffingFacts.length,1);
+assert.equal(northOfficial.staffingFacts[0].count,8);
+assert.equal(northOfficial.staffingFacts[0].mandatory,false);
+assert.match(northOfficial.staffingFacts[0].sourceText,/상주인력 월평균 8명 이상을 유지 권고/);
 for(const [key,expectedCount] of [['R26BK01818412:000',3],['R26BK01810885:000',4]]){
  const original=verified[key];
  assert.ok(original&&original.verification==='official_attachment_sha256'&&original.staffingFacts.length===expectedCount,key);
@@ -90,6 +97,11 @@ const records=new Map([
 const evidenceUI=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),docs,records,new Map(),new Map(),false,'',
  s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'));
 const lx={bidNo:'R26BK01818412'},seoul={bidNo:'R26BK01810885'};
+const recoveredNorth=evidenceUI.jobRequirementEvidence({bidNo:'R26BK01783957'});
+assert.equal(recoveredNorth.onsite.status.key,'onsite_recommended');
+assert.equal(recoveredNorth.onsite.status.label,'상주 8명 이상 권고');
+assert.ok(evidenceUI.jobRequirementBadges({bidNo:'R26BK01783957'}).includes('월평균'));
+assert.ok(evidenceUI.jobRequirementBadges({bidNo:'R26BK01783957'}).includes('붙임1_제안요청서'));
 assert.equal(evidenceUI.jobRequirementEvidence(lx).roles.status.key,'role_requirements');
 const lxHtml=evidenceUI.jobRequirementBadges(lx);
 for(const label of ['인력 조건 확인','근무조건 협의','FP 산정 전문가 포함','참여인력 재직·경력 증빙'])assert.ok(lxHtml.includes(label),label);
