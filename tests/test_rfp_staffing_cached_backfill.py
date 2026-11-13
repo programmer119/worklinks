@@ -26,8 +26,9 @@ with tempfile.TemporaryDirectory() as tmp:
     report=base/'report.json'
     index.write_text(json.dumps({'ok':True,'generatedAt':'test',
       'byNotice':{key:{'status':'text_extracted_requires_review',
-        'manifestComplete':True,'staffingRoleScanComplete':True,  # Legacy v2 claimed complete.
-        'files':[{'name':'투입인력계획서.pdf','staffingRoleScanVersion':2,
+        'manifestComplete':True,'staffingRoleScanComplete':True,  # Staffing roles done; new condition facts missing.
+        'files':[{'name':'투입인력계획서.pdf','staffingRoleScanVersion':4,
+          'staffingFactScanVersion':0,
           'readable':True,'sourceSha256':sha,
           'sourceTextScanComplete':True}]}}},ensure_ascii=False))
     detail.write_text(json.dumps({'ok':True,'byNotice':{key:{'files':[
@@ -56,4 +57,14 @@ with tempfile.TemporaryDirectory() as tmp:
     assert all(r['sourceFile']=='투입인력계획서.pdf' and r['sourceText']
                for r in change['staffingRoles']),change
     assert len(calls)==1,calls
+    assert change['staffingFactScanVersions']=={'0':2},change
+    # Once the SHA-matched cached file has been published as fact-version 2,
+    # the next incremental pass MUST skip it without re-reading any bytes.
+    done=json.loads(index.read_text())
+    done['byNotice'][key]['files'][0]['staffingFactScanVersion']=2
+    index.write_text(json.dumps(done))
+    calls.clear()
+    after=run(index,detail,ledger,patch,report,max_files=5,max_seconds=30)
+    assert after['filesReparsed']==0 and after['governmentApiCalls']==0,after
+    assert not calls,calls
 print('CACHED_RFP_STAFFING_REPARSE_OFFLINE_FIXTURE=PASS')
