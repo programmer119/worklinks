@@ -19,7 +19,7 @@ with tempfile.TemporaryDirectory() as temporary:
     m.STATE=root/'scheduler.json'
     m.SEEDS.mkdir()
     m.SCRIPTS.mkdir()
-    for script in ('refresh_worklinks_rfp.py','analyze_worklinks_rfp_ai.py',
+    for script in ('refresh_worklinks_rfp.py','staffing_facts.py','analyze_worklinks_rfp_ai.py',
                    'refresh_worklinks_actionable.py',
                    'refresh_worklinks_open_award_fallback.py',
                    'batch_backfill_changcom_top500_rfp.py',
@@ -43,6 +43,7 @@ with tempfile.TemporaryDirectory() as temporary:
         assert (staged/'snapshots'/'rfp-clauses.json').is_symlink()
         assert (staged/'snapshots'/'rfp-top500-batch-metadata-20261111.json').is_symlink()
         assert not (staged/'snapshots'/'rfp-coverage-index.json').is_symlink()
+        assert (staged/'scripts'/'staffing_facts.py').is_file(), 'RFP extractor must stage its dependency'
         assert not (staged/'startup-support').exists()
     def mock_runner(args,cwd,env,capture_output,text,timeout):
         assert env['WORKLINKS_G2B_API'].startswith('http://127.0.0.1:')
