@@ -162,7 +162,7 @@ def staffing_ancillary_form_without_extractable_text(file):
         return False
     name=Path(str(file.get('name') or '')).name.strip()
     return bool(re.fullmatch(
-        r'(?:입찰\\s*참가\\s*신청서|서약서\\s*[\\(\\[]\\s*서식\\s*[\\)\\]])\\.(?:hwp|hwpx|pdf)',
+        r'(?:입찰\s*참가\s*신청서|서약서\s*[\(\[]\s*서식\s*[\)\]])\.(?:hwp|hwpx|pdf)',
         name, re.I))
 
 
