@@ -391,7 +391,8 @@ assert.equal(past.pastCompetitionSummary(pastBid).latest.count,2);
 assert.equal(past.pastCompetitionSummary(pastBid).low,true);
 assert.equal(past.bidAdvantageFromHistory(past.pastCompetitionSummary(pastBid)).level,2,
  'one verified low-bid year without a confirmed incumbent merits two research chips');
-assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/class="advantage-pill"/g)||[]).length,2);
+assert.equal((past.bidAdvantageMarkup(past.pastCompetitionSummary(pastBid),true).match(/advantage-pill is-filled/g)||[]).length,2,
+ 'advantage tier two fills two of three chips');
 past.competitionByNotice.set('20241237450',{count:9,checkedAt:Date.now()});
 assert.equal(past.pastCompetitionSummary(pastBid).low,false,
  'past 9-bidder year cannot be labeled uniformly low competition');
