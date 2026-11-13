@@ -168,8 +168,11 @@ def main():
                 document.documentElement.dataset.worklinksPartnerAccess='granted';
                 window.dispatchEvent(new Event('worklinks:partner-access'));
             }""")
+            # The private decision summary is rendered in the Changcom
+            # workspace, not the public general-jobs workspace.
+            page.evaluate("setWorkspaceView('changcom')")
             page.wait_for_function(
-                "() => worklinksPartnerAccess() && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",
+                "() => worklinksPartnerAccess() && workspaceActiveView==='changcom' && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",
                 timeout=15000
             )
             assert page.evaluate("jobRenderLimit") == 24
