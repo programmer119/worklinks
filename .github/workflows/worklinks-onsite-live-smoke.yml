@@ -37,6 +37,7 @@ jobs:
           assert "job-req-onsite-person" in page
           assert "상주인력 · 월평균" in page
           assert "투입기간 " in page
+          assert "[data-state=\"onsite_negotiable\"] .job-req-trigger{background:#ecfccb" in page
           north=data['byNotice']['R26BK01783957:000']
           assert north['sha256']=='0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645'
           assert any(f.get('kind')=='headcount_recommended' and
@@ -81,7 +82,15 @@ jobs:
               output=page.evaluate("""() => {
                 const root=document.getElementById('jobCards');
                 if(!root)throw new Error('Job cards root missing');
+                jobSearchRfpState.set('R99BK12345678:000',{
+                  seen:true,status:'text_extracted_requires_review',complete:true,
+                  scanComplete:true,documentCount:1,effectiveReadableCount:1,
+                  staffingRoleScanComplete:true,
+                  excerpts:[{text:'상주 여부 및 상주 인원은 계약 체결 후 발주기관과 협의하여 결정한다',
+                    sourceFile:'협의조건_제안요청서.pdf'}]
+                });
                 const rows=[
+                  ['consult','R99BK12345678'],
                   ['yongin','R26BK01807134'],
                   ['north','R26BK01783957'],
                   ['seoul','R26BK01810885']
@@ -102,6 +111,7 @@ jobs:
                     tooltip:tip.textContent.replace(/\\s+/g,' ').trim(),
                     expanded:button.getAttribute('aria-expanded'),
                     display:getComputedStyle(tip).display,
+                    badgeBackground:getComputedStyle(button).backgroundColor,
                     width:Math.round(tip.getBoundingClientRect().width)};
                   wrap.remove();
                   return result;
@@ -111,12 +121,18 @@ jobs:
               print('LIVE_ONSITE_BROWSER_PAGE_ERRORS',json.dumps(errors[:5],ensure_ascii=False))
               for row in output:
                   assert row['expanded']=='true' and row['display']=='block' and row['width']>0,row
-                  if row['name']=='yongin':
+                  if row['name']=='consult':
+                      assert row['badge']=='상주 협의',row
+                      assert row['siteKey']=='onsite_negotiable',row
+                      assert row['badgeBackground']=='rgb(236, 252, 203)',row
+                      for term in ['상주 여부·인원','협의조건_제안요청서.pdf']:
+                          assert term in row['tooltip'],(row,term)
+                  elif row['name']=='yongin':
                       assert row['badge']=='상주 확인',row
                       for term in ['응용SW 개발자','1명','11.04개월','75%','공내역서.xlsx']:
                           assert term in row['tooltip'],(row,term)
                   elif row['name']=='north':
-                      assert row['badge']=='상주 8명 이상 권고',row
+                      assert row['badge']=='상주 권고',row
                       for term in ['월평균','8명 이상','필수 인원 아님','제안요청서']:
                           assert term in row['tooltip'],(row,term)
                   elif row['name']=='seoul':
