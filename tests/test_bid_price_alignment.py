@@ -199,7 +199,7 @@ def changcom_card(title, amount):
 partner_html = (
     '<!doctype html><html lang="ko"><meta charset="utf-8">'
     '<meta name="viewport" content="width=device-width,initial-scale=1">'
-    '<style>' + css[0] + '</style><body>'
+    '<style>' + '\n'.join(css) + '</style><body>'
     '<div id="jobsView" class="workspace-view on" data-job-mode="partner"'
     ' style="display:block">'
     '<div id="jobCards" class="cards"'
