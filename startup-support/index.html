@@ -514,6 +514,7 @@
 #jobCards .job-req-item[data-state="offsite"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="role_found"] .job-req-icon{background:#dbeafe;color:#1d4ed8}
 #jobCards .job-req-item[data-state="role_unspecified"] .job-req-icon{background:#e2e8f0;color:#475569}
+#jobCards .job-req-item[data-state="onsite_present"] .job-req-trigger,#jobCards .job-req-item[data-state="role_workload"] .job-req-trigger{background:#eef5ff;border-color:#c7ddf4;color:#174375}
 #jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 28px));padding:12px 14px;border:1px solid #cad5e3;border-radius:11px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.15);color:#1e293b;font-size:15px;font-weight:500;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
 #jobCards .job-req-item[data-requirement="roles"] .job-req-tip{width:min(430px,calc(100vw - 28px));right:0;left:auto;bottom:calc(100% + 7px);max-height:70vh;overflow-y:auto;padding:0}
@@ -526,6 +527,14 @@
 #jobCards .job-req-tip-facts .job-req-tip-row{padding:7px 1px;border-bottom:1px solid #e2e8f0}
 #jobCards .job-req-tip-facts .job-req-tip-row:first-child{font-size:18px;font-weight:850;color:#123d75}
 #jobCards .job-req-tip-facts .job-req-tip-row:last-child{border-bottom:0;color:#53657c}
+#jobCards .job-req-effort-table{width:100%;border-collapse:collapse;table-layout:auto;font-size:13px;line-height:1.4}
+#jobCards .job-req-effort-table th{font-size:12px;text-align:right;font-weight:750;color:#516379;padding:8px 4px;border-bottom:1px solid #cbd5e1;white-space:nowrap}
+#jobCards .job-req-effort-table th:first-child,#jobCards .job-req-effort-table td:first-child{text-align:left}
+#jobCards .job-req-effort-table td{padding:9px 4px;border-bottom:1px solid #e2e8f0;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#jobCards .job-req-effort-table td:first-child{white-space:normal;font-weight:650;color:#152e50}
+#jobCards .job-req-effort-table tr[data-onsite="true"] td:first-child:after{content:' · 상주';color:#1d4ed8;font-weight:800}
+#jobCards .job-req-effort-total{font-size:17px;font-weight:850;color:#174375;padding-bottom:8px}
+#jobCards .job-req-effort-foot{font-size:12.5px;line-height:1.5;color:#64748b;padding-top:10px}
 #jobCards .job-req-tip-roles{padding:3px 14px}
 #jobCards .job-req-tip-role{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px 14px;padding:11px 2px;border-bottom:1px solid #e2e8f0}
 #jobCards .job-req-tip-role:last-child{border-bottom:none}
@@ -607,6 +616,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobDetailModal .job-key-state[data-state="required"]{border-color:#fcd34d;background:#fffbeb;color:#92400e}
 #jobDetailModal .job-key-state[data-state="not_required"]{border-color:#86efac;background:#f0fdf4;color:#166534}
 #jobDetailModal .job-key-state[data-state="failed"]{border-color:#fca5a5;background:#fef2f2;color:#b91c1c}
+#jobDetailModal .job-key-state[data-state="onsite_present"],#jobDetailModal .job-key-state[data-state="role_workload"]{border-color:#c7ddf4;background:#eef5ff;color:#174375}
 #jobDetailModal .job-key-state[data-state="evaluation"]{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
 #jobDetailModal .job-key-requirements .job-key-primary{font-size:15.5px;font-weight:700;line-height:1.55;color:#1e293b;margin:0 0 6px;overflow-wrap:anywhere}
 #jobDetailModal .job-key-requirements .job-key-secondary{font-size:14px;line-height:1.6;color:#475569;margin:0;overflow-wrap:anywhere}
@@ -4207,7 +4217,9 @@ function jobRequirementEvidence(x){
  return {
   insurance:{status:four,source:srcInsurance,lines:insLines},
   onsite:{status:site,source:srcOnsite,lines:siteLines},
-  roles:{status:roleStatus,lines:roleLines,items:roleSources,factLines},
+  roles:{status:roleStatus,lines:roleLines,items:roleSources,factLines,workloads:effortRows,
+   totalManMonths:total?Number(total.manMonths):null,
+   sourceFiles:[...new Set(effortRows.map(f=>String(f.sourceFile||'')).filter(Boolean))]},
   meta:{full,saved,staff,clauses,tried,scanFailed,fullyReviewed}
  };
 }
@@ -4245,8 +4257,19 @@ function jobRequirementBadges(x){
   const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
   const status=(messages[code]||{})[v.key]||'원문에서 조건 확인 필요';
   const hasFacts=code==='roles'&&evidence.roles.factLines?.length>0;
+  const workloads=code==='roles'?(evidence.roles.workloads||[]):[];
+  const totalManMonths=code==='roles'?evidence.roles.totalManMonths:null;
+  const workloadTable=workloads.length?
+   '<div class="job-req-tip-facts"><div class="job-req-effort-total">총 투입공수 '+
+    (Number.isFinite(totalManMonths)?totalManMonths.toFixed(3)+'MM':'확인 중')+'</div>'+
+    '<table class="job-req-effort-table"><thead><tr><th>직무</th><th>기간</th><th>투입률</th><th>공수</th></tr></thead><tbody>'+
+    workloads.slice(0,8).map(f=>'<tr data-onsite="'+String(f.onsite===true)+'"><td>'+htmlEscape(String(f.role||'직무'))+'</td><td>'+
+     htmlEscape(String(f.durationMonths))+'개월</td><td>'+htmlEscape((Number(f.allocationRate)*100).toFixed(1))+'%</td><td>'+
+     htmlEscape(Number(f.manMonths).toFixed(3))+'MM</td></tr>').join('')+'</tbody></table>'+
+    '<div class="job-req-effort-foot">MM은 투입공수이며 확정 인원 수가 아닙니다. 원문에 인원 수는 별도 명시되지 않았습니다.</div>'+
+    '<div class="job-req-effort-foot">출처: '+htmlEscape(evidence.roles.sourceFiles.join(' · '))+'</div></div>':'';
   const intro=code==='roles'&&(roleRows.length||hasFacts)?
-   '<div class="job-req-tip-heading"><strong class="job-req-tip-head">'+(roleRows.length?'필요 인력':'투입계획')+'</strong><span class="job-req-tip-total">'+(roleRows.length?roles.length+'개 역할':'인원 수 미명시')+'</span></div>':
+   '<div class="job-req-tip-heading"><strong class="job-req-tip-head">'+(roleRows.length?'필요 인력':'투입계획')+'</strong><span class="job-req-tip-total">'+(roleRows.length?roles.length+'개 역할':workloads.length?workloads.length+'개 투입항목':'인원 수 미명시')+'</span></div>':
    '<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>';
   const rows=roleRows.map(row=>
    '<div class="job-req-tip-role" data-uncertain="'+String(row.ambiguous||!row.literallyFound)+'">'+
@@ -4260,16 +4283,17 @@ function jobRequirementBadges(x){
    '<div class="job-req-tip-roles">'+rows+'</div>'+
     (remaining?'<span class="job-req-tip-sub">나머지 '+remaining+'개 역할은 상세에서 확인</span>':'')+
     (roles.length>1?'<span class="job-req-tip-sub">역할 간 중복·총원 미확인</span>':''):
+    (code==='roles'&&workloadTable?workloadTable:
     (code==='roles'&&evidence.roles.factLines?.length?
      '<div class="job-req-tip-facts">'+evidence.roles.factLines.slice(0,8).map(v=>'<span class="job-req-tip-row">'+htmlEscape(v)+'</span>').join('')+'</div>':
-     '<span class="job-req-tip-row">'+htmlEscape(status)+'</span>'));
+     '<span class="job-req-tip-row">'+htmlEscape(status)+'</span>')));
   const ariaSummary=code==='roles'&&roleRows.length?
    roleRows.map(row=>row.roleName+' '+row.count+(row.ambiguous?' 세부업무 미확인':'')).join(', '):status;
   return '<span class="job-req-item" data-requirement="'+code+'" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
     htmlEscape(header+' · '+ariaSummary)+'" aria-expanded="false">'+
-    htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
-    ({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',onsite_present:'i',not_specified:'?',offsite:'✓',role_found:'i',role_workload:'i',role_recommended:'i',role_count_unspecified:'?',role_mentioned:'i',role_unspecified:'?'})[v.key]+'</span></button>'+
+    htmlEscape(label)+(['not_checked','checking','failed','required','required_at_bid','not_required','onsite','not_specified','offsite','role_count_unspecified','role_unspecified'].includes(v.key)?
+     ' <span class="job-req-icon" aria-hidden="true">'+({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',not_specified:'?',offsite:'✓',role_count_unspecified:'?',role_unspecified:'?'})[v.key]+'</span>':'')+'</button>'+
    '<span class="job-req-tip" role="tooltip">'+tip+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험, 상주 여부, 역할별 인원">'+
@@ -4369,7 +4393,9 @@ function jobDetailRequirementGrid(x){
   },
   roles:{
    name:'역할별 인원',code:'roles',s:e.roles.status,
-   primary:e.roles.items.length?e.roles.items.map(v=>v.role).join(' · '):'역할·인원 동시 기재 미확인',
+   primary:e.roles.items.length?e.roles.items.map(v=>v.role).join(' · '):
+    e.roles.status.key==='role_workload'?'투입공수 '+e.roles.status.label.replace(/^공수\s*/,'')+' · 직무별 산출내역 확인':
+    '역할·인원 동시 기재 미확인',
    sub:'원문에 기재된 역할별 인원 · 총원 및 상주인원으로 합산하지 않음',
    rows:e.roles.items.map(v=>({text:v.text,file:v.file,url:v.url}))
   },
@@ -4397,7 +4423,7 @@ function jobDetailRequirementGrid(x){
  const readable=Array.isArray(full?.files)?full.files.filter(f=>f.readable===true).length:Number(saved?.readableCount||0);
  const coverage=hasFiles?' · 판독 '+readable+'/'+hasFiles+'건':'';
  function card(item){
-  const icon=({required:'!',required_at_bid:'!',not_required:'✓',failed:'?',checking:'…',onsite:'●',offsite:'✓',evaluation:'~',review:'?',not_checked:'?',role_found:'i',role_workload:'i',role_recommended:'i',role_count_unspecified:'?',role_mentioned:'i',role_unspecified:'?'})[item.s.key]||'?';
+  const icon=({required:'!',required_at_bid:'!',not_required:'✓',failed:'?',checking:'…',onsite:'●',offsite:'✓',evaluation:'~',review:'?',not_checked:'?',role_count_unspecified:'?',role_unspecified:'?'})[item.s.key]||'';
   const extra=item.rows.length?
    '<details><summary>원문 근거 '+item.rows.length+'건 보기</summary>'+
    item.rows.map(r=>'<div class="job-key-source">'+htmlEscape(r.text)+
@@ -4406,7 +4432,7 @@ function jobDetailRequirementGrid(x){
     '</div>').join('')+'</details>':'';
   return '<article class="job-key-item" data-kind="'+item.code+'">'+
    '<div class="job-key-head"><strong>'+htmlEscape(item.name)+'</strong>'+
-   '<span class="job-key-state" data-state="'+item.s.key+'">'+icon+' '+htmlEscape(item.s.label)+'</span></div>'+
+   '<span class="job-key-state" data-state="'+item.s.key+'">'+(icon?icon+' ':'')+htmlEscape(item.s.label)+'</span></div>'+
    '<p class="job-key-primary">'+htmlEscape(item.primary)+'</p>'+
    '<p class="job-key-secondary">'+htmlEscape(item.sub)+'</p>'+
    extra+'</article>';
