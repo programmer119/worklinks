@@ -13,6 +13,10 @@ with tempfile.TemporaryDirectory() as t:
       json.dumps({'ok':True,'byNotice':{
         'R26BK01792736:000':{'status':'text_extracted_requires_review',
           'manifestComplete':True,'files':[{'readable':True}],
+          'staffingFacts':[{'kind':'staffing_requirement','requirementType':'proof',
+             'label':'건강보험 자격득실확인서 등 재직 증빙',
+             'sourceText':'재직 증명 서류(건강보험 자격 득실 확인서 등)',
+             'sourceFile':'공식입찰공고.pdf','sourceLine':19,'headcount':None}],
           'changcomClauseEvidence':{
             'files':[{'name':'공식입찰공고.pdf',
                       'url':'https://www.g2b.go.kr/official/attachment.pdf'},
@@ -41,6 +45,11 @@ with tempfile.TemporaryDirectory() as t:
         assert exact['searchMode']=='saved_only'
         assert exact['totalCount']==1 and exact['items'][0]['bidNo']==a,exact
         assert exact['items'][0]['rfpSavedState']['complete'] is True,exact
+        requirements=exact['items'][0]['rfpSavedState']['staffingFacts']
+        assert len(requirements)==1 and requirements[0]['kind']=='staffing_requirement',requirements
+        assert requirements[0]['label']=='건강보험 자격득실확인서 등 재직 증빙'
+        assert requirements[0]['requirementType']=='proof'
+        assert requirements[0]['headcount'] is None,'no inferred staffing headcount'
         quotes=exact['items'][0]['rfpSavedState']['excerpts']
         assert len(quotes)==1 and '1468' in quotes[0]['text'],exact
         assert quotes[0]['sourceFile']=='공식입찰공고.pdf'
@@ -59,6 +68,8 @@ with tempfile.TemporaryDirectory() as t:
         assert unexpected['totalCount']==0,unexpected
         all_=search(10,0,True)
         assert all_['totalCount']==3 and all_['searchMode']=='none',all_
+        matched=[x for x in all_['items'] if x['bidNo']==a]
+        assert len(matched)==1 and matched[0]['rfpSavedState']['staffingFacts'][0]['label']==requirements[0]['label']
         try:search(10,0,True,'A'*81)
         except m['ApiError']:pass
         else:raise AssertionError('long search query accepted')
