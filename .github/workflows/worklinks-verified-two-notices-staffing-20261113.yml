@@ -1,0 +1,90 @@
+name: WorkLinks source-verified LX and Seoul staffing conditions
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/worklinks-verified-two-notices-staffing-20261113.yml]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original HWP and HWPX readers
+        run: python3 -m pip install -q pyhwp pypdf six
+      - name: Verify official RFP bytes and extract only source-supported conditions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,sys,pathlib
+          sys.path.insert(0,'scripts')
+          from refresh_worklinks_rfp import download,extract_with_source_status,normalize_extracted_text
+          notices=[
+            ('R26BK01818412','000',2,'제안요청서(2027년 노후계획도시정비플랫폼 운영 및 유지관리)_ver1.4.hwp',[
+              ('workplace','근무조건 협의','발주처와 조직 및 인력, 투입인력 근무조건'),
+              ('expertise','FP 산정 전문가 포함','기능점수 산정 가능 전문가를 포함토록 함'),
+              ('proof','참여인력 재직·경력 증빙','참여인력이 대표사 또는 공동수급업체 인원인 경우에는 재직증명서를')
+            ]),
+            ('R26BK01810885','000',3,'2. 제안요청서.hwpx',[
+              ('onsite','상주인력 근무·휴가 조건','상주인력의 휴가 등은 사전 승인을'),
+              ('pm','PM 10년 경력 · 참여율 50% 이상','사업총괄인력(PM)은 소프트웨어 관련 해당분야에서 10년 이상'),
+              ('proof','건강보험 자격득실확인서 등 재직 증빙','건강보험 자격 득실 확인서 등'),
+              ('workforce','공고일 현재 참여인력 자사 소속','참여인력(제안서 인력)은 입찰 공고일 현재')
+            ])
+          ]
+          output={}
+          for bid,order,seq,name,conditions in notices:
+            url='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo='+bid+'&bidPbancOrd='+order+'&fileType=&fileSeq='+str(seq)+'&prcmBsneSeCd=03'
+            raw=download(url)
+            digest=hashlib.sha256(raw).hexdigest()
+            parsed,meta=extract_with_source_status(name,raw)
+            assert meta.get('sourceComplete') is True,(bid,meta)
+            lines=normalize_extracted_text(parsed).splitlines()
+            found=[]
+            for requirement,label,needle in conditions:
+              matches=[(idx+1,line) for idx,line in enumerate(lines) if needle in ' '.join(line.split())]
+              assert matches,('missing verified source passage',bid,needle)
+              idx,line=matches[0]
+              found.append({'kind':'staffing_requirement','requirementType':requirement,
+                   'label':label,'sourceText':' '.join(line.split())[:240],
+                   'sourceFile':name,'sourceUrl':url,'sourceLine':idx})
+            output[bid+':'+order]={
+                'verification':'official_attachment_sha256','sourceFile':name,
+                'sha256':digest,'sourceUrl':url,'staffingFacts':found}
+            print('VERIFIED_STAFF_REQUIREMENTS',bid,'bytes',len(raw),'sha256',digest,
+                  'labels',[v['label'] for v in found],flush=True)
+          pathlib.Path('/tmp/worklinks-staffing-sources-two-notices.json').write_text(
+              json.dumps(output,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+      - name: Merge verified facts without changing existing verified notices
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for retry in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 - <<'PY'
+          import json,pathlib,datetime
+          target=pathlib.Path('startup-support/staffing-source-verified.json')
+          document=json.loads(target.read_text(encoding='utf-8'))
+          new=json.loads(pathlib.Path('/tmp/worklinks-staffing-sources-two-notices.json').read_text(encoding='utf-8'))
+          assert document['ok'] is True and document['schemaVersion']==1
+          document['byNotice'].update(new)
+          document['generatedAt']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+          target.write_text(json.dumps(document,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+            git add startup-support/staffing-source-verified.json
+            if git diff --cached --quiet; then
+              echo VERIFIED_SOURCE_CONDITIONS_ALREADY_MERGED=PASS
+              exit 0
+            fi
+            git commit -m 'data: publish official-source LX and Seoul staffing requirements'
+            if git push origin HEAD:main;then
+              echo VERIFIED_SOURCE_CONDITIONS_PUBLISHED=PASS
+              exit 0
+            fi
+          done
+          exit 1
