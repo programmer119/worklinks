@@ -522,6 +522,10 @@
 #jobCards .job-req-tip-heading .job-req-tip-head{margin:0}
 #jobCards .job-req-tip-total{font-size:13px;font-weight:750;color:#335a92}
 #jobCards .job-req-tip-row{display:block;font-size:15px;line-height:1.5}
+#jobCards .job-req-tip-facts{padding:9px 15px 12px}
+#jobCards .job-req-tip-facts .job-req-tip-row{padding:7px 1px;border-bottom:1px solid #e2e8f0}
+#jobCards .job-req-tip-facts .job-req-tip-row:first-child{font-size:18px;font-weight:850;color:#123d75}
+#jobCards .job-req-tip-facts .job-req-tip-row:last-child{border-bottom:0;color:#53657c}
 #jobCards .job-req-tip-roles{padding:3px 14px}
 #jobCards .job-req-tip-role{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px 14px;padding:11px 2px;border-bottom:1px solid #e2e8f0}
 #jobCards .job-req-tip-role:last-child{border-bottom:none}
@@ -4135,6 +4139,7 @@ function jobRequirementEvidence(x){
   ...effortRows.slice(0,8).map(f=>
    String(f.role||'직무')+' · '+f.durationMonths+'개월 × '+(100*Number(f.allocationRate)).toFixed(1)+'% = '+Number(f.manMonths).toFixed(3)+'MM'+(f.onsite?' · 상주':'')),
   ...(effortRows.length&&!roles.length?['직무별 인원 수 미명시 · MM은 인원 수가 아님']:[]),
+  ...(effortRows.length?['출처: '+[...new Set(effortRows.map(f=>String(f.sourceFile||'')).filter(Boolean))].join(' · ')]:[]),
   ...(rec?['상주인력 월평균 '+rec.count+'명 이상 권고 (필수 아님)']:[]),
   ...unnumbered.slice(0,8).map(f=>String(f.role||'직무')+' · 인원 수 미명시'),
   ...(planned?['투입인력 구성·현황 제시 필요 (숫자 미명시)']:[])
@@ -4210,8 +4215,9 @@ function jobRequirementBadges(x){
   };
   const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
   const status=(messages[code]||{})[v.key]||'원문에서 조건 확인 필요';
-  const intro=code==='roles'&&roleRows.length?
-   '<div class="job-req-tip-heading"><strong class="job-req-tip-head">필요 인력</strong><span class="job-req-tip-total">'+roles.length+'개 역할</span></div>':
+  const hasFacts=code==='roles'&&evidence.roles.factLines?.length>0;
+  const intro=code==='roles'&&(roleRows.length||hasFacts)?
+   '<div class="job-req-tip-heading"><strong class="job-req-tip-head">'+(roleRows.length?'필요 인력':'투입계획')+'</strong><span class="job-req-tip-total">'+(roleRows.length?roles.length+'개 역할':'인원 수 미명시')+'</span></div>':
    '<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>';
   const rows=roleRows.map(row=>
    '<div class="job-req-tip-role" data-uncertain="'+String(row.ambiguous||!row.literallyFound)+'">'+
@@ -4226,7 +4232,7 @@ function jobRequirementBadges(x){
     (remaining?'<span class="job-req-tip-sub">나머지 '+remaining+'개 역할은 상세에서 확인</span>':'')+
     (roles.length>1?'<span class="job-req-tip-sub">역할 간 중복·총원 미확인</span>':''):
     (code==='roles'&&evidence.roles.factLines?.length?
-     evidence.roles.factLines.slice(0,8).map(v=>'<span class="job-req-tip-row">'+htmlEscape(v)+'</span>').join(''):
+     '<div class="job-req-tip-facts">'+evidence.roles.factLines.slice(0,8).map(v=>'<span class="job-req-tip-row">'+htmlEscape(v)+'</span>').join('')+'</div>':
      '<span class="job-req-tip-row">'+htmlEscape(status)+'</span>'));
   const ariaSummary=code==='roles'&&roleRows.length?
    roleRows.map(row=>row.roleName+' '+row.count+(row.ambiguous?' 세부업무 미확인':'')).join(', '):status;
