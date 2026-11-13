@@ -137,7 +137,7 @@ def run():
             try:
                 raw=p.download(f["url"])
                 newsha=hashlib.sha256(raw).hexdigest()
-                row.update(bytes=len(raw),sha256prefix=newsha[:16],
+                row.update(bytes=len(raw),sha256=newsha,sha256prefix=newsha[:16],
                            priorShaMatches=(None if not f["sha"] else
                                             newsha==f["sha"]))
                 if f["sha"] and newsha!=f["sha"]:

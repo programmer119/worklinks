@@ -520,6 +520,13 @@
 #jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 28px));padding:12px 14px;border:1px solid #cad5e3;border-radius:11px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.15);color:#1e293b;font-size:15px;font-weight:500;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
 #jobCards .job-req-item[data-requirement="roles"] .job-req-tip{width:min(570px,calc(100vw - 28px));right:0;left:auto;bottom:calc(100% + 7px);max-height:70vh;overflow-y:auto;padding:0}
+#jobCards .job-req-item[data-requirement="onsite"] .job-req-tip{width:min(410px,calc(100vw - 28px));max-height:70vh;overflow-y:auto;padding:15px}
+#jobCards .job-req-onsite-title{display:block;font-size:16px;font-weight:850;color:#0f172a;margin-bottom:9px}
+#jobCards .job-req-onsite-person{display:flex;align-items:baseline;justify-content:space-between;gap:12px;color:#152e50;font-size:16px;font-weight:800}
+#jobCards .job-req-onsite-count{font-size:20px;font-weight:900;color:#123d75;white-space:nowrap}
+#jobCards .job-req-onsite-meta{margin-top:7px;color:#334155;font-size:14px;line-height:1.5}
+#jobCards .job-req-onsite-note{margin-top:7px;color:#475569;font-size:13px;line-height:1.5}
+#jobCards .job-req-onsite-source{margin-top:11px;padding-top:9px;border-top:1px solid #e2e8f0;color:#64748b;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
 #jobCards .job-req-tip-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f4f7fb;padding:13px 15px;border-radius:10px 10px 0 0;border-bottom:1px solid #dbe3ef}
 #jobCards .job-req-tip-head{display:block;font-size:16px;font-weight:850;color:#0f172a;margin-bottom:6px}
 #jobCards .job-req-tip-heading .job-req-tip-head{margin:0}
@@ -4192,7 +4199,10 @@ function jobRequirementEvidence(x){
  (full?.files||[]).forEach(f=>(f.staffingFacts||[]).forEach(addFact));
  const effortRows=facts.filter(f=>f.kind==='workload_role');
  const total=facts.find(f=>f.kind==='workload_total'&&Number(f.manMonths)>0);
- const rec=facts.find(f=>f.kind==='headcount_recommended'&&f.mandatory===false&&Number(f.count)>0);
+ const rec=facts.find(f=>f.kind==='headcount_recommended'&&f.mandatory===false&&
+   f.onsite===true&&Number(f.count)>0&&/상주\s*인력.{0,35}월\s*평균/.test(String(f.sourceText||'')))||
+   facts.find(f=>f.kind==='headcount_recommended'&&f.mandatory===false&&
+    f.onsite===true&&Number(f.count)>0);
  const planned=facts.some(f=>f.kind==='staffing_plan_required');
  const unnumbered=facts.filter(f=>f.kind==='role_unspecified');
  const verifiedRequirements=facts.filter(f=>f.kind==='staffing_requirement'&&
@@ -4201,7 +4211,7 @@ function jobRequirementEvidence(x){
  const verifiedProof=verifiedRequirements.find(f=>f.requirementType==='proof'&&
    /건강\s*보험|고용\s*보험|4\s*대\s*보험/.test(String(f.sourceText||'')+' '+String(f.label||'')));
  if(verifiedOnsite && site.key!=='onsite'){
-  site={key:'onsite_present',label:'상주조건 확인',
+  site={key:'onsite_present',label:'상주 확인',
    reason:'정상 판독된 공식 제안요청서에서 상주 근무조건 확인 · 정확한 배치인원은 별도 판단'};
  }
  if(verifiedProof){
@@ -4235,6 +4245,12 @@ function jobRequirementEvidence(x){
    file:String(singleOnsiteRole.sourceFile||'공고 첨부'),url:String(singleOnsiteRole.sourceUrl||''),
    scope:'상주 투입공수표 단일 직무 항목',mm:singleOnsiteRole.manMonths,
    inferredFromWorkload:true});
+ }
+ // Recommended onsite staffing is positive evidence of onsite conditions,
+ // even though it does not impose a mandatory staff count.
+ if(rec&&!onsiteEffort&&site.key!=='onsite'){
+  site={key:'onsite_recommended',label:'상주 '+rec.count+'명 이상 권고',
+   reason:'원문에 상주인력 월평균 '+rec.count+'명 이상 유지 권고 · 필수 의무가 아님'};
  }
  const staffingClues=clauses.filter(c=>/투입.{0,12}(?:인력|인원)|(?:인력|인원).{0,12}(?:구성|계획)|전문.{0,12}기술.{0,5}인력/.test(c.text||''));
  // When the older machine index has excerpts but no structured staffing facts,
@@ -4302,10 +4318,12 @@ function jobRequirementEvidence(x){
   (sr.manMonthsMentioned||[]).length?'투입공수: '+sr.manMonthsMentioned.join(' / ')+' MM':'',
   (sr.experienceYearsMentioned||[]).length?'경력: '+sr.experienceYearsMentioned.join(' / ')+'년':''
  ].filter(Boolean);
- const srcOnsite=verifiedOnsite?
-  {text:String(verifiedOnsite.sourceText),file:String(verifiedOnsite.sourceFile)}:
+ const srcOnsite=site.key==='onsite_recommended'&&rec?
+  {text:String(rec.sourceText),file:String(rec.sourceFile)}:
   (site.key==='onsite_present'&&onsiteEffort)?
   {text:String(onsiteEffort.sourceText),file:String(onsiteEffort.sourceFile)}:
+  verifiedOnsite?
+  {text:String(verifiedOnsite.sourceText),file:String(verifiedOnsite.sourceFile)}:
   onsiteConfirmed||foundOnsite[0];
  const siteLines=[];
  if(srcOnsite){
@@ -4315,7 +4333,10 @@ function jobRequirementEvidence(x){
  if(coverage){siteLines.unshift(coverage);roleLines.unshift(coverage);}
  return {
   insurance:{status:four,source:srcInsurance,lines:insLines},
-  onsite:{status:site,source:srcOnsite,lines:siteLines},
+  onsite:{status:site,source:srcOnsite,lines:siteLines,
+   recommendation:rec,workloads:onsiteAllocations,singleRole:singleOnsiteRole,
+   roles:roleSources.filter(r=>r.inferredFromWorkload||/상주/.test(String(r.onsite||''))),
+   requirements:verifiedRequirements.filter(f=>f.requirementType==='onsite')},
   roles:{status:roleStatus,lines:roleLines,items:roleSources,factLines,
    requirements:displayedRequirements,workloads:effortRows,
    totalManMonths:total?Number(total.manMonths):null,
@@ -4327,7 +4348,7 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,code){
-  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:((code==='onsite'&&['onsite','onsite_present','not_specified','offsite'].includes(v.key))||(code==='insurance'&&v.key==='employment_proof')?v.label:name));
+  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:((code==='onsite'&&['onsite','onsite_present','onsite_recommended','not_specified','offsite'].includes(v.key))||(code==='insurance'&&v.key==='employment_proof')?v.label:name));
   const roles=code==='roles'?evidence.roles.items:[];
   const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
   const roleRows=roles.slice(0,4).map(record=>{
@@ -4352,7 +4373,7 @@ function jobRequirementBadges(x){
   const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
    insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',employment_proof:'건강보험 자격득실확인서 등 재직 증빙 요구 · 4대보험 전체 의무 확인과는 별도',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
-   onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'공식 문서에서 상주인력 또는 상주 근무조건 확인 · 인원 수는 별도 확인',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'공식 문서에서 상주인력 또는 상주 근무조건 확인',onsite_recommended:'상주 근무인력 권고 · 필수 아님',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_workload:'투입공수 확인 · 인원 수 아님',role_recommended:'권고 인원 · 필수 아님',role_requirements:'원문 근거가 있는 인력 요구사항',role_count_unspecified:'인력 구성 확인 · 정확한 숫자는 별도',role_mentioned:'인원 언급 · 역할 미확정',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
   const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
@@ -4387,7 +4408,36 @@ function jobRequirementBadges(x){
      '<small class="job-req-tip-source">'+(row.inferredFromWorkload?'투입공수표 단일 상주 직무 기준 · 1명 판독':row.literallyFound?'저장 발췌 문구 일치 · 원문 대조 전':'자동 추출명 · 원문 표현 대조 필요')+'</small></div>'+
     '<strong class="job-req-tip-count">'+htmlEscape(row.count)+'</strong>'+
    '</div>').join('');
-  const tip=intro+(code==='roles'&&roleRows.length?
+  const siteInfo=code==='onsite'?evidence.onsite:null;
+  const single=siteInfo?.singleRole;
+  const recInfo=siteInfo?.recommendation;
+  const onsiteSource=siteInfo?.source;
+  const siteRequirement=(siteInfo?.requirements||[])[0];
+  const siteRoleDetails=(siteInfo?.roles||[]).filter(r=>!r.inferredFromWorkload).slice(0,4);
+  const onsitePrimary=recInfo&&siteInfo.status.key==='onsite_recommended'?
+   '<div class="job-req-onsite-person"><strong>상주인력 · 월평균</strong><strong class="job-req-onsite-count">'+
+    htmlEscape(String(recInfo.count))+'명 이상</strong></div>'+
+    '<div class="job-req-onsite-note">유지 권고 · 필수 인원 아님</div>':
+   single?
+    '<div class="job-req-onsite-person"><strong>'+htmlEscape(String(single.role||'개발자'))+
+     '</strong><strong class="job-req-onsite-count">1명</strong></div>'+
+    '<div class="job-req-onsite-meta">투입기간 '+htmlEscape(String(single.durationMonths))+
+     '개월 · 투입률 '+htmlEscape((Number(single.allocationRate)*100).toFixed(0))+'% · '+
+     htmlEscape(Number(single.manMonths).toFixed(2))+'MM</div>'+
+    '<div class="job-req-onsite-note">공수표의 단일 상주 직무 항목 기준 · 계약상 의무 인원은 별도 검증</div>':
+   siteRoleDetails.length?
+    siteRoleDetails.map(r=>'<div class="job-req-onsite-person"><strong>'+
+     htmlEscape(String(r.roleName||r.role))+'</strong><strong class="job-req-onsite-count">'+
+     htmlEscape(String(r.count))+'명'+(r.countKind==='minimum'?' 이상':'')+'</strong></div>').join(''):
+   siteRequirement?
+    '<div class="job-req-onsite-person"><strong>'+htmlEscape(String(siteRequirement.label||'상주 근무조건'))+'</strong></div>':
+   '<div class="job-req-onsite-note">'+htmlEscape(status)+'</div>';
+  const onsiteDetails='<strong class="job-req-onsite-title">상주인력</strong>'+onsitePrimary+
+   (onsiteSource?.text?
+    '<div class="job-req-onsite-meta">'+htmlEscape(String(onsiteSource.text).replace(/\s+/g,' ').slice(0,210))+'</div>':'')+
+   (onsiteSource?.file?'<div class="job-req-onsite-source">출처: '+
+    htmlEscape(String(onsiteSource.file))+'</div>':'');
+  const tip=code==='onsite'?onsiteDetails:intro+(code==='roles'&&roleRows.length?
    '<div class="job-req-tip-roles">'+rows+'</div>'+
     (remaining?'<span class="job-req-tip-sub">나머지 '+remaining+'개 역할은 상세에서 확인</span>':'')+
     (roles.length>1?'<span class="job-req-tip-sub">역할 간 중복·총원 미확인</span>':''):
