@@ -514,16 +514,25 @@
 #jobCards .job-req-item[data-state="offsite"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="role_found"] .job-req-icon{background:#dbeafe;color:#1d4ed8}
 #jobCards .job-req-item[data-state="role_unspecified"] .job-req-icon{background:#e2e8f0;color:#475569}
-#jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 28px));padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.18);color:#0f172a;font-size:15px;font-weight:500;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
+#jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 28px));padding:12px 14px;border:1px solid #cad5e3;border-radius:11px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.15);color:#1e293b;font-size:15px;font-weight:500;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
-#jobCards .job-req-item[data-requirement="roles"] .job-req-tip{right:0;left:auto;bottom:calc(100% + 7px);width:min(375px,calc(100vw - 28px));max-height:none;overflow:visible}
-#jobCards .job-req-tip-head{display:block;font-size:16px;font-weight:850;color:#0f172a;margin:0 0 8px}
-#jobCards .job-req-tip-row{display:block;margin:0;font-size:15px;line-height:1.5}
-#jobCards .job-req-tip-role{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #e2e8f0}
-#jobCards .job-req-tip-role-name{font-size:15px;font-weight:700;color:#0f172a}
-#jobCards .job-req-tip-role-name small{display:block;font-size:13px;font-weight:500;color:#475569;margin-top:2px}
-#jobCards .job-req-tip-count{font-size:16px;font-weight:850;white-space:nowrap;color:#0f172a}
-#jobCards .job-req-tip-sub{display:block;margin-top:7px;font-size:13px;line-height:1.45;color:#475569}
+#jobCards .job-req-item[data-requirement="roles"] .job-req-tip{width:min(430px,calc(100vw - 28px));right:0;left:auto;bottom:calc(100% + 7px);max-height:70vh;overflow-y:auto;padding:0}
+#jobCards .job-req-tip-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f4f7fb;padding:13px 15px;border-radius:10px 10px 0 0;border-bottom:1px solid #dbe3ef}
+#jobCards .job-req-tip-head{display:block;font-size:16px;font-weight:850;color:#0f172a;margin-bottom:6px}
+#jobCards .job-req-tip-heading .job-req-tip-head{margin:0}
+#jobCards .job-req-tip-total{font-size:13px;font-weight:750;color:#335a92}
+#jobCards .job-req-tip-row{display:block;font-size:15px;line-height:1.5}
+#jobCards .job-req-tip-roles{padding:3px 14px}
+#jobCards .job-req-tip-role{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px 14px;padding:11px 2px;border-bottom:1px solid #e2e8f0}
+#jobCards .job-req-tip-role:last-child{border-bottom:none}
+#jobCards .job-req-tip-role-main strong{display:block;font-size:15px;font-weight:850;color:#152e50}
+#jobCards .job-req-tip-role-main small{display:block;font-size:13px;line-height:1.4;margin-top:4px;color:#475569}
+#jobCards .job-req-tip-role-main .job-req-tip-role-description{font-weight:650;color:#8a5a17}
+#jobCards .job-req-tip-role-main .job-req-tip-source{font-size:12px;color:#64748b}
+#jobCards .job-req-tip-role[data-uncertain="true"] .job-req-tip-source{color:#9a6700}
+#jobCards .job-req-tip-count{display:inline-flex;align-items:center;justify-content:center;min-width:52px;max-width:110px;white-space:nowrap;border:1px solid #c6dbfb;border-radius:7px;padding:5px 9px;background:#eff6ff;color:#184a96;font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+#jobCards .job-req-tip-sub{display:block;padding:3px 16px 7px;font-size:12.5px;line-height:1.45;color:#66758a}
+#jobCards .job-req-tip-sub:last-child{padding-bottom:13px}
 #jobCards .job-req-item[data-requirement="roles"] .job-req-trigger{white-space:nowrap}
 #jobCards .job-mini:has(.job-req-strip){overflow:visible}
 @media(hover:none){#jobCards .job-req-trigger{cursor:pointer}}
@@ -4035,42 +4044,50 @@ function jobRequirementBadges(x){
  if(!evidence)return '';
  function marker(name,v,code){
   const label=code==='roles'?({role_found:'역할별 인원',role_unspecified:'인원 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name));
-  // Show extracted per-role facts only; OCR prose does not prove which role
-  // an experience requirement belongs to. Keep quotes in the detail view.
-  const roleItems=code==='roles'?evidence.roles.items:[];
-  const roleRows=roleItems.slice(0,4).map(record=>{
+  const roles=code==='roles'?evidence.roles.items:[];
+  const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
+  const roleRows=roles.slice(0,4).map(record=>{
    const roleName=String(record.roleName||record.role||'').trim();
-   const count=Number(record.count);
-   const countLabel=Number.isInteger(count)&&count>0
-    ?count+'명'+(record.countKind==='minimum'?' 이상':'')
-    :'인원 확인 필요';
+   const number=Number(record.count);
+   const count=Number.isInteger(number)&&number>0?number+'명'+(record.countKind==='minimum'?' 이상':''):'인원 미확인';
+   const source=String(record.text||'').normalize('NFKC').replace(/\s+/g,'');
+   const key=roleName.normalize('NFKC').replace(/\s+/g,'');
+   const found=key?source.indexOf(key):-1;
+   const excerpt=found>=0?source.slice(found+key.length,found+key.length+32):'';
+   const literallyFound=found>=0&&Number.isInteger(number)&&new RegExp(String(number)+'(?:명|인)').test(excerpt);
+   const ambiguous=genericRole.test(roleName.replace(/\s+/g,' '));
+   const hint=/^(?:PM|프로젝트\s*관리자|사업\s*책임자)$/i.test(roleName)?
+    'PM은 사업 진행·일정 등을 관리하는 역할':
+    ambiguous?'세부 담당업무·직무 범위 확인 필요':'';
    const detail=[String(record.grade||'').trim(),String(record.onsite||'').trim()].filter(Boolean).join(' · ');
-   return {
-    title:roleName,
-    count:countLabel,
-    detail
-   };
+   return {roleName,count,hint,detail,ambiguous,literallyFound};
   });
-  const remaining=Math.max(0,roleItems.length-4);
-  const header=code==='onsite'?'상주 여부':code==='roles'?'역할별 요구 인원':'4대보험';
+  const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
    insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    onsite:{onsite:'발주처 상주 근무 필요',offsite:'상주 의무 미확인',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_unspecified:'역할·인원 동시 기재 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
+  const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
   const status=(messages[code]||{})[v.key]||'원문에서 조건 확인 필요';
-  const roleBody=roleRows.map(row=>'<span class="job-req-tip-role">'+
-   '<span class="job-req-tip-role-name">'+htmlEscape(row.title)+
-    (row.detail?'<small>'+htmlEscape(row.detail)+'</small>':'')+'</span>'+
-   '<strong class="job-req-tip-count">'+htmlEscape(row.count)+'</strong></span>').join('');
-  const tip='<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>'+
-   (code==='roles'&&roleRows.length?roleBody+
-    (roleItems.length>1?'<span class="job-req-tip-sub">역할 간 포함관계·총원 미확인</span>':'')+
-    (remaining?'<span class="job-req-tip-sub">그 외 '+remaining+'개 역할은 상세 화면에서 확인</span>':''):
+  const intro=code==='roles'&&roleRows.length?
+   '<div class="job-req-tip-heading"><strong class="job-req-tip-head">필요 인력</strong><span class="job-req-tip-total">'+roles.length+'개 역할</span></div>':
+   '<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>';
+  const rows=roleRows.map(row=>
+   '<div class="job-req-tip-role" data-uncertain="'+String(row.ambiguous||!row.literallyFound)+'">'+
+    '<div class="job-req-tip-role-main"><strong>'+htmlEscape(row.roleName)+'</strong>'+
+     (row.detail?'<small>'+htmlEscape(row.detail)+'</small>':'')+
+     (row.hint?'<small class="job-req-tip-role-description">'+htmlEscape(row.hint)+'</small>':'')+
+     '<small class="job-req-tip-source">'+(row.literallyFound?'저장된 원문 발췌에 해당 표현 확인':'자동 추출명 · 원문 표현 대조 필요')+'</small></div>'+
+    '<strong class="job-req-tip-count">'+htmlEscape(row.count)+'</strong>'+
+   '</div>').join('');
+  const tip=intro+(code==='roles'&&roleRows.length?
+   '<div class="job-req-tip-roles">'+rows+'</div>'+
+    (remaining?'<span class="job-req-tip-sub">나머지 '+remaining+'개 역할은 상세에서 확인</span>':'')+
+    (roles.length>1?'<span class="job-req-tip-sub">역할 간 중복·총원 미확인</span>':''):
     '<span class="job-req-tip-row">'+htmlEscape(status)+'</span>');
   const ariaSummary=code==='roles'&&roleRows.length?
-   roleRows.map(row=>row.title+' '+row.count+(row.detail?' '+row.detail:'')).join(', '):
-   status;
+   roleRows.map(row=>row.roleName+' '+row.count+(row.ambiguous?' 세부업무 미확인':'')).join(', '):status;
   return '<span class="job-req-item" data-requirement="'+code+'" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
     htmlEscape(header+' · '+ariaSummary)+'" aria-expanded="false">'+
