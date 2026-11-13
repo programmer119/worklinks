@@ -3030,6 +3030,34 @@ async function refreshQualificationReview(){
 }
 var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='',rfpSnapshotLoading=false;
 var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved database pages.
+// A compact, official-byte-verified fact feed is a read-only recovery path
+// when the cumulative server123 RFP scanner has not yet published its batch.
+async function refreshVerifiedStaffingFacts(){
+ try{
+  const response=await fetch('./staffing-source-verified.json',{cache:'no-store'});
+  if(!response.ok)return;
+  const snapshot=await response.json();
+  if(snapshot?.ok!==true||snapshot?.schemaVersion!==1||!snapshot.byNotice)return;
+  let changed=false;
+  for(const [notice,source] of Object.entries(snapshot.byNotice)){
+   if(!/^(?:R\d{2}BK\d{8}|\d{11}):\d{3}$/.test(notice)||
+      !source||source.verification!=='official_attachment_sha256'||
+      !/^[a-f0-9]{64}$/i.test(String(source.sha256||''))||
+      !Array.isArray(source.staffingFacts))continue;
+   // Never replace fresh server evidence with a recovery artifact.
+   const previous=rfpSnapshotByNotice.get(notice)||{};
+   if(Array.isArray(previous.staffingFacts)&&previous.staffingFacts.length)continue;
+   const facts=source.staffingFacts.filter(f=>f&&
+     ['workload_role','workload_total','headcount_recommended','staffing_plan_required','role_unspecified'].includes(f.kind)&&
+     String(f.sourceFile||'')===String(source.sourceFile||'')&&
+     String(f.sourceText||'').trim()).slice(0,35);
+   if(!facts.length)continue;
+   rfpSnapshotByNotice.set(notice,{...previous,staffingFacts:facts});
+   changed=true;
+  }
+  if(changed)scheduleJobsRender();
+ }catch(e){/* A failed recovery fetch never proves the absence of staffing. */}
+}
 // Qualification checking uses official G2B evidence and the RFP source snapshot, not AI classifications.
 function rfpSnapshotForJob(x){
  const id=jobBidIdentity(x);
@@ -3051,6 +3079,7 @@ async function refreshRfpSnapshot(){
   // A missing or stale snapshot is not evidence of absent eligibility clauses.
  }finally{
   rfpSnapshotLoading=false;
+  await refreshVerifiedStaffingFacts();
   scheduleJobsRender();
  }
 }
