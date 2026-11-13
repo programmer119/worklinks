@@ -13,7 +13,7 @@ import re
 import tempfile
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from staffing_facts import STAFF_REQUIREMENT_PATTERNS
+from staffing_facts import STAFF_REQUIREMENT_PATTERNS, GENERIC_FILE_RE
 
 _CONFUSING_ROLE=re.compile(r'전담\s*유지\s*보수|별도의?\s*담당자|기타\s*인력|부문별\s*대표자')
 _OBVIOUS_SCORE=re.compile(r'평가\s*항목|평가\s*기준|배\s*점|점수|점\s*이상|산술한\s*수치')
@@ -55,7 +55,7 @@ def defensible_staffing_fact(fact):
     kind=str(fact.get('kind') or '')
     quote=' '.join(str(fact.get('sourceText') or '').split())
     file=str(fact.get('sourceFile') or '')
-    if not quote or not file or len(quote)>240:return False
+    if not quote or not file or len(quote)>240 or GENERIC_FILE_RE.search(file):return False
     if re.search(r'산정\s*예시|평가\s*배점|평가\s*점수',quote):return False
     if kind=='workload_role':
         try:
