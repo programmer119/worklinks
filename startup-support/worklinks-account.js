@@ -1,5 +1,5 @@
 import { AuthHubClient } from './authhub-client.js';
-import { renderWorklinksHeaderAuth } from './worklinks-header-auth.js';
+import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl } from './worklinks-header-auth.js';
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
@@ -49,6 +49,46 @@ function itemDetails(id){
 function show(message){
   const target=$('worklinks-auth-info');
   if(target)target.textContent=message;
+}
+// The main page has no #worklinks-auth-info; session expiry needs its own
+// visible, actionable notice rather than a message sent to a missing element.
+function showAuthExpiry(message='로그인이 만료되었습니다.'){
+  const anchor=document.querySelector('.pagehead');
+  if(!anchor)return;
+  let notice=$('worklinks-session-notice');
+  if(!notice){
+    notice=document.createElement('div');
+    notice.id='worklinks-session-notice';
+    notice.className='worklinks-session-notice';
+    notice.setAttribute('role','status');
+    notice.setAttribute('aria-live','polite');
+    anchor.insertAdjacentElement('afterend',notice);
+  }
+  notice.replaceChildren();
+  const label=document.createElement('strong');
+  label.textContent=message;
+  const detail=document.createElement('span');
+  detail.textContent='다시 로그인하면 기존 계정의 저장 기록을 이어서 사용할 수 있습니다.';
+  const link=document.createElement('a');
+  link.href=worklinksHostedAuthUrl('login');
+  link.textContent='다시 로그인';
+  notice.append(label,detail,link);
+}
+function clearAuthExpiry(){
+  $('worklinks-session-notice')?.remove();
+}
+function terminalAuthError(error){
+  return [400,401,403].includes(Number(error?.status))||
+    ['refresh token is missing','refresh_without_token','authhub_identity_changed'].includes(String(error?.message||''));
+}
+function expireSession(account, message='로그인이 만료되었습니다.'){
+  if(!account||account!==state.account)return;
+  // Do not call remote logout on expiry: a failed remote request must not
+  // delay cleanup, and local account changes must never be erased.
+  try{state.client?.storage?.removeItem(state.client.key)}catch{}
+  guestRestore();
+  buttons(null);
+  showAuthExpiry(message);
 }
 // Recovery is opt-in: an explicit member-side false can be intentional.
 // Only offer evidence from the SAME browser's positive guest history to its owner.
@@ -145,12 +185,20 @@ async function api(path,options={},retryAuth=true){
     cache:'no-store',signal:AbortSignal.timeout(12000)
   });
   const data=await response.json().catch(()=>({}));
-  if(response.status===401&&retryAuth&&account&&state.client&&path==='/worklinks-state'){
-    await renewApiSession(account,token);
-    if(state.account!==account)throw Error('account_changed');
-    return api(path,options,false);
+  if([401,403].includes(response.status)&&account&&path==='/worklinks-state'){
+    if(retryAuth&&state.client){
+      try{await renewApiSession(account,token)}
+      catch(error){
+        if(terminalAuthError(error))expireSession(account);
+        throw error;
+      }
+      if(state.account!==account)throw Error('account_changed');
+      return api(path,options,false);
+    }
+    expireSession(account);
+    throw Object.assign(Error('auth_required'),{status:response.status});
   }
-  if(!response.ok||!data.ok)throw Error(data.error||'HTTP '+response.status);
+  if(!response.ok||!data.ok)throw Object.assign(Error(data.error||'HTTP '+response.status),{status:response.status});
   return data;
 }
 async function validSession(client){
@@ -167,7 +215,10 @@ async function validSession(client){
     if(me?.membership?.status!=='active'||!me?.user?.id)return null;
     return {token:session.accessToken,identity:String(me.user.id),email:String(me.user.email||'')};
   }catch(error){
-    if(error.status===401){try{await client.logout()}catch{};return null}
+    if(terminalAuthError(error)){
+      try{client.storage?.removeItem(client.key)}catch{}
+      return null;
+    }
     throw error;
   }
 }
@@ -344,7 +395,7 @@ function buttons(session){
     root,session,
     onLogout:async()=>{
       try{if(state.client)await state.client.logout()}catch{}
-      guestRestore();buttons(null);show('비회원 · 이 브라우저에만 저장');
+      guestRestore();buttons(null);clearAuthExpiry();show('비회원 · 이 브라우저에만 저장');
     },
     onRecover:session?()=>{
       // Support-record recovery stays within the support workspace, not the header.
@@ -405,8 +456,15 @@ async function bootstrap(){
     return;
   }
   try{
+    const previouslySignedIn=Boolean(state.client.session()?.accessToken);
     const session=await validSession(state.client);
-    if(!session){guestRestore();buttons(null);show('비회원 · 이 브라우저에만 저장');return}
+    if(!session){
+      guestRestore();buttons(null);
+      if(previouslySignedIn)showAuthExpiry();
+      else{clearAuthExpiry();show('비회원 · 이 브라우저에만 저장')}
+      return;
+    }
+    clearAuthExpiry();
     state.account=session.identity;state.token=session.token;state.serverReady=false;
     publishPartnerAccess(true);
     // Show preserved account-local data while waiting, but do not overwrite server truth.
@@ -419,26 +477,29 @@ async function bootstrap(){
 }
 window.addEventListener('online',()=>{if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}});
 window.addEventListener('focus',()=>{
-  if(!state.account)return;
-  if(!state.serverReady)reconcileServer().catch(()=>{});
-  else if(!state.busy&&Object.keys(decode(accountKeys(state.account).pending)).length)flush().catch(()=>{});
   const identity=state.account;
-  // Revalidate on returning to the tab; expired/revoked access must not keep Partners open.
+  if(!identity||!state.client)return;
+  // Verify first: avoid sending expired tokens to the data API on focus.
   validSession(state.client).then(session=>{
     if(identity!==state.account)return;
     if(!session||session.identity!==identity){
-      guestRestore();buttons(null);show('인증 만료 · 다시 로그인하세요');
-    }else{
-      state.token=session.token;
-      publishPartnerAccess(true);
+      expireSession(identity);
+      return;
     }
-  }).catch(()=>{if(identity===state.account)publishPartnerAccess(false)});
+    state.token=session.token;
+    publishPartnerAccess(true);
+    if(!state.serverReady)reconcileServer().catch(()=>{});
+    else if(!state.busy&&Object.keys(decode(accountKeys(identity).pending)).length)
+      flush().catch(()=>{});
+  }).catch(()=>{
+    // A transient connection failure is NOT a logout. Access stays fail-closed
+    // until a successful verification, while local account records are retained.
+    if(identity===state.account)publishPartnerAccess(false);
+  });
 });
 window.addEventListener('storage',event=>{
-  // A logout in another tab immediately revokes this tab's partner access.
-  if(state.client&&event.key===state.client.key&&!event.newValue&&state.account){
-    guestRestore();buttons(null);show('다른 탭에서 로그아웃됨');
-  }
+  if(state.client&&event.key===state.client.key&&!event.newValue&&state.account)
+    expireSession(state.account,'다른 탭에서 로그아웃되었습니다.');
 });
 if(document.getElementById('worklinks-auth-header'))buttons(null);
 bootstrap().catch(error=>{console.warn('WorkLinks AuthHub bootstrap',error);show('브라우저 저장 유지 · 인증 서버 확인 필요')});
