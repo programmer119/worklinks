@@ -1,0 +1,64 @@
+# One-time production-browser regression for two public source-backed tender records.
+name: WorkLinks two onsite statuses live UI recheck
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-two-onsite-live-ui-recheck-20261113.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Install disposable browser testing tools
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Assert live source-backed onsite and staffing status mapping
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request,urllib.parse,json
+          from playwright.sync_api import sync_playwright
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/saved?sw=1&limit=10&offset=0&q='
+          rows=[]
+          for bid in ('R26BK01811303','R26BK01805618'):
+              req=urllib.request.Request(base+bid,headers={'Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=30) as stream:
+                  d=json.load(stream)
+              matches=[x for x in d.get('items') or [] if x.get('bidNo')==bid]
+              assert len(matches)==1,(bid,len(matches))
+              record=matches[0]
+              assert record['rfpSavedState']['staffingRoleScanComplete'] is True,(bid,record['rfpSavedState'])
+              rows.append(record)
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1380,'height':860})
+              page.goto('https://worklinks.suaveforge.com/startup-support/?view=changcom',
+                        wait_until='domcontentloaded',timeout=55000)
+              page.wait_for_function("typeof jobRequirementEvidence==='function'",timeout=30000)
+              result=page.evaluate("""records=>{
+                const out=[];
+                for(const data of records){
+                  const key=data.bidNo+':'+String(data.order||'000').padStart(3,'0');
+                  jobListRfpState.set(key,data.rfpSavedState);
+                  const x={id:'g2b-servc-'+data.bidNo+'-'+String(data.order||'000').padStart(3,'0'),
+                    noticeNumber:data.bidNo,noticeOrder:data.order,title:data.title,kind:'servc',
+                    amount:data.budget};
+                  const e=jobRequirementEvidence(x);
+                  out.push({id:key,title:data.title,onsite:e?.onsite?.status,
+                    insurance:e?.insurance?.status,roles:e?.roles?.status,
+                    staffingScopeRead:e?.meta?.saved?.staffingRoleScanComplete});
+                }
+                return out;
+              }""",rows)
+              browser.close()
+          print('LIVE_RFP_JOB_BADGE_STATUSES',json.dumps(result,ensure_ascii=False),flush=True)
+          for item in result:
+              assert item['staffingScopeRead'] is True,item
+              assert item['onsite']['key'] not in ('failed','not_checked','checking'),item
+              assert item['roles']['key'] not in ('failed','not_checked','checking'),item
+          print('TWO_ONSITE_FAILURE_BADGES_RESOLVED_IN_LIVE_JS=PASS')
+          PY
