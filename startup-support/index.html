@@ -4187,7 +4187,7 @@ function jobRequirementEvidence(x){
    String(f.sourceFile||'').trim()&&String(f.sourceText||'').trim());
  const verifiedOnsite=verifiedRequirements.find(f=>f.requirementType==='onsite');
  const verifiedProof=verifiedRequirements.find(f=>f.requirementType==='proof'&&
-   /건강\s*보험|고용\s*보험|4\s*대\s*보험/.test(String(f.sourceText||'')));
+   /건강\s*보험|고용\s*보험|4\s*대\s*보험/.test(String(f.sourceText||'')+' '+String(f.label||'')));
  if(verifiedOnsite && site.key!=='onsite'){
   site={key:'onsite_present',label:'상주조건 확인',
    reason:'정상 판독된 공식 제안요청서에서 상주 근무조건 확인 · 정확한 배치인원은 별도 판단'};
@@ -4288,7 +4288,7 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,code){
-  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인력 조건 확인',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&['onsite','onsite_present','not_specified','offsite'].includes(v.key)?v.label:name));
+  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:((code==='onsite'&&['onsite','onsite_present','not_specified','offsite'].includes(v.key))||(code==='insurance'&&v.key==='employment_proof')?v.label:name));
   const roles=code==='roles'?evidence.roles.items:[];
   const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
   const roleRows=roles.slice(0,4).map(record=>{
@@ -4312,7 +4312,7 @@ function jobRequirementBadges(x){
   });
   const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
-   insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',employment_proof:'건강보험 자격득실확인서 등 재직 증빙 요구 · 4대보험 전체 의무 확인과는 별도',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'투입공수표에서 상주인력 확인 · 역할별 인원은 별도 항목',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_workload:'투입공수 확인 · 인원 수 아님',role_recommended:'권고 인원 · 필수 아님',role_requirements:'원문 근거가 있는 인력 요구사항',role_count_unspecified:'인력 구성 확인 · 정확한 숫자는 별도',role_mentioned:'인원 언급 · 역할 미확정',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
