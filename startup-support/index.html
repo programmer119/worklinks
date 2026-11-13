@@ -529,6 +529,7 @@
 #jobCards .job-req-conditions{padding:7px 19px 15px}
 #jobCards .job-req-condition{padding:11px 0;border-bottom:1px solid #e2e8f0}
 #jobCards .job-req-condition strong{font-size:15px;font-weight:750;color:#17365c;line-height:1.5}
+#jobCards .job-req-condition-excerpt{font-size:13px;line-height:1.45;color:#596778;padding-top:3px;margin:0;overflow-wrap:anywhere}
 #jobCards .job-req-condition-foot{font-size:13px;font-weight:550;color:#596778;margin-top:10px}
 #jobCards .job-req-condition-source{font-size:12.5px;color:#6c7789;margin-top:6px;overflow-wrap:anywhere}
 #jobCards .job-req-tip-facts .job-req-tip-row{padding:7px 1px;border-bottom:1px solid #e2e8f0}
@@ -4228,6 +4229,33 @@ function jobRequirementEvidence(x){
    inferredFromWorkload:true});
  }
  const staffingClues=clauses.filter(c=>/투입.{0,12}(?:인력|인원)|(?:인력|인원).{0,12}(?:구성|계획)|전문.{0,12}기술.{0,5}인력/.test(c.text||''));
+ // When the older machine index has excerpts but no structured staffing facts,
+ // show only meaningful source-quoted conditions, not a bare "미명시" tooltip.
+ const inferredRequirementLabels=[
+  [/(?:근무\s*조건|작업\s*장소).{0,30}(?:협의|결정)/,'근무·작업장소 협의'],
+  [/(?:기능\s*점수|FP).{0,30}(?:전문가|산정\s*가능)/,'FP 산정 전문인력'],
+  [/(?:투입|참여)\s*인력.{0,40}(?:재직\s*증명|경력\s*증명|이력\s*사항)/,'참여인력 경력·재직 증빙'],
+  [/(?:투입|참여)\s*인원.{0,40}(?:현황|구성).{0,25}(?:제출|제시)|(?:인원|인력)\s*현황.{0,20}(?:제출|제시)/,'인력 현황 제출'],
+  [/(?:업무\s*분장|담당\s*업무).{0,30}(?:제출|제시|관리)/,'인력 업무분장 제시'],
+  [/(?:상주\s*인력|상주\s*근무).{0,45}(?:휴가|사전\s*승인|근무\s*조건)/,'상주인력 근무조건'],
+  [/(?:PM|사업\s*총괄\s*인력).{0,80}(?:경력|[1-9]\d?\s*년\s*이상)/,'PM 경력요건']
+ ];
+ const fallbackRequirements=[],fallbackSeen=new Set();
+ if(!verifiedRequirements.length){
+  for(const c of clauses){
+   const quote=String(c.text||'').replace(/\s+/g,' ').trim();
+   if(!quote||negative.test(quote)||/산정\s*예시|평가\s*배점|배점\s*예시/.test(quote))continue;
+   const match=inferredRequirementLabels.find(([re])=>re.test(quote));
+   if(!match)continue;
+   const label=match[1],file=String(c.file||'공고 원문');
+   if(fallbackSeen.has(label)||/행안부\s*예규|입찰\s*및\s*계약집행기준/.test(file))continue;
+   fallbackSeen.add(label);
+   fallbackRequirements.push({kind:'staffing_requirement',requirementType:'quoted_excerpt',
+    label,sourceText:quote.slice(0,210),sourceFile:file,headcount:null,sourceScope:'저장 원문 발췌'});
+   if(fallbackRequirements.length>=4)break;
+  }
+ }
+ const displayedRequirements=verifiedRequirements.length?verifiedRequirements:fallbackRequirements;
  const factLines=[
   ...(total?['총 투입공수 '+Number(total.manMonths).toFixed(3)+'MM (인원 수 아님)']:[]),
   ...effortRows.slice(0,8).map(f=>
@@ -4249,7 +4277,7 @@ function jobRequirementEvidence(x){
   total?{key:'role_workload',label:'공수 '+Number(total.manMonths).toFixed(3)+'MM',reason:'공수는 투입기간×투입률이며 인원 수가 아님'}:
   effortRows.length?{key:'role_workload',label:'공수 확인',reason:'역할별 공수 확인 · 인원 수 미확정'}:
   rec?{key:'role_recommended',label:Number(rec.count)+'명 권고',reason:'상주 인원 권고 · 의무 인원 수 아님'}:
-  verifiedRequirements.length?{key:'role_requirements',label:'인력 조건 확인',
+  displayedRequirements.length?{key:'role_requirements',label:'인력 조건 확인',
     reason:'원문에서 실제 인력·근무·증빙 요구사항을 확인 · 숫자 지정은 별개'}:
   planned||unnumbered.length||staffingClues.length?{key:'role_count_unspecified',label:'인원 수 미명시',reason:'인력 구성·역할은 확인됐지만 숫자 지정 인원 없음'}:
   mentioned.length?{key:'role_mentioned',label:'인원 언급',reason:'인원 숫자 언급 · 역할별 인원 근거 미추출'}:
@@ -4281,7 +4309,7 @@ function jobRequirementEvidence(x){
   insurance:{status:four,source:srcInsurance,lines:insLines},
   onsite:{status:site,source:srcOnsite,lines:siteLines},
   roles:{status:roleStatus,lines:roleLines,items:roleSources,factLines,
-   requirements:verifiedRequirements,workloads:effortRows,
+   requirements:displayedRequirements,workloads:effortRows,
    totalManMonths:total?Number(total.manMonths):null,
    sourceFiles:[...new Set(effortRows.map(f=>String(f.sourceFile||'')).filter(Boolean))]},
   meta:{full,saved,staff,clauses,tried,scanFailed,fullyReviewed}
@@ -4325,7 +4353,8 @@ function jobRequirementBadges(x){
   const requirements=code==='roles'?(evidence.roles.requirements||[]):[];
   const requirementsHtml=requirements.length?
    '<div class="job-req-conditions">'+
-    requirements.slice(0,8).map(f=>'<div class="job-req-condition"><strong>'+htmlEscape(String(f.label||'인력 요구'))+'</strong></div>').join('')+
+    requirements.slice(0,8).map(f=>'<div class="job-req-condition"><strong>'+htmlEscape(String(f.label||'인력 요구'))+'</strong>'+
+     (f.sourceScope==='저장 원문 발췌'?'<p class="job-req-condition-excerpt">'+htmlEscape(String(f.sourceText||'').slice(0,160))+'</p>':'')+'</div>').join('')+
     '<p class="job-req-condition-foot">직무별 확정 인원 수는 별도 명시되지 않음</p>'+
     '<p class="job-req-condition-source">원문: '+htmlEscape([...new Set(requirements.map(f=>String(f.sourceFile||'')))].join(' · '))+'</p></div>':'';
   const workloads=code==='roles'?(evidence.roles.workloads||[]):[];
