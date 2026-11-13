@@ -121,7 +121,7 @@ def extract_staffing_facts(text, filename, source_url=''):
     for i,line in enumerate(lines):
         s=' '.join(line.split())
         if not s or len(evidence)>=33:continue
-        if re.search(r'산정\\s*예시|평가\\s*배점|배점\\s*예시',s):continue
+        if re.search(r'산정\s*예시|평가\s*배점|배점\s*예시',s):continue
         for requirement_type,label,pattern in STAFF_REQUIREMENT_PATTERNS:
             key=(requirement_type,label)
             if key in seen_requirements:continue
