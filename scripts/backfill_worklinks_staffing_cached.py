@@ -27,6 +27,7 @@ from refresh_worklinks_rfp import (
     extract_with_source_status,
     normalize_extracted_text,
     staffing_from_saved_excerpts,
+    staffing_scan_pending,
 )
 
 # Give the visible, near-term tender cards first chance at cached source reparse.
@@ -94,7 +95,7 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
         if not isinstance(row,dict):continue
         if priority_only and key not in PRIORITY:continue
         if row.get('status')!='text_extracted_requires_review':continue
-        if row.get('staffingRoleScanComplete') is True:continue
+        if row.get('staffingRoleScanComplete') is True and not staffing_scan_pending(row):continue
         eligible_records+=1
         for position,f in enumerate(row.get('files') or []):
             if not isinstance(f,dict) or f.get('readable') is not True:continue
