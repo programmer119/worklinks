@@ -9,6 +9,7 @@ on:
       - 'server/g2b-proxy.py'
       - 'tests/test_rfp_staffing_roles.py'
       - 'tests/worklinks-jobs-regression.cjs'
+      - 'tests/worklinks-staffing-regression.cjs'
       - '.github/workflows/staffing-role-regression-pr.yml'
 permissions:
   contents: read
@@ -24,5 +25,5 @@ jobs:
           python3 tests/test_rfp_staffing_roles.py
           python3 tests/test_staffing_publish_evidence.py
           python3 tests/test_rfp_staffing_cached_backfill.py
-      - name: Existing frontend regression
-        run: node tests/worklinks-jobs-regression.cjs
+      - name: Targeted staffing UI regression
+        run: node tests/worklinks-staffing-regression.cjs
