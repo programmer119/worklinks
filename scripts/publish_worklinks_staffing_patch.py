@@ -91,9 +91,7 @@ def merge(index_path,patch_paths,report_paths):
             rejected+=len(proposed)-len(trusted)
             retained+=len(trusted)
             old['staffingRoles']=unique_rows(trusted+prior)
-            old['staffingRoleScanComplete']=bool(
-                old.get('staffingRoleScanComplete') is True or
-                new.get('staffingRoleScanComplete') is True)
+            old['staffingRoleScanComplete']=new.get('staffingRoleScanComplete') is True
             for field in ('staffingCachedReparseFiles','staffingCachedReparseAt',
                           'staffingCachedReparseVersion'):
                 if field in new:old[field]=new[field]
