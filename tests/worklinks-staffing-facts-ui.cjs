@@ -20,6 +20,12 @@ const states=new Map([
   sourceFile:'붙임1_제안요청서.hwpx'}),f('role_unspecified',{role:'사업관리자(PM)',headcount:null})])],
  ['X:000',mk([f('staffing_plan_required',{headcount:null,mandatory:true})])],
  ['E:000',mk([])],
+ ['C:000',{...mk([]),excerpts:[{text:'상주 여부 및 상주 인원은 계약 체결 후 발주기관과 협의하여 결정한다',
+  sourceFile:'협의조건_제안요청서.pdf'}]}],
+ ['L:000',{...mk([]),excerpts:[{text:'상주인력의 휴가 및 근무시간은 발주처와 협의하여 조정한다',
+  sourceFile:'상주근무_안내서.pdf'}]}],
+ ['F:000',{...mk([]),excerpts:[{text:'상주인력 2명 배치하여야 한다',
+  sourceFile:'필수상주_제안요청서.pdf'}]}],
  ['M:000',mk([f('workload_role',{role:'응용SW 개발자',durationMonths:10,allocationRate:.5,onsite:true,sourceText:'(상주인력) 응용SW 개발자'}),
   f('workload_role',{role:'보안 담당자',durationMonths:10,allocationRate:.5,onsite:true,sourceText:'(상주인력) 보안 담당자'})])]
 ]);
@@ -42,9 +48,9 @@ assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).roles.items[0].inferredFrom
 assert.equal(app.jobRequirementEvidence({bidNo:'M'}).roles.status.key,'role_workload','multiple onsite rows must not imply a single person');
 assert.equal(app.jobRequirementEvidence({bidNo:'Y'}).onsite.status.key,'onsite_present');
 assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.key,'onsite_recommended');
-assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.label,'상주 8명 이상 권고');
+assert.equal(app.jobRequirementEvidence({bidNo:'N'}).onsite.status.label,'상주 권고');
 const northBadgeHtml=app.jobRequirementBadges({bidNo:'N'});
-assert.ok(northBadgeHtml.includes('상주 8명 이상 권고'),'onsite badge must show recommendation');
+assert.ok(northBadgeHtml.includes('상주 권고'),'onsite badge must show recommendation');
 const northTooltip=northBadgeHtml.slice(northBadgeHtml.indexOf('data-requirement="onsite"'),
  northBadgeHtml.indexOf('data-requirement="roles"'));
 for(const fragment of ['상주인력 · 월평균','8명 이상','유지 권고 · 필수 인원 아님',
@@ -53,6 +59,26 @@ for(const fragment of ['상주인력 · 월평균','8명 이상','유지 권고 
 }
 assert.ok(!northTooltip.includes('상주 여부 미확정'),'known recommendation is not unknown');
 assert.equal(app.jobRequirementEvidence({bidNo:'E'}).onsite.status.key,'not_specified');
+assert.equal(app.jobRequirementEvidence({bidNo:'C'}).onsite.status.key,'onsite_negotiable');
+assert.equal(app.jobRequirementEvidence({bidNo:'C'}).onsite.status.label,'상주 협의');
+assert.equal(app.jobRequirementEvidence({bidNo:'L'}).onsite.status.key,'not_specified',
+ 'negotiating leave or work hours does not imply negotiating onsite requirements');
+assert.equal(app.jobRequirementEvidence({bidNo:'F'}).onsite.status.key,'onsite');
+assert.equal(app.jobRequirementEvidence({bidNo:'F'}).onsite.status.label,'상주 필수');
+const consultBadge=app.jobRequirementBadges({bidNo:'C'});
+for(const fragment of ['상주 협의','상주 여부·인원','발주기관과 협의하여 결정',
+ '협의조건_제안요청서.pdf']){
+ assert.ok(consultBadge.includes(fragment),'consult badge missing '+fragment);
+}
+assert.ok(!app.jobRequirementBadges({bidNo:'L'}).includes('상주 협의'));
+assert.ok(html.includes('[data-state="onsite_negotiable"] .job-req-trigger{background:#ecfccb'),
+ 'negotiated onsite badge must be light lime, not orange or red');
+assert.ok(html.includes('[data-state="onsite"] .job-req-trigger{background:#fef2f2'),
+ 'mandatory onsite must be red');
+assert.ok(html.includes('[data-state="onsite_recommended"] .job-req-trigger{background:#fff2e5'),
+ 'recommended onsite must be orange');
+assert.ok(html.includes('[data-state="offsite"] .job-req-trigger{background:#dcfce7'),
+ 'offsite must be green');
 assert.ok(app.jobRequirementBadges({bidNo:'Y'}).includes('상주 확인'));
 assert.ok(!app.jobRequirementBadges({bidNo:'Y'}).includes('비상주 ✓'));
 assert.ok(app.jobRequirementEvidence({bidNo:'Y'}).roles.factLines.some(v=>v.includes('8.280MM')));
@@ -99,7 +125,7 @@ const evidenceUI=moduleUI(x=>({bidNo:x.bidNo,order:'000'}),docs,records,new Map(
 const lx={bidNo:'R26BK01818412'},seoul={bidNo:'R26BK01810885'};
 const recoveredNorth=evidenceUI.jobRequirementEvidence({bidNo:'R26BK01783957'});
 assert.equal(recoveredNorth.onsite.status.key,'onsite_recommended');
-assert.equal(recoveredNorth.onsite.status.label,'상주 8명 이상 권고');
+assert.equal(recoveredNorth.onsite.status.label,'상주 권고');
 assert.ok(evidenceUI.jobRequirementBadges({bidNo:'R26BK01783957'}).includes('월평균'));
 assert.ok(evidenceUI.jobRequirementBadges({bidNo:'R26BK01783957'}).includes('붙임1_제안요청서'));
 assert.equal(evidenceUI.jobRequirementEvidence(lx).roles.status.key,'role_requirements');
