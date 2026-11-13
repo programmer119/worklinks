@@ -53,7 +53,7 @@ jobs:
               const ids=%s;
               const jobs=typeof g2bLiveJobs!=='undefined'?g2bLiveJobs:[];
               const results=ids.map(key=>{
-                const x=jobs.find(j=>j.bidNo+':'+(j.order||'000')===key);
+                const x=jobs.find(j=>(j.noticeNumber||j.bidNo)+':'+(j.noticeOrder||j.order||'000')===key);
                 if(!x)return {notice:key,loaded:false};
                 const e=jobRequirementEvidence(x);
                 return {notice:key,loaded:true,title:x.title,roles:e?.roles?.status||null,
@@ -68,8 +68,8 @@ jobs:
             page.evaluate("""() => { const tab=document.querySelector('.workspace-tab[data-view="jobs"]'); if(tab)tab.click(); }""")
             page.wait_for_timeout(1100)
             tooltip=page.evaluate("""() => {
-              const buttons=[...document.querySelectorAll('[data-job-requirement="roles"]')];
-              const b=buttons.find(el=>el.closest('.job-mini')?.querySelector('[data-job-requirement="roles"]'));
+              const buttons=[...document.querySelectorAll('.job-req-item[data-requirement="roles"]')];
+              const b=buttons.find(el=>el.querySelector('button'));
               if(!b)return {visibleButtons:buttons.length,reason:'No role badge currently rendered'};
               const btn=b.querySelector('button');
               const tip=b.querySelector('.job-req-tip');
