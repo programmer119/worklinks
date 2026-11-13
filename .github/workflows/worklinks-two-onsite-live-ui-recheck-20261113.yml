@@ -58,7 +58,7 @@ jobs:
           print('LIVE_RFP_JOB_BADGE_STATUSES',json.dumps(result,ensure_ascii=False),flush=True)
           for item in result:
               assert item['staffingScopeRead'] is True,item
-              assert item['onsite']['key'] not in ('failed','not_checked','checking'),item
+              assert item['onsite']['key']=='not_specified' and item['onsite']['label']=='상주 미확정',item
               assert item['roles']['key'] not in ('failed','not_checked','checking'),item
-          print('TWO_ONSITE_FAILURE_BADGES_RESOLVED_IN_LIVE_JS=PASS')
+          print('TWO_ONSITE_SOURCE_MISSING_NOT_MISLABELLED_OFFSITE=PASS')
           PY
