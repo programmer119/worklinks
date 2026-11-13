@@ -22,3 +22,10 @@
 .worklinks-account-nav .worklinks-auth-popup a:hover{background:#f2f7fc}
 .worklinks-auth-sr{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
 @media(max-width:550px){.worklinks-account-nav .worklinks-auth-button,.worklinks-account-nav .worklinks-auth-summary{font-size:13px;min-height:34px;padding:7px 10px}.worklinks-account-nav .worklinks-auth-secondary{padding:7px 6px}}
+
+/* Session expiry is a single compact, actionable notice immediately below the header. */
+.worklinks-session-notice{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 12px;padding:12px 15px;border:1px solid #efcb88;border-radius:10px;background:#fff8ec;color:#644313;font:500 14px/1.45 system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif}
+.worklinks-session-notice strong{font-weight:800;font-size:15px}
+.worklinks-session-notice span{flex:1 1 220px}
+.worklinks-session-notice a{display:inline-flex;justify-content:center;align-items:center;border-radius:8px;background:#173e6c;color:#fff;text-decoration:none;font-weight:750;padding:9px 14px;white-space:nowrap}
+.worklinks-session-notice a:hover{background:#245589}
