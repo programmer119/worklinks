@@ -4168,9 +4168,28 @@ function jobRequirementEvidence(x){
  // A costed onsite work allocation is positive source evidence, but not proof
  // that a specific number of employees must work permanently at the client.
  const onsiteEffort=effortRows.find(f=>f.onsite===true&&/상주\s*인력/.test(String(f.sourceText||'')));
+ // One named onsite allocation line covering up to a year, with a fractional
+ // participation rate, describes one assigned developer, not 8.28 people.
+ // Infer a thumbnail count only for a *single* onsite line. This is an
+ // allocation-based reading, not a separately documented mandatory headcount.
+ const onsiteAllocations=effortRows.filter(f=>f.onsite===true);
+ const singleOnsiteRole=onsiteEffort&&onsiteAllocations.length===1&&
+  String(onsiteEffort.role||'').trim()&&
+  Number(onsiteEffort.durationMonths)>0&&Number(onsiteEffort.durationMonths)<=12&&
+  Number(onsiteEffort.allocationRate)>0&&Number(onsiteEffort.allocationRate)<=1
+  ?onsiteEffort:null;
  if(onsiteEffort&&site.key!=='onsite'){
-  site={key:'onsite_present',label:'상주인력 기재',
-   reason:'투입공수표에 상주인력 구분 확인 · 상주 의무와 확정 인원은 별도 검토'};
+  site={key:'onsite_present',label:'상주 확인',
+   reason:'공수표에서 상주인력 항목 확인 · 계약상 의무 여부는 별도 검증'};
+ }
+ if(singleOnsiteRole&&!roles.length){
+  const role=String(singleOnsiteRole.role).trim();
+  roles.push(role+' 1명');
+  roleSources.push({role:role+' 1명',roleName:role,count:1,countKind:'allocation',
+   grade:'',onsite:'상주',text:String(singleOnsiteRole.sourceText||''),
+   file:String(singleOnsiteRole.sourceFile||'공고 첨부'),url:String(singleOnsiteRole.sourceUrl||''),
+   scope:'상주 투입공수표 단일 직무 항목',mm:singleOnsiteRole.manMonths,
+   inferredFromWorkload:true});
  }
  const staffingClues=clauses.filter(c=>/투입.{0,12}(?:인력|인원)|(?:인력|인원).{0,12}(?:구성|계획)|전문.{0,12}기술.{0,5}인력/.test(c.text||''));
  const factLines=[
@@ -4184,7 +4203,11 @@ function jobRequirementEvidence(x){
   ...(planned?['투입인력 구성·현황 제시 필요 (숫자 미명시)']:[])
  ];
  const roleStatus=roles.length?
-  {key:'role_found',label:roles.length+'개 역할',reason:'원문에서 역할과 인원이 함께 적힌 근거만 발췌. 전체 인원·상주 인원 합계가 아님'}:
+  {key:'role_found',
+   label:singleOnsiteRole&&roleSources.length===1&&roleSources[0].inferredFromWorkload?'역할별 인원 1명':roles.length+'개 역할',
+   reason:singleOnsiteRole&&roleSources.length===1&&roleSources[0].inferredFromWorkload?
+    '공수표의 단일 상주 직무 항목 기준 1명으로 판독 · 별도 인원 수 기재는 아님':
+    '원문에서 역할과 인원이 함께 적힌 근거만 발췌. 전체 인원·상주 인원 합계가 아님'}:
   rfpSnapshotLoading&&!full&&!saved?{key:'checking',label:'확인중',reason:'원문 판독자료를 불러오는 중'}:
   !tried?{key:'not_checked',label:'확인안함',reason:'원문 수집·검증 기록 없음'}:
   total?{key:'role_workload',label:'공수 '+Number(total.manMonths).toFixed(3)+'MM',reason:'공수는 투입기간×투입률이며 인원 수가 아님'}:
@@ -4227,7 +4250,7 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,code){
-  const label=code==='roles'?({role_found:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&['onsite','onsite_present','not_specified','offsite'].includes(v.key)?v.label:name));
+  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 수 미명시',role_mentioned:'인원 언급',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&['onsite','onsite_present','not_specified','offsite'].includes(v.key)?v.label:name));
   const roles=code==='roles'?evidence.roles.items:[];
   const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
   const roleRows=roles.slice(0,4).map(record=>{
@@ -4246,12 +4269,13 @@ function jobRequirementBadges(x){
      '이 사업의 운영·유지관리 투입 인력으로 추정 · 세부 업무 미확인':
      '담당업무·직무 범위 확인 필요'):'';
    const detail=[String(record.grade||'').trim(),String(record.onsite||'').trim()].filter(Boolean).join(' · ');
-   return {roleName,count,hint,detail,ambiguous,literallyFound};
+   return {roleName,count,hint,detail,ambiguous,literallyFound,
+    inferredFromWorkload:record.inferredFromWorkload===true};
   });
   const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
    insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
-   onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'투입공수표에 상주인력 기재 · 의무/인원 미확정',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   onsite:{onsite:'발주처 상주 근무 필요',onsite_present:'투입공수표에서 상주인력 확인 · 역할별 인원은 별도 항목',not_specified:'상주 여부 미확정 · 비상주 확정 아님',offsite:'비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_workload:'투입공수 확인 · 인원 수 아님',role_recommended:'권고 인원 · 필수 아님',role_count_unspecified:'인력 조건 확인 · 수 미명시',role_mentioned:'인원 언급 · 역할 미확정',role_unspecified:'인원표 미검출',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
   const header=code==='roles'?'필요 인력':code==='onsite'?'상주 여부':'4대보험';
@@ -4276,7 +4300,7 @@ function jobRequirementBadges(x){
     '<div class="job-req-tip-role-main"><strong>'+htmlEscape(row.roleName)+'</strong>'+
      (row.detail?'<small>'+htmlEscape(row.detail)+'</small>':'')+
      (row.hint?'<small class="job-req-tip-role-description">'+htmlEscape(row.hint)+'</small>':'')+
-     '<small class="job-req-tip-source">'+(row.literallyFound?'저장 발췌 문구 일치 · 원문 대조 전':'자동 추출명 · 원문 표현 대조 필요')+'</small></div>'+
+     '<small class="job-req-tip-source">'+(row.inferredFromWorkload?'투입공수표 단일 상주 직무 기준 · 1명 판독':row.literallyFound?'저장 발췌 문구 일치 · 원문 대조 전':'자동 추출명 · 원문 표현 대조 필요')+'</small></div>'+
     '<strong class="job-req-tip-count">'+htmlEscape(row.count)+'</strong>'+
    '</div>').join('');
   const tip=intro+(code==='roles'&&roleRows.length?
