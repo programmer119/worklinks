@@ -516,7 +516,11 @@
 #jobCards .job-req-item[data-state="role_unspecified"] .job-req-icon{background:#e2e8f0;color:#475569}
 #jobCards .job-req-tip{display:none;position:absolute;z-index:90;bottom:calc(100% + 7px);left:0;width:min(340px,calc(100vw - 35px));padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 12px 28px rgba(15,23,42,.18);color:#1e293b;font-size:13px;font-weight:500;line-height:1.65;white-space:pre-line;overflow-wrap:anywhere;pointer-events:none}
 #jobCards .job-req-item:hover .job-req-tip,#jobCards .job-req-item:focus-within .job-req-tip,#jobCards .job-req-item[data-open="true"] .job-req-tip{display:block}
-#jobCards .job-req-item[data-requirement="roles"] .job-req-tip{right:0;left:auto;bottom:100%;width:min(420px,calc(100vw - 32px));max-height:65vh;overflow-y:auto;pointer-events:auto}
+#jobCards .job-req-item[data-requirement="roles"] .job-req-tip{right:0;left:auto;bottom:100%;width:min(320px,calc(100vw - 32px));max-height:none;overflow:visible;pointer-events:none}
+#jobCards .job-req-tip{padding:9px 11px;line-height:1.45;white-space:normal}
+#jobCards .job-req-tip-head{display:block;font-size:13px;font-weight:850;color:#0f172a;margin-bottom:4px}
+#jobCards .job-req-tip-row{display:block;margin:2px 0;font-size:13px;line-height:1.4}
+#jobCards .job-req-tip-sub{display:block;margin-top:4px;font-size:12px;line-height:1.4;color:#64748b}
 #jobCards .job-req-item[data-requirement="roles"] .job-req-trigger{white-space:nowrap}
 #jobCards .job-mini:has(.job-req-strip){overflow:visible}
 @media(hover:none){#jobCards .job-req-trigger{cursor:pointer}}
@@ -4024,20 +4028,36 @@ function jobRequirementEvidence(x){
 function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
- function marker(name,v,lines,code){
-   const label=code==='roles'?({role_found:'역할별 인원',role_unspecified:'인원 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name));
-   const tooltip=[name+' · '+v.label,v.reason].concat(lines).filter(Boolean).join('\n');
+ function marker(name,v,code){
+  const label=code==='roles'?({role_found:'역할별 인원',role_unspecified:'인원 미검출',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:(code==='onsite'&&(v.key==='onsite'||v.key==='offsite')?v.label:name));
+  // The card hover is a short summary; document quotes, filenames and line
+  // evidence remain available in the full job detail.
+  const roleItems=code==='roles'?evidence.roles.items:[];
+  const summarizeRole=record=>{
+   const title=String(record.role||'').trim();
+   const source=String(record.text||'');
+   const years=source.match(/(?:경력\s*[:：]?\s*)?(\d{1,2})\s*년\s*이상(?:\s*(?:의\s*)?경력)?/);
+   return title+(years&&!/\d+\s*년/.test(title)?' · 경력 '+years[1]+'년 이상':'');
+  };
+  const roleSummaries=roleItems.slice(0,4).map(summarizeRole);
+  const remaining=Math.max(0,roleItems.length-4);
+  const header=name+' · '+v.label;
+  const rows=code==='roles'&&roleSummaries.length?roleSummaries:[v.reason||'추가 확인 필요'];
+  const tip='<strong class="job-req-tip-head">'+htmlEscape(header)+'</strong>'+
+   rows.map(line=>'<span class="job-req-tip-row">'+htmlEscape(line)+'</span>').join('')+
+   (remaining?'<span class="job-req-tip-sub">외 '+remaining+'개 역할은 상세보기</span>':'');
+  const description=header+' · '+rows.join(' · ')+(remaining?' · 외 '+remaining+'개':'');
   return '<span class="job-req-item" data-requirement="'+code+'" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
-     htmlEscape(name+' '+v.label+'. '+tooltip)+'" aria-expanded="false">'+
+     htmlEscape(description)+'" aria-expanded="false">'+
      htmlEscape(label)+' <span class="job-req-icon" aria-hidden="true">'+
      ({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_found:'i',role_unspecified:'?'})[v.key]+'</span></button>'+
-   '<span class="job-req-tip" role="tooltip">'+htmlEscape(tooltip)+'</span></span>';
+   '<span class="job-req-tip" role="tooltip">'+tip+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험, 상주 여부, 역할별 인원">'+
-  marker('4대보험',evidence.insurance.status,evidence.insurance.lines,'insurance')+
-  marker('상주',evidence.onsite.status,evidence.onsite.lines,'onsite')+
-  marker('역할별 인원',evidence.roles.status,evidence.roles.lines,'roles')+'</div>';
+  marker('4대보험',evidence.insurance.status,'insurance')+
+  marker('상주',evidence.onsite.status,'onsite')+
+  marker('역할별 인원',evidence.roles.status,'roles')+'</div>';
 }
 
 
