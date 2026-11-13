@@ -150,6 +150,27 @@ def run():
                     row["sourceComplete"]=False
                     report["fileResults"].append(row)
                     continue
+                # Focused official-source diagnostic. Print role table context,
+                # not the full proposal or unrelated personal information.
+                if (name=="yongin" and "공내역서" in f["name"]):
+                    print("STAFFING_TABLE_DIAG "+json.dumps({
+                        "case":name,"file":f["name"],"allLines":text.splitlines()[:90]
+                    },ensure_ascii=False),flush=True)
+                if ((name=="north" or name=="exercise") and "제안요청서" in f["name"]):
+                    lines=text.splitlines()
+                    terms=re.compile(
+                        r"월평균.{0,12}인력|총\s*8\s*명|PM\s*[0-9]|PL\s*[0-9]|"
+                        r"인원\s*(?:수|구성|계획)|포털\s*개발|AI\s*전문|"
+                        r"상주\s*인력|전문\s*기술\s*인력|투입.{0,12}인원|"
+                        r"분야별\s*인원|인력\s*구성",re.I)
+                    indices=[i for i,line in enumerate(lines) if terms.search(line)]
+                    excerpts=[{"line":i+1,"context":" | ".join(
+                        " ".join(z.split())[:250] for z in lines[max(0,i-1):i+2]
+                    )[:620]} for i in indices[:38]]
+                    print("STAFFING_TABLE_DIAG "+json.dumps({
+                        "case":name,"file":f["name"],"matches":len(indices),
+                        "excerpts":excerpts
+                    },ensure_ascii=False),flush=True)
                 roles=p.extract_staffing_roles(text,f["name"],f["url"])
                 row.update(status="PARSED",chars=len(text),roleCount=len(roles),
                            relevantLines=excerpt_lines(text))
