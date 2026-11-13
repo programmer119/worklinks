@@ -52,7 +52,7 @@ def api_route(route):
         limit = int(args.get("limit", ["500"])[0])
         calls.append((offset, limit))
         payload = {
-            "ok": True, "totalCount": 480, "eligibilityLinked": 0,
+            "ok": True, "persisted": True, "totalCount": 480, "eligibilityLinked": 0,
             "items": [record(i) for i in range(offset, min(offset + limit, 480))]
         }
     elif path.endswith("/status"):
@@ -147,7 +147,7 @@ def main():
                 "() => g2bServerAvailable && g2bLoadedOffset === 160",
                 timeout=20000
             )
-            assert calls == [(0, 160)], "Mobile first page must be bounded: %s" % calls
+            assert calls == [(i, 40) for i in range(0, 160, 40)], "Mobile first 160 rows need four 40-row fetches: %s" % calls
             assert not external_calls, "Jobs refresh queried upstream-dependent endpoints: %s" % external_calls
             # API state is updated before its debounced DOM paint. Wait for
             # the actual visible control, not just the background fetch flag.
@@ -286,7 +286,7 @@ def main():
                 }""",selector)
                 assert point is not None, "mobile action obstructed: "+selector
                 page.mouse.click(point["x"],point["y"])
-            assert calls == [(0,160)], ("prechecked card grid must not trigger extra G2B requests", calls)
+            assert calls == [(i, 40) for i in range(0, 160, 40)], ("prechecked card grid must not trigger extra G2B requests", calls)
             assert not external_calls, ("first paint must use stored evidence only", external_calls)
 
             # Important card text must never be ellipsized, even for unusually
@@ -330,7 +330,7 @@ def main():
             # Mobile deliberately displays just 24 cards at once; advancing
             # the server's 160-row cache can take several smaller More clicks.
             for _ in range(16):
-                if len(calls) > 1:
+                if len(calls) > 4:
                     break
                 button = page.locator("#g2bMore")
                 assert button.is_visible(), "More button must expose remaining rows"
@@ -339,7 +339,7 @@ def main():
             page.wait_for_function(
                 "() => g2bLoadedOffset >= 320", timeout=15000
             )
-            assert calls[:2] == [(0, 160), (160, 160)], calls
+            assert calls[:8] == [(i, 40) for i in range(0, 320, 40)], calls
             click_verified(".workspace-tab[data-view='support']")
             page.locator("#supportView.on").wait_for()
             count = len(calls)
