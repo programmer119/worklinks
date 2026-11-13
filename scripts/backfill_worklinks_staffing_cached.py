@@ -29,6 +29,7 @@ from refresh_worklinks_rfp import (
     normalize_extracted_text,
     staffing_from_saved_excerpts,
     staffing_scan_pending,
+    staffing_effective_file_complete,
 )
 
 # Give the visible, near-term tender cards first chance at cached source reparse.
@@ -229,13 +230,17 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
             seen_facts.add(signature)
             facts.append(fact)
             if len(facts)>=35:break
-        # HWP counterpart deliberately skipped as a different format does not
-        # prove identical legal content, so do not certify a full-document scan.
-        complete=bool(row.get('manifestComplete') is True and len(files)>0 and
-            all(isinstance(f,dict) and f.get('readable') is True and
-                (scanned.get((key,i)) is not None and
-                 not scanned[(key,i)]['truncated'])
-                for i,f in enumerate(files)))
+        # Completion is scoped to verified project-specific staffing sources,
+        # not ancillary submission forms or authenticated PDF substitutes.
+        effective_files=[dict(f) for f in files]
+        for i,v in enumerate(performed):
+            if v is None:continue
+            effective_files[i]['staffingRoleScanVersion']=STAFFING_ROLE_SCAN_VERSION
+            effective_files[i]['staffingFactScanVersion']=STAFFING_FACT_SCAN_VERSION
+            effective_files[i]['staffingRoleScanTruncated']=v['truncated']
+        complete=bool(row.get('manifestComplete') is True and effective_files and
+            all(staffing_effective_file_complete(f,effective_files)
+                for f in effective_files))
         updates[key]={
             'staffingRoles':roles,
             'staffingFacts':facts,
@@ -243,6 +248,10 @@ def run(index_path, detail_path, ledger_path, patch_path, report_path,
             'staffingCachedReparseFiles':sum(bool(x) for x in performed),
             'staffingCachedReparseAt':now,
             'staffingCachedReparseVersion':STAFFING_ROLE_SCAN_VERSION,
+            'staffingRoleScanVersions':{
+                str(i):STAFFING_ROLE_SCAN_VERSION for i,v in enumerate(performed) if v},
+            'staffingRoleScanTruncations':{
+                str(i):bool(v['truncated']) for i,v in enumerate(performed) if v},
             'staffingFactScanVersions':{
                 str(i):STAFFING_FACT_SCAN_VERSION for i,v in enumerate(performed) if v},
         }
