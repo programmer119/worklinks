@@ -367,6 +367,17 @@ def main():
                             'attemptEpoch':0}
             log('PIPELINE_STAFFING_ROLE_UPGRADE_RESCAN_ENQUEUED',
                 RFP_STAFFING_READER_VERSION)
+        # A previous attempt may have failed because the new parser module was
+        # absent from staged workspaces. Now that it is deployed, retry this
+        # bounded RFP batch immediately instead of retaining the hourly cooldown.
+        failed_rfp=state.get('rfp') or {}
+        if (failed_rfp.get('status')=='failed' and
+                "No module named 'staffing_facts'" in str(failed_rfp.get('error') or '') and
+                (SCRIPTS / 'staffing_facts.py').is_file()):
+            state['rfp']={'status':'retry_after_staffing_module_restored',
+                          'attemptEpoch':0,
+                          'previousFailure':str(failed_rfp.get('error') or '')[:180]}
+            log('PIPELINE_STAFFING_MODULE_RESTORED_RETRY_NOW')
         state['rfpRepairPreflight'] = repair_preflight()
         # After a new worker deployment, retry one previously failed repair
         # immediately ONLY when a fresh read-only preflight succeeds.
