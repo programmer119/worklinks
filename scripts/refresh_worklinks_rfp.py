@@ -2090,7 +2090,7 @@ def publish_notice_checkpoint(notice_key, result, fingerprint):
     """
     path=os.environ.get('WORKLINKS_RFP_NOTICE_PROGRESS_DB')
     if not path:return False
-    if not re.fullmatch(r'(?:R\\d{2}BK\\d{8}|\\d{11}):\\d{3}',notice_key):
+    if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',notice_key):
         raise ValueError('invalid_checkpoint_notice_key')
     record=compact_coverage(result)
     checked=str(result.get('checkedAt') or '')
