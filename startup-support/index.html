@@ -4054,6 +4054,12 @@ function jobRequirementEvidence(x){
  }
  if(staff?.evidence?.text)clauses.push({text:String(staff.evidence.text),type:'staff_proof',required:false,file:staff.evidence.sourceFile||''});
  const tried=!!full||saved?.seen===true||!!staff?.evidence;
+ // A fetched notice without an executed RFP scan is pending, not an extraction failure.
+ const scanNotRun=!!saved&&Number(saved.documentCount||0)===0&&
+   !Array.isArray(full?.files)&&
+   (saved.rfpScanStatus==='not_scanned'||saved.status==='not_scanned'||
+    (saved.scanComplete===false&&saved.staffingRoleScanComplete!==true&&
+     !saved.lastScannedAt&&!saved.scannedAt));
  const status=String(full?.status||saved?.status||'');
  const scanFailed=tried&&(status!=='text_extracted_requires_review'||full?.manifestComplete===false||
    (Array.isArray(full?.files)&&full.files.some(f=>f.readable!==true||f.sourceTextScanComplete===false))||
@@ -4108,6 +4114,7 @@ function jobRequirementEvidence(x){
    return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
   if(rfpSnapshotLoading&&!full&&!insuranceSourceReadComplete)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
+  if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고는 수집됐으나 RFP 원문 스캔이 실행되지 않음 · 판독 실행 필요'};
   if(insuranceSourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
    return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
   if(insuranceSourceReadComplete&&!mentioned.length)
@@ -4160,6 +4167,7 @@ function jobRequirementEvidence(x){
      reason:'상주 조건 판독자료를 아직 확보하지 못해 확인 중'};
    if(!tried)return {key:'not_checked',label:'확인안함',
      reason:'공고 원문 API 수집·검증 호출 기록 없음'};
+   if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고 수집 후 RFP 스캔 미실행 · 상주 조건 판독 필요'};
    if(!staffingSourceReadComplete)return {key:'failed',label:'확인실패',
      reason:'상주 조건을 확인할 원문·첨부 수집 또는 판독이 완료되지 않음'};
    // A completed source review without an onsite requirement is treated as offsite.
@@ -4352,6 +4360,7 @@ function jobRequirementEvidence(x){
     '원문에서 역할과 인원이 함께 적힌 근거만 발췌. 전체 인원·상주 인원 합계가 아님'}:
   rfpSnapshotLoading&&!full&&!saved?{key:'checking',label:'확인중',reason:'원문 판독자료를 불러오는 중'}:
   !tried?{key:'not_checked',label:'확인안함',reason:'원문 수집·검증 기록 없음'}:
+  scanNotRun?{key:'checking',label:'확인중',reason:'RFP 원문 스캔 미실행 · 역할별 인원 판독 필요'}:
   total?{key:'role_workload',label:'공수 '+Number(total.manMonths).toFixed(3)+'MM',reason:'공수는 투입기간×투입률이며 인원 수가 아님'}:
   effortRows.length?{key:'role_workload',label:'공수 확인',reason:'역할별 공수 확인 · 인원 수 미확정'}:
   rec?{key:'role_recommended',label:Number(rec.count)+'명 권고',reason:'상주 인원 권고 · 의무 인원 수 아님'}:
