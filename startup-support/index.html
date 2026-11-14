@@ -2193,8 +2193,12 @@ function paintRfpRescanProgress(){
   '</div>'+
   (laneBars?'<h3 class="rfp-rescan-section-title">작업 진행</h3><div class="rfp-rescan-stages">'+laneBars+'</div>':'')+
   '<h3 class="rfp-rescan-section-title">기능별 판독 완료</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
-  (counts.unknownDeadline?'<div class="rfp-rescan-unknown">마감일 확인 불가 '+
-    rfpProgressNumber(counts.unknownDeadline)+'건은 전체 대상에서 제외</div>':'')+
+  (counts.unknownDeadline?'<div class="rfp-rescan-unknown">전자투찰 마감일 미제공 '+
+    rfpProgressNumber(counts.unknownDeadline)+'건 · 별도 판독 '+
+    rfpProgressNumber(counts.unknownDeadlineCompleted)+' / '+
+    rfpProgressNumber(counts.unknownDeadline)+'건 (미완료 '+
+    rfpProgressNumber(counts.unknownDeadlinePending)+
+    '건) · 직찰·우편 공고 포함 · 미마감 집계와 분리 관리</div>':'')+
   '<p class="rfp-rescan-foot">진행률 = 최신 판독 완료 공고 ÷ 전체 관리 대상 공고. 10초마다 새 집계를 조회합니다. '+
   '이 화면은 운영 서버에 저장된 결과만 보여줍니다. 미판독·실패·구버전 재처리는 서버 작업자가 수행해야 하며 이 버튼은 재판독을 시작하지 않습니다.'+
   '<span style="display:block">확인 기준: '+htmlEscape(String(info.asOf||'').replace('T',' ').slice(0,19))+
