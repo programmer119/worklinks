@@ -1836,6 +1836,27 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                 'noticeDetailError':notice.get('error') or '',
                 'files':[],'reviewComplete':False,
                 'contractPerformanceVerified':False}
+    dual_scan=os.environ.get('WORKLINKS_RFP_DUAL_SCAN_ONLY')=='1'
+    if dual_scan:
+        receipts=data.get('downloadVerifiedFiles')
+        if not isinstance(receipts,list) or not receipts:
+            return {'status':'download_not_verified',
+                    'reasonCode':'no_verified_originals_in_download_receipt',
+                    'sourceOriginalMissing':True,'files':[],
+                    'reviewComplete':False}
+        # The downloader's verified persisted originals, NOT the official
+        # metadata manifest, are the sole source of scanning work.
+        manifest=[{'name':f.get('name'),'url':f.get('url'),
+                   'sourceSha256':f.get('sha256')}
+                  for f in receipts if isinstance(f,dict)
+                  and f.get('url') and f.get('sha256')]
+        if len(manifest)!=len(receipts):
+            return {'status':'download_not_verified',
+                    'reasonCode':'invalid_download_receipt',
+                    'sourceOriginalMissing':True,'files':[],
+                    'reviewComplete':False}
+    else:
+        manifest=docs.get('items') or []
     saved=[]
     # Reuse the EXACT successfully parsed attachment when a retry is needed
     # only for another failed file or a newly added file. Never download all
@@ -1850,13 +1871,13 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                     old_file.get('sourceSha256') and
                     old_file.get('sourceUrl')):
                 reusable[(old_file.get('name'),old_file.get('sourceUrl'))]=old_file
-    manifest=docs.get('items') or []
     primary_manifest=manifest[:MAX_DOCUMENTS]
     # Process PDF first, even when the official list puts HWP first.
     # Restore official ordering in saved source evidence afterwards.
     processing_order=sorted(range(len(primary_manifest)),
         key=lambda i: 0 if str(primary_manifest[i].get('name') or '').lower().endswith('.pdf') else 1)
     saved_slots={}
+    original_missing=False
     queued={}
     prefetch_positions=iter(_eligible_prefetch_positions(
         primary_manifest,processing_order,reusable)) if prefetch is not None else iter(())
@@ -1951,6 +1972,10 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                     _NOTICE_CONTEXT.notice_key=None
                     _NOTICE_CONTEXT.closes_on=''
                     phase['downloadSeconds']+=time.perf_counter()-timer
+            if dual_scan and hashlib.sha256(raw).hexdigest()!=item.get('sourceSha256'):
+                from rfp_dual_queue import RfpDualQueue
+                RfpDualQueue(os.environ['WORKLINKS_RFP_DUAL_QUEUE_DB']).mark_download_missing(notice_key)
+                raise RuntimeError('verified_original_sha_mismatch')
             if live_trace:live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='텍스트 추출',status='working')
             timer=time.perf_counter()
             try:
@@ -1988,7 +2013,11 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
         except Exception as ex:
-            record['errorCategory']=classify_failure(ex)
+            if dual_scan and str(ex) in ('queued_original_missing','verified_original_sha_mismatch'):
+                original_missing=True
+                record['errorCategory']='verified_original_missing'
+            else:
+                record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
         if live_trace:live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='판독 완료' if record.get('readable') else '판독 오류',status='done' if record.get('readable') else 'retry',error=str(record.get('errorCategory') or ''))
         saved_slots[position]=record
@@ -1999,9 +2028,12 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                       'errorCategory':'manifest_documents_over_limit'})
     readable=any(x.get('readable') for x in saved)
     notice=data.get('noticeDocuments') or {}
-    return {'status':'text_extracted_requires_review' if readable else 'text_unavailable',
-            'reasonCode':'readable_text_requires_full_review' if readable else
+    return {'status':'download_not_verified' if original_missing else
+                     'text_extracted_requires_review' if readable else 'text_unavailable',
+            'reasonCode':'verified_original_missing' if original_missing else
+                         'readable_text_requires_full_review' if readable else
                          'download_or_format_failure',
+            'sourceOriginalMissing':original_missing,
             'source':'나라장터 e발주 + 입찰공고 상세',
             'count':docs.get('count'),'eorderCount':docs.get('eorderCount'),
             'noticeDetailDocumentCount':docs.get('noticeDetailDocumentCount'),
@@ -2363,6 +2395,9 @@ def main():
     if dual_scan:
         from rfp_dual_queue import RfpDualQueue
         dual_queue=RfpDualQueue(os.environ['WORKLINKS_RFP_DUAL_QUEUE_DB'])
+        migration=dual_queue.reconcile_legacy_ready()
+        if any(migration.values()):
+            print('RFP_DUAL_LEGACY_RECEIPT_RECONCILE',json.dumps(migration,separators=(',',':')),flush=True)
         dual_queue.recover_stale_scans()
         claims=dual_queue.claim_ready(limit)
         selected=[(key.split(':')[0],key.split(':')[1],closes)
@@ -2655,7 +2690,8 @@ def main():
         # The parent worker commits final queue statuses only AFTER publishing
         # both validated RFP snapshots, so a crash cannot lose scan evidence.
         scan_outcomes=[{'key':no+':'+ordn,
-                        'ok':scan_validity.get(no+':'+ordn) is True}
+                        'ok':scan_validity.get(no+':'+ordn) is True,
+                        'redownload':bool((results.get(no+':'+ordn) or {}).get('sourceOriginalMissing'))}
                        for no,ordn in uncached]
         print('RFP_DUAL_SCAN_RESULT',json.dumps(scan_outcomes,separators=(',',':')),flush=True)
     stage_done('rebuild_and_write_coverage')
