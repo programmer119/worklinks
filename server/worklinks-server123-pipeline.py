@@ -427,7 +427,7 @@ def prune_rfp_archive(*,compact=True):
                 key=no+':'+ordinal
                 if key not in deadlines or date>deadlines[key]:
                     deadlines[key]=date
-    grace=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_GRACE_DAYS','7'))
+    grace=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_GRACE_DAYS','0'))
     unknown=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_UNKNOWN_DAYS','30'))
     ledger=CallLedger(DATA/'rfp-request-ledger.sqlite3')
     report=ledger.prune_expired(
