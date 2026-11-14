@@ -2958,10 +2958,27 @@ function jobAmountLabel(raw){
  }
  return t||'예산 미확인';
 }
+/* Compact only exact numeric bid-card budgets, irrespective of the
+   notice ID prefix. The full value stays in the tooltip and detail view. */
+function jobCardCompactBudget(raw){
+ const t=String(raw??'').trim();
+ let won=null;
+ if(/^\\d[\\d,]*$/.test(t))won=Number(t.replace(/,/g,''));
+ else{
+  const m=t.match(/^(\\d[\\d,]*)\\s*억(?:\\s*(\\d[\\d,]*)\\s*만원)?(?:\\s*원)?$/);
+  if(m)won=Number(m[1].replace(/,/g,''))*100000000+
+   Number((m[2]||'0').replace(/,/g,''))*10000;
+ }
+ if(Number.isFinite(won)&&won>=100000000)
+  return (Math.floor(won/10000000)/10).toFixed(1).replace(/\\.0$/,'')+'억';
+ return jobAmountLabel(raw);
+}
 /* Preserve the source's provisional salary wording, but give the amount
    a readable hierarchy. Never turn estimated monthly pay into a bid budget. */
 function jobCardAmountMarkup(x){
  const original=jobAmountLabel(x.amount);
+ const compact=jobCardCompactBudget(x.amount);
+ if(compact!==original)return htmlEscape(compact);
  if(/^g2b-/.test(String(x.id||'')))return htmlEscape(original);
  const parts=original.match(/^(예상\s*월|월|예상)\s+([0-9,]+\s*(?:만원|원))(?:\s*\/\s*(계약조건\s*확인))?$/);
  if(!parts)return htmlEscape(original);
