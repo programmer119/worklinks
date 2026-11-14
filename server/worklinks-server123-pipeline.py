@@ -107,7 +107,7 @@ def publish_atomic(src, destination):
     gzpath = Path(str(destination) + '.gz')
     gzstaging = gzpath.with_name('.' + gzpath.name + '.next')
     try:
-        with src.open('rb') as inp, staging.open('wb') as out, gzip.open(gzstaging, 'wb', compresslevel=6) as zipped:
+        with src.open('rb') as inp, staging.open('wb') as out, gzip.open(gzstaging, 'wb', compresslevel=1) as zipped:
             while True:
                 chunk = inp.read(1024 * 1024)
                 if not chunk:
