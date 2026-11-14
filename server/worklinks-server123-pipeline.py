@@ -29,7 +29,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
-RFP_DRAIN_ALGORITHM_VERSION = 'per-notice-live-progress-v4-20261114'
+RFP_DRAIN_ALGORITHM_VERSION = 'two-independent-queues-v5-20261114'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
@@ -185,7 +185,7 @@ def stage_workspace(path,minimal=False):
                  'batch_backfill_changcom_top500_rfp.py',
                  'repair_changcom_top500_rfp.py',
                  'repair_open_rfp_cached_attachments.py',
-                 'rfp_call_ledger.py'):
+                 'rfp_call_ledger.py','rfp_dual_queue.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in (() if minimal else READ_FILES):
         source = SEEDS / name
@@ -246,6 +246,22 @@ def repair_preflight():
 
 def run_once(kind, runner=None, _single=False):
     """Run one job in an isolated writable workspace, atomic publish on success."""
+    dual_enabled=(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1')
+    if kind=='rfpUpgrade' and dual_enabled and runner is None:
+        # Waiting on original downloads must NOT create an expensive 80MB
+        # staged scan workspace, nor report the full backlog as complete.
+        sys.path.insert(0,str(SCRIPTS))
+        from rfp_dual_queue import RfpDualQueue
+        q=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+        q.recover_stale_scans()
+        if q.ready_count()==0:
+            counters=q.stats()
+            if counters['total'] and counters['scan']['done']==counters['total']:
+                return False
+            log('RFP_DUAL_WAIT_ORIGINALS',
+                counters['download']['done'],counters['download']['total'],
+                counters['scan']['done'],counters['scan']['total'])
+            return 'download_wait'
     if kind not in PUBLISHED:
         raise ValueError('unknown_pipeline_kind')
     if kind == 'rfpOpenRepair' and runner is None and not _single:
@@ -262,6 +278,9 @@ def run_once(kind, runner=None, _single=False):
                    WORKLINKS_RFP_ROLE_PRIORITY_KEYS=RFP_STAFFING_PRIORITY_KEYS,
                    WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'),
                    WORKLINKS_RFP_NOTICE_PROGRESS_DB=str(DATA/'rfp-notice-progress.sqlite3'))
+        if kind=='rfpUpgrade' and dual_enabled:
+            env['WORKLINKS_RFP_DUAL_SCAN_ONLY']='1'
+            env['WORKLINKS_RFP_DUAL_QUEUE_DB']=str(DATA/'rfp-dual-queue.sqlite3')
         if kind in ('rfp','rfpUpgrade'):
             # OCR repair remains full-fidelity, but the bulk scanner never
             # holds every other notice behind multi-page Tesseract.
@@ -302,6 +321,8 @@ def run_once(kind, runner=None, _single=False):
             details = (completed.stderr or completed.stdout or '').strip().splitlines()
             reason = details[-1][:130] if details else 'missing_child_diagnostics'
             raise RuntimeError('pipeline_' + kind + '_failed: ' + reason)
+        if kind=='rfpUpgrade' and dual_enabled and 'RFP_DUAL_SCAN_NO_READY' in (completed.stdout or ''):
+            return 'download_wait'
         if kind=='rfpUpgrade' and 'RFP_UPGRADE_SELECT_COUNT 0' in (completed.stdout or ''):
             if ('SAVED_NOTICE_DISCOVERY_UNAVAILABLE' in (completed.stdout or '') or
                     'RFP_DISCOVER_SERVER_ERROR' in (completed.stdout or '')):
@@ -313,6 +334,19 @@ def run_once(kind, runner=None, _single=False):
         quality_guard(kind, outputs)
         for result in outputs:
             publish_atomic(result, SEEDS / result.name)
+        if kind=='rfpUpgrade' and dual_enabled:
+            # Mark scans finished ONLY after both validated archives are
+            # durably published. An interrupted publish is always retryable.
+            from rfp_dual_queue import RfpDualQueue
+            queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+            for line in (completed.stdout or '').splitlines():
+                if not line.startswith('RFP_DUAL_SCAN_RESULT '):continue
+                records=json.loads(line.split(' ',1)[1])
+                for record in records:
+                    key=str(record.get('key') or '')
+                    if re.fullmatch(r'(?:R\\d{2}BK\\d{8}|\\d{11}):\\d{3}',key):
+                        queue.scan_finished(key,bool(record.get('ok')),
+                                            'scan_unverified_or_incomplete')
         log('PIPELINE_PUBLISHED', kind,
             'outputs', ','.join(result.name for result in outputs))
         if kind=='rfpOpenRepair' and _single:
@@ -342,6 +376,9 @@ def iteration(current=None, runner=None):
         # Scanner and repair jobs share a single serial scheduler. Never let
         # 100s+ OCR/repair jobs stop the successful first-time scan queue.
         # Paused/empty drains may safely run repairs while scanning is idle.
+        if (kind=='rfp' and os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1'
+                and state.get('rfpUpgradeActive') is True):
+            continue  # Regular old-mode RFP scan cannot race the split queue.
         if kind in ('rfpOpenRepair','rfpRepair') and state.get('rfpUpgradeActive') is True:
             drain_status=str((state.get('rfpUpgrade') or {}).get('status') or '')
             if drain_status in ('started','ok','parser_versions_upgraded','drain_algorithm_upgraded'):
@@ -367,7 +404,11 @@ def iteration(current=None, runner=None):
             finished=time.time()
             if kind=='rfpUpgrade':
                 state['rfpUpgradeBatchesCompleted']=int(state.get('rfpUpgradeBatchesCompleted') or 0)+(1 if more is not False else 0)
-                if more is False:
+                if more=='download_wait':
+                    entry.update(status='waiting_for_download',successEpoch=finished,
+                                 retryAfterEpoch=finished+5)
+                    log('PIPELINE_RFP_WAIT_DOWNLOADER',5,'seconds')
+                elif more is False:
                     # No eligible item *now* does not mean the 2k+ remaining
                     # notices are complete: some may need official-file retry.
                     entry.update(status='no_eligible_now',successEpoch=finished,
@@ -437,6 +478,37 @@ def prune_rfp_archive(*,compact=True):
          'unknownDays':unknown,**report},separators=(',',':')))
     return report
 
+
+
+def ensure_independent_downloader(current):
+    """Keep one separate long-lived download PROCESS alive through scan cycles."""
+    enabled=(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1' and
+             current.get('rfpUpgradeActive') is True)
+    if not enabled:return None
+    source=SCRIPTS/'rfp_download_worker.py'
+    if not source.is_file():raise RuntimeError('rfp_download_worker_missing')
+    global _RFP_DOWNLOAD_PROCESS,_RFP_DOWNLOAD_LAST_LAUNCH
+    if _RFP_DOWNLOAD_PROCESS is not None and _RFP_DOWNLOAD_PROCESS.poll() is None:
+        return _RFP_DOWNLOAD_PROCESS.pid
+    if time.monotonic()-_RFP_DOWNLOAD_LAST_LAUNCH<10:return None
+    env=dict(os.environ,WORKLINKS_G2B_API=SOURCE_API,
+             G2B_PIPELINE_DATA=str(DATA),G2B_PIPELINE_SCRIPTS=str(SCRIPTS),
+             WORKLINKS_RFP_UPGRADE_ONLY='1',WORKLINKS_RFP_DEFER_OCR='1',
+             WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'),
+             WORKLINKS_RFP_DOWNLOAD_CONCURRENCY='8')
+    logpath=DATA/'rfp-download-worker.log'
+    if logpath.is_file() and logpath.stat().st_size>8*1048576:
+        os.replace(logpath,DATA/'rfp-download-worker.previous.log')
+    with logpath.open('a') as stream:
+        _RFP_DOWNLOAD_PROCESS=subprocess.Popen(
+            [sys.executable,'-u',str(source)],
+            cwd=str(DATA),env=env,stdout=stream,stderr=subprocess.STDOUT)
+    _RFP_DOWNLOAD_LAST_LAUNCH=time.monotonic()
+    log('RFP_DOWNLOAD_PROCESS_STARTED','pid',_RFP_DOWNLOAD_PROCESS.pid)
+    return _RFP_DOWNLOAD_PROCESS.pid
+
+_RFP_DOWNLOAD_PROCESS=None
+_RFP_DOWNLOAD_LAST_LAUNCH=-100
 
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
@@ -557,6 +629,7 @@ def main():
             except Exception as error:
                 log('RFP_ARCHIVE_RETENTION_FAILED',type(error).__name__)
         while True:
+            ensure_independent_downloader(read_state())
             state=iteration()
             # Archive maintenance is never allowed to block the continuous
             # scanner; only one bounded cleanup job may run at a time.
