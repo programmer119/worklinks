@@ -160,8 +160,10 @@ def run_forever():
     queue=RfpDualQueue(QUEUE)
     queue.reset_stale()
     planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
-                                  reader.fetch_json,META_PACE)
+                                  reader.fetch_json,META_PACE,
+                                  allow_exceptions=False)
              if BULK_ENABLED else None)
+    # Never turn unmatched date results into individual government calls.
     last_refresh=0
     halted_until=0
     planner_pause_until=0
