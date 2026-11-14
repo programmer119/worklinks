@@ -86,7 +86,7 @@ CHANGCOM_SOURCE=ROOT/'startup-support/changcom-actionable.json'
 CHANGCOM_EVIDENCE_DEST=ROOT/'startup-support/changcom-rfp-evidence.json'
 CHANGCOM_BACKFILL60=ROOT/'startup-support/audits/changcom-rfp-backfill-60-20261110.json'
 CHANGCOM_URGENT_RECOVERY=ROOT/'startup-support/audits/changcom-priority-rfp-recovery-20261111.json'
-MAX_FILE=24_000_000
+MAX_FILE=100_000_000
 # OCR is local-only and bounded to prevent runaway attachment processing.
 MAX_PDF_OCR_PAGES=24
 MAX_PDF_OCR_PIXELS=12_000_000
