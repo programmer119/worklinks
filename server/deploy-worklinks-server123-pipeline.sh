@@ -145,6 +145,7 @@ start_worker(){
       -e G2B_PIPELINE_SCRIPTS=/app/scripts \
       -e WORKLINKS_G2B_API=http://127.0.0.1:18192/api/g2b \
       -e G2B_RFP_BATCH=8 \
+      -e WORKLINKS_RFP_DOWNLOAD_CONCURRENCY=8 \
       -v "$BASE/data:/app/data" \
       -v "$SCRIPTS:/app/scripts:ro" \
       -v "$TARGET:/app/worklinks-server123-pipeline.py:ro" \
