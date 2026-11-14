@@ -936,7 +936,7 @@ for(const [key,field] of [['contract','cntrctCnclsMthdNm'],['awardMethodCode','s
 // Thumbnail: role-specific headcounts are independent of on-site work location.
 // Hover/click must show exact role, headcount, cited text and source file.
 const reqFns=new Function('jobBidIdentity','rfpSnapshotByNotice','jobSearchRfpState',
- 'jobListRfpState','changcomPrecheckByNotice','rfpSnapshotLoading','rfpSnapshotCheckedAt',
+ 'jobListRfpState','changcomPrecheckByNotice','rfpScanProvenanceByNotice','rfpSnapshotLoading','rfpSnapshotCheckedAt',
  'htmlEscape',part('function jobRequirementEvidence(x){','function jobDetailRequirementGrid(x){')+
  'return {jobRequirementEvidence,jobRequirementBadges};'
 )(
@@ -949,7 +949,7 @@ const reqFns=new Function('jobBidIdentity','rfpSnapshotByNotice','jobSearchRfpSt
     {type:'staff_proof',sourceText:'PM 1명, 개발자 2명, 디자이너 1명 투입 계획',sourceFile:'인력계획.pdf'},
     {type:'staff_proof',sourceText:'상주 인력은 발주처에서 상시 근무하여야 한다.',sourceFile:'인력계획.pdf'}
    ]}]
- }]]),new Map(),new Map(),new Map(),false,'',x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')
+ }]]),new Map(),new Map(),new Map(),new Map(),false,'',x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')
 );
 const roleBid={noticeNumber:'R26BK55555555',noticeOrder:'000'};
 const rolesEvidence=reqFns.jobRequirementEvidence(roleBid);
