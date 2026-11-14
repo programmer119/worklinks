@@ -1,0 +1,36 @@
+name: WorkLinks RFP live progress safety
+on:
+  push:
+    paths:
+      - 'scripts/rfp_live_activity.py'
+      - 'scripts/rfp_download_worker.py'
+      - 'scripts/rfp_bulk_manifests.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'server/deploy-worklinks-server123-pipeline.sh'
+      - 'startup-support/rfp-progress-live.js'
+      - 'tests/test_rfp_live_telemetry.py'
+      - '.github/workflows/worklinks-rfp-live-telemetry-ci.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'server/**'
+      - 'startup-support/rfp-progress-live.js'
+      - 'tests/test_rfp_live_telemetry.py'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check Python, shell and browser JavaScript syntax
+        run: |
+          python -m py_compile scripts/rfp_live_activity.py scripts/rfp_download_worker.py scripts/rfp_bulk_manifests.py scripts/refresh_worklinks_rfp.py server/g2b-proxy.py server/worklinks-server123-pipeline.py
+          bash -n server/deploy-worklinks-server123-pipeline.sh
+          node --check startup-support/rfp-progress-live.js
+      - name: Verify real durable progress and retries without provider requests
+        run: python tests/test_rfp_live_telemetry.py
