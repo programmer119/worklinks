@@ -277,12 +277,16 @@ class BulkManifestPlanner:
         for key,day in mapping.items():groups.setdefault(day,set()).add(key)
         day=sorted(groups,reverse=True)[0]
         keys=groups[day]
+        import rfp_live_activity as live
+        live.record('manifest',day,phase='공식 첨부목록 조회',status='working',files_total=len(SOURCES))
         sources={}
         calls=0
-        for source in SOURCES:
+        for source_index,source in enumerate(SOURCES):
+            live.record('manifest',day,phase='공식 '+str(source)+' 목록 조회',status='working',files_done=source_index,files_total=len(SOURCES))
             items,made=self._source_for_day(day,source,keys)
             calls+=made
             if items is None:
+                live.record('manifest',day,phase='부분 목록 응답',status='retry',error='official page incomplete')
                 return {'new':0,'day':day,'calls':calls,'partial':True}
             sources[source]=items
         # A full-date response can legitimately contain no attachment files,
@@ -308,6 +312,7 @@ class BulkManifestPlanner:
                 manifests[missing[0]]=recovered
                 missing=missing[1:]
         count=self.queue.save_bulk_manifests(manifests)
+        live.record('manifest',day,phase='목록 확보 완료' if not missing else '누락 공고 재확인 필요',status='done' if not missing else 'retry',files_done=len(SOURCES),files_total=len(SOURCES),error='' if not missing else str(len(missing))+' notices not present in verified date batch',retry_epoch=0 if not missing else time.time()+3600)
         calls+=exception_calls
         if missing:
             # Retry on another planning window rather than hammer the same day.
