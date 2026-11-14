@@ -406,6 +406,9 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
     backfill=pending_changcom_backfill()
     urgent=pending_urgent_recovery()
     priority=priority or set()
+    # Bounded, opt-in migration of OLD successful parses ahead of new scans.
+    # This is a ranking hint, never evidence that a missing document is readable.
+    prefer_legacy=os.environ.get('WORKLINKS_RFP_PREFER_LEGACY_SCAN')=='1'
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -459,7 +462,11 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
                 staff_missing=staffing_scan_pending(cached)
+                legacy_outdated=(cached.get('status')=='text_extracted_requires_review' and
+                                 (int(cached.get('classificationVersion') or 0)<CLASSIFICATION_VERSION or
+                                  int(cached.get('hwpxReaderVersion') or 0)<HWPX_READER_VERSION))
                 rank=(-3 if key in priority and temporal==0 else
+                      -2 if prefer_legacy and legacy_outdated and key in targets and temporal==0 else
                       -2 if key in urgent and key in targets and temporal==0 else
                       -1 if staff_missing and key in targets and temporal==0 else
                       -1 if key in backfill and temporal==0 else
