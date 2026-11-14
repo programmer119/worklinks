@@ -15,7 +15,7 @@ import time
 import urllib.parse
 
 SOURCES=('ordinary','eorder','detail')
-ROWS=1000
+ROWS=999
 MAX_PAGES_PER_DAY_SOURCE=500
 MAX_FETCH_PER_PASS=18
 DAILY_LIMIT=180
@@ -61,7 +61,7 @@ class BulkManifestPlanner:
 
     @staticmethod
     def _required_pages(total,first_count):
-        # Some government gateways cap numOfRows=1000 to 10 actual rows.
+        # A 1000-row request returned 10 rows; use 999 and retain defensive pagination.
         # The first page's actual size, never the requested size, controls
         # pagination. Incomplete/empty first pages must fail closed.
         if total<0 or first_count<0 or (total>0 and first_count==0):
@@ -90,7 +90,7 @@ class BulkManifestPlanner:
 
     def _pages_present(self,day,source):
         with self.queue.connect() as db:
-            rows=db.execute('''SELECT page,total_count,raw_count
+            rows=db.execute('''SELECT page,total_count,raw_count,requested_rows
                 FROM rfp_bulk_pages WHERE day=? AND source=? ORDER BY page''',
                 (day,source)).fetchall()
         return rows
@@ -117,6 +117,13 @@ class BulkManifestPlanner:
         cached=self._cached_pages(day,source)
         if cached is not None:return cached,0
         saved=self._pages_present(day,source)
+        if saved and any(row[3]!=ROWS for row in saved):
+            # Only incomplete caches reach here; complete caches were reused.
+            # Never continue a 10-row first page with 999-row page offsets.
+            with self.queue.connect() as db:
+                db.execute('DELETE FROM rfp_bulk_pages WHERE day=? AND source=?',
+                           (day,source))
+            saved=[]
         known_total=saved[0][1] if saved else None
         if known_total is not None and known_total<0:
             raise BulkManifestError('invalid_cached_batch_total')
@@ -171,11 +178,11 @@ class BulkManifestPlanner:
                 filtered.append(item)  # retain all rows for newly discovered notices
             with self.queue.connect() as db:
                 db.execute('''INSERT OR REPLACE INTO rfp_bulk_pages
-                    (day,source,page,total_count,raw_count,items_json,saved_at)
-                    VALUES(?,?,?,?,?,?,?)''',
+                    (day,source,page,total_count,raw_count,items_json,saved_at,requested_rows)
+                    VALUES(?,?,?,?,?,?,?,?)''',
                     (day,source,page,count,raw,
                      json.dumps(filtered,ensure_ascii=False,separators=(',',':')),
-                     dt.datetime.now(dt.timezone.utc).isoformat()))
+                     dt.datetime.now(dt.timezone.utc).isoformat(),ROWS))
             fetched+=1
             pages=expected
             page+=1
