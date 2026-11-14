@@ -3,7 +3,7 @@ import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl } from './worklinks-h
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
-const AUTH_UI_BUILD = '20261114-auth-watch-v3';
+const AUTH_UI_BUILD = '20261114-auth-retry-v4';
 const GUEST = {
   applied: 'externaltools_startup_support_status_v1',
   hidden: 'worklinks_startup_support_hidden_v1',
@@ -16,6 +16,20 @@ const intentsFor=key=>decode(INTENT_PREFIX+key);
 const timeOf=x=>Number(x?.at)||0;
 const remoteTime=x=>Date.parse(x?.updatedAt||'')||0;
 const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
+let authRetryAttempts=0;
+let manualAuthRetryInFlight=false;
+function authErrorDetail(error){
+  const status=Number(error?.status)||0;
+  if(status===429)return '인증 서버에서 요청을 제한했습니다. 잠시 후 다시 확인하거나 다시 로그인하세요.';
+  if(status>=500)return '인증 서버가 일시적으로 응답하지 않습니다 (HTTP '+status+'). 다시 확인하거나 다시 로그인하세요.';
+  if(error?.name==='TimeoutError'||error?.name==='AbortError')return '인증 서버 응답 시간이 초과되었습니다. 인터넷 연결을 확인하고 다시 시도하세요.';
+  if(status)return '인증 서버에서 HTTP '+status+' 오류가 발생했습니다. 다시 확인하거나 다시 로그인하세요.';
+  return '인증 서버 연결에 실패했습니다. 네트워크 상태를 확인하고 다시 확인하거나 다시 로그인하세요.';
+}
+function showAuthCheckError(message,error){
+  const attempt=authRetryAttempts?' · 다시 확인 '+authRetryAttempts+'회 실패':'';
+  setAuthGate('error',message,authErrorDetail(error)+attempt);
+}
 const $ = (id)=>document.getElementById(id);
 // Partner UI is fail-closed: only an active AuthHub /v1/me membership grants access.
 // This event drives the existing (non-module) WorkLinks page; no token is exposed.
@@ -53,7 +67,7 @@ function show(message){
 }
 // A failed/expired session must NEVER leave the previous workspace on screen.
 // The gate exists outside <main>, so hiding main also hides all cached job data.
-function setAuthGate(mode='login',message='로그인이 필요합니다.'){
+function setAuthGate(mode='login',message='로그인이 필요합니다.',detailMessage=''){
   if(document.body?.dataset.worklinksAuthCallback==='true')return;
   const gate=$('worklinks-auth-gate');
   document.documentElement.dataset.worklinksAuthState='locked';
@@ -65,11 +79,12 @@ function setAuthGate(mode='login',message='로그인이 필요합니다.'){
   const login=$('worklinks-auth-gate-login');
   const retry=$('worklinks-auth-gate-retry');
   if(title)title.textContent=message;
-  if(detail)detail.textContent=mode==='error'
-    ? '연결 상태를 확인한 후 다시 시도해 주세요. 기존 저장 기록은 삭제되지 않습니다.'
-    : '다시 로그인하면 기존 계정의 저장 기록을 이어서 사용할 수 있습니다.';
+  if(detail)detail.textContent=detailMessage||(mode==='error'
+    ? '연결 상태를 확인한 후 다시 확인하거나 다시 로그인하세요. 기존 저장 기록은 삭제되지 않습니다.'
+    : '다시 로그인하면 기존 계정의 저장 기록을 이어서 사용할 수 있습니다.');
   if(login)login.href=worklinksHostedAuthUrl('login');
-  if(login)login.hidden=mode==='error'||mode==='checking';
+  // A failed AuthHub request must never trap the user behind retry-only UI.
+  if(login)login.hidden=mode==='checking';
   if(retry)retry.hidden=mode!=='error';
   gate.hidden=false;
 }
@@ -450,7 +465,7 @@ async function loadAuthConfig(){
 async function bootstrap(){
   let config;
   try{config=await loadAuthConfig()}
-  catch{setAuthGate('error','로그인 서버 연결을 확인할 수 없습니다.');return}
+  catch(error){showAuthCheckError('로그인 서버 연결을 확인할 수 없습니다.',error);return}
   state.project=config.project||'';
   if(!config.enabled){setAuthGate('error','로그인 설정을 확인할 수 없습니다.');return}
   state.client=new AuthHubClient({apiBase:config.authApi,project:state.project,environment:'production'});
@@ -486,11 +501,34 @@ async function bootstrap(){
     await reconcileServer();
     buttons(session);
   }catch(error){
-    setAuthGate('error','로그인 상태를 확인할 수 없습니다.');
+    showAuthCheckError('로그인 상태를 확인할 수 없습니다.',error);
     publishPartnerAccess(false);buttons(null);
   }
 }
-window.addEventListener('online',()=>{if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}});
+// The retry button reruns AuthHub config/session verification in the current
+// page. Reloading the document only repeated the error without new feedback.
+async function retryAuthCheck(){
+  if(manualAuthRetryInFlight)return;
+  manualAuthRetryInFlight=true;
+  authRetryAttempts+=1;
+  const button=$('worklinks-auth-gate-retry');
+  if(button)button.disabled=true;
+  setAuthGate('checking','로그인 상태 다시 확인 중','인증 서버와 계정 상태를 새로 조회하고 있습니다.');
+  try{await bootstrap()}
+  catch(error){showAuthCheckError('로그인 상태를 확인할 수 없습니다.',error)}
+  finally{
+    manualAuthRetryInFlight=false;
+    if(button)button.disabled=false;
+  }
+}
+window.addEventListener('online',()=>{
+  if(document.documentElement.dataset.worklinksAuthState==='locked'&&
+     !$('worklinks-auth-gate-retry')?.hidden){
+    retryAuthCheck().catch(()=>{});
+    return;
+  }
+  if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}
+});
 // Existing open tabs need their own heartbeat; a new deployment does not replace
 // JavaScript that is already running inside those tabs.
 let verificationInFlight=null;
@@ -564,6 +602,11 @@ window.addEventListener('storage',event=>{
     location.reload();
 });
 if(document.getElementById('worklinks-auth-header'))buttons(null);
+if($('worklinks-auth-gate-retry')){
+  $('worklinks-auth-gate-retry').addEventListener('click',()=>{
+    retryAuthCheck().catch(()=>{});
+  });
+}
 if($('worklinks-auth-gate-login')){
   $('worklinks-auth-gate-login').addEventListener('click',()=>{
     sessionStorage.setItem('worklinks_auth_return_url',location.pathname+location.search+location.hash);
@@ -571,5 +614,5 @@ if($('worklinks-auth-gate-login')){
 }
 bootstrap().catch(error=>{
   console.warn('WorkLinks AuthHub bootstrap',error);
-  setAuthGate('error','로그인 상태를 확인할 수 없습니다.');
+  showAuthCheckError('로그인 상태를 확인할 수 없습니다.',error);
 });
