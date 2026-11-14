@@ -714,6 +714,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .rfp-rescan-stage-track{height:7px}
 .rfp-rescan-foot{border-top:1px solid #e6eaf0;margin:20px 0 0;padding-top:12px;font-size:12.5px;line-height:1.7;color:#5d6775}
 .rfp-rescan-unknown{margin-top:7px;font-size:13px;color:#a15b22}
+.rfp-rescan-refresh-warning{padding:10px 12px;margin:12px 0;border:1px solid #f1cb93;background:#fff8ef;border-radius:8px;color:#805110;font-size:13px;line-height:1.55}.rfp-rescan-refresh-warning .rfp-rescan-retry{margin-left:8px}
 .rfp-rescan-service-error{padding:16px 0 3px;color:#25354a}.rfp-rescan-service-error strong{font-size:17px}.rfp-rescan-service-error p{font-size:14px;line-height:1.6;color:#526173;margin:8px 0 15px}.rfp-rescan-retry{border:1px solid #a4b7ce;border-radius:8px;background:#f4f8fd;color:#15395e;font-size:14px;font-weight:800;padding:9px 15px;cursor:pointer}
 @media(max-width:700px){
  .pagehead{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"copy account" "actions actions"}
@@ -2056,6 +2057,8 @@ var G2B_PROXY_URL=localStorage.getItem('worklinks_g2b_base_v1')||G2B_DEFAULT_URL
 /* The progress button reads a SERVER count, never a partially loaded card list.
    Opening it never triggers a scan or any upstream procurement request. */
 var rfpRescanProgress=null,rfpRescanProgressError='',rfpRescanLastRead=0,rfpRescanBusy=null;
+const RFP_PROGRESS_POLL_MS=10000;
+const RFP_PROGRESS_TIMEOUT_MS=8000;
 function rfpProgressNumber(n){return Number(n||0).toLocaleString('ko-KR')}
 function paintRfpRescanProgress(){
  const label=document.getElementById('rfpRescanLabel');
@@ -2063,16 +2066,18 @@ function paintRfpRescanProgress(){
  const panel=document.getElementById('rfpRescanContent');
  if(!label||!panel)return;
  const info=rfpRescanProgress;
- if(!info||!info.counts||info.rescanPercent===null||info.rescanPercent===undefined){
+ if(!info||!info.counts||!Number.isFinite(Number(info.counts.total))){
   label.textContent='판독 현황 오류';fill.style.width='0%';
   panel.innerHTML='<div class="rfp-rescan-service-error"><strong>판독 현황을 불러오지 못했습니다.</strong><p>운영 서버 연결 또는 집계 API 상태를 확인해야 합니다. 판독 작업이 실행 중인지도 아직 확인되지 않았습니다.</p><button type="button" id="rfpRescanRetry" class="rfp-rescan-retry">다시 조회</button></div>';
   document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
   return;
  }
  const counts=info.counts,remain=Number(info.rescanPercent);
- const complete=counts.completed,all=counts.total;
- const pct=all?((100*complete/all).toFixed(1)):'0.0';
- label.textContent='판독 완료 '+pct+'%';
+ const complete=Number(counts.completed),all=Number(counts.total);
+ const pct=all?Math.max(0,Math.min(100,100*complete/all)).toFixed(2):'0.00';
+ const delayed=Boolean(rfpRescanProgressError);
+ label.textContent=(delayed?'갱신 지연 ':'진행률 ')+pct+'% · '+rfpProgressNumber(complete)+'건';
+ label.parentElement.title='최신 판독 '+rfpProgressNumber(complete)+' / '+rfpProgressNumber(all)+'건 · 서버 집계 '+String(info.asOf||'시각 미확인')+(delayed?' · 최근 재조회 실패':'');
  fill.style.width=pct+'%';
  const stageNames={classification:'RFP 조건',roles:'역할·인원',facts:'인력 요구사항',hwpx:'HWPX 해석'};
  const stages=Object.entries(info.stages||{}).map(([name,st])=>{
@@ -2089,6 +2094,7 @@ function paintRfpRescanProgress(){
      progress.toFixed(1)+'%"></span></span></div>';
  }).join('');
  panel.innerHTML=
+  (delayed?'<div class="rfp-rescan-refresh-warning" role="status">최신 집계를 갱신하지 못했습니다. 아래 수치는 마지막 정상 조회 결과입니다. <button type="button" id="rfpRescanRetry" class="rfp-rescan-retry">다시 조회</button></div>':'')+
   '<div class="rfp-rescan-totals">'+
    '<div class="rfp-rescan-metric"><span>관리 대상</span><strong>'+rfpProgressNumber(all)+'</strong></div>'+
    '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong>'+rfpProgressNumber(complete)+'</strong></div>'+
@@ -2107,17 +2113,22 @@ function paintRfpRescanProgress(){
   '<h3 class="rfp-rescan-section-title">기능별 판독 완료</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
   (counts.unknownDeadline?'<div class="rfp-rescan-unknown">마감일 확인 불가 '+
     rfpProgressNumber(counts.unknownDeadline)+'건은 전체 대상에서 제외</div>':'')+
-  '<p class="rfp-rescan-foot">재판독 비율 = 구버전 판독 공고 ÷ 마감 전 전체 공고. '+
+  '<p class="rfp-rescan-foot">진행률 = 최신 판독 완료 공고 ÷ 전체 관리 대상 공고. 10초마다 운영 서버의 실제 집계를 갱신합니다. '+
   '이 화면은 운영 서버에 저장된 결과만 보여줍니다. 미판독·실패·구버전 재처리는 서버 작업자가 수행해야 하며 이 버튼은 재판독을 시작하지 않습니다.'+
   '<span style="display:block">확인 기준: '+htmlEscape(String(info.asOf||'').replace('T',' ').slice(0,19))+
   ' · 판독 완료는 입찰 자격 충족을 의미하지 않습니다.</span></p>';
+ if(delayed)document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
 }
 async function refreshRfpRescanProgress(force=false){
  if(rfpRescanBusy)return rfpRescanBusy;
- if(!force&&rfpRescanLastRead&&Date.now()-rfpRescanLastRead<60000)return;
+ if(!force&&rfpRescanLastRead&&Date.now()-rfpRescanLastRead<RFP_PROGRESS_POLL_MS)return;
  rfpRescanBusy=(async()=>{
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),RFP_PROGRESS_TIMEOUT_MS);
   try{
-   const res=await fetch(G2B_DEFAULT_URL+'/rfp-rescan-progress',{cache:'no-store'});
+   // Timestamp query and no-store bypass browser and intermediary caches.
+   const url=G2B_DEFAULT_URL+'/rfp-rescan-progress?_='+Date.now();
+   const res=await fetch(url,{cache:'no-store',signal:controller.signal});
    if(!res.ok)throw Error('운영 집계 HTTP '+res.status);
    const report=await res.json();
    if(report?.ok!==true||report?.schemaVersion!==1||
@@ -2127,10 +2138,10 @@ async function refreshRfpRescanProgress(force=false){
     throw Error('집계 데이터 형식 오류');
    rfpRescanProgress=report;rfpRescanProgressError='';rfpRescanLastRead=Date.now();
   }catch(error){
-   // Never keep advertising an unverified old percentage as current.
-   rfpRescanProgress=null;rfpRescanProgressError=String(error?.message||error).slice(0,110);
-   rfpRescanLastRead=0;
-  }finally{paintRfpRescanProgress();rfpRescanBusy=null}
+   // Keep the last verified count, but label it as stale on a failed refresh.
+   rfpRescanProgressError=String(error?.message||error).slice(0,110);
+   rfpRescanLastRead=Date.now();
+  }finally{clearTimeout(timeout);paintRfpRescanProgress();rfpRescanBusy=null}
  })();
  return rfpRescanBusy;
 }
@@ -2160,9 +2171,9 @@ async function refreshRfpRescanProgress(force=false){
   }
  });
  document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden&&Date.now()-rfpRescanLastRead>60000)void refreshRfpRescanProgress();
+  if(!document.hidden&&true)void refreshRfpRescanProgress();
  });
- setInterval(()=>{if(!document.hidden)void refreshRfpRescanProgress()},90000);
+ setInterval(()=>{if(!document.hidden)void refreshRfpRescanProgress()},RFP_PROGRESS_POLL_MS);
  void refreshRfpRescanProgress();
 })();
 
