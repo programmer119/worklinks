@@ -4068,7 +4068,8 @@ function jobRequirementEvidence(x){
    clauses.push({text:String(c.text),type:c.type,required:false,file:c.sourceFile||''});
  }
  if(staff?.evidence?.text)clauses.push({text:String(staff.evidence.text),type:'staff_proof',required:false,file:staff.evidence.sourceFile||''});
- const tried=!!full||saved?.seen===true||!!staff?.evidence||!!provenance;
+ const tried=!!full||saved?.seen===true||!!saved?.status||saved?.scanComplete===true||
+   !!staff?.evidence||!!provenance;
  // A fetched notice without an executed RFP scan is pending, not an extraction failure.
  const scanNotRun=!!saved&&!Array.isArray(full?.files)&&
    (saved.rfpScanStatus==='not_scanned'||saved.status==='not_scanned'||
@@ -4541,7 +4542,9 @@ function jobRequirementBadges(x){
       '미기록')+
     ' · HWPX '+(pv.hwpxReaderVersion?'v'+pv.hwpxReaderVersion:'미기록')+
     ' · '+(pv.current?'최신 판독 완료':'재판독 필요'):
-    '판독 버전: 기록 없음 · 최신 판독 확인 필요';
+    evidence.meta.saved?.status==='text_extracted_requires_review'?
+    '원문 추출 기록 있음 · 판독기 버전 미기록 · 재판독 필요':
+    '판독 버전 기록 없음 · 최신 판독 확인 필요';
   const onsiteDetails='<strong class="job-req-onsite-title">상주 여부</strong>'+onsitePrimary+
    '<div class="job-req-onsite-meta">'+htmlEscape(versionSummary)+'</div>'+
    (onsiteSource?.text?
