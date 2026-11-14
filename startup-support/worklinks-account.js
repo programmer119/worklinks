@@ -50,32 +50,38 @@ function show(message){
   const target=$('worklinks-auth-info');
   if(target)target.textContent=message;
 }
-// The main page has no #worklinks-auth-info; session expiry needs its own
-// visible, actionable notice rather than a message sent to a missing element.
+// A failed/expired session must NEVER leave the previous workspace on screen.
+// The gate exists outside <main>, so hiding main also hides all cached job data.
+function setAuthGate(mode='login',message='로그인이 필요합니다.'){
+  if(document.body?.dataset.worklinksAuthCallback==='true')return;
+  const gate=$('worklinks-auth-gate');
+  document.documentElement.dataset.worklinksAuthState='locked';
+  const main=document.querySelector('body > main');
+  if(main)main.inert=true;
+  if(!gate)return;
+  const title=$('worklinks-auth-gate-title');
+  const detail=$('worklinks-auth-gate-description');
+  const login=$('worklinks-auth-gate-login');
+  const retry=$('worklinks-auth-gate-retry');
+  if(title)title.textContent=message;
+  if(detail)detail.textContent=mode==='error'
+    ? '연결 상태를 확인한 후 다시 시도해 주세요. 기존 저장 기록은 삭제되지 않습니다.'
+    : '다시 로그인하면 기존 계정의 저장 기록을 이어서 사용할 수 있습니다.';
+  if(login)login.href=worklinksHostedAuthUrl('login');
+  if(login)login.hidden=mode==='error';
+  if(retry)retry.hidden=mode!=='error';
+  gate.hidden=false;
+}
 function showAuthExpiry(message='로그인이 만료되었습니다.'){
-  const anchor=document.querySelector('.pagehead');
-  if(!anchor)return;
-  let notice=$('worklinks-session-notice');
-  if(!notice){
-    notice=document.createElement('div');
-    notice.id='worklinks-session-notice';
-    notice.className='worklinks-session-notice';
-    notice.setAttribute('role','status');
-    notice.setAttribute('aria-live','polite');
-    anchor.insertAdjacentElement('afterend',notice);
-  }
-  notice.replaceChildren();
-  const label=document.createElement('strong');
-  label.textContent=message;
-  const detail=document.createElement('span');
-  detail.textContent='다시 로그인하면 기존 계정의 저장 기록을 이어서 사용할 수 있습니다.';
-  const link=document.createElement('a');
-  link.href=worklinksHostedAuthUrl('login');
-  link.textContent='다시 로그인';
-  notice.append(label,detail,link);
+  setAuthGate('expired',message);
 }
 function clearAuthExpiry(){
   $('worklinks-session-notice')?.remove();
+  const gate=$('worklinks-auth-gate');
+  if(gate)gate.hidden=true;
+  document.documentElement.dataset.worklinksAuthState='granted';
+  const main=document.querySelector('body > main');
+  if(main)main.inert=false;
 }
 function terminalAuthError(error){
   return [400,401,403].includes(Number(error?.status))||
@@ -85,10 +91,10 @@ function expireSession(account, message='로그인이 만료되었습니다.'){
   if(!account||account!==state.account)return;
   // Do not call remote logout on expiry: a failed remote request must not
   // delay cleanup, and local account changes must never be erased.
+  showAuthExpiry(message);
   try{state.client?.storage?.removeItem(state.client.key)}catch{}
   guestRestore();
   buttons(null);
-  showAuthExpiry(message);
 }
 // Recovery is opt-in: an explicit member-side false can be intentional.
 // Only offer evidence from the SAME browser's positive guest history to its owner.
@@ -394,8 +400,11 @@ function buttons(session){
   renderWorklinksHeaderAuth({
     root,session,
     onLogout:async()=>{
-      try{if(state.client)await state.client.logout()}catch{}
-      guestRestore();buttons(null);clearAuthExpiry();show('비회원 · 이 브라우저에만 저장');
+      // Lock immediately, before a potentially slow/rejected remote logout.
+      showAuthExpiry('로그아웃되었습니다.');
+      const client=state.client;
+      guestRestore();buttons(null);
+      try{if(client)await client.logout()}catch{}
     },
     onRecover:session?()=>{
       // Support-record recovery stays within the support workspace, not the header.
@@ -440,16 +449,20 @@ async function loadAuthConfig(){
 async function bootstrap(){
   let config;
   try{config=await loadAuthConfig()}
-  catch{show('비회원 · 브라우저 저장 (AuthHub 인증 설정 연결 실패)');return}
+  catch{setAuthGate('error','로그인 서버 연결을 확인할 수 없습니다.');return}
   state.project=config.project||'';
-  if(!config.enabled){show('비회원 · 브라우저 저장 (AuthHub 프로젝트 등록 대기)');return}
+  if(!config.enabled){setAuthGate('error','로그인 설정을 확인할 수 없습니다.');return}
   state.client=new AuthHubClient({apiBase:config.authApi,project:state.project,environment:'production'});
   if(document.body?.dataset.worklinksAuthCallback==='true'){
     try{
       const result=await state.client.consumeOAuthCallback(location.href);
       if(result?.pendingApproval)throw Error('가입 승인 대기');
       if(!result)throw Error('인증 코드 없음');
-      location.replace('/startup-support/');
+      const previous=sessionStorage.getItem('worklinks_auth_return_url')||'/startup-support/';
+      sessionStorage.removeItem('worklinks_auth_return_url');
+      const destination=previous.startsWith('/startup-support/')&&!previous.includes('auth-callback.html')
+        ?previous:'/startup-support/';
+      location.replace(destination);
     }catch(error){
       const target=$('worklinks-callback-status');if(target)target.textContent='인증 완료 실패: '+String(error.message||error);
     }
@@ -459,9 +472,9 @@ async function bootstrap(){
     const previouslySignedIn=Boolean(state.client.session()?.accessToken);
     const session=await validSession(state.client);
     if(!session){
-      guestRestore();buttons(null);
       if(previouslySignedIn)showAuthExpiry();
-      else{clearAuthExpiry();show('비회원 · 이 브라우저에만 저장')}
+      else setAuthGate('login','로그인이 필요합니다.');
+      guestRestore();buttons(null);
       return;
     }
     clearAuthExpiry();
@@ -472,7 +485,8 @@ async function bootstrap(){
     await reconcileServer();
     buttons(session);
   }catch(error){
-    guestRestore();buttons(null);show('비회원 · 브라우저 저장 (AuthHub 확인 지연)');
+    setAuthGate('error','로그인 상태를 확인할 수 없습니다.');
+    publishPartnerAccess(false);buttons(null);
   }
 }
 window.addEventListener('online',()=>{if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}});
@@ -494,12 +508,26 @@ window.addEventListener('focus',()=>{
   }).catch(()=>{
     // A transient connection failure is NOT a logout. Access stays fail-closed
     // until a successful verification, while local account records are retained.
-    if(identity===state.account)publishPartnerAccess(false);
+    if(identity===state.account){
+      publishPartnerAccess(false);
+      setAuthGate('error','로그인 연결을 확인할 수 없습니다.');
+    }
   });
 });
 window.addEventListener('storage',event=>{
-  if(state.client&&event.key===state.client.key&&!event.newValue&&state.account)
+  if(!state.client||event.key!==state.client.key)return;
+  if(!event.newValue&&state.account)
     expireSession(state.account,'다른 탭에서 로그아웃되었습니다.');
+  else if(event.newValue&&document.documentElement.dataset.worklinksAuthState==='locked')
+    location.reload();
 });
 if(document.getElementById('worklinks-auth-header'))buttons(null);
-bootstrap().catch(error=>{console.warn('WorkLinks AuthHub bootstrap',error);show('브라우저 저장 유지 · 인증 서버 확인 필요')});
+if($('worklinks-auth-gate-login')){
+  $('worklinks-auth-gate-login').addEventListener('click',()=>{
+    sessionStorage.setItem('worklinks_auth_return_url',location.pathname+location.search+location.hash);
+  });
+}
+bootstrap().catch(error=>{
+  console.warn('WorkLinks AuthHub bootstrap',error);
+  setAuthGate('error','로그인 상태를 확인할 수 없습니다.');
+});
