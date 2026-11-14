@@ -791,7 +791,114 @@ def invalid_file_reason(item):
     return 'unrecognized_file_error'
 
 
-def download(url):
+
+class DownloadPrefetch:
+    """Separate bounded attachment downloader for four independent scan threads.
+
+    At most eight file GETs run at once. A limited two-file lookahead per
+    notice bounds memory while download and text extraction overlap. The
+    official-source ledger retains verified compressed bytes after parsing.
+    """
+
+    def __init__(self,max_workers=8):
+        self.workers=max(1,min(8,int(max_workers)))
+        self.executor=ThreadPoolExecutor(max_workers=self.workers,
+                                         thread_name_prefix='rfp-download')
+        self.lock=threading.Lock()
+        self.pace_lock=threading.Lock()
+        self.next_start=0.0
+        self.inflight={}
+        self.submitted=0
+        self.coalesced=0
+        self.network_attempts=0
+
+    def __enter__(self):return self
+
+    def __exit__(self,*exc):
+        self.executor.shutdown(wait=True)
+
+    def acquire(self):
+        """Limit starts to <=4 official file requests/s even with eight threads."""
+        with self.pace_lock:
+            now=time.monotonic()
+            start=max(now,self.next_start)
+            self.next_start=start+0.25
+            self.network_attempts+=1
+        delay=start-now
+        if delay>0:time.sleep(delay)
+
+    def submit(self,notice_key,closes_on,url):
+        with self.lock:
+            ongoing=self.inflight.get(url)
+            if ongoing is not None and not ongoing.done():
+                self.coalesced+=1
+                return ongoing
+            future=self.executor.submit(
+                _download_for_notice,notice_key,closes_on,url,self)
+            self.inflight[url]=future
+            self.submitted+=1
+            return future
+
+    def release(self,url,future):
+        with self.lock:
+            if self.inflight.get(url) is future and future.done():
+                del self.inflight[url]
+
+    def stats(self):
+        with self.lock:
+            return {'workers':self.workers,'submitted':self.submitted,
+                    'coalesced':self.coalesced,
+                    'networkAttempts':self.network_attempts}
+
+
+def _download_for_notice(notice_key,closes_on,url,prefetch):
+    _NOTICE_CONTEXT.notice_key=notice_key
+    _NOTICE_CONTEXT.closes_on=closes_on
+    started=time.perf_counter()
+    try:
+        raw=download(url,rate_gate=prefetch)
+        return raw,time.perf_counter()-started
+    finally:
+        _NOTICE_CONTEXT.notice_key=None
+        _NOTICE_CONTEXT.closes_on=''
+
+
+def _eligible_prefetch_positions(manifest,processing_order,reusable):
+    """Never prefetch a possible same-stem HWP before checking its PDF.
+
+    A failed PDF's HWP is downloaded on demand through the SAME pool.
+    Already-successful staffing parses and deferred OCR are never fetched.
+    """
+    pdf_stems={
+        _document_stem(str(item.get('name') or ''))
+        for item in manifest
+        if isinstance(item,dict) and
+           str(item.get('name') or '').lower().endswith('.pdf') and
+           legal_file(item) is not None
+    }
+    result=[]
+    for position in processing_order:
+        item=manifest[position]
+        public=legal_file(item)
+        if not public:continue
+        name,url=public
+        if (name.lower().endswith(('.hwp','.hwpx')) and
+                _document_stem(name) in pdf_stems):
+            continue
+        retained=reusable.get((name,url))
+        if (retained and
+                int(retained.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+                int(retained.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
+                retained.get('staffingRoleScanTruncated') is not True):
+            continue
+        if (os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1' and
+                name.lower().endswith(('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp'))):
+            continue
+        result.append(position)
+    return result
+
+
+def download(url,*,rate_gate=None):
     # Persist small official binaries even if text extraction later fails.
     # A parser-only retry can then reuse the exact bytes without an HTTP call.
     ledger=active_rfp_ledger()
@@ -807,6 +914,7 @@ def download(url):
             return reusable
     request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
     for attempt in range(3):
+        if rate_gate is not None:rate_gate.acquire()
         try:
             with OPENER.open(request,timeout=35) as r:
                 status=getattr(r,'status',200)
@@ -1663,8 +1771,8 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
         raise RuntimeError('RFP_UPSTREAM_METADATA_UNAVAILABLE_PREFLIGHT')
     return staged
 
-def process(no,ordn,metadata=None,previous=None):
-    phase={'downloadSeconds':0.0,'extractSeconds':0.0,
+def process(no,ordn,metadata=None,previous=None,prefetch=None):
+    phase={'downloadSeconds':0.0,'downloadQueueWaitSeconds':0.0,'extractSeconds':0.0,
            'analysisSeconds':0.0,'textCacheHits':0,'filesProcessed':0,
            'deferredImageFiles':0}
     data=(metadata if metadata is not None else fetch_json(
@@ -1707,6 +1815,19 @@ def process(no,ordn,metadata=None,previous=None):
     processing_order=sorted(range(len(primary_manifest)),
         key=lambda i: 0 if str(primary_manifest[i].get('name') or '').lower().endswith('.pdf') else 1)
     saved_slots={}
+    queued={}
+    prefetch_positions=iter(_eligible_prefetch_positions(
+        primary_manifest,processing_order,reusable)) if prefetch is not None else iter(())
+    notice_key=no+':'+ordn
+    close_date=_NOTICE_DEADLINES.get(notice_key,'')
+    def refill():
+        if prefetch is None:return
+        while len(queued)<2:
+            try:position=next(prefetch_positions)
+            except StopIteration:break
+            name,url=legal_file(primary_manifest[position])
+            queued[position]=prefetch.submit(notice_key,close_date,url)
+    refill()
     for position in processing_order:
         item=primary_manifest[position]
         public=legal_file(item)
@@ -1749,15 +1870,37 @@ def process(no,ordn,metadata=None,previous=None):
             # Measure file work separately from page retrieval, metadata and
             # whole-index JSON publication; worker threads may overlap.
             phase['filesProcessed']+=1
-            timer=time.perf_counter()
-            try:
-                _NOTICE_CONTEXT.notice_key=no+':'+ordn
-                _NOTICE_CONTEXT.closes_on=_NOTICE_DEADLINES.get(no+':'+ordn,'')
-                raw=download(url)
-            finally:
-                _NOTICE_CONTEXT.notice_key=None
-                _NOTICE_CONTEXT.closes_on=''
-                phase['downloadSeconds']+=time.perf_counter()-timer
+            if prefetch is not None:
+                future=queued.pop(position,None)
+                if future is None:
+                    # Fallback HWP after an unsuccessful same-stem PDF remains
+                    # in the bounded downloader, never in the scan thread.
+                    future=prefetch.submit(notice_key,close_date,url)
+                waited=time.perf_counter()
+                try:
+                    raw,download_seconds=future.result()
+                finally:
+                    prefetch.release(url,future)
+                    phase['downloadQueueWaitSeconds']+=time.perf_counter()-waited
+                phase['downloadSeconds']+=download_seconds
+                # Start fetching the next official file before parsing bytes.
+                refill()
+                # A coalesced source may belong to several notices: retain
+                # every notice's deadline, not just the first downloader.
+                ledger=active_rfp_ledger()
+                if ledger is not None:
+                    ledger.link_attachment(cache_key('official_attachment',url),
+                                           notice_key,close_date)
+            else:
+                timer=time.perf_counter()
+                try:
+                    _NOTICE_CONTEXT.notice_key=notice_key
+                    _NOTICE_CONTEXT.closes_on=close_date
+                    raw=download(url)
+                finally:
+                    _NOTICE_CONTEXT.notice_key=None
+                    _NOTICE_CONTEXT.closes_on=''
+                    phase['downloadSeconds']+=time.perf_counter()-timer
             timer=time.perf_counter()
             try:
                 extracted,source_evidence,text_cache_hit=extract_cached_text(name,raw)
@@ -2216,16 +2359,20 @@ def main():
                     continue
             except (ValueError,TypeError):pass
         uncached.append((no,ordn))
-    # Official requests are bounded; four independent notices run concurrently
-    # so one unavailable PDF does not starve the entire 16-minute job.
+    # Scan concurrency and download concurrency are independent: four
+    # notice parsers consume completed raw bytes from eight download workers.
     preloaded=preflight_rfp_metadata(uncached)
     stage_done('preflight_metadata')
-    file_phase_totals={'downloadSeconds':0.0,'extractSeconds':0.0,
-                       'analysisSeconds':0.0,'textCacheHits':0,'filesProcessed':0,
-                       'deferredImageFiles':0}
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    file_phase_totals={'downloadSeconds':0.0,'downloadQueueWaitSeconds':0.0,
+                       'extractSeconds':0.0,'analysisSeconds':0.0,
+                       'textCacheHits':0,'filesProcessed':0,'deferredImageFiles':0}
+    download_workers=max(1,min(8,int(os.environ.get(
+        'WORKLINKS_RFP_DOWNLOAD_CONCURRENCY','8'))))
+    with DownloadPrefetch(max_workers=download_workers) as prefetch:
+      with ThreadPoolExecutor(max_workers=4) as pool:
         tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn)),
-                           old.get(no+':'+ordn) or prior_index.get(no+':'+ordn)):
+                           old.get(no+':'+ordn) or prior_index.get(no+':'+ordn),
+                           prefetch):
                (no,ordn) for no,ordn in uncached}
         for future in as_completed(tasks):
             no,ordn=tasks[future]
@@ -2285,6 +2432,8 @@ def main():
                     print('RFP_NOTICE_CHECKPOINT_FAILED',key,
                           type(checkpoint_error).__name__,flush=True)
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
+      prefetch_stats=prefetch.stats()
+    print('RFP_DOWNLOAD_PIPELINE',json.dumps(prefetch_stats,separators=(',',':')),flush=True)
     stage_done('process_notices')
     if not results:raise SystemExit('NO_RFP_RESULT')
     details,omitted=bounded_detail_snapshot(results)
