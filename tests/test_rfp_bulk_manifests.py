@@ -221,4 +221,61 @@ with tempfile.TemporaryDirectory() as root:
     assert len(official)==3,official
     print('RFP_BULK_EXCEPTION_BOUNDED_THREE_OPERATIONS=PASS',flush=True)
 
+# Live provider example: 151 total records, but numOfRows=1000 yields only
+# 10 real records per page. Complete all 16 real pages, and resume after page 1.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    db=root/'bids.sqlite3'
+    bid='R26BK00010020'
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
+        con.execute('INSERT INTO bid_notices VALUES (?,?,?,1)',
+                    (bid,'000',json.dumps({'posted':new_day+'T10:00:00'})))
+    q=RfpDualQueue(root/'queue.sqlite3')
+    q.enqueue([(bid,'000','2099-12-31')],'r1')
+    seen=[]
+    def clamped_fetch(url):
+        u=urllib.parse.urlparse(url)
+        assert u.path=='/api/g2b/rfp-attachment-batch',u.path
+        args=dict(urllib.parse.parse_qsl(u.query))
+        assert args['rows']=='1000',args
+        source=args['source']
+        page=int(args['page'])
+        seen.append((source,page))
+        if source=='ordinary':
+            total=151
+            count=min(10,max(0,total-(page-1)*10))
+            items=[{'bidNo':bid if page==16 else 'R26BK09999999',
+                    'order':'000','name':'rfp.pdf',
+                    'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/'+str(page)+'.pdf',
+                    'source':'notice_attachment_api'} for _ in range(count)]
+        elif source=='detail':
+            total=1
+            count=1
+            items=[{'bidNo':bid,'order':'000','presence':True,'source':'notice_detail'}]
+        else:
+            total=0
+            count=0
+            items=[]
+        return {'ok':True,'source':source,'page':page,'totalCount':total,
+                'rawCount':count,'items':items}
+    planner=bulk.BulkManifestPlanner(q,db,clamped_fetch,NoDelay(),
+                                     allow_exceptions=False)
+    original_pass=bulk.MAX_FETCH_PER_PASS
+    try:
+        bulk.MAX_FETCH_PER_PASS=1
+        first=planner.populate_one_day()
+        assert first.get('partial') and first['calls']==1,first
+        bulk.MAX_FETCH_PER_PASS=18
+        final=planner.populate_one_day()
+        assert final['new']==1,final
+        assert [page for src,page in seen if src=='ordinary']==list(range(1,17)),seen
+        assert len(seen)==18,seen
+        assert q.bulk_manifest(bid+':000')['attachments']['count']==1
+        assert planner._cached_pages(new_day,'ordinary') is not None
+        print('RFP_BULK_LIVE_PROVIDER_151_ROWS_10_PER_PAGE_RESUME=PASS',
+              {'dateBatchCalls':len(seen),'ordinaryPages':16},flush=True)
+    finally:
+        bulk.MAX_FETCH_PER_PASS=original_pass
+
 print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
