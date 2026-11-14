@@ -219,8 +219,11 @@ with sync_playwright() as p:
             const a = document.querySelector('#jobsView .job-amount').getBoundingClientRect();
             const h = document.querySelector('#jobsView .job-headline').getBoundingClientRect();
             return {
-                titleLeft:t.left,titleRight:t.right,titleTop:t.top,titleBottom:t.bottom,\n                titleHeight:t.height,titleFont:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-headline h3')).fontSize),\n                titleLineHeight:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-headline h3')).lineHeight),
-                priceLeft:a.left,priceRight:a.right,priceTop:a.top,priceBottom:a.bottom,\n                priceHeight:a.height,priceFont:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-amount')).fontSize),
+                titleLeft:t.left,titleRight:t.right,titleTop:t.top,titleBottom:t.bottom,
+                titleHeight:t.height,titleFont:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-headline h3')).fontSize),
+                titleLineHeight:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-headline h3')).lineHeight),
+                priceLeft:a.left,priceRight:a.right,priceTop:a.top,priceBottom:a.bottom,
+                priceHeight:a.height,priceFont:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-amount')).fontSize),
                 headlineRight:h.right,
                 overflow:document.documentElement.scrollWidth>innerWidth+1
             };
@@ -231,7 +234,11 @@ with sync_playwright() as p:
             assert rect["priceTop"]>=rect["titleBottom"]-1,(width,rect)
         else:
             assert rect["priceLeft"]>=rect["titleRight"]-1,(width,rect)
-            assert rect["priceTop"]<rect["titleBottom"],(width,rect)\n            assert 1.8<=rect["titleHeight"]/rect["titleLineHeight"]<=2.1,(width,rect)\n            assert rect["priceFont"]>rect["titleFont"]*2,(width,rect)\n            assert abs(rect["titleTop"]-rect["priceTop"])<=4,(width,rect)\n            assert abs(rect["titleBottom"]-rect["priceBottom"])<=4,(width,rect)
+            assert rect["priceTop"]<rect["titleBottom"],(width,rect)
+            assert 1.8<=rect["titleHeight"]/rect["titleLineHeight"]<=2.1,(width,rect)
+            assert rect["priceFont"]>rect["titleFont"]*2,(width,rect)
+            assert abs(rect["titleTop"]-rect["priceTop"])<=4,(width,rect)
+            assert abs(rect["titleBottom"]-rect["priceBottom"])<=4,(width,rect)
         print("CHANGCOM_COMPACT_PRICE_LAYOUT_PASS",width,rect,flush=True)
         page.close()
     browser.close()
