@@ -94,7 +94,9 @@ jobs:
                       ver_hist['staffingFactScanVersion'][str(f.get('staffingFactScanVersion') or 'unrecorded')]+=1
           print('RFP_AUDIT_VERSION_DISTRIBUTION',json.dumps({k:dict(v.most_common()) for k,v in ver_hist.items()},ensure_ascii=False),flush=True)
           migrated=('R26BK01756453:000','R26BK01805618:000','R26BK01808969:000','R26BK01806198:000',
-                    'R26BK01811303:000','R26BK01747488:000','R26BK01757043:000','R26BK01750330:000')
+                    'R26BK01811303:000','R26BK01747488:000','R26BK01757043:000','R26BK01750330:000',
+                    'R26BK01757706:000','R26BK01759044:000','R26BK01758415:000','R26BK01754477:001',
+                    'R26BK01759843:000','R26BK01759046:000','R26BK01760442:000','R26BK01761785:000')
           migration_results=[]
           for key in migrated:
               r=idx.get(key) or {}
@@ -107,7 +109,7 @@ jobs:
                   'unreadableFiles':r.get('unreadableDocumentCount'),
                   'roleVersions':sorted(set(int(f.get('staffingRoleScanVersion') or 0)
                       for f in (r.get('files') or []) if isinstance(f,dict) and f.get('readable') is True))})
-          print('RFP_AUDIT_MIGRATED_8',json.dumps(migration_results,ensure_ascii=False),flush=True)
+          print('RFP_AUDIT_MIGRATED_16',json.dumps(migration_results,ensure_ascii=False),flush=True)
           for key in ('R26BK01797739:000','R26BK01813685:000','R26BK01761455:000','R26BK01786583:000'):
               v=idx.get(key) or {}
               cross_detail.append({'key':key,'status':v.get('status'),'classification':v.get('classificationVersion'),
