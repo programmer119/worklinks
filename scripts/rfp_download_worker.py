@@ -294,6 +294,7 @@ def run_download_forever(queue,halt):
     halted_until=0.0
     last_report=time.monotonic()
     last_watchdog=time.monotonic()
+    subprocess_started_epoch=time.time()
     started=0
     downloaded=0
     live.worker('download','running')
@@ -331,7 +332,8 @@ def run_download_forever(queue,halt):
             if inflight and time.monotonic()-last_watchdog>=5:
                 last_watchdog=time.monotonic()
                 claimed_keys={claim[0] for claim in inflight.values()}
-                stuck=live.stalled_downloads(claimed_keys,idle_seconds=180)
+                stuck=live.stalled_downloads(claimed_keys,idle_seconds=180,
+                                             min_updated_epoch=subprocess_started_epoch)
                 if stuck:
                     item=stuck[0]
                     reason='file_no_byte_progress_'+str(item['idleSeconds'])+'s'
@@ -376,6 +378,7 @@ def run_forever():
     os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
     queue=RfpDualQueue(QUEUE)
     queue.reset_stale()
+    live.recover_interrupted_downloads()
     planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
                                   reader.fetch_json,META_PACE,
                                   allow_exceptions=True)
