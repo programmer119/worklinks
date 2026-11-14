@@ -143,6 +143,13 @@ def download_one(queue,claim,halt):
         if docs.get('ok') is not True or docs.get('complete') is not True:
             raise ValueError('official_attachment_manifest_not_confirmed:'+errors[:80])
         manifest=(docs.get('items') or [])[:reader.MAX_DOCUMENTS]
+        if not manifest:
+            # A verified empty official list is a finished no-file notice,
+            # not a scan failure and never eligible for scanner retry.
+            queue.no_attachments(key,meta)
+            live.record('download',key,phase='첨부파일 없음 · 정상 종료',
+                        status='done',files_done=0,files_total=0)
+            return True
         # No scanner or extractor is called anywhere in this process.
         seen=set()
         urls=[]
@@ -150,10 +157,10 @@ def download_one(queue,claim,halt):
             approved=reader.legal_file(item)
             if not approved:continue
             name,url=approved
-            if os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1' and name.lower().endswith(
-                ('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')):
-                continue
             if url not in seen:seen.add(url);urls.append(url)
+        if not urls:
+            raise ValueError('nonempty_official_manifest_has_no_downloadable_url')
+        verified_files=[]
         live.record('download',key,phase='파일 다운로드',status='working',files_total=len(urls))
         reader._NOTICE_CONTEXT.notice_key=key
         reader._NOTICE_CONTEXT.closes_on=closes
@@ -190,6 +197,9 @@ def download_one(queue,claim,halt):
             stored=ledger.get_bytes(cache_key('official_attachment',url))
             if stored is None or hashlib.sha256(data).digest()!=hashlib.sha256(stored).digest():
                 raise RuntimeError('original_archive_not_verified_or_storage_quota')
+            verified_files.append({'name':file_name,'url':url,
+                                   'sha256':hashlib.sha256(stored).hexdigest(),
+                                   'bytes':len(stored)})
             live.record('download',key,file_key=file_key,file_name=file_name,
                         phase='저장 검증 완료',status='done',
                         bytes_done=len(data),bytes_total=len(data),
@@ -199,6 +209,7 @@ def download_one(queue,claim,halt):
             del data,stored
             live.record('download',key,phase='파일 다운로드',status='working',
                         files_done=index+1,files_total=len(urls))
+        meta=dict(meta,downloadVerifiedFiles=verified_files)
         queue.downloaded(key,meta,len(urls),len(urls))
         live.record('download',key,phase='다운로드 완료',status='done',files_done=len(urls),files_total=len(urls))
         return True
@@ -378,6 +389,8 @@ def run_forever():
     os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
     queue=RfpDualQueue(QUEUE)
     queue.reset_stale()
+    migration=queue.reconcile_legacy_ready()
+    print('RFP_VERIFIED_RECEIPT_MIGRATION',json.dumps(migration,separators=(',',':')),flush=True)
     live.recover_interrupted_downloads()
     planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
                                   reader.fetch_json,META_PACE,
