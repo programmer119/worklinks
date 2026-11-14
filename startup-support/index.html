@@ -4529,7 +4529,7 @@ function jobRequirementBadges(x){
      htmlEscape(String(r.count))+'명'+(r.countKind==='minimum'?' 이상':'')+'</strong></div>').join(''):
    siteRequirement?
     '<div class="job-req-onsite-person"><strong>'+htmlEscape(String(siteRequirement.label||'상주 근무조건'))+'</strong></div>':
-   '<div class="job-req-onsite-note">'+htmlEscape(status)+'</div>';
+   '<div class="job-req-onsite-note">'+htmlEscape(siteInfo?.status?.reason||status)+'</div>';
   const pv=evidence.meta.provenance;
   const versionSummary=pv?
    '판독 버전: RFP '+(pv.classificationVersion?'v'+pv.classificationVersion:'미기록')+
