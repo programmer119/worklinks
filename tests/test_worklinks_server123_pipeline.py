@@ -2,6 +2,7 @@
 """No-network tests for server123 scheduler durability and publication."""
 import gzip
 import os
+import sys
 from unittest.mock import patch
 import importlib.util
 import json
@@ -206,6 +207,7 @@ with tempfile.TemporaryDirectory() as temporary:
     # independent scan lane. A failed batch must not silently complete notice.
     (m.SCRIPTS/'rfp_dual_queue.py').write_text(
         (source.parents[1]/'scripts'/'rfp_dual_queue.py').read_text())
+    sys.path.insert(0,str(m.SCRIPTS))
     from rfp_dual_queue import RfpDualQueue
     dual=RfpDualQueue(m.DATA/'rfp-dual-queue.sqlite3')
     dual.enqueue([('R26BK01808709','000','2099-12-31')],'test-reader-1')
