@@ -1,0 +1,46 @@
+name: WorkLinks independent download and scan queue regression
+on:
+  push:
+    branches: [feat/rfp-independent-download-scan-queues-20261114]
+    paths:
+      - 'scripts/rfp_dual_queue.py'
+      - 'scripts/rfp_download_worker.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'server/g2b-proxy.py'
+      - 'server/deploy-worklinks-server123-pipeline.sh'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_dual_queue.py'
+      - 'tests/test_worklinks_server123_pipeline.py'
+      - 'tests/test_rfp_rescan_ui.py'
+      - '.github/workflows/worklinks-rfp-dual-queue-ci-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify independent 1000-notice download queue and original scan regressions
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile scripts/rfp_dual_queue.py scripts/rfp_download_worker.py scripts/refresh_worklinks_rfp.py server/worklinks-server123-pipeline.py server/g2b-proxy.py
+          bash -n server/deploy-worklinks-server123-pipeline.sh
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_rfp_download_prefetch.py
+          python3 tests/test_rfp_speed_regression.py
+          python3 tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_archive_retention.py
+          python3 tests/test_rfp_rescan_progress.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          python3 - <<'PY'
+          import pathlib
+          html=pathlib.Path('startup-support/index.html').read_text()
+          assert "['원본 다운로드',laneData.download],['문서 스캔',laneData.scan]" in html
+          assert 'rfpRescanMiniFill' in html
+          print('RFP_DUAL_UI_TWO_LANES_OUTER_PRESERVED=PASS')
+          PY
+          echo RFP_DUAL_LANE_CI=PASS
