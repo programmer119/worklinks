@@ -22,7 +22,7 @@ def previous():
       files=[dict(name='request.pdf',readable=True,sourceTextScanComplete=True,
                   sourceSha256='a'*64,staffingRoleScanVersion=versions[2],
                   staffingFactScanVersion=versions[3])])
-saved={r['bidNo']+':000':previous() for r in rows if r['bidNo']!='R26BK00000007'}
+saved={r['bidNo']+':000':previous() for r in rows if r['bidNo'] not in ('R26BK00000007','R26BK00000008')}
 saved['R26BK00000001:000']['classificationVersion']=versions[0]-1
 saved['R26BK00000002:000']['files'][0]['staffingFactScanVersion']=versions[3]-1
 saved['R26BK00000003:000']['classificationVersion']=versions[0]-1
