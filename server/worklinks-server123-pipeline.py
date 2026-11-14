@@ -344,7 +344,7 @@ def run_once(kind, runner=None, _single=False):
                 records=json.loads(line.split(' ',1)[1])
                 for record in records:
                     key=str(record.get('key') or '')
-                    if re.fullmatch(r'(?:R\\d{2}BK\\d{8}|\\d{11}):\\d{3}',key):
+                    if re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',key):
                         queue.scan_finished(key,bool(record.get('ok')),
                                             'scan_unverified_or_incomplete')
         log('PIPELINE_PUBLISHED', kind,
