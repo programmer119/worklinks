@@ -27,6 +27,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
+RFP_DRAIN_ALGORITHM_VERSION = 'continuous-open-sw-and-extracted-text-cache-v1-20261114'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
@@ -430,6 +431,15 @@ def main():
             state['rfpUpgrade']={'status':'parser_versions_upgraded','attemptEpoch':0}
             state['rfp']={'status':'parser_versions_upgraded','attemptEpoch':0}
             log('PIPELINE_PARSER_UPGRADE_QUEUE_CREATED',current_versions)
+        # A source-only queue change does not alter parser field versions.
+        # Discard an old "no eligible" cooldown on this deploy so the
+        # newly supported first-time SW backlog starts draining immediately.
+        if state.get('rfpDrainAlgorithmVersion')!=RFP_DRAIN_ALGORITHM_VERSION:
+            state['rfpDrainAlgorithmVersion']=RFP_DRAIN_ALGORITHM_VERSION
+            state['rfpUpgradeActive']=True
+            state['rfpUpgrade']={'status':'drain_algorithm_upgraded','attemptEpoch':0,
+                                 'retryAfterEpoch':0,'failureStreak':0}
+            log('PIPELINE_RFP_DRAIN_ALGORITHM_ACTIVATED',RFP_DRAIN_ALGORITHM_VERSION)
         state['rfpUpgradePeriodSeconds']=RFP_UPGRADE_PERIOD
         state['rfpRegularPeriodSeconds']=RFP_PERIOD
         # A "started" entry from disk can only belong to a process that
