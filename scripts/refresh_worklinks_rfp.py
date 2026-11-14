@@ -1920,6 +1920,10 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                 'alternatePdfEvidenceMode':'same_basename_not_proven_identical'}
             continue
         retained=reusable.get((name,url))
+        if dual_scan and retained and retained.get('sourceSha256')!=item.get('sourceSha256'):
+            # Same source URL is not sufficient: reparse if its verified
+            # downloaded content identity changed since the older scan.
+            retained=None
         # Qualification text can be reused ONLY if its separate staffing-table
         # pass was completed as well. Older read-only qualification scans must
         # reparse this official file (cached bytes if present, otherwise download).
