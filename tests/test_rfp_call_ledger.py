@@ -45,10 +45,20 @@ with tempfile.TemporaryDirectory() as tmp:
     class Response:
         status=200
         headers={}
-        def __init__(self,body):self.body=body
+        def __init__(self,body):
+            self.body=body
+            self.cursor=0
         def __enter__(self):return self
         def __exit__(self,*args):return False
-        def read(self,n=None):return self.body
+        def read(self,n=None):
+            # A streaming response must deliver each byte once, obeying n.
+            # Repeating the whole payload on every read() falsely simulates
+            # an infinite official file and trips the real 24MB safety cap.
+            if n is None or n<0:
+                n=len(self.body)-self.cursor
+            chunk=self.body[self.cursor:self.cursor+n]
+            self.cursor+=len(chunk)
+            return chunk
     physically_called=[]
     def official_fetch(req,timeout=0):
         physically_called.append(req.full_url)
