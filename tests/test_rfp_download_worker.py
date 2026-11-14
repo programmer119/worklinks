@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory() as root:
     def fake_get(url):
         assert 'bid-evidence?' in url
         return meta
-    def fake_download(url,*,rate_gate=None,progress=None,on_retry=None):
+    def fake_download(url,ledger,notice_key,closes_on,*,rate_gate=None,progress=None,on_retry=None):
         nonlocal_var=None
         global active,max_parallel,downloaded
         with lock:
@@ -43,10 +43,11 @@ with tempfile.TemporaryDirectory() as root:
         time.sleep(.04)
         if progress:progress(11,11,True)
         with lock:active-=1
-        return b'archive raw'
+        return {'sha256':__import__('hashlib').sha256(b'archive raw').hexdigest(),
+                'bytes':len(b'archive raw')}
     halt=threading.Event()
     with patch.object(worker.reader,'fetch_json',side_effect=fake_get),\
-         patch.object(worker.reader,'download',side_effect=fake_download),\
+         patch.object(worker,'stream_original_to_verified_ledger',side_effect=fake_download),\
          patch.object(worker.reader,'active_rfp_ledger',return_value=FakeLedger()),\
          patch.object(worker.META_PACE,'acquire',return_value=None):
         with ThreadPoolExecutor(max_workers=8) as pool:
@@ -73,7 +74,7 @@ with tempfile.TemporaryDirectory() as root:
     empty={'attachments':{'ok':True,'complete':True,'items':[]},
            'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
     with patch.object(worker.reader,'fetch_json',return_value=empty),\
-         patch.object(worker.reader,'download',side_effect=AssertionError('must not download')),\
+         patch.object(worker,'stream_original_to_verified_ledger',side_effect=AssertionError('must not download')),\
          patch.object(worker.META_PACE,'acquire',return_value=None):
         chosen=queue.claim_download()
         assert chosen[0]==empty_key,chosen
