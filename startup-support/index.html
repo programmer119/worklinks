@@ -5891,7 +5891,8 @@ function setWorkspaceView(view){
    },0)});
   }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
-  if(partnerMode&&jobsInitialDataReady)loadG2bFilterInventory();
+  if(partnerMode&&typeof jobsInitialDataReady!=='undefined'&&jobsInitialDataReady&&
+    typeof loadG2bFilterInventory==='function')loadG2bFilterInventory();
  }
  if(changed){
   const url=new URL(window.location.href);
