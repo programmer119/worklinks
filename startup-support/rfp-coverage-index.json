@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-11-14T02:30:53.019387+00:00",
+  "generatedAt": "2026-11-14T02:46:30.500045+00:00",
   "scope": "누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)",
   "reviewComplete": false,
   "scannedNoticeCount": 3280,
@@ -86496,29 +86496,61 @@
     },
     "R26BK01747488:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
+      "partialRetryCount": 0,
       "reviewComplete": false,
-      "attachmentManifestCount": 3,
-      "readableDocumentCount": 2,
+      "attachmentManifestCount": 4,
+      "manifestComplete": true,
+      "readableDocumentCount": 3,
       "unreadableDocumentCount": 1,
       "files": [
         {
           "name": "2027년 광주교육정보시스템유지관리 및 보안관제 용역 제안요청서(최종).hwpx",
           "readable": true,
           "sourceSha256": "9853467947a3764947e55349f3eabda46129abcc0f6ee9b96c9975f75fbd0d42",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 391
+          "clauseCandidateCount": 454
         },
         {
           "name": "공고서_지방_공동_하도급_발표.hwp",
           "readable": false,
           "sourceSha256": "",
-          "errorCategory": "no_searchable_text",
+          "alternatePdfEvidence": "공고서_지방_공동_하도급_발표.pdf",
+          "alternatePdfSourceSha256": "3dd91c875d0f845d1a10043cd40982549cfe33849887ef7f3b2a96a855479e7e",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
+          "extractionEvidence": {},
+          "errorCategory": "",
           "sourceTextScanComplete": false,
+          "staffingRoleScanVersion": 0,
+          "staffingFactScanVersion": 0,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         },
@@ -86526,16 +86558,69 @@
           "name": "공고서_지방_공동_하도급_발표.pdf",
           "readable": true,
           "sourceSha256": "3dd91c875d0f845d1a10043cd40982549cfe33849887ef7f3b2a96a855479e7e",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 12,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 448
+          "clauseCandidateCount": 529
+        },
+        {
+          "name": "2027년 광주교육정보시스템유지관리 및 보안관제 용역 제안요청서(최종).hwpx",
+          "readable": true,
+          "sourceSha256": "9853467947a3764947e55349f3eabda46129abcc0f6ee9b96c9975f75fbd0d42",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 454
         }
       ],
+      "staffingRoles": [],
+      "staffingFacts": [],
+      "staffingRoleScanComplete": true,
+      "manifestSignature": "6b1810b8b36d772a89a1262278a5df597b8d89ad9b6e2c4a7e0c9afbc6ffa63c",
+      "manifestCheckedAt": "2026-11-14T02:47:55.467978+00:00",
+      "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-24T05:53:07.558298+00:00",
-        "readableDocumentCount": 2,
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+        "readableDocumentCount": 3,
         "unreadableDocumentCount": 1,
         "manifestComplete": true,
         "reviewComplete": false,
@@ -86548,6 +86633,10 @@
           {
             "name": "공고서_지방_공동_하도급_발표.pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+          },
+          {
+            "name": "2027년 광주교육정보시스템유지관리 및 보안관제 용역 제안요청서(최종).hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058101&rfpOrd=000&rfpUntyAtchFileNo=12"
           }
         ],
         "clauseCandidates": {
@@ -86695,21 +86784,21 @@
           ],
           "staff_proof": [
             {
-              "text": "요구사항 고유번호MHR-002요구사항 분류사업수행 인력 요구사항요구사항 명칭유지관리(보안관제 포함) 상주 인력 권고사항요구사항상세설명정의유지관리(보안관제 포함) 상주 인력 권고사항세부내용① 상주인력은 2인 이상 상시 배치 운영 - ② 상주인력 자격 요건 구 분업무분야 및 투입인력중급기술자서버(1인 이상), 보안관제(1인 이상) -기술자등급은 한국소프트웨어산업협회에서 공표한 ‘S/W 기술자 임금실태조사 결과’ -한국소프트웨어산업협회 발행 경력증명서, 자격증명서, 건강보험자격득실확인",
+              "text": "나. 정보시스템 운영의 효율성, 생산성 향상을 지속적으로 관리할 수 있는 통합 유지관리 운영 체계 확보 - 유지관리의 효율성 및 신속한 대처를 위해 전문인력 상주 근무",
               "codes": [],
               "sourceFile": "2027년 광주교육정보시스템유지관리 및 보안관제 용역 제안요청서(최종).hwpx",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "금실태조사 결과’ -한국소프트웨어산업협회 발행 경력증명서, 자격증명서, 건강보험자격득실확인서, 기술 자격증 사본 등 경력 확인이 가능한 증빙자료를 제안서에 포함 - 보안관제 인력은 보안관제 전문기업 소속이어야 함(보안관제 전문기업 지정 등에 관한 공고 준용) - 휴일 및 야간 긴급상황 발생시 2시간 이내 응소하여야 함③ 발주기관은 전산장비 운영 중 품질 저하 현상이 발생하는 경우, 투입인력 교체 또는 품질제고를 위한 추가 인력 투입을 요구할 수 있으며, 사업자는 이에 응해야 함④",
+              "text": "- 유지관리의 효율성 및 신속한 대처를 위해 전문인력 상주 근무",
               "codes": [],
               "sourceFile": "2027년 광주교육정보시스템유지관리 및 보안관제 용역 제안요청서(최종).hwpx",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "② 상주인력 자격 요건 구 분업무분야 및 투입인력중급기술자서버(1인 이상), 보안관제(1인 이상)",
+              "text": "- 유지관리의 효율성 및 신속한 대처를 위해 전문인력 상주 근무 다. 전산장비 및 소프트웨어의 운영·유지관리를 위한 전문화된 활동 수행",
               "codes": [],
               "sourceFile": "2027년 광주교육정보시스템유지관리 및 보안관제 용역 제안요청서(최종).hwpx",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
@@ -86741,21 +86830,21 @@
           ],
           "registration_identity": [
             {
+              "text": "니 , 가급적 제출 마감일 전일까지 제안서 및 가격입찰서를 제출 완료 하시기 바랍니다 . 3. 입찰참가자격 ---------------------------------------------------------------------------------------------------------------------------------------- 아래의 입찰참가자격을 모두 갖춘 자 이어야 합니다 . ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마",
+              "codes": [],
+              "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "합니다 . ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스",
+              "codes": [],
+              "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 (G2B 시스 템 ) 에 아래의 사항을 모두 입찰참가자격으로 등록 한 자 - [ 소프트웨어사업자 ( 컴퓨터관련서비스사업 )(1468) 와 정보통신공사업 (0036)] 업종을 등록 한 업체 ○ 「 중소기업제품 구매촉진 및 판로지원에 관한 법률 」 제 9 조 및 같은 법 시행령 제 10 조의 규정에 따라 직접생산확인증 명서 [ 정보시스템유지관리서비스 (8111189901)] 를 소지",
-              "codes": [],
-              "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "⑤ 기타서류 1 식 ( 해당사항 있을 경우 ) ※ 기타 제안서 제출 관련 사항 ( 작성규격 및 작성지침 , 제출서류 , 발표자료 등 ) 은 제안요청서를 참조하시기 바랍니다 . - 입찰참가자격 확인을 위한 제출서류 : ① 소프트웨어사업자 일반현황 관리 확인서 ( 구 ( 舊 ) 소프트웨어사업자 신고확인서 ) 1 부 ② 경쟁입찰참가자격등록증 ( 시스템에서 확인 가능 )",
-              "codes": [],
-              "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "① 소프트웨어사업자 일반현황 관리 확인서 ( 구 ( 舊 ) 소프트웨어사업자 신고확인서 ) 1 부 ② 경쟁입찰참가자격등록증 ( 시스템에서 확인 가능 )",
               "codes": [],
               "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
@@ -86833,13 +86922,6 @@
           ],
           "bid_security": [
             {
-              "text": "588-0800, FAX: 042-472-2297) 로 문의하시기 바랍니다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다 . 공동수급체의",
-              "codes": [],
-              "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
               "text": "로 문의하시기 바랍니다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다 . 공동수급체의",
               "codes": [],
               "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
@@ -86847,7 +86929,14 @@
               "interpretation": "manual_review_required"
             },
             {
-              "text": "○ ( 입 찰 참가 자 격 등 록 ) 조 달 청 경 쟁 입 찰 참가 자 격 등 록 은 수 시 로 가 능 하 며 , 입 찰 참 가 를 위 해서 는 전자 입 찰 서 제 출 마 감일 전 일 18:00 까 지 등 록 을 하 여 야 합 니다 . 등 록 절 차 와 나라 장 터 이 용안 내 는 정 부조 달 콜 센 터 ( ☎ 1588-0800, FAX: 042-472-2297) 로 문의하시기 바랍니다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시",
+              "text": "○ ( 입찰참가자격 등록 ) 조달청 경쟁입찰참가자격 등록은 수시로 가능하며 , 입찰참가를 위해서는 전자입찰서 제출마감일 전일 18:00 까지 등록을 하여야 합니다 . 등록절차와 나라장터 이용안내는 정부조달콜센터 ( ☎ 1588-0800, FAX: 042-472-2297) 로 문의하시기 바랍니다 . ○ ( 입찰보증금 납부 ) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다 . 공동수급체의 경우 대표사는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여",
+              "codes": [],
+              "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "랍니다 . 공동수급체의 경우 대표사는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야",
               "codes": [],
               "sourceFile": "공고서_지방_공동_하도급_발표.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01747488&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
@@ -86855,52 +86944,93 @@
             }
           ]
         }
-      },
-      "staffingRoleScanComplete": false
+      }
     },
     "R26BK01757043:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-24T05:53:07.558298+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
+      "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 6,
-      "readableDocumentCount": 6,
-      "unreadableDocumentCount": 0,
+      "manifestComplete": true,
+      "readableDocumentCount": 5,
+      "unreadableDocumentCount": 1,
       "files": [
         {
-          "name": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-          "readable": true,
-          "sourceSha256": "42fc82e7ff042d042a7e3c6f7cb4d90dd1f91671d138ae2b90d0bddbf9831e52",
-          "errorCategory": "",
-          "sourceTextScanComplete": true,
-          "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 155
-        },
-        {
           "name": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).hwp",
-          "readable": true,
-          "sourceSha256": "f0fef7f1be67f47c2bce5d5155175eeb954fefb55fef35e249016cd295c6a86b",
+          "readable": false,
+          "sourceSha256": "",
+          "alternatePdfEvidence": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+          "alternatePdfSourceSha256": "efa5bba633b166d584c71ffe286618369d836d294180d41187d72b0eb45a5007",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
+          "extractionEvidence": {},
           "errorCategory": "",
-          "sourceTextScanComplete": true,
+          "sourceTextScanComplete": false,
+          "staffingRoleScanVersion": 0,
+          "staffingFactScanVersion": 0,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 108
+          "clauseCandidateCount": 0
         },
         {
           "name": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
           "readable": true,
           "sourceSha256": "efa5bba633b166d584c71ffe286618369d836d294180d41187d72b0eb45a5007",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 29,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 475
+          "clauseCandidateCount": 502
         },
         {
           "name": "1-2. Invitation for Bids(Egypt PMC_R26BK01757043-000).docx",
           "readable": true,
           "sourceSha256": "cd393d8e9324e95e7ef3cd863966886ea04f2d60f3443f765cfade7f39ad27a9",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
           "clauseCandidateCount": 0
         },
@@ -86908,38 +87038,142 @@
           "name": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
           "readable": true,
           "sourceSha256": "42fc82e7ff042d042a7e3c6f7cb4d90dd1f91671d138ae2b90d0bddbf9831e52",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 155
+          "clauseCandidateCount": 161
         },
         {
           "name": "3. (투찰내역서) 이집트지재권 PMC 용역.xlsm",
           "readable": true,
           "sourceSha256": "df7a6f3a6b4984abd9187d2ff48245ac5adeff03215efedb5ad8eed51ca245ac",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 144
+          "clauseCandidateCount": 228
+        },
+        {
+          "name": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
+          "readable": true,
+          "sourceSha256": "42fc82e7ff042d042a7e3c6f7cb4d90dd1f91671d138ae2b90d0bddbf9831e52",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 161
         }
       ],
+      "staffingRoles": [
+        {
+          "role": "인프라",
+          "grade": "",
+          "count": 1,
+          "countKind": "minimum",
+          "onsite": "",
+          "manMonths": null,
+          "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
+          "sourceLine": 136,
+          "sourceText": "응용시스템, 데이터, 인프라 구축 등 ISP(정보화전략계획) 기반 과업 수행 분야별로 전문가를 최소 1인 이상 투입",
+          "scope": "document",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+        },
+        {
+          "role": "PM",
+          "grade": "",
+          "count": 1,
+          "countKind": "specified",
+          "onsite": "",
+          "manMonths": null,
+          "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
+          "sourceLine": 453,
+          "sourceText": "※ 핵심투입인력 : 사업관리자(PM) 1인",
+          "scope": "document",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+        },
+        {
+          "role": "PM",
+          "grade": "",
+          "count": 3,
+          "countKind": "specified",
+          "onsite": "",
+          "manMonths": null,
+          "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
+          "sourceLine": 785,
+          "sourceText": "- 사업관리자(PM)가 발표를 하며, PM을 포함한 3명 이내의 핵심투입인력, 사업 참여자 등이 배석하여 평가위원의 질의에 응답할 수 있음.",
+          "scope": "document",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+        }
+      ],
+      "staffingFacts": [],
+      "staffingRoleScanComplete": true,
+      "manifestSignature": "982e9b6dfb08aa1be32d6087c64cd9c426b54fd45ace746f1abd2bbc8c64cd2a",
+      "manifestCheckedAt": "2026-11-14T02:47:56.544077+00:00",
+      "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-24T05:53:07.558298+00:00",
-        "readableDocumentCount": 6,
-        "unreadableDocumentCount": 0,
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+        "readableDocumentCount": 5,
+        "unreadableDocumentCount": 1,
         "manifestComplete": true,
         "reviewComplete": false,
         "eligibilityVerified": false,
         "files": [
-          {
-            "name": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1"
-          },
-          {
-            "name": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).hwp",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
-          },
           {
             "name": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
@@ -86955,36 +87189,40 @@
           {
             "name": "3. (투찰내역서) 이집트지재권 PMC 용역.xlsm",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
+          },
+          {
+            "name": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1"
           }
         ],
         "clauseCandidates": {
           "industry_code": [
             {
-              "text": "* 입찰 참가 이후 낙찰자 선정되어 계약체결 하는 경우, 계약관리를 위하여 협력단 전자조달시스템(https://nebid.koica.go.kr) 가입 필요 ① 소프트웨어사업자(컴퓨터관련서비스사업) (나라장터 업종코드 : 1468)",
+              "text": "아래의 사항을 모두 입찰참가자격으로 등록한 자 - 소프트웨어사업자 컴퓨터관련서비스사업 나라장터 업종코드 ( ) ( : 1468)①",
               "codes": [
                 "1468"
               ],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "① 소프트웨어사업자(컴퓨터관련서비스사업) (나라장터 업종코드 : 1468)",
-              "codes": [
-                "1468"
-              ],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "① 소프트웨어사업자(컴퓨터관련서비스사업) (나라장터 업종코드 : 1468) ② 학술, 연구용역(나라장터 업종코드 : 1169)",
+              "text": "아래의 입찰참가자격을 모두 갖춘 자이어야 합니다. ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터 시스템 에 (G2B ) 아래의 사항을 모두 입찰참가자격으로 등록한 자 - 소프트웨어사업자 컴퓨터관련서비스사업 나라장터 업종코드 ( ) ( : 1468)① - 학술 연구용역 나라장터 업종코드 , ( : 1169) ②",
               "codes": [
                 "1468",
                 "1169"
               ],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 소프트웨어사업자 컴퓨터관련서비스사업 나라장터 업종코드 ( ) ( : 1468)①",
+              "codes": [
+                "1468"
+              ],
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
@@ -87013,116 +87251,116 @@
           ],
           "sme_certificate": [
             {
-              "text": "계약기간이 일 이내인 경우 납품대금이 억원 이하인 경우1) 90 2) 1 단순 구매계약의 경우 중소기업기본법 제 조에 따른 중소기업이 아닌 경우3) 4) 2 「 」",
+              "text": "계약기간이 일 이내인 경우 납품대금이 억원 이하인 경우1) 90 2) 1 단순 구매계약의 경우 중소기업기본법 제 조에 따른 중소기업이 아닌 경우3) 4) 2「 」",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "낙찰통보를 받은 날로부터 일 이내에 반드시 제출하여야 합니다 다만 다음 중 어느 하나라도 해당하는 경우에는 적용하지 7 . , 않습니다. 계약기간이 일 이내인 경우 납품대금이 억원 이하인 경우1) 90 2) 1 단순 구매계약의 경우 중소기업기본법 제 조에 따른 중소기업이 아닌 경우3) 4) 2 「 」 세부사항은 중소벤처기업부의 표준 연동계약서 가이드북 참조※ 「 」",
+              "text": "낙찰통보를 받은 날로부터 일 이내에 반드시 제출하여야 합니다 다만 다음 중 어느 하나라도 해당하는 경우에는 적용하지 7 . , 않습니다. 계약기간이 일 이내인 경우 납품대금이 억원 이하인 경우1) 90 2) 1 단순 구매계약의 경우 중소기업기본법 제 조에 따른 중소기업이 아닌 경우3) 4) 2「 」 세부사항은 중소벤처기업부의 표준 연동계약서 가이드북 참조※ 「 」",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "단순 구매계약의 경우 중소기업기본법 제 조에 따른 중소기업이 아닌 경우3) 4) 2 「 」",
+              "text": "단순 구매계약의 경우 중소기업기본법 제 조에 따른 중소기업이 아닌 경우3) 4) 2「 」",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            }
-          ],
-          "region_restriction": [
-            {
-              "text": "제2조(공동수급체) 공동수급체의 명칭, 사업소의 소재지, 대표자는 다음과 같다.",
-              "codes": [],
-              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "제2조(공동수급체) 공동수급체의 명칭, 사업소의 소재지, 대표자는 다음과 같다. 1. 명 칭 : ㅇㅇㅇ",
-              "codes": [],
-              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "3. 발주자명 : 제2조(공동수급체) 공동수급체의 명칭, 사업소의 소재지, 대표자는 다음과 같다.",
-              "codes": [],
-              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "joint_participation": [
             {
-              "text": "ㅇ 한국국제협력단법 시행령 제13조의4 제2항 제1호 나목에 의거한 인권경영 실천 서약서, 성희롱·성폭력예방실천서약서 및 같은 법 시행령 제13조의4 제2항 제2호 다목에 의거한 ODA 사업 참여 반부패 선언서, 국가를 당사자로 하는 계약에 관한 법률 제27조의4에 의거한 하도급 직불서약서와 국가를 당사자로 하는 계약에 관한 법률 제5조의2(청렴계약) 및 같은 법 시행령 제4조의2에 따른 청렴계약서(이행서약서), 상생결제 활용동의서를 제출한 자",
+              "text": "계약구분 총액계약 계약방법 일반경쟁 계약입찰방법 협상에 의한 낙찰자 결정 국내/국제입찰 구분 국제입찰 공동계약 및 구성방식 전자 공동이행 또는 분담이행 가능( )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "ㅇ 분담이행 방식으로 발주한 용역에 SW 과업이 포함된 경우, SW 과업을 제외한 타 과업에 대해서는 관련 법령(소프트웨어 진흥법 제48조 제2항 및 제4항, 소프트웨어사업자의 사업 참여 지원 지침 제2조제1항) 미적용",
+              "text": "국내/국제입찰 구분 국제입찰 공동계약 및 구성방식 전자 공동이행 또는 분담이행 가능( )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "ㅇ 공동도급(공동이행방식 혹은 분담이행방식)이 가능하며, 구성원은 대표사 포함 5개 이하로 제한(※ 단, 분담이행방식으로 공동수급체를 구성하여 참여하는 경우 각 업종별 1개 업체만 입찰 참여할 수 있으며, 공동수급체 구성원(대표사 포함)은 최대 2개 업체까지 가능합니다.)",
+              "text": "계약방법 일반경쟁 계약입찰방법 협상에 의한 낙찰자 결정 국내/국제입찰 구분 국제입찰 공동계약 및 구성방식 전자 공동이행 또는 분담이행 가능( ) 세부품명 정보화프로젝트관리서비스",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "performance_proof": [
             {
-              "text": "※ 투입인력의 자격요건 증빙 관련 - 투입인력의 자격요건을 확인할 수 있는 증빙서류(학위증, 경력증명서, 실적증명서, 재직증명서, 자격증, 고용사실 입증자료(국민연금(직역연금 포함), 고용보험, 의료보험 등 4대보험 가입증명서 중 어느 하나) 등)를 제출해야 함.",
+              "text": "여부 미확인으로 발생되는 모든 책임은 입찰참가자에게 있습니다. ○ 국가종합전자조달시스템 나라장터( )을 통해 제출하는 제안서류 일체는 파일 형식으로 제출하여야 하며 총 용PDF , 량은 를 초과할 수 없습니다300MB . 용량을 줄이기 위해 화질을 떨어뜨려 내용을 확인할 수 없는 경우 평가에 불이익이 발생할 수 있으며 ※ 이로인해 발생되는 모든 책임은 입찰참가자에게 있습니다 특히 정량제안서의 실적증명서 등. ( )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "- 투입인력의 자격요건을 확인할 수 있는 증빙서류(학위증, 경력증명서, 실적증명서, 재직증명서, 자격증, 고용사실 입증자료(국민연금(직역연금 포함), 고용보험, 의료보험 등 4대보험 가입증명서 중 어느 하나) 등)를 제출해야 함.",
+              "text": "실적증명서 등. ( )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "- 경험요건 증빙은 다음 중 어느 하나의 방법으로 증빙하여야 함. 1) 투입 인력의 참여여부 및 수행과업 명시된 실적증명서",
+              "text": "용량을 줄이기 위해 화질을 떨어뜨려 내용을 확인할 수 없는 경우 평가에 불이익이 발생할 수 있으며 ※ 이로인해 발생되는 모든 책임은 입찰참가자에게 있습니다 특히 정량제안서의 실적증명서 등. ( )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "staff_proof": [
             {
-              "text": "※ 핵심투입인력 : 사업관리자(PM) 1인",
+              "text": "○ 입찰서는 반드시 국가종합전자조달시스템 나라장터 을 통하여 전자적으로만 제출하여야 합니다( ) . ※ 입찰공고에 첨부된 투찰내역서는 가격입찰서 제출시 제출하지않고 우선협상자로 선정시 추후 별도 제출합니다. 3. 기술제안서는 다음과 같이 파일명을 지정하여 제출하시기 바랍니다. 1) 정성제안서 부분 : 기술제안서 본문( )Ⅰ 식 1 필수 사항(* ) 2) 정성참고자료 부분 : 기술제안서 투입인력 부문( )Ⅱ 식 1 필수 사항(* )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "※ 핵심투입인력 : 사업관리자(PM) 1인 ※ 투입인력의 자격요건 증빙 관련",
+              "text": "1) 정성제안서 부분 : 기술제안서 본문( )Ⅰ 식 1 필수 사항(* ) 2) 정성참고자료 부분 : 기술제안서 투입인력 부문( )Ⅱ 식 1 필수 사항(* )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "<표> ※ 핵심투입인력 : 사업관리자(PM) 1인",
+              "text": "※ 입찰공고에 첨부된 투찰내역서는 가격입찰서 제출시 제출하지않고 우선협상자로 선정시 추후 별도 제출합니다. 3. 기술제안서는 다음과 같이 파일명을 지정하여 제출하시기 바랍니다. 1) 정성제안서 부분 : 기술제안서 본문( )Ⅰ 식 1 필수 사항(* ) 2) 정성참고자료 부분 : 기술제안서 투입인력 부문( )Ⅱ 식 1 필수 사항(* ) 3) 정량제안서 부분 : 별첨 첨부 및 증빙( ) 식 1 필수 사항(* )",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            }
+          ],
+          "eligibility_cutoff": [
+            {
+              "text": "하여야 하며 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의하시기 바랍니다 공동수급 구성원 전원 해, .( 당) - 다만 등기관청에 상호 또는 대표자 변경신고 후 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 , 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 기준일이 정해져 있는 경우에는 해당일 이며 마감일 일시가 정해져 있( ) (",
+              "codes": [],
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 기준일이 정해져 있는 경우에는 해당일 이며 마감일 일시가 정해져 있( ) (",
+              "codes": [],
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "당) - 다만 등기관청에 상호 또는 대표자 변경신고 후 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 , 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일 기준일이 정해져 있는 경우에는 해당일 이며 마감일 일시가 정해져 있( ) ( 는 경우에는 해당일시 까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다) .",
+              "codes": [],
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
@@ -87151,35 +87389,28 @@
           ],
           "unclassified_qualification": [
             {
-              "text": "- 제안사 소속 증빙은 재직증명서와 아래 자료 중 하나를 제출하여야 하며, 반드시 자격취득일이 입찰공고일 이전(입찰공고일도 인정)",
+              "text": "입찰참가자격 등록3-2.",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "터 5년이 경과되지 않을시 참여 가능 (중소기업 및 중견기업만 입찰참가 가능)",
+              "text": "찰참가자격의 평가항목 또는 사업관리자 역량 에 대하여 최저점이 부여됩니다(PM ) .",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "나. 입찰참가 등록 및 입찰서(기술제안서 포함) 제출 : 입찰공고서에 의함",
+              "text": "정될 시 본 계약 서약 내용을 그대로 계약특수조건으로 이행하고 입찰참가자격 ) ( ) ,",
               "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "legal_exclusion": [
-            {
-              "text": "ㅇ 국가를 당사자로 하는 계약에 관한 법률 제27조의5 및 같은 법 시행령 제12조 제3항에 따라 ‘조세포탈 등을 한 자’로서 유죄판결이 확정된 날부터 2년이 지나지 아니한 자는 참여 불가",
-              "codes": [],
-              "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
-              "interpretation": "manual_review_required"
-            },
             {
               "text": "지원에 관한 지침 준수」 ㅇ 소프트웨어 진흥법 제 조제 항에 따라 상호출자제한기업집단 소속회사의 입찰 참여 제한48 4「 」 입찰참가자격 공지사항※ 다음 중 어느 하나에 해당하는 자는 입찰참가자격이 없음◐ - 국가를 당사자로 하는 계약에 관한 법률 제 조의 및 같은 법 시행령 제 조제 항에 따라 조세포탈 등을 한 자 로서 유27 5 12 3 ‘ ’「 」",
               "codes": [],
@@ -87193,11 +87424,18 @@
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
+            },
+            {
+              "text": "- 국가를 당사자로 하는 계약에 관한 법률 제 조의 및 같은 법 시행령 제 조제 항에 따라 조세포탈 등을 한 자 로서 유27 5 12 3 ‘ ’「 」 죄판결이 확정된 날부터 년이 지나지 아니한 자2",
+              "codes": [],
+              "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
             }
           ],
           "submission_required": [
             {
-              "text": "출은 전자입찰 시 정해진 서식에 따라 송신한 입찰서로 서약서 제출을 대신합니다.) 공동수급체를 구성하여 입찰에 참가하는 경우 해당시( )◐ - 필요시 공동이행 또는 분담이행방식이 가능합니다 . - 4 - - 공동수급체 구성원은 각각 본 입찰에서 요구 또는 분담한 부분을 이행하는데 필요한 입찰참가자격을 갖추어야 합",
+              "text": "출은 전자입찰 시 정해진 서식에 따라 송신한 입찰서로 서약서 제출을 대신합니다.) 공동수급체를 구성하여 입찰에 참가하는 경우 해당시( )◐ - 필요시 공동이행 또는 분담이행방식이 가능합니다. - 4 - - 공동수급체 구성원은 각각 본 입찰에서 요구 또는 분담한 부분을 이행하는데 필요한 입찰참가자격을 갖추어야 합",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
@@ -87220,21 +87458,21 @@
           ],
           "bid_security": [
             {
-              "text": "○ 입 찰보증금 납부 입 찰참 가 자는 반드시 이 건 입찰공 고의 입 찰보 증금 내용 을 숙 지 하시 기 바 랍니 다( ) . 공동수급체의 경우 대표사 는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다.",
+              "text": "○ 입찰보증금 납부 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다( ) . 공동수급체의 경우 대표사",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "지 등 록 을 하 여 야 합 니 다 등 록 절 차 와 나 라 장 터 이 용 안 내 는 정 부 조 달 콜 센 터 로 문 의 하 시 기 . ( 1588-0800, FAX: 042-472-2297) ☎ 바 랍 니 다 . ○ 입 찰보증금 납부 입 찰참 가 자는 반드시 이 건 입찰공 고의 입 찰보 증금 내용 을 숙 지 하시 기 바 랍니 다( ) . 공동수급체의 경우 대표사 는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다. ○",
+              "text": "○ 입찰보증금 납부 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다( ) . 공동수급체의 경우 대표사 는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다.",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다. ○",
+              "text": "바랍니다. ○ 입찰보증금 납부 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다( ) . 공동수급체의 경우 대표사",
               "codes": [],
               "sourceFile": "1-1. 입찰공고문(이집트 지식재산권 PMC 용역).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01757043&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
@@ -87242,49 +87480,7 @@
             }
           ]
         }
-      },
-      "staffingRoles": [
-        {
-          "role": "PM",
-          "grade": "",
-          "count": 1,
-          "countKind": "specified",
-          "onsite": "",
-          "manMonths": null,
-          "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
-          "sourceLine": 1,
-          "sourceText": "※ 핵심투입인력 : 사업관리자(PM) 1인",
-          "scope": "excerpt"
-        },
-        {
-          "role": "PM",
-          "grade": "",
-          "count": 1,
-          "countKind": "specified",
-          "onsite": "",
-          "manMonths": null,
-          "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
-          "sourceLine": 1,
-          "sourceText": "※ 핵심투입인력 : 사업관리자(PM) 1인 ※ 투입인력의 자격요건 증빙 관련",
-          "scope": "excerpt"
-        },
-        {
-          "role": "PM",
-          "grade": "",
-          "count": 1,
-          "countKind": "specified",
-          "onsite": "",
-          "manMonths": null,
-          "sourceFile": "2. 제안요청서(이집트 지식재산권 PMC 용역).hwp",
-          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00059715&rfpOrd=000&rfpUntyAtchFileNo=1",
-          "sourceLine": 1,
-          "sourceText": "<표> ※ 핵심투입인력 : 사업관리자(PM) 1인",
-          "scope": "excerpt"
-        }
-      ],
-      "staffingRoleScanComplete": false
+      }
     },
     "R26BK01764593:000": {
       "status": "text_extracted_requires_review",
@@ -87989,15 +88185,15 @@
     },
     "R26BK01756453:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-25T19:36:44.755036+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
       "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 3,
       "manifestComplete": true,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 0,
+      "readableDocumentCount": 2,
+      "unreadableDocumentCount": 1,
       "files": [
         {
           "name": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.pdf",
@@ -88007,29 +88203,37 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 3,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 112
+          "clauseCandidateCount": 118
         },
         {
           "name": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.hwp",
-          "readable": true,
-          "sourceSha256": "c3c2d8551ddddd58d50115b13bf672043fe21d915abe196ef10349b11adbb7f6",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
+          "readable": false,
+          "sourceSha256": "",
+          "alternatePdfEvidence": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.pdf",
+          "alternatePdfSourceSha256": "a25b8a7aea4e2e4b250bc17bf08b47a34ed61e6005941cd0382a6cd8747cdeb8",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
           "extractionEvidence": {},
           "errorCategory": "",
-          "sourceTextScanComplete": true,
+          "sourceTextScanComplete": false,
           "staffingRoleScanVersion": 0,
           "staffingFactScanVersion": 0,
           "staffingScopeExcluded": false,
@@ -88037,7 +88241,7 @@
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 28
+          "clauseCandidateCount": 0
         },
         {
           "name": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
@@ -88047,30 +88251,38 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 111
+          "clauseCandidateCount": 121
         }
       ],
       "staffingRoles": [],
       "staffingFacts": [],
-      "staffingRoleScanComplete": false,
-      "manifestSignature": "3e9c9f3c660687434d79b5fc32a449e0c5deaf7a294a590059248e377ce95c0b",
-      "manifestCheckedAt": "2026-10-25T19:37:13.521742+00:00",
+      "staffingRoleScanComplete": true,
+      "manifestSignature": "e3611f658c6a558a1c8d4059744c8de293815d852291ee87a637693083f3152a",
+      "manifestCheckedAt": "2026-11-14T02:47:13.833435+00:00",
       "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-25T19:36:44.755036+00:00",
-        "readableDocumentCount": 3,
-        "unreadableDocumentCount": 0,
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+        "readableDocumentCount": 2,
+        "unreadableDocumentCount": 1,
         "manifestComplete": true,
         "reviewComplete": false,
         "eligibilityVerified": false,
@@ -88078,10 +88290,6 @@
           {
             "name": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
-          },
-          {
-            "name": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.hwp",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
           },
           {
             "name": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
@@ -88221,24 +88429,24 @@
           ],
           "staff_proof": [
             {
-              "text": "및 복구 요구사항테스트 요구사항(TER)통합 테스트TER-001통합테스트 요구사항보안 요구사항(SER)데이터 보안SER-001보안관리 및 준수사항SER-002기술적 보안 사항인증 및 권한SER-003투입 인력에 대한 보안 관리 사항품질 요구사항 (QUR)신뢰성QUR-001품질 보증 방안요구사항 목록",
+              "text": "사. 입찰보증보험증권(입찰금액의 5% 이상 : 이행보증보험증권) 1부 아. 소프트웨어 일반현황 관리확인서 1부 자. 중·소기업·소상공인 확인서 1부 차. 국세 및 지방세 납세증명서 각 1부 카. 위임장과 재직증명서(대리인 입찰 참가시) 각 1부",
               "codes": [],
-              "sourceFile": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "sourceFile": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "투입 인력에 대한 보안 관리 사항",
+              "text": "차. 국세 및 지방세 납세증명서 각 1부 카. 위임장과 재직증명서(대리인 입찰 참가시) 각 1부",
               "codes": [],
-              "sourceFile": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "sourceFile": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "투입 인력에 대한 보안 관리 사항 품질 요구사항 (QUR)",
+              "text": "아. 소프트웨어 일반현황 관리확인서 1부 자. 중·소기업·소상공인 확인서 1부 차. 국세 및 지방세 납세증명서 각 1부 카. 위임장과 재직증명서(대리인 입찰 참가시) 각 1부 * 가격입찰서(산출내역서 포함)는 서류 제출과 별도로 국가종합전자조달시스템(나라장터)을 통해 직접 전자",
               "codes": [],
-              "sourceFile": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "sourceFile": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
@@ -88267,13 +88475,6 @@
           ],
           "unclassified_qualification": [
             {
-              "text": "위임장과 재직증명서(대리인 입찰 참가시) 각 1부",
-              "codes": [],
-              "sourceFile": "[입찰공고문]_AI의료융합데이터센터 플랫폼 구축 사업.hwp",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
               "text": "제안 일반사항1. 사업관리 사항2. 입찰 참가 신청 방법3. 참가 자격 및 사업자 선정 방법4. 제안 설명회5. 평가 방식V. 제안서 작성 방법1. 제안서 효력2. 제안",
               "codes": [],
               "sourceFile": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
@@ -88282,6 +88483,13 @@
             },
             {
               "text": "3. 참가 자격 및 사업자 선정 방법",
+              "codes": [],
+              "sourceFile": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "정보 이용기간 및 보유기간필수대표자의성명, 주민등록번호대표자의 입찰참가자격 및 계약체결 시참가자격에 관한 확인 절차목적 달성 후 즉시 폐기(계약 체결 또는 대금 지급)필수입",
               "codes": [],
               "sourceFile": "[제안요청서]_AI의료융합데이터센터 플랫폼 구축 사업.hwpx",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01756453&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
@@ -89077,56 +89285,16 @@
     },
     "R26BK01750330:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-10-25T19:36:44.755036+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
       "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 6,
       "manifestComplete": true,
-      "readableDocumentCount": 6,
-      "unreadableDocumentCount": 0,
+      "readableDocumentCount": 5,
+      "unreadableDocumentCount": 1,
       "files": [
-        {
-          "name": "제안요청서.hwpx",
-          "readable": true,
-          "sourceSha256": "3c65807832700bcf8b98c6c0b9455a056ddbacd81527654731d876fece40dbfb",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
-          "errorCategory": "",
-          "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
-          "staffingScopeExcluded": false,
-          "staffingScopeReason": "",
-          "staffingRoleScanTruncated": false,
-          "qualificationScanTruncated": false,
-          "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 299
-        },
-        {
-          "name": "",
-          "readable": true,
-          "sourceSha256": "3c65807832700bcf8b98c6c0b9455a056ddbacd81527654731d876fece40dbfb",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
-          "errorCategory": "",
-          "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
-          "staffingScopeExcluded": false,
-          "staffingScopeReason": "",
-          "staffingRoleScanTruncated": false,
-          "qualificationScanTruncated": false,
-          "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 299
-        },
         {
           "name": "Summary Notice.pdf",
           "readable": true,
@@ -89135,11 +89303,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 3,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -89149,15 +89325,15 @@
         },
         {
           "name": "공고서(국제_SW_오프라인평가).hwpx",
-          "readable": true,
-          "sourceSha256": "55fca1de777dfd64ca9b2111e28add3772ca59d717d5d9674f0ea60d9dc0db8b",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
+          "readable": false,
+          "sourceSha256": "",
+          "alternatePdfEvidence": "공고서(국제_SW_오프라인평가).pdf",
+          "alternatePdfSourceSha256": "df43bf25e69a40203de59751e9d160552147c418b53a81836c3a61f68576623f",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
           "extractionEvidence": {},
           "errorCategory": "",
-          "sourceTextScanComplete": true,
+          "sourceTextScanComplete": false,
           "staffingRoleScanVersion": 0,
           "staffingFactScanVersion": 0,
           "staffingScopeExcluded": false,
@@ -89165,7 +89341,7 @@
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 174
+          "clauseCandidateCount": 0
         },
         {
           "name": "공고서(국제_SW_오프라인평가).pdf",
@@ -89175,17 +89351,25 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 11,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 664
+          "clauseCandidateCount": 707
         },
         {
           "name": "제안요청서.hwpx",
@@ -89195,49 +89379,113 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 299
+          "clauseCandidateCount": 306
+        },
+        {
+          "name": "제안요청서.hwpx",
+          "readable": true,
+          "sourceSha256": "3c65807832700bcf8b98c6c0b9455a056ddbacd81527654731d876fece40dbfb",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 306
+        },
+        {
+          "name": "",
+          "readable": true,
+          "sourceSha256": "3c65807832700bcf8b98c6c0b9455a056ddbacd81527654731d876fece40dbfb",
+          "alternatePdfEvidence": "",
+          "alternatePdfSourceSha256": "",
+          "alternatePdfEvidenceMode": "",
+          "skippedDuplicateFormat": false,
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
+          "errorCategory": "",
+          "sourceTextScanComplete": true,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
+          "staffingScopeExcluded": false,
+          "staffingScopeReason": "",
+          "staffingRoleScanTruncated": false,
+          "qualificationScanTruncated": false,
+          "unmatchedQualificationAnchorCount": 0,
+          "clauseCandidateCount": 306
         }
       ],
       "staffingRoles": [],
-      "staffingFacts": [],
-      "staffingRoleScanComplete": false,
-      "manifestSignature": "64465b27adf8987a2f38d15ee6bd928280247eb3a95a0f9fbb38a42350d89e24",
-      "manifestCheckedAt": "2026-10-25T19:37:42.800919+00:00",
+      "staffingFacts": [
+        {
+          "kind": "staffing_requirement",
+          "role": "",
+          "sourceText": "- SW사업정보 중 기능점수 데이터의 작성을 위해 사업수행 인원 중 기능점수 산정 가능 전문가 포함",
+          "sourceFile": "제안요청서.hwpx",
+          "sourceLine": 2589,
+          "headcount": null,
+          "requirementType": "expertise",
+          "label": "FP 산정 전문가 포함",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+        }
+      ],
+      "staffingRoleScanComplete": true,
+      "manifestSignature": "653e748ca2ccd2b586ae3474264a7b686d9ad4ad823040069aaa5a2fb878c5e6",
+      "manifestCheckedAt": "2026-11-14T02:48:11.138094+00:00",
       "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-10-25T19:36:44.755036+00:00",
-        "readableDocumentCount": 6,
-        "unreadableDocumentCount": 0,
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+        "readableDocumentCount": 5,
+        "unreadableDocumentCount": 1,
         "manifestComplete": true,
         "reviewComplete": false,
         "eligibilityVerified": false,
         "files": [
           {
-            "name": "제안요청서.hwpx",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15"
-          },
-          {
-            "name": "공식 첨부자료",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=19"
-          },
-          {
             "name": "Summary Notice.pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
-          },
-          {
-            "name": "공고서(국제_SW_오프라인평가).hwpx",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
           },
           {
             "name": "공고서(국제_SW_오프라인평가).pdf",
@@ -89246,29 +89494,43 @@
           {
             "name": "제안요청서.hwpx",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
+            "name": "제안요청서.hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15"
+          },
+          {
+            "name": "공식 첨부자료",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=19"
           }
         ],
         "clauseCandidates": {
           "industry_code": [
             {
-              "text": "■ 조달청 협상에 의한 계약 제안서평가 세부기준 [별표 11]※ (정량평가 항목) ‘상생협력’은 조달청장 평가상생협력 평가기준중소기업 참여 지분율평가점수평점50% 이상5.0평점방식은[주] 에 따름45% 이상～50% 미만4.040% 이상～45% 미만3.035% 이상～40% 미만2.035% 미만1.0[주] 1. 상생협력은 소프트웨어사업자의 소프트웨어사업 분담부문을 대상으로 중소기업인 소프트웨어사업자의 공동수급체 참여비율(지분율)로 평가한다. 다만, 공동이행방식의 공동수급체인 경우에는",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "text": "아래의 사항을 모두 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련서비스사업)(1468) 또는 소프트웨어사업자(패키지소프트웨어개발.공급사업)(1426) 업종을 등록한 업체",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "업자의 공동수급체 참여비율(지분율)로 평가한다. 다만, 공동이행방식의 공동수급체인 경우에는 전체 사업에서 중소기업인 사업자의 지분율로 평가한다. 가. (분담이행방식 적용례) 소프트웨어개발사업부문 80%, 정보통신공사 20%로 구성된 소프트웨어개발ㆍ구축사업에서 대기업인 소프트웨어사업자 A는 소프트웨어사업 40%, 중소기업인 소프트웨어사업자 B는 소프트웨어사업 40%, 중소기업인 정보통신공사업자 C는 정보통신공사(20%)를 분담하는 것으로 공동수급체를 구성한 경우의 중소기업 소프트웨",
-              "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "text": "입찰참가자격을 모두 갖춘 자이어야 합니다. ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터(G2B시스템)에 아래의 사항을 모두 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련서비스사업)(1468) 또는 소프트웨어사업자(패키지소프트웨어개발.공급사업)(1426) 업종을 등록한 업체 * 본 사업은 사업금액이 40억원 이상 80억원 미만인 사업으로 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술",
+              "codes": [
+                "1468",
+                "1426"
+              ],
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "C는 정보통신공사(20%)를 분담하는 것으로 공동수급체를 구성한 경우의 중소기업 소프트웨어사업자 참여비율 평가는 소프트웨어개발사업비율(80%)에서 소프트웨어사업자 중 중소기업인 소프트웨어사업자 B의 참여비율(40%)로 평가하며 이 경우 50%로 평가점수는 5점이 된다. 나. (공동이행방식 적용례) 소프트웨어개발사업부문 80%, 정보통신공사 20%로 구성된 소프트웨어개발ㆍ구축사업에서 소프트웨어개발사업부문에 대하여 대기업인 소프트웨어사업자 A는 40%, 중소기업인 소프트웨어사업자",
+              "text": "사업으로 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
@@ -89300,21 +89562,21 @@
               "text": "단독으로 입찰에 참가한 경우 최고 등급을 부여하고, 중소기업인 소프트웨어사업자의 참여 지분이 없는 경우에는 0점을 부여한다. 3. 중소기업 여부의 확인 및 평가는 다음 각 호와 같다. 가.「중소기업 범위 및 확인에 관한 규정」제6조에 따른 중소기업확인서를 발급받고「중소기업제품 공공구매종합정보망」에 등재된 경우로서 평가기준일은 입찰서 제출 마감일 전일로 하며 중소기업확인서의 유효기간 내에 있어야 한다. 이 경우 제안서 평가일 전일까지 발급된 자료도 심사에 포함한다. 나. 공동수급체",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "야 한다. 이 경우 제안서 평가일 전일까지 발급된 자료도 심사에 포함한다. 나. 공동수급체의 구성원(대표자 포함)에「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 중소기업(중소기업자간 경쟁입찰 참여제한 대상 중소기업)에 대해서는 적용하지 않는다. 다. 중소기업협동조합이 입찰에 참여하는 경우 해당계약을 이행하기 위하여 참여하는 조합원사(중소기업)의 지분율을 합산하여 평가한다. 4. 관련 법령에 의한 중소기업자간 경쟁 사업의 경우이거나「소프트웨어 진흥법」제48조",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "3. 중소기업 여부의 확인 및 평가는 다음 각 호와 같다. 가.「중소기업 범위 및 확인에 관한 규정」제6조에 따른 중소기업확인서를 발급받고「중소기업제품 공공구매종합정보망」에 등재된 경우로서 평가기준일은 입찰서 제출 마감일 전일로 하며 중소기업확인서의 유효기간 내에 있어야 한다. 이 경우 제안서 평가일 전일까지 발급된 자료도 심사에 포함한다.",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
@@ -89329,24 +89591,24 @@
           ],
           "joint_participation": [
             {
-              "text": "출 안내 5. 입찰 시 유의사항 6. 일반사항 Ⅵ. 기타 사항 [붙임1] 기술적용계획표 [붙임2] 기술지원 확약서 [붙임3] 자료열람 신청 및 열람 확인서 [붙임4] 제안서 첨부 양식 [붙임5] 하도급 계약 관련 제출 서류 [붙임6] 보안서약서(개인) [붙임7] 보안확약서(업체) [붙임8] 사업자 위규 처리기준 및 보안위약금 부과기준 [붙임9] 소프트웨어 개발사업의 적정 사업기간 종합 산정서 [붙임10] 상용SW 직접구매 제외요청 사전검토 결과 [붙임11] 산업재해예방 안전보건관",
+              "text": "- 제안요청 설명회: 7page 참고 - 하도급: 제안요청서 참조",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "[붙임4] 제안서 첨부 양식 [붙임5] 하도급 계약 관련 제출 서류",
+              "text": "○ 하자담보책임기간: 1년(제안요청서, 제안서, 협상결과 등에 따름) ○ 기타사항 - 제안요청 설명회: 7page 참고 - 하도급: 제안요청서 참조 - 차등점수제: 해당없음",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "[붙임5] 하도급 계약 관련 제출 서류",
+              "text": "- 하도급: 제안요청서 참조",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
@@ -89355,48 +89617,41 @@
               "text": "- 원가 업무 : 회계 계정별로 발생된 실적과 개인별 활동량 등을 기반으로 부서별, 계정별, 상품별 활동원가 및 수익을 산출하는 업무 - 경영평가 업무 : 관서별 사업수행 실적을 평가지표와 평가기준에 따라 평가를 수행하고, 상여금의 산출 및 지급을 처리하는 업무",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "- 경영평가 업무 : 관서별 사업수행 실적을 평가지표와 평가기준에 따라 평가를 수행하고, 상여금의 산출 및 지급을 처리하는 업무 - 경영정보(MIS) 업무 : 정책결정권자에게 필요한 경영정보를 제공하고, 정책결정에 참고할 핵심사항을 표출하여 경영방향을 설정할 수 있도록 경영현황을 제공하는 업무",
               "codes": [],
               "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "staff_proof": [
             {
-              "text": "- ｢소프트웨어사업 계약 및 관리감독에 관한 지침｣ 별지 제4호 서식에 따른 “소프트웨어 개발사업의 적정 사업기간 종합 산정서” 첨부(붙임9) ○ 본 사업은 기능점수 기반으로 수립되어 입찰자의 투입인력의 수 및 인적사항, 투입기간 등을 요구하지 않습니다.",
+              "text": "⑬ 기타 증명서류 1식(필요할 경우) ※ 공동계약의 경우에는 공동수급체 대표사가 공동계약 운용요령에 의거 공동수급협정서와 함께 구성원 전원의 ①∼⑤의 입찰참가서류를 제출하여야 합니다. ○ 기타 제출서류(직접방문제출자만 해당): 조달청 경쟁입찰참가자격 등록증상에 미등록된 대리인이 출석할 경우 위임장(동 등록증상에 등록된 사용인감으로 날인바라며, 미등록된 사용인감일 경우 인감증명서 및 사용인감계를 제출) 및 재직증명서",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "○ 본 사업은 기능점수 기반으로 수립되어 입찰자의 투입인력의 수 및 인적사항, 투입기간 등을 요구하지 않습니다.",
+              "text": "를 제출) 및 재직증명서",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "○ 본 사업은 기능점수 기반으로 수립되어 입찰자의 투입인력의 수 및 인적사항, 투입기간 등을 요구하지 않습니다. ○ 본 사업은 ｢소프트웨어 진흥법 시행령｣ 제36조, ｢소프트웨어사업 계약 및 관리감독에 관한 지침｣ 제6조에 따라 “단일기관 내부사용 목적의 소프트웨어사업”으로 소프트웨어사업 영향평가 제외대상 사업입니다.",
+              "text": "○ 기타 제출서류(직접방문제출자만 해당): 조달청 경쟁입찰참가자격 등록증상에 미등록된 대리인이 출석할 경우 위임장(동 등록증상에 등록된 사용인감으로 날인바라며, 미등록된 사용인감일 경우 인감증명서 및 사용인감계를 제출) 및 재직증명서",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "eligibility_cutoff": [
-            {
-              "text": "입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
-              "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
             {
               "text": "록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져",
               "codes": [],
@@ -89410,120 +89665,127 @@
               "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
+            },
+            {
+              "text": "하여야 하며, 변경등록하지 않고 참여한 입찰은 무효입찰임을 알려드리오니 주의 바랍니다.(공동수급 구성원 전원 해당) - 다만, 법인등기부등본(또는 사업자등록증)의 상호 또는 대표자 변경신고 후 해당 기관에서 변경사항이 확정되지 않아 입찰자에게 책임이 없는 사유로 입찰참가자격 등록을 할 수 없어 변경 전 상호 또는 대표자 명의로 한 입찰은 유효한 입찰로 간주합니다. 3) 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해",
+              "codes": [],
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
             }
           ],
           "registration_identity": [
             {
-              "text": "- ‘소프트웨어사업자 일반현황 관리 확인서’는 최근년도 결산 신고 된 자료로 제출 ② 경쟁입찰참가자격등록증(시스템에서 확인 가능)",
+              "text": "국가의 국민으로서 동 체결국에서 용역을 공급하는 자 또는 국내에서 용역을 공급하는 자로서 아래의 입찰참가자격을 모두 갖춘 자이어야 합니다. ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터(G2B시스템)에",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "② 경쟁입찰참가자격등록증(시스템에서 확인 가능)",
+              "text": "입찰참가자격을 모두 갖춘 자이어야 합니다. ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터(G2B시스템)에",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "② 경쟁입찰참가자격등록증(시스템에서 확인 가능) ③ 법인등기부등본(시스템에서 확인 가능. 단, 개인사업자인 경우 사업자등록증)",
+              "text": "WTO 정부조달협정 또는 대한민국 정부와 자유무역협정(대한민국 정부가 정부조달분야에서 국제입찰을 허용할 것을 약속한 자유 무역협정에 한 함)을 체결한 국가의 국민으로서 동 체결국에서 용역을 공급하는 자 또는 국내에서 용역을 공급하는 자로서 아래의 입찰참가자격을 모두 갖춘 자이어야 합니다. ○ 국가종합전자조달시스템 입찰참가자격등록규정에 따라 반드시 전자입찰서 제출 마감일 전일까지 나라장터(G2B시스템)에 아래의 사항을 모두 입찰참가자격으로 등록한 자",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "unclassified_qualification": [
             {
-              "text": "ㆍ 재직증명서",
+              "text": "경쟁입찰참가자격 등록을 신청합니다.",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "Summary Notice.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "라. 공동수급체 구성",
+              "text": "3-2. 입찰참가자격 등록",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "아. 하도급 관리",
+              "text": "- 설명회 참석은 필수사항이 아니며, 입찰참가자격과는 무관합니다.",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "legal_exclusion": [
             {
-              "text": "야 한다. 이 경우 제안서 평가일 전일까지 발급된 자료도 심사에 포함한다. 나. 공동수급체의 구성원(대표자 포함)에「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 중소기업(중소기업자간 경쟁입찰 참여제한 대상 중소기업)에 대해서는 적용하지 않는다. 다. 중소기업협동조합이 입찰에 참여하는 경우 해당계약을 이행하기 위하여 참여하는 조합원사(중소기업)의 지분율을 합산하여 평가한다. 4. 관련 법령에 의한 중소기업자간 경쟁 사업의 경우이거나「소프트웨어 진흥법」제48조",
+              "text": "여 지원에 관한 지침」(과학기술 정보통신부고시)에 의거 매출액 8천억원 이상 대기업은 입찰에 참여할 수 없으며, 「소프트웨어진흥법」 제48조 제4항 및 「독점",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "나. 공동수급체의 구성원(대표자 포함)에「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 중소기업(중소기업자간 경쟁입찰 참여제한 대상 중소기업)에 대해서는 적용하지 않는다.",
+              "text": "* 본 사업은 사업금액이 40억원 이상 80억원 미만인 사업으로 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술 정보통신부고시)에 의거 매출액 8천억원 이상 대기업은 입찰에 참여할 수 없으며, 「소프트웨어진흥법」 제48조 제4항 및 「독점",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "나. 공동수급체의 구성원(대표자 포함)에「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조의2에 해당하는 중소기업(중소기업자간 경쟁입찰 참여제한 대상 중소기업)에 대해서는 적용하지 않는다. 다. 중소기업협동조합이 입찰에 참여하는 경우 해당계약을 이행하기 위하여 참여하는 조합원사(중소기업)의 지분율을 합산하여 평가한다.",
+              "text": "아래의 사항을 모두 입찰참가자격으로 등록한 자 - 소프트웨어사업자(컴퓨터관련서비스사업)(1468) 또는 소프트웨어사업자(패키지소프트웨어개발.공급사업)(1426) 업종을 등록한 업체 * 본 사업은 사업금액이 40억원 이상 80억원 미만인 사업으로 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」(과학기술 정보통신부고시)에 의거 매출액 8천억원 이상 대기업은 입찰에 참여할 수 없으며, 「소프트웨어진흥법」 제48조 제4항 및 「독점 규제 및 공정거래에 관한 법률」 제31조에 따라",
               "codes": [],
-              "sourceFile": "제안요청서.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do?rfpNo=R26DH00058286&rfpOrd=000&rfpUntyAtchFileNo=15",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "submission_required": [
             {
-              "text": "입찰참가자격 확인을 위한 제출서류:",
+              "text": "⑤ 기타서류 1식(해당사항 있을 경우, 제안요청서 참조) - 소프트웨어사업 하도급 계획서 1식 포함 - 하도급 계획의 적정성 평가는 ‘<서식 3> 소프트웨어사업 하도급 계획서’에 따라 평가하므로 입찰 참여자는 해당 내용을 반드시 기술 제안서에 포함하여 제출하여야 합니다.(하도급을 하지 않는 경우에도 0%로 기재하여 제출) - 입찰참가자격 확인을 위한 제출서류:",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "입찰참가자격 확인을 위한 제출서류: ① 소프트웨어사업자 일반현황 관리 확인서(구(舊) 소프트웨어사업자 신고확인서) 1부",
+              "text": "반드시 기술 제안서에 포함하여 제출하여야 합니다.(하도급을 하지 않는 경우에도 0%로 기재하여 제출) - 입찰참가자격 확인을 위한 제출서류:",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "- 입찰참가자격 확인을 위한 제출서류:",
+              "text": "- 소프트웨어사업 하도급 계획서 1식 포함 - 하도급 계획의 적정성 평가는 ‘<서식 3> 소프트웨어사업 하도급 계획서’에 따라 평가하므로 입찰 참여자는 해당 내용을 반드시 기술 제안서에 포함하여 제출하여야 합니다.(하도급을 하지 않는 경우에도 0%로 기재하여 제출) - 입찰참가자격 확인을 위한 제출서류: ① 소프트웨어사업자 일반현황 관리 확인서(구(舊) 소프트웨어사업자 신고확인서) 1부",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "bid_security": [
             {
-              "text": "(입찰보증금 납부) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 공동수급체의 경우 대표사는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다.",
+              "text": "○ (입찰보증금 납부) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 공동수급체의 경우",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "입찰자가 아래에 해당하는 경우에는 입찰금액의 100분의 5이상(「국가계약법 시행령」 제37조 제1항 단서조항에 따른 재정경제부장관이 기간을 정하여 고시한 경우에는 1천분의 25이상)의 입찰보증금을 납부 하여야 합니다.",
+              "text": "○ (입찰보증금 납부) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 공동수급체의 경우 대표사는 반드시 구성원사의 입찰보증금 납부대상 여부를 확인하여 관련 조항에 따른 입찰보증금을 납부하여야 합니다.",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "입찰공고일 이전 1년 이내에 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조제2항제2호가목의 사유로 입찰참가자격 제한을 받은 자(입찰참가자격 제한 기간 중인 경우를 포함한다.)",
+              "text": "문의하시기 바랍니다. ○ (입찰보증금 납부) 입찰참가자는 반드시 이 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 공동수급체의 경우",
               "codes": [],
-              "sourceFile": "공고서(국제_SW_오프라인평가).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "sourceFile": "공고서(국제_SW_오프라인평가).pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01750330&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ]
@@ -318610,9 +318872,9 @@
     },
     "R26BK01808969:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-11-10T14:56:40.720009+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
       "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 3,
@@ -318628,11 +318890,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 26,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -318648,17 +318918,25 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 32,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 116
+          "clauseCandidateCount": 122
         },
         {
           "name": "08. G2B 전자입찰공고(협상)_169.pdf",
@@ -318668,28 +318946,36 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 10,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 207
+          "clauseCandidateCount": 213
         }
       ],
       "staffingRoles": [],
       "staffingFacts": [],
-      "staffingRoleScanComplete": false,
+      "staffingRoleScanComplete": true,
       "manifestSignature": "6d614c8ea8c89f78d1b5d62b2504f2ba23a3804b33a2c4f8c39a94bbc1f87c88",
-      "manifestCheckedAt": "2026-11-10T14:57:28.258453+00:00",
+      "manifestCheckedAt": "2026-11-14T02:47:29.469372+00:00",
       "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-11-10T14:56:40.720009+00:00",
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
         "readableDocumentCount": 3,
         "unreadableDocumentCount": 0,
         "manifestComplete": true,
@@ -319393,27 +319679,27 @@
     },
     "R26BK01805618:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-11-10T14:56:40.720009+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
       "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 4,
       "manifestComplete": true,
-      "readableDocumentCount": 3,
-      "unreadableDocumentCount": 1,
+      "readableDocumentCount": 2,
+      "unreadableDocumentCount": 2,
       "files": [
         {
           "name": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-          "readable": true,
-          "sourceSha256": "c3cce2ab3c10376e7364c80663f97dadf42a12b192182184d1c7c03639b2c17f",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
+          "readable": false,
+          "sourceSha256": "",
+          "alternatePdfEvidence": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+          "alternatePdfSourceSha256": "8625439681ad4285e552a73492455e93254d0678204e3057f1b1577f09ae7232",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
           "extractionEvidence": {},
           "errorCategory": "",
-          "sourceTextScanComplete": true,
+          "sourceTextScanComplete": false,
           "staffingRoleScanVersion": 0,
           "staffingFactScanVersion": 0,
           "staffingScopeExcluded": false,
@@ -319421,7 +319707,7 @@
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 35
+          "clauseCandidateCount": 0
         },
         {
           "name": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
@@ -319431,11 +319717,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 11,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -319451,11 +319745,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -319486,23 +319788,19 @@
       ],
       "staffingRoles": [],
       "staffingFacts": [],
-      "staffingRoleScanComplete": false,
+      "staffingRoleScanComplete": true,
       "manifestSignature": "b9fdaa5027368d1d2bad9de74aa55e4c9fca5fc834f4acaaaba0aa2afe027da0",
-      "manifestCheckedAt": "2026-11-10T14:57:29.523498+00:00",
+      "manifestCheckedAt": "2026-11-14T02:47:20.536541+00:00",
       "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-11-10T14:56:40.720009+00:00",
-        "readableDocumentCount": 3,
-        "unreadableDocumentCount": 1,
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+        "readableDocumentCount": 2,
+        "unreadableDocumentCount": 2,
         "manifestComplete": true,
         "reviewComplete": false,
         "eligibilityVerified": false,
         "files": [
-          {
-            "name": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
-          },
           {
             "name": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
@@ -319515,25 +319813,25 @@
         "clauseCandidates": {
           "industry_code": [
             {
-              "text": "라. 우리 대학과 분쟁·낙찰 포기 또는 계약 불이행 등의 사실이 없는 자 마.「국가종합전자조달시스템 입찰참가자격등록규정(조달청 고시)」에 의하여 국가종합전자조달시스템(나라장터)에 전자입찰서 제출 마감일 전일(18:00)까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으로 입찰 참가자격을 등록한 자",
-              "codes": [
-                "1426"
-              ],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "마.「국가종합전자조달시스템 입찰참가자격등록규정(조달청 고시)」에 의하여 국가종합전자조달시스템(나라장터)에 전자입찰서 제출 마감일 전일(18:00)까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으로 입찰 참가자격을 등록한 자",
-              "codes": [
-                "1426"
-              ],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
               "text": "까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으",
+              "codes": [
+                "1426"
+              ],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으 로 입찰 참가자격을 등록한 자",
+              "codes": [
+                "1426"
+              ],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "국가종합전자조달시스템(나라장터)에 전자입찰서 제출 마감일 전일(18:00) 까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으",
               "codes": [
                 "1426"
               ],
@@ -319544,35 +319842,28 @@
           ],
           "direct_production": [
             {
-              "text": "* 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰의 경우 적용함)",
+              "text": "분’을 받을 수 있습니다. * 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "* 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰의 경우 적용함) 11. 하도급에 관한 사항",
+              "text": "아래의 계약 주요 조건을 위반한 경우 ‘부정당업자 입찰참가자격 제한처 - 11 - 분’을 받을 수 있습니다. * 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰 의 경우 적용함)",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "라. 「국가를 당사자로 하는 계약에 관한 법률 시행령」 제76조 제1항 제2호에 따라 아래의 계약 주요 조건을 위반한 경우 ‘부정당업자 입찰참가자격 제한처분’을 받을 수 있습니다. * 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰의 경우 적용함)",
+              "text": "* 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "sme_certificate": [
-            {
-              "text": "바.「중소기업기본법」 제2조제2항에 따른 소기업 또는 「소상공인기본법」 제2조에 따른 소상공인으로서 중소기업 범위 및 확인에 관한 규정에 따라 발급된 소기업·소상공인 확인서(중소기업확인서)(제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
             {
               "text": "까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으 로 입찰 참가자격을 등록한 자 바.「중소기업기본법」 제2조제2항에 따른 소기업 또는 「소상공인기본법」 제2조에 따른 소상공인으로서 중소기업 범위 및 확인에 관한 규정에 따라 발 급된 소기업·소상공인 확인서(중소기업확인서)(제출 마감일 전일까지 발급된",
               "codes": [],
@@ -319586,16 +319877,16 @@
               "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
+            },
+            {
+              "text": "로 입찰 참가자격을 등록한 자 바.「중소기업기본법」 제2조제2항에 따른 소기업 또는 「소상공인기본법」 제2조에 따른 소상공인으로서 중소기업 범위 및 확인에 관한 규정에 따라 발 급된 소기업·소상공인 확인서(중소기업확인서)(제출 마감일 전일까지 발급된 것으로 유효기간 내에 있어야 함)를 소지한 업체",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
             }
           ],
           "region_restriction": [
-            {
-              "text": "사. 입찰공고일 전일[신규사업자(법인인 경우 법인 등기일, 개인사업자인 경우 사업자등록일 기준)인 경우 입찰공고일 이후를 포함]부터 입찰일(낙찰자는 계약체결일, 적격심사 대상자는 적격심사서류 제출일)까지 법인등기부상 본점(개인사업자인 경우에는 사업자등록증 또는 관련 법령에 따른 허가·인가·면허·등록·신고등에 관련된 서류에 기재된 사업장의 소재지)을 계속 서울특별시 또는 경기도에 소재한 자.",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
             {
               "text": "사. 입찰공고일 전일[신규사업자(법인인 경우 법인 등기일, 개인사업자인 경우 사업자등록일 기준)인 경우 입찰공고일 이후를 포함]부터 입찰일(낙찰자는 계약체결일, 적격심사 대상자는 적격심사서류 제출일)까지 법인등기부상 본점(개인사업자인 경우에는 사업자등록증 또는 관련 법령에 따른 허가·인 가·면허·등록·신고등에 관련된 서류에 기재된 사업장의 소재지)을 계속 서",
               "codes": [],
@@ -319609,48 +319900,55 @@
               "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
+            },
+            {
+              "text": "사업자등록일 기준)인 경우 입찰공고일 이후를 포함]부터 입찰일(낙찰자는 계약체결일, 적격심사 대상자는 적격심사서류 제출일)까지 법인등기부상 본점(개인사업자인 경우에는 사업자등록증 또는 관련 법령에 따른 허가·인 가·면허·등록·신고등에 관련된 서류에 기재된 사업장의 소재지)을 계속 서 - 5 -",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
             }
           ],
           "joint_participation": [
             {
-              "text": "* 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰의 경우 적용함) 11. 하도급에 관한 사항",
+              "text": "- 11 - 분’을 받을 수 있습니다. * 하청생산, 타사제품 납품 등 직접생산 조건을 위반한 계약이행(제조입찰 의 경우 적용함) 11. 하도급에 관한 사항",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "11. 하도급에 관한 사항",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "11. 하도급에 관한 사항 ❍ 본 용역(입찰)은 하도급은 불허합니다.",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "eligibility_cutoff": [
             {
-              "text": "라. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다.",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "라. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까지 참가자격을 갖추지 않은 경우 무효입찰임을 알려드리오니 주의하시기 바랍니다. 10. 불공정행위 금지",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
               "text": "찰유의서」제12조에 정한 입찰무효 해당 여부 확인을 위하여 등록정보 확 인을 위한 서류(법인등기부등본, 입찰대리인임을 확인할 수 있는 서류, 관련 되는 면허 등을 증명하는 서류 등)요청하는 경우, 낙찰대상자는 관계서류를 한양여자대학교로 제출하여야 합니다. 라. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "한양여자대학교로 제출하여야 합니다. 라. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "인을 위한 서류(법인등기부등본, 입찰대리인임을 확인할 수 있는 서류, 관련 되는 면허 등을 증명하는 서류 등)요청하는 경우, 낙찰대상자는 관계서류를 한양여자대학교로 제출하여야 합니다. 라. 입찰참가자격의 판단기준일은 입찰참가자격등록 마감일(기준일이 정해져 있 는 경우에는 해당일)이며 마감일(일시가 정해져 있는 경우에는 해당일시)까",
               "codes": [],
               "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
@@ -319659,44 +319957,37 @@
           ],
           "registration_identity": [
             {
+              "text": "계약관련규정을 철저히 숙지하신 후 입찰에 참가하여 주시기 바랍니다. - 다 음 - 1. 조달물자(용역) 구매입찰 공고서 2. 국가종합전자조달시스템 전자입찰특별유의서 3. 국가종합전자조달시스템 입찰참가자격등록규정",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "3. 국가종합전자조달시스템 입찰참가자격등록규정 4. (계약예규) 용역입찰유의서",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "라. 우리 대학과 분쟁·낙찰 포기 또는 계약 불이행 등의 사실이 없는 자 마.「국가종합전자조달시스템 입찰참가자격등록규정(조달청 고시)」에 의하여 국가종합전자조달시스템(나라장터)에 전자입찰서 제출 마감일 전일(18:00)까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으로 입찰 참가자격을 등록한 자",
+              "text": "2. 국가종합전자조달시스템 전자입찰특별유의서 3. 국가종합전자조달시스템 입찰참가자격등록규정 4. (계약예규) 용역입찰유의서 5. (계약예규) 정부입찰 ․ 계약 집행기준 6. (계약예규) 용역계약 일반조건",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "마.「국가종합전자조달시스템 입찰참가자격등록규정(조달청 고시)」에 의하여 국가종합전자조달시스템(나라장터)에 전자입찰서 제출 마감일 전일(18:00)까지소프트웨어사업자[패키지소프트웨어개발·공급사업(업종코드:1426)] 으로 입찰 참가자격을 등록한 자",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "unclassified_qualification": [
             {
-              "text": "아. 입찰참가자격 관련사항은 ‘국가종합전자조달시스템’ 및 ‘중소기업 제품 공공구매 종합정보망’에서 직접 확인하므로",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "지 않거나 해당 기업인증정보의 유효기간이 만료되면 부적격 처리(입찰 참가 자격이 없음)됩니다.",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
               "text": "이 만료되면 부적격 처리(입찰 참가 자격이 없음)됩니다.",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "2) 입찰참가자격 등록 : 조달청의 경쟁입찰 참가자격등록은 수시로 가능하",
               "codes": [],
               "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
@@ -319705,47 +319996,47 @@
           ],
           "submission_required": [
             {
-              "text": "가.「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 같은 법 시행규칙 제14조, 제15조에 의한 입찰참가 자격을 갖춘 자",
+              "text": "가.「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 같은 법 시 행규칙 제14조, 제15조에 의한 입찰참가 자격을 갖춘 자",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "가.「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 같은 법 시행규칙 제14조, 제15조에 의한 입찰참가 자격을 갖춘 자 나.「국가를 당사자로 하는 계약에 관한 법률 시행령」제76조(부정당업자의 입찰참가자격제한)에 의한 부정당업자로 입찰자격 제한을 받는 자는 원천적으로 제외",
+              "text": "* 기타 공고문에 첨부된 제안요청(규격)서를 반드시 확인하시기 바랍니다. 2. 입찰참가자격 가.「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 같은 법 시 행규칙 제14조, 제15조에 의한 입찰참가 자격을 갖춘 자 나.「국가를 당사자로 하는 계약에 관한 법률 시행령」제76조(부정당업자의",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "2. 입찰참가자격 가.「국가를 당사자로 하는 계약에 관한 법률 시행령」제12조 및 같은 법 시행규칙 제14조, 제15조에 의한 입찰참가 자격을 갖춘 자",
+              "text": "행규칙 제14조, 제15조에 의한 입찰참가 자격을 갖춘 자",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "bid_security": [
             {
+              "text": "3) 입찰보증금 : 입찰보증금의 납부와 관련하여 입찰참가자는 반드시 본 건",
+              "codes": [],
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "3) 입찰보증금 : 입찰보증금의 납부와 관련하여 입찰참가자는 반드시 본 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다.",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "3) 입찰보증금 : 입찰보증금의 납부와 관련하여 입찰참가자는 반드시 본 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다. 4) 안전입찰 : 전자입찰은 반드시 나라장터 안전 입찰서비스를 이용하여 입찰서를 제출하여야 합니다.(자세한 사항은 안전 입찰서비스 유의사항 안내 참고)",
+              "text": "1588-0800)로 문의하시기 바랍니다. 3) 입찰보증금 : 입찰보증금의 납부와 관련하여 입찰참가자는 반드시 본 건",
               "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "2) 입찰참가자격 등록 : 조달청의 경쟁입찰 참가자격등록은 수시로 가능하며, 입찰참가를 위하여는 입찰서 제출 마감일 전일 18:00시까지 등록을 하여야 합니다. 등록절차와 나라장터(G2B) 이용안내는 정부조달콜센터(☎ 1588-0800)로 문의하시기 바랍니다. 3) 입찰보증금 : 입찰보증금의 납부와 관련하여 입찰참가자는 반드시 본 건 입찰공고의 입찰보증금 내용을 숙지하시기 바랍니다.",
-              "codes": [],
-              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "입찰공고_[혁신]도서관 정보시스템 고도화 및 모바일·AI 서비스 구축.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01805618&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ]
@@ -319754,9 +320045,9 @@
     },
     "R26BK01811303:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-11-10T14:56:40.720009+00:00",
-      "classificationVersion": 22,
-      "hwpxReaderVersion": 2,
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
+      "classificationVersion": 23,
+      "hwpxReaderVersion": 3,
       "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 6,
@@ -319768,12 +320059,12 @@
           "name": "입찰공고.hwp",
           "readable": false,
           "sourceSha256": "",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
+          "alternatePdfEvidence": "입찰공고.pdf",
+          "alternatePdfSourceSha256": "8f42a5b83da03304c2b629591324dee37b411639559e44ac0f9a37d8feae54c2",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
           "extractionEvidence": {},
-          "errorCategory": "no_searchable_text",
+          "errorCategory": "",
           "sourceTextScanComplete": false,
           "staffingRoleScanVersion": 0,
           "staffingFactScanVersion": 0,
@@ -319792,11 +320083,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 2,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -319812,11 +320111,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -319832,11 +320139,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -319872,11 +320187,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -319886,14 +320209,26 @@
         }
       ],
       "staffingRoles": [],
-      "staffingFacts": [],
-      "staffingRoleScanComplete": false,
+      "staffingFacts": [
+        {
+          "kind": "staffing_requirement",
+          "role": "",
+          "sourceText": "◦ SW사업정보 중 기능점수 데이터의 작성을 위해 사업수행 인원 중 기능점수 산정 가능 전문가를 포함토록 함",
+          "sourceFile": "제안요청서.hwp",
+          "sourceLine": 828,
+          "headcount": null,
+          "requirementType": "expertise",
+          "label": "FP 산정 전문가 포함",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01811303&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+        }
+      ],
+      "staffingRoleScanComplete": true,
       "manifestSignature": "3b5926c13bf82731bb2efa6ea0ce2df4de5ccf0557e91e59d71ff027fd2d1fbc",
-      "manifestCheckedAt": "2026-11-10T14:57:38.611456+00:00",
+      "manifestCheckedAt": "2026-11-14T02:47:38.848749+00:00",
       "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-11-10T14:56:40.720009+00:00",
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
         "readableDocumentCount": 4,
         "unreadableDocumentCount": 2,
         "manifestComplete": true,
@@ -323244,9 +323579,9 @@
     },
     "R26BK01806198:000": {
       "status": "text_extracted_requires_review",
-      "checkedAt": "2026-11-10T15:04:19.487817+00:00",
+      "checkedAt": "2026-11-14T02:46:30.500045+00:00",
       "classificationVersion": 23,
-      "hwpxReaderVersion": 2,
+      "hwpxReaderVersion": 3,
       "partialRetryCount": 0,
       "reviewComplete": false,
       "attachmentManifestCount": 5,
@@ -323256,15 +323591,15 @@
       "files": [
         {
           "name": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-          "readable": true,
-          "sourceSha256": "fe28efbcc333395efc6132c0ed001765799721a39f49b72f7d0da9e69d74e63c",
-          "alternatePdfEvidence": "",
-          "alternatePdfSourceSha256": "",
-          "alternatePdfEvidenceMode": "",
-          "skippedDuplicateFormat": false,
+          "readable": false,
+          "sourceSha256": "",
+          "alternatePdfEvidence": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+          "alternatePdfSourceSha256": "e3fb2d390f042cc40e733b37cdd8a5c5d6da2152b179bd53be4284d56ff74a0c",
+          "alternatePdfEvidenceMode": "same_basename_not_proven_identical",
+          "skippedDuplicateFormat": true,
           "extractionEvidence": {},
           "errorCategory": "",
-          "sourceTextScanComplete": true,
+          "sourceTextScanComplete": false,
           "staffingRoleScanVersion": 0,
           "staffingFactScanVersion": 0,
           "staffingScopeExcluded": false,
@@ -323272,7 +323607,7 @@
           "staffingRoleScanTruncated": false,
           "qualificationScanTruncated": false,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 61
+          "clauseCandidateCount": 0
         },
         {
           "name": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
@@ -323282,11 +323617,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 1,
+            "pdfPages": 8,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -323302,11 +323645,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": false,
           "staffingScopeReason": "",
           "staffingRoleScanTruncated": false,
@@ -323316,23 +323667,31 @@
         },
         {
           "name": "(행안부예규) 지방자치단체 입찰시 낙찰자 결정기준(2026.11.2.).hwpx",
-          "readable": false,
-          "sourceSha256": "",
+          "readable": true,
+          "sourceSha256": "856115fef50f2f97081c6adc9fd4d92ff41805e442b55283d11e87996b67ad9c",
           "alternatePdfEvidence": "",
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
-          "errorCategory": "large_xml_section",
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
+          "errorCategory": "",
           "sourceTextScanComplete": false,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": true,
           "staffingScopeReason": "공통 입찰·계약 규정 또는 일반 낙찰기준 (사업별 인원요건 아님)",
-          "staffingRoleScanTruncated": false,
-          "qualificationScanTruncated": false,
+          "staffingRoleScanTruncated": true,
+          "qualificationScanTruncated": true,
           "unmatchedQualificationAnchorCount": 0,
-          "clauseCandidateCount": 0
+          "clauseCandidateCount": 1233
         },
         {
           "name": "(행안부예규) 지방자치단체 입찰 및 계약집행기준(2026.7.1.).hwpx",
@@ -323342,11 +323701,19 @@
           "alternatePdfSourceSha256": "",
           "alternatePdfEvidenceMode": "",
           "skippedDuplicateFormat": false,
-          "extractionEvidence": {},
+          "extractionEvidence": {
+            "sourceComplete": true,
+            "pdfFiles": 0,
+            "pdfPages": 0,
+            "ocrAttemptedPages": 0,
+            "ocrRecoveredPages": 0,
+            "unresolvedPages": 0,
+            "extractionMethod": "native"
+          },
           "errorCategory": "",
           "sourceTextScanComplete": true,
-          "staffingRoleScanVersion": 0,
-          "staffingFactScanVersion": 0,
+          "staffingRoleScanVersion": 4,
+          "staffingFactScanVersion": 2,
           "staffingScopeExcluded": true,
           "staffingScopeReason": "공통 입찰·계약 규정 또는 일반 낙찰기준 (사업별 인원요건 아님)",
           "staffingRoleScanTruncated": false,
@@ -323356,24 +323723,74 @@
         }
       ],
       "staffingRoles": [],
-      "staffingFacts": [],
-      "staffingRoleScanComplete": false,
+      "staffingFacts": [
+        {
+          "kind": "staffing_requirement",
+          "role": "",
+          "sourceText": "․ 재직 증명 서류(건강보험 자격 득실 확인서 등)",
+          "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+          "sourceLine": 135,
+          "headcount": null,
+          "requirementType": "proof",
+          "label": "건강보험 자격득실확인서 등 재직 증빙",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
+        },
+        {
+          "kind": "staffing_plan_required",
+          "role": "",
+          "sourceText": "요구사항 번호 PMR-07요구사항 명 사업 수행조직요구사항 분류 프로젝트관리 요구사항상세설명정의 사업 수행조직 및 운영방안 제시세부내용◦ 제안사는 본 사업을 수행할 추진조직, 인력구성 및 프로필과 단계별 인력투입계획 및 역할, 투입률 등을 제시하여야 하고 특히 PM, PL은 투입인력의 기술수준을 상세하게 제시하여야 하며, 인력은 발주기관의 동의 없이 제안사 임의로 변경할 수 없음◦ 사업관리자(PM) 및 사업리더(PL)는 제안사",
+          "sourceFile": "2. 제안요청서.hwpx",
+          "sourceLine": 1489,
+          "mandatory": true,
+          "headcount": null,
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+        },
+        {
+          "kind": "staffing_plan_required",
+          "role": "",
+          "sourceText": "◦ 사업수행계획서 제출시 월별 상세 투입인력현황을 제시하여야 함",
+          "sourceFile": "2. 제안요청서.hwpx",
+          "sourceLine": 1509,
+          "mandatory": true,
+          "headcount": null,
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+        },
+        {
+          "kind": "staffing_requirement",
+          "role": "",
+          "sourceText": "본 및 사본 각 1부 - 주요사업 실적증명 서류 - 신용평가등급 확인서 - 참여인력 증거서류 󰋻기술 및 경력 증거서류 (소프트웨어 기술자 경력 증명서, 자격증 및 학력 증명, 경력 증명, 건강보험 자격 득실 확인서 등) 󰋻재직 증명 서류(건강보험 자격 득실 확인서 등)⑪ 기타 입찰참가자격을 증명하는 서류",
+          "sourceFile": "2. 제안요청서.hwpx",
+          "sourceLine": 2067,
+          "headcount": null,
+          "requirementType": "proof",
+          "label": "건강보험 자격득실확인서 등 재직 증빙",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+        },
+        {
+          "kind": "staffing_requirement",
+          "role": "",
+          "sourceText": "❍ 참여인력(제안서 인력)은 입찰 공고일 현재 제안사 구성원의 자사인력으로 구성하여야 한다.",
+          "sourceFile": "2. 제안요청서.hwpx",
+          "sourceLine": 2175,
+          "headcount": null,
+          "requirementType": "workforce",
+          "label": "공고일 현재 참여인력 자사 소속",
+          "sourceUrl": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
+        }
+      ],
+      "staffingRoleScanComplete": true,
       "manifestSignature": "14d4b0b554c0e6edf45aed0912a207ce72e5efa4042b63ba91b17ca1b590a0fd",
-      "manifestCheckedAt": "2026-11-10T15:05:25.684893+00:00",
+      "manifestCheckedAt": "2026-11-14T02:47:38.589442+00:00",
       "manifestChangePending": false,
       "changcomClauseEvidence": {
         "status": "text_extracted_requires_review",
-        "checkedAt": "2026-11-10T15:04:19.487817+00:00",
+        "checkedAt": "2026-11-14T02:46:30.500045+00:00",
         "readableDocumentCount": 4,
         "unreadableDocumentCount": 1,
         "manifestComplete": true,
         "reviewComplete": false,
         "eligibilityVerified": false,
         "files": [
-          {
-            "name": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"
-          },
           {
             "name": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"
@@ -323383,6 +323800,10 @@
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=3&prcmBsneSeCd=03"
           },
           {
+            "name": "(행안부예규) 지방자치단체 입찰시 낙찰자 결정기준(2026.11.2.).hwpx",
+            "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03"
+          },
+          {
             "name": "(행안부예규) 지방자치단체 입찰 및 계약집행기준(2026.7.1.).hwpx",
             "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03"
           }
@@ -323390,187 +323811,190 @@
         "clauseCandidates": {
           "industry_code": [
             {
-              "text": "⟨문의처 : 조달청 전자 조달센터(☏ 1588-0800)⟩ 나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을 등록한 자",
+              "text": "조달청 입찰참가자격 미등록 업체는 「국가종합전자조달시스템 전자입찰특별유의서」에 따라 전자입찰서 제출마감일 전일까지 등록하여야 합니다. ⟨문의처 : 조달청 전자 조달센터(☏ 1588-0800)⟩ 나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을",
               "codes": [
                 "1588",
                 "0800"
               ],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을 등록한 자",
+              "text": "나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을 등록한 자 1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업인 소프트웨어 사업자는 입찰에 참여할 수 없습니다.",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "text": "따라 전자입찰서 제출마감일 전일까지 등록하여야 합니다. ⟨문의처 : 조달청 전자 조달센터(☏ 1588-0800)⟩ 나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을 등록한 자",
+              "codes": [
+                "1588",
+                "0800"
+              ],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "direct_production": [
             {
-              "text": "다. 「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조(경쟁입찰 참여자격) 및 같은 법 시행령 제9조에 의한 유자격자로서 직접생산확인증명서[빅데이터분석서비스(8111200202)]를 소지하고, 「중소기업기본법」제2조에 따른 중소기업자로서, 「중소기업 범위 및 확인에 관한 규정」에 따라 발급된 중소기업확인서를 소지한 중소기업자(중기업, 소기업, 소상공인)",
+              "text": "‣ 공정거래위원회 홈페이지(http://www.ftc.go.kr) 소식·뉴스> 공정위 소식 > 보도자료 에서 키워드 “공시대상기업집단 등 지정 결과 발표” 검색> 첨부서류 중 “(별첨5) 공 시대상기업집단 계열회사 현황” 참조 다. 「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조(경쟁입찰 참여자격) 및 같 은 법 시행령 제9조에 의한 유자격자로서 직접생산확인증명서[빅데이터분석서비스",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "다. 「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조(경쟁입찰 참여자격) 및 같 은 법 시행령 제9조에 의한 유자격자로서 직접생산확인증명서[빅데이터분석서비스",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "에서 키워드 “공시대상기업집단 등 지정 결과 발표” 검색> 첨부서류 중 “(별첨5) 공 시대상기업집단 계열회사 현황” 참조 다. 「중소기업제품 구매촉진 및 판로지원에 관한 법률」제8조(경쟁입찰 참여자격) 및 같 은 법 시행령 제9조에 의한 유자격자로서 직접생산확인증명서[빅데이터분석서비스 (8111200202)]를 소지하고, 「중소기업기본법」제2조에 따른 중소기업자로서, 「중소기",
               "codes": [
                 "8111200202"
               ],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "※ 중소기업확인서는 공공구매정보망(www.smpp.go.kr)에 등록되어 있어야 하고, 유효기간 내에 있어야 하며, 제안서 제출 마감일까지 발급된 자료도 심사에 포함합니다. ※ 직접생산확인증명서는 입찰 마감일의 전일까지 공공구매정보망(www.smpp.go.kr)에 등록된 것으로서 유효기간 내에 있어야 합니다.",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "※ 직접생산확인증명서는 입찰 마감일의 전일까지 공공구매정보망(www.smpp.go.kr)에 등록된 것으로서 유효기간 내에 있어야 합니다.",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "sme_certificate": [
             {
+              "text": "우선 적용됩니다. 또한 입찰공고문과 첨부물은 상호보완 적용됩니다. ▸입찰공고문에 정한 각종 규정은 개정될 수 있으며, 개정될 경우 개정규정 부칙의 시행일(또는 적용례)에 따라 개정 규정의 적용 여부가 결정될 수 있습니다. 1. 입찰에 부치는 사항 ※ 제한경쟁(중소기업자), 총액입찰, 단독이행, 협상에 의한 계약",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "1. 입찰에 부치는 사항 ※ 제한경쟁(중소기업자), 총액입찰, 단독이행, 협상에 의한 계약",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "※ 제한경쟁(중소기업자), 총액입찰, 단독이행, 협상에 의한 계약",
+              "text": "▸입찰공고문에 정한 각종 규정은 개정될 수 있으며, 개정될 경우 개정규정 부칙의 시행일(또는 적용례)에 따라 개정 규정의 적용 여부가 결정될 수 있습니다. 1. 입찰에 부치는 사항 ※ 제한경쟁(중소기업자), 총액입찰, 단독이행, 협상에 의한 계약 가. 사 업 명 : 2027년 서울형 빅데이터 표준분석모델 개발 및 운영 용역",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "※ 제한경쟁(중소기업자), 총액입찰, 단독이행, 협상에 의한 계약 가. 사 업 명 : 2027년 서울형 빅데이터 표준분석모델 개발 및 운영 용역",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "region_restriction": [
             {
-              "text": "14) 현장대리인(「건설산업기본법」 등 공사 관련 법령에 따른 기술자 배치기준에 적합한 자를 말한다)을 불필요하게 현장에 상주시키는 사례 15) 특수한 기술이나 공법*이 요구되지 않음에도 실적을 지역제한이나 기술의 보유상황과 중복하여 제한하는 사례",
+              "text": "내에 재해경감활동에 대해 평가한 결과 우수한 기업으로 인증 받은 자1.0입찰공고일 기준 행정안전부 장관이 재해경감 우수기업으로 인증한 자1.0㈛해당지역 영업활동기간1.0전입일로부터 입찰공고일 전일까지 1년 이상1.00.5전입일로부터 입찰공고 전일까지 6개월 이상 1년 미만(거)고용노동부장관이 ｢고용위기지역 지정 고시｣로 지정한 고용위기지역에서 영업행위를 하는 자0.5입찰공고일 기준 고용위기지역에 본점 소재지를 둔 자0.5(너)본점소재지를 과밀억제권역에서 그 외 지역으로 이전한 자",
               "codes": [],
-              "sourceFile": "(행안부예규) 지방자치단체 입찰 및 계약집행기준(2026.7.1.).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "sourceFile": "(행안부예규) 지방자치단체 입찰시 낙찰자 결정기준(2026.11.2.).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "15) 특수한 기술이나 공법*이 요구되지 않음에도 실적을 지역제한이나 기술의 보유상황과 중복하여 제한하는 사례",
+              "text": "역에 본점 소재지를 둔 자0.5(너)본점소재지를 과밀억제권역에서 그 외 지역으로 이전한 자1.0입찰공고일 기준 최근 1년 이내 본점 소재지를 이전한 자1.0 2) 심사기준(평가기준일 : 입찰공고일)",
               "codes": [],
-              "sourceFile": "(행안부예규) 지방자치단체 입찰 및 계약집행기준(2026.7.1.).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "sourceFile": "(행안부예규) 지방자치단체 입찰시 낙찰자 결정기준(2026.11.2.).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "15) 특수한 기술이나 공법*이 요구되지 않음에도 실적을 지역제한이나 기술의 보유상황과 중복하여 제한하는 사례 * 제4장 제한입찰 운영요령 별표 특수한 기술·공법·설비 등이 필요한 공사와 물품의 제조·구매",
+              "text": "입찰공고일 기준 고용위기지역에 본점 소재지를 둔 자",
               "codes": [],
-              "sourceFile": "(행안부예규) 지방자치단체 입찰 및 계약집행기준(2026.7.1.).hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=5&prcmBsneSeCd=03",
+              "sourceFile": "(행안부예규) 지방자치단체 입찰시 낙찰자 결정기준(2026.11.2.).hwpx",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=4&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "joint_participation": [
             {
-              "text": "※ 하도급 또는 직원의 인력파견 형태로도 참여 불가",
+              "text": "등록한 자 1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중 소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업 인 소프트웨어 사업자는 입찰에 참여할 수 없습니다. ※ 하도급 또는 직원의 인력파견 형태로도 참여 불가",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "※ 하도급 또는 직원의 인력파견 형태로도 참여 불가 2) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 중소기업(소프트웨어사업자 일반 현황 관리 확인서 상의 ‘공공 소프트웨어사업 입찰참여 제한금액 : 없음’으로 확인)만 입찰 참여 가능합니다.",
+              "text": "인 소프트웨어 사업자는 입찰에 참여할 수 없습니다. ※ 하도급 또는 직원의 인력파견 형태로도 참여 불가",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업인 소프트웨어 사업자는 입찰에 참여할 수 없습니다. ※ 하도급 또는 직원의 인력파견 형태로도 참여 불가",
+              "text": "1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중 소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업 인 소프트웨어 사업자는 입찰에 참여할 수 없습니다. ※ 하도급 또는 직원의 인력파견 형태로도 참여 불가 2) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "performance_proof": [
             {
+              "text": "※ 인감(사용인감) 지참, 사용인감 사용시 사용인감계 별도 제출 - 청렴계약이행서약서, 근로자권리보호이행서약서, 안전보건관리준수서약서 각 1부 바. 위임장 또는 재직증명서 1부 (대리인 제출 시) 사. 평가관련 증명서류(별권 제출) 원본 및 사본 각 1부 - 주요사업 실적증명 서류",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "사. 평가관련 증명서류(별권 제출) 원본 및 사본 각 1부 - 주요사업 실적증명 서류",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "- 주요사업 실적증명 서류",
+              "text": "- 청렴계약이행서약서, 근로자권리보호이행서약서, 안전보건관리준수서약서 각 1부 바. 위임장 또는 재직증명서 1부 (대리인 제출 시) 사. 평가관련 증명서류(별권 제출) 원본 및 사본 각 1부 - 주요사업 실적증명 서류 - 신용평가등급 확인서",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "- 주요사업 실적증명 서류 - 신용평가등급 확인서",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "staff_proof": [
             {
+              "text": "- 법인등기부등본 및 법인인감증명서 각 1부 (개인사업자인 경우 주민등록등본 및 인감증명서 각 1부) ※ 인감(사용인감) 지참, 사용인감 사용시 사용인감계 별도 제출 - 청렴계약이행서약서, 근로자권리보호이행서약서, 안전보건관리준수서약서 각 1부 바. 위임장 또는 재직증명서 1부 (대리인 제출 시)",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "- 청렴계약이행서약서, 근로자권리보호이행서약서, 안전보건관리준수서약서 각 1부 바. 위임장 또는 재직증명서 1부 (대리인 제출 시)",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "바. 위임장 또는 재직증명서 1부 (대리인 제출 시)",
+              "text": "(개인사업자인 경우 주민등록등본 및 인감증명서 각 1부) ※ 인감(사용인감) 지참, 사용인감 사용시 사용인감계 별도 제출 - 청렴계약이행서약서, 근로자권리보호이행서약서, 안전보건관리준수서약서 각 1부 바. 위임장 또는 재직증명서 1부 (대리인 제출 시) 사. 평가관련 증명서류(별권 제출) 원본 및 사본 각 1부",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "바. 위임장 또는 재직증명서 1부 (대리인 제출 시) 사. 평가관련 증명서류(별권 제출) 원본 및 사본 각 1부",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "registration_identity": [
             {
-              "text": "※ 입찰에 참여하는 자는 조달청 경쟁입찰 참가자격 등록증의 정보와 법인등기부등본 상의 정보가 정확히 일치하는지의 여부를 반드시 확인하신 후 입찰에 참여하여 주시기 바랍니다.(대표자, 상호, 면허사항 등) 위의 등록사항에 변경이 있을 경우에는 반드시 경쟁입찰 참가자격 등록증을 변경하여야 하며 변경등록을 하지 아니하고 입찰에 참여한 경우에는 「지방자치단체를 당사자로 하는 계약에 관한 법률 시행규칙」제42조에 의하여 입찰무효 사유에 해당됩니다.",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "※ 한 업체의 소속 대표자 중 1인이 다른 업체의 대표자를 겸임할 경우 해당 업체들이 하나의 입찰에 동시 참여하면 동일인이 2통의 입찰서를 제출한 것으로 간주되어 모두 무효 입찰로 처리됩니다. 이에 따라 대표자가 2인 이상인 업체의 경우 조달청 입찰참가자격 등록 시 대표자 전원을 등록하여야 하고, 현재 1인만 등록된 경우에는 변경 등록을 하여야 하며, 변경 등록을 하지 아니하고 입찰에 참가한 자는 「지방계약법 시행규칙」제42조 제5호 나목에 의하여 입찰 무효 사유에 해당됩니다.",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
               "text": "8. 입찰의 무효 가. 「지방자치단체를 당사자로 하는 계약에 관한 법률 시행령」제39조 및 같은 법 시행 규칙 제42조, 「지방자치단체 입찰 및 계약집행 기준」, 「국가종합전자조달시스템 전 자입찰특별유의서」, 「국가종합전자조달시스템 이용약관」 등을 따릅니다. ※ 입찰에 참여하는 자는 조달청 경쟁입찰 참가자격 등록증의 정보와 법인등기부등본 상의 정보가",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "자입찰특별유의서」, 「국가종합전자조달시스템 이용약관」 등을 따릅니다. ※ 입찰에 참여하는 자는 조달청 경쟁입찰 참가자격 등록증의 정보와 법인등기부등본 상의 정보가",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
+              "text": "가. 「지방자치단체를 당사자로 하는 계약에 관한 법률 시행령」제39조 및 같은 법 시행 규칙 제42조, 「지방자치단체 입찰 및 계약집행 기준」, 「국가종합전자조달시스템 전 자입찰특별유의서」, 「국가종합전자조달시스템 이용약관」 등을 따릅니다. ※ 입찰에 참여하는 자는 조달청 경쟁입찰 참가자격 등록증의 정보와 법인등기부등본 상의 정보가 정확히 일치하는지의 여부를 반드시 확인하신 후 입찰에 참여하여 주시기 바랍니다.(대표자,",
               "codes": [],
               "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
@@ -323581,65 +324005,65 @@
             {
               "text": "○ 입찰안내 상담 및 입찰참가 자격등록 : 조달청 정부조달 콜센터 (☎ 1588-0800)",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "○ ①입찰참가자격, ②과업내용 :",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
               "text": "1) 입찰참가자격 등록은 G2B(나라장터)에서 2026. 11. 16.(월) 18:00까지 완료하여야 합니다.",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "legal_exclusion": [
             {
-              "text": "나. 입찰참가등록마감일 기준 「소프트웨어 진흥법 시행령」제53조 및 같은 법 시행규칙 제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을 등록한 자 1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업인 소프트웨어 사업자는 입찰에 참여할 수 없습니다.",
+              "text": "제17조에 의거 소프트웨어사업자(분야: 컴퓨터관련서비스사업)으로 입찰참가자격을 등록한 자 1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중 소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업 인 소프트웨어 사업자는 입찰에 참여할 수 없습니다.",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업인 소프트웨어 사업자는 입찰에 참여할 수 없습니다.",
+              "text": "소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업 인 소프트웨어 사업자는 입찰에 참여할 수 없습니다.",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업인 소프트웨어 사업자는 입찰에 참여할 수 없습니다. ※ 하도급 또는 직원의 인력파견 형태로도 참여 불가",
+              "text": "등록한 자 1) 본 사업은 연간 사업비 20억 원 미만 사업으로 「소프트웨어 진흥법」에 의한 「중 소 소프트웨어사업자의 사업 참여 지원에 관한 지침」에 따라 대기업 및 중견기업 인 소프트웨어 사업자는 입찰에 참여할 수 없습니다. ※ 하도급 또는 직원의 인력파견 형태로도 참여 불가",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             }
           ],
           "bid_security": [
             {
+              "text": "나. 발표방법 : 업체당 30분 내외(제안설명 20분, 질의응답 10분) 다. 발표순서 : 제안서발표 당일 추첨 라. 발 표 자 : 사업책임자(PM)가 직접 발표 ※ PM은 반드시 신분증 지참 (배석인원은 발표자 포함 5인 이내) 7. 입찰보증금 납부 및 귀속",
+              "codes": [],
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
+              "interpretation": "manual_review_required"
+            },
+            {
               "text": "7. 입찰보증금 납부 및 귀속",
               "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
+              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
+              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
               "interpretation": "manual_review_required"
             },
             {
-              "text": "※ PM은 반드시 신분증 지참 (배석인원은 발표자 포함 5인 이내) 7. 입찰보증금 납부 및 귀속",
-              "codes": [],
-              "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.hwpx",
-              "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03",
-              "interpretation": "manual_review_required"
-            },
-            {
-              "text": "나. 발표방법 : 업체당 30분 내외(제안설명 20분, 질의응답 10분) 다. 발표순서 : 제안서발표 당일 추첨 라. 발 표 자 : 사업책임자(PM)가 직접 발표 ※ PM은 반드시 신분증 지참 (배석인원은 발표자 포함 5인 이내) 7. 입찰보증금 납부 및 귀속",
+              "text": "7. 입찰보증금 납부 및 귀속 입찰보증금은 면제하되, 전자입찰참가신청서식에 따라 납부확약내용이 명기된 전자지",
               "codes": [],
               "sourceFile": "1. 입찰공고문_서울특별시 재무공고 제2026-2378.pdf",
               "url": "https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01806198&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03",
@@ -344555,5 +344979,5 @@
       }
     }
   },
-  "workflowRunId": "43546689125"
+  "workflowRunId": "43548104682"
 }
