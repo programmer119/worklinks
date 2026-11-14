@@ -661,6 +661,12 @@ def _extract_pdf_with_audit(raw):
         if len(attempted)>=MAX_PDF_OCR_PAGES:
             missing.append(i+1)
             continue
+        # Bulk index/eligibility scan must never block its 8-notice batch on
+        # multi-page Tesseract. Preserve the unresolved pages for the isolated
+        # cached attachment OCR-repair job, which runs with this flag OFF.
+        if os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1':
+            missing.append(i+1)
+            continue
         attempted.append(i+1)
         try:
             value=_ocr_pdf_page(raw,i)
@@ -1679,6 +1685,12 @@ def process(no,ordn,metadata=None,previous=None):
             saved_slots[position]=dict(retained)
             continue
         record={'name':name,'sourceUrl':url,'readable':False}
+        if (os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1' and
+                name.lower().endswith(('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp'))):
+            record.update(errorCategory='ocr_deferred_to_repair',
+                          sourceTextScanComplete=False,ocrDeferred=True)
+            saved_slots[position]=record
+            continue
         try:
             # Tie even a failed binary download to its exact public notice.
             try:
