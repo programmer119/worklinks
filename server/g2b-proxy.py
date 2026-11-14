@@ -62,17 +62,8 @@ def api_ledger_event(ledger,kind,key,outcome,**fields):
         ledger.record(kind,key,outcome,**fields)
 
 
-def get_key(use_operating=False):
-    # A02 and B1/B2/B3 use the SAME approved production credential file.
-    # Fail closed when explicitly configured; never fall back to the old A02 key.
-    if use_operating and OPERATING_KEY_PATH:
-        try:
-            with open(OPERATING_KEY_PATH, 'r') as f:
-                for line in f:
-                    if line.startswith('G2B_STANDARD_SERVICE_KEY='):
-                        return line.split('=', 1)[1].strip()
-        except (OSError, IOError): pass
-        return ''
+def get_key():
+    # Legacy key remains available ONLY to other separately subscribed APIs.
     k = os.environ.get('G2B_SERVICE_KEY', '').strip()
     if k: return k
     try:
@@ -82,6 +73,20 @@ def get_key(use_operating=False):
                     return line.split('=', 1)[1].strip()
     except (OSError, IOError): pass
     return ''
+
+
+def get_a02_key():
+    # A02 uses the same independently verified operating key as B1/B2/B3.
+    # Fail closed if its explicitly configured file is missing or invalid.
+    if OPERATING_KEY_PATH:
+        try:
+            with open(OPERATING_KEY_PATH, 'r') as f:
+                for line in f:
+                    if line.startswith('G2B_STANDARD_SERVICE_KEY='):
+                        return line.split('=', 1)[1].strip()
+        except (OSError, IOError): pass
+        return ''
+    return get_key()
 
 class ApiError(Exception):
     def __init__(self, msg, status=502):
@@ -159,7 +164,7 @@ def upstream_rate_diagnostics():
 
 def request_api(base, operation, params):
     # Scope the shared credential to A02; leave other subscribed services alone.
-    token = get_key(use_operating=(base == API_BASE))
+    token = get_a02_key() if base == API_BASE else get_key()
     if not token: raise ApiError('secret_not_configured', 503)
     args = {'serviceKey':token, 'type':'json'}
     args.update(params)
