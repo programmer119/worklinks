@@ -70,6 +70,7 @@ with tempfile.TemporaryDirectory() as tmp:
     queue.enqueue([(no,'000','2099-12-31') for no in dates],'reader-v3')
     assert queue.claim_download(ready_manifest=True) is None
 
+    assert bulk.ROWS==999, 'live G2B 1000-row requests were capped at 10'
     original_rows=bulk.ROWS
     original_pass=bulk.MAX_FETCH_PER_PASS
     bulk.ROWS=2
@@ -143,14 +144,14 @@ g['request_api']=fake_request
 try:
     start=new_day.replace('-','')+'0000'
     end=new_day.replace('-','')+'2359'
-    result=proxy.rfp_attachment_batch_page('ordinary',start,end,1,1000)
+    result=proxy.rfp_attachment_batch_page('ordinary',start,end,1,999)
     assert result['ok'] and result['rawCount']==1
     assert result['items'][0]['bidNo']==first
     assert len(seen)==1 and seen[0][0]=='getBidPblancListInfoAtchFileInfo02'
-    assert seen[0][1]['inqryDiv']==1 and seen[0][1]['numOfRows']==1000
+    assert seen[0][1]['inqryDiv']==1 and seen[0][1]['numOfRows']==999
     assert 'bidNtceNo' not in seen[0][1],seen
     try:
-        proxy.rfp_attachment_batch_page('ordinary','202610010000','202610102359',1,1000)
+        proxy.rfp_attachment_batch_page('ordinary','202610010000','202610102359',1,999)
     except proxy.ApiError as ex:assert ex.status==400
     else:raise AssertionError('provider 7-day bound not enforced')
     assert len(seen)==1
@@ -221,8 +222,8 @@ with tempfile.TemporaryDirectory() as root:
     assert len(official)==3,official
     print('RFP_BULK_EXCEPTION_BOUNDED_THREE_OPERATIONS=PASS',flush=True)
 
-# Live provider example: 151 total records, but numOfRows=1000 yields only
-# 10 real records per page. Complete all 16 real pages, and resume after page 1.
+# Defensive case: even at requested 999, unexpected 10-row pages must
+# still paginate completely without missing any records. Complete all 16 real pages, and resume after page 1.
 with tempfile.TemporaryDirectory() as root:
     root=Path(root)
     db=root/'bids.sqlite3'
@@ -238,7 +239,7 @@ with tempfile.TemporaryDirectory() as root:
         u=urllib.parse.urlparse(url)
         assert u.path=='/api/g2b/rfp-attachment-batch',u.path
         args=dict(urllib.parse.parse_qsl(u.query))
-        assert args['rows']=='1000',args
+        assert args['rows']=='999',args
         source=args['source']
         page=int(args['page'])
         seen.append((source,page))
@@ -277,5 +278,45 @@ with tempfile.TemporaryDirectory() as root:
               {'dateBatchCalls':len(seen),'ordinaryPages':16},flush=True)
     finally:
         bulk.MAX_FETCH_PER_PASS=original_pass
+
+# Previously persisted 1000-row request's incomplete page must be replaced
+# instead of combining pageNo=1 at size 10 with pageNo=2 at size 999.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    db=root/'bids.sqlite3'
+    bid='R26BK00010030'
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
+        con.execute('INSERT INTO bid_notices VALUES (?,?,?,1)',
+                    (bid,'000',json.dumps({'posted':new_day+'T10:00:00'})))
+    q=RfpDualQueue(root/'queue.sqlite3')
+    q.enqueue([(bid,'000','2099-12-31')],'r1')
+    with q.connect() as con:
+        con.execute('INSERT INTO rfp_bulk_pages (day,source,page,total_count,raw_count,items_json,saved_at,requested_rows) VALUES (?,?,?,?,?,?,?,?)',
+                    (new_day,'ordinary',1,151,10,'[]',bulk.dt.datetime.now(bulk.dt.timezone.utc).isoformat(),1000))
+    seen=[]
+    def fetch999(url):
+        args=dict(urllib.parse.parse_qsl(urllib.parse.urlparse(url).query))
+        assert args['rows']=='999',args
+        seen.append((args['source'],int(args['page'])))
+        assert args['page']=='1', '999 results should fit one page'
+        if args['source']=='ordinary':
+            items=[{'bidNo':bid,'order':'000','name':'doc.pdf',
+                    'url':'https://www.g2b.go.kr/doc.pdf','source':'notice_attachment_api'} for _ in range(151)]
+        elif args['source']=='detail':
+            items=[{'bidNo':bid,'order':'000','presence':True,'source':'notice_detail'}]
+        else:
+            items=[]
+        return {'ok':True,'source':args['source'],'page':1,'totalCount':len(items),
+                'rawCount':len(items),'items':items}
+    planner=bulk.BulkManifestPlanner(q,db,fetch999,NoDelay(),allow_exceptions=False)
+    result=planner.populate_one_day()
+    assert result['new']==1,result
+    assert len(seen)==3 and ('ordinary',1) in seen,seen
+    with q.connect() as con:
+        entries=con.execute('SELECT page,raw_count,requested_rows FROM rfp_bulk_pages WHERE day=? AND source=?',
+                            (new_day,'ordinary')).fetchall()
+    assert entries==[(1,151,999)],entries
+    print('RFP_BULK_OLD_1000_ROW_CACHE_MIGRATED_TO_999=PASS',flush=True)
 
 print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
