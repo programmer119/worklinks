@@ -141,8 +141,11 @@ def collected_source(db,day,source,fetch=None,limit=MAX_CALLS_PER_RUN):
     if expected>MAX_PAGES:raise ValueError('mandatory_batch_too_many_pages')
     fetched=0
     indexed={p[0]:p for p in pages}
-    for page in range(1,expected+1):
-        if page in indexed:continue
+    page=1
+    while page<=expected:
+        if page in indexed:
+            page+=1
+            continue
         if fetched>=limit:return None,fetched
         reserve(db,source,day,page)
         result,items=fetch_page(source,day,page,fetch)
@@ -164,7 +167,7 @@ def collected_source(db,day,source,fetch=None,limit=MAX_CALLS_PER_RUN):
                         json.dumps(items,ensure_ascii=False,separators=(',',':')),stamp()))
         indexed[page]=(page,total,current,json.dumps(items))
         fetched+=1
-        if page>=expected:break
+        page+=1
     if len(indexed)!=expected:return None,fetched
     full=[]
     for page in range(1,expected+1):
@@ -319,8 +322,8 @@ def run_forever():
         try:
             result=run_once(db)
             print('MANDATORY_BATCH_PROGRESS',json.dumps(result),flush=True)
-            wait=(600 if result.get('status')=='complete' else
-                  120 if result.get('status')=='partial_pages' else 1800)
+            wait=(2 if result.get('status')=='complete' else
+                  30 if result.get('status')=='partial_pages' else 1800)
         except Exception as exc:
             print('MANDATORY_BATCH_RETRY_LATER',type(exc).__name__,
                   str(exc)[:100],flush=True)
