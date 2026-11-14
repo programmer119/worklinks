@@ -2049,7 +2049,11 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == '/api/g2b/rfp-attachment-batch':
                 # Enforce server-local access: this expensive read must not
                 # be exposed as a public unauthenticated quota-spending API.
-                if self.client_address[0] not in ('127.0.0.1','::1'):
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
                     raise ApiError('local_worker_only',403)
                 try:
                     page=int(get('page','1'))
