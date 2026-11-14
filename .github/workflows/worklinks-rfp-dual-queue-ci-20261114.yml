@@ -1,7 +1,7 @@
 name: WorkLinks independent download and scan queue regression
 on:
   push:
-    branches: [feat/rfp-dual-queues-main-sync-20261114]
+    branches: [main, feat/rfp-dual-queues-main-sync-20261114]
     paths:
       - 'scripts/rfp_dual_queue.py'
       - 'scripts/rfp_download_worker.py'
