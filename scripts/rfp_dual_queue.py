@@ -85,7 +85,7 @@ class RfpDualQueue:
         """Safe only at process start; a lost worker can be resumed from raw bytes."""
         with self.connect() as db:
             db.execute("UPDATE rfp_dual_notices SET download_status='pending' WHERE download_status='fetching'")
-            db.execute("UPDATE rfp_dual_notices SET scan_status='pending' WHERE scan_status='scanning'")
+            # Scanner claims are recovered on their own timeout, not on downloader restart.
 
     def claim_download(self):
         with self.connect() as db:
