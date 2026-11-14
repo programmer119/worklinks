@@ -1,4 +1,4 @@
-name: WorkLinks RFP production browser polling diagnosis
+name: WorkLinks RFP production polling post-fix
 on:
   push:
     branches: [main]
@@ -9,48 +9,48 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 7
     steps:
-      - name: Install browser
+      - name: Install real browser
         run: |
           python3 -m pip install -q playwright
           python3 -m playwright install chromium
-      - name: Diagnose actual browser requests over 35 seconds
+      - name: Confirm 4+ successful RFP refreshes under bounded saved-data loading
         shell: bash
         run: |
           python3 - <<'PY'
-          import json,time,urllib.request
+          import json
           from playwright.sync_api import sync_playwright
-          page_url='https://worklinks.suaveforge.com/startup-support/?view=jobs'
-          api_url='https://api-suaveforge.suaveforge.com:18458/api/g2b/rfp-rescan-progress'
-          try:
-            req=urllib.request.Request(api_url,headers={'Origin':'https://worklinks.suaveforge.com','Cache-Control':'no-cache'})
-            t=time.monotonic()
-            with urllib.request.urlopen(req,timeout=30) as response:
-              result=json.load(response)
-              print('PYTHON_API',json.dumps({'elapsed':round(time.monotonic()-t,2),'status':response.status,'cors':response.headers.get('Access-Control-Allow-Origin'),'asOf':result.get('asOf'),'done':result.get('counts',{}).get('completed')},ensure_ascii=False),flush=True)
-          except Exception as e:print('PYTHON_API_ERROR',repr(e),flush=True)
           with sync_playwright() as p:
-            browser=p.chromium.launch(headless=True)
-            page=browser.new_page(viewport={'width':1310,'height':820})
-            def rfp(r): return '/rfp-rescan-progress' in r.url
-            page.on('console',lambda msg:print('BROWSER_CONSOLE',msg.type,msg.text[:350],flush=True) if msg.type=='error' else None)
-            page.on('pageerror',lambda err:print('BROWSER_PAGEERROR',str(err)[:500],flush=True))
-            page.on('request',lambda req:print('REQ',req.url,flush=True) if rfp(req) else None)
-            page.on('requestfailed',lambda req:print('FAILED_REQ',req.url,req.failure,flush=True) if rfp(req) else None)
-            page.on('response',lambda resp:print('RESPONSE',resp.status,resp.url,'cors',resp.headers.get('access-control-allow-origin',''),flush=True) if rfp(resp) else None)
-            page.goto(page_url,wait_until='domcontentloaded',timeout=60000)
-            for i in range(8):
-              page.wait_for_timeout(5000)
-              data=page.evaluate("""() => ({
-                text: document.getElementById('rfpRescanLabel')?.textContent,
-                count: document.getElementById('rfpRescanCount')?.textContent,
-                seconds: document.getElementById('rfpRescanSeconds')?.textContent,
-                error: typeof rfpRescanProgressError==='undefined'?'unset':rfpRescanProgressError,
-                successAt:typeof rfpRescanLastSuccessAt==='undefined'?null:rfpRescanLastSuccessAt,
-                fetchedAt:typeof rfpRescanLastRead==='undefined'?null:rfpRescanLastRead,
-                serverAt:typeof rfpRescanProgress==='undefined'?null:rfpRescanProgress?.asOf
-              })""")
-              print('BROWSER_STATE',i,json.dumps(data,ensure_ascii=False),flush=True)
-            browser.close()
+              browser=p.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1330,'height':830})
+              progress_requests=[]
+              progress_success=[]
+              failures=[]
+              saved_requests=[]
+              page.on('request',lambda q:progress_requests.append(q.url) if '/rfp-rescan-progress' in q.url else saved_requests.append(q.url) if '/saved?sw=1' in q.url else None)
+              page.on('response',lambda r:progress_success.append(r.status) if '/rfp-rescan-progress' in r.url and r.status==200 else None)
+              page.on('requestfailed',lambda q:failures.append({'url':q.url,'error':q.failure}) if '/rfp-rescan-progress' in q.url else None)
+              page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
+              assert 'const savedWindow=g2bCompactScreen()?160:400' in page.content(),'new bounded loader not deployed'
+              print('NEW_FRONTEND_DEPLOYED=TRUE',flush=True)
+              for i in range(10):
+                  page.wait_for_timeout(5000)
+                  info=page.evaluate("""() => ({
+                    label:document.querySelector('#rfpRescanLabel')?.textContent,
+                    count:document.querySelector('#rfpRescanCount')?.textContent,
+                    lastSuccess:typeof rfpRescanLastSuccessAt==='undefined'?0:rfpRescanLastSuccessAt,
+                    error:typeof rfpRescanProgressError==='undefined'?'unset':rfpRescanProgressError,
+                    serverAsOf:typeof rfpRescanProgress==='undefined'?'unknown':rfpRescanProgress?.asOf,
+                    savedOffset:typeof g2bLoadedOffset==='undefined'?null:g2bLoadedOffset,
+                    savedTotal:typeof g2bSavedTotal==='undefined'?null:g2bSavedTotal
+                  })""")
+                  print('ACTUAL_BROWSER',i,json.dumps(info,ensure_ascii=False),flush=True)
+              print('RESULT',json.dumps({'progressRequests':len(progress_requests),'successfulResponses':len(progress_success),'failedProgressRequests':failures,'savedRequests':len(saved_requests)},ensure_ascii=False),flush=True)
+              assert len(progress_success)>=4, 'progress refresh did not succeed at least four times'
+              assert not failures,'browser rejected progress request during polling'
+              assert len(saved_requests)<=5,'too many bulk saved-data requests during first load'
+              assert not page.evaluate("() => Boolean(rfpRescanProgressError)"), 'live progress is marked delayed'
+              browser.close()
+          print('WORKLINKS_PRODUCTION_POLLING_STABLE=PASS',flush=True)
           PY
