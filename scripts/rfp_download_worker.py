@@ -18,6 +18,7 @@ import urllib.parse
 import refresh_worklinks_rfp as reader
 from rfp_call_ledger import cache_key
 from rfp_dual_queue import RfpDualQueue
+from rfp_bulk_manifests import BulkManifestPlanner, BulkManifestQuota, BulkManifestError
 
 DATA=Path(os.environ.get('G2B_PIPELINE_DATA','/app/data'))
 SCRIPTS=Path(os.environ.get('G2B_PIPELINE_SCRIPTS','/app/scripts'))
@@ -26,6 +27,7 @@ QUEUE=DATA/'rfp-dual-queue.sqlite3'
 WORKERS=max(1,min(8,int(os.environ.get('WORKLINKS_RFP_DOWNLOAD_CONCURRENCY','8'))))
 POLL_SECONDS=2
 REFRESH_SECONDS=600
+BULK_ENABLED=os.environ.get('WORKLINKS_RFP_BATCH_MANIFESTS')=='1'
 
 class ProviderBackoff(RuntimeError):
     pass
@@ -92,9 +94,16 @@ def download_one(queue,claim,halt):
         queue.download_failed(key,'upstream_paused',retry_seconds=600)
         return False
     try:
-        META_PACE.acquire()
-        meta=reader.fetch_json(reader.BASE+'bid-evidence?'+urllib.parse.urlencode(
-            {'bidNo':bid,'order':ordinal}))
+        if BULK_ENABLED:
+            # No per-bid official API in the bulk downloader, including
+            # region information. The whole-day 3-source manifest is durable.
+            meta=queue.bulk_manifest(key)
+            if meta is None:
+                raise RuntimeError('complete_bulk_manifest_missing')
+        else:
+            META_PACE.acquire()
+            meta=reader.fetch_json(reader.BASE+'bid-evidence?'+urllib.parse.urlencode(
+                {'bidNo':bid,'order':ordinal}))
         docs=meta.get('attachments') or {}
         errors=' '.join(str(x or '') for x in
           (docs.get('error'),(meta.get('noticeDocuments') or {}).get('error'),
@@ -150,20 +159,50 @@ def run_forever():
     os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
     queue=RfpDualQueue(QUEUE)
     queue.reset_stale()
+    planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
+                                  reader.fetch_json,META_PACE)
+             if BULK_ENABLED else None)
     last_refresh=0
     halted_until=0
+    planner_pause_until=0
+    last_planner_pass=-100.0
     while True:
         now=time.monotonic()
         if now-last_refresh>=REFRESH_SECONDS:
             discover_all(queue)
             last_refresh=now
+        if planner is not None and time.time()>=planner_pause_until and (
+                now-last_planner_pass>=3):
+            last_planner_pass=now
+            try:
+                result=planner.populate_one_day()
+                if result.get('calls') or result.get('new'):
+                    print('RFP_BULK_MANIFEST_PROGRESS',
+                          json.dumps(result,separators=(',',':')),flush=True)
+                if result.get('new')==0 and result.get('calls')==0:
+                    planner_pause_until=time.time()+60
+            except BulkManifestQuota as exc:
+                planner_pause_until=time.time()+3600
+                print('RFP_BULK_LOCAL_CALL_BUDGET_PAUSE',
+                      str(exc),flush=True)
+            except Exception as exc:
+                # Never replace an incomplete multi-page response with an
+                # invented empty source, and never flood the API with retries.
+                problem=str(exc)
+                planner_pause_until=time.time()+(3600 if
+                    detects_upstream_limit(problem) or
+                    getattr(exc,'code',0) in (429,502,503)
+                    else 600)
+                print('RFP_BULK_OFFICIAL_SOURCE_UNAVAILABLE',
+                    type(exc).__name__,problem[:140],
+                    'retryAfterEpoch',round(planner_pause_until),flush=True)
         if time.time()<halted_until:
             time.sleep(min(30,halted_until-time.time()))
             continue
         halt=threading.Event()
         claimed=[]
         for i in range(WORKERS):
-            row=queue.claim_download()
+            row=queue.claim_download(ready_manifest=BULK_ENABLED)
             if row:claimed.append(row)
             else:break
         if not claimed:

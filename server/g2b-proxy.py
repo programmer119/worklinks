@@ -720,6 +720,72 @@ def _is_stale_eorder_reason(name,latest_business_year,notice_year=None):
     return bool(years and max(years)<notice_year and max(years)<latest_business_year)
 
 
+RFP_BATCH_SOURCES={
+    'ordinary':'getBidPblancListInfoAtchFileInfo02',
+    'eorder':'getBidPblancListInfoEorderAtchFileInfo02',
+    'detail':'getBidPblancListInfoServc02'
+}
+
+def rfp_attachment_batch_page(source,from_time,to_time,page,rows):
+    """One OFFICIAL paginated date query, never one request per notice.
+
+    Only called from localhost by the separate download worker. Source-wide
+    quota/circuit-breaker is shared with all existing BidPublicInfoService02
+    operations; it is NOT bypassed to force requests through a daily 429.
+    """
+    operation=RFP_BATCH_SOURCES.get(source)
+    if operation is None:raise ApiError('invalid_rfp_batch_source',400)
+    if not (re.fullmatch(r'\d{12}',from_time) and
+            re.fullmatch(r'\d{12}',to_time)):
+        raise ApiError('invalid_rfp_batch_dates',400)
+    try:
+        start=datetime.datetime.strptime(from_time,'%Y%m%d%H%M')
+        end=datetime.datetime.strptime(to_time,'%Y%m%d%H%M')
+    except ValueError:
+        raise ApiError('invalid_rfp_batch_dates',400)
+    if end<start or (end-start).total_seconds()>7*86400:
+        raise ApiError('rfp_batch_max_7_days',400)
+    if not (1<=page<=3000 and 1<=rows<=1000):
+        raise ApiError('invalid_rfp_batch_pagination',400)
+    raw=request_api(API_BASE,operation,{
+        'pageNo':page,'numOfRows':rows,'inqryDiv':1,
+        'inqryBgnDt':from_time,'inqryEndDt':to_time
+    })
+    source_rows=raw['items']
+    count=raw['totalCount']
+    if count>0 and not source_rows:
+        raise ApiError('incomplete_rfp_batch_page',502)
+    normalized=[]
+    for row in source_rows:
+        if not isinstance(row,dict):raise ApiError('malformed_rfp_batch_row')
+        bid=str(row.get('bidNtceNo') or '').strip()
+        if not re.fullmatch(r'[A-Za-z0-9-]{8,40}',bid):
+            raise ApiError('missing_rfp_batch_bid_number')
+        order=str(row.get('bidNtceOrd') or '000').zfill(3)
+        if not re.fullmatch(r'\d{3}',order):
+            raise ApiError('invalid_rfp_batch_order')
+        if source=='detail':
+            for pos in range(1,11):
+                url=str(row.get('ntceSpecDocUrl'+str(pos)) or '').strip()
+                name=str(row.get('ntceSpecFileNm'+str(pos)) or '').strip()
+                if not url and not name:continue
+                normalized.append({'bidNo':bid,'order':order,'name':name[:160],
+                    'url':url if url.startswith('https://') else '',
+                    'source':'notice_detail'})
+        else:
+            name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName',
+                            'eorderAtchFileNm'])
+            url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl',
+                           'fileDownloadUrl','eorderAtchFileUrl'])
+            if name or url:
+                normalized.append({'bidNo':bid,'order':order,'name':name[:160],
+                    'url':url if url.startswith('https://') else '',
+                    'source':'eorder' if source=='eorder' else 'notice_attachment_api'})
+    return {'ok':True,'source':source,'from':from_time,'to':to_time,
+            'page':page,'rows':rows,'totalCount':count,
+            'rawCount':len(source_rows),'items':normalized}
+
+
 def bid_evidence_query(bid_no, order):
     """Four official A02 sources; include ordinary attachments beyond e-order."""
     regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
@@ -1980,6 +2046,22 @@ class Handler(BaseHTTPRequestHandler):
                 project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
                 return self.reply(200, worklinks_state_get(project, user_id))
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/rfp-attachment-batch':
+                # Enforce server-local access: this expensive read must not
+                # be exposed as a public unauthenticated quota-spending API.
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                try:
+                    page=int(get('page','1'))
+                    rows=int(get('rows','1000'))
+                except ValueError:
+                    raise ApiError('invalid_rfp_batch_pagination',400)
+                return self.reply(200,rfp_attachment_batch_page(
+                    get('source'),get('from'),get('to'),page,rows))
             if u.path == '/api/g2b/upstream-rate-status':
                 return self.reply(200,upstream_rate_diagnostics())
             if u.path == '/api/g2b/crawl-status':

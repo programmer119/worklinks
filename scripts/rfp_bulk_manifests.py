@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+"""One-day, paginated, durable official attachment lists for many RFP notices.
+
+All three document sources are acquired by PERIOD rather than by notice.
+An incomplete page/source NEVER counts as a complete manifest. A single
+request may populate dozens of separate notice download jobs.
+"""
+import datetime as dt
+import json
+import math
+from pathlib import Path
+import re
+import sqlite3
+import time
+import urllib.parse
+
+SOURCES=('ordinary','eorder','detail')
+ROWS=1000
+MAX_PAGES_PER_DAY_SOURCE=60
+MAX_FETCH_PER_PASS=18
+DAILY_LIMIT=180
+HOURLY_LIMIT=36
+
+class BulkManifestError(RuntimeError):
+    pass
+
+class BulkManifestQuota(BulkManifestError):
+    pass
+
+class BulkManifestPlanner:
+    def __init__(self,queue,bids_db,fetch,pacer):
+        self.queue=queue
+        self.bids_db=Path(bids_db)
+        self.fetch=fetch
+        self.pacer=pacer
+
+    def posted_days(self):
+        """Only verified posted dates from saved SW service notices."""
+        if not self.bids_db.is_file():return {}
+        with sqlite3.connect('file:'+str(self.bids_db)+'?mode=ro',uri=True,timeout=12) as db:
+            rows=db.execute('''SELECT bid_no,bid_ord,payload
+                FROM bid_notices WHERE sw_candidate=1''').fetchall()
+        desired=set(self.queue.unprepared_notices())
+        result={}
+        for no,order,payload in rows:
+            key=str(no)+':'+str(order or '000').zfill(3)
+            if key not in desired:continue
+            try:notice=json.loads(payload)
+            except (ValueError,TypeError):continue
+            raw=str(notice.get('posted') or '')
+            match=re.match(r'^(20\d\d)[-/]?(\d\d)[-/]?(\d\d)',raw)
+            if not match:continue
+            try:
+                date=dt.date(*map(int,match.groups()))
+            except ValueError:continue
+            if date>dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date():
+                continue
+            result[key]=date.isoformat()
+        return result
+
+    def _cached_pages(self,day,source):
+        with self.queue.connect() as db:
+            rows=db.execute('''SELECT page,total_count,raw_count,items_json
+                FROM rfp_bulk_pages WHERE day=? AND source=? ORDER BY page''',
+                (day,source)).fetchall()
+        if not rows:return None
+        total=rows[0][1]
+        required=max(1,math.ceil(total/ROWS))
+        if (required>MAX_PAGES_PER_DAY_SOURCE or len(rows)!=required or
+                [row[0] for row in rows]!=list(range(1,required+1)) or
+                any(row[1]!=total or not 0<=row[2]<=ROWS for row in rows) or
+                sum(row[2] for row in rows)!=total):
+            return None
+        return [record for row in rows for record in json.loads(row[3])]
+
+    def _pages_present(self,day,source):
+        with self.queue.connect() as db:
+            rows=db.execute('''SELECT page,total_count,raw_count
+                FROM rfp_bulk_pages WHERE day=? AND source=? ORDER BY page''',
+                (day,source)).fetchall()
+        return rows
+
+    def _reserve_api_call(self,source,day,page):
+        stamp=dt.datetime.now(dt.timezone.utc)
+        hourly=(stamp-dt.timedelta(hours=1)).isoformat()
+        midnight=stamp.replace(hour=0,minute=0,second=0,microsecond=0).isoformat()
+        with self.queue.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            hour=db.execute("SELECT COUNT(*) FROM rfp_bulk_request_budget WHERE started_at>=?",
+                            (hourly,)).fetchone()[0]
+            daily=db.execute("SELECT COUNT(*) FROM rfp_bulk_request_budget WHERE started_at>=?",
+                             (midnight,)).fetchone()[0]
+            if hour>=HOURLY_LIMIT or daily>=DAILY_LIMIT:
+                raise BulkManifestQuota('rfp_bulk_budget_hourly_or_daily')
+            db.execute('''INSERT INTO rfp_bulk_request_budget(started_at,source,day,page)
+                VALUES(?,?,?,?)''',(stamp.isoformat(),source,day,page))
+            # 3-day bounded history; avoid a forever-growing request ledger.
+            db.execute("DELETE FROM rfp_bulk_request_budget WHERE started_at<?",
+                       ((stamp-dt.timedelta(days=3)).isoformat(),))
+
+    def _source_for_day(self,day,source,needed_keys):
+        cached=self._cached_pages(day,source)
+        if cached is not None:return cached,0
+        saved=self._pages_present(day,source)
+        known_total=saved[0][1] if saved else None
+        if known_total is not None and known_total<0:
+            raise BulkManifestError('invalid_cached_batch_total')
+        pages=max(1,math.ceil(known_total/ROWS)) if known_total is not None else 1
+        if pages>MAX_PAGES_PER_DAY_SOURCE:
+            raise BulkManifestError('batch_page_count_unprofitable')
+        existing={row[0] for row in saved}
+        fetched=0
+        page=1
+        while page<=pages:
+            if page in existing:
+                page+=1
+                continue
+            if fetched>=MAX_FETCH_PER_PASS:
+                return None,fetched
+            self._reserve_api_call(source,day,page)
+            self.pacer.acquire()
+            compact=day.replace('-','')
+            params={'source':source,'from':compact+'0000',
+                    'to':compact+'2359','page':page,'rows':ROWS}
+            url='http://127.0.0.1:18192/api/g2b/rfp-attachment-batch?'+urllib.parse.urlencode(params)
+            payload=self.fetch(url)
+            if payload.get('ok') is not True:
+                raise BulkManifestError('batch_proxy_incomplete:'+str(payload.get('error'))[:100])
+            count=int(payload.get('totalCount',-1))
+            raw=int(payload.get('rawCount',-1))
+            if (count<0 or raw<0 or raw>ROWS or
+                    (count and raw==0) or
+                    int(payload.get('page',-1))!=page or
+                    payload.get('source')!=source or
+                    not isinstance(payload.get('items'),list)):
+                raise BulkManifestError('batch_invalid_provider_pagination')
+            expected=max(1,math.ceil(count/ROWS))
+            if expected>MAX_PAGES_PER_DAY_SOURCE:
+                raise BulkManifestError('batch_page_count_unprofitable')
+            if known_total is not None and count!=known_total:
+                raise BulkManifestError('batch_total_changed_restart_window')
+            known_total=count
+            filtered=[]
+            for item in payload['items']:
+                if not isinstance(item,dict):
+                    raise BulkManifestError('batch_invalid_attachment_item')
+                filtered.append(item)  # retain all rows for newly discovered notices
+            with self.queue.connect() as db:
+                db.execute('''INSERT OR REPLACE INTO rfp_bulk_pages
+                    (day,source,page,total_count,raw_count,items_json,saved_at)
+                    VALUES(?,?,?,?,?,?,?)''',
+                    (day,source,page,count,raw,
+                     json.dumps(filtered,ensure_ascii=False,separators=(',',':')),
+                     dt.datetime.now(dt.timezone.utc).isoformat()))
+            fetched+=1
+            pages=expected
+            page+=1
+        return self._cached_pages(day,source),fetched
+
+    @staticmethod
+    def _notice_meta(key,source_items):
+        merged=[]
+        all_detail=[]
+        seen=set()
+        general=0;eorder=0
+        for source in SOURCES:
+            for row in source_items[source]:
+                if str(row.get('bidNo'))+':'+str(row.get('order'))!=key:
+                    continue
+                name=str(row.get('name') or '')[:160]
+                url=str(row.get('url') or '')
+                item={'name':name,'url':url,'source':row.get('source')}
+                if source=='detail':all_detail.append(item)
+                if url and url in seen:continue
+                if url:seen.add(url)
+                if name or url:merged.append(item)
+                if source=='ordinary':general+=1
+                if source=='eorder':eorder+=1
+        return {'ok':True,'bidNo':key.split(':')[0],'order':key.split(':')[1],
+            'region':{'ok':False,'complete':False,'error':'not_requested_for_rfp_download'},
+            'attachments':{'ok':True,'complete':True,'count':len(merged),
+                 'items':merged,'generalCount':general,'eorderCount':eorder,
+                 'noticeDetailDocumentCount':len(all_detail),
+                 'sourceCoverage':'all_three_official_paginated_date_sources'},
+            'noticeDocuments':{'ok':True,'complete':True,'items':all_detail,
+                               'count':len(all_detail),
+                               'source':'official_paginated_notice_detail'},
+            'manifestOrigin':'verified_full_day_batch'}
+
+    def populate_one_day(self):
+        """At most one day per pass; never touch the actual file-download queue."""
+        mapping=self.posted_days()
+        if not mapping:return {'new':0,'missingPostedDate':len(self.queue.unprepared_notices()),'calls':0}
+        groups={}
+        for key,day in mapping.items():groups.setdefault(day,set()).add(key)
+        day=sorted(groups,reverse=True)[0]
+        keys=groups[day]
+        sources={}
+        calls=0
+        for source in SOURCES:
+            items,made=self._source_for_day(day,source,keys)
+            calls+=made
+            if items is None:
+                return {'new':0,'day':day,'calls':calls,'partial':True}
+            sources[source]=items
+        manifests={key:self._notice_meta(key,sources) for key in keys}
+        count=self.queue.save_bulk_manifests(manifests)
+        return {'new':count,'day':day,'calls':calls,'sourceCounts':
+                {src:len(items) for src,items in sources.items()},
+                'pending':len(self.queue.unprepared_notices())}
