@@ -8,6 +8,7 @@ on:
       - 'startup-support/rfp-clauses.json'
       - 'tests/test_worklinks_mobile_bootstrap.py'
       - 'tests/test_bid_price_alignment.py'
+      - 'tests/test_bid_compact_amount.cjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,6 +18,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Verify compact bid amount truncation and precise budget tooltip
+        run: node tests/test_bid_compact_amount.cjs
       - name: Install browser automation
         run: |
           python3 -m pip install -q playwright
