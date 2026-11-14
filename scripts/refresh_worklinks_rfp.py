@@ -473,10 +473,11 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                                   int(cached.get('hwpxReaderVersion') or 0)<HWPX_READER_VERSION or
                                   staff_missing))
                 if upgrade_only:
-                    # A parser upgrade must drain ALL actionable open work:
-                    # never-scanned bids and outdated evidence, not only legacy successes.
-                    # Expired/unknown-deadline bids remain available to the ordinary job.
-                    if temporal!=0:continue
+                    # Keep scanner-upgrade rescans distinct from FIRST-TIME scans.
+                    # A version migration spends its reserved slots ONLY on open
+                    # notices previously extracted with an older parser.
+                    # Never-scanned bids remain in the normal scheduled queue.
+                    if temporal!=0 or not legacy_outdated:continue
                     # Avoid repeatedly hitting a broken official endpoint or re-downloading
                     # an unchanged unreadable file within its 24-hour retry cooldown.
                     last_attempt=str(cached.get('lastAttemptAt') or '')
@@ -488,8 +489,6 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                             if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
                         except (ValueError,TypeError):pass
                     seen[key]=((0 if key in targets else 1,
-                                0 if not cached else 1,
-                                0 if legacy_outdated else 1,
                                 str(cached.get('lastAttemptAt') or cached.get('checkedAt') or ''),
                                 key),no,order,date.isoformat() if date else '')
                     continue
