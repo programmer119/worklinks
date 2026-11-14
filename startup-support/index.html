@@ -1023,7 +1023,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
     <p id="worklinks-auth-gate-description">계정 상태를 확인하고 있습니다.</p>
     <div class="worklinks-auth-gate-actions">
       <a id="worklinks-auth-gate-login" hidden href="https://authhub.suaveforge.com/login/?project=p47&amp;environment=production&amp;redirect_uri=https%3A%2F%2Fworklinks.suaveforge.com%2Fstartup-support%2Fauth-callback.html&amp;state=%2Fstartup-support%2F&amp;mode=login">다시 로그인</a>
-      <button type="button" id="worklinks-auth-gate-retry" hidden onclick="location.reload()">다시 확인</button>
+      <button type="button" id="worklinks-auth-gate-retry" hidden>다시 확인</button>
     </div>
   </section>
 </div>
@@ -6172,4 +6172,4 @@ document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){categ
  var note=root.querySelector('.src-status-note');note.textContent='기준: 본등록 '+itemsList.length+'건 중 '+total+'건 ('+(include?'마감 포함':'마감 제외')+'). 출처 URL 도메인이 정확히 일치하는 항목만 집계 · 미분류 '+(total-matched)+'건. 링크 없는 묶음·포털을 통한 타 기관 공고는 0건으로 보일 수 있으며 미검색 또는 공고 없음의 의미가 아닙니다.';
  }
  root.querySelectorAll('[data-src-expired]').forEach(function(b){b.addEventListener('click',function(){root.querySelectorAll('[data-src-expired]').forEach(function(z){z.classList.toggle('on',z===b);z.setAttribute('aria-pressed',z===b?'true':'false')});refresh()})});refresh();})();
-</script><script type="module" src="./worklinks-account.js?v=20261114-auth-watch-v3"></script></main></body></html>
+</script><script type="module" src="./worklinks-account.js?v=20261114-auth-retry-v4"></script></main></body></html>
