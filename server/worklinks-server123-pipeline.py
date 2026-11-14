@@ -376,9 +376,12 @@ def iteration(current=None, runner=None):
         # Scanner and repair jobs share a single serial scheduler. Never let
         # 100s+ OCR/repair jobs stop the successful first-time scan queue.
         # Paused/empty drains may safely run repairs while scanning is idle.
-        if (kind=='rfp' and os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1'
-                and state.get('rfpUpgradeActive') is True):
-            continue  # Regular old-mode RFP scan cannot race the split queue.
+        if (os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1'
+                and kind in ('rfp','rfpRepair')):
+            # Legacy RFP and frozen top500 repair use bid-evidence per notice.
+            # The split queue + period-batched manifest replaces those paths.
+            # Keep cached-file OCR repair, which uses zero upstream metadata calls.
+            continue
         if kind in ('rfpOpenRepair','rfpRepair') and state.get('rfpUpgradeActive') is True:
             drain_status=str((state.get('rfpUpgrade') or {}).get('status') or '')
             if drain_status in ('started','ok','parser_versions_upgraded','drain_algorithm_upgraded'):
