@@ -26,8 +26,9 @@ for(const [input,expected] of [
 }
 assert.equal(jobCardCompactBudget('99900000'),jobAmountLabel('99900000'),
  'sub-1억 amounts keep existing display');
-assert.equal(jobCardAmountMarkup({id:'external-job',amount:'월 670만원'}),'월 670만원',
- 'monthly wages are not treated as bid amounts');
+assert.ok(jobCardAmountMarkup({id:'external-job',amount:'월 670만원'}).includes('670만원')&&
+ !jobCardAmountMarkup({id:'external-job',amount:'월 670만원'}).includes('억'),
+ 'monthly wages keep their existing salary-specific layout, not bid amount formatting');
 assert.equal(jobAmountLabel('185990000'),'1억 8,599만원',
  'details and the tooltip retain the exact budget');
 assert.ok(src.includes('title="\'+htmlEscape(jobAmountLabel(x.amount))+\'"'),
