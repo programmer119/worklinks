@@ -125,6 +125,17 @@ assert missing_candidates==[(rows[0]['bidNo'],'000',
 assert module['staffing_scan_pending'](missing_staff)
 assert not module['staffing_scan_pending'](scanned_record())
 print('WORKLINKS_STAFFING_MISSING_SCAN_RESCHEDULE=PASS')
+# Explicit notice priorities must also select never-scanned bids, not only
+# already-extracted files whose staffing pass is incomplete.
+priority_keys={rows[6]['bidNo']+':000', rows[7]['bidNo']+':000'}
+unscanned=dict(all_done)
+for key in priority_keys:
+    unscanned[key]={'status':'not_scanned','classificationVersion':module['CLASSIFICATION_VERSION'],
+                    'checkedAt':utc.isoformat(),'files':[], 'reviewComplete':False}
+assert all(not module['staffing_scan_pending'](unscanned[key]) for key in priority_keys)
+prioritized=discover(2,unscanned,priority=priority_keys)
+assert {no+':'+order for no,order,_ in prioritized}==priority_keys,prioritized
+print('WORKLINKS_RFP_UNSCANNED_EXACT_PRIORITY=PASS')
 # Transient failures and parser upgrades remain legitimate, bounded retries.
 bad_key=rows[0]['bidNo']+':000'
 version_key=rows[1]['bidNo']+':000'
