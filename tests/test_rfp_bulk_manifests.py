@@ -184,4 +184,41 @@ with tempfile.TemporaryDirectory() as root:
     assert x.posted_days()=={},'deferred missing should not spin in a tight loop'
     print('RFP_MISSING_BATCH_NOTICE_REMAINS_INCOMPLETE=PASS',flush=True)
 
+# One rare missing notice uses one restricted local exception call only,
+# with three official-operation budget reservations and no region lookup.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    db=root/'bids.sqlite3'
+    missed='R26BK00010010'
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
+        con.execute('INSERT INTO bid_notices VALUES (?,?,?,1)',
+                    (missed,'000',json.dumps({'posted':new_day+'T10:00:00'})))
+    q=RfpDualQueue(root/'queue.sqlite3')
+    q.enqueue([(missed,'000','2099-12-31')],'r1')
+    exception_urls=[]
+    def exception_fetch(url):
+        u=urllib.parse.urlparse(url)
+        if u.path=='/api/g2b/rfp-attachment-exception':
+            exception_urls.append(url)
+            assert dict(urllib.parse.parse_qsl(u.query))=={'bidNo':missed,'order':'000'}
+            return {'ok':True,'attachments':{'ok':True,'complete':True,
+                    'items':[{'name':'rfp.pdf','url':
+                    'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/rfp.pdf'}]},
+                    'noticeDocuments':{'ok':True,'complete':True,'items':[]},
+                    'region':{'ok':False,'complete':False}}
+        args=dict(urllib.parse.parse_qsl(u.query))
+        assert u.path=='/api/g2b/rfp-attachment-batch'
+        return {'ok':True,'source':args['source'],'page':int(args['page']),
+                'totalCount':0,'rawCount':0,'items':[]}
+    planner=bulk.BulkManifestPlanner(q,db,exception_fetch,NoDelay())
+    done=planner.populate_one_day()
+    assert done['new']==1 and done['calls']==6,done
+    assert len(exception_urls)==1,exception_urls
+    assert q.bulk_manifest(missed+':000')['manifestOrigin']=='verified_missing_date_batch_exception'
+    with q.connect() as con:
+        official=con.execute("SELECT source FROM rfp_bulk_request_budget WHERE source LIKE 'exception_%'").fetchall()
+    assert len(official)==3,official
+    print('RFP_BULK_EXCEPTION_BOUNDED_THREE_OPERATIONS=PASS',flush=True)
+
 print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
