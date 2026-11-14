@@ -1,0 +1,34 @@
+name: WorkLinks 100 MB streaming and 422 regression
+on:
+  push:
+    branches: [fix/rfp-streamed-100mb-20261115]
+    paths:
+      - 'scripts/rfp_download_worker.py'
+      - 'scripts/rfp_call_ledger.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_rfp_streamed_100mb.py'
+      - 'tests/test_rfp_download_worker.py'
+      - 'tests/test_rfp_independent_workers_and_scan.py'
+      - '.github/workflows/worklinks-rfp-100mb-stream-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify streaming original archive, actual 81 MB fixture, 422 error and existing worker/ledger tests
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile scripts/rfp_download_worker.py scripts/rfp_call_ledger.py scripts/refresh_worklinks_rfp.py
+          python3 tests/test_rfp_streamed_100mb.py
+          python3 tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_download_worker.py
+          python3 tests/test_rfp_independent_workers_and_scan.py
+          python3 tests/test_rfp_dual_queue.py
+          echo RFP_100MB_STREAMED_ORIGINAL_TESTS_PASS

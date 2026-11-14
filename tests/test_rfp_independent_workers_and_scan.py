@@ -54,7 +54,10 @@ no,ordinal='R26BK01800329','000'
 meta={'ok':True,'attachments':{'ok':True,'complete':True,
        'items':[{'name':'terms.pdf',
         'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/terms.pdf'}]},
-       'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+       'noticeDocuments':{'ok':True,'complete':True,'items':[]},
+       'downloadVerifiedFiles':[{'name':'terms.pdf','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/terms.pdf',
+         'sha256':__import__('hashlib').sha256(b'verified-official-file').hexdigest(),
+         'bytes':len(b'verified-official-file')}]}
 claims=[(no+':'+ordinal,'2099-12-31',meta)]
 index=reader.dual_scan_metadata_by_notice(claims)
 assert index[(no,ordinal)] is meta
