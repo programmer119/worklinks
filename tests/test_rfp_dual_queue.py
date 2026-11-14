@@ -28,13 +28,17 @@ with tempfile.TemporaryDirectory() as tmp:
     assert queue.enqueue(rows,'reader-v1')==0
     stats=queue.stats()
     assert stats['download']['total']==1000 and stats['scan']['total']==1000,stats
-    meta={'attachments':{'ok':True,'complete':True,'items':[]},
-          'noticeDocuments':{'ok':True,'complete':True}}
+    meta={'attachments':{'ok':True,'complete':True,
+                         'items':[{'name':'rfp.pdf','url':'https://www.g2b.go.kr/UntyAtchFile/rfp.pdf'}]},
+          'noticeDocuments':{'ok':True,'complete':True},
+          'downloadVerifiedFiles':[{'name':'rfp.pdf',
+              'url':'https://www.g2b.go.kr/UntyAtchFile/rfp.pdf',
+              'sha256':'a'*64,'bytes':100}]}
     # Original downloading never depends on scan claims.
     for i in range(1000):
         claim=queue.claim_download()
         assert claim is not None,(i,queue.stats())
-        queue.downloaded(claim[0],meta,0,0)
+        queue.downloaded(claim[0],meta,1,1)
     assert queue.claim_download() is None
     stats=queue.stats()
     assert stats['download']['done']==1000 and stats['scan']['done']==0,stats
@@ -105,4 +109,37 @@ with tempfile.TemporaryDirectory() as tmp:
         keys={row[0] for row in connection.execute(
             'SELECT notice_key FROM rfp_dual_notices').fetchall()}
     assert 'R26BK99990001:000' in keys
+# A verified empty official manifest never enters the scan lane.
+with tempfile.TemporaryDirectory() as tmp:
+    q=RfpDualQueue(Path(tmp)/'empty.sqlite3')
+    q.enqueue([('R26BK01234567','000','2099-12-31')],'reader-v1')
+    key,_=q.claim_download()
+    empty={'attachments':{'ok':True,'complete':True,'items':[]},
+           'noticeDocuments':{'ok':True,'complete':True,'items':[]},
+           'manifestOrigin':'verified_full_day_batch'}
+    q.no_attachments(key,empty)
+    assert q.claim_ready(8)==[]
+    assert q.stats()['scan']['skipped']==1
+    assert q.stats()['scan']['failed']==0
+    assert q.stats()['scan']['done']==1
+    assert q.stats()['download']['done']==1
+    # Legacy ready rows are migrated to skip or back to verified download.
+    q.enqueue([('R26BK01234568','000','2099-12-31')],'reader-v1')
+    legacy,_=q.claim_download()
+    with q.connect() as db:
+        db.execute("UPDATE rfp_dual_notices SET download_status='ready', scan_status='retry',metadata_json=? WHERE notice_key=?",
+                   (json.dumps(empty),legacy))
+    q.enqueue([('R26BK01234569','000','2099-12-31')],'reader-v1')
+    legacy_file,_=q.claim_download()
+    with q.connect() as db:
+        db.execute("UPDATE rfp_dual_notices SET download_status='ready',scan_status='retry',metadata_json=? WHERE notice_key=?",
+                   (json.dumps({'attachments':{'ok':True,'complete':True,'items':[{'name':'a.pdf','url':'https://www.g2b.go.kr/UntyAtchFile/a.pdf'}]},
+                   'noticeDocuments':{'ok':True,'complete':True}}),legacy_file))
+    fix=q.reconcile_legacy_ready()
+    assert fix=={'requeuedForVerifiedDownload':1,'verifiedEmptyManifestsSkipped':1},fix
+    assert q.stats()['scan']['skipped']==2
+    assert q.stats()['scan']['failed']==0
+    assert q.claim_ready(8)==[]
+    assert q.claim_download()[0]==legacy_file
+
 print('RFP_DUAL_QUEUE_1000_FULL_DOWNLOAD_INDEPENDENT_SCAN=PASS')
