@@ -58,6 +58,9 @@ with tempfile.TemporaryDirectory() as temp:
     hung=activity.stalled_downloads(['R26BK00000001:000'],idle_seconds=180)
     assert len(hung)==1 and hung[0]['fileName']=='사업제안요청서.pdf',hung
     assert activity.stalled_downloads(['unclaimed'],idle_seconds=180)==[]
+    assert activity.stalled_downloads(['R26BK00000001:000'],
+           idle_seconds=180,min_updated_epoch=time.time()+10)==[]
+
     activity.record('download','R26BK00000001:000',file_key='f1',
                     file_name='사업제안요청서.pdf',phase='전송 중',
                     bytes_done=1572864,bytes_total=2097152)
@@ -88,4 +91,13 @@ with tempfile.TemporaryDirectory() as temp:
     assert activity.record('scan','abc') is None
     assert activity.worker('scan','running') is None
     activity.connect=original
+    activity.record('download','R26BK00000055:000',file_key='orphan',
+                    file_name='중단된파일.pdf',phase='전송 중',status='working',
+                    bytes_done=10,bytes_total=100)
+    assert activity.recover_interrupted_downloads()==2, 'both working file rows reclaimed'
+    reclaimed=[row for row in activity.snapshot()['items']
+               if row['fileName']=='중단된파일.pdf'][0]
+    assert reclaimed['status']=='retry' and reclaimed['error']=='worker_restart_reclaim'
+    assert not activity.stalled_downloads(['R26BK00000055:000'],
+                                          idle_seconds=0)
 print('WORKLINKS_RFP_LIVE_TELEMETRY=PASS')
