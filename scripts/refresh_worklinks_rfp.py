@@ -436,7 +436,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                 key=no+':'+order
                 cached=prior.get(key) or {}
                 retry=needs_hwpx_reader_retry(cached)
-                if cached.get('reviewComplete') is True:continue
+                # A past legal review never exempts the source from a newer parser.
+                if cached.get('reviewComplete') is True and not upgrade_only:continue
                 partially_retryable=partial_retry_due(cached,utc)
                 if (reusable_rfp_extraction(cached) and not partially_retryable
                         and not staffing_scan_pending(cached)):
