@@ -2104,6 +2104,10 @@ function paintRfpRescanProgress(){
  const complete=Number(counts.completed),all=Number(counts.total);
  const pct=all?Math.max(0,Math.min(100,100*complete/all)).toFixed(2):'0.00';
  const delayed=Boolean(rfpRescanProgressError);
+ const worker=info.worker?.available===true?info.worker:null;
+ const workItem=worker?.tasks?.rfpUpgrade||worker?.tasks?.rfp||null;
+ const workerNames={started:'실행 중',ok:'최근 작업 완료',failed:'최근 작업 실패',parser_versions_upgraded:'재판독 대상 생성',interrupted_retry_on_restart:'중단 후 재실행',unknown:'상태 미확인'};
+ const workerStatus=workItem?(workerNames[workItem.status]||'상태 확인 필요'):'상태 미확인';
  count.textContent='완료 '+rfpProgressNumber(complete)+' / '+rfpProgressNumber(all)+'건';
  label.textContent=pct+'%'+(delayed?' · 갱신 지연':'');
  fill.style.width=pct+'%';
@@ -2150,7 +2154,8 @@ function paintRfpRescanProgress(){
   ' · 판독 완료는 입찰 자격 충족을 의미하지 않습니다.</span></p>'+
   '<div class="rfp-rescan-server-note">마지막 조회 '+htmlEscape(rfpClock(rfpRescanLastSuccessAt))+
   ' · 서버 집계 '+htmlEscape(String(info.asOf||'시각 미확인').replace('T',' ').slice(0,19))+
-  ' · 직전 조회 대비 완료 '+(rfpRescanLastDelta>0?'+':'')+rfpRescanLastDelta+'건</div>';
+  ' · 직전 조회 대비 완료 '+(rfpRescanLastDelta>0?'+':'')+rfpRescanLastDelta+'건</div>'+ 
+  (worker?'<div class="rfp-rescan-server-note">서버 재판독: '+htmlEscape(workerStatus)+(worker.upgradeActive?' · 재판독 대상 처리 활성화':'')+(workItem?.attemptEpoch?' · 최근 시작 '+htmlEscape(rfpClock(workItem.attemptEpoch*1000)):'')+'</div>':'');
  if(delayed)document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
 }
 async function refreshRfpRescanProgress(force=false){
