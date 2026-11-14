@@ -40,6 +40,9 @@ with sync_playwright() as p:
     assert '16.67%' in page.locator('#rfpRescanLabel').inner_text()
     assert button.is_visible()
     assert page.locator('#rfpRescanCycle').is_visible()
+    assert '조회' in page.locator('#rfpRescanCycle').inner_text()
+    assert '초' in page.locator('#rfpRescanCycle').inner_text()
+    assert page.evaluate("() => getComputedStyle(document.getElementById('rfpRescanCycle')).backgroundImage")=='none', 'a poll timer must not look like circular scan progress'
     assert page.evaluate(
       "() => document.querySelector('#rfpRescanLaunch').closest('.head-actions') !== null")
     # Countdown is not a fake completion animation; it shows seconds until next HTTP read.
