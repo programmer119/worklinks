@@ -185,7 +185,7 @@ def stage_workspace(path,minimal=False):
                  'batch_backfill_changcom_top500_rfp.py',
                  'repair_changcom_top500_rfp.py',
                  'repair_open_rfp_cached_attachments.py',
-                 'rfp_call_ledger.py','rfp_dual_queue.py','rfp_bulk_manifests.py'):
+                 'rfp_call_ledger.py','rfp_dual_queue.py','rfp_live_activity.py','rfp_bulk_manifests.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in (() if minimal else READ_FILES):
         source = SEEDS / name
