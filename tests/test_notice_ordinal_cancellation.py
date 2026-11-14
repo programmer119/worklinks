@@ -75,7 +75,7 @@ with tempfile.TemporaryDirectory() as tmp:
                 'order':2,'sw':True,'cancelled':True},latest
             assert latest['R26BK01817649']['sw'] is False
             assert not selected,selected
-            with patch.dict(proxy,{'G2B_DB_PATH':str(bids_db)}):
+            with patch.dict(proxy['open_bid_db'].__globals__,{'G2B_DB_PATH':str(bids_db)}):
                 # SQL must not revive any old SW ordinal when latest is a
                 # cancellation or a newer non-SW procurement notice.
                 found=proxy['query_saved_bids'](50,0,only_sw=True)
