@@ -96,4 +96,12 @@ with tempfile.TemporaryDirectory() as tmp:
     queue.enqueue([('R26BK99999999','000','2026-10-31')],'reader-v2')
     assert queue.retire_expired(today=dt.date(2026,11,14))==1
     assert queue.stats()['total']==1000
+    # No electronic close is common for direct/letter bids and must not
+    # disappear from the download lane; confirmed expired bids still retire.
+    assert queue.enqueue([('R26BK99990001','000','')],'reader-v2')==1
+    assert queue.retire_expired(today=dt.date(2026,11,14))==0
+    assert queue.stats()['total']==1001
+    keys={row[0] for row in queue.connect().execute(
+        'SELECT notice_key FROM rfp_dual_notices').fetchall()}
+    assert 'R26BK99990001:000' in keys
 print('RFP_DUAL_QUEUE_1000_FULL_DOWNLOAD_INDEPENDENT_SCAN=PASS')
