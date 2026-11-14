@@ -2084,7 +2084,7 @@ function paintRfpCountdown(){
  if(launch)launch.setAttribute('aria-label','판독 '+(rfpRescanProgress?.counts?rfpProgressNumber(rfpRescanProgress.counts.completed)+' / '+rfpProgressNumber(rfpRescanProgress.counts.total)+'건':'현황 확인 중')+' · '+(loading?'조회 중':(rfpRescanProgressError?'조회 오류 · ':'')+'다음 조회 '+remain+'초'));
 }
 const RFP_PROGRESS_POLL_MS=10000;
-const RFP_PROGRESS_TIMEOUT_MS=8000;
+const RFP_PROGRESS_TIMEOUT_MS=15000;
 function rfpProgressNumber(n){return Number(n||0).toLocaleString('ko-KR')}
 function paintRfpRescanProgress(){
  const label=document.getElementById('rfpRescanLabel');
@@ -2644,7 +2644,8 @@ document.getElementById('changcomActionableRefresh')?.addEventListener('click',f
  loadChangcomActionable(true);
 });
 
-// Keep the complete G2B source in server SQLite; mobile downloads it incrementally.
+// Keep the complete G2B source in server SQLite and download only a bounded initial window.
+// Search still queries the entire saved DB; More loads subsequent windows on demand.
 // Read ONLY saved SQLite data; never hit government APIs during UI pagination.
 // A temporary failure on page N must not discard successfully fetched pages 0..N-1.
 async function g2bFetchSavedPage(offset,preferredLimit){
@@ -2718,10 +2719,10 @@ async function g2bLoadSaved(append){
  let offset=incremental?g2bLoadedOffset:0;
  let total=incremental?g2bSavedTotal:0;
  let linkedOnServer=incremental?g2bLinkedEligibility:null;
- // Mobile starts with only 160 saved notices in 40-row requests. Fetch the
- // next bounded window only when More exhausts the already received cards.
- const mobileSavedWindow=g2bCompactScreen()?160:Infinity;
- const maxOffset=mobileSavedWindow===Infinity?Infinity:offset+mobileSavedWindow;
+ // Never flood the high-port API with the entire multi-thousand-notice DB on load.
+ // Mobile: 160 rows; desktop: 400 rows. Additional pages remain available via More.
+ const savedWindow=g2bCompactScreen()?160:400;
+ const maxOffset=offset+savedWindow;
  let preferredLimit=g2bCompactScreen()?40:100;
  let published=false;
  function publish(){
@@ -2767,7 +2768,8 @@ async function g2bLoadSaved(append){
    if(!preservePrior&&(offset===records.length||offset%1200<size||offset>=total||offset>=maxOffset))publish();
    showProgress(offset>=total?' · 모두 수신':' · 이어서 읽는 중');
    if(offset>=total||!records.length)break;
-   await new Promise(resolve=>setTimeout(resolve,0));
+   // Leave bandwidth for the independent 10-second scanner-progress request.
+   await new Promise(resolve=>setTimeout(resolve,300));
   }
   if(!published||preservePrior||offset!==g2bLoadedOffset)publish();
   g2bSavedLoadError='';
