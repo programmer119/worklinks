@@ -29,6 +29,8 @@ saved['R26BK00000004:000']['classificationVersion']=versions[0]-1
 saved['R26BK00000005:000']={'status':'not_scanned','files':[]}
 saved['R26BK00000006:000']['classificationVersion']=versions[0]-1
 saved['R26BK00000006:000']['lastAttemptAt']=dt.datetime.now(dt.timezone.utc).isoformat()
+saved['R26BK00000006:000']['lastAttemptReaderFingerprint']=':'.join(str(n) for n in
+    (versions[0],versions[1],versions[2],versions[3]))
 
 def fetch(url):
     from urllib.parse import parse_qs,urlsplit
