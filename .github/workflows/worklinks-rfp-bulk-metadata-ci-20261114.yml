@@ -1,0 +1,36 @@
+name: WorkLinks batched RFP metadata no-network regression
+on:
+  push:
+    branches: [fix/rfp-batched-attachment-manifests-20261114]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'server/deploy-worklinks-server123-pipeline.sh'
+      - 'scripts/rfp_bulk_manifests.py'
+      - 'scripts/rfp_download_worker.py'
+      - 'scripts/rfp_dual_queue.py'
+      - 'tests/test_rfp_bulk_manifests.py'
+      - '.github/workflows/worklinks-rfp-bulk-metadata-ci-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and regression-test batch listing with zero upstream requests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile server/g2b-proxy.py server/worklinks-server123-pipeline.py scripts/rfp_dual_queue.py scripts/rfp_download_worker.py scripts/rfp_bulk_manifests.py
+          bash -n server/deploy-worklinks-server123-pipeline.sh
+          python3 tests/test_rfp_bulk_manifests.py
+          python3 tests/test_bid_evidence.py
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_rfp_download_worker.py
+          python3 tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_archive_retention.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          echo RFP_BATCHED_METADATA_REGRESSION=PASS
