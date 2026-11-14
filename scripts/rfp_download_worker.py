@@ -293,6 +293,7 @@ def run_download_forever(queue,halt):
     """Eight continuous download slots; refill on EACH completion."""
     halted_until=0.0
     last_report=time.monotonic()
+    last_watchdog=time.monotonic()
     started=0
     downloaded=0
     live.worker('download','running')
@@ -324,6 +325,32 @@ def run_download_forever(queue,halt):
                         succeeded=False
                     downloaded+=int(succeeded is True)
             else:time.sleep(POLL_SECONDS)
+            # Last-resort recovery only if a claimed network stream has made
+            # NO byte progress for three minutes. Typical slow-but-progressing
+            # downloads are never reset merely because their timer is long.
+            if inflight and time.monotonic()-last_watchdog>=5:
+                last_watchdog=time.monotonic()
+                claimed_keys={claim[0] for claim in inflight.values()}
+                stuck=live.stalled_downloads(claimed_keys,idle_seconds=180)
+                if stuck:
+                    item=stuck[0]
+                    reason='file_no_byte_progress_'+str(item['idleSeconds'])+'s'
+                    retry_at=time.time()+30
+                    queue.download_failed(item['noticeKey'],reason,retry_seconds=30)
+                    live.record('download',item['noticeKey'],
+                        file_key=item['fileKey'],file_name=item['fileName'],
+                        phase='전송 정체 · 작업자 자동 복구',status='retry',
+                        retry_epoch=retry_at,error=reason)
+                    live.worker('download','retry',reason,retry_at)
+                    print('RFP_DOWNLOAD_HARD_STALL_RESTART',json.dumps({
+                        'notice':item['noticeKey'],'idleSeconds':item['idleSeconds'],
+                        'recovery':'isolated_downloader_subprocess_relaunch',
+                        'retryEpoch':retry_at},separators=(',',':')),flush=True)
+                    # Threads blocked inside a platform socket cannot safely
+                    # be interrupted. The separate parent process detects
+                    # this exit, restarts in >=10 seconds, and reset_stale()
+                    # requeues unaffected in-flight notices. Scanner stays up.
+                    os._exit(72)
             if halt.is_set() and not inflight:
                 # Do not hold all file workers for half an hour for
                 # one old metadata provider error.
