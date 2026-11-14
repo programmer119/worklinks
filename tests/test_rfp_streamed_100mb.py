@@ -69,6 +69,20 @@ with tempfile.TemporaryDirectory() as tmp:
         assert again==new
         assert source.calls==1,'cached original was fetched again'
 
+    # A server that advertises a longer Content-Length but closes early must
+    # be retried once, never saved as a valid truncated official original.
+    short=StreamingResponse(1_048_576)
+    short.headers['Content-Length']='2097152'
+    complete=StreamingResponse(2_097_152)
+    outcomes=[short,complete]
+    resumed=MockOpener(lambda:outcomes.pop(0))
+    with patch.object(reader,'OPENER',resumed),patch.object(worker.time,'sleep',return_value=None):
+        recovered=worker.stream_original_to_verified_ledger(
+            URL+'-short-first',ledger,'R26BK01806524:000','2099-12-31')
+    assert resumed.calls==2
+    assert recovered['bytes']==2_097_152
+    assert ledger.verified_bytes_info(cache_key('official_attachment',URL+'-short-first'))==recovered
+
     # File larger than 100MB must be rejected before any body allocation.
     oversize=MockOpener(lambda:StreamingResponse(100_000_001))
     with patch.object(reader,'OPENER',oversize):
