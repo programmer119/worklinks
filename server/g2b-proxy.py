@@ -23,6 +23,7 @@ BIND_HOST = os.environ.get('BIND_HOST', '127.0.0.1')
 TLS_CERT_FILE = os.environ.get('G2B_TLS_CERT_FILE', '').strip()
 TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
 SECRET_PATH = os.environ.get('G2B_SECRET_PATH', '/home/worklinks/g2b/secrets/g2b.env')
+OPERATING_KEY_PATH = os.environ.get('G2B_OPERATING_KEY_PATH', '').strip()
 API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService02'
 AWARD_BASE = 'https://apis.data.go.kr/1230000/as/ScsbidInfoService'
 CONTRACT_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctInfoService'
@@ -62,6 +63,16 @@ def api_ledger_event(ledger,kind,key,outcome,**fields):
 
 
 def get_key():
+    # A02 and B1/B2/B3 use the SAME approved production credential file.
+    # Fail closed when explicitly configured; never fall back to the old A02 key.
+    if OPERATING_KEY_PATH:
+        try:
+            with open(OPERATING_KEY_PATH, 'r') as f:
+                for line in f:
+                    if line.startswith('G2B_STANDARD_SERVICE_KEY='):
+                        return line.split('=', 1)[1].strip()
+        except (OSError, IOError): pass
+        return ''
     k = os.environ.get('G2B_SERVICE_KEY', '').strip()
     if k: return k
     try:
