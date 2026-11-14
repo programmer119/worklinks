@@ -648,7 +648,7 @@ def main():
             # jobs fair (one bounded RFP batch per loop) and never spin while
             # the upstream service is rate-limited or no items are eligible.
             time.sleep(1 if (state.get('rfpUpgradeActive') is True and
-                              drain.get('status')=='ok') else
+                              drain.get('status') in ('ok','waiting_for_download')) else
                        15 if state.get('rfpUpgradeActive') is True else 90)
 
 
