@@ -1200,7 +1200,16 @@ def rfp_progress_worker_status(state_path):
             'attemptEpoch':safe_epoch(entry.get('attemptEpoch')),
             'successEpoch':safe_epoch(entry.get('successEpoch'))
         }
-    return {'available':True, 'upgradeActive':state.get('rfpUpgradeActive') is True,
+    upgrade_active=state.get('rfpUpgradeActive') is True
+    try:
+        upgrade_period=max(0,int(state.get('rfpUpgradePeriodSeconds') or 0))
+    except (ValueError,TypeError):
+        upgrade_period=0
+    last_attempt=(tasks.get('rfpUpgrade') or {}).get('attemptEpoch') or 0
+    next_attempt=last_attempt+upgrade_period if upgrade_active and upgrade_period and last_attempt else 0
+    return {'available':True,'upgradeActive':upgrade_active,
+            'upgradePeriodSeconds':upgrade_period,
+            'nextUpgradeEpoch':next_attempt,
             'tasks':tasks}
 
 
