@@ -19,7 +19,8 @@ test -S /home/ggul-docker/run/docker.sock
 dk image inspect "$IMG" >/dev/null
 test "$(dk inspect -f '{{.State.Running}}' "$CRAWLER")" = true
 test "$(dk inspect -f '{{.HostConfig.NetworkMode}}' "$CRAWLER")" = host
-if cmp -s "$SOURCE" "$TARGET";then
+# An explicitly authorized key rotation requires a new bind mount even if code is identical.
+if cmp -s "$SOURCE" "$TARGET" && test "${G2B_FORCE_RECREATE:-0}" != "1";then
  echo 'WORKLINKS_G2B_CRAWLER_SOURCE_CURRENT=PASS'
  exit 0
 fi
