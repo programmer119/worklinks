@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """No-network tests for server123 scheduler durability and publication."""
 import gzip
+import os
+from unittest.mock import patch
 import importlib.util
 import json
 from pathlib import Path
@@ -199,6 +201,29 @@ with tempfile.TemporaryDirectory() as temporary:
     print('WORKLINKS_CONTINUOUS_SCAN_NOT_BLOCKED_BY_REPAIRS=PASS')
 
     print('WORKLINKS_RFP_UPGRADE_12_BATCH_OCR_FAIRNESS=PASS')
+
+    # After durable snapshot publication, the scanner parent acknowledges its
+    # independent scan lane. A failed batch must not silently complete notice.
+    (m.SCRIPTS/'rfp_dual_queue.py').write_text(
+        (source.parents[1]/'scripts'/'rfp_dual_queue.py').read_text())
+    from rfp_dual_queue import RfpDualQueue
+    dual=RfpDualQueue(m.DATA/'rfp-dual-queue.sqlite3')
+    dual.enqueue([('R26BK01808709','000','2099-12-31')],'test-reader-1')
+    claim=dual.claim_download()
+    assert claim
+    dual.downloaded(claim[0],{'attachments':{'ok':True,'complete':True,
+                                             'items':[]}},0,0)
+    ready=dual.claim_ready(1)
+    assert len(ready)==1
+    def dual_runner(args,**kwargs):
+        result=mock_runner(args,**kwargs)
+        return SimpleNamespace(returncode=0,
+            stdout='RFP_DUAL_SCAN_RESULT [{"key":"R26BK01808709:000","ok":true}]',
+            stderr='')
+    with patch.dict(os.environ,{'WORKLINKS_RFP_DUAL_QUEUE':'1'}):
+        m.run_once('rfpUpgrade',dual_runner)
+    assert dual.stats()['scan']['done']==1,dual.stats()
+    print('WORKLINKS_DUAL_SCAN_COMMIT_AFTER_SNAPSHOT_PUBLISH=PASS')
 
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
     (m.SEEDS/'rfp-coverage-index.json').write_text(json.dumps(historical))
