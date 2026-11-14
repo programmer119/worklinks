@@ -100,7 +100,8 @@ def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
                             progress(bytes_received,raw_length,False)
                             last_progress=tick
                 if raw_length and bytes_received!=raw_length:
-                    raise ValueError('download_length_mismatch')
+                    raise ValueError('download_length_mismatch: received='+str(bytes_received)+
+                                     ' expected='+str(raw_length))
             ledger.record('attachment_http',reqkey,'http_ok',
                           http_status=status,notice_key=notice_key,
                           response_sha256=digest.hexdigest(),
@@ -124,7 +125,9 @@ def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
                         'official_attachment_reference_missing_422') from exc
                 retry=exc.code in (429,500,502,503,504)
             else:
-                retry=isinstance(exc,(TimeoutError,ConnectionError,urllib.error.URLError))
+                retry=(isinstance(exc,(TimeoutError,ConnectionError,urllib.error.URLError)) or
+                       (isinstance(exc,ValueError) and
+                        str(exc).startswith('download_length_mismatch:')))
             if not retry or attempt==2:raise
             if on_retry:on_retry(exc,1.5*(attempt+1))
             time.sleep(1.5*(attempt+1))
