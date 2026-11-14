@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import shutil
 import sqlite3
+import tempfile
 import zlib
 
 
@@ -190,6 +191,123 @@ class CallLedger:
         if result and notice_key:self.link_attachment(key,notice_key,closes_on)
         return result
 
+
+    @staticmethod
+    def _verify_blob_stream(conn, rowid, expected):
+        """Read compressed SQLite BLOB in chunks, verify raw SHA, keep RAM bounded."""
+        digest=hashlib.sha256()
+        size=0
+        decoder=zlib.decompressobj()
+        with conn.blobopen('verified_cache','payload',int(rowid),readonly=True) as blob:
+            while True:
+                compressed=blob.read(256*1024)
+                if not compressed:break
+                remaining=compressed
+                while remaining:
+                    decoded=decoder.decompress(remaining,1024*1024)
+                    remaining=decoder.unconsumed_tail
+                    if decoded:
+                        size+=len(decoded)
+                        digest.update(decoded)
+                    if not remaining:break
+                    if not decoded and remaining==compressed:
+                        raise ValueError('compressed_blob_no_progress')
+            last=decoder.flush()
+            if last:
+                size+=len(last)
+                digest.update(last)
+        if not decoder.eof or decoder.unused_data or digest.hexdigest()!=expected:
+            raise ValueError('stored_original_sha256_mismatch')
+        return {'sha256':expected,'bytes':size}
+
+    def verified_bytes_info(self,key):
+        """Validate an archived original without materializing the raw file."""
+        with self._connect() as conn:
+            row=conn.execute("""SELECT rowid,sha256 FROM verified_cache
+                WHERE request_key=? AND media_type='bytes' AND source_revision=''""",
+                (key,)).fetchone()
+            if row is None:return None
+            try:info=self._verify_blob_stream(conn,row[0],row[1])
+            except (ValueError,zlib.error,sqlite3.Error):
+                self.record('cache',key,'corrupt_cache',error_class='stream_sha256_mismatch')
+                return None
+        self.record('cache',key,'cache_hit',response_sha256=info['sha256'])
+        return info
+
+    def save_file(self,key,source,*,max_bytes=100_000_000,
+                  notice_key=None,closes_on=''):
+        """Stream-compress a bounded on-disk original into SQLite BLOB chunks.
+
+        No giant bytes object is passed to SQLite or retained in Python.
+        Read back the entire saved compressed BLOB and validate source SHA
+        before considering the original durably saved.
+        """
+        source=Path(source)
+        compressed_path=None
+        try:
+            with tempfile.NamedTemporaryFile(dir=self.path.parent,
+                    prefix='.rfp-compressed-',suffix='.part',delete=False) as tmp:
+                compressed_path=Path(tmp.name)
+                packed=zlib.compressobj(level=4)
+                raw_digest=hashlib.sha256()
+                raw_size=0
+                with source.open('rb') as inp:
+                    while True:
+                        block=inp.read(1024*1024)
+                        if not block:break
+                        raw_size+=len(block)
+                        if raw_size>max_bytes:raise ValueError('large_file')
+                        raw_digest.update(block)
+                        output=packed.compress(block)
+                        if output:tmp.write(output)
+                tmp.write(packed.flush())
+            compressed_size=compressed_path.stat().st_size
+            signature=raw_digest.hexdigest()
+            max_disk,reserve=self._limits()
+            with self._connect() as conn:
+                conn.execute('BEGIN IMMEDIATE')
+                existing=conn.execute('SELECT length(payload) FROM verified_cache WHERE request_key=?',
+                                       (key,)).fetchone()
+                current_size=self.path.stat().st_size if self.path.is_file() else 0
+                wal=Path(str(self.path)+'-wal')
+                if wal.is_file():current_size+=wal.stat().st_size
+                growth=max(0,compressed_size-(int(existing[0]) if existing else 0))
+                if (current_size+growth+8*1048576>max_disk or
+                    shutil.disk_usage(self.path.parent).free<reserve+max(growth*2,1048576)):
+                    conn.execute('''INSERT INTO call_events
+                        (occurred_at,kind,request_key,outcome,detail)
+                        VALUES(?,?,?,?,?)''',
+                        (utcnow(),'cache',key,'storage_quota_skip',
+                         'compressed_bytes='+str(compressed_size)))
+                    return None
+                conn.execute('''INSERT INTO verified_cache
+                    (request_key,stored_at,media_type,payload,sha256,source_revision)
+                    VALUES (?,?,?,zeroblob(?),?,'') ON CONFLICT(request_key) DO UPDATE SET
+                    stored_at=excluded.stored_at,media_type=excluded.media_type,
+                    payload=excluded.payload,sha256=excluded.sha256,
+                    source_revision=excluded.source_revision''',
+                    (key,utcnow(),'bytes',compressed_size,signature))
+                rowid=conn.execute('SELECT rowid FROM verified_cache WHERE request_key=?',
+                                   (key,)).fetchone()[0]
+                with compressed_path.open('rb') as src,conn.blobopen(
+                        'verified_cache','payload',rowid,readonly=False) as blob:
+                    while True:
+                        chunk=src.read(1024*1024)
+                        if not chunk:break
+                        blob.write(chunk)
+                checked=self._verify_blob_stream(conn,rowid,signature)
+                if checked['bytes']!=raw_size:raise ValueError('stored_original_length_mismatch')
+                conn.execute('''INSERT INTO call_events
+                    (occurred_at,kind,request_key,outcome,response_sha256,detail)
+                    VALUES (?,?,?,?,?,?)''',
+                    (utcnow(),'cache',key,'verified_response_saved',signature,
+                     'bytes='+str(raw_size)))
+            if notice_key:self.link_attachment(key,notice_key,closes_on)
+            return {'sha256':signature,'bytes':raw_size}
+        finally:
+            if compressed_path is not None:
+                try:compressed_path.unlink()
+                except FileNotFoundError:pass
 
     @staticmethod
     def _close_date(value):
