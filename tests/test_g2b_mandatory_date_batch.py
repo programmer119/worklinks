@@ -13,6 +13,21 @@ p=ROOT/'server/g2b-mandatory-date-batch.py'
 spec=importlib.util.spec_from_file_location('mandatory_date_batch',p)
 mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
+# Guard real proxy validation: YYYYMMDDHHMM must be accepted (not a
+# mistakenly double-escaped \\d regex). No government HTTP call.
+proxy_spec=importlib.util.spec_from_file_location('g2b_proxy_batch_test',
+                                                 ROOT/'server/g2b-proxy.py')
+proxy=importlib.util.module_from_spec(proxy_spec)
+proxy_spec.loader.exec_module(proxy)
+captured=[]
+proxy.request_api=lambda base,operation,params:(
+    captured.append((base,operation,params)) or
+    {'totalCount':1,'items':[{'bidNtceNo':'R26BK12345678','bidNtceOrd':'000'}]})
+response=proxy.mandatory_enrichment_date_page('license','202611140000','202611142359',1,999)
+assert response['ok'] is True and response['rawCount']==1
+assert captured[0][1]=='getBidPblancListInfoLicenseLimit02'
+assert 'bidNtceNo' not in captured[0][2] and captured[0][2]['inqryDiv']==1
+
 bid='R26BK12345678'
 other='R26BK12345679'
 day=(dt.datetime.now(mod.KST).date()-dt.timedelta(days=1)).strftime('%Y%m%d')
