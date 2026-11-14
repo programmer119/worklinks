@@ -164,9 +164,10 @@ def run_forever():
     queue.reset_stale()
     planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
                                   reader.fetch_json,META_PACE,
-                                  allow_exceptions=False)
+                                  allow_exceptions=True)
              if BULK_ENABLED else None)
-    # Never turn unmatched date results into individual government calls.
+    # Necessary missing-date records may use the strictly capped exception budget
+    # (maximum two notice-level recoveries per day), not unrestricted per-bid loops.
     last_refresh=0
     halted_until=0
     planner_pause_until=0

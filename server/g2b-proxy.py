@@ -737,6 +737,49 @@ def _is_stale_eorder_reason(name,latest_business_year,notice_year=None):
     return bool(years and max(years)<notice_year and max(years)<latest_business_year)
 
 
+MANDATORY_BATCH_OPERATIONS={
+    'license':'getBidPblancListInfoLicenseLimit02',
+    'serviceProducts':'getBidPblancListInfoServcPurchsObjPrdct02',
+    'mandatoryJointRegion':'getBidPblancJntcontrctDutyRgnListInfo02',
+    'regionalIncentives':'getBidPblancIncntvRgnListInfo02'
+}
+
+def mandatory_enrichment_date_page(source,from_time,to_time,page,rows):
+    """Fetch one full period/page shared by many notice IDs. Never single-bid."""
+    operation=MANDATORY_BATCH_OPERATIONS.get(source)
+    if not operation:raise ApiError('invalid_mandatory_batch_source',400)
+    if not (re.fullmatch(r'\d{12}',from_time) and
+            re.fullmatch(r'\d{12}',to_time)):
+        raise ApiError('invalid_mandatory_batch_date',400)
+    try:
+        start=datetime.datetime.strptime(from_time,'%Y%m%d%H%M')
+        end=datetime.datetime.strptime(to_time,'%Y%m%d%H%M')
+    except ValueError:
+        raise ApiError('invalid_mandatory_batch_date',400)
+    if end<start or (end-start).total_seconds()>86400:
+        raise ApiError('invalid_mandatory_batch_window',400)
+    if not (1<=page<=1000 and 1<=rows<=999):
+        raise ApiError('invalid_mandatory_batch_pagination',400)
+    data=request_api(API_BASE,operation,{
+        'pageNo':page,'numOfRows':rows,'inqryDiv':1,
+        'inqryBgnDt':from_time,'inqryEndDt':to_time})
+    items=data.get('items') or []
+    total=data.get('totalCount')
+    if not isinstance(total,int) or total<0 or total>999000:
+        raise ApiError('invalid_mandatory_batch_total',502)
+    if (total>0 and not items) or len(items)>rows:
+        raise ApiError('incomplete_mandatory_batch_response',502)
+    for item in items:
+        if not isinstance(item,dict):
+            raise ApiError('malformed_mandatory_batch_item',502)
+        if not re.fullmatch(r'[A-Za-z0-9-]{8,40}',
+                            str(item.get('bidNtceNo') or '')):
+            raise ApiError('mandatory_batch_row_missing_bid_number',502)
+    return {'ok':True,'source':source,'page':page,
+            'totalCount':total,'rawCount':len(items),'items':items,
+            'dateFrom':from_time,'dateTo':to_time}
+
+
 RFP_BATCH_SOURCES={
     'ordinary':'getBidPblancListInfoAtchFileInfo02',
     'eorder':'getBidPblancListInfoEorderAtchFileInfo02',
@@ -2133,6 +2176,20 @@ class Handler(BaseHTTPRequestHandler):
                 project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
                 return self.reply(200, worklinks_state_get(project, user_id))
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/mandatory-enrichment-batch':
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                try:
+                    page=int(get('page','1'))
+                    rows=int(get('rows','999'))
+                except ValueError:
+                    raise ApiError('invalid_mandatory_batch_pagination',400)
+                return self.reply(200,mandatory_enrichment_date_page(
+                    get('source'),get('from'),get('to'),page,rows))
             if u.path == '/api/g2b/rfp-attachment-batch':
                 # Enforce server-local access: this expensive read must not
                 # be exposed as a public unauthenticated quota-spending API.

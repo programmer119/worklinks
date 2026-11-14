@@ -1,0 +1,37 @@
+name: WorkLinks mandatory A02 date-batch collector and capped RFP exceptions regression
+on:
+  push:
+    branches: [fix/required-enrichment-date-batch-20261115]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'server/g2b-eligibility-worker.py'
+      - 'server/g2b-mandatory-date-batch.py'
+      - 'server/deploy-g2b-eligibility-worker-only.sh'
+      - 'scripts/rfp_download_worker.py'
+      - 'tests/test_g2b_mandatory_date_batch.py'
+      - 'tests/test_worklinks_bulk_only_auto.py'
+      - '.github/workflows/worklinks-mandatory-date-batch-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile, syntax and no official request regression
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          bash -n server/deploy-g2b-eligibility-worker-only.sh
+          python3 -m py_compile server/g2b-proxy.py server/g2b-eligibility-worker.py server/g2b-mandatory-date-batch.py scripts/rfp_download_worker.py
+          python3 tests/test_g2b_mandatory_date_batch.py
+          python3 tests/test_worklinks_bulk_only_auto.py
+          python3 tests/test_g2b_eligibility_worker.py
+          python3 tests/test_bid_extra.py
+          python3 tests/test_bid_evidence.py
+          python3 tests/test_rfp_bulk_manifests.py
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          echo REQUIRED_A02_DATE_BATCH_REGRESSION=PASS

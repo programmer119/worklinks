@@ -184,13 +184,21 @@ def verify(no,order):
  return data
 
 def main():
- # Existing cache stays available to search/detail UI. Do not perform
- # thousands of automatic notice-number A02 requests while bulk mode is on.
+ # A requested bulk-only mode must still collect mandatory evidence.
+ # The collector fetches complete source/date windows, not per bid number.
  if os.environ.get('WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE')=='1':
-  log('QUALIFICATION_AUTO_SINGLE_DISABLED','officialCalls',0,
-      'cachePreserved',True,'bulkReplacementRequired',True)
-  while True:
-   time.sleep(1800)
+  import importlib.util
+  path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                    'g2b-mandatory-date-batch.py')
+  spec=importlib.util.spec_from_file_location('g2b_mandatory_date_batch',path)
+  if not spec or not spec.loader:
+   raise RuntimeError('mandatory_date_batch_worker_missing')
+  module=importlib.util.module_from_spec(spec)
+  spec.loader.exec_module(module)
+  log('QUALIFICATION_BATCH_COLLECTION_STARTED','dateWide',True,
+      'perNoticeOfficialCalls',0)
+  module.run_forever()
+  return
  conn=sqlite3.connect(DB,timeout=30)
  conn.execute('PRAGMA busy_timeout=30000')
  conn.execute('PRAGMA journal_mode=WAL')
