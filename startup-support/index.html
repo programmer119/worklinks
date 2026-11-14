@@ -2963,14 +2963,14 @@ function jobAmountLabel(raw){
 function jobCardCompactBudget(raw){
  const t=String(raw??'').trim();
  let won=null;
- if(/^\\d[\\d,]*$/.test(t))won=Number(t.replace(/,/g,''));
+ if(/^\d[\d,]*$/.test(t))won=Number(t.replace(/,/g,''));
  else{
-  const m=t.match(/^(\\d[\\d,]*)\\s*억(?:\\s*(\\d[\\d,]*)\\s*만원)?(?:\\s*원)?$/);
+  const m=t.match(/^(\d[\d,]*)\s*억(?:\s*(\d[\d,]*)\s*만원)?(?:\s*원)?$/);
   if(m)won=Number(m[1].replace(/,/g,''))*100000000+
    Number((m[2]||'0').replace(/,/g,''))*10000;
  }
  if(Number.isFinite(won)&&won>=100000000)
-  return (Math.floor(won/10000000)/10).toFixed(1).replace(/\\.0$/,'')+'억';
+  return (Math.floor(won/10000000)/10).toFixed(1).replace(/\.0$/,'')+'억';
  return jobAmountLabel(raw);
 }
 /* Preserve the source's provisional salary wording, but give the amount
