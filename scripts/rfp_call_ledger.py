@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import sqlite3
 import zlib
 
@@ -51,6 +52,17 @@ class CallLedger:
             )''')
             conn.execute('''CREATE INDEX IF NOT EXISTS call_events_key_id
                             ON call_events(request_key,id)''')
+            conn.execute('''CREATE TABLE IF NOT EXISTS attachment_refs (
+                request_key TEXT NOT NULL,
+                notice_key TEXT NOT NULL,
+                closes_on TEXT NOT NULL DEFAULT '',
+                PRIMARY KEY(request_key,notice_key)
+            )''')
+            conn.execute('''CREATE INDEX IF NOT EXISTS attachment_refs_notice
+                            ON attachment_refs(notice_key)''')
+            conn.execute('''CREATE TABLE IF NOT EXISTS ledger_meta (
+                key TEXT PRIMARY KEY, value TEXT NOT NULL
+            )''')
             conn.execute('''CREATE TABLE IF NOT EXISTS verified_cache (
                 request_key TEXT PRIMARY KEY,
                 stored_at TEXT NOT NULL,
@@ -125,8 +137,28 @@ class CallLedger:
 
     def _store(self,key,media_type,raw,*,source_revision=''):
         signature=hashlib.sha256(raw).hexdigest()
-        compressed=zlib.compress(raw,level=6)
+        compressed=zlib.compress(raw,level=4)
+        max_disk,reserve=self._limits()
         with self._connect() as conn:
+            # Serialize quota checks across concurrent notice workers.
+            conn.execute('BEGIN IMMEDIATE')
+            existing=conn.execute('SELECT length(payload) FROM verified_cache WHERE request_key=?',
+                                  (key,)).fetchone()
+            current_size=(self.path.stat().st_size if self.path.exists() else 0)
+            wal=Path(str(self.path)+'-wal')
+            if wal.is_file():current_size+=wal.stat().st_size
+            # Budget limits physical SQLite/WAL growth, not only raw file size.
+            # Replacements are allowed when the DB is full, if no page growth
+            # is needed. Admission never evicts a live notice's archived bytes.
+            growth=max(0,len(compressed)-(int(existing[0]) if existing else 0))
+            if (current_size+growth+8*1048576>max_disk or
+                shutil.disk_usage(self.path.parent).free<reserve+max(growth*2,1048576)):
+                conn.execute('''INSERT INTO call_events
+                    (occurred_at,kind,request_key,outcome,detail)
+                    VALUES(?,?,?,?,?)''',
+                    (utcnow(),'cache',key,'storage_quota_skip',
+                     'compressed_bytes='+str(len(compressed))))
+                return None
             conn.execute('''INSERT INTO verified_cache
                 (request_key,stored_at,media_type,payload,sha256,source_revision)
                 VALUES (?,?,?,?,?,?) ON CONFLICT(request_key) DO UPDATE SET
@@ -147,12 +179,147 @@ class CallLedger:
             return None
         return self._store(key,'json',raw,source_revision=source_revision)
 
-    def save_bytes(self,key,raw,*,source_revision='',max_bytes=12_000_000):
+    def save_bytes(self,key,raw,*,source_revision='',max_bytes=24_000_000,
+                   notice_key=None,closes_on=''):
         if len(raw)>max_bytes:
             self.record('cache',key,'payload_above_cache_limit',
                         detail='bytes='+str(len(raw)))
             return None
-        return self._store(key,'bytes',raw,source_revision=source_revision)
+        result=self._store(key,'bytes',raw,source_revision=source_revision)
+        if result and notice_key:self.link_attachment(key,notice_key,closes_on)
+        return result
+
+
+    @staticmethod
+    def _close_date(value):
+        raw=str(value or '').strip()
+        try:
+            return dt.date.fromisoformat(raw[:10]) if len(raw)>=10 else dt.date.fromisoformat(raw)
+        except (ValueError,TypeError):
+            return None
+
+    def link_attachment(self, key, notice_key, closes_on=''):
+        """Reference an exact archived binary from a notice (no download)."""
+        if not notice_key:return
+        date=self._close_date(closes_on)
+        with self._connect() as db:
+            db.execute('''INSERT INTO attachment_refs(request_key,notice_key,closes_on)
+                VALUES(?,?,?) ON CONFLICT(request_key,notice_key) DO UPDATE SET
+                closes_on=CASE WHEN excluded.closes_on<>'' THEN excluded.closes_on
+                               ELSE attachment_refs.closes_on END''',
+                (key,str(notice_key)[:48],date.isoformat() if date else ''))
+
+    @staticmethod
+    def _limits():
+        def number(name,default,minimum,maximum):
+            try:val=int(os.environ.get(name,str(default)))
+            except ValueError:val=default
+            return min(max(val,minimum),maximum)
+        return (number('WORKLINKS_RFP_LEDGER_MAX_MB',4096,256,16384)*1048576,
+                number('WORKLINKS_RFP_DISK_RESERVE_MB',5120,512,32768)*1048576)
+
+    def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=7,
+                      unknown_days=30, json_days=30, event_days=60):
+        """Delete only expired/orphan archived bytes; retain any live notice ref.
+
+        Legacy archives are linked to their notice from historical HTTP events.
+        Unknown-deadline archives expire after a bounded fallback lifetime.
+        Nothing here touches original RFP scan evidence or API snapshot files.
+        """
+        deadlines=deadline_by_notice or {}
+        today=today or dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
+        if isinstance(today,dt.datetime):today=today.date()
+        grace=max(0,int(grace_days))
+        unknown=max(1,int(unknown_days))
+        now_utc=dt.datetime.now(dt.timezone.utc)
+        cutoff_json=(now_utc-dt.timedelta(days=max(1,int(json_days)))).isoformat()
+        cutoff_events=(now_utc-dt.timedelta(days=max(1,int(event_days)))).isoformat()
+        archived_deleted=0
+        json_deleted=0
+        events_deleted=0
+        deleted_payload_bytes=0
+        with self._connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            if not db.execute("SELECT 1 FROM ledger_meta WHERE key='legacy_refs_migrated'").fetchone():
+                db.execute('''INSERT OR IGNORE INTO attachment_refs(request_key,notice_key,closes_on)
+                    SELECT DISTINCT e.request_key,e.notice_key,''
+                    FROM call_events e INNER JOIN verified_cache c
+                       ON c.request_key=e.request_key AND c.media_type='bytes'
+                    WHERE e.kind IN ('attachment_http','attachment_reuse')
+                      AND e.notice_key IS NOT NULL AND e.notice_key<>'' ''')
+                db.execute("INSERT INTO ledger_meta(key,value) VALUES('legacy_refs_migrated',?)",
+                           (utcnow(),))
+            # Notice metadata can be corrected after an archive was saved.
+            for notice,close in deadlines.items():
+                date=self._close_date(close)
+                if date:
+                    db.execute('UPDATE attachment_refs SET closes_on=? WHERE notice_key=?',
+                               (date.isoformat(),notice))
+            refs={}
+            for key,notice,close in db.execute(
+                    'SELECT request_key,notice_key,closes_on FROM attachment_refs'):
+                refs.setdefault(key,[]).append((notice,close))
+            to_remove=[]
+            for key,stamp,payload_size in db.execute(
+                    "SELECT request_key,stored_at,length(payload) FROM verified_cache WHERE media_type='bytes'"):
+                try:created=dt.datetime.fromisoformat(stamp).date()
+                except (TypeError,ValueError):created=today
+                keep=False
+                candidates=refs.get(key,[])
+                if not candidates:
+                    keep=(today-created).days<unknown
+                else:
+                    for notice,stored_close in candidates:
+                        date=self._close_date(deadlines.get(notice) or stored_close)
+                        if date:
+                            if today<=date+dt.timedelta(days=grace):
+                                keep=True
+                                break
+                        elif (today-created).days<unknown:
+                            keep=True
+                            break
+                if not keep:to_remove.append((key,int(payload_size or 0)))
+            for key,size in to_remove:
+                db.execute("DELETE FROM verified_cache WHERE request_key=? AND media_type='bytes'",
+                           (key,))
+                db.execute("DELETE FROM attachment_refs WHERE request_key=?",(key,))
+                archived_deleted+=1
+                deleted_payload_bytes+=size
+            json_deleted=db.execute(
+                "DELETE FROM verified_cache WHERE media_type='json' AND stored_at < ?",
+                (cutoff_json,)).rowcount
+            events_deleted=db.execute(
+                "DELETE FROM call_events WHERE occurred_at < ?",(cutoff_events,)).rowcount
+            remaining=db.execute(
+                "SELECT COUNT(*),COALESCE(SUM(length(payload)),0) FROM verified_cache WHERE media_type='bytes'"
+            ).fetchone()
+        # SQLite deletion may leave reusable free pages. Compact safely when
+        # enough disk space exists; otherwise preserve data and retry later.
+        file_before=self.path.stat().st_size if self.path.exists() else 0
+        reclaimed=0
+        try:
+            with sqlite3.connect(str(self.path),timeout=1) as db:
+                db.execute('PRAGMA busy_timeout=1000')
+                db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+                free_pages=db.execute('PRAGMA freelist_count').fetchone()[0]
+                page_size=db.execute('PRAGMA page_size').fetchone()[0]
+                reclaimable=free_pages*page_size
+                incremental=db.execute('PRAGMA auto_vacuum').fetchone()[0]==2
+                if reclaimable>=32*1048576:
+                    if incremental:
+                        db.execute('PRAGMA incremental_vacuum')
+                    elif (shutil.disk_usage(self.path.parent).free >=
+                          file_before*2+512*1048576):
+                        db.execute('VACUUM')
+            reclaimed=max(0,file_before-self.path.stat().st_size)
+        except (sqlite3.Error,OSError):
+            pass  # Cannot block active reader or cause disk pressure.
+        return {'attachmentsDeleted':archived_deleted,
+                'deletedCompressedBytes':deleted_payload_bytes,
+                'jsonDeleted':json_deleted,'eventsDeleted':events_deleted,
+                'attachmentsRemaining':remaining[0],
+                'compressedBytesRemaining':remaining[1],
+                'fileBytesReclaimed':reclaimed}
 
     def stats(self):
         with self._connect() as conn:
