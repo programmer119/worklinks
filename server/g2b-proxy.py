@@ -1395,6 +1395,59 @@ def rfp_rescan_progress():
     return report
 
 
+def query_saved_open_inventory():
+    """Read every saved SW notice eligible for an open/unknown-deadline filter.
+    Never call procurement APIs or hide a failed/incomplete census as a total.
+    """
+    now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    con=open_bid_db()
+    try:
+        history=bool(con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='recurring_projects'").fetchone())
+        series=('r.history_json,r.repeat_years' if history else 'NULL,0')
+        join=("LEFT JOIN recurring_projects r ON b.kind=r.kind AND b.bid_no=r.bid_no"
+              if history else '')
+        rows=con.execute("SELECT b.payload,q.payload,"+series+
+            " FROM bid_notices b LEFT JOIN bid_license_cache q ON "+
+            "b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "+
+            join+" WHERE b.sw_candidate=1 "+
+            "ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC").fetchall()
+    finally:
+        con.close()
+    allowed=('kind','bidNo','order','title','org','agency','posted','closes',
+             'budget','url','state','contract','awardMethod','awardMethodCode',
+             'awardFloorRate','purchsObjPrdctList')
+    kept=[];expired=0;cancelled=0;unknown=0
+    for payload,license_payload,history_json,years in rows:
+        try:raw=json.loads(payload)
+        except (TypeError,ValueError) as exc:
+            raise ApiError('inventory_invalid_record',503) from exc
+        if not isinstance(raw,dict) or not raw.get('bidNo'):
+            raise ApiError('inventory_invalid_record',503)
+        if re.search('취소|철회|폐기',str(raw.get('state') or '')):
+            cancelled+=1
+            continue
+        deadline=rfp_deadline_kst(raw.get('closes'))
+        if deadline is not None and deadline<now:
+            expired+=1
+            continue
+        if deadline is None:unknown+=1
+        item={k:raw[k] for k in allowed if k in raw}
+        if license_payload:
+            try:item['bidEligibility']=json.loads(license_payload)
+            except (TypeError,ValueError):
+                item['bidEligibility']={'ok':False,'complete':False,'error':'cache_invalid'}
+        if history_json and int(years or 0)>=2:
+            try:item['repeatHistory']=json.loads(history_json)
+            except (TypeError,ValueError):pass
+        kept.append(item)
+    return {'ok':True,'complete':True,'scope':'all_saved_sw_active_or_unknown',
+            'totalStoredSw':len(rows),'includedCount':len(kept),
+            'unknownDeadline':unknown,'expiredExcluded':expired,
+            'cancelledExcluded':cancelled,'asOf':now.isoformat(),
+            'noGovernmentApiCalls':True,'items':kept}
+
+
 def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
     try:
@@ -2102,6 +2155,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
             if u.path == '/api/g2b/rfp-rescan-progress':
                 return self.reply(200,rfp_rescan_progress())
+            if u.path == '/api/g2b/saved-inventory':
+                return self.reply(200,query_saved_open_inventory())
             if u.path == '/api/g2b/saved':
                 try: limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except ValueError: raise ApiError('invalid_saved_pagination',400)
