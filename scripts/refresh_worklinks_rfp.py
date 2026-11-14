@@ -412,6 +412,9 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
     # This is a ranking hint, never evidence that a missing document is readable.
     prefer_legacy=os.environ.get('WORKLINKS_RFP_PREFER_LEGACY_SCAN')=='1'
     upgrade_only=os.environ.get('WORKLINKS_RFP_UPGRADE_ONLY')=='1'
+    reader_fingerprint=':'.join(str(n) for n in
+        (CLASSIFICATION_VERSION,HWPX_READER_VERSION,
+         STAFFING_ROLE_SCAN_VERSION,STAFFING_FACT_SCAN_VERSION))
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -477,7 +480,9 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                     # Avoid repeatedly hitting a broken official endpoint or re-downloading
                     # an unchanged unreadable file within its 24-hour retry cooldown.
                     last_attempt=str(cached.get('lastAttemptAt') or '')
-                    if last_attempt:
+                    if (last_attempt and
+                            cached.get('lastAttemptReaderFingerprint')==reader_fingerprint and
+                            not cached.get('manifestChangePending')):
                         try:
                             when=dt.datetime.fromisoformat(last_attempt.replace('Z','+00:00'))
                             if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
@@ -2007,6 +2012,10 @@ def main():
             raise SystemExit('RFP_EXACT_PRIORITY_SELECTION_FAILED')
         print('RFP_EXACT_PRIORITY_SELECTED',sorted(selected_keys),flush=True)
     results=dict(old)
+    selected_keys={no+':'+order for no,order,_ in selected}
+    reader_fingerprint=':'.join(str(n) for n in
+        (CLASSIFICATION_VERSION,HWPX_READER_VERSION,
+         STAFFING_ROLE_SCAN_VERSION,STAFFING_FACT_SCAN_VERSION))
     # Parse already-stored binaries first; an older record is never re-downloaded
     # just to populate the staffing column.
     cached_staffing_upgrades=backfill_cached_staffing(results,max_files=96)
@@ -2120,9 +2129,15 @@ def main():
                 item.get('status')!='text_extracted_requires_review'):
             update['staffingRoles']=prev['staffingRoles']
             update['staffingRoleScanComplete']=False
+        if key in selected_keys:
+            update['lastAttemptAt']=now.isoformat()
+            update['lastAttemptReaderFingerprint']=reader_fingerprint
+        elif prev.get('lastAttemptAt'):
+            update['lastAttemptAt']=prev['lastAttemptAt']
+            if prev.get('lastAttemptReaderFingerprint'):
+                update['lastAttemptReaderFingerprint']=prev['lastAttemptReaderFingerprint']
         if key in failed_refresh:
             update['lastAttemptStatus']=failed_refresh[key]
-            update['lastAttemptAt']=now.isoformat()
         # Retain the last authenticated manifest and pending-change flag if a
         # fresh download failed or the current metadata endpoints were partial.
         # Probe timestamps are newer than the cached detail's extraction
