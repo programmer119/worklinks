@@ -82,10 +82,11 @@ def deployed_rfp_reader_versions():
            'HWPX_READER_VERSION':'hwpxReaderVersion'}
     result={}
     for variable,field in names.items():
-        matched=re.search(r'(?m)^'+variable+r'\\s*=\\s*([0-9]+)',source)
-        if not matched:
+        candidates=[line.split('=',1)[1].strip() for line in source.splitlines()
+                    if '=' in line and line.split('=',1)[0].strip()==variable]
+        if len(candidates)!=1 or not candidates[0].isdigit():
             raise RuntimeError('deployed_rfp_parser_version_missing_'+variable)
-        result[field]=int(matched.group(1))
+        result[field]=int(candidates[0])
     return result
 
 
