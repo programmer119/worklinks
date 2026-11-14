@@ -106,6 +106,7 @@ def scanned_record():
             'files':[{'name':'official.hwpx','readable':True,
                       'sourceSha256':'d'*64,'sourceTextScanComplete':True,
                       'staffingRoleScanVersion':module['STAFFING_ROLE_SCAN_VERSION'],
+                      'staffingFactScanVersion':module['STAFFING_FACT_SCAN_VERSION'],
                       'staffingRoleScanTruncated':False}]}
 all_done={row['bidNo']+':'+row['order']:scanned_record() for row in rows}
 calls.clear()
