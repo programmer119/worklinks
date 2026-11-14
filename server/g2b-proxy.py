@@ -1465,6 +1465,39 @@ def rfp_rescan_progress():
     report['worker']=rfp_progress_worker_status(state_path)
     report['lanes']=rfp_dual_lane_progress(
         os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3'))
+    # Read-only telemetry: no provider request, job launch, or worker side effect.
+    try:
+        live_db=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3')
+        if os.path.isfile(live_db):
+            with sqlite3.connect('file:'+live_db+'?mode=ro',uri=True,timeout=2) as live:
+                tables=set(row[0] for row in live.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"))
+                if 'rfp_live_events' in tables:
+                    rows=live.execute('''SELECT lane,notice_key,file_name,phase,status,
+                        bytes_done,bytes_total,files_done,files_total,retry_epoch,
+                        error_text,updated_epoch FROM rfp_live_events
+                        WHERE status NOT IN ('done','skipped') OR updated_epoch>?
+                        ORDER BY CASE WHEN status='working' THEN 0
+                            WHEN status='retry' THEN 1 ELSE 2 END,
+                            updated_epoch DESC LIMIT 24''',(time.time()-120,)).fetchall()
+                    keys=('lane','noticeKey','fileName','phase','status','bytesDone',
+                          'bytesTotal','filesDone','filesTotal','retryEpoch','error',
+                          'updatedEpoch')
+                    workers={}
+                    if 'rfp_live_workers' in tables:
+                        for lane,status,error,retry,updated in live.execute(
+                            'SELECT lane,status,error_text,retry_epoch,updated_epoch FROM rfp_live_workers'):
+                            workers[lane]={'status':status,'error':error,
+                                'retryEpoch':retry,'updatedEpoch':updated,
+                                'stale':time.time()-updated>90}
+                    report['activity']={'available':True,
+                        'items':[dict(zip(keys,row)) for row in rows],
+                        'workers':workers}
+                else:
+                    report['activity']={'available':False}
+        else:report['activity']={'available':False}
+    except (sqlite3.Error,OSError):
+        report['activity']={'available':False}
     report['progressCacheSeconds']=8
     with _RFP_PROGRESS_LOCK:
         _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+8)
