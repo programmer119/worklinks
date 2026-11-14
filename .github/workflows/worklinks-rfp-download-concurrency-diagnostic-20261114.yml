@@ -1,0 +1,95 @@
+name: WorkLinks bounded public attachment download concurrency diagnostic (read-only)
+on:
+  push:
+    branches:
+      - diagnostics/rfp-attachment-concurrency-20261114
+    paths:
+      - '.github/workflows/worklinks-rfp-download-concurrency-diagnostic-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Compare 1 2 4 8 official file GET concurrency without production writes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import concurrent.futures as cf
+          import gzip, json, random, re, statistics, time, urllib.parse, urllib.request
+          
+          BASE='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          URL=BASE+'snapshot?name=rfp-clauses'
+          req=urllib.request.Request(URL,headers={'Accept-Encoding':'gzip','User-Agent':'WorkLinks-Bounded-ReadOnly-Concurrency/1.0'})
+          start=time.monotonic()
+          with urllib.request.urlopen(req,timeout=35) as resp:
+              payload=resp.read()
+              if 'gzip' in (resp.headers.get('Content-Encoding') or ''):payload=gzip.decompress(payload)
+          doc=json.loads(payload)
+          index=doc.get('byNotice') or {}
+          print('RFP_CONCURRENCY_INDEX',json.dumps({'records':len(index),'bytes':len(payload),'fetchSeconds':round(time.monotonic()-start,3)},ensure_ascii=False),flush=True)
+          candidates=[]
+          seen=set()
+          for key,notice in sorted(index.items()):
+              for f in notice.get('files') or []:
+                  name=str(f.get('name') or '')
+                  url=str(f.get('sourceUrl') or '')
+                  urlparts=urllib.parse.urlsplit(url)
+                  if not (f.get('readable') is True and f.get('sourceSha256') and name.lower().endswith(('.hwp','.hwpx','.pdf')) and urlparts.scheme=='https' and urlparts.hostname=='www.g2b.go.kr' and urlparts.path.startswith('/pn/pnp/pnpe/UntyAtchFile/')): continue
+                  if url in seen:continue
+                  seen.add(url)
+                  candidates.append({'notice':key,'name':name,'url':url,'fmt':name.lower().rsplit('.',1)[-1]})
+          # Diverse notices, no special preference to a known slow URL.
+          by_fmt={'hwp':[],'hwpx':[],'pdf':[]}
+          for c in candidates:by_fmt[c['fmt']].append(c)
+          rng=random.Random(20261114)
+          for f in by_fmt:rng.shuffle(by_fmt[f])
+          selected=[]
+          for target_fmt in ['pdf','hwp','pdf','hwp','pdf','hwp','pdf','hwp']:
+              item=next((v for v in by_fmt[target_fmt] if v['notice'] not in {x['notice'] for x in selected}),None)
+              if item:selected.append(item)
+          if len(selected)<8:
+              for c in candidates:
+                  if c['notice'] not in {x['notice'] for x in selected}:selected.append(c)
+                  if len(selected)>=8:break
+          selected=selected[:8]
+          print('RFP_CONCURRENCY_SOURCES',json.dumps([{'notice':c['notice'],'name':c['name'][:85],'format':c['fmt']} for c in selected],ensure_ascii=False),flush=True)
+          if len(selected)<8: raise SystemExit('NOT_ENOUGH_SOURCE_FILES')
+          
+          # Exactly 8 actual official file GETs per stage, no G2B metadata API calls.
+          def one(c):
+              t=time.perf_counter()
+              request=urllib.request.Request(c['url'],headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+              try:
+                  with urllib.request.urlopen(request,timeout=35) as r:
+                      raw=r.read(24_000_001)
+                      code=r.status
+                  if len(raw)>24_000_000:raise ValueError('large_file_over_24MB')
+                  return {'status':code,'bytes':len(raw),'sec':round(time.perf_counter()-t,4),'format':c['fmt'],'notice':c['notice']}
+              except Exception as e:
+                  code=getattr(e,'code',0)
+                  return {'status':code,'bytes':0,'sec':round(time.perf_counter()-t,4),'error':type(e).__name__,'format':c['fmt'],'notice':c['notice']}
+          
+          for parallel in [1,2,4,8]:
+              order=selected[:]
+              rng.shuffle(order)
+              t=time.perf_counter()
+              with cf.ThreadPoolExecutor(max_workers=parallel) as pool:
+                  futures=[]
+                  for c in order:
+                      futures.append(pool.submit(one,c))
+                      time.sleep(0.25)  # global start rate <=4/s; prevent abrupt bursts
+                  samples=[f.result() for f in futures]
+              elapsed=time.perf_counter()-t
+              errors=[s for s in samples if s.get('error') or s['status']!=200]
+              sizes=sum(s['bytes'] for s in samples)
+              success=[s['sec'] for s in samples if s.get('status')==200]
+              report={'parallel':parallel,'files':len(samples),'success':len(success),'errors':errors,'wallSec':round(elapsed,3),'totalMiB':round(sizes/1048576,2),'filesPerSecond':round(len(success)/elapsed,4),'MiBPerSecond':round(sizes/1048576/elapsed,3),'meanFileSec':round(statistics.mean(success),3) if success else None,'medianFileSec':round(statistics.median(success),3) if success else None,'maxFileSec':round(max(success),3) if success else None,'byFormat':{fmt:[s['sec'] for s in samples if s['format']==fmt and s.get('status')==200] for fmt in ('pdf','hwp','hwpx')}}
+              print('RFP_DOWNLOAD_CONCURRENCY_BENCH',json.dumps(report,ensure_ascii=False),flush=True)
+              if any(s['status'] in (403,429,500,502,503,504) or s.get('error')=='TimeoutError' for s in errors):
+                  print('RFP_BENCH_STOP_UPSTREAM_ERROR',flush=True)
+                  break
+          
+          PY
