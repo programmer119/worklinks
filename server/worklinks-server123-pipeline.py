@@ -185,7 +185,7 @@ def stage_workspace(path,minimal=False):
                  'batch_backfill_changcom_top500_rfp.py',
                  'repair_changcom_top500_rfp.py',
                  'repair_open_rfp_cached_attachments.py',
-                 'rfp_call_ledger.py','rfp_dual_queue.py'):
+                 'rfp_call_ledger.py','rfp_dual_queue.py','rfp_bulk_manifests.py'):
         shutil.copy2(SCRIPTS / name, root / 'scripts' / name)
     for name in (() if minimal else READ_FILES):
         source = SEEDS / name
@@ -495,7 +495,8 @@ def ensure_independent_downloader(current):
              G2B_PIPELINE_DATA=str(DATA),G2B_PIPELINE_SCRIPTS=str(SCRIPTS),
              WORKLINKS_RFP_UPGRADE_ONLY='1',WORKLINKS_RFP_DEFER_OCR='1',
              WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'),
-             WORKLINKS_RFP_DOWNLOAD_CONCURRENCY='8')
+             WORKLINKS_RFP_DOWNLOAD_CONCURRENCY='8',
+             WORKLINKS_RFP_BATCH_MANIFESTS='1')
     logpath=DATA/'rfp-download-worker.log'
     if logpath.is_file() and logpath.stat().st_size>8*1048576:
         os.replace(logpath,DATA/'rfp-download-worker.previous.log')
