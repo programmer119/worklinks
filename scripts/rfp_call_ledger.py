@@ -219,7 +219,8 @@ class CallLedger:
                 number('WORKLINKS_RFP_DISK_RESERVE_MB',5120,512,32768)*1048576)
 
     def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=7,
-                      unknown_days=30, json_days=30, event_days=60):
+                      unknown_days=30, json_days=30, event_days=60,
+                      compact=True):
         """Delete only expired/orphan archived bytes; retain any live notice ref.
 
         Legacy archives are linked to their notice from historical HTTP events.
@@ -300,12 +301,12 @@ class CallLedger:
         try:
             with sqlite3.connect(str(self.path),timeout=1) as db:
                 db.execute('PRAGMA busy_timeout=1000')
-                db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+                if compact:db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
                 free_pages=db.execute('PRAGMA freelist_count').fetchone()[0]
                 page_size=db.execute('PRAGMA page_size').fetchone()[0]
                 reclaimable=free_pages*page_size
                 incremental=db.execute('PRAGMA auto_vacuum').fetchone()[0]==2
-                if reclaimable>=32*1048576:
+                if compact and reclaimable>=32*1048576:
                     if incremental:
                         db.execute('PRAGMA incremental_vacuum')
                     elif (shutil.disk_usage(self.path.parent).free >=
