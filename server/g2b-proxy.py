@@ -1401,10 +1401,15 @@ def rfp_dual_lane_progress(path):
         with sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=2) as db:
             rows=db.execute('''SELECT download_status,scan_status,COUNT(*)
                 FROM rfp_dual_notices GROUP BY download_status,scan_status''').fetchall()
+            # One saved three-source attachment manifest means this notice's
+            # file list is complete. Read only: no procurement requests.
+            manifest_done=db.execute('''SELECT COUNT(*) FROM rfp_bulk_manifests m
+                JOIN rfp_dual_notices n ON n.notice_key=m.notice_key''').fetchone()[0]
     except (sqlite3.Error,OSError):
         return {'available':False}
     total=sum(n for _,_,n in rows)
     return {'available':True,
+            'manifest':{'total':total,'done':min(manifest_done,total)},
             'download':{'total':total,
                 'done':sum(n for a,_,n in rows if a=='ready'),
                 'active':sum(n for a,_,n in rows if a=='fetching'),
