@@ -62,10 +62,10 @@ def api_ledger_event(ledger,kind,key,outcome,**fields):
         ledger.record(kind,key,outcome,**fields)
 
 
-def get_key():
+def get_key(use_operating=False):
     # A02 and B1/B2/B3 use the SAME approved production credential file.
     # Fail closed when explicitly configured; never fall back to the old A02 key.
-    if OPERATING_KEY_PATH:
+    if use_operating and OPERATING_KEY_PATH:
         try:
             with open(OPERATING_KEY_PATH, 'r') as f:
                 for line in f:
@@ -158,7 +158,8 @@ def upstream_rate_diagnostics():
             'notProviderAccountUsage':True,'utcDate':today,'services':records}
 
 def request_api(base, operation, params):
-    token = get_key()
+    # Scope the shared credential to A02; leave other subscribed services alone.
+    token = get_key(use_operating=(base == API_BASE))
     if not token: raise ApiError('secret_not_configured', 503)
     args = {'serviceKey':token, 'type':'json'}
     args.update(params)
