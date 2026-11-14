@@ -4158,8 +4158,14 @@ function jobRequirementEvidence(x){
    // A paragraph may contain both a negative/negotiable example and a
    // positive requirement. Prefer a concrete, cited affirmative clause.
    const sentences=String(c.text).split(/[。;\n]|(?<=다)\.\s+/).filter(Boolean);
-   return sentences.some(sentence=>onsiteWording.test(sentence)&&onsiteDuty.test(sentence)&&
-      !onsiteNotMandatory.test(sentence));
+   return sentences.some(sentence=>{
+     // Index headings from a table of contents are NOT an affirmative staffing duty.
+     // MHR-003 "상주인력 복무 기준" beside MPR-010, MPR-011 etc is a heading, not a clause.
+     const headings=sentence.match(/\b[A-Z]{2,5}-\d{3,4}\b/g)||[];
+     if(headings.length>=3&&!/(?:하여야|해야|의무|반드시|필수)/.test(sentence))return false;
+     return onsiteWording.test(sentence)&&onsiteDuty.test(sentence)&&
+       !onsiteNotMandatory.test(sentence);
+   });
  });
  // Only the decision to work onsite (or its staffing level) being negotiated
  // qualifies. Negotiating leave, working hours or holidays does not.
