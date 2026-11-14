@@ -90,7 +90,7 @@ with sync_playwright() as p:
     assert page.locator('[data-rfp-stage="download"].is-active').count()==1
     assert page.locator('[data-rfp-stage="scan"].is-active').count()==1
     assert page.locator('[data-rfp-stage="manifest"].is-active').count()==0
-    assert page.locator('#rfpRescanModalRefresh').inner_text().startswith('다음 조회')
+    page.wait_for_function("() => document.getElementById('rfpRescanModalRefresh')?.textContent.startsWith('다음 조회')",timeout=12000)
     page.evaluate("() => {window._rfpOriginalDownloadTrack=document.querySelector('[data-rfp-stage=\"download\"] .rfp-rescan-stage-track');}")
     assert page.locator('#rfpRescanLabel').inner_text().startswith('16.67%'), 'outer progress must stay unchanged'
 
