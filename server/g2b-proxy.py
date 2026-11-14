@@ -1411,11 +1411,13 @@ def rfp_dual_lane_progress(path):
     return {'available':True,
             'manifest':{'total':total,'done':min(manifest_done,total)},
             'download':{'total':total,
-                'done':sum(n for a,_,n in rows if a=='ready'),
+                'done':sum(n for a,_,n in rows if a in ('ready','no_attachments')),
+                'skipped':sum(n for a,_,n in rows if a=='no_attachments'),
                 'active':sum(n for a,_,n in rows if a=='fetching'),
                 'failed':sum(n for a,_,n in rows if a=='retry')},
             'scan':{'total':total,
-                'done':sum(n for _,b,n in rows if b=='done'),
+                'done':sum(n for _,b,n in rows if b in ('done','skipped')),
+                'skipped':sum(n for _,b,n in rows if b=='skipped'),
                 'active':sum(n for _,b,n in rows if b=='scanning'),
                 'failed':sum(n for _,b,n in rows if b=='retry')}}
 
