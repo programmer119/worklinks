@@ -1219,6 +1219,38 @@ def rfp_progress_worker_status(state_path):
             'tasks':tasks}
 
 
+def read_rfp_notice_checkpoints(index):
+    """Read durable per-notice progress commits before full 8-notice archive publication."""
+    path=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-notice-progress.sqlite3')
+    if not os.path.isfile(path):
+        return index,[],0
+    try:
+        conn=sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=3)
+        try:
+            saved=conn.execute('''SELECT notice_key,checked_at,evidence_json
+                FROM rfp_notice_checkpoints ORDER BY checked_at DESC
+                LIMIT 12000''').fetchall()
+        finally:conn.close()
+    except (sqlite3.Error,OSError,IOError):
+        return index,[],0
+    current=dict(index)
+    changes=[]
+    for key,checked,value in saved:
+        if not isinstance(key,str) or not re.match(r'^(?:R\d{2}BK\d{8}|\d{11}):\d{3}$',key):
+            continue
+        try:row=json.loads(value)
+        except (ValueError,TypeError):continue
+        if not isinstance(row,dict) or str(row.get('checkedAt') or '')!=str(checked):
+            continue
+        prior=current.get(key)
+        if str((prior or {}).get('checkedAt') or '') >= checked:
+            continue
+        current[key]=row
+        changes.append({'bidNo':key,'checkedAt':checked,
+                        'status':str(row.get('status') or '')[:60]})
+    return current,changes[:12],len(changes)
+
+
 def rfp_rescan_progress():
     """Read-only saved-data progress, cached <= 8s for the 10s UI cadence."""
     version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
@@ -1237,10 +1269,13 @@ def rfp_rescan_progress():
         index_mtime=os.stat(os.path.join(SNAPSHOT_ROOT,'rfp-coverage-index.json')).st_mtime_ns
     except OSError:
         raise ApiError('rfp_source_files_unavailable',503)
+    notice_db=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-notice-progress.sqlite3')
+    try:notice_mtime=os.stat(notice_db).st_mtime_ns
+    except OSError:notice_mtime=None
     state_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),'pipeline-scheduler-state.json')
     try:worker_mtime=os.stat(state_path).st_mtime_ns
     except OSError:worker_mtime=None
-    sig=(stamp,db_mtime,index_mtime,worker_mtime)
+    sig=(stamp,db_mtime,index_mtime,worker_mtime,notice_mtime)
     with _RFP_PROGRESS_LOCK:
         if _RFP_PROGRESS_CACHE['signature']==sig and \
            _RFP_PROGRESS_CACHE['result'] is not None and \
@@ -1251,7 +1286,11 @@ def rfp_rescan_progress():
         bids=con.execute("SELECT bid_no,bid_ord,payload FROM bid_notices "
                          "WHERE sw_candidate=1 ORDER BY last_seen DESC").fetchall()
     finally:con.close()
-    report=rfp_progress_from_rows(bids,index,latest)
+    live_index,recent_notices,unpublished_count=read_rfp_notice_checkpoints(index)
+    report=rfp_progress_from_rows(bids,live_index,latest)
+    report['noticeProgressMode']='per_notice_durable_checkpoint'
+    report['recentNoticeUpdates']=recent_notices
+    report['noticesPendingBatchArchive']=unpublished_count
     # Never imply the progress endpoint starts an asynchronous scan.
     report['trigger']='server123_parser_version_upgrade_and_scheduled_worker'
     report['worker']=rfp_progress_worker_status(state_path)
