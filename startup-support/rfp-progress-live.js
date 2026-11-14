@@ -32,6 +32,8 @@
    '<div class="rfp-rescan-section-header"><h3>작업 진행</h3>'+
     '<span>첨부목록 확보·원본 다운로드 → 별도 문서 판독</span></div>'+
    '<div class="rfp-rescan-lanes">'+laneKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
+   '<div class="rfp-rescan-section-header"><h3>현재 작업 · 오류 · 재시도</h3></div>'+
+   '<div class="rfp-live-details" id="rfpLiveDetails" aria-live="off"></div>'+
    '<div class="rfp-rescan-section-header"><h3>기능별 판독 완료</h3></div>'+
    '<div class="rfp-rescan-feature-list">'+stageKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
    '<div class="rfp-rescan-unknown" id="rfpRescanUnknown" hidden>'+
@@ -55,6 +57,77 @@
   const button=document.getElementById('rfpRescanRefreshNow');
   if(button)button.disabled=Boolean(rfpRescanBusy);
  };
+
+ function paintLiveDetails(panel,activity){
+  const root=panel.querySelector('#rfpLiveDetails');
+  if(!root)return;
+  const lanes=[['manifest','첨부목록'],['download','다운로드'],['scan','판독']];
+  root.replaceChildren();
+  if(!activity?.available){
+   const text=document.createElement('p');
+   text.className='rfp-live-muted';
+   text.textContent='작업 상세 집계 미제공 · 서버 상태 확인 필요';
+   root.append(text);return;
+  }
+  const items=Array.isArray(activity.items)?activity.items:[];
+  const workers=activity.workers||{};
+  const now=Date.now()/1000;
+  const fmt=epoch=>epoch?new Intl.DateTimeFormat('ko-KR',{
+    timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',
+    second:'2-digit',hour12:false}).format(new Date(epoch*1000)):'—';
+  const amount=n=>(Math.max(0,Number(n)||0)/1048576).toFixed(2)+' MB';
+  const text=(parent,tag,value,cls)=>{
+    const el=document.createElement(tag);el.textContent=value;
+    if(cls)el.className=cls;parent.append(el);return el;
+  };
+  for(const [lane,title] of lanes){
+   const section=document.createElement('section');
+   section.className='rfp-live-lane';
+   const head=document.createElement('div');head.className='rfp-live-lane-head';
+   text(head,'strong',title);
+   const worker=workers[lane];
+   let status='상태 기록 없음';
+   if(worker){
+    if(worker.stale)status='상태 갱신 끊김';
+    else if(worker.status==='retry'&&worker.retryEpoch>now)status='재시도 '+fmt(worker.retryEpoch);
+    else if(worker.status==='retry')status='재시도 시각 도달';
+    else status=worker.status==='running'?'작업 확인 중':worker.status;
+   }
+   text(head,'span',status,worker?.stale||worker?.status==='retry'?'rfp-live-problem':'');
+   section.append(head);
+   if(worker?.error)text(section,'div','원인: '+worker.error,'rfp-live-error');
+   const entries=items.filter(item=>item.lane===lane).slice(0,5);
+   if(!entries.length)text(section,'div','현재 표시할 세부 작업 없음','rfp-live-muted');
+   for(const item of entries){
+    const row=document.createElement('div');row.className='rfp-live-item';
+    const first=document.createElement('div');first.className='rfp-live-item-title';
+    text(first,'strong',item.fileName||item.noticeKey||'공고');
+    let tag=item.status==='retry'?'재시도 예정':item.status==='working'?'처리 중':item.status==='done'?'완료':item.status;
+    text(first,'span',tag,item.status==='retry'?'rfp-live-problem':'');
+    row.append(first);
+    const detail=[];
+    if(item.fileName)detail.push(item.noticeKey);
+    if(item.phase)detail.push(item.phase);
+    if(item.filesTotal>0)detail.push('파일 '+item.filesDone+' / '+item.filesTotal+'개');
+    if(item.bytesDone>0||item.bytesTotal>0)
+     detail.push(amount(item.bytesDone)+' / '+(item.bytesTotal>0?amount(item.bytesTotal):'전체 크기 미제공'));
+    if(item.status==='retry'&&item.retryEpoch>0)detail.push('다음 재시도 '+fmt(item.retryEpoch));
+    text(row,'div',detail.join(' · '),'rfp-live-meta');
+    if(item.bytesTotal>0){
+      const progress=document.createElement('progress');
+      progress.max=item.bytesTotal;progress.value=Math.min(item.bytesTotal,Math.max(0,item.bytesDone||0));
+      progress.setAttribute('aria-label',item.fileName+' 다운로드 진행률');
+      row.append(progress);
+    }
+    if(item.error)text(row,'div','오류: '+item.error,'rfp-live-error');
+    if(item.status==='working'&&now-Number(item.updatedEpoch||0)>90)
+      text(row,'div','90초 이상 진행 기록 없음 · 작업 정지 여부 확인 필요','rfp-live-problem');
+    section.append(row);
+   }
+   root.append(section);
+  }
+ }
+
  window.paintRfpLiveProgress=function(){
   const label=document.getElementById('rfpRescanLabel');
   const count=document.getElementById('rfpRescanCount');
@@ -134,6 +207,7 @@
   panel.querySelector('#rfpRescanUnknown').hidden=!unknownTotal;
   updateField(panel,'unknown',number(unknownTotal)+'건 · 별도 판독 '+
    number(counts.unknownDeadlineCompleted)+' / '+number(unknownTotal)+'건');
+  paintLiveDetails(panel,info.activity);
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
   count.textContent='완료 '+number(done)+' / '+number(all)+'건';
@@ -146,4 +220,22 @@
    (active?'작업 진행 중':'서버 집계 '+rfpClock(info.asOf));
   window.paintRfpLiveCountdown();
  };
+
+(function(){
+ if(document.getElementById('rfp-live-details-style'))return;
+ const css=document.createElement('style');css.id='rfp-live-details-style';
+ css.textContent=`
+ .rfp-live-details{display:grid;gap:10px;margin:10px 0 14px;}
+ .rfp-live-lane{padding:10px 12px;border:1px solid var(--border,#d4d8df);border-radius:10px;min-width:0;}
+ .rfp-live-lane-head,.rfp-live-item-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+ .rfp-live-lane-head{font-size:15px;padding-bottom:5px;}
+ .rfp-live-item{padding:8px 0;border-top:1px solid var(--border,#d4d8df);min-width:0;}
+ .rfp-live-item-title{font-size:14px;overflow-wrap:anywhere;}
+ .rfp-live-meta{font-size:13px;line-height:1.5;opacity:.9;overflow-wrap:anywhere;}
+ .rfp-live-error,.rfp-live-problem{color:#c0442b;font-size:13px;line-height:1.5;overflow-wrap:anywhere;}
+ .rfp-live-muted{font-size:13px;opacity:.75;}
+ .rfp-live-item progress{width:100%;height:8px;display:block;margin-top:6px;accent-color:#16836e;}
+ `;
+ document.head.append(css);
+})();
 })();
