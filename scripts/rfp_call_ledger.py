@@ -339,7 +339,7 @@ class CallLedger:
 
     def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=0,
                       unknown_days=30, json_days=30, event_days=60,
-                      compact=True):
+                      compact=True, cancelled_notice_numbers=None):
         """Run one non-overlapping, bounded retention pass.
 
         The independent flock prevents manual + scheduler cleanups from
@@ -355,15 +355,18 @@ class CallLedger:
                 return self._prune_expired_unlocked(
                     deadline_by_notice,today=today,grace_days=grace_days,
                     unknown_days=unknown_days,json_days=json_days,
-                    event_days=event_days,compact=compact)
+                    event_days=event_days,compact=compact,
+                    cancelled_notice_numbers=cancelled_notice_numbers)
             finally:
                 fcntl.flock(lock.fileno(),fcntl.LOCK_UN)
 
     def _prune_expired_unlocked(self, deadline_by_notice=None, *, today=None,
                                grace_days=0,unknown_days=30,json_days=30,
-                               event_days=60,compact=True):
+                               event_days=60,compact=True,
+                               cancelled_notice_numbers=None):
         """Short SQLite transactions; never hold a write lock while planning."""
         deadlines=deadline_by_notice or {}
+        cancelled=set(cancelled_notice_numbers or ())
         today=today or dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
         if isinstance(today,dt.datetime):today=today.date()
         grace=max(0,int(grace_days))
@@ -378,6 +381,7 @@ class CallLedger:
         def still_active(refs,created):
             if not refs:return (today-created).days<unknown
             for notice,stored_close in refs:
+                if notice.split(':',1)[0] in cancelled:continue
                 date=self._close_date(deadlines.get(notice) or stored_close)
                 if date is not None:
                     if today<=date+dt.timedelta(days=grace):return True

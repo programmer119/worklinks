@@ -462,15 +462,20 @@ def prune_rfp_archive(*,compact=True):
     from rfp_call_ledger import CallLedger
     db_path=DATA/'bids.sqlite3'
     deadlines={}
+    latest_by_no={}
     if db_path.is_file():
         with sqlite3.connect('file:'+str(db_path)+'?mode=ro',
                              uri=True,timeout=15) as db:
-            for (payload,) in db.execute(
-                    "SELECT payload FROM bid_notices WHERE sw_candidate=1"):
+            for bid_no,bid_ord,payload in db.execute(
+                    "SELECT bid_no,bid_ord,payload FROM bid_notices"):
                 try:notice=json.loads(payload)
                 except (TypeError,ValueError):continue
-                no=str(notice.get('bidNo') or '')
-                ordinal=str(notice.get('order') or '0').zfill(3)
+                no=str(bid_no or notice.get('bidNo') or '')
+                ordinal=str(bid_ord or notice.get('order') or '0').zfill(3)
+                status=str(notice.get('noticeKind') or notice.get('state') or '')
+                number=int(ordinal)
+                if no not in latest_by_no or number>latest_by_no[no][0]:
+                    latest_by_no[no]=(number,bool(re.search('취소|철회|폐기',status)))
                 raw=str(notice.get('closes') or '')
                 match=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',raw)
                 if not match:continue
@@ -482,11 +487,14 @@ def prune_rfp_archive(*,compact=True):
     grace=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_GRACE_DAYS','0'))
     unknown=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_UNKNOWN_DAYS','30'))
     ledger=CallLedger(DATA/'rfp-request-ledger.sqlite3')
+    cancelled={no for no,(ordinal,is_cancelled) in latest_by_no.items()
+               if is_cancelled}
     report=ledger.prune_expired(
-        deadlines,grace_days=grace,unknown_days=unknown,compact=compact)
+        deadlines,grace_days=grace,unknown_days=unknown,compact=compact,
+        cancelled_notice_numbers=cancelled)
     log('RFP_ARCHIVE_RETENTION',json.dumps(
-        {'mappedNoticeDeadlines':len(deadlines),'graceDays':grace,
-         'unknownDays':unknown,**report},separators=(',',':')))
+        {'mappedNoticeDeadlines':len(deadlines),'cancelledNumbers':len(cancelled),
+         'graceDays':grace,'unknownDays':unknown,**report},separators=(',',':')))
     return report
 
 
