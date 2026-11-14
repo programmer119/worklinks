@@ -272,9 +272,11 @@
   const worker=info.worker?.available===true?info.worker:null;
   const upgrade=worker?.tasks?.rfpUpgrade||null;
   const scanWorkerActive=Boolean(worker?.upgradeActive&&upgrade?.status==='started');
-  const dlActive=Math.max(0,Number(lanes?.download?.active||0));
+  const dlNotices=Math.max(0,Number(lanes?.download?.active||0));
+  const downloadGroup=info.activity?.downloadGroup;
+  const dlFiles=downloadGroup?.available?Math.max(0,Number(downloadGroup.activeCount||0)):null;
   const scanActive=Math.max(0,Number(lanes?.scan?.active||0));
-  const active=!delayed&&(dlActive>0||scanActive>0||scanWorkerActive);
+  const active=!delayed&&(dlNotices>0||dlFiles>0||scanActive>0||scanWorkerActive);
   for(const [name,value] of Object.entries({
    total:number(all),complete:number(done),rescanRequired:number(counts.rescanRequired),
    unscanned:number(counts.unscanned),legacy:number(counts.legacy),
@@ -289,7 +291,8 @@
   updateField(panel,'liveText',delayed?'서버 집계 갱신 지연':
    active?'실제 작업 진행 중':worker?.upgradeActive?'판독 작업 확인 중':'현재 처리 중인 공고 없음');
   const activeParts=[];
-  if(dlActive)activeParts.push('다운로드 '+number(dlActive)+'건');
+  if(dlFiles>0)activeParts.push('파일 다운로드 '+number(dlFiles)+'개');
+  else if(dlNotices>0)activeParts.push('원본 준비 '+number(dlNotices)+'건');
   if(scanActive)activeParts.push('판독 '+number(scanActive)+'건');
   if(scanWorkerActive&&!scanActive)activeParts.push('판독 배치 실행');
   const delta=Number(rfpRescanLastDelta||0);
