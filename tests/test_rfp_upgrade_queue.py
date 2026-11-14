@@ -25,6 +25,8 @@ def previous():
 saved={r['bidNo']+':000':previous() for r in rows if r['bidNo']!='R26BK00000007'}
 saved['R26BK00000001:000']['classificationVersion']=versions[0]-1
 saved['R26BK00000002:000']['files'][0]['staffingFactScanVersion']=versions[3]-1
+saved['R26BK00000003:000']['classificationVersion']=versions[0]-1
+saved['R26BK00000003:000']['reviewComplete']=True
 saved['R26BK00000004:000']['classificationVersion']=versions[0]-1
 saved['R26BK00000005:000']={'status':'not_scanned','files':[]}
 saved['R26BK00000006:000']['classificationVersion']=versions[0]-1
@@ -45,7 +47,7 @@ finally:
     if previous_env is None:os.environ.pop('WORKLINKS_RFP_UPGRADE_ONLY',None)
     else:os.environ['WORKLINKS_RFP_UPGRADE_ONLY']=previous_env
 keys={no+':'+order for no,order,_ in chosen}
-assert keys=={'R26BK00000001:000','R26BK00000002:000'},(keys,chosen)
+assert keys=={'R26BK00000001:000','R26BK00000002:000','R26BK00000003:000'},(keys,chosen)
 # Initial scans remain eligible through the independent ordinary scanner.
 ordinary=m['discover'](8,saved,targets=set())
 ordinary_keys={no+':'+order for no,order,_ in ordinary}
