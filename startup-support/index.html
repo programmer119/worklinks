@@ -2040,12 +2040,12 @@ function paintRfpRescanProgress(){
   '<div class="rfp-rescan-totals">'+
    '<div class="rfp-rescan-metric"><span>관리 대상</span><strong>'+rfpProgressNumber(all)+'</strong></div>'+
    '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong>'+rfpProgressNumber(complete)+'</strong></div>'+
-   '<div class="rfp-rescan-metric"><span>재판독 필요</span><strong>'+rfpProgressNumber(counts.rescanRequired)+'</strong></div>'+ "
+   '<div class="rfp-rescan-metric"><span>재판독 필요</span><strong>'+rfpProgressNumber(counts.rescanRequired)+'</strong></div>'+
   '</div>'+
   '<span class="rfp-rescan-big-track" role="progressbar" aria-label="전체 최신 판독 완료" aria-valuenow="'+
     pct+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+pct+'%"></span></span>'+
   '<div class="rfp-rescan-legend"><span>완료 <b>'+pct+'%</b></span>'+
-   '<span>구버전 재판독 <b>'+remain.toFixed(1)+'%</b></span></div>'+ "
+   '<span>구버전 재판독 <b>'+remain.toFixed(1)+'%</b></span></div>'+
   '<div class="rfp-rescan-legend">'+
    '<span>구버전 <b>'+rfpProgressNumber(counts.legacy)+'건</b></span>'+
    '<span>최초 미판독 <b>'+rfpProgressNumber(counts.unscanned)+'건</b></span>'+
@@ -2055,7 +2055,7 @@ function paintRfpRescanProgress(){
   '<h3 class="rfp-rescan-section-title">기능별 판독 완료</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
   (counts.unknownDeadline?'<div class="rfp-rescan-unknown">마감일 확인 불가 '+
     rfpProgressNumber(counts.unknownDeadline)+'건은 전체 대상에서 제외</div>':'')+
-  '<p class="rfp-rescan-foot">재판독 비율 = 구버전 판독 공고 ÷ 마감 전 전체 공고. '+ "
+  '<p class="rfp-rescan-foot">재판독 비율 = 구버전 판독 공고 ÷ 마감 전 전체 공고. '+
   '구버전 판독은 배포된 판독기가 업데이트되면 서버에서 재처리합니다. '+
   '미판독·실패는 별도 처리 대상입니다. 화면 열기만으로 판독을 실행하지 않습니다.'+
   '<span style="display:block">확인 기준: '+htmlEscape(String(info.asOf||'').replace('T',' ').slice(0,19))+
