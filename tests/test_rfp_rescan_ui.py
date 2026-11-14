@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Live progress UI: meaningful completed/total counts, 10-second clock and fresh updates."""
 import json
+import time
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -39,6 +40,10 @@ fake={
               'tasks':{'rfpUpgrade':{'status':'started',
                                     'attemptEpoch':1794630000,'successEpoch':0}}}
 }
+for item in fake['activity']['items']:
+    item['updatedEpoch']=time.time()
+for worker in fake['activity']['workers'].values():
+    worker['updatedEpoch']=time.time()
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True)
     page=browser.new_page(viewport={'width':1310,'height':820})
@@ -100,13 +105,21 @@ with sync_playwright() as p:
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
     assert '원본 다운로드' in body and '850 / 1,000건' in body,body
-    assert '사업제안요청서.pdf' in body and '0.50 MB / 2.00 MB' in body,body
-    assert 'provider quota' in body and '인력조건.hwp' in body,body
+    assert '사업제안요청서.pdf' in body and '0.50MB / 2.00MB' in body,body
+    assert '공식 API 호출 제한' in body and '인력조건.hwp' in body,body
     page.evaluate("""() => {
-      window._rfpFileLiveRow=document.querySelector('[data-lane="download"] .rfp-live-item');
+      window._rfpFileLiveRow=document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track');
     }""")
 
     assert '문서 판독' in body and '375 / 1,000건' in body,body
+    assert page.locator('#rfpLiveDetails').count()==0, 'duplicate detail cards must be removed'
+    assert page.locator('#rfpRescanContent .rfp-rescan-lanes .rfp-rescan-stage-row').count()==3
+    assert page.locator('#rfpRescanContent .rfp-rescan-features:not([open])').count()==1
+    assert page.evaluate("""() => {
+       const modal=document.getElementById('rfpRescanDialog');
+       return modal.scrollHeight <= modal.clientHeight+2;
+    }"""), 'at 820px viewport the monitor must fit one screen without inner scrolling'
+
     assert '진행률 =' not in body and '미판독·실패·구버전' not in body,body
     assert page.locator('.rfp-rescan-livebar.is-active').count()==1
     assert page.locator('[data-rfp-stage="download"].is-active').count()==1
@@ -129,9 +142,9 @@ with sync_playwright() as p:
     assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
     assert '851 / 1,000건' in page.locator('#rfpRescanContent').text_content()
-    assert '1.00 MB / 2.00 MB' in page.locator('#rfpRescanContent').text_content()
+    assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate("""() => window._rfpFileLiveRow ===
-      document.querySelector('[data-lane="download"] .rfp-live-item')"""), 'file row must not remount'
+      document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track')"""), 'file row must not remount'
 
     assert '920 / 1,000건' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
