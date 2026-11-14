@@ -194,7 +194,70 @@ class RfpDualQueue:
                 retry_epoch=excluded.retry_epoch,reason=excluded.reason''',
                 [(key,time.time()+seconds,str(reason)[:120]) for key in keys])
 
+    def no_attachments(self,key,metadata):
+        """All official manifest sources checked: no files to download or scan."""
+        attachments=metadata.get('attachments') or {}
+        notices=metadata.get('noticeDocuments') or {}
+        if not (attachments.get('ok') is True and attachments.get('complete') is True
+                and notices.get('ok') is True and notices.get('complete') is True
+                and not attachments.get('items')):
+            raise ValueError('no_attachments_requires_verified_empty_manifest')
+        with self.connect() as db:
+            db.execute('''UPDATE rfp_dual_notices
+                SET download_status='no_attachments',scan_status='skipped',
+                    metadata_json=?,download_done=0,download_total=0,
+                    download_retry_epoch=0,scan_retry_epoch=0,last_error='',
+                    updated_at=?
+                WHERE notice_key=? AND download_status='fetching' ''',
+                (json.dumps(metadata,ensure_ascii=False,separators=(',',':')),
+                 now_utc(),key))
+
+    def reconcile_legacy_ready(self):
+        """Move legacy unverified ready rows back to downloader, or skip empty
+        official manifests. Only unprocessed rows; completed scans untouched.
+        """
+        repaired=0
+        skipped=0
+        with self.connect() as db:
+            rows=db.execute("""SELECT notice_key,metadata_json
+                FROM rfp_dual_notices WHERE download_status='ready'
+                AND scan_status IN ('pending','retry')""").fetchall()
+            for key,raw in rows:
+                try: meta=json.loads(raw)
+                except (ValueError,TypeError):meta={}
+                verified=meta.get('downloadVerifiedFiles') if isinstance(meta,dict) else None
+                if isinstance(verified,list) and verified and all(
+                    isinstance(f,dict) and f.get('url') and f.get('sha256')
+                    for f in verified):
+                    continue
+                attachments=(meta.get('attachments') or {}) if isinstance(meta,dict) else {}
+                notice=(meta.get('noticeDocuments') or {}) if isinstance(meta,dict) else {}
+                if (attachments.get('ok') is True and attachments.get('complete') is True
+                        and notice.get('ok') is True and notice.get('complete') is True
+                        and not attachments.get('items')):
+                    db.execute("""UPDATE rfp_dual_notices SET
+                        download_status='no_attachments',scan_status='skipped',
+                        download_done=0,download_total=0,
+                        download_retry_epoch=0,scan_retry_epoch=0,last_error='',
+                        updated_at=? WHERE notice_key=?""",(now_utc(),key))
+                    skipped+=1
+                else:
+                    db.execute("""UPDATE rfp_dual_notices SET
+                        download_status='pending',scan_status='pending',
+                        download_done=0,download_total=0,
+                        download_retry_epoch=0,scan_retry_epoch=0,
+                        last_error='legacy_download_receipt_missing',
+                        updated_at=? WHERE notice_key=?""",(now_utc(),key))
+                    repaired+=1
+        return {'requeuedForVerifiedDownload':repaired,'verifiedEmptyManifestsSkipped':skipped}
+
     def downloaded(self,key,metadata,done,total):
+        originals=metadata.get('downloadVerifiedFiles')
+        if (not isinstance(originals,list) or not originals or
+                done!=total or len(originals)!=total or
+                any(not isinstance(f,dict) or not f.get('url') or
+                    not f.get('sha256') for f in originals)):
+            raise ValueError('downloaded_requires_verified_file_receipts')
         payload=json.dumps(metadata,ensure_ascii=False,separators=(',',':'))
         with self.connect() as db:
             db.execute('''UPDATE rfp_dual_notices
@@ -269,14 +332,15 @@ class RfpDualQueue:
             rows=db.execute('''SELECT download_status,scan_status,COUNT(*)
                 FROM rfp_dual_notices GROUP BY download_status,scan_status''').fetchall()
         total=sum(n for _,_,n in rows)
-        downloaded=sum(n for download,_,n in rows if download=='ready')
-        scan_done=sum(n for _,scan,n in rows if scan=='done')
+        downloaded=sum(n for download,_,n in rows if download in ('ready','no_attachments'))
+        scan_done=sum(n for _,scan,n in rows if scan in ('done','skipped'))
+        skipped=sum(n for _,scan,n in rows if scan=='skipped')
         # "retry" is retriable, not a fabricated completed action.
         return {'available':True,'total':total,
                 'download':{'total':total,'done':downloaded,
                             'active':sum(n for download,_,n in rows if download=='fetching'),
                             'failed':sum(n for download,_,n in rows if download=='retry')},
-                'scan':{'total':total,'done':scan_done,
+                'scan':{'total':total,'done':scan_done,'skipped':skipped,
                         'active':sum(n for _,scan,n in rows if scan=='scanning'),
                         'failed':sum(n for _,scan,n in rows if scan=='retry')}}
 
@@ -290,10 +354,11 @@ class RfpDualQueue:
         total=sum(n for _,_,n in rows)
         return {'available':True,'total':total,
                 'download':{'total':total,
-                            'done':sum(n for a,_,n in rows if a=='ready'),
+                            'done':sum(n for a,_,n in rows if a in ('ready','no_attachments')),
                             'active':sum(n for a,_,n in rows if a=='fetching'),
                             'failed':sum(n for a,_,n in rows if a=='retry')},
                 'scan':{'total':total,
-                        'done':sum(n for _,b,n in rows if b=='done'),
+                        'done':sum(n for _,b,n in rows if b in ('done','skipped')),
+                        'skipped':sum(n for _,b,n in rows if b=='skipped'),
                         'active':sum(n for _,b,n in rows if b=='scanning'),
                         'failed':sum(n for _,b,n in rows if b=='retry')}}
