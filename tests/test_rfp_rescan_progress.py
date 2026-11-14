@@ -51,3 +51,53 @@ assert deadline('20261115').hour==23
 assert deadline('') is None
 assert calc([],index,latest,asof=now)['rescanPercent'] is None
 print('WORKLINKS_RFP_RESCAN_PROGRESS_REGRESSION=PASS',counts)
+
+
+# One completed notice becomes visible without waiting for all eight batch tasks.
+import os
+import tempfile
+import sqlite3
+from unittest.mock import patch
+reader=runpy.run_path(str(root/'scripts/refresh_worklinks_rfp.py'),run_name='test_notice_checkpoints')
+writer=reader['publish_notice_checkpoint']
+overlay=p['read_rfp_notice_checkpoints']
+latest_reader=dict(classificationVersion=reader['CLASSIFICATION_VERSION'],
+    staffingRoleScanVersion=reader['STAFFING_ROLE_SCAN_VERSION'],
+    staffingFactScanVersion=reader['STAFFING_FACT_SCAN_VERSION'],
+    hwpxReaderVersion=reader['HWPX_READER_VERSION'])
+def completed_scan(checked):
+    return dict(status='text_extracted_requires_review',
+        checkedAt=checked,classificationVersion=latest_reader['classificationVersion'],
+        hwpxReaderVersion=latest_reader['hwpxReaderVersion'],
+        manifestComplete=True,readableDocumentCount=1,
+        files=[dict(name='rfp.pdf',readable=True,sourceSha256='a'*64,
+          sourceTextScanComplete=True,qualificationScanTruncated=False,
+          staffingRoleScanTruncated=False,
+          staffingRoleScanVersion=latest_reader['staffingRoleScanVersion'],
+          staffingFactScanVersion=latest_reader['staffingFactScanVersion'])])
+with tempfile.TemporaryDirectory() as temp:
+    dbpath=str(Path(temp)/'rfp-notice-progress.sqlite3')
+    timestamp='2026-11-14T07:00:01+00:00'
+    ids=['R26BK01800001:000','R26BK01800002:000']
+    bids=[notice(x.split(':')[0],'2026-11-15 10:00') for x in ids]
+    with patch.dict(os.environ,{'WORKLINKS_RFP_NOTICE_PROGRESS_DB':dbpath}):
+        assert writer(ids[0],completed_scan(timestamp),'test-v1')
+        with patch.dict(overlay.__globals__,{'G2B_DB_PATH':str(Path(temp)/'bids.sqlite3')}):
+            index_one,first_recent,first_pending=overlay({})
+            assert len(first_recent)==1 and first_pending==1
+            result_one=calc(bids,index_one,latest_reader,asof=now)['counts']
+            assert result_one['completed']==1 and result_one['unscanned']==1,result_one
+            assert writer(ids[1],completed_scan('2026-11-14T07:00:04+00:00'),'test-v1')
+            index_two,second_recent,second_pending=overlay({})
+            result_two=calc(bids,index_two,latest_reader,asof=now)['counts']
+            assert result_two['completed']==2 and second_pending==2,result_two
+            # The complete index now supersedes the checkpoint, even when
+            # an earlier in-flight batch is still updating its local scan.
+            latest_archived=completed_scan('2026-11-14T07:01:00+00:00')
+            index_archived,changes,pending=overlay({ids[0]:latest_archived})
+            assert index_archived[ids[0]]==latest_archived and pending==1
+            # Replaying an older event cannot move a verified notice backward.
+            assert writer(ids[0],completed_scan('2026-11-14T06:59:59+00:00'),'test-v1')
+            _,_,pending2=overlay({ids[0]:latest_archived})
+            assert pending2==1
+print('WORKLINKS_RFP_EACH_NOTICE_IMMEDIATE_PROGRESS=PASS')
