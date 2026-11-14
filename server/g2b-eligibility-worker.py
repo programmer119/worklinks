@@ -184,6 +184,13 @@ def verify(no,order):
  return data
 
 def main():
+ # Existing cache stays available to search/detail UI. Do not perform
+ # thousands of automatic notice-number A02 requests while bulk mode is on.
+ if os.environ.get('WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE')=='1':
+  log('QUALIFICATION_AUTO_SINGLE_DISABLED','officialCalls',0,
+      'cachePreserved',True,'bulkReplacementRequired',True)
+  while True:
+   time.sleep(1800)
  conn=sqlite3.connect(DB,timeout=30)
  conn.execute('PRAGMA busy_timeout=30000')
  conn.execute('PRAGMA journal_mode=WAL')
