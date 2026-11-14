@@ -145,6 +145,20 @@ class RfpDualQueue:
                  0 if success else time.time()+3600,
                  '' if success else str(reason)[:140],now_utc(),key))
 
+    def mark_download_missing(self,key):
+        with self.connect() as db:
+            db.execute('''UPDATE rfp_dual_notices SET download_status='pending',
+                scan_status='pending',download_retry_epoch=0,scan_retry_epoch=0,
+                last_error='cached_original_missing',updated_at=?
+                WHERE notice_key=?''',(now_utc(),key))
+
+    def recover_stale_scans(self,seconds=2400):
+        cutoff=(dt.datetime.now(dt.timezone.utc)-
+                dt.timedelta(seconds=seconds)).isoformat()
+        with self.connect() as db:
+            return db.execute('''UPDATE rfp_dual_notices SET scan_status='pending'
+                WHERE scan_status='scanning' AND updated_at<?''',(cutoff,)).rowcount
+
     def scan_release(self,keys):
         with self.connect() as db:
             db.executemany('''UPDATE rfp_dual_notices SET scan_status='pending'
