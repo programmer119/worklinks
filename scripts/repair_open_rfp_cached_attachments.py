@@ -234,6 +234,8 @@ def process_one(key,scan,meta,ledger):
                 raise ValueError('no_searchable_text')
             triggers,snippets=rfp.parse_clauses(text)
             clauses=rfp.extract_rule_candidates(text,label)
+            roles=rfp.extract_staffing_roles(text,label,item['url'])
+            facts=rfp.extract_staffing_facts(text,label,item['url'])
             audit=rfp.preserve_unclassified_qualification(text,label,clauses)
             if len(text)>350000 or audit.get('sourceTextScanComplete') is not True:
                 counts['still_scan_incomplete']+=1
@@ -244,7 +246,11 @@ def process_one(key,scan,meta,ledger):
                       'unmatchedQualificationAnchorCount':0,
                       'clauseCandidateCount':len(clauses),
                       'textChars':len(text),'sourceUrl':item['url'],
-                      'extractionEvidence':evidence})
+                      'extractionEvidence':evidence,
+                      'staffingRoles':roles,'staffingFacts':facts,
+                      'staffingRoleScanVersion':rfp.STAFFING_ROLE_SCAN_VERSION,
+                      'staffingFactScanVersion':rfp.STAFFING_FACT_SCAN_VERSION,
+                      'staffingRoleScanTruncated':len(text)>rfp.STAFFING_ROLE_TEXT_LIMIT})
             f.pop('errorCategory',None)
             f.pop('error',None)
             latest.append({'name':label,'sourceUrl':item['url'],
@@ -307,6 +313,10 @@ def update_counts(rec,now,additions):
     rec['signatureReaderRepair']=REPAIR_VERSION
     rec['reviewComplete']=False
     rec['requiredConditionsComplete']=False
+    rec['staffingRoles']=rfp.staffing_summary(rec)
+    rec['staffingFacts']=rfp.staffing_fact_summary(rec)
+    rec['staffingRoleScanComplete']=bool(rec.get('manifestComplete') is True and
+        all(rfp.staffing_effective_file_complete(f,fs) for f in fs))
     if additions:update_evidence(rec,additions,now)
 
 
