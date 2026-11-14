@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>WorkLinks</title>
-<link rel="stylesheet" href="./worklinks-header-auth.css?v=20261113-session-expiry-1">
+<link rel="stylesheet" href="./worklinks-header-auth.css?v=20261114-auth-gate-2">
+<script>document.documentElement.dataset.worklinksAuthState='checking';</script>
 <style>
 :root{--bg:#f5f6f8;--card:#fff;--line:#e5e7eb;--text:#15171a;--muted:#6b7280;--ok:#047857;--bad:#b91c1c;--warn:#a16207;--accent:#111827}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif;color:var(--text)}main{max-width:1320px;margin:28px auto;padding:0 16px 40px}h1{margin:0 0 6px;font-size:26px}.sub{color:var(--muted);margin-bottom:16px}.panel,.box,.hiddenbox{background:var(--card);border:1px solid var(--line);border-radius:16px}.panel{padding:14px;margin-bottom:14px}.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:#fff;padding:10px 18px;border-radius:10px;cursor:pointer;font-weight:800}.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.f,.pagebtn,.hidebtn,.showbtn,.bizbtn{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:999px;cursor:pointer}.f.on,.pagebtn.on{background:var(--accent);color:#fff}.stats{margin-left:auto;color:var(--muted);font-size:13px}.box{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1180px}th,td{padding:13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--muted);background:#fafafa;position:sticky;top:0;z-index:1}tr:last-child td{border-bottom:0}a{font-weight:750;color:#0b57d0;text-decoration:none}a:hover{text-decoration:underline}.status{white-space:nowrap}.status label{display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer}.status input{width:19px;height:19px;cursor:pointer}.pill{display:inline-block;margin-left:6px;padding:3px 7px;border-radius:999px;font-size:11px}.okp{background:#ecfdf5;color:var(--ok)}.badp{background:#fef2f2;color:var(--bad)}.warnp{background:#fffbeb;color:var(--warn)}.bad{color:var(--bad);font-weight:800}.ok{color:var(--ok);font-weight:700}.warn{color:var(--warn);font-weight:700}.money{margin-top:5px;font-size:12px;font-weight:800;color:var(--ok)}.dday{font-weight:900;white-space:nowrap}.dday.soon{color:var(--bad)}.dday.mid{color:var(--warn)}.dday.open{color:var(--ok)}.dday.expired{color:#9ca3af}.pill.earlyp{background:#fff3df;color:#92400e;border:1px solid #f6ce82;font-weight:900}.hidebtn{padding:5px 9px;font-size:12px;color:#6b7280}.showbtn{padding:5px 9px;font-size:12px}.bizbtn{padding:5px 9px;font-size:12px;font-weight:800}.note{margin-top:10px;color:var(--muted);font-size:12px}.pager{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;padding:14px}.hiddenbox{margin-top:14px;overflow:hidden}.hiddenbox summary{cursor:pointer;padding:15px 16px;font-weight:800;list-style:none}.hiddenbox summary::-webkit-details-marker{display:none}.hiddenwrap{overflow:auto;border-top:1px solid var(--line)}.hiddenempty{padding:16px;color:var(--muted)}.pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}.headcopy h1{margin:0 0 6px}.headcopy .sub{margin-bottom:0}.sourcebox{position:relative;flex:0 0 auto}.sourcebox summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 13px;font-size:13px;font-weight:800;box-shadow:0 1px 2px rgba(0,0,0,.03)}.sourcebox summary::-webkit-details-marker{display:none}.sourcebox[open] summary{background:var(--accent);color:#fff;border-color:var(--accent)}.sourcepop{position:absolute;right:0;top:46px;width:min(430px,calc(100vw - 32px));z-index:20;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 14px 34px rgba(17,24,39,.16)}.sourcepop h3{margin:0 0 10px;font-size:15px}.sourcepop p{margin:8px 0;color:var(--muted);font-size:12px;line-height:1.6}.sourcepop .srcgroup{margin-top:12px}.sourcepop .srctitle{font-size:12px;font-weight:900;color:var(--text);margin-bottom:7px}.sourcepop .srclinks{display:flex;flex-wrap:wrap;gap:7px}.sourcepop .srclinks a{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 9px;background:#fafafa;font-size:12px;font-weight:750}.sourcepop .method{margin-top:12px;padding-top:11px;border-top:1px solid var(--line);color:#4b5563;font-size:12px;line-height:1.65}.workspace-tabs{display:flex;gap:8px;margin:0 0 16px;padding:5px;background:#e9edf2;border-radius:14px;max-width:1100px;flex-wrap:wrap}.workspace-tab{flex:1 1 145px;min-width:0;border:0;background:transparent;padding:11px 14px;border-radius:10px;cursor:pointer;font-weight:900;color:#4b5563;white-space:nowrap}.workspace-tab.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(17,24,39,.10)}.workspace-view{display:none}.workspace-view.on{display:block}
@@ -1014,7 +1015,19 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 </style>
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
 </head>
-<body data-worklinks-account-module="main"><main>
+<body data-worklinks-account-module="main">
+<div id="worklinks-auth-gate" class="worklinks-auth-gate" role="region" aria-labelledby="worklinks-auth-gate-title">
+  <section class="worklinks-auth-gate-card">
+    <div class="worklinks-auth-gate-brand">WorkLinks</div>
+    <h2 id="worklinks-auth-gate-title">로그인 확인 중</h2>
+    <p id="worklinks-auth-gate-description">계정 상태를 확인하고 있습니다.</p>
+    <div class="worklinks-auth-gate-actions">
+      <a id="worklinks-auth-gate-login" hidden href="https://authhub.suaveforge.com/login/?project=p47&amp;environment=production&amp;redirect_uri=https%3A%2F%2Fworklinks.suaveforge.com%2Fstartup-support%2Fauth-callback.html&amp;state=%2Fstartup-support%2F&amp;mode=login">다시 로그인</a>
+      <button type="button" id="worklinks-auth-gate-retry" hidden onclick="location.reload()">다시 확인</button>
+    </div>
+  </section>
+</div>
+<main inert>
 <div class="pagehead">
   <div class="headcopy">
     <h1><a class="worklinks-home" href="./?view=support" aria-label="WorkLinks 홈으로 이동">WorkLinks</a></h1>
@@ -6159,4 +6172,4 @@ document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){categ
  var note=root.querySelector('.src-status-note');note.textContent='기준: 본등록 '+itemsList.length+'건 중 '+total+'건 ('+(include?'마감 포함':'마감 제외')+'). 출처 URL 도메인이 정확히 일치하는 항목만 집계 · 미분류 '+(total-matched)+'건. 링크 없는 묶음·포털을 통한 타 기관 공고는 0건으로 보일 수 있으며 미검색 또는 공고 없음의 의미가 아닙니다.';
  }
  root.querySelectorAll('[data-src-expired]').forEach(function(b){b.addEventListener('click',function(){root.querySelectorAll('[data-src-expired]').forEach(function(z){z.classList.toggle('on',z===b);z.setAttribute('aria-pressed',z===b?'true':'false')});refresh()})});refresh();})();
-</script><script type="module" src="./worklinks-account.js?v=20261113-session-expiry-1"></script></main></body></html>
+</script><script type="module" src="./worklinks-account.js?v=20261114-auth-gate-2"></script></main></body></html>
