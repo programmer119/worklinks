@@ -7,6 +7,7 @@ on:
       - 'scripts/rfp_call_ledger.py'
       - 'scripts/refresh_worklinks_rfp.py'
       - 'tests/test_rfp_streamed_100mb.py'
+      - 'tests/test_rfp_download_worker.py'
       - '.github/workflows/worklinks-rfp-100mb-stream-ci-20261115.yml'
   workflow_dispatch:
 permissions:
