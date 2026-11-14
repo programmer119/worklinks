@@ -136,6 +136,25 @@ assert all(not module['staffing_scan_pending'](unscanned[key]) for key in priori
 prioritized=discover(2,unscanned,priority=priority_keys)
 assert {no+':'+order for no,order,_ in prioritized}==priority_keys,prioritized
 print('WORKLINKS_RFP_UNSCANNED_EXACT_PRIORITY=PASS')
+# A bounded migration must prefer eligible old successful parsers to ordinary
+# newly discovered tenders without equating legacy extraction with failure.
+import os
+legacy_key=rows[12]['bidNo']+':000'
+fresh_key=rows[13]['bidNo']+':000'
+legacy_records=dict(all_done)
+legacy_records[legacy_key]={**scanned_record(),
+    'classificationVersion':module['CLASSIFICATION_VERSION']-1,
+    'hwpxReaderVersion':module['HWPX_READER_VERSION']-1}
+legacy_records[fresh_key]={'status':'not_scanned','files':[]}
+prior_env=os.environ.get('WORKLINKS_RFP_PREFER_LEGACY_SCAN')
+try:
+    os.environ['WORKLINKS_RFP_PREFER_LEGACY_SCAN']='1'
+    migration=discover(1,legacy_records,targets={legacy_key,fresh_key})
+    assert len(migration)==1 and migration[0][:2]==(rows[12]['bidNo'],'000'),migration
+finally:
+    if prior_env is None:os.environ.pop('WORKLINKS_RFP_PREFER_LEGACY_SCAN',None)
+    else:os.environ['WORKLINKS_RFP_PREFER_LEGACY_SCAN']=prior_env
+print('WORKLINKS_RFP_LEGACY_MIGRATION_PRIORITY=PASS')
 # Transient failures and parser upgrades remain legitimate, bounded retries.
 bad_key=rows[0]['bidNo']+':000'
 version_key=rows[1]['bidNo']+':000'
