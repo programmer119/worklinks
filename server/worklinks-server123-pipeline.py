@@ -400,7 +400,7 @@ def iteration(current=None, runner=None):
 
 
 
-def prune_rfp_archive():
+def prune_rfp_archive(*,compact=True):
     """Periodic bounded cleanup of source binaries, independent from RFP scans.
 
     Deadline metadata comes from the same local saved-notice inventory used by
@@ -431,7 +431,7 @@ def prune_rfp_archive():
     unknown=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_UNKNOWN_DAYS','30'))
     ledger=CallLedger(DATA/'rfp-request-ledger.sqlite3')
     report=ledger.prune_expired(
-        deadlines,grace_days=grace,unknown_days=unknown)
+        deadlines,grace_days=grace,unknown_days=unknown,compact=compact)
     log('RFP_ARCHIVE_RETENTION',json.dumps(
         {'mappedNoticeDeadlines':len(deadlines),'graceDays':grace,
          'unknownDays':unknown,**report},separators=(',',':')))
@@ -552,8 +552,8 @@ def main():
              'qualificationBatch', QUALIFICATION_BATCH)
         last_archive_cleanup=0.0
         archive_cleanup_thread=None
-        def safe_archive_cleanup():
-            try:prune_rfp_archive()
+        def safe_archive_cleanup(compact):
+            try:prune_rfp_archive(compact=compact)
             except Exception as error:
                 log('RFP_ARCHIVE_RETENTION_FAILED',type(error).__name__)
         while True:
@@ -563,8 +563,11 @@ def main():
             if (time.monotonic()-last_archive_cleanup>=3600 and
                     (archive_cleanup_thread is None or
                      not archive_cleanup_thread.is_alive())):
+                drain_status=str((state.get('rfpUpgrade') or {}).get('status') or '')
+                drain_busy=bool(state.get('rfpUpgradeActive') and drain_status=='ok')
                 archive_cleanup_thread=threading.Thread(
-                    target=safe_archive_cleanup,name='rfp-archive-retention',daemon=True)
+                    target=safe_archive_cleanup,args=(not drain_busy,),
+                    name='rfp-archive-retention',daemon=True)
                 archive_cleanup_thread.start()
                 last_archive_cleanup=time.monotonic()
             drain=state.get('rfpUpgrade') or {}
