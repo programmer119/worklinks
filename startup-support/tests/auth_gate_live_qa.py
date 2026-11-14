@@ -150,7 +150,7 @@ with sync_playwright() as pw:
     page.locator(".worklinks-auth-dropdown").wait_for(state="visible", timeout=30000)
     page.locator("#worklinks-auth-gate").wait_for(state="hidden", timeout=30000)
     assert not navigations, "Recovered retry unexpectedly reloaded page"
-    assert page.locator("body > main").evaluate("(e)=>not e.inert")
+    assert page.locator("body > main").evaluate("(e)=>!e.inert")
     print("AUTH_RETRY_FAIL_THEN_RECOVER_WITHOUT_RELOAD=PASS", flush=True)
     context.close()
     browser.close()
