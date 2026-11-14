@@ -2171,7 +2171,7 @@ async function refreshRfpRescanProgress(force=false){
   }
  });
  document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden&&true)void refreshRfpRescanProgress();
+  if(!document.hidden)void refreshRfpRescanProgress(true);
  });
  setInterval(()=>{if(!document.hidden)void refreshRfpRescanProgress()},RFP_PROGRESS_POLL_MS);
  void refreshRfpRescanProgress();
