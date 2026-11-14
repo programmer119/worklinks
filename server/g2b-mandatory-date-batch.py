@@ -241,6 +241,7 @@ def save_extra(db,day,rows_by_source,allowed):
         for no,order in keys:
             existing=db.execute('''SELECT payload FROM bid_extra_cache
                          WHERE bid_no=? AND bid_ord=?''',(no,order)).fetchone()
+            prior={}
             if existing:
                 try:
                     prior=json.loads(existing[0])
