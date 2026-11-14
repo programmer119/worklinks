@@ -16,7 +16,7 @@ fake={
               'roles':{'total':6,'done':2,'remaining':4},
               'facts':{'total':6,'done':2,'remaining':4},
               'hwpx':{'total':2,'done':1,'remaining':1}},
-    'worker':{'available':True,'upgradeActive':True,
+    'worker':{'available':True,'upgradeActive':True,'continuousDrain':True,
               'tasks':{'rfpUpgrade':{'status':'started',
                                     'attemptEpoch':1794630000,'successEpoch':0}}}
 }
@@ -60,7 +60,7 @@ with sync_playwright() as p:
       timeout=12000)
     body=page.locator('#rfpRescanContent').inner_text()
     for term in ('관리 대상','6','최신 판독 완료','1','재판독 필요','구버전',
-                 '최초 미판독','역할·인원','16.67%','서버 재판독','실행 중'):
+                 '최초 미판독','역할·인원','16.67%','서버 재판독','판독 중','원문 판독 중'):
         assert term in body,(term,body)
 
     # A new server result must actually update both completed numerator and percentage.
