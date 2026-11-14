@@ -11,6 +11,16 @@ CORS = {
     "access-control-allow-headers": "authorization, content-type, accept",
 }
 
+def wait_for_live_revision(page):
+    # GitHub Pages deploys asynchronously and its CDN may briefly serve an older HTML.
+    for attempt in range(36):
+        if REVISION in page.content():
+            return
+        time.sleep(4)
+        page.goto(URL + "&_qa=" + str(time.time_ns()),
+                  wait_until="domcontentloaded", timeout=60000)
+    raise AssertionError("Auth UI revision not yet deployed to live site")
+
 def install_fake_auth(page, revoked):
     def route_auth(route):
         req = route.request
@@ -56,6 +66,7 @@ def open_session(browser, revoked):
     page.clock.install()
     install_fake_auth(page, revoked)
     page.goto(URL, wait_until="domcontentloaded", timeout=60000)
+    wait_for_live_revision(page)
     page.locator(".worklinks-auth-dropdown").wait_for(state="visible", timeout=30000)
     page.locator("#worklinks-auth-gate").wait_for(state="hidden", timeout=30000)
     assert REVISION in page.content(), "Unexpected live account module revision"
@@ -74,6 +85,7 @@ with sync_playwright() as pw:
     browser = pw.chromium.launch(headless=True)
     visitor = browser.new_page(viewport={"width": 1440, "height": 900})
     visitor.goto(URL, wait_until="domcontentloaded", timeout=60000)
+    wait_for_live_revision(visitor)
     visitor.locator("#worklinks-auth-gate-login").wait_for(state="visible", timeout=25000)
     assert REVISION in visitor.content()
     assert visitor.locator("body > main").evaluate("(e)=>e.inert")
