@@ -4055,11 +4055,10 @@ function jobRequirementEvidence(x){
  if(staff?.evidence?.text)clauses.push({text:String(staff.evidence.text),type:'staff_proof',required:false,file:staff.evidence.sourceFile||''});
  const tried=!!full||saved?.seen===true||!!staff?.evidence;
  // A fetched notice without an executed RFP scan is pending, not an extraction failure.
- const scanNotRun=!!saved&&Number(saved.documentCount||0)===0&&
-   !Array.isArray(full?.files)&&
+ const scanNotRun=!!saved&&!Array.isArray(full?.files)&&
    (saved.rfpScanStatus==='not_scanned'||saved.status==='not_scanned'||
-    (saved.scanComplete===false&&saved.staffingRoleScanComplete!==true&&
-     !saved.lastScannedAt&&!saved.scannedAt));
+    (Number(saved.documentCount||0)===0&&saved.scanComplete===false&&
+     saved.staffingRoleScanComplete!==true&&!saved.lastScannedAt&&!saved.scannedAt));
  const status=String(full?.status||saved?.status||'');
  const scanFailed=tried&&(status!=='text_extracted_requires_review'||full?.manifestComplete===false||
    (Array.isArray(full?.files)&&full.files.some(f=>f.readable!==true||f.sourceTextScanComplete===false))||
