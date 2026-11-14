@@ -8,8 +8,11 @@
    '<div class="rfp-rescan-stage-label"><span class="rfp-rescan-stage-name">'+title+'</span>'+
    '<span class="rfp-rescan-stage-right"><strong data-rfp-field="'+key+'Count">—</strong>'+
    '<span class="rfp-rescan-stage-note" data-rfp-field="'+key+'State">확인 중</span></span></div>'+
-   '<div class="rfp-rescan-stage-track" role="progressbar" aria-label="'+title+' 완료" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
-   '<span style="width:0%"></span></div></div>';
+   '<div class="rfp-rescan-stage-track" role="progressbar" aria-label="'+title+' 전체 완료" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'+
+   '<span class="rfp-stage-file-fill" style="width:0%"></span>'+
+   '<span class="rfp-stage-aggregate-fill" style="width:0%"></span>'+
+   '<span class="rfp-stage-focus"><span class="rfp-stage-focus-name">작업 정보 확인 중</span>'+
+   '<span class="rfp-stage-focus-metric"></span></span></div></div>';
  }
  function mount(panel){
   panel.innerHTML=
@@ -32,10 +35,8 @@
    '<div class="rfp-rescan-section-header"><h3>작업 진행</h3>'+
     '<span>첨부목록 확보·원본 다운로드 → 별도 문서 판독</span></div>'+
    '<div class="rfp-rescan-lanes">'+laneKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
-   '<div class="rfp-rescan-section-header"><h3>현재 작업 · 오류 · 재시도</h3></div>'+
-   '<div class="rfp-live-details" id="rfpLiveDetails" aria-live="off"></div>'+
-   '<div class="rfp-rescan-section-header"><h3>기능별 판독 완료</h3></div>'+
-   '<div class="rfp-rescan-feature-list">'+stageKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
+   '<details class="rfp-rescan-features"><summary>기능별 판독 상세</summary>'+
+   '<div class="rfp-rescan-feature-list">'+stageKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div></details>'+
    '<div class="rfp-rescan-unknown" id="rfpRescanUnknown" hidden>'+
     '<strong>마감일 미제공</strong> <span data-rfp-field="unknown"></span></div>'+
    '<div class="rfp-rescan-bottomline"><span data-rfp-field="serverTime">서버 집계 —</span>'+
@@ -58,103 +59,6 @@
   if(button)button.disabled=Boolean(rfpRescanBusy);
  };
 
-
- function paintLiveDetails(panel,activity){
-  const root=panel.querySelector('#rfpLiveDetails');
-  if(!root)return;
-  const lanes=[['manifest','첨부목록'],['download','다운로드'],['scan','판독']];
-  const fmt=epoch=>epoch?new Intl.DateTimeFormat('ko-KR',{
-   timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',hour:'2-digit',
-   minute:'2-digit',second:'2-digit',hour12:false
-  }).format(new Date(epoch*1000)):'—';
-  const amount=n=>(Math.max(0,Number(n)||0)/1048576).toFixed(2)+' MB';
-  const now=Date.now()/1000;
-  const items=activity?.available&&Array.isArray(activity.items)?activity.items:[];
-  const workers=activity?.workers||{};
-  if(root.dataset.ready!=='1'){
-   root.replaceChildren();
-   for(const [lane,name] of lanes){
-    const section=document.createElement('section');
-    section.className='rfp-live-lane';section.dataset.lane=lane;
-    const head=document.createElement('div');head.className='rfp-live-lane-head';
-    const title=document.createElement('strong');title.textContent=name;
-    const status=document.createElement('span');status.className='rfp-live-worker-status';
-    head.append(title,status);section.append(head);
-    const error=document.createElement('div');error.className='rfp-live-error';
-    section.append(error);
-    const list=document.createElement('div');list.className='rfp-live-list';
-    for(let i=0;i<5;i++){
-     const row=document.createElement('div');row.className='rfp-live-item';row.hidden=true;
-     const first=document.createElement('div');first.className='rfp-live-item-title';
-     const label=document.createElement('strong');
-     const state=document.createElement('span');
-     first.append(label,state);
-     const detail=document.createElement('div');detail.className='rfp-live-meta';
-     const progress=document.createElement('progress');progress.max=1;progress.value=0;progress.hidden=true;
-     const failure=document.createElement('div');failure.className='rfp-live-error';
-     row.append(first,detail,progress,failure);list.append(row);
-    }
-    section.append(list);root.append(section);
-   }
-   root.dataset.ready='1';
-  }
-  for(const [lane] of lanes){
-   const section=root.querySelector('[data-lane="'+lane+'"]');
-   const status=section.querySelector('.rfp-live-worker-status');
-   const error=section.querySelector(':scope > .rfp-live-error');
-   const worker=workers[lane];
-   let state='작업 상세 집계 미제공';
-   if(activity?.available&&worker){
-    if(worker.status==='retry'&&worker.retryEpoch>now)
-     state='재시도 '+fmt(worker.retryEpoch);
-    else if(worker.stale)state='상태 갱신 끊김';
-    else if(worker.status==='retry')state=worker.retryEpoch?'재시도 시각 도달':'오류 발생';
-    else state=worker.status==='running'?'작업 확인 중':worker.status;
-   }else if(activity?.available)state='작업 상태 기록 없음';
-   if(status.textContent!==state)status.textContent=state;
-   status.className='rfp-live-worker-status'+((worker?.stale||worker?.status==='retry')?' rfp-live-problem':'');
-   const reason=worker?.error?'원인: '+worker.error:'';
-   if(error.textContent!==reason)error.textContent=reason;
-   const entries=items.filter(item=>item.lane===lane).slice(0,5);
-   const rows=section.querySelectorAll('.rfp-live-item');
-   rows.forEach((row,i)=>{
-    const item=entries[i];row.hidden=!item;
-    if(!item)return;
-    const title=row.querySelector('strong');
-    const label=item.fileName||item.noticeKey||'공고';
-    if(title.textContent!==label)title.textContent=label;
-    const tag=row.querySelector('.rfp-live-item-title span');
-    const tagText=item.status==='retry'?'재시도 예정':item.status==='working'?'처리 중':item.status==='done'?'완료':item.status;
-    if(tag.textContent!==tagText)tag.textContent=tagText;
-    tag.className=item.status==='retry'?'rfp-live-problem':'';
-    const parts=[];
-    if(item.fileName)parts.push(item.noticeKey);
-    if(item.phase)parts.push(item.phase);
-    if(item.filesTotal>0)parts.push('파일 '+item.filesDone+' / '+item.filesTotal+'개');
-    if(item.bytesDone>0||item.bytesTotal>0)
-     parts.push(amount(item.bytesDone)+' / '+(item.bytesTotal>0?amount(item.bytesTotal):'전체 크기 미제공'));
-    if(item.status==='retry'&&item.retryEpoch>0)parts.push('다음 재시도 '+fmt(item.retryEpoch));
-    const detail=row.querySelector('.rfp-live-meta'),value=parts.join(' · ');
-    if(detail.textContent!==value)detail.textContent=value;
-    const bar=row.querySelector('progress');
-    bar.hidden=!(item.bytesTotal>0);
-    if(item.bytesTotal>0){
-     bar.max=item.bytesTotal;bar.value=Math.min(item.bytesTotal,Math.max(0,item.bytesDone||0));
-     bar.setAttribute('aria-label',(item.fileName||'첨부파일')+' 다운로드 진행률');
-    }
-    const failure=row.querySelector(':scope > .rfp-live-error');
-    const stale=item.status==='working'&&now-Number(item.updatedEpoch||0)>90;
-    const message=item.error?'오류: '+item.error:stale?'90초 이상 진행 기록 없음 · 작업 정지 여부 확인 필요':'';
-    if(failure.textContent!==message)failure.textContent=message;
-   });
-   const noWork=section.querySelector('.rfp-live-none');
-   if(entries.length===0&&!noWork){
-    const node=document.createElement('div');node.className='rfp-live-none rfp-live-muted';
-    node.textContent=activity?.available?'현재 표시할 세부 작업 없음':'서버 상세 집계 연결 필요';
-    section.append(node);
-   }else if(entries.length>0&&noWork)noWork.remove();
-  }
- }
 
  window.paintRfpLiveProgress=function(){
   const label=document.getElementById('rfpRescanLabel');
@@ -229,13 +133,13 @@
    const track=node.querySelector('.rfp-rescan-stage-track');
    track.classList.toggle('is-active',stageActive);
    track.setAttribute('aria-valuenow',progress.toFixed(1));
-   track.firstElementChild.style.width=progress.toFixed(2)+'%';
+   track.querySelector('.rfp-stage-aggregate-fill').style.width=progress.toFixed(2)+'%';
   }
   const unknownTotal=Math.max(0,Number(counts.unknownDeadline||0));
   panel.querySelector('#rfpRescanUnknown').hidden=!unknownTotal;
   updateField(panel,'unknown',number(unknownTotal)+'건 · 별도 판독 '+
    number(counts.unknownDeadlineCompleted)+' / '+number(unknownTotal)+'건');
-  paintLiveDetails(panel,info.activity);
+  window.paintRfpLaneFocus();
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
   count.textContent='완료 '+number(done)+' / '+number(all)+'건';
@@ -249,21 +153,4 @@
   window.paintRfpLiveCountdown();
  };
 
-(function(){
- if(document.getElementById('rfp-live-details-style'))return;
- const css=document.createElement('style');css.id='rfp-live-details-style';
- css.textContent=`
- .rfp-live-details{display:grid;gap:10px;margin:10px 0 14px;}
- .rfp-live-lane{padding:10px 12px;border:1px solid var(--border,#d4d8df);border-radius:10px;min-width:0;}
- .rfp-live-lane-head,.rfp-live-item-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
- .rfp-live-lane-head{font-size:15px;padding-bottom:5px;}
- .rfp-live-item{padding:8px 0;border-top:1px solid var(--border,#d4d8df);min-width:0;}
- .rfp-live-item-title{font-size:14px;overflow-wrap:anywhere;}
- .rfp-live-meta{font-size:13px;line-height:1.5;opacity:.9;overflow-wrap:anywhere;}
- .rfp-live-error,.rfp-live-problem{color:#c0442b;font-size:13px;line-height:1.5;overflow-wrap:anywhere;}
- .rfp-live-muted{font-size:13px;opacity:.75;}
- .rfp-live-item progress{width:100%;height:8px;display:block;margin-top:6px;accent-color:#16836e;}
- `;
- document.head.append(css);
-})();
 })();
