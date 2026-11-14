@@ -19,6 +19,22 @@ fake={
     'lanes':{'available':True,'manifest':{'total':1000,'done':900},
              'download':{'total':1000,'done':850,'active':8,'failed':2},
              'scan':{'total':1000,'done':375,'active':4,'failed':0}},
+    'activity':{'available':True,
+        'workers':{'manifest':{'status':'retry','error':'provider quota',
+                              'retryEpoch':1794672000,'updatedEpoch':1794630000,'stale':False},
+                   'download':{'status':'running','error':'','retryEpoch':0,
+                               'updatedEpoch':1794630000,'stale':False},
+                   'scan':{'status':'running','error':'','retryEpoch':0,
+                           'updatedEpoch':1794630000,'stale':False}},
+        'items':[{'lane':'download','noticeKey':'R26BK00000001:000',
+                  'fileName':'사업제안요청서.pdf','phase':'전송 중','status':'working',
+                  'bytesDone':524288,'bytesTotal':2097152,
+                  'filesDone':1,'filesTotal':3,'retryEpoch':0,
+                  'error':'','updatedEpoch':1794630000},
+                 {'lane':'scan','noticeKey':'R26BK00000002:000',
+                  'fileName':'인력조건.hwp','phase':'텍스트 추출','status':'working',
+                  'bytesDone':0,'bytesTotal':0,'filesDone':0,'filesTotal':2,
+                  'retryEpoch':0,'error':'','updatedEpoch':1794630000}]},
     'worker':{'available':True,'upgradeActive':True,'continuousDrain':True,
               'tasks':{'rfpUpgrade':{'status':'started',
                                     'attemptEpoch':1794630000,'successEpoch':0}}}
@@ -84,6 +100,12 @@ with sync_playwright() as p:
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
     assert '원본 다운로드' in body and '850 / 1,000건' in body,body
+    assert '사업제안요청서.pdf' in body and '0.50 MB / 2.00 MB' in body,body
+    assert 'provider quota' in body and '인력조건.hwp' in body,body
+    page.evaluate("""() => {
+      window._rfpFileLiveRow=document.querySelector('[data-lane="download"] .rfp-live-item');
+    }""")
+
     assert '문서 판독' in body and '375 / 1,000건' in body,body
     assert '진행률 =' not in body and '미판독·실패·구버전' not in body,body
     assert page.locator('.rfp-rescan-livebar.is-active').count()==1
@@ -97,6 +119,7 @@ with sync_playwright() as p:
     # A new server result must actually update both completed numerator and percentage.
     fake['counts'].update(completed=2,remaining=4,unscanned=0)
     fake['lanes']['download']['done']=851
+    fake['activity']['items'][0]['bytesDone']=1048576
     fake['lanes']['manifest']['done']=920
     fake['asOf']='2026-11-14T12:01:00+09:00'
     page.evaluate("() => refreshRfpRescanProgress(true)")
@@ -106,6 +129,10 @@ with sync_playwright() as p:
     assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
     assert '851 / 1,000건' in page.locator('#rfpRescanContent').text_content()
+    assert '1.00 MB / 2.00 MB' in page.locator('#rfpRescanContent').text_content()
+    assert page.evaluate("""() => window._rfpFileLiveRow ===
+      document.querySelector('[data-lane="download"] .rfp-live-item')"""), 'file row must not remount'
+
     assert '920 / 1,000건' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
     assert len(calls)>=2
