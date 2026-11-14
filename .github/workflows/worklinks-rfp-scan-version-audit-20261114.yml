@@ -1,0 +1,125 @@
+name: WorkLinks RFP scan-version and no-scan census (read only)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-rfp-scan-version-audit-20261114.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Census complete stored RFP index and server states (no G2B calls)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections, datetime, json, pathlib, re, urllib.parse, urllib.request
+          root=pathlib.Path('startup-support')
+          idx=json.loads((root/'rfp-coverage-index.json').read_text(encoding='utf-8'))['byNotice']
+          actionable=json.loads((root/'changcom-actionable.json').read_text(encoding='utf-8'))['bids']
+          code=pathlib.Path('scripts/refresh_worklinks_rfp.py').read_text()
+          def version(name):
+              match=re.search(r'(?m)^'+name+r'\s*=\s*(\d+)',code)
+              if not match:raise RuntimeError('missing-version:'+name)
+              return int(match.group(1))
+          versions={x:version(x) for x in ('CLASSIFICATION_VERSION','STAFFING_ROLE_SCAN_VERSION','HWPX_READER_VERSION')}
+          print('RFP_AUDIT_VERSIONS',json.dumps(versions),flush=True)
+          cohort={}
+          for b in actionable:
+              if b.get('deadlineState') not in ('open','unknown'):continue
+              key=str(b.get('bidNo') or '')+':'+str(b.get('order') or '000').zfill(3)
+              if key in cohort:raise RuntimeError('duplicate_cohort_key:'+key)
+              cohort[key]=b
+          print('RFP_AUDIT_COUNTS',json.dumps({'active_candidate_count':len(cohort),'cumulative_index_count':len(idx),'all_actionable_count':len(actionable)}),flush=True)
+          counts=collections.Counter(); statuses=collections.Counter(); reasons=collections.Counter()
+          errorcats=collections.Counter(); sample=collections.defaultdict(list)
+          def add(k,key):
+              counts[k]+=1
+              if len(sample[k])<5:sample[k].append(key)
+          for key in cohort:
+              record=idx.get(key)
+              if not isinstance(record,dict) or not record:
+                  add('no_index_record',key)
+                  continue
+              status=str(record.get('status') or 'missing_status')
+              statuses[status]+=1
+              files=[f for f in record.get('files') or [] if isinstance(f,dict)]
+              if status in ('not_scanned','unscanned'):
+                  add('indexed_explicit_not_scanned',key)
+              elif status!='text_extracted_requires_review':
+                  add('indexed_attempt_non_success',key)
+                  reasons[str(record.get('reasonCode') or status)]+=1
+              else:
+                  add('indexed_text_extracted',key)
+                  if record.get('manifestComplete') is True:
+                      add('manifest_complete',key)
+                  elif record.get('manifestComplete') is False:
+                      add('manifest_incomplete',key)
+                  else:
+                      add('manifest_unknown',key)
+                  if record.get('staffingRoleScanComplete') is True:
+                      add('staffing_complete',key)
+                  else:
+                      add('staffing_incomplete',key)
+                  if record.get('unreadableDocumentCount',0):
+                      add('text_extracted_but_unreadable_attached',key)
+              if int(record.get('classificationVersion') or 0)<versions['CLASSIFICATION_VERSION']:
+                  add('old_or_missing_classification_version',key)
+              if int(record.get('hwpxReaderVersion') or 0)<versions['HWPX_READER_VERSION']:
+                  add('old_or_missing_hwpx_reader_version',key)
+              for f in files:
+                  if f.get('readable') is True:
+                      if int(f.get('staffingRoleScanVersion') or 0)<versions['STAFFING_ROLE_SCAN_VERSION']:
+                          add('readable_file_older_staffing_scan_version_NOTICE',key)
+                          break
+              for f in files:
+                  if f.get('readable') is not True and f.get('errorCategory'):
+                      errorcats[str(f.get('errorCategory'))]+=1
+              if status=='text_extracted_requires_review' and record.get('staffingRoleScanComplete') is not True:
+                  add('possible_old_scan_ui_false_failure',key)
+          print('RFP_AUDIT_COUNTS',json.dumps(dict(sorted(counts.items())),ensure_ascii=False),flush=True)
+          print('RFP_AUDIT_STATUSES',json.dumps(dict(statuses.most_common()),ensure_ascii=False),flush=True)
+          print('RFP_AUDIT_REASONS',json.dumps(dict(reasons.most_common(20)),ensure_ascii=False),flush=True)
+          print('RFP_AUDIT_FILE_ERRORS',json.dumps(dict(errorcats.most_common(20)),ensure_ascii=False),flush=True)
+          print('RFP_AUDIT_SAMPLES',json.dumps(sample,ensure_ascii=False),flush=True)
+          for key in ('R26BK01797739:000','R26BK01813685:000'):
+              v=idx.get(key)
+              print('RFP_AUDIT_TARGET',json.dumps({'key':key,'found':bool(v),'status':v.get('status') if v else None,'version':v.get('classificationVersion') if v else None,'staffingRoleScanComplete':v.get('staffingRoleScanComplete') if v else None,'manifestComplete':v.get('manifestComplete') if v else None,'files':[{'name':f.get('name'),'readable':f.get('readable'),'errorCategory':f.get('errorCategory'),'scanComplete':f.get('sourceTextScanComplete'),'staffingScanVersion':f.get('staffingRoleScanVersion')} for f in (v.get('files') or [])] if v else []},ensure_ascii=False),flush=True)
+          # Read only the local WorkLinks saved database API. This is never the upstream G2B service.
+          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/saved'
+          server={};total=None;server_error=None
+          try:
+              for off in range(0,20000,500):
+                  url=api+'?'+urllib.parse.urlencode({'sw':1,'limit':500,'offset':off})
+                  with urllib.request.urlopen(urllib.request.Request(url,headers={'Cache-Control':'no-cache'}),timeout=18) as response:
+                      data=json.load(response)
+                  if data.get('ok') is not True:raise ValueError('saved_api_not_ok')
+                  total=int(data.get('totalCount') or 0)
+                  items=data.get('items') or []
+                  for b in items:
+                      key=str(b.get('bidNo') or '')+':'+str(b.get('order') or '000').zfill(3)
+                      if key in cohort:server[key]=b
+                  if off+len(items)>=total or not items:break
+          except Exception as exc:server_error=type(exc).__name__+':'+str(exc)[:120]
+          print('RFP_AUDIT_SERVER',json.dumps({'totalCount':total,'cohortFetched':len(server),'error':server_error},ensure_ascii=False),flush=True)
+          if server and not server_error:
+              srv=collections.Counter();mis=collections.Counter();sm=collections.defaultdict(list)
+              for key,info in server.items():
+                  state=info.get('rfpSavedState') or {}
+                  status=str(state.get('rfpScanStatus') or state.get('status') or 'missing')
+                  srv[status]+=1
+                  index_record=idx.get(key) or {}
+                  indexed_complete=index_record.get('status')=='text_extracted_requires_review'
+                  if status=='not_scanned' and indexed_complete:
+                      mis['server_not_scanned_but_index_readable']+=1
+                      if len(sm['server_not_scanned_but_index_readable'])<7:sm['server_not_scanned_but_index_readable'].append(key)
+                  if indexed_complete and state.get('staffingRoleScanComplete') is not True:
+                      mis['index_extracted_but_server_staffing_incomplete']+=1
+                  if indexed_complete and not state:
+                      mis['index_extracted_but_server_state_missing']+=1
+              print('RFP_AUDIT_SERVER_STATUSES',json.dumps(dict(srv.most_common()),ensure_ascii=False),flush=True)
+              print('RFP_AUDIT_SERVER_MISMATCH',json.dumps({'counts':dict(mis),'samples':sm},ensure_ascii=False),flush=True)
+          PY
