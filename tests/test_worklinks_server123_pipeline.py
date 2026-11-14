@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import time
 from types import SimpleNamespace
 
 source=Path(__file__).resolve().parents[1]/'server'/'worklinks-server123-pipeline.py'
@@ -101,6 +102,55 @@ with tempfile.TemporaryDirectory() as temporary:
     assert all(state[k]['status']=='ok' for k in ('actionable','rfp','awardFallback','rfpRepair','rfpOpenRepair','qualification'))
     another=m.iteration(1700000001,mock_runner)
     assert another['rfp']['attemptEpoch']==1700000000
+
+    # A triggered scan MUST continue the next bounded batch without a timed wait.
+    now=time.time()
+    active=m.read_state()
+    active.update(rfpUpgradeActive=True,rfpUpgrade={'status':'parser_versions_upgraded','attemptEpoch':0})
+    m.publish_state(active)
+    batches=[]
+    def recording_runner(args,**kwargs):
+        if kwargs['env'].get('WORKLINKS_RFP_UPGRADE_ONLY')=='1':
+            batches.append('upgrade')
+        return mock_runner(args,**kwargs)
+    first=m.iteration(now,recording_runner)
+    second=m.iteration(now+1,recording_runner)
+    assert len(batches)==2, 'successful RFP batches must run back-to-back'
+    assert second['rfpUpgrade']['status']=='ok'
+    assert second['rfpUpgrade']['attemptEpoch']==now+1
+    assert second['rfpUpgradeActive'] is True
+    assert second['rfpUpgradeBatchesCompleted']==2
+
+    # A real upstream quota error should pause, never spin or hammer G2B.
+    def quota_runner(args,**kwargs):
+        if kwargs['env'].get('WORKLINKS_RFP_UPGRADE_ONLY')=='1':
+            batches.append('quota_attempt')
+            return SimpleNamespace(returncode=1,stdout='',
+                                   stderr='RFP_UPSTREAM_DAILY_QUOTA_PREFLIGHT')
+        return mock_runner(args,**kwargs)
+    failed=m.iteration(now+2,quota_runner)
+    assert failed['rfpUpgrade']['status']=='failed'
+    assert failed['rfpUpgrade']['retryAfterEpoch']>=time.time()+21500
+    assert failed['rfpUpgradeActive'] is True
+    held=m.iteration(now+3,quota_runner)
+    assert batches.count('quota_attempt')==1
+    assert held['rfpUpgrade']['status']=='failed'
+
+    # No currently eligible RFP is not proof every notice is complete:
+    # keep the triggered queue active and recheck after a cooldown.
+    active=m.read_state()
+    active['rfpUpgrade']={'status':'ok','attemptEpoch':now+1}
+    m.publish_state(active)
+    def empty_runner(args,**kwargs):
+        if kwargs['env'].get('WORKLINKS_RFP_UPGRADE_ONLY')=='1':
+            return SimpleNamespace(returncode=0,stdout='RFP_UPGRADE_SELECT_COUNT 0',
+                                   stderr='')
+        return mock_runner(args,**kwargs)
+    empty=m.iteration(now+4,empty_runner)
+    assert empty['rfpUpgrade']['status']=='no_eligible_now'
+    assert empty['rfpUpgradeActive'] is True
+    assert empty['rfpUpgrade']['retryAfterEpoch']>time.time()+250
+
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
     (m.SEEDS/'rfp-coverage-index.json').write_text(json.dumps(historical))
     (m.DATA/'bad').mkdir()
