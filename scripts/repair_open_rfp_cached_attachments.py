@@ -222,7 +222,7 @@ def process_one(key,scan,meta,ledger):
             continue
         try:
             raw,origin=fetch_verified_raw(item,ledger)
-            extracted,evidence=rfp.extract_with_source_status(label,raw)
+            extracted,evidence,_=rfp.extract_cached_text(label,raw)
             text=rfp.normalize_extracted_text(extracted)
             if not evidence['sourceComplete']:
                 f['extractionEvidence']=evidence
