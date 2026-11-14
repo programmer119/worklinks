@@ -1,0 +1,25 @@
+name: WorkLinks streaming fixture and quota recovery regression
+on:
+  push:
+    branches: [fix/streaming-mock-read-20261115]
+    paths:
+      - 'tests/test_rfp_call_ledger.py'
+      - '.github/workflows/worklinks-rfp-streaming-fixture-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify streaming read EOF, durable caching and RFP quota recovery
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_quota_resume.py
+          python3 tests/test_rfp_bulk_manifests.py
+          echo STREAMING_RFP_FIXTURE_AND_QUOTA_RECOVERY=PASS
