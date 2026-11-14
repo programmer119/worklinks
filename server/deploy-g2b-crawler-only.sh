@@ -9,10 +9,11 @@ DOCKER=/home/ggul-docker/bin/docker
 SOCKET=unix:///home/ggul-docker/run/docker.sock
 IMG=python:3.11-alpine
 SECRET="$BASE/secrets/g2b.env"
+OPERATING_SECRET="$BASE/secrets/g2b-standard.env"
 DB="$BASE/data/bids.sqlite3"
 CRAWLER=worklinks-g2b-crawler
 dk(){ "$DOCKER" -H "$SOCKET" "$@"; }
-for f in "$SOURCE" "$TARGET" "$DOCKER" "$SECRET" "$DB";do
+for f in "$SOURCE" "$TARGET" "$DOCKER" "$SECRET" "$OPERATING_SECRET" "$DB";do
  test -s "$f" || { echo "CRAWLER_DEPLOY_MISSING=$f";exit 5; }
 done
 test -S /home/ggul-docker/run/docker.sock
@@ -45,12 +46,14 @@ start_crawler(){
  dk rm -f "$CRAWLER" >/dev/null 2>&1 || true
  dk run -d --name "$CRAWLER" --restart unless-stopped --network host \
   -e G2B_SECRET_PATH=/run/secrets/g2b.env \
+  -e G2B_OPERATING_KEY_PATH=/run/secrets/g2b-standard.env \
   -e G2B_DB_PATH=/app/data/bids.sqlite3 \
   -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
   -e G2B_BACKFILL_DAYS=14 -e G2B_REFRESH_DAYS=3 -e G2B_INTERVAL_SECONDS=3600 \
   -v "$TARGET:/app/g2b-full-crawler.py:ro" \
   -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
   -v "$SECRET:/run/secrets/g2b.env:ro" \
+  -v "$OPERATING_SECRET:/run/secrets/g2b-standard.env:ro" \
   -v "$BASE/data:/app/data" \
   "$IMG" python -u /app/g2b-full-crawler.py >/dev/null
 }
