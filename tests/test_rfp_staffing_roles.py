@@ -44,7 +44,9 @@ assert {x['role']:x['count'] for x in table}=={'PM':1,'DBA':2},table
 
 item={'status':'text_extracted_requires_review','manifestComplete':True,
       'files':[{'name':'제안요청서.pdf','readable':True,'sourceTextScanComplete':True,
-                'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],'staffingRoleScanTruncated':False,
+                'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],
+                'staffingFactScanVersion':p['STAFFING_FACT_SCAN_VERSION'],
+                'staffingRoleScanTruncated':False,
                 'staffingRoles':roles}]}
 summed=summary(item)
 assert len(summed)==4,summed
@@ -78,6 +80,7 @@ assert not parse('사업관리자(PM)를 지정하고 전담유지보수 1명을
 pdf={'name':'공고서.pdf','readable':True,'sourceTextScanComplete':True,
      'sourceSha256':'a'*64,'qualificationScanTruncated':False,
      'staffingRoleScanVersion':p['STAFFING_ROLE_SCAN_VERSION'],
+     'staffingFactScanVersion':p['STAFFING_FACT_SCAN_VERSION'],
      'staffingRoleScanTruncated':False,'staffingRoles':[]}
 hwp={'name':'공고서.hwpx','readable':False,'skippedDuplicateFormat':True,
      'sourceTextScanComplete':False,'alternatePdfEvidence':'공고서.pdf',
