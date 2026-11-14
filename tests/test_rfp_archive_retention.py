@@ -64,6 +64,12 @@ with tempfile.TemporaryDirectory() as tmp:
     assert ledger.get_json(jkey) is None
     assert report['jsonDeleted']==1,report
     assert ledger.prune_expired(today=TODAY)['attachmentsDeleted']==0
+    # Without an operator grace override, an ended bid expires the next day.
+    ended_yesterday=mk('closed_yesterday')
+    assert ledger.save_bytes(ended_yesterday,original,
+                             notice_key='R26BK00000008:000',closes_on='2026-11-13')
+    assert ledger.prune_expired(today=TODAY)['attachmentsDeleted']==1
+    assert ledger.get_bytes(ended_yesterday) is None
     with sqlite3.connect(ledger.path) as db:
         assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok'
         assert db.execute('SELECT COUNT(*) FROM attachment_refs WHERE request_key=?',(expired,)).fetchone()[0]==0
