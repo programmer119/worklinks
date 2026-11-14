@@ -40,6 +40,7 @@ test "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 8 \
 # Unit test runs on a temporary directory only.
 dk run --rm \
     -v "$SOURCE:/app/server/worklinks-server123-pipeline.py:ro" \
+    -v "$ROOT/scripts/rfp_dual_queue.py:/app/scripts/rfp_dual_queue.py:ro" \
     -v "$ROOT/tests/test_worklinks_server123_pipeline.py:/app/tests/test_worklinks_server123_pipeline.py:ro" \
     python:3.11-alpine python /app/tests/test_worklinks_server123_pipeline.py
 dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
