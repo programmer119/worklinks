@@ -10,6 +10,7 @@ import fcntl
 import gzip
 import json
 import re
+import sqlite3
 import os
 from pathlib import Path
 import shutil
@@ -397,6 +398,45 @@ def iteration(current=None, runner=None):
     return state
 
 
+
+def prune_rfp_archive():
+    """Periodic bounded cleanup of source binaries, independent from RFP scans.
+
+    Deadline metadata comes from the same local saved-notice inventory used by
+    the scanner; unknown deadlines get a bounded age-based fallback in ledger.
+    """
+    sys.path.insert(0,str(SCRIPTS))
+    from rfp_call_ledger import CallLedger
+    db_path=DATA/'bids.sqlite3'
+    deadlines={}
+    if db_path.is_file():
+        with sqlite3.connect('file:'+str(db_path)+'?mode=ro',
+                             uri=True,timeout=15) as db:
+            for (payload,) in db.execute(
+                    "SELECT payload FROM bid_notices WHERE sw_candidate=1"):
+                try:notice=json.loads(payload)
+                except (TypeError,ValueError):continue
+                no=str(notice.get('bidNo') or '')
+                ordinal=str(notice.get('order') or '0').zfill(3)
+                raw=str(notice.get('closes') or '')
+                match=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})',raw)
+                if not match:continue
+                try:date=dt.date(*(int(x) for x in match.groups()))
+                except ValueError:continue
+                key=no+':'+ordinal
+                if key not in deadlines or date>deadlines[key]:
+                    deadlines[key]=date
+    grace=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_GRACE_DAYS','7'))
+    unknown=int(os.environ.get('WORKLINKS_RFP_ARCHIVE_UNKNOWN_DAYS','30'))
+    ledger=CallLedger(DATA/'rfp-request-ledger.sqlite3')
+    report=ledger.prune_expired(
+        deadlines,grace_days=grace,unknown_days=unknown)
+    log('RFP_ARCHIVE_RETENTION',json.dumps(
+        {'mappedNoticeDeadlines':len(deadlines),'graceDays':grace,
+         'unknownDays':unknown,**report},separators=(',',':')))
+    return report
+
+
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
     SEEDS.mkdir(parents=True, exist_ok=True)
@@ -509,8 +549,14 @@ def main():
             'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT,
             'rfpOpenOcrLimit', RFP_OPEN_OCR_LIMIT,
              'qualificationBatch', QUALIFICATION_BATCH)
+        last_archive_cleanup=0.0
         while True:
             state=iteration()
+            if time.monotonic()-last_archive_cleanup>=3600:
+                try:prune_rfp_archive()
+                except (OSError,sqlite3.Error,ValueError) as error:
+                    log('RFP_ARCHIVE_RETENTION_FAILED',type(error).__name__)
+                last_archive_cleanup=time.monotonic()
             drain=state.get('rfpUpgrade') or {}
             # Continuous scan while candidates exist. Keep ordinary scheduled
             # jobs fair (one bounded RFP batch per loop) and never spin while
