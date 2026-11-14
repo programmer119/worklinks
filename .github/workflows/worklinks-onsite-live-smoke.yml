@@ -158,10 +158,14 @@ jobs:
                           assert term in row['tooltip'],(row,term)
                   elif row['name'] in ('platform','exercise'):
                       assert row['realRecord'] is True,row
-                      assert row['badge']=='상주 미확정',row
-                      assert row['siteKey']=='not_specified',row
-                      assert row['badgeBackground']=='rgb(241, 245, 249)',row
-                      assert '상주·비상주' in row['tooltip'] or '확정할 수 없음' in row['tooltip'],row
+                      assert row['siteKey'] in ('offsite','checking'),row
+                      if row['siteKey']=='offsite':
+                          assert '비상주' in row['badge'] and '상주 요구사항 미기재' in row['tooltip'],row
+                          assert '최신 판독 완료' in row['tooltip'],row
+                      else:
+                          assert '확인중' in row['badge'],row
+                          assert '최신 판독' in row['tooltip'],row
+                          assert ('재검증' in row['tooltip'] or '재판독' in row['tooltip']),row
                   elif row['name']=='north':
                       assert row['badge']=='상주 권고',row
                       for term in ['월평균','8명 이상','필수 인원 아님','제안요청서']:
