@@ -41,9 +41,14 @@ jobs:
           python3 - <<'PY'
           import pathlib
           html=pathlib.Path('startup-support/index.html').read_text()
-          assert "['원본 다운로드',laneData.download],['문서 스캔',laneData.scan]" in html
+          js=pathlib.Path('startup-support/rfp-progress-live.js').read_text()
+          assert 'rfp-progress-live.js' in html
+          assert "['manifest','첨부목록 확보']" in js
+          assert "['download','원본 다운로드']" in js
+          assert "['scan','문서 판독']" in js
           assert 'rfpRescanMiniFill' in html
-          print('RFP_DUAL_UI_TWO_LANES_OUTER_PRESERVED=PASS')
+          assert 'window.paintRfpLiveProgress' in js
+          print('RFP_DUAL_UI_THREE_STAGES_INDEPENDENT_SCAN=PASS')
           PY
           echo RFP_DUAL_LANE_CI=PASS
       - name: Validate modal's two clear rows in a real browser
