@@ -20,7 +20,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - name: Verify independent 1000-notice download queue and original scan regressions
@@ -44,3 +44,18 @@ jobs:
           print('RFP_DUAL_UI_TWO_LANES_OUTER_PRESERVED=PASS')
           PY
           echo RFP_DUAL_LANE_CI=PASS
+      - name: Validate modal's two clear rows in a real browser
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import pathlib,re
+          html=pathlib.Path('startup-support/index.html').read_text()
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,re.S|re.I)
+          pathlib.Path('/tmp/worklinks-dual-queue-inline.js').write_text('\n'.join(scripts))
+          PY
+          node --check /tmp/worklinks-dual-queue-inline.js
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+          python3 -m http.server 18766 --bind 127.0.0.1 --directory . >/tmp/worklinks-dual-http.log 2>&1 &
+          python3 tests/test_rfp_rescan_ui.py
