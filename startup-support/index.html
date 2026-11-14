@@ -1044,7 +1044,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 <div id="rfpRescanModal" class="rfp-rescan-modal" role="dialog" aria-modal="true" aria-labelledby="rfpRescanModalTitle" aria-hidden="true">
   <div class="rfp-rescan-dialog" id="rfpRescanDialog" tabindex="-1">
     <div class="rfp-rescan-head"><div>
-      <h2 id="rfpRescanModalTitle">공고 판독 진행 현황</h2>
+      <h2 id="rfpRescanModalTitle">첨부문서 판독 진행 현황</h2>
       <p>마감 전 SW 공고 · 공고번호와 차수 기준 중복 제거</p>
     </div><button type="button" class="rfp-rescan-close" id="rfpRescanClose" aria-label="닫기">×</button></div>
     <div id="rfpRescanContent" aria-live="polite">실제 운영 서버의 집계를 조회하고 있어요.</div>
@@ -2156,7 +2156,7 @@ function paintRfpRescanProgress(){
      '" aria-valuemin="0" aria-valuemax="100"><span style="width:'+
      percentage.toFixed(1)+'%"></span></span></div>';
  }).join(''):'';
- const stageNames={classification:'RFP 조건',roles:'역할·인원',facts:'인력 요구사항',hwpx:'HWPX 해석'};
+ const stageNames={classification:'첨부문서 조건',roles:'역할·인원',facts:'인력 요구사항',hwpx:'HWPX 해석'};
  const stages=Object.entries(info.stages||{}).map(([name,st])=>{
   const applicable=Number(st.total)>0;
   const done=rfpProgressNumber(st.done);
@@ -3729,7 +3729,7 @@ function productionRequirementCheck(x,p){
  }
  const records=Array.isArray(p.productionRecords)?p.productionRecords:[],snapshot=p.productionSnapshotDate||'날짜 미확인';
  if(!p.productionCheckedAt)return {applicable:true,status:'pending',snapshot,reason:'직접생산 발급현황 조회 전·실패'};
- if(!products.length)return {applicable:true,status:'unknown',snapshot,reason:'공고 요약 및 RFP 추출 문구에 필수 직접생산 세부품명 없음 · 원문 확인 필요'};
+ if(!products.length)return {applicable:true,status:'unknown',snapshot,reason:'공고 요약 및 첨부문서 추출 내용에 필수 직접생산 세부품명 없음 · 원문 확인 필요'};
  const matched=products.filter(name=>records.some(r=>String(r.product||'').replace(/\s/g,'')===name&&
   (!r.validFrom||String(r.validFrom).slice(0,10)<=kstISO())&&
   r.validTo&&String(r.validTo).slice(0,10)>=kstISO()));
@@ -3993,9 +3993,9 @@ function comparePartnerJob(x,p){
  if(rfp?.status==='text_extracted_requires_review'||rfpFullyReviewed){
   const files=(rfp.files||[]).filter(q=>q.readable);
   const categories=[...new Set(files.flatMap(q=>Object.entries(q.topics||{}).filter(([k,n])=>n>0).map(([k])=>k)))];
-  add('rfp-extracted','공식 RFP 본문 조건 검토',rfpFullyReviewed?'ok':rfpSourceScanned?'pending':'unknown',
+  add('rfp-extracted','공식 첨부문서 조건 검토',rfpFullyReviewed?'ok':rfpSourceScanned?'pending':'unknown',
    files.length+'개 문서 텍스트 추출 · 확인 키워드: '+categories.join(', ')+
-   ' · 문구 포함만으로 참가요건 충족/필수 여부 확정 불가. 근거를 상세 화면에 표시','나라장터 공식 RFP 원문');
+   ' · 문구 포함만으로 참가요건 충족/필수 여부 확정 불가. 근거를 상세 화면에 표시','나라장터 공식 첨부문서');
  }else if(rfp?.status==='no_eorder_files'){
   add('rfp-no-eorder','e발주 첨부 원문','unknown',
    'e발주 첨부 목록 0건 · 공고문이나 타 경로의 첨부 문서가 없다는 뜻이 아니며 조건 확인 필요','나라장터 e발주');
@@ -4045,8 +4045,8 @@ const changcomOriginalNoticeReviews=Object.freeze({
  'R26BK01772216:000':{state:'missing0036',reason:"경남 소재 본점과 1468·0036 동시 필수; 창컴은 부천 본점·0036 미등록",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01772216&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
  'R26BK01768055:000':{state:'pending',reason:"1468 등록조건 일치, 공동이행 가능; 제안요청서 실적·인력·수행능력 추가 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01768055&bidPbancOrd=000&fileType=&fileSeq=1&prcmBsneSeCd=03"},
  'R26BK01760974:001':{state:'pending',reason:"정정 공고: 정보시스템유지관리 직접생산 8111189901 및 중소기업확인서 필수, 공동·하도급 불가; 현행 효력 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01760974&bidPbancOrd=001&fileType=&fileSeq=2&prcmBsneSeCd=03"},
- 'R26BK01759246:000':{state:'pending',reason:"1468 일치, 유지관리 직접생산 8111189901·중소기업확인서 필수; 현재 효력·RFP 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01759246&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
- 'R26BK01774426:000':{state:'pending',reason:"1468 일치, 유지관리 직접생산 8111189901·중소기업확인서 필수; 현재 효력·RFP 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01774426&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01759246:000':{state:'pending',reason:"1468 일치, 유지관리 직접생산 8111189901·중소기업확인서 필수; 현재 효력·첨부문서 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01759246&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
+ 'R26BK01774426:000':{state:'pending',reason:"1468 일치, 유지관리 직접생산 8111189901·중소기업확인서 필수; 현재 효력·첨부문서 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01774426&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"},
  'R26BK01775500:000':{state:'pending',reason:"1468·유지관리 직접생산·중소기업확인서 필수; 과거 공고와 과업 달라 경쟁 이력 동일성 확인 필요",source:"https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01775500&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03"}
 });
 function changcomOriginalNoticeReview(x,p){
@@ -4060,7 +4060,7 @@ const changcomReviewPhases=Object.freeze({
  'R26BK01768055:000':{entry:"1468 정상 등록(2026.10.18 기준), 공동이행 허용. 기타 필수 참가조건은 별도 확인",proposal:"PL급 이상 핵심기술자 경력확인서, 제안 인력표·사업실적 증빙 준비. 실적 제출과 최소 입찰실적 제한은 다름",delivery:"시스템 운영·유지관리 투입. 핵심인력 변경 제한 및 14일 이상 인수인계"},
  'R26BK01760974:001':{entry:"1468 등록·소기업 유효·직접생산 8111189901 유효 조회(2026.10.18). 공동계약 불가, 기타 참가조건 별도 확인",proposal:"제안 발표 PM은 공고 전부터 평가일까지 재직해야 하며 재직증명서·4대보험 가입증명서 준비",delivery:"낙찰 시 NRC 홈페이지 유지관리 자체 수행, 하도급 불가"},
  'R26BK01759246:000':{entry:"1468 등록·소기업 유효·직접생산 8111189901 유효 조회(2026.10.18). 기타 필수 참가조건 별도 확인",proposal:"기술자 근무·기술경력확인서, 참여인력 구성·사업실적 증빙 준비(최소 입찰실적 제한 단정 금지)",delivery:"상주인력 최소 1명, 비상주 분야별 역할·투입공수 계획과 실제 배치 가능성 확인"},
- 'R26BK01774426:000':{entry:"1468 등록·소기업 유효·직접생산 8111189901 유효 조회(2026.10.18). RFP상 공동수급 불허, 기타 참가조건 별도 확인",proposal:"투입인력 경력·자격 및 공수 제안 서류 준비",delivery:"필수인력 1명과 정해진 M/M 투입, 미충족 시 감액 조건"},
+ 'R26BK01774426:000':{entry:"1468 등록·소기업 유효·직접생산 8111189901 유효 조회(2026.10.18). 첨부문서상 공동수급 불허, 기타 참가조건 별도 확인",proposal:"투입인력 경력·자격 및 공수 제안 서류 준비",delivery:"필수인력 1명과 정해진 M/M 투입, 미충족 시 감액 조건"},
  'R26BK01775500:000':{entry:"1468 등록·소기업 유효·직접생산 8111189901 유효 조회(2026.10.18). 공동이행·분담·혼합 허용, 하도급 불가. 기타 참가조건 별도 확인",proposal:"PM 재직 조건, 최근 3년 실적·투입인력 이력서 등 제안 자료 준비(평가실적과 필수 입찰실적 구별)",delivery:"PM/DB 운영자 최소 1명, 보안약점 진단 담당자의 개발경력·보안 자격 등 수행조건 확인"}
 });
 function changcomOriginalReviewMarkup(x,companies,compact=false){
@@ -4302,7 +4302,7 @@ function renderJobDetail(x){
  const extracted=rfpSnapshotForJob(x);
 
  const readable=(extracted?.files||[]).filter(f=>f.readable);
- const extractHTML=readable.length?'<section class="job-detail-section"><h3>공식 RFP 텍스트 발췌 · 자동분석 참고</h3>'+
+ const extractHTML=readable.length?'<section class="job-detail-section"><h3>공식 첨부문서 발췌 · 자동분석 참고</h3>'+
   '<p>공식 다운로드 문서 '+readable.length+'건 · 해당 문구의 필수·선택·예외 조항은 원문 재확인이 필요합니다.</p>'+
   readable.map(f=>'<div class="job-match-company"><b>'+htmlEscape(f.name)+'</b>'+
     (Array.isArray(f.clauseCandidates)&&f.clauseCandidates.length?
@@ -4317,7 +4317,7 @@ function renderJobDetail(x){
         '<span class="jobmatch-chip pending">필수·예외 검토</span></div>';
       }).join('')+'</div>':
       (Array.isArray(f.snippets)?f.snippets.slice(0,8).map(v=>'<div class="job-match-row"><div class="job-match-main"><strong>'+htmlEscape(v.topic)+'</strong><small>'+htmlEscape(v.text)+'</small></div><span class="jobmatch-chip unknown">원문 검토</span></div>').join(''):''))+'</div>').join('')+
-  '<p>※ RFP 자동 발췌는 실적·인력·지역의 충족 판정이 아닙니다. 전체 부속서류 및 증빙을 따로 대조해야 합니다.</p></section>':'';
+  '<p>※ 첨부문서 자동 발췌는 실적·인력·지역의 충족 판정이 아닙니다. 전체 부속서류 및 증빙을 따로 대조해야 합니다.</p></section>':'';
  const variantLinks=Array.isArray(x.variants)&&x.variants.length>1?
  '<section class="job-detail-section"><h3>같은 제목·기관·금액의 공고 '+x.variants.length+'건</h3><p>정정·재공고 또는 별도 발주인지 각 원문에서 확인하세요.</p>'+
  x.variants.map(function(z){return '<div style="margin-top:6px"><a href="'+htmlEscape(z.url)+'" target="_blank" rel="noopener noreferrer">'+htmlEscape(z.noticeNumber||z.id)+' · '+htmlEscape(z.posted)+' ↗</a></div>'}).join('')+'</section>':'';
@@ -4325,7 +4325,7 @@ function renderJobDetail(x){
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
  const confirmedHistory=standardBidMarkup(x);
  document.getElementById('jobDetailBody').innerHTML=jobDetailRequirementGrid(x)+base+reviewNote+savedResearchMarkup(x)+docLinks+
-  (extractHTML&&!jobSearchText?'<details class="job-detail-advanced"><summary>RFP 원문 발췌 보기</summary>'+extractHTML+'</details>':'')+
+  (extractHTML&&!jobSearchText?'<details class="job-detail-advanced"><summary>첨부문서 발췌 보기</summary>'+extractHTML+'</details>':'')+
   (confirmedHistory?'<section class="job-detail-section"><h3>개찰·낙찰·계약 이력</h3>'+confirmedHistory+'</section>':'')+
   bidChangePriceMarkup(x)+variantLinks+actions;
 }
@@ -4527,9 +4527,9 @@ function jobRequirementEvidence(x){
    return {key:'required',label:'사전 필요',reason:'공고일 기준 등 입찰 전에 이미 충족해야 하는 조건이 원문에 명시됨'};
   if(positive&&bidStage.test(positive.text))
    return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
-  if(rfpSnapshotLoading&&!full&&!insuranceSourceReadComplete)return {key:'checking',label:'확인중',reason:'저장된 RFP 상세 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
+  if(rfpSnapshotLoading&&!full&&!insuranceSourceReadComplete)return {key:'checking',label:'확인중',reason:'저장된 첨부문서 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
-  if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고는 수집됐으나 RFP 원문 스캔이 실행되지 않음 · 판독 실행 필요'};
+  if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고는 수집됐으나 첨부문서 판독이 실행되지 않음 · 판독 실행 필요'};
   if(insuranceSourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
    return {key:'not_required',label:'필요없음',reason:'공식 문서 정상 판독 · 해당 요건 불필요 문구 확인'};
   if(insuranceSourceReadComplete&&!mentioned.length)
@@ -4588,7 +4588,7 @@ function jobRequirementEvidence(x){
      reason:'상주 조건 판독자료를 아직 확보하지 못해 확인 중'};
    if(!tried)return {key:'not_checked',label:'확인안함',
      reason:'공고 원문 API 수집·검증 호출 기록 없음'};
-   if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고 수집 후 RFP 스캔 미실행 · 상주 조건 판독 필요'};
+   if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고 수집 후 첨부문서 판독 미실행 · 상주 조건 판독 필요'};
    if(!staffingSourceReadComplete){
      if(saved?.status==='text_extracted_requires_review'||provenance?.status==='text_extracted_requires_review')
        return {key:'checking',label:'확인중',
@@ -4794,7 +4794,7 @@ function jobRequirementEvidence(x){
     '원문에서 역할과 인원이 함께 적힌 근거만 발췌. 전체 인원·상주 인원 합계가 아님'}:
   rfpSnapshotLoading&&!full&&!saved?{key:'checking',label:'확인중',reason:'원문 판독자료를 불러오는 중'}:
   !tried?{key:'not_checked',label:'확인안함',reason:'원문 수집·검증 기록 없음'}:
-  scanNotRun?{key:'checking',label:'확인중',reason:'RFP 원문 스캔 미실행 · 역할별 인원 판독 필요'}:
+  scanNotRun?{key:'checking',label:'확인중',reason:'첨부문서 판독 미실행 · 역할별 인원 판독 필요'}:
   total?{key:'role_workload',label:'공수 '+Number(total.manMonths).toFixed(3)+'MM',reason:'공수는 투입기간×투입률이며 인원 수가 아님'}:
   effortRows.length?{key:'role_workload',label:'공수 확인',reason:'역할별 공수 확인 · 인원 수 미확정'}:
   rec?{key:'role_recommended',label:Number(rec.count)+'명 권고',reason:'상주 인원 권고 · 의무 인원 수 아님'}:
@@ -4948,7 +4948,7 @@ function jobRequirementBadges(x){
    '<div class="job-req-onsite-note">'+htmlEscape(siteInfo?.status?.reason||status)+'</div>';
   const pv=evidence.meta.provenance;
   const versionSummary=pv?
-   '판독 버전: RFP '+(pv.classificationVersion?'v'+pv.classificationVersion:'미기록')+
+   '첨부문서 판독 버전: '+(pv.classificationVersion?'v'+pv.classificationVersion:'미기록')+
     ' · 인력 '+(pv.staffingRoleVersions?.length?
       pv.staffingRoleVersions.map(n=>n?'v'+n:'미기록').join('/'):
       '미기록')+
