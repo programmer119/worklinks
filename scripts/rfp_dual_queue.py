@@ -165,6 +165,12 @@ class RfpDualQueue:
                 WHERE notice_key=? AND scan_status='scanning' ''',
                 [(key,) for key in keys])
 
+    def ready_count(self):
+        with self.connect() as db:
+            return db.execute('''SELECT COUNT(*) FROM rfp_dual_notices
+                WHERE download_status='ready' AND scan_status IN ('pending','retry')
+                AND scan_retry_epoch<=?''',(time.time(),)).fetchone()[0]
+
     def stats(self):
         with self.connect() as db:
             rows=db.execute('''SELECT download_status,scan_status,COUNT(*)
