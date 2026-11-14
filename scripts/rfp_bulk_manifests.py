@@ -65,13 +65,33 @@ class BulkManifestPlanner:
                 (day,source)).fetchall()
         if not rows:return None
         total=rows[0][1]
-        required=max(1,math.ceil(total/ROWS))
+        # Some official operations silently return ten rows despite requesting
+        # 1,000. The FIRST ACTUAL page, not the requested rows, controls the
+        # page count. Never treat 10/151 as a one-page complete response.
+        first=rows[0][2]
+        effective=first if total>first else max(1,total)
+        required=max(1,math.ceil(total/effective))
         if (required>MAX_PAGES_PER_DAY_SOURCE or len(rows)!=required or
                 [row[0] for row in rows]!=list(range(1,required+1)) or
-                any(row[1]!=total or not 0<=row[2]<=ROWS for row in rows) or
+                any(row[1]!=total or row[2]!=min(effective,total-(row[0]-1)*effective)
+                    for row in rows) or
                 sum(row[2] for row in rows)!=total):
             return None
-        return [record for row in rows for record in json.loads(row[3])]
+        out=[]
+        seen_full_pages=set()
+        for page,count,raw,data in rows:
+            try:
+                values=json.loads(data)
+                if not isinstance(values,list):return None
+            except (TypeError,ValueError):return None
+            # If official API ignored 'page', repeated pages would otherwise
+            # silently certify the wrong RFP attachments.
+            if page<required and values:
+                signature=json.dumps(values,ensure_ascii=False,sort_keys=True)
+                if signature in seen_full_pages:return None
+                seen_full_pages.add(signature)
+            out.extend(values)
+        return out
 
     def _pages_present(self,day,source):
         with self.queue.connect() as db:
@@ -105,7 +125,12 @@ class BulkManifestPlanner:
         known_total=saved[0][1] if saved else None
         if known_total is not None and known_total<0:
             raise BulkManifestError('invalid_cached_batch_total')
-        pages=max(1,math.ceil(known_total/ROWS)) if known_total is not None else 1
+        if saved and saved[0][0]==1:
+            first_raw=saved[0][2]
+            effective=(first_raw if known_total>first_raw else max(1,known_total))
+        else:
+            effective=ROWS
+        pages=max(1,math.ceil(known_total/effective)) if known_total is not None else 1
         if pages>MAX_PAGES_PER_DAY_SOURCE:
             raise BulkManifestError('batch_page_count_unprofitable')
         existing={row[0] for row in saved}
@@ -121,7 +146,8 @@ class BulkManifestPlanner:
             self.pacer.acquire()
             compact=day.replace('-','')
             params={'source':source,'from':compact+'0000',
-                    'to':compact+'2359','page':page,'rows':ROWS}
+                    'to':compact+'2359','page':page,
+                    'rows':ROWS if page==1 else effective}
             url='http://127.0.0.1:18192/api/g2b/rfp-attachment-batch?'+urllib.parse.urlencode(params)
             payload=self.fetch(url)
             if payload.get('ok') is not True:
@@ -134,11 +160,15 @@ class BulkManifestPlanner:
                     payload.get('source')!=source or
                     not isinstance(payload.get('items'),list)):
                 raise BulkManifestError('batch_invalid_provider_pagination')
-            expected=max(1,math.ceil(count/ROWS))
-            if expected>MAX_PAGES_PER_DAY_SOURCE:
-                raise BulkManifestError('batch_page_count_unprofitable')
             if known_total is not None and count!=known_total:
                 raise BulkManifestError('batch_total_changed_restart_window')
+            if page==1:
+                effective=raw if count>raw else max(1,count)
+            elif raw!=min(effective,count-(page-1)*effective):
+                raise BulkManifestError('batch_provider_page_size_changed')
+            expected=max(1,math.ceil(count/effective))
+            if expected>MAX_PAGES_PER_DAY_SOURCE:
+                raise BulkManifestError('batch_page_count_unprofitable')
             known_total=count
             filtered=[]
             for item in payload['items']:
@@ -193,7 +223,9 @@ class BulkManifestPlanner:
         if not mapping:return {'new':0,'missingPostedDate':len(self.queue.unprepared_notices()),'calls':0}
         groups={}
         for key,day in mapping.items():groups.setdefault(day,set()).add(key)
-        day=sorted(groups,reverse=True)[0]
+        # Most pending notices per official batch call first; latest day wins
+        # ties. Prevent expensive near-empty days from starving the backlog.
+        day=max(groups,key=lambda value:(len(groups[value]),value))
         keys=groups[day]
         sources={}
         calls=0
