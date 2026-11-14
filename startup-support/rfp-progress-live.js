@@ -88,9 +88,9 @@
    const worker=workers[lane];
    let status='상태 기록 없음';
    if(worker){
-    if(worker.stale)status='상태 갱신 끊김';
-    else if(worker.status==='retry'&&worker.retryEpoch>now)status='재시도 '+fmt(worker.retryEpoch);
-    else if(worker.status==='retry')status='재시도 시각 도달';
+    if(worker.status==='retry'&&worker.retryEpoch>now)status='재시도 '+fmt(worker.retryEpoch);
+    else if(worker.stale)status='상태 갱신 끊김';
+    else if(worker.status==='retry')status=worker.retryEpoch>0?'재시도 시각 도달':'오류 발생';
     else status=worker.status==='running'?'작업 확인 중':worker.status;
    }
    text(head,'span',status,worker?.stale||worker?.status==='retry'?'rfp-live-problem':'');
