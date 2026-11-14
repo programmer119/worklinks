@@ -5,6 +5,7 @@ The download worker never waits for a scan; the scanner claims only ready notice
 A changed reader fingerprint resets scanning but keeps verified archived originals.
 """
 import datetime as dt
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -43,10 +44,18 @@ class RfpDualQueue:
             db.execute('''CREATE INDEX IF NOT EXISTS dual_queue_scan
                 ON rfp_dual_notices(scan_status,download_status,scan_retry_epoch)''')
 
+    @contextmanager
     def connect(self):
         db=sqlite3.connect(str(self.path),timeout=12)
         db.execute('PRAGMA busy_timeout=12000')
-        return db
+        try:
+            yield db
+            db.commit()
+        except BaseException:
+            db.rollback()
+            raise
+        finally:
+            db.close()
 
     def enqueue(self,notices,fingerprint):
         """Idempotent. 64-small-row transactions avoid blocking scan writes."""
