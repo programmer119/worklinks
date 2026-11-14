@@ -15,6 +15,11 @@ from rfp_dual_queue import RfpDualQueue
 from rfp_call_ledger import CallLedger,cache_key
 import refresh_worklinks_rfp as reader
 
+# The regression commits 2,000+ tiny SQLite transactions. Test-only data
+# belongs in tmpfs, not the slow Docker overlay on CentOS server123.
+if Path('/dev/shm').is_dir() and os.access('/dev/shm',os.W_OK):
+    tempfile.tempdir='/dev/shm'
+
 with tempfile.TemporaryDirectory() as tmp:
     db=Path(tmp)/'rfp-dual-queue.sqlite3'
     queue=RfpDualQueue(db)
