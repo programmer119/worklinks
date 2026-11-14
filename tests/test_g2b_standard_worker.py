@@ -87,4 +87,55 @@ bad.append({**rows["B2"][0], "fnlSucsfCorpBizrno": "2223344444",
 parsed = m.normalize_awards(bad, "20261109")
 assert parsed[0][7] == "" and parsed[0][12] == 1
 assert m.normalize_awards([{"bidNtceNo": other}], "20261109")[0][5] is None
+
+# Regression for the 2026-11-10 production failure: official B2 first-page
+# totalCount=21039 (43 pages x 500) was rejected by the old 35-page cap.
+assert m.page_limit("B2") >= 43
+assert m.page_limit("B1") == 35 and m.page_limit("B3") == 35
+large_calls = []
+large_rows = 21039
+def large_fetch(service, day, page, query):
+    assert service == "B2" and day == "20261110"
+    assert query["numOfRows"] == 500
+    large_calls.append(page)
+    size = min(500, large_rows - (page-1)*500)
+    assert size > 0
+    items = [{
+        "bidNtceNo": f"R26BK{(page-1)*500+i:08d}",
+        "bidNtceOrd": "000",
+        "fnlSucsfCorpBizrno": "1112233333",
+        "fnlSucsfCorpNm": "낙찰업체",
+        "fnlSucsfAmt": "100000000",
+        "fnlSucsfRt": "91.5",
+        "fnlSucsfDate": "2026-11-10",
+    } for i in range(size)]
+    return {"response":{"header":{"resultCode":"00"},
+                        "body":{"items":items,"totalCount":large_rows}}}
+with tempfile.TemporaryDirectory() as tmp:
+    dbpath = os.path.join(tmp, "large-b2.sqlite3")
+    assert m.run(days=5,max_requests=80,fetch=large_fetch,
+                 db_path=dbpath,key="mock",only_day="20261110",
+                 only_service="B2") == 0
+    assert large_calls == list(range(1,44)), large_calls
+    db = sqlite3.connect(dbpath)
+    assert db.execute("SELECT received,pages FROM std_windows WHERE service='B2' AND day='20261110'").fetchone() == (21039,43)
+    assert db.execute("SELECT COUNT(*) FROM std_awards WHERE day='20261110'").fetchone()[0] == 21039
+    assert db.execute("SELECT message FROM std_run_status WHERE id=1").fetchone()[0] == "targeted_completed"
+    assert db.execute("SELECT last_success FROM std_run_status WHERE id=1").fetchone()[0] is None
+    assert db.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+    db.close()
+    assert m.run(days=5,max_requests=80,fetch=lambda *args: (_ for _ in ()).throw(AssertionError("re-fetch")),
+                 db_path=dbpath,key="mock",only_day="20261110",
+                 only_service="B2") == 0
+
+# Remain bounded: an implausible 50,001-row B2 window still fails fast.
+def too_large(service,day,page,query):
+    return {"response":{"header":{"resultCode":"00"},
+                        "body":{"items":[{}],"totalCount":50001}}}
+try:
+    m.collect_window("B2","20261110","mock",[0,100],fetch=too_large)
+    raise AssertionError("oversized B2 source should fail")
+except m.ProviderFailure as exc:
+    assert exc.reason == "unbounded_window",exc.reason
+
 print("WORKLINKS_G2B_STANDARD_OFFLINE_REGRESSION=PASS")
