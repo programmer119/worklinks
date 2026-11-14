@@ -75,7 +75,8 @@ with tempfile.TemporaryDirectory() as tmp:
             assert 1<=exc.retry_after_seconds<=3602,exc.retry_after_seconds
         else:
             raise AssertionError('rolling hour budget not enforced')
-        assert q.connect().execute('SELECT COUNT(*) FROM rfp_bulk_request_budget').fetchone()[0]==1
+        with q.connect() as db:
+            assert db.execute('SELECT COUNT(*) FROM rfp_bulk_request_budget').fetchone()[0]==1
     finally:
         bulk.HOURLY_LIMIT=old_hour
         bulk.DAILY_LIMIT=old_day
