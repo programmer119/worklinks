@@ -151,6 +151,34 @@ with tempfile.TemporaryDirectory() as temporary:
     assert empty['rfpUpgradeActive'] is True
     assert empty['rfpUpgrade']['retryAfterEpoch']>time.time()+250
 
+    # An OCR batch may take minutes and repair zero files. During an active
+    # RFP reader upgrade it must not run between every eight-notice batch.
+    keep=m.read_state()
+    keep['rfpUpgradeActive']=True
+    keep['rfpUpgrade']={'status':'failed','attemptEpoch':now+4,
+                       'retryAfterEpoch':time.time()+3600}
+    keep['rfpOpenRepair']={'status':'ok','attemptEpoch':0}
+    keep['rfpUpgradeBatchesCompleted']=3
+    keep['rfpOpenRepairUpgradeBatch']=0
+    m.publish_state(keep)
+    repair_calls=[]
+    def count_repair(args,**kwargs):
+        if 'repair_open_rfp_cached_attachments.py' in args[1]:
+            repair_calls.append('ocr')
+        return mock_runner(args,**kwargs)
+    deferred=m.iteration(now+5,count_repair)
+    assert not repair_calls, 'expensive no-progress OCR must yield to upgrade queue'
+    assert deferred['rfpOpenRepair']['attemptEpoch']==0
+    keep=m.read_state()
+    keep['rfpUpgradeBatchesCompleted']=12
+    m.publish_state(keep)
+    fair=m.iteration(now+6,count_repair)
+    assert repair_calls==['ocr'],repair_calls
+    assert fair['rfpOpenRepairUpgradeBatch']==12
+    again=m.iteration(now+7,count_repair)
+    assert repair_calls==['ocr'],repair_calls
+    print('WORKLINKS_RFP_UPGRADE_12_BATCH_OCR_FAIRNESS=PASS')
+
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
     (m.SEEDS/'rfp-coverage-index.json').write_text(json.dumps(historical))
     (m.DATA/'bad').mkdir()
