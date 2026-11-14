@@ -639,6 +639,16 @@ def main():
         while True:
             ensure_independent_downloader(read_state())
             state=iteration()
+            # Keep scan health visible independently of the downloader.
+            try:
+                sys.path.insert(0,str(SCRIPTS))
+                import rfp_live_activity as live_trace
+                scan=(state.get('rfpUpgrade') or {})
+                retry=float(scan.get('retryAfterEpoch') or 0)
+                if scan.get('status')=='failed' or (retry and retry>time.time()):
+                    live_trace.worker('scan','retry',str(scan.get('error') or scan.get('status') or ''),retry)
+                else:live_trace.worker('scan','running')
+            except (ImportError,OSError,ValueError):pass
             # Archive maintenance is never allowed to block the continuous
             # scanner; only one bounded cleanup job may run at a time.
             if (time.monotonic()-last_archive_cleanup>=3600 and
