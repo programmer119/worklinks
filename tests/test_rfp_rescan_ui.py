@@ -112,7 +112,7 @@ with sync_playwright() as p:
       timeout=12000)
     body=page.locator('#rfpRescanContent').text_content()
     for term in ('관리 대상','6','최신 판독 완료','1','재판독 필요','구버전',
-                 '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','다운로드 8건','판독 4건'):
+                 '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','파일 다운로드 8개','판독 4건'):
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
     assert '원본 다운로드' in body and '850 / 1,000건' in body,body
