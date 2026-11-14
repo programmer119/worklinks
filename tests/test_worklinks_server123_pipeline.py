@@ -213,8 +213,13 @@ with tempfile.TemporaryDirectory() as temporary:
     dual.enqueue([('R26BK01808709','000','2099-12-31')],'test-reader-1')
     claim=dual.claim_download()
     assert claim
-    dual.downloaded(claim[0],{'attachments':{'ok':True,'complete':True,
-                                             'items':[]}},0,0)
+    dual.downloaded(claim[0],{
+        'attachments':{'ok':True,'complete':True,
+                       'items':[{'name':'rfp.pdf','url':'https://www.g2b.go.kr/UntyAtchFile/test.pdf'}]},
+        'noticeDocuments':{'ok':True,'complete':True},
+        'downloadVerifiedFiles':[{'name':'rfp.pdf',
+            'url':'https://www.g2b.go.kr/UntyAtchFile/test.pdf','sha256':'a'*64}]
+    },1,1)
     ready=dual.claim_ready(1)
     assert len(ready)==1
     def dual_runner(args,**kwargs):
