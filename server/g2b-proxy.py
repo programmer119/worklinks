@@ -1164,13 +1164,16 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
         else:cat='incomplete'
         summary[cat]+=1
     summary['remaining']=summary['total']-summary['completed']
+    summary['rescanRequired']=summary['legacy']
     assert summary['remaining']==sum(summary[k] for k in
                                     ('legacy','unscanned','failed','incomplete'))
     percent=(round(100.0*summary['remaining']/summary['total'],1)
              if summary['total'] else None)
+    rescan_percent=(round(100.0*summary['rescanRequired']/summary['total'],1)
+                    if summary['total'] else None)
     return {'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
             'asOf':now.isoformat(),'latest':latest,'counts':summary,
-            'remainingPercent':percent,'stages':stages,
+            'remainingPercent':percent,'rescanPercent':rescan_percent,'stages':stages,
             'basis':'one exact bid number and ordinal; known deadlines only',
             'noGovernmentApiCalls':True}
 
