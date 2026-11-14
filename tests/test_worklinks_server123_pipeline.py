@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory() as temporary:
                    'batch_backfill_changcom_top500_rfp.py',
                    'repair_changcom_top500_rfp.py',
                    'repair_open_rfp_cached_attachments.py',
-                   'rfp_call_ledger.py','rfp_dual_queue.py','rfp_bulk_manifests.py'):
+                   'rfp_call_ledger.py','rfp_dual_queue.py','rfp_live_activity.py','rfp_bulk_manifests.py'):
         (m.SCRIPTS/script).write_text('# test fixture\n',encoding='utf-8')
     original={'ok':True,'generatedAt':'2026-11-01','byNotice':{
         'R26BK01808709:000':{'status':'text_extracted_requires_review'}}}
