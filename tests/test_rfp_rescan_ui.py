@@ -39,7 +39,8 @@ with sync_playwright() as p:
       "() => document.getElementById('rfpRescanCount')?.textContent.includes('완료 1 / 6건')",
       timeout=25000)
     button=page.locator('#rfpRescanLaunch')
-    assert '16.67%' in page.locator('#rfpRescanLabel').inner_text()
+    actual_label=page.locator('#rfpRescanLabel').inner_text()
+    assert '16.67%' in actual_label,(actual_label,errors,page.locator('#rfpRescanCount').inner_text())
     assert button.is_visible()
     assert page.locator('#rfpRescanCycle').is_visible()
     assert '조회' in page.locator('#rfpRescanCycle').inner_text()
