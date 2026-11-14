@@ -4,6 +4,7 @@ Never classify final bid eligibility from a keyword or omit review of attachment
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import nullcontext
 import datetime as dt
 import hashlib
 import io
@@ -912,6 +913,14 @@ def download(url,*,rate_gate=None):
                           notice_key=notice_key,
                           response_sha256=hashlib.sha256(reusable).hexdigest())
             return reusable
+    if os.environ.get('WORKLINKS_RFP_DUAL_SCAN_ONLY')=='1':
+        # The scan lane never makes a network request. Missing archives go
+        # back to the independent download lane for verification/recovery.
+        from rfp_dual_queue import RfpDualQueue
+        key=getattr(_NOTICE_CONTEXT,'notice_key',None)
+        if key:
+            RfpDualQueue(os.environ['WORKLINKS_RFP_DUAL_QUEUE_DB']).mark_download_missing(key)
+        raise RuntimeError('queued_original_missing')
     request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
     for attempt in range(3):
         if rate_gate is not None:rate_gate.acquire()
@@ -2295,8 +2304,24 @@ def main():
     # agencies and no re-download once the requested scan is complete.
     priority={k for k in os.environ.get('WORKLINKS_RFP_ROLE_PRIORITY_KEYS','').split(',')
               if re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',k)}
-    selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
-                      priority=priority)
+    dual_scan=os.environ.get('WORKLINKS_RFP_DUAL_SCAN_ONLY')=='1'
+    dual_queue=None
+    selected_metadata={}
+    if dual_scan:
+        from rfp_dual_queue import RfpDualQueue
+        dual_queue=RfpDualQueue(os.environ['WORKLINKS_RFP_DUAL_QUEUE_DB'])
+        dual_queue.recover_stale_scans()
+        claims=dual_queue.claim_ready(limit)
+        selected=[(key.split(':')[0],key.split(':')[1],closes)
+                  for key,closes,_ in claims]
+        selected_metadata={key:metadata for key,_,metadata in claims}
+        print('RFP_DUAL_SCAN_READY',len(selected),flush=True)
+        if not selected:
+            print('RFP_DUAL_SCAN_NO_READY',flush=True)
+            return
+    else:
+        selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
+                          priority=priority)
     # RFP archive retention follows the official closing date, not scan date.
     _NOTICE_DEADLINES.clear()
     _NOTICE_DEADLINES.update({no+':'+order:date for no,order,date in selected if date})
@@ -2336,8 +2361,11 @@ def main():
             prior['classificationVersion']=2
     success=0
     failed_refresh={}
+    scan_validity={}
     uncached=[]
-    for no,ordn,_ in selected:
+    if dual_scan:
+        uncached=[(no,ordn) for no,ordn,_ in selected]
+    for no,ordn,_ in ([] if dual_scan else selected):
         key=no+':'+ordn
         cached=old.get(key)
         cached_source=prior_index.get(key) or cached
@@ -2361,14 +2389,14 @@ def main():
         uncached.append((no,ordn))
     # Scan concurrency and download concurrency are independent: four
     # notice parsers consume completed raw bytes from eight download workers.
-    preloaded=preflight_rfp_metadata(uncached)
+    preloaded=selected_metadata if dual_scan else preflight_rfp_metadata(uncached)
     stage_done('preflight_metadata')
     file_phase_totals={'downloadSeconds':0.0,'downloadQueueWaitSeconds':0.0,
                        'extractSeconds':0.0,'analysisSeconds':0.0,
                        'textCacheHits':0,'filesProcessed':0,'deferredImageFiles':0}
     download_workers=max(1,min(8,int(os.environ.get(
         'WORKLINKS_RFP_DOWNLOAD_CONCURRENCY','8'))))
-    with DownloadPrefetch(max_workers=download_workers) as prefetch:
+    with (nullcontext(None) if dual_scan else DownloadPrefetch(max_workers=download_workers)) as prefetch:
       with ThreadPoolExecutor(max_workers=4) as pool:
         tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn)),
                            old.get(no+':'+ordn) or prior_index.get(no+':'+ordn),
@@ -2379,6 +2407,7 @@ def main():
             key=no+':'+ordn
             try:
                 data=future.result()
+                scan_validity[key]=data.get('status')=='text_extracted_requires_review'
                 profile=data.pop('_stageTimings',None)
                 if profile:
                     for name,value in profile.items():
@@ -2410,6 +2439,7 @@ def main():
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
+                scan_validity[key]=False
                 reason=('metadata_http_'+str(e.code) if isinstance(e,urllib.error.HTTPError)
                         else classify_failure(e))
                 failed={'status':'metadata_fetch_failed','reasonCode':reason,
@@ -2432,8 +2462,8 @@ def main():
                     print('RFP_NOTICE_CHECKPOINT_FAILED',key,
                           type(checkpoint_error).__name__,flush=True)
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
-      prefetch_stats=prefetch.stats()
-    print('RFP_DOWNLOAD_PIPELINE',json.dumps(prefetch_stats,separators=(',',':')),flush=True)
+      prefetch_stats=prefetch.stats() if prefetch is not None else {'workers':0,'submitted':0,'coalesced':0,'networkAttempts':0}
+    if not dual_scan:print('RFP_DOWNLOAD_PIPELINE',json.dumps(prefetch_stats,separators=(',',':')),flush=True)
     stage_done('process_notices')
     if not results:raise SystemExit('NO_RFP_RESULT')
     details,omitted=bounded_detail_snapshot(results)
@@ -2561,6 +2591,13 @@ def main():
        'reviewComplete':False,'scannedNoticeCount':len(coverage),
        'byNotice':coverage}
     COVERAGE_DEST.write_text(json.dumps(cumulative,ensure_ascii=False,separators=(',',':'))+'\n',encoding='utf-8')
+    if dual_scan:
+        # The parent worker commits final queue statuses only AFTER publishing
+        # both validated RFP snapshots, so a crash cannot lose scan evidence.
+        scan_outcomes=[{'key':no+':'+ordn,
+                        'ok':scan_validity.get(no+':'+ordn) is True}
+                       for no,ordn in uncached]
+        print('RFP_DUAL_SCAN_RESULT',json.dumps(scan_outcomes,separators=(',',':')),flush=True)
     stage_done('rebuild_and_write_coverage')
     print('RFP_SNAPSHOT_READY','DETAIL_RECORDS',len(output['byNotice']),
           'CUMULATIVE_SCANNED',len(coverage),'NEW_READABLE',success)
