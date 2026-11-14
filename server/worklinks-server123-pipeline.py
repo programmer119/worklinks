@@ -24,7 +24,7 @@ SCRIPTS = Path(os.environ.get('G2B_PIPELINE_SCRIPTS', '/app/scripts'))
 STATE = DATA / 'pipeline-scheduler-state.json'
 SOURCE_API = os.environ.get('WORKLINKS_G2B_API', 'http://127.0.0.1:18192/api/g2b')
 RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
-RFP_UPGRADE_PERIOD = max(900, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 1800)))
+RFP_UPGRADE_PERIOD = max(600, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
@@ -392,6 +392,8 @@ def main():
             state['rfpUpgrade']={'status':'parser_versions_upgraded','attemptEpoch':0}
             state['rfp']={'status':'parser_versions_upgraded','attemptEpoch':0}
             log('PIPELINE_PARSER_UPGRADE_QUEUE_CREATED',current_versions)
+        state['rfpUpgradePeriodSeconds']=RFP_UPGRADE_PERIOD
+        state['rfpRegularPeriodSeconds']=RFP_PERIOD
         # A "started" entry from disk can only belong to a process that
         # terminated before publishing its result; this worker owns the
         # exclusive scheduler lock. Re-run immediately, never treat it as
@@ -444,6 +446,7 @@ def main():
         publish_state(state)
         log('PIPELINE_REPAIR_PREFLIGHT', state['rfpRepairPreflight'])
         log('PIPELINE_SERVER123_STARTED', 'rfpPeriod', RFP_PERIOD,
+            'rfpUpgradePeriod', RFP_UPGRADE_PERIOD, 'rfpUpgradeLimit', RFP_UPGRADE_LIMIT,
             'shortlistPeriod', SHORTLIST_PERIOD, 'openAwardPeriod', AWARD_FALLBACK_PERIOD,
             'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT,
             'rfpOpenOcrLimit', RFP_OPEN_OCR_LIMIT,
