@@ -28,11 +28,12 @@ class BulkManifestQuota(BulkManifestError):
     pass
 
 class BulkManifestPlanner:
-    def __init__(self,queue,bids_db,fetch,pacer):
+    def __init__(self,queue,bids_db,fetch,pacer,allow_exceptions=True):
         self.queue=queue
         self.bids_db=Path(bids_db)
         self.fetch=fetch
         self.pacer=pacer
+        self.allow_exceptions=allow_exceptions
 
     def posted_days(self):
         """Only verified posted dates from saved SW service notices."""
@@ -40,7 +41,7 @@ class BulkManifestPlanner:
         with sqlite3.connect('file:'+str(self.bids_db)+'?mode=ro',uri=True,timeout=12) as db:
             rows=db.execute('''SELECT bid_no,bid_ord,payload
                 FROM bid_notices WHERE sw_candidate=1''').fetchall()
-        desired=set(self.queue.unprepared_notices())
+        desired=set(self.queue.unprepared_notices(eligible_only=True))
         result={}
         for no,order,payload in rows:
             key=str(no)+':'+str(order or '000').zfill(3)
@@ -157,6 +158,35 @@ class BulkManifestPlanner:
             page+=1
         return self._cached_pages(day,source),fetched
 
+    def _exception_one(self,key,day):
+        """Maximum one exceptional notice per pass, maximum two per UTC day.
+
+        Normal traffic remains three shared date listings. A three-operation
+        exception is used only after a complete batch misses the notice.
+        """
+        if not self.allow_exceptions:return None,0
+        stamp=dt.datetime.now(dt.timezone.utc)
+        midnight=stamp.replace(hour=0,minute=0,second=0,microsecond=0).isoformat()
+        with self.queue.connect() as db:
+            used=db.execute("""SELECT COUNT(*) FROM rfp_bulk_request_budget
+                WHERE started_at>=? AND source LIKE 'exception_%'""",
+                (midnight,)).fetchone()[0]
+        if used>=6:return None,0
+        # Reserve the cost of ALL THREE official operations, not one proxy call.
+        for src in SOURCES:self._reserve_api_call('exception_'+src,day,0)
+        self.pacer.acquire()
+        bid,order=key.split(':',1)
+        params=urllib.parse.urlencode({'bidNo':bid,'order':order})
+        payload=self.fetch('http://127.0.0.1:18192/api/g2b/rfp-attachment-exception?'+params)
+        attachments=payload.get('attachments') or {}
+        documents=payload.get('noticeDocuments') or {}
+        if (attachments.get('ok') is not True or
+                attachments.get('complete') is not True or
+                documents.get('complete') is not True):
+            return None,3
+        payload['manifestOrigin']='verified_missing_date_batch_exception'
+        return payload,3
+
     @staticmethod
     def _notice_meta(key,source_items):
         merged=[]
@@ -170,7 +200,7 @@ class BulkManifestPlanner:
                 name=str(row.get('name') or '')[:160]
                 url=str(row.get('url') or '')
                 item={'name':name,'url':url,'source':row.get('source')}
-                if source=='detail':all_detail.append(item)
+                if source=='detail' and (name or url):all_detail.append(item)
                 if url and url in seen:continue
                 if url:seen.add(url)
                 if name or url:merged.append(item)
@@ -203,8 +233,33 @@ class BulkManifestPlanner:
             if items is None:
                 return {'new':0,'day':day,'calls':calls,'partial':True}
             sources[source]=items
-        manifests={key:self._notice_meta(key,sources) for key in keys}
+        # A full-date response can legitimately contain no attachment files,
+        # but it cannot establish that an entirely absent notice was checked.
+        # Avoid a per-notice fallback storm: hold unmatched notices for a
+        # later bounded exception pass; never publish an invented empty list.
+        present={key:False for key in keys}
+        for items in sources.values():
+            for item in items:
+                key=str(item.get('bidNo'))+':'+str(item.get('order'))
+                if key in present:present[key]=True
+        verified={key for key,found in present.items() if found}
+        missing=sorted(keys-verified)
+        manifests={key:self._notice_meta(key,sources) for key in verified}
+        exception_calls=0
+        if missing:
+            # One notice at most; never fan out a per-notice API storm.
+            try:
+                recovered,exception_calls=self._exception_one(missing[0],day)
+            except BulkManifestQuota:
+                recovered=None
+            if recovered is not None:
+                manifests[missing[0]]=recovered
+                missing=missing[1:]
         count=self.queue.save_bulk_manifests(manifests)
-        return {'new':count,'day':day,'calls':calls,'sourceCounts':
-                {src:len(items) for src,items in sources.items()},
+        calls+=exception_calls
+        if missing:
+            # Retry on another planning window rather than hammer the same day.
+            self.queue.defer_bulk_unmatched(missing,3600,'not_present_in_complete_date_batch')
+        return {'new':count,'day':day,'calls':calls,'unmatched':len(missing),
+                'sourceCounts':{src:len(items) for src,items in sources.items()},
                 'pending':len(self.queue.unprepared_notices())}
