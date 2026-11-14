@@ -24,6 +24,7 @@ for item in "$SOURCE" "$ROOT/server/Dockerfile.worklinks-pipeline" \
     "$ROOT/scripts/repair_open_rfp_cached_attachments.py" \
     "$ROOT/scripts/rfp_call_ledger.py" \
     "$ROOT/scripts/rfp_dual_queue.py" \
+    "$ROOT/scripts/rfp_live_activity.py" \
     "$ROOT/scripts/rfp_bulk_manifests.py" \
     "$ROOT/tests/test_rfp_bulk_manifests.py" \
     "$ROOT/scripts/rfp_download_worker.py" \
@@ -138,6 +139,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
    cmp -s "$ROOT/scripts/repair_open_rfp_cached_attachments.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" &&
    cmp -s "$ROOT/scripts/rfp_call_ledger.py" "$SCRIPTS/rfp_call_ledger.py" &&
    cmp -s "$ROOT/scripts/rfp_dual_queue.py" "$SCRIPTS/rfp_dual_queue.py" &&
+   cmp -s "$ROOT/scripts/rfp_live_activity.py" "$SCRIPTS/rfp_live_activity.py" &&
    cmp -s "$ROOT/scripts/rfp_bulk_manifests.py" "$SCRIPTS/rfp_bulk_manifests.py" &&
    cmp -s "$ROOT/scripts/rfp_download_worker.py" "$SCRIPTS/rfp_download_worker.py" &&
    test "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" = true &&
@@ -147,7 +149,7 @@ if cmp -s "$SOURCE" "$TARGET" &&
 fi
 mkdir -p "$BASE/pipeline/backup"
 for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/staffing_facts.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py" "$SCRIPTS/rfp_dual_queue.py" "$SCRIPTS/rfp_download_worker.py" "$SCRIPTS/rfp_bulk_manifests.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py" "$SCRIPTS/rfp_dual_queue.py" "$SCRIPTS/rfp_live_activity.py" "$SCRIPTS/rfp_download_worker.py" "$SCRIPTS/rfp_bulk_manifests.py";do
   test ! -s "$f" || cp -p "$f" "$BASE/pipeline/backup/$(basename "$f")"
 done
 PREVIOUS="$(dk inspect -f '{{.Config.Image}}' "$WORKER" 2>/dev/null || true)"
@@ -170,7 +172,7 @@ rollback(){
   echo 'PIPELINE_DEPLOY_ROLLBACK_ATTEMPT'
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
   for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/staffing_facts.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py" "$SCRIPTS/rfp_dual_queue.py" "$SCRIPTS/rfp_download_worker.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py" "$SCRIPTS/rfp_dual_queue.py" "$SCRIPTS/rfp_live_activity.py" "$SCRIPTS/rfp_download_worker.py";do
     saved="$BASE/pipeline/backup/$(basename "$f")"
     if test -s "$saved";then cp -p "$saved" "$f";else rm -f "$f";fi
   done
@@ -188,6 +190,7 @@ install -m 0644 "$ROOT/scripts/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_c
 install -m 0644 "$ROOT/scripts/repair_open_rfp_cached_attachments.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py"
 install -m 0644 "$ROOT/scripts/rfp_call_ledger.py" "$SCRIPTS/rfp_call_ledger.py"
 install -m 0644 "$ROOT/scripts/rfp_dual_queue.py" "$SCRIPTS/rfp_dual_queue.py"
+install -m 0644 "$ROOT/scripts/rfp_live_activity.py" "$SCRIPTS/rfp_live_activity.py"
 install -m 0644 "$ROOT/scripts/rfp_bulk_manifests.py" "$SCRIPTS/rfp_bulk_manifests.py"
 install -m 0644 "$ROOT/scripts/rfp_download_worker.py" "$SCRIPTS/rfp_download_worker.py"
 start_worker "$IMAGE"
