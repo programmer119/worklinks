@@ -2081,6 +2081,39 @@ def bounded_detail_snapshot(records, max_records=240, max_bytes=MAX_PUBLISHED_RF
     return selected,len(omitted)
 
 
+def publish_notice_checkpoint(notice_key, result, fingerprint):
+    """Durably record ONE finished notice as soon as its future completes.
+
+    This small SQLite checkpoint is independent of the 8-notice JSON snapshot.
+    It includes only compact, source-linked evidence and never declares an
+    incomplete source or unreadable file to be fully verified.
+    """
+    path=os.environ.get('WORKLINKS_RFP_NOTICE_PROGRESS_DB')
+    if not path:return False
+    if not re.fullmatch(r'(?:R\\d{2}BK\\d{8}|\\d{11}):\\d{3}',notice_key):
+        raise ValueError('invalid_checkpoint_notice_key')
+    record=compact_coverage(result)
+    checked=str(result.get('checkedAt') or '')
+    if not checked or not record.get('status'):
+        raise ValueError('invalid_checkpoint_source_provenance')
+    record['lastAttemptAt']=checked
+    record['lastAttemptReaderFingerprint']=fingerprint
+    value=json.dumps(record,ensure_ascii=False,separators=(',',':'))
+    with sqlite3.connect(path,timeout=12) as db:
+        db.execute('PRAGMA busy_timeout=12000')
+        db.execute('''CREATE TABLE IF NOT EXISTS rfp_notice_checkpoints(
+            notice_key TEXT PRIMARY KEY,
+            checked_at TEXT NOT NULL,
+            evidence_json TEXT NOT NULL)''')
+        db.execute('''INSERT INTO rfp_notice_checkpoints(notice_key,checked_at,evidence_json)
+            VALUES(?,?,?) ON CONFLICT(notice_key) DO UPDATE SET
+            checked_at=excluded.checked_at,evidence_json=excluded.evidence_json
+            WHERE excluded.checked_at>=rfp_notice_checkpoints.checked_at''',
+            (notice_key,checked,value))
+    print('RFP_NOTICE_CHECKPOINT',notice_key,checked,record['status'],flush=True)
+    return True
+
+
 def main():
     # Measure the actual production wall-clock phases per scheduled batch.
     # Final summary is emitted AFTER snapshot save so the parent worker's
@@ -2195,7 +2228,9 @@ def main():
                 if profile:
                     for name,value in profile.items():
                         file_phase_totals[name]+=value
-                data['checkedAt']=now.isoformat()
+                # Record the real per-notice completion time, not the common
+                # batch start timestamp shared by all eight notices.
+                data['checkedAt']=dt.datetime.now(dt.timezone.utc).isoformat()
                 data['classificationVersion']=CLASSIFICATION_VERSION
                 data['hwpxReaderVersion']=HWPX_READER_VERSION
                 previous=prior_index.get(key) or old.get(key) or {}
@@ -2208,6 +2243,9 @@ def main():
                     print('RFP_PRIOR_DETAIL_PRESERVED',key,data['status'],flush=True)
                 else:
                     results[key]=data
+                # Progress becomes visible and durable immediately for THIS
+                # notice, even while other futures remain in flight.
+                publish_notice_checkpoint(key,results[key],reader_fingerprint)
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
@@ -2225,6 +2263,7 @@ def main():
                     failed_refresh[key]='metadata_fetch_failed'
                 else:
                     results[key]=failed
+                publish_notice_checkpoint(key,results[key],reader_fingerprint)
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     stage_done('process_notices')
     if not results:raise SystemExit('NO_RFP_RESULT')
