@@ -105,3 +105,21 @@ with tempfile.TemporaryDirectory() as temp:
             _,_,pending2=overlay({ids[0]:latest_archived})
             assert pending2==1
 print('WORKLINKS_RFP_EACH_NOTICE_IMMEDIATE_PROGRESS=PASS')
+
+# The UI's three progress rows are real per-notice queue counts, not animation.
+with tempfile.TemporaryDirectory() as temp:
+    path=Path(temp)/'rfp-dual-queue.sqlite3'
+    with sqlite3.connect(path) as conn:
+        conn.execute('CREATE TABLE rfp_dual_notices (notice_key TEXT PRIMARY KEY, download_status TEXT, scan_status TEXT)')
+        conn.execute('CREATE TABLE rfp_bulk_manifests (notice_key TEXT PRIMARY KEY)')
+        conn.executemany('INSERT INTO rfp_dual_notices VALUES (?,?,?)',[
+            ('notice-a','ready','done'),('notice-b','fetching','scanning'),
+            ('notice-c','pending','pending')])
+        conn.executemany('INSERT INTO rfp_bulk_manifests VALUES (?)',[
+            ('notice-a',),('notice-b',),('old-retired-notice',)])
+    lanes=p['rfp_dual_lane_progress'](str(path))
+    assert lanes['available'] is True,lanes
+    assert lanes['manifest']=={'total':3,'done':2},lanes
+    assert lanes['download']['done']==1 and lanes['download']['active']==1,lanes
+    assert lanes['scan']['done']==1 and lanes['scan']['active']==1,lanes
+print('WORKLINKS_RFP_METADATA_DOWNLOAD_SCAN_LANES=PASS')
