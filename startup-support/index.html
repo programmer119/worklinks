@@ -2107,21 +2107,21 @@ function paintRfpRescanProgress(){
  const delayed=Boolean(rfpRescanProgressError);
  const worker=info.worker?.available===true?info.worker:null;
  const workItem=[worker?.tasks?.rfpUpgrade,worker?.tasks?.rfp].filter(Boolean).sort((a,b)=>Number(b.attemptEpoch||0)-Number(a.attemptEpoch||0))[0]||null;
- const workerNames={started:'실행 중',ok:'최근 작업 완료',failed:'최근 작업 실패',parser_versions_upgraded:'재판독 대상 생성',interrupted_retry_on_restart:'중단 후 재실행',unknown:'상태 미확인'};
- const workerStatus=workItem?(workerNames[workItem.status]||'상태 확인 필요'):'상태 미확인';
+ const workerNames={started:'판독 중',ok:'최근 배치 완료',failed:'작업 오류',no_eligible_now:'현재 판독 가능한 대상 없음',parser_versions_upgraded:'판독 갱신 시작',interrupted_retry_on_restart:'중단 작업 재개',unknown:'상태 미확인'};
  const upgradeTask=worker?.tasks?.rfpUpgrade||null;
+ const workerStatus=upgradeTask?(workerNames[upgradeTask.status]||'상태 확인 필요'):'상태 미확인';
  const nextUpgrade=Number(worker?.nextUpgradeEpoch||0);
- const upgradeRunning=upgradeTask?.status==='started';
- const nextUpgradeText=upgradeRunning?'재판독 실행 중':
-   (worker?.upgradeActive&&nextUpgrade>0?
-      (nextUpgrade*1000>Date.now()?'다음 재판독 예정 '+rfpClock(nextUpgrade*1000):'다음 재판독 차례 도래'):
-      (worker?.upgradeActive?'재판독 일정 확인 중':'재판독 작업 비활성'));
+ const retryPending=worker?.upgradeActive&&nextUpgrade*1000>Date.now();
+ const continuous=worker?.upgradeActive&&worker?.continuousDrain===true;
+ const nextUpgradeText=continuous?
+   (upgradeTask?.status==='started'?'원문 판독 중':'다음 묶음 연속 처리 중'):
+   retryPending?'재시도 '+rfpClock(nextUpgrade*1000):
+   (worker?.upgradeActive?'미해결 공고 재검사 중':'재판독 작업 종료');
  const nextNode=document.getElementById('rfpRescanNext');
  if(nextNode){
-   const etaMins=Math.max(1,Math.ceil((nextUpgrade*1000-Date.now())/60000));
-   nextNode.textContent=upgradeRunning?'판독 중':
-     (worker?.upgradeActive&&nextUpgrade>0?
-       (nextUpgrade*1000>Date.now()?'다음 '+etaMins+'분':'다음 차례'):'일정 미확인');
+   nextNode.textContent=continuous?'연속 판독 중':
+     retryPending?'재시도 '+Math.max(1,Math.ceil((nextUpgrade*1000-Date.now())/60000))+'분':
+     (worker?.upgradeActive?'재검사 중':'작업 종료');
    nextNode.title=nextUpgradeText;
  }
  count.textContent='완료 '+rfpProgressNumber(complete)+' / '+rfpProgressNumber(all)+'건';
@@ -2171,7 +2171,7 @@ function paintRfpRescanProgress(){
   '<div class="rfp-rescan-server-note">마지막 조회 '+htmlEscape(rfpClock(rfpRescanLastSuccessAt))+
   ' · 서버 집계 '+htmlEscape(String(info.asOf||'시각 미확인').replace('T',' ').slice(0,19))+
   ' · 직전 조회 대비 완료 '+(rfpRescanLastDelta>0?'+':'')+rfpRescanLastDelta+'건</div>'+ 
-  (worker?'<div class="rfp-rescan-server-note">서버 재판독 '+htmlEscape(workerStatus)+(upgradeTask?.successEpoch?' · 최근 완료 '+htmlEscape(rfpClock(upgradeTask.successEpoch*1000)):'')+' · '+htmlEscape(nextUpgradeText)+(worker.upgradePeriodSeconds?' · 처리 간격 '+Math.round(worker.upgradePeriodSeconds/60)+'분':'')+'</div>':'');
+  (worker?'<div class="rfp-rescan-server-note">서버 재판독 '+htmlEscape(workerStatus)+(upgradeTask?.successEpoch?' · 최근 배치 완료 '+htmlEscape(rfpClock(upgradeTask.successEpoch*1000)):'')+' · '+htmlEscape(nextUpgradeText)+(worker.upgradeBatchesCompleted?' · 완료된 배치 '+rfpProgressNumber(worker.upgradeBatchesCompleted)+'회':'')+'</div>':'');
  if(delayed)document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
 }
 async function refreshRfpRescanProgress(force=false){
