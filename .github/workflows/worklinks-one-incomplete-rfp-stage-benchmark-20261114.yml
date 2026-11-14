@@ -1,0 +1,87 @@
+name: WorkLinks single unfinished notice read-only stage timings
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-one-incomplete-rfp-stage-benchmark-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install same HWP/PDF readers as scanner
+        run: python3 -m pip install -q pyhwp pypdf pymupdf Pillow
+      - name: Profile 1 real unfinished notice attachment with production parser (no G2B metadata APIs)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import importlib,sys,time,statistics,os,json,tempfile,hashlib,pathlib
+          sys.path.insert(0,str(pathlib.Path.cwd()/'scripts'))
+          m=importlib.import_module('refresh_worklinks_rfp')
+          NOTICE='R26BK01827991'
+          FILENAME='26-HS115 00. 제안요청서.hwp'
+          URL='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01827991&bidPbancOrd=000&fileType=&fileSeq=2&prcmBsneSeCd=03'
+          timings={}
+          stage_errors={}
+          def measure(name,call,repeats=3):
+              vals=[];last=None
+              for i in range(repeats):
+                  before=time.perf_counter()
+                  try: last=call()
+                  except Exception as e:
+                      stage_errors[name]=type(e).__name__+': '+str(e)[:160]
+                      vals.append(round((time.perf_counter()-before)*1000,3))
+                      break
+                  vals.append(round((time.perf_counter()-before)*1000,3))
+              timings[name]={'runs':len(vals),'min_ms':min(vals) if vals else None,'max_ms':max(vals) if vals else None,'samples_ms':vals}
+              return last
+          meta={'bidNo':NOTICE,'order':'000','name':FILENAME,'url':URL,'kind':'servc'}
+          measure('01_lookup_saved_notice',lambda:dict(meta),30)
+          measure('02_check_prior_scan_flags',lambda:(False,True,m.CLASSIFICATION_VERSION,m.STAFFING_ROLE_SCAN_VERSION),30)
+          measure('03_validate_attachment',lambda:m.legal_file(meta),30)
+          measure('04_duplicate_file_check',lambda:m.verified_pdf_companion(meta,[]),30)
+          measure('05_reuse_decision',lambda:({}.get((FILENAME,URL))),30)
+          raw=measure('06_download_uncached_once',lambda:m.download(URL),1)
+          if raw is None:
+              print('RFP_REAL_FILE_DOWNLOAD_FAILED',stage_errors.get('06_download_uncached_once'),flush=True)
+              print('RFP_ONE_FILE_TIMINGS',json.dumps({'notice':NOTICE,'scope':'ONE_ATTACHED_FILE_NOT_WHOLE_NOTICE','timings':timings,'errors':stage_errors,'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
+              raise SystemExit(0)
+          print('RFP_REAL_FILE',json.dumps({'notice':NOTICE,'filename':FILENAME,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()[:16],'magic':raw[:8].hex()},ensure_ascii=False),flush=True)
+          source=measure('07_extract_hwp_to_text',lambda:m.extract_with_source_status(FILENAME,raw),3)
+          if source is None:
+              print('RFP_EXTRACT_FAILED',stage_errors.get('07_extract_hwp_to_text'),flush=True)
+              print('RFP_ONE_FILE_TIMINGS',json.dumps({'notice':NOTICE,'scope':'ONE_ATTACHED_FILE_NOT_WHOLE_NOTICE','timings':timings,'errors':stage_errors,'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
+              raise SystemExit(0)
+          extracted,evidence=source
+          content=measure('08_normalize_text',lambda:m.normalize_extracted_text(extracted),10)
+          measure('09_keyword_parse',lambda:m.parse_clauses(content),3)
+          candidate=measure('09b_rule_evidence',lambda:m.extract_rule_candidates(content,FILENAME),3)
+          roles=measure('10_staff_roles',lambda:m.extract_staffing_roles(content,FILENAME,URL),3)
+          facts=measure('11_staff_facts',lambda:m.extract_staffing_facts(content,FILENAME,URL),3)
+          qualification=measure('12_qualification_scan',lambda:m.preserve_unclassified_qualification(content,FILENAME,candidate),3)
+          def make_record():
+              f={'name':FILENAME,'sourceUrl':URL,'readable':True,'sourceSha256':hashlib.sha256(raw).hexdigest(),
+                 'staffingRoleScanVersion':m.STAFFING_ROLE_SCAN_VERSION,
+                 'staffingFactScanVersion':m.STAFFING_FACT_SCAN_VERSION,
+                 'staffingRoles':roles,'staffingFacts':facts,
+                 'clauseCandidates':candidate,'sourceTextScanComplete':True,'textChars':len(content)}
+              f.update(qualification or {})
+              return {'status':'text_extracted_requires_review','files':[f],
+                      'manifestComplete':True,'checkedAt':'2026-11-14T07:00:00Z',
+                      'classificationVersion':m.CLASSIFICATION_VERSION,'hwpxReaderVersion':m.HWPX_READER_VERSION}
+          record=measure('13_build_result_record',make_record,10)
+          measure('13b_compact_index',lambda:m.compact_coverage(record),3)
+          def persist():
+              with tempfile.TemporaryDirectory() as tmp:
+                  p=pathlib.Path(tmp)/'single-notice.json'
+                  p.write_text(json.dumps({'byNotice':{NOTICE+':000':record}},ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+                  return p.stat().st_size
+          save_size=measure('14_serialize_and_save',persist,3)
+          print('RFP_ONE_FILE_TIMINGS',json.dumps({'notice':NOTICE,'scope':'ONE_ATTACHED_FILE_NOT_WHOLE_NOTICE','filename':FILENAME,
+             'downloadBytes':len(raw),'textChars':len(content),'roles':len(roles or []),'facts':len(facts or []),
+             'rules':len(candidate or []),'writtenBytes':save_size,'timings':timings,'errors':stage_errors,'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
+          PY
