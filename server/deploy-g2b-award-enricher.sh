@@ -30,7 +30,15 @@ dk run --rm \
   -v "$SOURCE:/app/g2b-award-enricher.py:ro" \
   -v "$TEST:/app/test_award_enricher.py:ro" \
   "$IMG" python /app/test_award_enricher.py
+# Source equality alone is insufficient: an existing container may still
+# carry the obsolete pause environment flag and must be recreated.
+OLD_PAUSED=0
+if dk inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$WORKER" 2>/dev/null |
+   grep -Fxq 'WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1';then
+  OLD_PAUSED=1
+fi
 if cmp -s "$SOURCE" "$TARGET" && cmp -s "$SNAPSHOT" "$TARGET_SNAPSHOT" &&
+   test "$OLD_PAUSED" = 0 &&
    test "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" = true;then
   echo 'WORKLINKS_AWARD_ENRICHER_ALREADY_DEPLOYED=PASS'
   exit 0
@@ -49,7 +57,6 @@ start_worker(){
     -e AWARD_MAX_REQUESTS_PER_CYCLE=2 \
     -e AWARD_INTERVAL_SECONDS=3600 \
     -e AWARD_REQUEST_GAP_SECONDS=15 \
-    -e WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1 \
     -v "$TARGET:/app/g2b-award-enricher.py:ro" \
     -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
     -v "$TARGET_SNAPSHOT:/app/official-awards-snapshot.json:ro" \
@@ -85,4 +92,5 @@ echo 'WORKLINKS_AWARD_ENRICHER_RUNNING=PASS'
 echo 'WORKLINKS_AWARD_CACHE_PUBLIC=PASS'
 echo 'WORKLINKS_AWARD_MAX_REQUESTS_PER_CYCLE=2'
 echo 'WORKLINKS_AWARD_INTERVAL_SECONDS=3600'
+echo 'WORKLINKS_AWARD_HISTORY_AUTO_FALLBACK=ENABLED'
 echo 'WORKLINKS_AWARD_NO_NEW_PORTS=PASS'
