@@ -51,8 +51,12 @@ class RfpDualQueue:
                 day TEXT NOT NULL, source TEXT NOT NULL, page INTEGER NOT NULL,
                 total_count INTEGER NOT NULL, raw_count INTEGER NOT NULL,
                 items_json TEXT NOT NULL, saved_at TEXT NOT NULL,
+                requested_rows INTEGER NOT NULL DEFAULT 1000,
                 PRIMARY KEY(day,source,page)
             )''')
+            cols={row[1] for row in db.execute('PRAGMA table_info(rfp_bulk_pages)')}
+            if 'requested_rows' not in cols:
+                db.execute('ALTER TABLE rfp_bulk_pages ADD COLUMN requested_rows INTEGER NOT NULL DEFAULT 1000')
             db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_unmatched(
                 notice_key TEXT PRIMARY KEY, retry_epoch REAL NOT NULL,
                 reason TEXT NOT NULL DEFAULT ''
