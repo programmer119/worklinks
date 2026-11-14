@@ -85,6 +85,34 @@ def worker(lane,status,error='',retry_epoch=0):
           retry_epoch=excluded.retry_epoch,updated_epoch=excluded.updated_epoch''',
           (lane,str(status)[:32],str(error)[:180],float(retry_epoch or 0),time.time()))
 
+
+def stalled_downloads(notice_keys,idle_seconds=180,path=None):
+    """Observe only this process's currently claimed files; no API requests.
+
+    The separate download parent can relaunch a non-responsive subprocess
+    after a verified, long *no-byte-progress* period. Duration alone is not
+    treated as failure while bytes keep arriving.
+    """
+    keys=list(dict.fromkeys(str(key) for key in notice_keys if key))
+    if not keys:return []
+    target=str(path or database_path())
+    if not os.path.isfile(target):return []
+    try:
+        with sqlite3.connect('file:'+target+'?mode=ro',uri=True,timeout=2) as db:
+            cols={row[1] for row in db.execute('PRAGMA table_info(rfp_live_events)')}
+            if 'byte_progress_epoch' not in cols:return []
+            values=','.join('?' for _ in keys)
+            rows=db.execute('''SELECT notice_key,file_key,file_name,
+                    byte_progress_epoch,updated_epoch FROM rfp_live_events
+                WHERE lane='download' AND file_key<>'' AND status='working'
+                  AND phase='전송 중' AND notice_key IN ('''+values+''')''',keys).fetchall()
+        now=time.time()
+        return [{'noticeKey':key,'fileKey':fk,'fileName':name,
+                 'idleSeconds':int(now-(advanced or updated))}
+                for key,fk,name,advanced,updated in rows
+                if now-(advanced or updated)>idle_seconds]
+    except (sqlite3.Error,OSError):return []
+
 def snapshot(path=None,limit=12):
     target=path or database_path()
     if not os.path.isfile(target):return {'available':False}
