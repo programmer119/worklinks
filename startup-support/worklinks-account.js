@@ -501,6 +501,7 @@ window.addEventListener('focus',()=>{
       return;
     }
     state.token=session.token;
+    clearAuthExpiry();
     publishPartnerAccess(true);
     if(!state.serverReady)reconcileServer().catch(()=>{});
     else if(!state.busy&&Object.keys(decode(accountKeys(identity).pending)).length)
