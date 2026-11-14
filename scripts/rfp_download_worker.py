@@ -241,6 +241,18 @@ def run_manifest_forever(queue,planner):
         time.sleep(1)
 
 
+def refill_download_slots(queue,pool,inflight,halt):
+    """Fill each free slot independently; callers never wait for whole batches."""
+    added=0
+    while len(inflight)<WORKERS and not halt.is_set():
+        claim=queue.claim_download(ready_manifest=BULK_ENABLED)
+        if claim is None:break
+        future=pool.submit(download_one,queue,claim,halt)
+        inflight[future]=claim
+        added+=1
+    return added
+
+
 def run_download_forever(queue,halt):
     """Eight continuous download slots; refill on EACH completion."""
     halted_until=0.0
@@ -259,12 +271,7 @@ def run_download_forever(queue,halt):
                           json.dumps({'notices':revived,
                                       'basis':'verified_bulk_manifest'}),flush=True)
             if time.time()>=halted_until and not halt.is_set():
-                while len(inflight)<WORKERS:
-                    claim=queue.claim_download(ready_manifest=BULK_ENABLED)
-                    if claim is None:break
-                    future=pool.submit(download_one,queue,claim,halt)
-                    inflight[future]=claim
-                    started+=1
+                started+=refill_download_slots(queue,pool,inflight,halt)
             if inflight:
                 finished,_=wait(tuple(inflight),timeout=POLL_SECONDS,
                                 return_when=FIRST_COMPLETED)
