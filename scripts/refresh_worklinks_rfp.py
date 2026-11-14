@@ -439,7 +439,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                               last,date,key)
                         manifest_probe_out.append((rank,no,order))
                     continue
-                if (cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry
+                if (key not in priority and cached.get('classificationVersion')==CLASSIFICATION_VERSION and not retry
                         and not cached.get('manifestChangePending') and
                         not staffing_scan_pending(cached)):
                     try:
@@ -459,7 +459,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                 temporal=0 if date and date>=today else 1 if date is None else 2
                 novel=0 if not cached or cached.get('manifestChangePending') else 1
                 staff_missing=staffing_scan_pending(cached)
-                rank=(-3 if key in priority and staff_missing and temporal==0 else
+                rank=(-3 if key in priority and temporal==0 else
                       -2 if key in urgent and key in targets and temporal==0 else
                       -1 if staff_missing and key in targets and temporal==0 else
                       -1 if key in backfill and temporal==0 else
@@ -1965,6 +1965,13 @@ def main():
               if re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',k)}
     selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
                       priority=priority)
+    if os.environ.get('WORKLINKS_RFP_REQUIRE_EXACT_PRIORITY')=='1':
+        selected_keys={no+':'+ordn for no,ordn,_ in selected}
+        if not priority or selected_keys!=priority or len(selected)!=len(priority):
+            print('RFP_EXACT_PRIORITY_SELECTION_FAILED',
+                  'expected',sorted(priority),'selected',sorted(selected_keys),flush=True)
+            raise SystemExit('RFP_EXACT_PRIORITY_SELECTION_FAILED')
+        print('RFP_EXACT_PRIORITY_SELECTED',sorted(selected_keys),flush=True)
     results=dict(old)
     # Parse already-stored binaries first; an older record is never re-downloaded
     # just to populate the staffing column.
