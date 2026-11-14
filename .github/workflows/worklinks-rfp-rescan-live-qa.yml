@@ -1,4 +1,4 @@
-name: WorkLinks RFP rescan progress live read-only verification
+name: WorkLinks RFP production browser polling diagnosis
 on:
   push:
     branches: [main]
@@ -9,87 +9,48 @@ permissions:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 6
     steps:
-      - name: Verify deployed front-end progress button against real server values
-        shell: bash
+      - name: Install browser
         run: |
           python3 -m pip install -q playwright
           python3 -m playwright install chromium
-          python3 - <<'PY'
-          import json,urllib.request
-          from playwright.sync_api import sync_playwright
-          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/rfp-rescan-progress'
-          with urllib.request.urlopen(urllib.request.Request(api,headers={'Cache-Control':'no-cache'}),timeout=25) as res:
-              report=json.load(res)
-          assert report.get('ok') is True and report.get('rescanPercent') is not None,report
-          expected=report['rescanPercent']
-          with sync_playwright() as p:
-              browser=p.chromium.launch(headless=True)
-              page=browser.new_page(viewport={'width':1310,'height':850})
-              errors=[]
-              page.on('pageerror',lambda error:errors.append(str(error)[:250]))
-              page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',
-                        wait_until='domcontentloaded',timeout=60000)
-              page.wait_for_function("""v => {
-                  const t=document.getElementById('rfpRescanLabel')?.textContent||'';
-                  return t.includes('재판독 필요')&&t.includes(v.toFixed(1)+'%');
-              }""",arg=expected,timeout=45000)
-              button=page.locator('#rfpRescanLaunch')
-              account=page.locator('#worklinks-auth-header')
-              assert button.bounding_box()['x']<account.bounding_box()['x']
-              button.click()
-              page.locator('#rfpRescanModal.open').wait_for(timeout=10000)
-              panel=page.locator('#rfpRescanContent').inner_text()
-              for term in ['관리 대상','재판독 필요','구버전','최초 미판독',
-                           '판독 실패' if '판독 실패' in panel else '실패',
-                           'RFP 조건','역할·인원','인력 요구사항','HWPX 해석',
-                           format(report['counts']['total'],','),
-                           format(report['counts']['rescanRequired'],','),
-                           format(expected,'.1f')+'%']:
-                  assert term in panel,(term,panel[:1100])
-              assert not errors,errors[:5]
-              print('RFP_LIVE_HEADER_MODAL_VERIFIED',json.dumps({
-                  'rescanPercent':expected,'total':report['counts']['total'],
-                  'rescanRequired':report['counts']['rescanRequired'],
-                  'pageErrors':len(errors)},ensure_ascii=False),flush=True)
-              browser.close()
-          PY
-      - name: Confirm actual server123 upgrade progress endpoint and breakdown
+      - name: Diagnose actual browser requests over 35 seconds
         shell: bash
         run: |
           python3 - <<'PY'
-          import urllib.request,json,datetime
-          url='https://api-suaveforge.suaveforge.com:18458/api/g2b/rfp-rescan-progress'
-          req=urllib.request.Request(url,headers={'Cache-Control':'no-cache'})
+          import json,time,urllib.request
+          from playwright.sync_api import sync_playwright
+          page_url='https://worklinks.suaveforge.com/startup-support/?view=jobs'
+          api_url='https://api-suaveforge.suaveforge.com:18458/api/g2b/rfp-rescan-progress'
           try:
-              with urllib.request.urlopen(req,timeout=35) as res:
-                  data=json.load(res)
-          except Exception as e:
-              print('RFP_LIVE_PROGRESS_NOT_READY',type(e).__name__,str(e)[:170],flush=True)
-              raise
-          assert data.get('ok') is True and data.get('schemaVersion')==1,data
-          x=data['counts']
-          assert x['total']==x['completed']+x['remaining'],x
-          assert x['rescanRequired']==x['legacy'],x
-          assert x['total']>=x['rescanRequired'],x
-          assert data['rescanPercent'] is None or 0<=data['rescanPercent']<=100
-          assert data.get('noGovernmentApiCalls') is True,data
-          print('RFP_LIVE_PROGRESS_VERIFIED',json.dumps({
-              'asOf':data.get('asOf'),'latest':data.get('latest'),
-              'rescanPercent':data.get('rescanPercent'),'counts':data.get('counts'),
-              'stages':data.get('stages')
-          },ensure_ascii=False),flush=True)
-          with urllib.request.urlopen(
-                urllib.request.Request(
-                  'https://api-suaveforge.suaveforge.com:18458/api/g2b/pipeline-status',
-                  headers={'Cache-Control':'no-cache'}),timeout=25) as response:
-              current=json.load(response)
-          state=current.get('scheduler') or {}
-          print('RFP_LIVE_SCANNER_QUEUE_STATUS',json.dumps({
-             'upgradedVersions':state.get('rfpDeployedReaderVersions'),
-             'upgradeActive':state.get('rfpUpgradeActive'),
-             'upgradeJob':state.get('rfpUpgrade'),
-             'regularRfp':state.get('rfp')
-          },ensure_ascii=False),flush=True)
+            req=urllib.request.Request(api_url,headers={'Origin':'https://worklinks.suaveforge.com','Cache-Control':'no-cache'})
+            t=time.monotonic()
+            with urllib.request.urlopen(req,timeout=30) as response:
+              result=json.load(response)
+              print('PYTHON_API',json.dumps({'elapsed':round(time.monotonic()-t,2),'status':response.status,'cors':response.headers.get('Access-Control-Allow-Origin'),'asOf':result.get('asOf'),'done':result.get('counts',{}).get('completed')},ensure_ascii=False),flush=True)
+          except Exception as e:print('PYTHON_API_ERROR',repr(e),flush=True)
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True)
+            page=browser.new_page(viewport={'width':1310,'height':820})
+            def rfp(r): return '/rfp-rescan-progress' in r.url
+            page.on('console',lambda msg:print('BROWSER_CONSOLE',msg.type,msg.text[:350],flush=True) if msg.type=='error' else None)
+            page.on('pageerror',lambda err:print('BROWSER_PAGEERROR',str(err)[:500],flush=True))
+            page.on('request',lambda req:print('REQ',req.url,flush=True) if rfp(req) else None)
+            page.on('requestfailed',lambda req:print('FAILED_REQ',req.url,req.failure,flush=True) if rfp(req) else None)
+            page.on('response',lambda resp:print('RESPONSE',resp.status,resp.url,'cors',resp.headers.get('access-control-allow-origin',''),flush=True) if rfp(resp) else None)
+            page.goto(page_url,wait_until='domcontentloaded',timeout=60000)
+            for i in range(8):
+              page.wait_for_timeout(5000)
+              data=page.evaluate("""() => ({
+                text: document.getElementById('rfpRescanLabel')?.textContent,
+                count: document.getElementById('rfpRescanCount')?.textContent,
+                seconds: document.getElementById('rfpRescanSeconds')?.textContent,
+                error: typeof rfpRescanProgressError==='undefined'?'unset':rfpRescanProgressError,
+                successAt:typeof rfpRescanLastSuccessAt==='undefined'?null:rfpRescanLastSuccessAt,
+                fetchedAt:typeof rfpRescanLastRead==='undefined'?null:rfpRescanLastRead,
+                serverAt:typeof rfpRescanProgress==='undefined'?null:rfpRescanProgress?.asOf
+              })""")
+              print('BROWSER_STATE',i,json.dumps(data,ensure_ascii=False),flush=True)
+            browser.close()
           PY
