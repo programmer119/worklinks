@@ -122,6 +122,22 @@ class RfpDualQueue:
             db.execute("UPDATE rfp_dual_notices SET download_status='pending' WHERE download_status='fetching'")
             # Scanner claims are recovered on their own timeout, not on downloader restart.
 
+    def release_old_metadata_quota_retries(self):
+        """A verified bulk manifest supersedes stale per-notice metadata quota failures.
+
+        Only release errors from the old official-metadata reader. Binary HTTPS
+        failures and their existing backoff remain untouched.
+        """
+        with self.connect() as db:
+            return db.execute('''UPDATE rfp_dual_notices
+                SET download_retry_epoch=0,
+                    last_error='metadata_quota_recovered_by_verified_bulk_manifest'
+                WHERE download_status='retry'
+                  AND last_error LIKE '%upstream_temporarily_rate_limited_daily_quota%'
+                  AND EXISTS (SELECT 1 FROM rfp_bulk_manifests m
+                              WHERE m.notice_key=rfp_dual_notices.notice_key)
+            ''').rowcount
+
     def claim_download(self,ready_manifest=False):
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')

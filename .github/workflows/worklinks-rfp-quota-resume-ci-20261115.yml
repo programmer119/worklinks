@@ -1,0 +1,29 @@
+name: WorkLinks resume RFP attachment download when quota gate clears
+on:
+  push:
+    branches: [fix/rfp-resume-after-quota-cooldown-20261115]
+    paths:
+      - 'scripts/rfp_download_worker.py'
+      - 'scripts/rfp_dual_queue.py'
+      - 'scripts/rfp_bulk_manifests.py'
+      - 'tests/test_rfp_quota_resume.py'
+      - '.github/workflows/worklinks-rfp-quota-resume-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate 6-hour retry recovery, quota wait, 8-slot pacing and existing queue
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile scripts/rfp_download_worker.py scripts/rfp_dual_queue.py scripts/rfp_bulk_manifests.py
+          python3 tests/test_rfp_quota_resume.py
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_rfp_bulk_manifests.py
+          python3 tests/test_rfp_download_worker.py
+          echo RFP_AUTOMATIC_QUOTA_RESUME_CI=PASS

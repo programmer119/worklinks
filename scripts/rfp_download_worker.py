@@ -45,7 +45,7 @@ class Pace:
         if start>now:time.sleep(start-now)
 
 META_PACE=Pace(0.8)
-FILE_PACE=Pace(0.25)
+FILE_PACE=Pace(0.125)  # 8 file starts/sec for 8 independent download workers
 
 def configure_reader():
     # Reuse the current approved official-source client and file hash ledger.
@@ -89,6 +89,24 @@ def detects_upstream_limit(text):
             'limited_number_of_service_requests_exceeds_error' in raw or
             'upstream_result_23' in raw or 'upstream_http_429' in raw or
             'temporarily_rate_limited' in raw)
+
+def source_retry_seconds(error):
+    """Read local A02 gateway cooldown (zero official HTTP calls).
+
+    The proxy already tracks exact remaining time of its circuit breaker.
+    A past failure cannot justify an unrelated fixed one-hour sleep.
+    """
+    try:
+        status=reader.fetch_json(reader.BASE+'upstream-rate-status')
+        bids=(status.get('services') or {}).get('bids') or {}
+        remaining=int(bids.get('cooldownRemainingSeconds') or 0)
+        if remaining>0:
+            return remaining+2
+    except Exception:
+        pass
+    # A non-active local cooldown should be checked again soon; the durable
+    # quota budget will still prevent excessive official calls.
+    return 30 if detects_upstream_limit(str(error)) else 30
 
 def download_one(queue,claim,halt):
     key,closes=claim
@@ -144,7 +162,11 @@ def download_one(queue,claim,halt):
         queue.downloaded(key,meta,len(urls),len(urls))
         return True
     except ProviderBackoff as exc:
-        queue.download_failed(key,str(exc),retry_seconds=21600)
+        # Old metadata quota errors do not block a downloaded, verified
+        # bulk-manifest notice for six hours. Binary 429 still backs off.
+        is_manifest_metadata=BULK_ENABLED and detects_upstream_limit(str(exc))
+        queue.download_failed(key,str(exc),
+                              retry_seconds=(60 if is_manifest_metadata else 21600))
         return False
     except Exception as exc:
         delay=21600 if detects_upstream_limit(str(exc)) else 300
@@ -188,22 +210,33 @@ def run_forever():
                 if result.get('new')==0 and result.get('calls')==0:
                     planner_pause_until=time.time()+60
             except BulkManifestQuota as exc:
-                planner_pause_until=time.time()+3600
+                # The next request becomes possible at the rolling-window
+                # boundary, NOT an arbitrary hour from this exception.
+                seconds=int(exc.retry_after_seconds)
+                planner_pause_until=time.time()+seconds
                 print('RFP_BULK_LOCAL_CALL_BUDGET_PAUSE',
-                      str(exc),flush=True)
+                      str(exc),'retrySeconds',seconds,flush=True)
             except Exception as exc:
                 # Never replace an incomplete multi-page response with an
                 # invented empty source, and never flood the API with retries.
                 problem=str(exc)
-                planner_pause_until=time.time()+(3600 if
-                    detects_upstream_limit(problem) or
-                    getattr(exc,'code',0) in (429,502,503)
-                    else 600)
+                # The proxy's in-process circuit breaker has authoritative
+                # remaining time. Resume immediately after it clears; otherwise
+                # retry a bounded read of the same cached page after 30 sec.
+                seconds=source_retry_seconds(problem)
+                planner_pause_until=time.time()+seconds
                 print('RFP_BULK_OFFICIAL_SOURCE_UNAVAILABLE',
                     type(exc).__name__,problem[:140],
-                    'retryAfterEpoch',round(planner_pause_until),flush=True)
+                    'retryAfterEpoch',round(planner_pause_until),
+                    'retrySeconds',seconds,flush=True)
+        if BULK_ENABLED:
+            revived=queue.release_old_metadata_quota_retries()
+            if revived:
+                print('RFP_OBSOLETE_QUOTA_RETRIES_RELEASED',
+                      json.dumps({'notices':revived,'basis':'verified_bulk_manifest'}),
+                      flush=True)
         if time.time()<halted_until:
-            time.sleep(min(30,halted_until-time.time()))
+            time.sleep(min(10,halted_until-time.time()))
             continue
         halt=threading.Event()
         claimed=[]

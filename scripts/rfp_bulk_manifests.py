@@ -25,7 +25,9 @@ class BulkManifestError(RuntimeError):
     pass
 
 class BulkManifestQuota(BulkManifestError):
-    pass
+    def __init__(self,message,retry_after_seconds=60):
+        super().__init__(message)
+        self.retry_after_seconds=max(1,int(retry_after_seconds))
 
 class BulkManifestPlanner:
     def __init__(self,queue,bids_db,fetch,pacer,allow_exceptions=True):
@@ -106,7 +108,23 @@ class BulkManifestPlanner:
             daily=db.execute("SELECT COUNT(*) FROM rfp_bulk_request_budget WHERE started_at>=?",
                              (midnight,)).fetchone()[0]
             if hour>=HOURLY_LIMIT or daily>=DAILY_LIMIT:
-                raise BulkManifestQuota('rfp_bulk_budget_hourly_or_daily')
+                # Resume exactly as the saved rolling-hour / UTC-day budgets
+                # release requests, rather than blindly sleeping another hour.
+                retry_at=stamp
+                if hour>=HOURLY_LIMIT:
+                    oldest=db.execute('''SELECT MIN(started_at)
+                        FROM rfp_bulk_request_budget WHERE started_at>=?''',
+                        (hourly,)).fetchone()[0]
+                    if oldest:
+                        retry_at=max(retry_at,
+                            dt.datetime.fromisoformat(oldest)+dt.timedelta(hours=1,seconds=2))
+                if daily>=DAILY_LIMIT:
+                    retry_at=max(retry_at,
+                        stamp.replace(hour=0,minute=0,second=0,microsecond=0)+
+                        dt.timedelta(days=1,seconds=2))
+                wait=math.ceil((retry_at-stamp).total_seconds())
+                raise BulkManifestQuota('rfp_bulk_budget_hourly_or_daily',
+                                         retry_after_seconds=wait)
             db.execute('''INSERT INTO rfp_bulk_request_budget(started_at,source,day,page)
                 VALUES(?,?,?,?)''',(stamp.isoformat(),source,day,page))
             # 3-day bounded history; avoid a forever-growing request ledger.
