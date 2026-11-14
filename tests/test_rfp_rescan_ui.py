@@ -73,11 +73,11 @@ with sync_playwright() as p:
     # Dispatch this focused UI event without bypassing production auth routes.
     page.evaluate("() => document.getElementById('rfpRescanLaunch').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
     modal=page.locator('#rfpRescanModal')
-    assert modal.is_visible()
+    assert modal.get_attribute('aria-hidden')=='false' and page.evaluate("() => document.getElementById('rfpRescanModal').classList.contains('open')")
     page.wait_for_function(
       "() => document.querySelector('#rfpRescanContent')?.textContent.includes('서버 재판독')",
       timeout=12000)
-    body=page.locator('#rfpRescanContent').inner_text()
+    body=page.locator('#rfpRescanContent').text_content()
     for term in ('관리 대상','6','최신 판독 완료','1','재판독 필요','구버전',
                  '최초 미판독','역할·인원','16.67%','서버 재판독','판독 중','원문 판독 중'):
         assert term in body,(term,body)
@@ -92,14 +92,14 @@ with sync_playwright() as p:
     page.wait_for_function(
       "() => document.getElementById('rfpRescanCount')?.textContent.includes('완료 2 / 6건')",
       timeout=12000)
-    assert '33.33%' in page.locator('#rfpRescanLabel').inner_text()
-    assert '완료 +1건' in page.locator('#rfpRescanContent').inner_text()
+    assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
+    assert '완료 +1건' in page.locator('#rfpRescanContent').text_content()
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
     page.evaluate("() => document.getElementById('rfpRescanClose').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
     assert modal.get_attribute('aria-hidden')=='true'
     page.evaluate("() => {rfpRescanProgress=null;rfpRescanProgressError='조회 오류';paintRfpRescanProgress();}")
-    assert page.locator('#rfpRescanCount').inner_text()=='판독 현황 확인 불가'
+    assert page.locator('#rfpRescanCount').text_content()=='판독 현황 확인 불가'
     assert not errors,errors
     browser.close()
 print('WORKLINKS_RFP_RESCAN_LIVE_UI_REGRESSION=PASS')
