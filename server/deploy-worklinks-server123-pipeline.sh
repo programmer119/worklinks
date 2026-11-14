@@ -146,6 +146,7 @@ for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_
 done
 PREVIOUS="$(dk inspect -f '{{.Config.Image}}' "$WORKER" 2>/dev/null || true)"
 start_worker(){
+  local dual_mode="${2:-1}"
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
   dk run -d --name "$WORKER" --restart unless-stopped --network host \
       -e G2B_PIPELINE_DATA=/app/data \
@@ -153,7 +154,7 @@ start_worker(){
       -e WORKLINKS_G2B_API=http://127.0.0.1:18192/api/g2b \
       -e G2B_RFP_BATCH=8 \
       -e WORKLINKS_RFP_DOWNLOAD_CONCURRENCY=8 \
-      -e WORKLINKS_RFP_DUAL_QUEUE=1 \
+      -e WORKLINKS_RFP_DUAL_QUEUE="$dual_mode" \
       -v "$BASE/data:/app/data" \
       -v "$SCRIPTS:/app/scripts:ro" \
       -v "$TARGET:/app/worklinks-server123-pipeline.py:ro" \
@@ -163,11 +164,11 @@ rollback(){
   echo 'PIPELINE_DEPLOY_ROLLBACK_ATTEMPT'
   dk rm -f "$WORKER" >/dev/null 2>&1 || true
   for f in "$TARGET" "$SCRIPTS/refresh_worklinks_actionable.py" "$SCRIPTS/refresh_worklinks_rfp.py" "$SCRIPTS/staffing_facts.py" "$SCRIPTS/analyze_worklinks_rfp_ai.py" "$SCRIPTS/refresh_worklinks_open_award_fallback.py" \
-    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py";do
+    "$SCRIPTS/batch_backfill_changcom_top500_rfp.py" "$SCRIPTS/repair_changcom_top500_rfp.py" "$SCRIPTS/repair_open_rfp_cached_attachments.py" "$SCRIPTS/rfp_call_ledger.py" "$SCRIPTS/rfp_dual_queue.py" "$SCRIPTS/rfp_download_worker.py";do
     saved="$BASE/pipeline/backup/$(basename "$f")"
     if test -s "$saved";then cp -p "$saved" "$f";else rm -f "$f";fi
   done
-  if test -n "$PREVIOUS" && test -s "$TARGET";then start_worker "$PREVIOUS" || true;fi
+  if test -n "$PREVIOUS" && test -s "$TARGET";then start_worker "$PREVIOUS" 0 || true;fi
 }
 trap rollback ERR
 install -m 0644 "$SOURCE" "$TARGET"
