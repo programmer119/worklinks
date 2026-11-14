@@ -1490,9 +1490,48 @@ def rfp_rescan_progress():
                             workers[lane]={'status':status,'error':error,
                                 'retryEpoch':retry,'updatedEpoch':updated,
                                 'stale':time.time()-updated>90}
+                    download_group={'available':False}
+                    event_columns={c[1] for c in live.execute('PRAGMA table_info(rfp_live_events)')}
+                    if {'started_epoch','byte_progress_epoch'}.issubset(event_columns) and 'rfp_dual_notices' in tables:
+                        now_epoch=time.time()
+                        files=live.execute('''SELECT e.notice_key,e.file_name,e.bytes_done,
+                            e.bytes_total,e.started_epoch,e.byte_progress_epoch,e.updated_epoch,
+                            e.error_text FROM rfp_live_events e
+                            JOIN rfp_dual_notices n ON n.notice_key=e.notice_key
+                            WHERE e.lane='download' AND e.file_key<>''
+                              AND e.status='working' AND n.download_status='fetching'
+                              AND e.updated_epoch>?
+                            ORDER BY e.started_epoch ASC,e.notice_key ASC
+                            LIMIT 24''',(now_epoch-210,)).fetchall()
+                        active_files=[{'noticeKey':key,'name':name,'bytesDone':done,
+                                       'bytesTotal':total,'startedEpoch':start or updated,
+                                       'lastBytesEpoch':advanced or start or updated,
+                                       'updatedEpoch':updated,'error':err}
+                                      for key,name,done,total,start,advanced,updated,err in files]
+                        stalled=[f for f in active_files if
+                                 now_epoch-f['lastBytesEpoch']>=90]
+                        recent_errors=live.execute('''SELECT e.file_name,e.error_text,
+                            e.retry_epoch,e.updated_epoch
+                            FROM rfp_live_events e
+                            LEFT JOIN rfp_dual_notices n ON n.notice_key=e.notice_key
+                            WHERE e.lane='download' AND e.status='retry'
+                              AND e.error_text<>''
+                              AND e.updated_epoch>?
+                              AND (n.download_status IN ('retry','fetching')
+                                   OR n.notice_key IS NULL)
+                            ORDER BY e.updated_epoch DESC LIMIT 3''',(now_epoch-1800,)).fetchall()
+                        download_group={'available':True,'activeCount':len(active_files),
+                            'startedEpoch':min((f['startedEpoch'] for f in active_files),default=0),
+                            'files':active_files[:8],
+                            'stalledCount':len(stalled),
+                            'oldestStallSeconds':round(max((now_epoch-f['lastBytesEpoch']
+                                 for f in stalled),default=0)),
+                            'recentErrors':[{'name':name,'reason':err,
+                                'retryEpoch':retry,'updatedEpoch':updated}
+                                for name,err,retry,updated in recent_errors]}
                     report['activity']={'available':True,
                         'items':[dict(zip(keys,row)) for row in rows],
-                        'workers':workers}
+                        'workers':workers,'downloadGroup':download_group}
                 else:
                     report['activity']={'available':False}
         else:report['activity']={'available':False}
