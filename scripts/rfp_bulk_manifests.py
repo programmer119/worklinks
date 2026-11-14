@@ -16,7 +16,7 @@ import urllib.parse
 
 SOURCES=('ordinary','eorder','detail')
 ROWS=1000
-MAX_PAGES_PER_DAY_SOURCE=60
+MAX_PAGES_PER_DAY_SOURCE=300
 MAX_FETCH_PER_PASS=18
 DAILY_LIMIT=180
 HOURLY_LIMIT=36
@@ -263,14 +263,17 @@ class BulkManifestPlanner:
         # A sparse day's date query may be dozens of pages. Probe at most one
         # first page, then compare three complete batches to 3 per-bid calls.
         ordinary=self._pages_present(day,'ordinary')
-        if len(keys)<=8 and not ordinary:
+        if not ordinary:
             _,made=self._source_for_day(day,'ordinary',keys,fetch_limit=1)
             return {'new':0,'day':day,'calls':made,'probed':True}
-        if len(keys)<=8 and ordinary:
+        if ordinary:
             total=ordinary[0][1]
             raw=ordinary[0][2]
             effective=(raw if total>raw else max(1,total))
             estimated=max(1,math.ceil(total/effective))*len(SOURCES)
+            # Estimate the COMPLETE three-source batch cost against exact
+            # calls even for a large backlog; process sparse fallbacks eight
+            # at a time, never one giant burst.
             if estimated>len(keys)*len(SOURCES):
                 return self._single_for_day(day,keys)
         sources={}
