@@ -1,0 +1,24 @@
+name: WorkLinks staged activity fixture and RFP download regression
+on:
+  push:
+    branches: [fix/queue-activity-stage-mock-20261115]
+    paths:
+      - 'tests/test_worklinks_server123_pipeline.py'
+      - '.github/workflows/worklinks-pipeline-stage-fixture-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage all pipeline dependencies and verify RFP byte/resume tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 tests/test_worklinks_server123_pipeline.py
+          python3 tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_quota_resume.py
+          echo RFP_CURRENT_PIPELINE_NO_NETWORK_FIXTURES=PASS
