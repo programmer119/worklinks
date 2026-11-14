@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """No-network regression for deadline retention, raw-byte reuse and disk safety."""
 import datetime as dt
+import fcntl
 import importlib.util
 import os
 from pathlib import Path
@@ -98,6 +99,14 @@ with tempfile.TemporaryDirectory() as tmp:
         count=db.execute('SELECT COUNT(*) FROM call_events WHERE request_key=? AND kind=?',
                          (realkey,'attachment_http')).fetchone()[0]
         assert count==0,'raw source must be reused with 0 network calls'
+
+    # Concurrent maintenance must skip immediately rather than taking an
+    # archive-wide SQLite write lock while the scanner is publishing.
+    with (Path(str(ledger.path)+'.prune.lock')).open('a') as guard:
+        fcntl.flock(guard.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
+        skipped=ledger.prune_expired(today=TODAY)
+        assert skipped['status']=='already_running',skipped
+        fcntl.flock(guard.fileno(),fcntl.LOCK_UN)
 
     # Hard disk reserve prevents growth; scanner may parse the downloaded bytes,
     # but the archive must not silently exceed a dangerously full filesystem.
