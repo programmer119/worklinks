@@ -36,4 +36,16 @@ jobs:
               'rescanPercent':data.get('rescanPercent'),'counts':data.get('counts'),
               'stages':data.get('stages')
           },ensure_ascii=False),flush=True)
+          with urllib.request.urlopen(
+                urllib.request.Request(
+                  'https://api-suaveforge.suaveforge.com:18458/api/g2b/pipeline-status',
+                  headers={'Cache-Control':'no-cache'}),timeout=25) as response:
+              current=json.load(response)
+          state=current.get('scheduler') or {}
+          print('RFP_LIVE_SCANNER_QUEUE_STATUS',json.dumps({
+             'upgradedVersions':state.get('rfpDeployedReaderVersions'),
+             'upgradeActive':state.get('rfpUpgradeActive'),
+             'upgradeJob':state.get('rfpUpgrade'),
+             'regularRfp':state.get('rfp')
+          },ensure_ascii=False),flush=True)
           PY
