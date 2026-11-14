@@ -72,7 +72,10 @@ def discover_all(queue):
     # notices. NO 8-bid limit here: the full backlog is made durable first.
     selected=reader.discover(100000,prior=previous,targets=set(),
                              manifest_probe_out=[],priority=set())
-    selected=[(no,order,closes) for no,order,closes in selected if closes]
+    # Direct/letter tenders often have no electronic close in A02/B1.
+    # Preserve unknown dates in the dual queue; the existing bulk manifest
+    # gate never falls back to one government API request per notice.
+    selected=[(no,order,closes) for no,order,closes in selected]
     added=queue.enqueue(selected,reader_fingerprint())
     retired=queue.retire_expired()
     print('RFP_DUAL_QUEUE_DISCOVERY',json.dumps({
