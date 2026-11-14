@@ -242,3 +242,65 @@ with sync_playwright() as p:
         print("CHANGCOM_COMPACT_PRICE_LAYOUT_PASS",width,rect,flush=True)
         page.close()
     browser.close()
+
+
+# Regression: general job pay must not appear in a tiny line below an
+# empty reserved business-area slot. Preserve the estimated-pay caveat.
+general_html = (
+ '<!doctype html><html lang="ko"><meta charset="utf-8">'
+ '<meta name="viewport" content="width=device-width,initial-scale=1">'
+ '<style>' + '\n'.join(css) + '</style><body>'
+ '<div id="jobsView" class="workspace-view on" data-job-mode="general" style="display:block">'
+ '<div id="jobCards" class="cards" style="width:640px;max-width:calc(100vw - 24px)">'
+ '<article class="card job-mini"><div class="job-day"><strong>D-DAY</strong><span class="job-date">11.14 23:59</span></div>'
+ '<div class="job-core"><div class="job-headline">'
+ '<h3><button class="job-card-title">급식 통합결제 POS·키오스크 개발 리더</button></h3>'
+ '<div class="job-headline-side"><div class="job-headline-badge"></div>'
+ '<span class="job-amount" title="예상 월 6,700,000원/계약조건 확인">'
+ '<span class="job-amount-main"><span class="job-amount-prefix">예상 월</span>'
+ '<strong class="job-amount-value">6,700,000원</strong></span>'
+ '<span class="job-amount-note">계약조건 확인</span></span></div></div>'
+ '<div class="job-eligibility-row"><div class="job-eligibility-content"></div></div>'
+ '<div class="job-highlights"><div class="job-highlight-tags"></div>'
+ '<a class="job-source-link">공고 원문 ↗</a></div></div></article>'
+ '</div></div></body></html>'
+)
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
+    for width in (700, 390):
+        page = browser.new_page(viewport={"width":width,"height":600})
+        page.set_content(general_html, wait_until="load")
+        result = page.evaluate("""() => {
+            const r = sel => document.querySelector(sel).getBoundingClientRect();
+            const title = r('.job-card-title');
+            const amount = r('.job-amount');
+            const value = r('.job-amount-value');
+            const head = r('.job-headline');
+            const card = r('#jobCards .job-mini');
+            return {
+                titleTop:title.top,titleBottom:title.bottom,titleRight:title.right,
+                amountTop:amount.top,amountBottom:amount.bottom,
+                amountRight:amount.right,headRight:head.right,
+                priceSize:parseFloat(getComputedStyle(document.querySelector('.job-amount-value')).fontSize),
+                badgeDisplay:getComputedStyle(document.querySelector('.job-headline-badge')).display,
+                emptyEligibilityDisplay:getComputedStyle(document.querySelector('.job-eligibility-row')).display,
+                priceVisible:document.querySelector('.job-amount-note').textContent.trim()==='계약조건 확인',
+                cardHeight:card.height,overlap:amount.left<title.right-1 && amount.top<title.bottom-1,
+                overflow:document.documentElement.scrollWidth>innerWidth+1
+            };
+        }""")
+        assert not result["overflow"],(width,result)
+        assert result["badgeDisplay"]=="none",(width,result)
+        assert result["emptyEligibilityDisplay"]=="none",(width,result)
+        assert result["priceVisible"],(width,result)
+        assert result["priceSize"]>=20,(width,result)
+        assert abs(result["amountRight"]-result["headRight"])<=2,(width,result)
+        if width==700:
+            assert not result["overlap"],(width,result)
+            assert abs(result["amountTop"]-result["titleTop"])<=20,(width,result)
+            assert result["cardHeight"]<=170,(width,result)
+        else:
+            assert result["amountTop"]>=result["titleBottom"]-1,(width,result)
+        print("GENERAL_JOB_PRICE_LAYOUT_PASS",width,result,flush=True)
+        page.close()
+    browser.close()
