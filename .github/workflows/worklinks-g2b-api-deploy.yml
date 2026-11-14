@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
       - 'server/deploy-g2b-api-only.sh'
       - 'tests/test_bid_evidence.py'
       - 'tests/test_worklinks_saved_search.py'
