@@ -80,3 +80,14 @@ def snapshot(path=None,limit=12):
                                      'stale':now-updated>90} for lane,status,err,retry,updated in workers}}
     except (sqlite3.Error,OSError):
         return {'available':False}
+
+# Telemetry is observational: a transient SQLite lock must never stop production
+# downloads or scans. Persistent loss is visible as stale worker activity.
+def _nonfatal(fn):
+    def wrapped(*args,**kwargs):
+        try:return fn(*args,**kwargs)
+        except (sqlite3.Error,OSError):return None
+    return wrapped
+
+record=_nonfatal(record)
+worker=_nonfatal(worker)
