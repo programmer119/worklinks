@@ -164,6 +164,11 @@ jobs:
           archive={**new_index,'workflowRunId':os.environ.get('GITHUB_RUN_ID'),
                    'scannedNoticeCount':len(indexed),'byNotice':indexed}
           archive_path.write_text(json.dumps(archive,ensure_ascii=False,indent=2)+'\n')
+          from scripts.build_worklinks_rfp_provenance import build, read_latest
+          provenance=build(archive,read_latest(pathlib.Path('scripts/refresh_worklinks_rfp.py')))
+          pathlib.Path('startup-support/rfp-scan-provenance.json').write_text(
+              json.dumps(provenance,ensure_ascii=False,separators=(',',':'))+'\n')
+          print('RFP_PROVENANCE_AFTER_SCAN',len(provenance['byNotice']),provenance['summary'])
           if archive_path.stat().st_size>=100_000_000:
             raise SystemExit('RFP_CUMULATIVE_INDEX_AT_GITHUB_BLOB_LIMIT')
           print('RFP_CUMULATIVE_SCANNED',len(indexed))
@@ -171,7 +176,7 @@ jobs:
           print('RFP_DETAIL_PUBLISHED_BYTES',dst.stat().st_size)
           print('RFP_DETAIL_OMITTED_FROM_ROLLING_CACHE',omitted)
           PY
-            git add startup-support/rfp-clauses.json startup-support/rfp-coverage-index.json
+            git add startup-support/rfp-clauses.json startup-support/rfp-coverage-index.json startup-support/rfp-scan-provenance.json
             if git diff --cached --quiet; then echo 'RFP_SNAPSHOT_UNCHANGED'; exit 0; fi
             git commit -m 'data: merge G2B RFP evidence without dropping older snippets'
             if git push origin HEAD:main; then echo 'RFP_SNAPSHOT_PUBLISHED'; exit 0; fi
