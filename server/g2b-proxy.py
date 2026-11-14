@@ -762,7 +762,7 @@ def rfp_attachment_batch_page(source,from_time,to_time,page,rows):
         raise ApiError('invalid_rfp_batch_dates',400)
     if end<start or (end-start).total_seconds()>7*86400:
         raise ApiError('rfp_batch_max_7_days',400)
-    if not (1<=page<=3000 and 1<=rows<=1000):
+    if not (1<=page<=3000 and 1<=rows<=999):
         raise ApiError('invalid_rfp_batch_pagination',400)
     raw=request_api(API_BASE,operation,{
         'pageNo':page,'numOfRows':rows,'inqryDiv':1,
@@ -2144,7 +2144,7 @@ class Handler(BaseHTTPRequestHandler):
                     raise ApiError('local_worker_only',403)
                 try:
                     page=int(get('page','1'))
-                    rows=int(get('rows','1000'))
+                    rows=int(get('rows','999'))
                 except ValueError:
                     raise ApiError('invalid_rfp_batch_pagination',400)
                 return self.reply(200,rfp_attachment_batch_page(
