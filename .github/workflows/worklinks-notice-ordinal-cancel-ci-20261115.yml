@@ -1,0 +1,28 @@
+name: WorkLinks latest ordinal and cancellation regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-full-crawler.py'
+      - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'scripts/rfp_dual_queue.py'
+      - 'scripts/rfp_call_ledger.py'
+      - 'scripts/rfp_download_worker.py'
+      - 'tests/test_notice_ordinal_cancellation.py'
+      - '.github/workflows/worklinks-notice-ordinal-cancel-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile all changed modules
+        run: |
+          python3 -m py_compile server/g2b-full-crawler.py server/g2b-proxy.py server/worklinks-server123-pipeline.py scripts/refresh_worklinks_rfp.py scripts/rfp_dual_queue.py scripts/rfp_download_worker.py scripts/rfp_call_ledger.py
+      - name: Verify latest version and official cancellation without network
+        run: python3 tests/test_notice_ordinal_cancellation.py
