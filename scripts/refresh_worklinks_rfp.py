@@ -2354,7 +2354,11 @@ def main():
         claims=dual_queue.claim_ready(limit)
         selected=[(key.split(':')[0],key.split(':')[1],closes)
                   for key,closes,_ in claims]
-        selected_metadata={key:metadata for key,_,metadata in claims}
+        # process() resolves metadata by the (bidNo, ordinal) tuple.
+        # Never index this by the colon-joined queue key: doing so made EVERY
+        # downloaded notice look like its verified manifest was missing.
+        selected_metadata={(key.split(':',1)[0],key.split(':',1)[1]):metadata
+                           for key,_,metadata in claims}
         print('RFP_DUAL_SCAN_READY',len(selected),flush=True)
         if not selected:
             print('RFP_DUAL_SCAN_NO_READY',flush=True)
