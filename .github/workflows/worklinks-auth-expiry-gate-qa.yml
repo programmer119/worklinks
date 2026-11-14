@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/worklinks-auth-expiry-gate-qa.yml'
+      - 'startup-support/worklinks-account.js'
+      - 'startup-support/worklinks-header-auth.js'
+      - 'startup-support/worklinks-header-auth.css'
+      - 'startup-support/worklinks-auth-version.txt'
+      - 'startup-support/tests/auth_gate_live_qa.py'
 permissions:
   contents: read
 jobs:
@@ -35,30 +40,5 @@ jobs:
         run: |
           python3 -m pip install -q playwright
           python3 -m playwright install --with-deps chromium
-      - name: Verify logged-out visitor cannot see old job list
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          import time
-          from playwright.sync_api import sync_playwright
-          url='https://worklinks.suaveforge.com/startup-support/?view=jobs'
-          with sync_playwright() as pw:
-            browser=pw.chromium.launch(headless=True)
-            page=browser.new_page(viewport={'width':1440,'height':900})
-            page.goto(url,wait_until='domcontentloaded',timeout=60000)
-            for _ in range(20):
-              source=page.content()
-              if '20261114-auth-gate-2' in source:break
-              time.sleep(3);page.reload(wait_until='domcontentloaded',timeout=60000)
-            assert '20261114-auth-gate-2' in page.content(),'Latest auth gate not on live Pages'
-            page.locator('#worklinks-auth-gate-login').wait_for(state='visible',timeout=30000)
-            assert page.locator('body > main').evaluate('(el)=>el.inert'), 'Main is not inert'
-            assert page.locator('body > main').evaluate('(el)=>getComputedStyle(el).visibility')=='hidden'
-            assert page.locator('#worklinks-auth-gate-title').is_visible()
-            assert 'authhub.suaveforge.com' in page.locator('#worklinks-auth-gate-login').get_attribute('href')
-            print('LOGGED_OUT_WORKSPACE_HIDDEN=PASS')
-            print('LOGIN_GATE_VISIBLE=PASS')
-            browser.close()
-          PY
       - name: Reproduce logout and revoked session on live page
         run: python3 startup-support/tests/auth_gate_live_qa.py
