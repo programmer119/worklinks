@@ -466,8 +466,11 @@ def prune_rfp_archive(*,compact=True):
     if db_path.is_file():
         with sqlite3.connect('file:'+str(db_path)+'?mode=ro',
                              uri=True,timeout=15) as db:
-            for bid_no,bid_ord,payload in db.execute(
-                    "SELECT bid_no,bid_ord,payload FROM bid_notices"):
+            columns={x[1] for x in db.execute('PRAGMA table_info(bid_notices)')}
+            query=("SELECT bid_no,bid_ord,payload FROM bid_notices"
+                   if {'bid_no','bid_ord'}.issubset(columns)
+                   else "SELECT NULL,NULL,payload FROM bid_notices")
+            for bid_no,bid_ord,payload in db.execute(query):
                 try:notice=json.loads(payload)
                 except (TypeError,ValueError):continue
                 no=str(bid_no or notice.get('bidNo') or '')
