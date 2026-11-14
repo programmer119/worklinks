@@ -302,5 +302,9 @@ with sync_playwright() as p:
         else:
             assert result["amountTop"]>=result["titleBottom"]-1,(width,result)
         print("GENERAL_JOB_PRICE_LAYOUT_PASS",width,result,flush=True)
+        if width==700:
+            import base64
+            shot=page.locator("#jobCards .job-mini").screenshot(type="jpeg",quality=66)
+            print("GENERAL_JOB_CARD_JPEG_B64="+base64.b64encode(shot).decode("ascii"),flush=True)
         page.close()
     browser.close()
