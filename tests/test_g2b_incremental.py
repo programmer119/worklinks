@@ -32,6 +32,12 @@ with tempfile.TemporaryDirectory(prefix='g2b-incremental-') as directory:
     set_window('servc',old,utc-dt.timedelta(days=30))
     assert not due(conn,'servc',old,today,utc),'completed backfill reread'
     assert due(conn,'cnstwk',old,today,utc),'failed historical window lost'
+    direct=mod['compact']({'bidNtceNo':'R26BK00000033','bidNtceOrd':'000',
+      'bidNtceNm':'직찰 공고','bidMethdNm':'직찰',
+      'bidClseDt':'','opengDt':'2026-11-24 17:00:00'},'servc')
+    assert direct['closes']=='' and direct['bidMethod']=='직찰'
+    assert direct['openingAt']=='2026-11-24 17:00:00'
+    assert direct['closes']!=direct['openingAt']
     bid={'kind':'servc','bidNo':'R26BK00000042','order':'000',
          'title':'정보시스템 유지관리','closes':(today+dt.timedelta(days=4)).isoformat()}
     mod['save'](conn,[bid])

@@ -185,6 +185,7 @@ def compact(x,kind):
     return {'kind':kind,'bidNo':str(get('bidNtceNo')),'order':str(get('bidNtceOrd')),
       'title':get('bidNtceNm'),'org':get('ntceInsttNm','dminsttNm'),'agency':get('dminsttNm'),
       'posted':get('bidNtceDt'),'closes':get('bidClseDt'),'budget':get('asignBdgtAmt','presmptPrce'),
+      'bidMethod':get('bidMethdNm'),'openingAt':get('opengDt'),
       'url':get('bidNtceDtlUrl'),'state':get('bidNtceSttusNm'),
       'contract':get('cntrctCnclsMthdNm'),
       'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),

@@ -555,7 +555,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                     # One continuous queue: legacy upgrades first, then the
                     # first-time open SW bids. Do not abandon thousands of
                     # unscanned bids just because the version queue drained.
-                    if temporal!=0:continue
+                    # Unknown electronic close is not evidence the bid expired.
+                    if temporal==2:continue
                     is_first_scan=not cached or cached.get('status') in ('not_scanned','unscanned')
                     retry_failed=bool(cached) and cached.get('status') not in (
                         'text_extracted_requires_review','not_scanned','unscanned')
@@ -569,7 +570,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                             when=dt.datetime.fromisoformat(last_attempt.replace('Z','+00:00'))
                             if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
                         except (ValueError,TypeError):pass
-                    lane=(0 if legacy_outdated else 1 if is_first_scan else 2)
+                    lane=(3 if temporal==1 else 0 if legacy_outdated else 1 if is_first_scan else 2)
                     seen[key]=((lane,0 if key in targets else 1,
                                 str(cached.get('lastAttemptAt') or cached.get('checkedAt') or ''),
                                 key),no,order,date.isoformat() if date else '')
@@ -603,6 +604,12 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
               today+dt.timedelta(days=3650),1,key)
         seen[key]=(rank,no,order,'')
     sorted_rows=sorted(seen.values(),key=lambda row:row[0])
+    if upgrade_only and limit>=3:
+        # Fairness for non-electronic tenders; no expired confirmed bid enters.
+        no_close=[row for row in sorted_rows if row[0][0]==3]
+        known=[row for row in sorted_rows if row[0][0]!=3]
+        selected=known[:limit-1]+no_close[:1] if no_close and len(known)>=limit else sorted_rows[:limit]
+        return [(no,order,date) for _,no,order,date in selected]
     return [(no,order,date) for _,no,order,date in sorted_rows[:limit]]
 
 def legal_file(item):

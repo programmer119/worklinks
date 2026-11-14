@@ -1211,7 +1211,8 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
     if now.tzinfo is None:raise ValueError('rfp_progress_clock_not_timezone_aware')
     unique=set()
     summary={'total':0,'completed':0,'remaining':0,'legacy':0,
-             'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0}
+             'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0,
+              'unknownDeadlineCompleted':0,'unknownDeadlinePending':0}
     stages={k:{'total':0,'done':0,'remaining':0} for k in
             ('classification','roles','facts','hwpx')}
     for bid_no,ordn,payload in rows:
@@ -1223,7 +1224,16 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
         if not isinstance(obj,dict):continue
         cutoff=rfp_deadline_kst(obj.get('closes'))
         if cutoff is None:
+            # Direct/letter bids can lack electronic close timestamps in official
+            # A02/B1 bulk responses. Count actual scanning separately.
             summary['unknownDeadline']+=1
+            check_row=index.get(key)
+            check=rfp_stage_checks(check_row,latest)
+            done=(isinstance(check_row,dict) and
+                  check_row.get('status')=='text_extracted_requires_review' and
+                  all(v is True for v in (check['classification'],check['roles'],check['facts']))
+                  and check['hwpx'] is not False)
+            summary['unknownDeadlineCompleted' if done else 'unknownDeadlinePending']+=1
             continue
         if cutoff<now:continue
         summary['total']+=1
@@ -1252,6 +1262,7 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
             cat='legacy'
         else:cat='incomplete'
         summary[cat]+=1
+    assert summary['unknownDeadlineCompleted']+summary['unknownDeadlinePending']==summary['unknownDeadline']
     summary['remaining']=summary['total']-summary['completed']
     summary['rescanRequired']=summary['legacy']
     assert summary['remaining']==sum(summary[k] for k in

@@ -41,7 +41,8 @@ index={
 result=calc(rows,index,latest,asof=now)
 counts=result['counts']
 assert counts=={'total':6,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
-                'unscanned':1,'failed':1,'incomplete':1,'unknownDeadline':1},counts
+                'unscanned':1,'failed':1,'incomplete':1,'unknownDeadline':1,
+                'unknownDeadlineCompleted':0,'unknownDeadlinePending':1},counts
 assert result['stages']['classification']=={'total':6,'done':3,'remaining':3},result['stages']
 assert result['stages']['facts']['done']==2,result['stages']
 assert result['stages']['hwpx']=={'total':0,'done':0,'remaining':0},result['stages']
@@ -49,6 +50,9 @@ assert result['remainingPercent']==83.3 and result['rescanPercent']==33.3,result
 assert deadline('202611151230').hour==12
 assert deadline('20261115').hour==23
 assert deadline('') is None
+checked_unknown=calc(rows,{**index,'R26BK00000008:000':good()},latest,asof=now)['counts']
+assert checked_unknown['unknownDeadlineCompleted']==1
+assert checked_unknown['unknownDeadlinePending']==0
 assert calc([],index,latest,asof=now)['rescanPercent'] is None
 print('WORKLINKS_RFP_RESCAN_PROGRESS_REGRESSION=PASS',counts)
 

@@ -11,7 +11,7 @@ today=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
 future=(today+dt.timedelta(days=3)).strftime('%Y%m%d')+'1400'
 past=(today-dt.timedelta(days=3)).strftime('%Y%m%d')+'1400'
 rows=[dict(bidNo='R26BK'+str(n).zfill(8),order='000',closes=deadline,kind='servc') for n,deadline in
-      [(1,future),(2,future),(3,future),(4,past),(5,future),(6,future),(7,future)]]
+      [(1,future),(2,future),(3,future),(4,past),(5,future),(6,future),(7,future),(8,'')]]
 versions=(m['CLASSIFICATION_VERSION'],m['HWPX_READER_VERSION'],
           m['STAFFING_ROLE_SCAN_VERSION'],m['STAFFING_FACT_SCAN_VERSION'])
 def previous():
@@ -48,7 +48,7 @@ finally:
     else:os.environ['WORKLINKS_RFP_UPGRADE_ONLY']=previous_env
 keys={no+':'+order for no,order,_ in chosen}
 assert keys=={'R26BK00000001:000','R26BK00000002:000','R26BK00000003:000',
-              'R26BK00000005:000','R26BK00000007:000'},(keys,chosen)
+              'R26BK00000005:000','R26BK00000007:000','R26BK00000008:000'},(keys,chosen)
 assert [no for no,_,_ in chosen[:3]]==[
     'R26BK00000001','R26BK00000002','R26BK00000003'],chosen
 # The independent ordinary scanner can also process never-scanned notices.
