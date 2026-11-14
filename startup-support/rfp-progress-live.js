@@ -82,6 +82,12 @@
   if(seconds>=60)return '재시도 '+Math.floor(seconds/60)+'분 '+seconds%60+'초 후';
   return '재시도 '+seconds+'초 후';
  }
+ function elapsedRfp(seconds){
+  const value=Math.max(0,Math.floor(seconds||0));
+  const pad=n=>String(n).padStart(2,'0');
+  if(value>=3600)return pad(Math.floor(value/3600))+':'+pad(Math.floor(value/60)%60)+':'+pad(value%60);
+  return pad(Math.floor(value/60))+':'+pad(value%60);
+ }
  function updateRfpText(el,value){
   if(el&&el.textContent!==value)el.textContent=value;
  }
@@ -101,6 +107,83 @@
    const state=node.querySelector('[data-rfp-field="'+key+'State"]');
    const lane=info?.lanes?.[key];
    const worker=activity?.workers?.[key];
+   // Exact physical file transfers from the server, not the eight notice slots.
+   if(key==='download'){
+    const group=activity?.downloadGroup;
+    const fmtBytes=n=>(Math.max(0,Number(n)||0)/1048576).toFixed(2)+'MB';
+    const activeCount=group?.available?Number(group.activeCount||0):0;
+    const files=Array.isArray(group?.files)?group.files:[];
+    const main=activeCount?files[0]:null;
+    const oldest=Number(group?.startedEpoch||0);
+    const elapsed=main&&oldest>0?elapsedRfp(now-oldest):'';
+    const errors=Array.isArray(group?.recentErrors)?group.recentErrors:[];
+    const due=errors.find(e=>Number(e.retryEpoch||0)>now);
+    const stalled=Number(group?.stalledCount||0);
+    const hasFailure=Boolean(stalled||errors.length||worker?.status==='retry'||
+                              (worker?.stale&&group?.available));
+    const failed=Math.max(0,Number(lane?.failed||0));
+    const note=errors[0];
+    let caption='현재 전송 파일 없음',description='',
+        badge=activeCount?activeCount+'개 전송 중':'진행 확인 중';
+    const infoBits=[];
+    if(!group?.available){
+     caption='파일별 다운로드 상태 미제공';
+     badge='집계 확인 필요';
+     description='서버 파일 전송 정보 연결 확인 필요';
+    }else if(main){
+     caption=(main.name||main.noticeKey||'공식 첨부파일')+
+       (activeCount>1?' 외 '+(activeCount-1)+'개':'');
+     if(main.bytesTotal>0||main.bytesDone>0)
+      infoBits.push(fmtBytes(main.bytesDone)+' / '+
+        (main.bytesTotal>0?fmtBytes(main.bytesTotal):'총용량 미제공'));
+     infoBits.push('다운로드 중 '+elapsed);
+     if(stalled){
+      badge='전송 정체 '+stalled+'개';
+      infoBits.unshift('전송 정체 '+Number(group.oldestStallSeconds||0)+'초');
+     }
+     if(errors.length){
+      badge=(stalled?'정체 '+stalled+'개 · ':'')+'오류 '+errors.length+'건';
+      infoBits.unshift(formatRfpError(note.reason));
+      if(due)infoBits.push(retryRfpText(due.retryEpoch,now));
+     }
+     description=infoBits.join(' · ');
+    }else if(due||worker?.status==='retry'){
+     caption='다운로드 오류 · 자동 재시도';
+     badge='재시도 예정';
+     if(note?.reason||worker?.error)
+      infoBits.push(formatRfpError(note?.reason||worker?.error));
+     infoBits.push(retryRfpText(due?.retryEpoch||worker?.retryEpoch,now));
+     description=infoBits.join(' · ');
+    }else if(worker?.stale){
+     caption='서버 전송 상태 갱신 끊김';
+     badge='작업 상태 확인 필요';
+    }else if(failed>0&&errors.length){
+     caption='파일 다운로드 오류';
+     badge='재시도 '+failed+'건';
+     description=formatRfpError(note.reason);
+    }else if(Number(lane?.done||0)>=Number(lane?.total||0)&&Number(lane?.total||0)>0){
+     caption='모든 원본 다운로드 완료';badge='완료';
+    }else{
+     caption='현재 전송 파일 없음';
+     badge=failed>0?'재시도 대상 '+failed+'건':'다음 다운로드 준비 중';
+    }
+    if(stale&&group?.available){badge='집계 갱신 지연';description='마지막 정상 집계 · '+description;}
+    updateRfpText(state,badge);
+    updateRfpText(label,caption);
+    updateRfpText(metric,description);
+    const filePct=main?.bytesTotal>0?
+      Math.max(0,Math.min(100,100*Number(main.bytesDone||0)/Number(main.bytesTotal))):0;
+    const width=filePct.toFixed(1)+'%';
+    if(fileFill.style.width!==width)fileFill.style.width=width;
+    node.classList.toggle('has-rfp-error',hasFailure||stale);
+    const tooltipFiles=files.map(x=>(x.name||x.noticeKey||'공식 첨부파일')+' '+fmtBytes(x.bytesDone)+
+      (x.bytesTotal>0?'/'+fmtBytes(x.bytesTotal):'')).join('\n');
+    const tooltip=[caption,description,tooltipFiles,
+      ...errors.map(x=>'오류: '+formatRfpError(x.reason)+' · '+retryRfpText(x.retryEpoch,now))]
+      .filter(Boolean).join('\n');
+    if(track.title!==tooltip)track.title=tooltip;
+    continue;
+   }
    const allItems=activity?.available&&Array.isArray(activity.items)
     ?activity.items.filter(x=>x.lane===key):[];
    const working=allItems.filter(x=>x.status==='working'&&now-Number(x.updatedEpoch||0)<=90);
