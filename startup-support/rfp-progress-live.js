@@ -57,8 +57,108 @@
   }
   const button=document.getElementById('rfpRescanRefreshNow');
   if(button)button.disabled=Boolean(rfpRescanBusy);
+  if(typeof window.paintRfpLaneFocus==='function')window.paintRfpLaneFocus();
  };
 
+
+
+ function formatRfpError(raw){
+  const value=String(raw||'');
+  if(/not present in verified date batch|not_present_in_complete_date_batch/.test(value))
+   return '검증된 날짜별 목록에 해당 공고가 없음';
+  if(/quota|rate.limit|429|upstream_result_22|upstream_result_23/i.test(value))
+   return '공식 API 호출 제한';
+  if(/complete_bulk_manifest_missing|manifest_not_confirmed|official page incomplete/i.test(value))
+   return '첨부목록 확보 미완료';
+  if(/cached_original_missing/.test(value))return '보관된 원본 파일 누락';
+  if(/503|502|timeout|connection/i.test(value))return '연결 오류';
+  return value.slice(0,100);
+ }
+ function retryRfpText(epoch,now){
+  const seconds=Math.max(0,Math.ceil(Number(epoch||0)-now));
+  if(!epoch)return '재시도 시각 미제공';
+  if(seconds===0)return '재시도 시각 도달';
+  if(seconds>=3600)return '재시도 '+Math.floor(seconds/3600)+'시간 '+Math.ceil((seconds%3600)/60)+'분 후';
+  if(seconds>=60)return '재시도 '+Math.floor(seconds/60)+'분 '+seconds%60+'초 후';
+  return '재시도 '+seconds+'초 후';
+ }
+ function updateRfpText(el,value){
+  if(el&&el.textContent!==value)el.textContent=value;
+ }
+ window.paintRfpLaneFocus=function(){
+  const panel=document.getElementById('rfpRescanContent');
+  if(!panel||panel.dataset.ready!=='1')return;
+  const info=rfpRescanProgress,activity=info?.activity;
+  const now=Date.now()/1000,stale=Boolean(rfpRescanProgressError);
+  const fmt=n=>(Math.max(0,Number(n)||0)/1048576).toFixed(2)+'MB';
+  for(const [key] of laneKeys){
+   const node=panel.querySelector('[data-rfp-stage="'+key+'"]');
+   if(!node)continue;
+   const track=node.querySelector('.rfp-rescan-stage-track');
+   const label=track.querySelector('.rfp-stage-focus-name');
+   const metric=track.querySelector('.rfp-stage-focus-metric');
+   const fileFill=track.querySelector('.rfp-stage-file-fill');
+   const state=node.querySelector('[data-rfp-field="'+key+'State"]');
+   const lane=info?.lanes?.[key];
+   const worker=activity?.workers?.[key];
+   const allItems=activity?.available&&Array.isArray(activity.items)
+    ?activity.items.filter(x=>x.lane===key):[];
+   const working=allItems.filter(x=>x.status==='working'&&now-Number(x.updatedEpoch||0)<=90);
+   const broken=allItems.filter(x=>x.status==='retry');
+   const recent=allItems.filter(x=>x.status==='done'&&now-Number(x.updatedEpoch||0)<=30);
+   const choices=working.length?[...working.slice(0,8),...broken.slice(0,2)]
+    :broken.length?broken.slice(0,5):recent.slice(0,3);
+   const selected=choices.length?choices[Math.floor(Date.now()/4000)%choices.length]:null;
+   const active=Math.max(0,Number(lane?.active||0));
+   const failed=Math.max(0,Number(lane?.failed||0));
+   const problems=Math.max(failed,broken.length);
+   let badge=active?'진행 '+active+'건':problems?'재시도 '+problems+'건':'';
+   if(active&&problems)badge+=' · 오류 '+problems+'건';
+   if(worker?.status==='retry'&&Number(worker.retryEpoch)>now)
+    badge=retryRfpText(worker.retryEpoch,now);
+   else if(worker?.stale&&active===0)badge='상태 갱신 끊김';
+   else if(stale)badge='집계 갱신 지연';
+   else if(!badge&&Number(lane?.done)>=Number(lane?.total)&&lane?.total>0)badge='완료';
+   else if(!badge&&key==='manifest')badge='순차 확보';
+   else if(!badge)badge='진행 확인 중';
+   updateRfpText(state,badge);
+   node.classList.toggle('has-rfp-error',Boolean(worker?.status==='retry'||worker?.stale||problems||stale));
+   let name='현재 처리 파일 없음',detail='';
+   const bits=[];
+   if(selected){
+    name=selected.fileName||selected.noticeKey||'공고';
+    if(selected.phase)bits.push(selected.phase);
+    if(selected.filesTotal>0&&key!=='manifest')bits.push('파일 '+selected.filesDone+'/'+selected.filesTotal);
+    if(selected.bytesDone>0||selected.bytesTotal>0)
+     bits.push(fmt(selected.bytesDone)+' / '+(selected.bytesTotal>0?fmt(selected.bytesTotal):'총용량 미제공'));
+    if(selected.status==='retry'){
+     if(selected.error)bits.push(formatRfpError(selected.error));
+     if(selected.retryEpoch)bits.push(retryRfpText(selected.retryEpoch,now));
+    }
+   }else if(worker?.status==='retry'){
+    name='작업 일시 중단';
+    if(worker.error)bits.push(formatRfpError(worker.error));
+    bits.push(retryRfpText(worker.retryEpoch,now));
+   }else if(worker?.stale){
+    name='서버 작업 기록 갱신 끊김';
+   }else if(!activity?.available){
+    name='실시간 파일 정보 연결 확인 필요';
+   }else if(active>0){
+    name='진행 중 · 파일별 정보 갱신 확인 필요';
+   }
+   if(selected&&choices.length>1)bits.push((choices.indexOf(selected)+1)+'/'+choices.length);
+   detail=bits.join(' · ');
+   const filePct=selected?.bytesTotal>0?
+    Math.max(0,Math.min(100,100*Number(selected.bytesDone||0)/Number(selected.bytesTotal))):0;
+   const width=filePct.toFixed(1)+'%';
+   if(fileFill.style.width!==width)fileFill.style.width=width;
+   updateRfpText(label,name);
+   updateRfpText(metric,detail);
+   const tooltip=[name,detail,worker?.error?'작업 오류: '+formatRfpError(worker.error):'']
+     .filter(Boolean).join(' · ');
+   if(track.title!==tooltip)track.title=tooltip;
+  }
+ };
 
  window.paintRfpLiveProgress=function(){
   const label=document.getElementById('rfpRescanLabel');
