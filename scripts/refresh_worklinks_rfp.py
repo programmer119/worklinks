@@ -906,7 +906,7 @@ def _eligible_prefetch_positions(manifest,processing_order,reusable):
     return result
 
 
-def download(url,*,rate_gate=None,progress=None):
+def download(url,*,rate_gate=None,progress=None,on_retry=None):
     # Persist small official binaries even if text extraction later fails.
     # A parser-only retry can then reuse the exact bytes without an HTTP call.
     ledger=active_rfp_ledger()
@@ -951,6 +951,8 @@ def download(url,*,rate_gate=None,progress=None):
                     if progress and (now_tick-last_report>=0.4 or (size and received>=size)):
                         progress(received,size,False)
                         last_report=now_tick
+                if size and received!=size:
+                    raise ValueError('download_length_mismatch')
                 raw=b''.join(chunks)
                 if progress:progress(received,size or received,True)
             if ledger:
@@ -976,6 +978,8 @@ def download(url,*,rate_gate=None,progress=None):
             else:
                 retry=isinstance(ex,(TimeoutError,ConnectionError,urllib.error.URLError))
             if not retry or attempt==2:raise
+            if on_retry is not None:
+                on_retry(ex,1.5*(attempt+1))
         time.sleep(1.5*(attempt+1))
 def _document_stem(name):
     # Only a matching filename stem inside the SAME official attachment
