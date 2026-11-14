@@ -1,0 +1,23 @@
+name: WorkLinks source-backed RFP throughput regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_rfp_speed_regression.py'
+      - '.github/workflows/worklinks-rfp-speed-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate parser compiles and source-backed speed regressions pass
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py
+          python3 tests/test_rfp_speed_regression.py
+          python3 tests/test_rfp_call_ledger.py
+          python3 tests/test_rfp_staffing_roles.py
