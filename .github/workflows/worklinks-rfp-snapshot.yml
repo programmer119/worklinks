@@ -92,10 +92,11 @@ jobs:
             echo 'LIVE_RFP_FIX_ONCE=3_PRIORITY_OFFICIAL_SCANS'
           fi
           if [[ "$GITHUB_EVENT_NAME" == "push" &&
-                "$HEAD_COMMIT_MSG" == "CHANGCOM_TWO_UNSCANNED_ONCE: R26BK01797739 R26BK01813685" ]]; then
+                "$HEAD_COMMIT_MSG" == "CHANGCOM_TWO_UNSCANNED_RETRY_ONCE: R26BK01797739 R26BK01813685" ]]; then
             export WORKLINKS_RFP_ROLE_PRIORITY_KEYS="R26BK01797739:000,R26BK01813685:000"
+            export WORKLINKS_RFP_REQUIRE_EXACT_PRIORITY=1
             limit=2
-            echo 'ONE_SHOT_TWO_UNSCANNED_RFP_PRIORITY=2'
+            echo 'ONE_SHOT_TWO_UNSCANNED_RFP_EXACT_PRIORITY=2'
           fi
           python3 scripts/refresh_worklinks_rfp.py --limit "$limit"
       - name: Checkpoint extracted RFP records before push
