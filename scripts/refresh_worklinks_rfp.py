@@ -37,6 +37,32 @@ _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
+RFP_TEXT_CACHE_VERSION=1
+
+def extract_cached_text(name, raw):
+    """Verified, content-addressed extracted text. Reclassify without rereading HWP/OCR.
+
+    Cache identity includes the exact binary hash and extractor revision. A
+    successful source extraction is cached; incomplete OCR/errors are not.
+    No official metadata or attachment HTTP request is made by this function.
+    """
+    ledger=active_rfp_ledger()
+    digest=hashlib.sha256(raw).hexdigest()
+    key=cache_key('rfp_extracted_text',RFP_TEXT_CACHE_VERSION,HWPX_READER_VERSION,
+                  Path(name).suffix.lower(),digest)
+    if ledger is not None:
+        cached=ledger.get_json(key,source_revision='reader-'+str(RFP_TEXT_CACHE_VERSION))
+        if (isinstance(cached,dict) and isinstance(cached.get('text'),str)
+                and isinstance(cached.get('evidence'),dict)
+                and cached['evidence'].get('sourceComplete') is True):
+            return cached['text'],cached['evidence'],True
+    text,evidence=extract_with_source_status(name,raw)
+    if ledger is not None and evidence.get('sourceComplete') is True:
+        ledger.save_json(key,{'text':text,'evidence':evidence},
+                         source_revision='reader-'+str(RFP_TEXT_CACHE_VERSION),
+                         max_bytes=16_000_000)
+    return text,evidence,False
+
 def active_rfp_ledger():
     """Only server123 opts in; local no-network regression remains isolated."""
     global _LEDGER_INSTANCE, _LEDGER_PATH
@@ -474,13 +500,15 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                                   int(cached.get('hwpxReaderVersion') or 0)<HWPX_READER_VERSION or
                                   staff_missing))
                 if upgrade_only:
-                    # Keep scanner-upgrade rescans distinct from FIRST-TIME scans.
-                    # A version migration spends its reserved slots ONLY on open
-                    # notices previously extracted with an older parser.
-                    # Never-scanned bids remain in the normal scheduled queue.
-                    if temporal!=0 or not legacy_outdated:continue
-                    # Avoid repeatedly hitting a broken official endpoint or re-downloading
-                    # an unchanged unreadable file within its 24-hour retry cooldown.
+                    # One continuous queue: legacy upgrades first, then the
+                    # first-time open SW bids. Do not abandon thousands of
+                    # unscanned bids just because the version queue drained.
+                    if temporal!=0:continue
+                    is_first_scan=not cached or cached.get('status') in ('not_scanned','unscanned')
+                    retry_failed=bool(cached) and cached.get('status') not in (
+                        'text_extracted_requires_review','not_scanned','unscanned')
+                    if not (legacy_outdated or is_first_scan or retry_failed):continue
+                    # Do not retry a known broken source on every batch.
                     last_attempt=str(cached.get('lastAttemptAt') or '')
                     if (last_attempt and
                             cached.get('lastAttemptReaderFingerprint')==reader_fingerprint and
@@ -489,7 +517,8 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                             when=dt.datetime.fromisoformat(last_attempt.replace('Z','+00:00'))
                             if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
                         except (ValueError,TypeError):pass
-                    seen[key]=((0 if key in targets else 1,
+                    lane=(0 if legacy_outdated else 1 if is_first_scan else 2)
+                    seen[key]=((lane,0 if key in targets else 1,
                                 str(cached.get('lastAttemptAt') or cached.get('checkedAt') or ''),
                                 key),no,order,date.isoformat() if date else '')
                     continue
@@ -1657,7 +1686,7 @@ def process(no,ordn,metadata=None,previous=None):
                 raw=download(url)
             finally:
                 _NOTICE_CONTEXT.notice_key=None
-            extracted,source_evidence=extract_with_source_status(name,raw)
+            extracted,source_evidence,text_cache_hit=extract_cached_text(name,raw)
             content=normalize_extracted_text(extracted)
             if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.webp')) else 100):
                 raise ValueError('no_searchable_text')
@@ -1673,6 +1702,7 @@ def process(no,ordn,metadata=None,previous=None):
                            'extractionEvidence':source_evidence,
                            'sourceSha256':hashlib.sha256(raw).hexdigest(),
                            'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
+                           'extractedTextCacheHit':text_cache_hit,
                            'qualificationScanTruncated':len(content)>350_000,
                            'clauseCandidatesTruncated':False,
                            'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
@@ -1820,7 +1850,7 @@ def backfill_cached_staffing(records, max_files=24):
                     raw=None
             if raw:
                 try:
-                    extracted,evidence=extract_with_source_status(name,raw)
+                    extracted,evidence,_=extract_cached_text(name,raw)
                     content=normalize_extracted_text(extracted)
                     if not evidence.get('sourceComplete'):
                         raise ValueError('cached_source_scan_incomplete')
@@ -2018,7 +2048,12 @@ def main():
          STAFFING_ROLE_SCAN_VERSION,STAFFING_FACT_SCAN_VERSION))
     # Parse already-stored binaries first; an older record is never re-downloaded
     # just to populate the staffing column.
-    cached_staffing_upgrades=backfill_cached_staffing(results,max_files=96)
+    # Never hold up each 8-notice live batch to reparse up to 96 OLD
+    # attachments. Selected notices are handled by process() itself.
+    # An explicit maintenance run may still opt into bounded backfill.
+    backfill_limit=max(0,min(96,int(os.environ.get('WORKLINKS_RFP_STAFFING_BACKFILL_FILES','0'))))
+    cached_staffing_upgrades=(backfill_cached_staffing(results,max_files=backfill_limit)
+                             if backfill_limit else 0)
     if cached_staffing_upgrades:
         print('RFP_CACHED_STAFFING_REPARSED',cached_staffing_upgrades,flush=True)
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
