@@ -11,6 +11,50 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
+      - name: Verify deployed front-end progress button against real server values
+        shell: bash
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+          python3 - <<'PY'
+          import json,urllib.request
+          from playwright.sync_api import sync_playwright
+          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/rfp-rescan-progress'
+          with urllib.request.urlopen(urllib.request.Request(api,headers={'Cache-Control':'no-cache'}),timeout=25) as res:
+              report=json.load(res)
+          assert report.get('ok') is True and report.get('rescanPercent') is not None,report
+          expected=report['rescanPercent']
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1310,'height':850})
+              errors=[]
+              page.on('pageerror',lambda error:errors.append(str(error)[:250]))
+              page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',
+                        wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("""v => {
+                  const t=document.getElementById('rfpRescanLabel')?.textContent||'';
+                  return t.includes('재판독 필요')&&t.includes(v.toFixed(1)+'%');
+              }""",arg=expected,timeout=45000)
+              button=page.locator('#rfpRescanLaunch')
+              account=page.locator('#worklinks-auth-header')
+              assert button.bounding_box()['x']<account.bounding_box()['x']
+              button.click()
+              page.locator('#rfpRescanModal.open').wait_for(timeout=10000)
+              panel=page.locator('#rfpRescanContent').inner_text()
+              for term in ['관리 대상','재판독 필요','구버전','최초 미판독',
+                           '판독 실패' if '판독 실패' in panel else '실패',
+                           'RFP 조건','역할·인원','인력 요구사항','HWPX 해석',
+                           format(report['counts']['total'],','),
+                           format(report['counts']['rescanRequired'],','),
+                           format(expected,'.1f')+'%']:
+                  assert term in panel,(term,panel[:1100])
+              assert not errors,errors[:5]
+              print('RFP_LIVE_HEADER_MODAL_VERIFIED',json.dumps({
+                  'rescanPercent':expected,'total':report['counts']['total'],
+                  'rescanRequired':report['counts']['rescanRequired'],
+                  'pageErrors':len(errors)},ensure_ascii=False),flush=True)
+              browser.close()
+          PY
       - name: Confirm actual server123 upgrade progress endpoint and breakdown
         shell: bash
         run: |
