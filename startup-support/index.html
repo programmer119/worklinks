@@ -1009,7 +1009,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
     <div class="sub">창업지원공고 · 개발 일감 · 영업대행을 한곳에서 관리합니다.</div>
     <div class="page-loadbar"><span id="pageLoadStamp" role="status" aria-live="off">화면 불러오는 중…</span><button type="button" id="pageRefreshButton" title="현재 탭을 유지하며 페이지를 새 주소로 다시 불러옵니다">↻ 새로고침</button></div>
   </div>
-  <button type="button" id="rfpRescanLaunch" aria-haspopup="dialog" aria-controls="rfpRescanModal" title="마감 전 SW 공고의 최신 판독 진행률">
+  <button type="button" id="rfpRescanLaunch" aria-haspopup="dialog" aria-controls="rfpRescanModal" title="마감 전 전체 SW 공고 중 구버전으로 재판독해야 하는 비율">
     <span class="rfp-rescan-label" id="rfpRescanLabel">판독 현황 확인 중</span>
     <span class="rfp-rescan-mini-track" aria-hidden="true"><span id="rfpRescanMiniFill"></span></span>
   </button>
@@ -2011,15 +2011,15 @@ function paintRfpRescanProgress(){
  const panel=document.getElementById('rfpRescanContent');
  if(!label||!panel)return;
  const info=rfpRescanProgress;
- if(!info||!info.counts||info.remainingPercent===null){
+ if(!info||!info.counts||info.rescanPercent===null||info.rescanPercent===undefined){
   label.textContent='판독 현황 확인 필요';fill.style.width='0%';
   panel.textContent='현재 전체 공고와 판독기 버전의 집계를 확인할 수 없어 퍼센트를 표시하지 않습니다.'+
     (rfpRescanProgressError?' ('+rfpRescanProgressError+')':'');
   return;
  }
- const counts=info.counts,remain=Number(info.remainingPercent);
+ const counts=info.counts,remain=Number(info.rescanPercent);
  const complete=counts.completed,all=counts.total;
- label.textContent='판독 필요 '+remain.toFixed(1)+'%';
+ label.textContent='재판독 필요 '+remain.toFixed(1)+'%';
  fill.style.width=Math.max(0,Math.min(100,remain))+'%';
  const pct=all?((100*complete/all).toFixed(1)):'0.0';
  const stageNames={classification:'RFP 조건',roles:'역할·인원',facts:'인력 요구사항',hwpx:'HWPX 해석'};
@@ -2040,12 +2040,12 @@ function paintRfpRescanProgress(){
   '<div class="rfp-rescan-totals">'+
    '<div class="rfp-rescan-metric"><span>관리 대상</span><strong>'+rfpProgressNumber(all)+'</strong></div>'+
    '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong>'+rfpProgressNumber(complete)+'</strong></div>'+
-   '<div class="rfp-rescan-metric"><span>판독 필요</span><strong>'+rfpProgressNumber(counts.remaining)+'</strong></div>'+
+   '<div class="rfp-rescan-metric"><span>재판독 필요</span><strong>'+rfpProgressNumber(counts.rescanRequired)+'</strong></div>'+ "
   '</div>'+
   '<span class="rfp-rescan-big-track" role="progressbar" aria-label="전체 최신 판독 완료" aria-valuenow="'+
     pct+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+pct+'%"></span></span>'+
   '<div class="rfp-rescan-legend"><span>완료 <b>'+pct+'%</b></span>'+
-   '<span>남은 검사 <b>'+remain.toFixed(1)+'%</b></span></div>'+
+   '<span>구버전 재판독 <b>'+remain.toFixed(1)+'%</b></span></div>'+ "
   '<div class="rfp-rescan-legend">'+
    '<span>구버전 <b>'+rfpProgressNumber(counts.legacy)+'건</b></span>'+
    '<span>최초 미판독 <b>'+rfpProgressNumber(counts.unscanned)+'건</b></span>'+
@@ -2055,7 +2055,7 @@ function paintRfpRescanProgress(){
   '<h3 class="rfp-rescan-section-title">기능별 판독 완료</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
   (counts.unknownDeadline?'<div class="rfp-rescan-unknown">마감일 확인 불가 '+
     rfpProgressNumber(counts.unknownDeadline)+'건은 전체 대상에서 제외</div>':'')+
-  '<p class="rfp-rescan-foot">남은 검사 비율 = (전체 − 최신 판독 완료) ÷ 전체. '+
+  '<p class="rfp-rescan-foot">재판독 비율 = 구버전 판독 공고 ÷ 마감 전 전체 공고. '+ "
   '구버전 판독은 배포된 판독기가 업데이트되면 서버에서 재처리합니다. '+
   '미판독·실패는 별도 처리 대상입니다. 화면 열기만으로 판독을 실행하지 않습니다.'+
   '<span style="display:block">확인 기준: '+htmlEscape(String(info.asOf||'').replace('T',' ').slice(0,19))+
@@ -2071,7 +2071,8 @@ async function refreshRfpRescanProgress(force=false){
    const report=await res.json();
    if(report?.ok!==true||report?.schemaVersion!==1||
       report?.scope!=='unexpired_saved_sw_bid_notices'||!report?.counts||
-      report.counts.total!==report.counts.completed+report.counts.remaining)
+      report.counts.total!==report.counts.completed+report.counts.remaining||
+      report.counts.rescanRequired!==report.counts.legacy)
     throw Error('집계 데이터 형식 오류');
    rfpRescanProgress=report;rfpRescanProgressError='';rfpRescanLastRead=Date.now();
   }catch(error){
