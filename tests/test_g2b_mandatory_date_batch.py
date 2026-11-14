@@ -73,10 +73,10 @@ with tempfile.TemporaryDirectory() as folder:
     assert partial is None and requests==1,(partial,requests)
     assert db.execute("SELECT COUNT(*) FROM mandatory_batch_windows").fetchone()[0]==0
     state=mod.run_once(db,fake)
-    assert state['status']=='complete' and state['calls']==5,state
+    assert state['status']=='complete' and state['calls']==4,state
     assert calls.count(('license',1))==1,calls
     assert calls.count(('license',2))==1,calls
-    assert len(calls)==6,calls  # 1 partial + 1 license resume + 3 other sources + one? 
+    assert len(calls)==5,calls  # one partial + one resumed page + three other sources 
     cached=db.execute("SELECT payload FROM bid_license_cache WHERE bid_no=?",(bid,)).fetchone()
     assert cached, 'verified license row missing'
     value=json.loads(cached[0])
@@ -89,7 +89,7 @@ with tempfile.TemporaryDirectory() as folder:
     assert extra['sources']['serviceProducts']['state']=='not_returned_for_date'
     assert db.execute("SELECT COUNT(*) FROM mandatory_batch_windows").fetchone()[0]==4
     again=mod.run_once(db,fake)
-    assert again['calls']==0 and len(calls)==6,(again,calls)
+    assert again['calls']==0 and len(calls)==5,(again,calls)
     # A prior confirmed source is preserved when another date has no row.
     old_source={'ok':True,'complete':True,'items':[{'some':'verified'}],
                 'totalCount':1}
