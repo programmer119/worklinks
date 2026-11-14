@@ -1788,6 +1788,13 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
     return staged
 
 def process(no,ordn,metadata=None,previous=None,prefetch=None):
+    if (os.environ.get('WORKLINKS_RFP_DUAL_SCAN_ONLY')=='1'
+            and metadata is None):
+        # A durable ready/scan record MUST include verified bulk metadata.
+        # Missing metadata is not permission to fetch bid-evidence by notice.
+        return {'status':'metadata_not_confirmed',
+                'reasonCode':'dual_queue_bulk_manifest_missing',
+                'reviewComplete':False,'files':[]}
     phase={'downloadSeconds':0.0,'downloadQueueWaitSeconds':0.0,'extractSeconds':0.0,
            'analysisSeconds':0.0,'textCacheHits':0,'filesProcessed':0,
            'deferredImageFiles':0}
