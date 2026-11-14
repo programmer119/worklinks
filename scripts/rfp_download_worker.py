@@ -5,7 +5,7 @@ In one persistent run it discovers the ENTIRE current unexpired backlog,
 then fills the durable download queue with at most eight in-flight notices.
 The independent scan process only consumes already-downloaded originals.
 """
-from concurrent.futures import ThreadPoolExecutor,as_completed
+from concurrent.futures import ThreadPoolExecutor,wait,FIRST_COMPLETED
 import datetime as dt
 import hashlib
 import json
@@ -197,29 +197,21 @@ def download_one(queue,claim,halt):
         reader._NOTICE_CONTEXT.notice_key=None
         reader._NOTICE_CONTEXT.closes_on=''
 
-def run_forever():
-    configure_reader()
-    os.environ.setdefault('WORKLINKS_RFP_UPGRADE_ONLY','1')
-    os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
-    queue=RfpDualQueue(QUEUE)
-    queue.reset_stale()
-    live.worker('download','running')
-    live.worker('manifest','running')
-    planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
-                                  reader.fetch_json,META_PACE,
-                                  allow_exceptions=True)
-             if BULK_ENABLED else None)
-    # Necessary missing-date records may use the strictly capped exception budget
-    # (maximum two notice-level recoveries per day), not unrestricted per-bid loops.
-    last_refresh=0
-    halted_until=0
-    planner_pause_until=0
+def run_manifest_forever(queue,planner):
+    """Independent source-discovery and date-batch manifest supply lane."""
+    last_refresh=-REFRESH_SECONDS
+    planner_pause_until=0.0
     last_planner_pass=-100.0
+    live.worker('manifest','running')
     while True:
         now=time.monotonic()
         if now-last_refresh>=REFRESH_SECONDS:
-            discover_all(queue)
             last_refresh=now
+            try:
+                discover_all(queue)
+            except Exception as exc:
+                print('RFP_DUAL_QUEUE_DISCOVERY_ERROR',
+                      type(exc).__name__,str(exc)[:140],flush=True)
         if planner is not None and time.time()>=planner_pause_until and (
                 now-last_planner_pass>=3):
             last_planner_pass=now
@@ -232,62 +224,102 @@ def run_forever():
                 if result.get('new')==0 and result.get('calls')==0:
                     planner_pause_until=time.time()+60
             except BulkManifestQuota as exc:
-                # The next request becomes possible at the rolling-window
-                # boundary, NOT an arbitrary hour from this exception.
                 seconds=int(exc.retry_after_seconds)
                 planner_pause_until=time.time()+seconds
                 live.worker('manifest','retry',str(exc),planner_pause_until)
                 print('RFP_BULK_LOCAL_CALL_BUDGET_PAUSE',
                       str(exc),'retrySeconds',seconds,flush=True)
             except Exception as exc:
-                # Never replace an incomplete multi-page response with an
-                # invented empty source, and never flood the API with retries.
                 problem=str(exc)
-                # The proxy's in-process circuit breaker has authoritative
-                # remaining time. Resume immediately after it clears; otherwise
-                # retry a bounded read of the same cached page after 30 sec.
                 seconds=source_retry_seconds(problem)
                 planner_pause_until=time.time()+seconds
                 live.worker('manifest','retry',problem,planner_pause_until)
                 print('RFP_BULK_OFFICIAL_SOURCE_UNAVAILABLE',
-                    type(exc).__name__,problem[:140],
-                    'retryAfterEpoch',round(planner_pause_until),
-                    'retrySeconds',seconds,flush=True)
-        if BULK_ENABLED:
-            revived=queue.release_old_metadata_quota_retries()
-            if revived:
-                print('RFP_OBSOLETE_QUOTA_RETRIES_RELEASED',
-                      json.dumps({'notices':revived,'basis':'verified_bulk_manifest'}),
-                      flush=True)
-        if time.time()<halted_until:
-            live.worker('download','retry','upstream provider pause',halted_until)
-            time.sleep(min(10,halted_until-time.time()))
-            continue
-        halt=threading.Event()
-        claimed=[]
-        for i in range(WORKERS):
-            row=queue.claim_download(ready_manifest=BULK_ENABLED)
-            if row:claimed.append(row)
-            else:break
-        if not claimed:
-            live.worker('download','running')
-            time.sleep(POLL_SECONDS)
-            continue
-        good=0
-        with ThreadPoolExecutor(max_workers=WORKERS,
-                                thread_name_prefix='rfp-original-fetch') as pool:
-            tasks=[pool.submit(download_one,queue,row,halt) for row in claimed]
-            for task in as_completed(tasks):
-                good+=int(task.result() is True)
-        if halt.is_set():
-            halted_until=time.time()+1800
-            live.worker('download','retry','provider rate limit',halted_until)
-            print('RFP_DOWNLOAD_PROVIDER_PAUSE',json.dumps(
-                {'seconds':1800,'claimed':len(claimed)},separators=(',',':')),flush=True)
-        if not halt.is_set():live.worker('download','running')
-        print('RFP_DUAL_DOWNLOAD_BATCH',json.dumps(
-            {'started':len(claimed),'downloaded':good,'workers':WORKERS,
-             'queue':queue.stats()},separators=(',',':')),flush=True)
+                      type(exc).__name__,problem[:140],
+                      'retryAfterEpoch',round(planner_pause_until),
+                      'retrySeconds',seconds,flush=True)
+        time.sleep(1)
+
+
+def run_download_forever(queue,halt):
+    """Eight continuous download slots; refill on EACH completion."""
+    halted_until=0.0
+    last_report=time.monotonic()
+    started=0
+    downloaded=0
+    live.worker('download','running')
+    with ThreadPoolExecutor(max_workers=WORKERS,
+                            thread_name_prefix='rfp-original-fetch') as pool:
+        inflight={}
+        while True:
+            if BULK_ENABLED:
+                revived=queue.release_old_metadata_quota_retries()
+                if revived:
+                    print('RFP_OBSOLETE_QUOTA_RETRIES_RELEASED',
+                          json.dumps({'notices':revived,
+                                      'basis':'verified_bulk_manifest'}),flush=True)
+            if time.time()>=halted_until and not halt.is_set():
+                while len(inflight)<WORKERS:
+                    claim=queue.claim_download(ready_manifest=BULK_ENABLED)
+                    if claim is None:break
+                    future=pool.submit(download_one,queue,claim,halt)
+                    inflight[future]=claim
+                    started+=1
+            if inflight:
+                finished,_=wait(tuple(inflight),timeout=POLL_SECONDS,
+                                return_when=FIRST_COMPLETED)
+                for future in finished:
+                    claim=inflight.pop(future)
+                    try:
+                        succeeded=future.result()
+                    except Exception as exc:
+                        queue.download_failed(claim[0],
+                              'unexpected_worker_failure_'+type(exc).__name__,
+                              retry_seconds=300)
+                        print('RFP_DOWNLOAD_WORKER_UNEXPECTED_ERROR',
+                              type(exc).__name__,str(exc)[:140],flush=True)
+                        succeeded=False
+                    downloaded+=int(succeeded is True)
+            else:time.sleep(POLL_SECONDS)
+            if halt.is_set() and not inflight:
+                # Do not hold all file workers for half an hour for
+                # one old metadata provider error.
+                halted_until=time.time()+30
+                halt.clear()
+                live.worker('download','retry','provider rate limit',halted_until)
+                print('RFP_DOWNLOAD_PROVIDER_PAUSE',
+                      json.dumps({'seconds':30},separators=(',',':')),flush=True)
+            elif not halt.is_set() and time.time()>=halted_until:
+                live.worker('download','running')
+            if time.monotonic()-last_report>=10:
+                print('RFP_DUAL_DOWNLOAD_BATCH',json.dumps({
+                    'started':started,'downloaded':downloaded,
+                    'active':len(inflight),'workers':WORKERS,
+                    'queue':queue.stats()},separators=(',',':')),flush=True)
+                started=downloaded=0
+                last_report=time.monotonic()
+
+
+def run_forever():
+    configure_reader()
+    os.environ.setdefault('WORKLINKS_RFP_UPGRADE_ONLY','1')
+    os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
+    queue=RfpDualQueue(QUEUE)
+    queue.reset_stale()
+    planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
+                                  reader.fetch_json,META_PACE,
+                                  allow_exceptions=True)
+             if BULK_ENABLED else None)
+    halt=threading.Event()
+    manifest_thread=threading.Thread(
+        target=run_manifest_forever,args=(queue,planner),
+        name='rfp-manifest-supply',daemon=True)
+    manifest_thread.start()
+    print('RFP_INDEPENDENT_8_SLOT_WORKERS_STARTED',
+          json.dumps({'downloads':WORKERS,'manifestThread':True,
+                      'scanProcess':'separate'}),flush=True)
+    run_download_forever(queue,halt)
+
 
 if __name__=='__main__':
     run_forever()
