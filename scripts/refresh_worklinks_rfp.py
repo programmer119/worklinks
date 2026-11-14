@@ -34,6 +34,7 @@ except ModuleNotFoundError as exc:
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
+_NOTICE_DEADLINES={}
 _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
@@ -797,8 +798,9 @@ def download(url):
     reqkey=cache_key('official_attachment',url)
     notice_key=getattr(_NOTICE_CONTEXT,'notice_key',None)
     if ledger and not os.environ.get('WORKLINKS_RFP_FORCE_REDOWNLOAD'):
-        reusable=ledger.get_bytes(reqkey,max_age_seconds=7*24*3600)
+        reusable=ledger.get_bytes(reqkey)
         if reusable is not None:
+            ledger.link_attachment(reqkey,notice_key,getattr(_NOTICE_CONTEXT,'closes_on',''))
             ledger.record('attachment_reuse',reqkey,'verified_bytes_reused',
                           notice_key=notice_key,
                           response_sha256=hashlib.sha256(reusable).hexdigest())
@@ -817,7 +819,8 @@ def download(url):
                               notice_key=notice_key,
                               response_sha256=hashlib.sha256(raw).hexdigest(),
                               detail='bytes='+str(len(raw)))
-                ledger.save_bytes(reqkey,raw)
+                ledger.save_bytes(reqkey,raw,notice_key=notice_key,
+                                  closes_on=getattr(_NOTICE_CONTEXT,'closes_on',''))
             return raw
         except (urllib.error.HTTPError,TimeoutError,ConnectionError,
                 urllib.error.URLError,ValueError) as ex:
@@ -1749,9 +1752,11 @@ def process(no,ordn,metadata=None,previous=None):
             timer=time.perf_counter()
             try:
                 _NOTICE_CONTEXT.notice_key=no+':'+ordn
+                _NOTICE_CONTEXT.closes_on=_NOTICE_DEADLINES.get(no+':'+ordn,'')
                 raw=download(url)
             finally:
                 _NOTICE_CONTEXT.notice_key=None
+                _NOTICE_CONTEXT.closes_on=''
                 phase['downloadSeconds']+=time.perf_counter()-timer
             timer=time.perf_counter()
             try:
@@ -2149,6 +2154,9 @@ def main():
               if re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',k)}
     selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
                       priority=priority)
+    # RFP archive retention follows the official closing date, not scan date.
+    _NOTICE_DEADLINES.clear()
+    _NOTICE_DEADLINES.update({no+':'+order:date for no,order,date in selected if date})
     stage_done('load_and_discover')
     if os.environ.get('WORKLINKS_RFP_UPGRADE_ONLY')=='1':
         print('RFP_UPGRADE_SELECT_COUNT',len(selected),flush=True)
