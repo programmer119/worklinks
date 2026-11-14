@@ -46,7 +46,7 @@ with sync_playwright() as p:
     assert modal.get_attribute('aria-hidden')=='false'
     assert modal.is_visible()
     text=page.locator('#rfpRescanContent').inner_text()
-    for term in ['관리 대상','6','최신 판독 완료','판독 필요','5','구버전','2','최초 미판독','1',
+    for term in ['관리 대상','6','최신 판독 완료','재판독 필요','2','구버전','최초 미판독','1',
                  '실패','검증 미완료','역할·인원','인력 요구사항','HWPX 해석','33.3%']:
         assert term in text,(term,text)
     assert len(calls)>=1
