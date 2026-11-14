@@ -16,7 +16,8 @@ fake={
               'roles':{'total':6,'done':2,'remaining':4},
               'facts':{'total':6,'done':2,'remaining':4},
               'hwpx':{'total':2,'done':1,'remaining':1}},
-    'lanes':{'available':True,'download':{'total':1000,'done':850,'active':8,'failed':2},
+    'lanes':{'available':True,'manifest':{'total':1000,'done':900},
+             'download':{'total':1000,'done':850,'active':8,'failed':2},
              'scan':{'total':1000,'done':375,'active':4,'failed':0}},
     'worker':{'available':True,'upgradeActive':True,'continuousDrain':True,
               'tasks':{'rfpUpgrade':{'status':'started',
@@ -75,31 +76,44 @@ with sync_playwright() as p:
     modal=page.locator('#rfpRescanModal')
     assert modal.get_attribute('aria-hidden')=='false' and page.evaluate("() => document.getElementById('rfpRescanModal').classList.contains('open')")
     page.wait_for_function(
-      "() => document.querySelector('#rfpRescanContent')?.textContent.includes('서버 재판독')",
+      "() => document.querySelector('#rfpRescanContent')?.textContent.includes('실제 작업 진행 중')",
       timeout=12000)
     body=page.locator('#rfpRescanContent').text_content()
     for term in ('관리 대상','6','최신 판독 완료','1','재판독 필요','구버전',
-                 '최초 미판독','역할·인원','16.67%','서버 재판독','판독 중','원문 판독 중'):
+                 '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','다운로드 8건','판독 4건'):
         assert term in body,(term,body)
+    assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
     assert '원본 다운로드' in body and '850 / 1,000건' in body,body
-    assert '문서 스캔' in body and '375 / 1,000건' in body,body
+    assert '문서 판독' in body and '375 / 1,000건' in body,body
+    assert '진행률 =' not in body and '미판독·실패·구버전' not in body,body
+    assert page.locator('.rfp-rescan-livebar.is-active').count()==1
+    assert page.locator('[data-rfp-stage="download"].is-active').count()==1
+    assert page.locator('[data-rfp-stage="scan"].is-active').count()==1
+    assert page.locator('[data-rfp-stage="manifest"].is-active').count()==0
+    assert page.locator('#rfpRescanModalRefresh').inner_text().startswith('다음 조회')
+    page.evaluate("() => {window._rfpOriginalDownloadTrack=document.querySelector('[data-rfp-stage=\"download\"] .rfp-rescan-stage-track');}")
     assert page.locator('#rfpRescanLabel').inner_text().startswith('16.67%'), 'outer progress must stay unchanged'
 
     # A new server result must actually update both completed numerator and percentage.
     fake['counts'].update(completed=2,remaining=4,unscanned=0)
+    fake['lanes']['download']['done']=851
+    fake['lanes']['manifest']['done']=920
     fake['asOf']='2026-11-14T12:01:00+09:00'
     page.evaluate("() => refreshRfpRescanProgress(true)")
     page.wait_for_function(
       "() => document.getElementById('rfpRescanCount')?.textContent.includes('완료 2 / 6건')",
       timeout=12000)
     assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
-    assert '완료 +1건' in page.locator('#rfpRescanContent').text_content()
+    assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
+    assert '851 / 1,000건' in page.locator('#rfpRescanContent').text_content()
+    assert '920 / 1,000건' in page.locator('#rfpRescanContent').text_content()
+    assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
     page.evaluate("() => document.getElementById('rfpRescanClose').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
     assert modal.get_attribute('aria-hidden')=='true'
     page.evaluate("() => {rfpRescanProgress=null;rfpRescanProgressError='조회 오류';paintRfpRescanProgress();}")
-    assert page.locator('#rfpRescanCount').text_content()=='판독 현황 확인 불가'
+    assert page.locator('#rfpRescanCount').text_content()=='판독 현황 조회 불가'
     assert not errors,errors
     browser.close()
 print('WORKLINKS_RFP_RESCAN_LIVE_UI_REGRESSION=PASS')
