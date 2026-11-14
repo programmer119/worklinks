@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Triggered version upgrades rescan legacy, never consume first-scan slots."""
+"""Continuous RFP queue prioritizes legacy, then processes first-time notices."""
 import datetime as dt
 import os
 import runpy
@@ -47,9 +47,12 @@ finally:
     if previous_env is None:os.environ.pop('WORKLINKS_RFP_UPGRADE_ONLY',None)
     else:os.environ['WORKLINKS_RFP_UPGRADE_ONLY']=previous_env
 keys={no+':'+order for no,order,_ in chosen}
-assert keys=={'R26BK00000001:000','R26BK00000002:000','R26BK00000003:000'},(keys,chosen)
-# Initial scans remain eligible through the independent ordinary scanner.
+assert keys=={'R26BK00000001:000','R26BK00000002:000','R26BK00000003:000',
+              'R26BK00000005:000','R26BK00000007:000'},(keys,chosen)
+assert [no for no,_,_ in chosen[:3]]==[
+    'R26BK00000001','R26BK00000002','R26BK00000003'],chosen
+# The independent ordinary scanner can also process never-scanned notices.
 ordinary=m['discover'](8,saved,targets=set())
 ordinary_keys={no+':'+order for no,order,_ in ordinary}
 assert {'R26BK00000005:000','R26BK00000007:000'}.issubset(ordinary_keys),ordinary_keys
-print('WORKLINKS_RFP_UPGRADE_ONLY_QUEUE_REGRESSION=PASS',sorted(keys))
+print('WORKLINKS_RFP_CONTINUOUS_FIRST_TIME_QUEUE_REGRESSION=PASS',sorted(keys))
