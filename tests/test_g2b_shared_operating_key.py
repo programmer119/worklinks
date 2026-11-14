@@ -22,12 +22,12 @@ with tempfile.TemporaryDirectory() as work:
                              run_name='shared_g2b_key_test')
         crawler=runpy.run_path(str(ROOT/'server'/'g2b-full-crawler.py'),
                                run_name='shared_g2b_crawler_test')
-        assert proxy['get_key'](use_operating=True)=='approved-operating-test-key'
+        assert proxy['get_a02_key']()=='approved-operating-test-key'
         assert proxy['get_key']()=='legacy-env-override-must-not-win-A02'
         assert crawler['secret']()=='approved-operating-test-key'
         # Missing/invalid operating key MUST NOT silently fall back to old A02.
         b.write_text('UNRELATED_CONFIG=value\n',encoding='utf-8')
-        assert proxy['get_key'](use_operating=True)==''
+        assert proxy['get_a02_key']()==''
         try:
             crawler['secret']()
         except RuntimeError as exc:
