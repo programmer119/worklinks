@@ -46,7 +46,9 @@ with sync_playwright() as p:
     page.evaluate("() => { rfpRescanNextReadAt=Date.now()+6000; paintRfpCountdown(); }")
     seconds=int(page.locator('#rfpRescanSeconds').inner_text())
     assert 5<=seconds<=6,seconds
-    page.wait_for_timeout(1200)
+    page.wait_for_function(
+      "() => {const t=document.getElementById('rfpRescanSeconds')?.textContent; return t !== '…' && Number(t) < 6;}",
+      timeout=4500)
     updated=int(page.locator('#rfpRescanSeconds').inner_text())
     assert updated<seconds,(seconds,updated)
 
