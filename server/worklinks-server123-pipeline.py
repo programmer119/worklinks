@@ -27,7 +27,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
-RFP_DRAIN_ALGORITHM_VERSION = 'continuous-open-sw-and-extracted-text-cache-v1-20261114'
+RFP_DRAIN_ALGORITHM_VERSION = 'continuous-open-sw-async-image-ocr-v2-20261114'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
@@ -259,6 +259,10 @@ def run_once(kind, runner=None, _single=False):
         env = dict(os.environ, WORKLINKS_G2B_API=SOURCE_API,
                    WORKLINKS_RFP_ROLE_PRIORITY_KEYS=RFP_STAFFING_PRIORITY_KEYS,
                    WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'))
+        if kind in ('rfp','rfpUpgrade'):
+            # OCR repair remains full-fidelity, but the bulk scanner never
+            # holds every other notice behind multi-page Tesseract.
+            env['WORKLINKS_RFP_DEFER_OCR']='1'
         if kind == 'rfp':
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_rfp.py'),
                        '--limit', str(RFP_LIMIT)]
