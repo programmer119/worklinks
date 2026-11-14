@@ -3,7 +3,7 @@ import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl } from './worklinks-h
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
-const AUTH_UI_BUILD = '20261114-staffing-free-v5';
+const AUTH_UI_BUILD = '20261114-amount-compact-v6';
 const GUEST = {
   applied: 'externaltools_startup_support_status_v1',
   hidden: 'worklinks_startup_support_hidden_v1',
