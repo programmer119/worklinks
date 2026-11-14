@@ -100,7 +100,7 @@ class BulkManifestPlanner:
                 (day,source)).fetchall()
         return rows
 
-    def _reserve_api_call(self,source,day,page):
+    def _reserve_api_call(self,source,day,page,cost=1):
         stamp=dt.datetime.now(dt.timezone.utc)
         hourly=(stamp-dt.timedelta(hours=1)).isoformat()
         midnight=stamp.replace(hour=0,minute=0,second=0,microsecond=0).isoformat()
@@ -110,15 +110,15 @@ class BulkManifestPlanner:
                             (hourly,)).fetchone()[0]
             daily=db.execute("SELECT COUNT(*) FROM rfp_bulk_request_budget WHERE started_at>=?",
                              (midnight,)).fetchone()[0]
-            if hour>=HOURLY_LIMIT or daily>=DAILY_LIMIT:
+            if hour+cost>HOURLY_LIMIT or daily+cost>DAILY_LIMIT:
                 raise BulkManifestQuota('rfp_bulk_budget_hourly_or_daily')
-            db.execute('''INSERT INTO rfp_bulk_request_budget(started_at,source,day,page)
-                VALUES(?,?,?,?)''',(stamp.isoformat(),source,day,page))
+            db.executemany('''INSERT INTO rfp_bulk_request_budget(started_at,source,day,page)
+                VALUES(?,?,?,?)''',[(stamp.isoformat(),source,day,page)]*cost)
             # 3-day bounded history; avoid a forever-growing request ledger.
             db.execute("DELETE FROM rfp_bulk_request_budget WHERE started_at<?",
                        ((stamp-dt.timedelta(days=3)).isoformat(),))
 
-    def _source_for_day(self,day,source,needed_keys):
+    def _source_for_day(self,day,source,needed_keys,fetch_limit=None):
         cached=self._cached_pages(day,source)
         if cached is not None:return cached,0
         saved=self._pages_present(day,source)
@@ -127,6 +127,8 @@ class BulkManifestPlanner:
             raise BulkManifestError('invalid_cached_batch_total')
         if saved and saved[0][0]==1:
             first_raw=saved[0][2]
+            if known_total>0 and first_raw==0:
+                raise BulkManifestError('invalid_cached_batch_first_page')
             effective=(first_raw if known_total>first_raw else max(1,known_total))
         else:
             effective=ROWS
@@ -140,7 +142,7 @@ class BulkManifestPlanner:
             if page in existing:
                 page+=1
                 continue
-            if fetched>=MAX_FETCH_PER_PASS:
+            if fetched>=min(MAX_FETCH_PER_PASS,fetch_limit or MAX_FETCH_PER_PASS):
                 return None,fetched
             self._reserve_api_call(source,day,page)
             self.pacer.acquire()
@@ -217,16 +219,60 @@ class BulkManifestPlanner:
                                'source':'official_paginated_notice_detail'},
             'manifestOrigin':'verified_full_day_batch'}
 
+    def _single_for_day(self,day,keys):
+        """Use only 3 exact metadata calls for each sparse or absent bid.
+
+        An incomplete exact-source response is never stored. Reserve every
+        potential official call before dispatch, even if it is cache-served.
+        """
+        made=0
+        complete={}
+        for key in sorted(keys)[:8]:
+            if self.queue.bulk_manifest(key) is not None:continue
+            bid,order=key.split(':',1)
+            self._reserve_api_call('single',day,-1,cost=3)
+            self.pacer.acquire()
+            url=('http://127.0.0.1:18192/api/g2b/rfp-attachment-single?'+
+                 urllib.parse.urlencode({'bidNo':bid,'order':order}))
+            payload=self.fetch(url)
+            made+=3  # Budget reservations; authoritative provider calls may use cache.
+            docs=payload.get('attachments') or {}
+            notice=payload.get('noticeDocuments') or {}
+            if (payload.get('ok') is not True or
+                    docs.get('ok') is not True or docs.get('complete') is not True or
+                    notice.get('complete') is not True):
+                raise BulkManifestError('exact_official_attachment_not_complete')
+            complete[key]=payload
+        return {'new':self.queue.save_bulk_manifests(complete),'day':day,
+                'callsReserved':made,'mode':'sparse_exact_three_sources',
+                'pending':len(self.queue.unprepared_notices())}
+
     def populate_one_day(self):
-        """At most one day per pass; never touch the actual file-download queue."""
+        """One dense day or up to 8 sparse notices per pass, source safe."""
         mapping=self.posted_days()
-        if not mapping:return {'new':0,'missingPostedDate':len(self.queue.unprepared_notices()),'calls':0}
+        missing_keys=set(self.queue.unprepared_notices())-set(mapping)
+        if not mapping:
+            if missing_keys:
+                return self._single_for_day('unknown',missing_keys)
+            return {'new':0,'missingPostedDate':0,'calls':0}
         groups={}
         for key,day in mapping.items():groups.setdefault(day,set()).add(key)
-        # Most pending notices per official batch call first; latest day wins
-        # ties. Prevent expensive near-empty days from starving the backlog.
+        # Drain dense days first: one batch serves the maximum number of bids.
         day=max(groups,key=lambda value:(len(groups[value]),value))
         keys=groups[day]
+        # A sparse day's date query may be dozens of pages. Probe at most one
+        # first page, then compare three complete batches to 3 per-bid calls.
+        ordinary=self._pages_present(day,'ordinary')
+        if len(keys)<=8 and not ordinary:
+            _,made=self._source_for_day(day,'ordinary',keys,fetch_limit=1)
+            return {'new':0,'day':day,'calls':made,'probed':True}
+        if len(keys)<=8 and ordinary:
+            total=ordinary[0][1]
+            raw=ordinary[0][2]
+            effective=(raw if total>raw else max(1,total))
+            estimated=max(1,math.ceil(total/effective))*len(SOURCES)
+            if estimated>len(keys)*len(SOURCES):
+                return self._single_for_day(day,keys)
         sources={}
         calls=0
         for source in SOURCES:
@@ -235,8 +281,21 @@ class BulkManifestPlanner:
             if items is None:
                 return {'new':0,'day':day,'calls':calls,'partial':True}
             sources[source]=items
-        manifests={key:self._notice_meta(key,sources) for key in keys}
+        seen_keys=set()
+        for source,items in sources.items():
+            for row in items:
+                key=str(row.get('bidNo') or '')+':'+str(row.get('order') or '')
+                if key in keys:seen_keys.add(key)
+        # An entirely missing bid is not proof of "no attachment". Only an
+        # exact three-source confirmation can mark an empty manifest complete.
+        manifests={key:self._notice_meta(key,sources) for key in seen_keys}
         count=self.queue.save_bulk_manifests(manifests)
+        missing=keys-seen_keys
+        if missing:
+            one=self._single_for_day(day,missing)
+            return {'new':count+one['new'],'day':day,'calls':calls,
+                    'exactCallsReserved':one['callsReserved'],
+                    'missingExact':len(missing),'pending':one['pending']}
         return {'new':count,'day':day,'calls':calls,'sourceCounts':
                 {src:len(items) for src,items in sources.items()},
                 'pending':len(self.queue.unprepared_notices())}
