@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Triggered upgrades drain unscanned and outdated live notices without repeating successes."""
+"""Triggered version upgrades rescan legacy, never consume first-scan slots."""
 import datetime as dt
 import os
 import runpy
@@ -45,6 +45,9 @@ finally:
     if previous_env is None:os.environ.pop('WORKLINKS_RFP_UPGRADE_ONLY',None)
     else:os.environ['WORKLINKS_RFP_UPGRADE_ONLY']=previous_env
 keys={no+':'+order for no,order,_ in chosen}
-assert keys=={'R26BK00000001:000','R26BK00000002:000',
-              'R26BK00000005:000','R26BK00000007:000'},(keys,chosen)
+assert keys=={'R26BK00000001:000','R26BK00000002:000'},(keys,chosen)
+# Initial scans remain eligible through the independent ordinary scanner.
+ordinary=m['discover'](8,saved,targets=set())
+ordinary_keys={no+':'+order for no,order,_ in ordinary}
+assert {'R26BK00000005:000','R26BK00000007:000'}.issubset(ordinary_keys),ordinary_keys
 print('WORKLINKS_RFP_UPGRADE_ONLY_QUEUE_REGRESSION=PASS',sorted(keys))
