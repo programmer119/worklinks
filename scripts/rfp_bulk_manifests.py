@@ -16,7 +16,7 @@ import urllib.parse
 
 SOURCES=('ordinary','eorder','detail')
 ROWS=1000
-MAX_PAGES_PER_DAY_SOURCE=60
+MAX_PAGES_PER_DAY_SOURCE=500
 MAX_FETCH_PER_PASS=18
 DAILY_LIMIT=180
 HOURLY_LIMIT=36
@@ -59,6 +59,15 @@ class BulkManifestPlanner:
             result[key]=date.isoformat()
         return result
 
+    @staticmethod
+    def _required_pages(total,first_count):
+        # Some government gateways cap numOfRows=1000 to 10 actual rows.
+        # The first page's actual size, never the requested size, controls
+        # pagination. Incomplete/empty first pages must fail closed.
+        if total<0 or first_count<0 or (total>0 and first_count==0):
+            raise BulkManifestError('batch_invalid_first_page_size')
+        return max(1,math.ceil(total/first_count)) if total else 1
+
     def _cached_pages(self,day,source):
         with self.queue.connect() as db:
             rows=db.execute('''SELECT page,total_count,raw_count,items_json
@@ -66,10 +75,15 @@ class BulkManifestPlanner:
                 (day,source)).fetchall()
         if not rows:return None
         total=rows[0][1]
-        required=max(1,math.ceil(total/ROWS))
+        if rows[0][0]!=1:return None
+        try:required=self._required_pages(total,rows[0][2])
+        except BulkManifestError:return None
+        effective=rows[0][2]
         if (required>MAX_PAGES_PER_DAY_SOURCE or len(rows)!=required or
                 [row[0] for row in rows]!=list(range(1,required+1)) or
                 any(row[1]!=total or not 0<=row[2]<=ROWS for row in rows) or
+                any(row[2]!=min(effective,max(0,total-i*effective))
+                    for i,row in enumerate(rows)) or
                 sum(row[2] for row in rows)!=total):
             return None
         return [record for row in rows for record in json.loads(row[3])]
@@ -106,7 +120,11 @@ class BulkManifestPlanner:
         known_total=saved[0][1] if saved else None
         if known_total is not None and known_total<0:
             raise BulkManifestError('invalid_cached_batch_total')
-        pages=max(1,math.ceil(known_total/ROWS)) if known_total is not None else 1
+        effective=saved[0][2] if saved and saved[0][0]==1 else None
+        if saved and effective is None:
+            raise BulkManifestError('batch_missing_first_page')
+        pages=(self._required_pages(known_total,effective)
+               if known_total is not None else 1)
         if pages>MAX_PAGES_PER_DAY_SOURCE:
             raise BulkManifestError('batch_page_count_unprofitable')
         existing={row[0] for row in saved}
@@ -135,7 +153,12 @@ class BulkManifestPlanner:
                     payload.get('source')!=source or
                     not isinstance(payload.get('items'),list)):
                 raise BulkManifestError('batch_invalid_provider_pagination')
-            expected=max(1,math.ceil(count/ROWS))
+            if effective is None:
+                if page!=1:raise BulkManifestError('batch_first_page_not_fetched')
+                effective=raw
+            expected=self._required_pages(count,effective)
+            if raw!=min(effective,max(0,count-(page-1)*effective)):
+                raise BulkManifestError('batch_unexpected_effective_page_size')
             if expected>MAX_PAGES_PER_DAY_SOURCE:
                 raise BulkManifestError('batch_page_count_unprofitable')
             if known_total is not None and count!=known_total:
