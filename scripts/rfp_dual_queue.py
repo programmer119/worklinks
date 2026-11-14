@@ -41,6 +41,24 @@ class RfpDualQueue:
             )''')
             db.execute('''CREATE INDEX IF NOT EXISTS dual_queue_fetch
                 ON rfp_dual_notices(download_status,download_retry_epoch)''')
+            db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_manifests(
+                notice_key TEXT PRIMARY KEY,
+                metadata_json TEXT NOT NULL,
+                sources TEXT NOT NULL,
+                saved_at TEXT NOT NULL
+            )''')
+            db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_pages(
+                day TEXT NOT NULL, source TEXT NOT NULL, page INTEGER NOT NULL,
+                total_count INTEGER NOT NULL, raw_count INTEGER NOT NULL,
+                items_json TEXT NOT NULL, saved_at TEXT NOT NULL,
+                PRIMARY KEY(day,source,page)
+            )''')
+            db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_request_budget(
+                started_at TEXT NOT NULL, source TEXT NOT NULL, day TEXT NOT NULL,
+                page INTEGER NOT NULL
+            )''')
+            db.execute('''CREATE INDEX IF NOT EXISTS rfp_bulk_request_started
+                ON rfp_bulk_request_budget(started_at)''')
             db.execute('''CREATE INDEX IF NOT EXISTS dual_queue_scan
                 ON rfp_dual_notices(scan_status,download_status,scan_retry_epoch)''')
 
@@ -96,19 +114,47 @@ class RfpDualQueue:
             db.execute("UPDATE rfp_dual_notices SET download_status='pending' WHERE download_status='fetching'")
             # Scanner claims are recovered on their own timeout, not on downloader restart.
 
-    def claim_download(self):
+    def claim_download(self,ready_manifest=False):
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
             row=db.execute('''SELECT notice_key,closes_on FROM rfp_dual_notices
                 WHERE download_status IN ('pending','retry')
                 AND download_retry_epoch<=?
+                AND (?=0 OR EXISTS(SELECT 1 FROM rfp_bulk_manifests
+                    WHERE rfp_bulk_manifests.notice_key=rfp_dual_notices.notice_key))
                 ORDER BY download_retry_epoch,updated_at,notice_key LIMIT 1''',
-                (time.time(),)).fetchone()
+                (time.time(),int(ready_manifest))).fetchone()
             if row:
                 db.execute('''UPDATE rfp_dual_notices SET download_status='fetching',
                     download_attempts=download_attempts+1,updated_at=?
                     WHERE notice_key=?''',(now_utc(),row[0]))
             return row
+
+    def save_bulk_manifests(self,records):
+        # Publish a complete three-source manifest atomically, never partial.
+        if not records:return 0
+        with self.connect() as db:
+            db.executemany('''INSERT INTO rfp_bulk_manifests(
+                notice_key,metadata_json,sources,saved_at)
+                VALUES (?,?,?,?) ON CONFLICT(notice_key) DO UPDATE SET
+                metadata_json=excluded.metadata_json,
+                sources=excluded.sources,saved_at=excluded.saved_at''',
+                [(key,json.dumps(metadata,ensure_ascii=False,separators=(',',':')),
+                  'ordinary,eorder,detail',now_utc()) for key,metadata in records.items()])
+        return len(records)
+
+    def bulk_manifest(self,key):
+        with self.connect() as db:
+            row=db.execute('''SELECT metadata_json FROM rfp_bulk_manifests
+                WHERE notice_key=?''',(key,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def unprepared_notices(self):
+        with self.connect() as db:
+            return [x[0] for x in db.execute('''SELECT notice_key FROM rfp_dual_notices
+                WHERE download_status IN ('pending','retry')
+                AND NOT EXISTS(SELECT 1 FROM rfp_bulk_manifests
+                    WHERE rfp_bulk_manifests.notice_key=rfp_dual_notices.notice_key)''')]
 
     def downloaded(self,key,metadata,done,total):
         payload=json.dumps(metadata,ensure_ascii=False,separators=(',',':'))
