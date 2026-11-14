@@ -906,7 +906,7 @@ def _eligible_prefetch_positions(manifest,processing_order,reusable):
     return result
 
 
-def download(url,*,rate_gate=None):
+def download(url,*,rate_gate=None,progress=None):
     # Persist small official binaries even if text extraction later fails.
     # A parser-only retry can then reuse the exact bytes without an HTTP call.
     ledger=active_rfp_ledger()
@@ -915,6 +915,7 @@ def download(url,*,rate_gate=None):
     if ledger and not os.environ.get('WORKLINKS_RFP_FORCE_REDOWNLOAD'):
         reusable=ledger.get_bytes(reqkey)
         if reusable is not None:
+            if progress:progress(len(reusable),len(reusable),True)
             ledger.link_attachment(reqkey,notice_key,getattr(_NOTICE_CONTEXT,'closes_on',''))
             ledger.record('attachment_reuse',reqkey,'verified_bytes_reused',
                           notice_key=notice_key,
@@ -936,8 +937,22 @@ def download(url,*,rate_gate=None):
                 status=getattr(r,'status',200)
                 size=int(r.headers.get('Content-Length') or '0')
                 if size>MAX_FILE:raise ValueError('large_file')
-                raw=r.read(MAX_FILE+1)
-                if len(raw)>MAX_FILE:raise ValueError('large_file')
+                chunks=[]
+                received=0
+                last_report=0.0
+                if progress:progress(0,size,False)
+                while True:
+                    block=r.read(min(256*1024,MAX_FILE+1-received))
+                    if not block:break
+                    chunks.append(block)
+                    received+=len(block)
+                    if received>MAX_FILE:raise ValueError('large_file')
+                    now_tick=time.monotonic()
+                    if progress and (now_tick-last_report>=0.4 or (size and received>=size)):
+                        progress(received,size,False)
+                        last_report=now_tick
+                raw=b''.join(chunks)
+                if progress:progress(received,size or received,True)
             if ledger:
                 ledger.record('attachment_http',reqkey,'http_ok',http_status=status,
                               notice_key=notice_key,
