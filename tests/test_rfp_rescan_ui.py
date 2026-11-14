@@ -42,6 +42,7 @@ with sync_playwright() as p:
     # expose its existing nodes for a focused layout test without changing
     # the production authentication behavior.
     page.evaluate("""() => {
+      document.querySelectorAll('[inert]').forEach(el=>el.removeAttribute('inert'));
       let n=document.getElementById('rfpRescanLaunch');
       for(;n;n=n.parentElement){
         if(getComputedStyle(n).display==='none')n.style.display='block';
