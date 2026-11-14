@@ -81,6 +81,7 @@ def connect():
     db.execute('PRAGMA journal_mode=WAL')
     db.execute('CREATE TABLE IF NOT EXISTS bid_notices (kind TEXT NOT NULL,bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,payload TEXT NOT NULL,first_seen TEXT NOT NULL,last_seen TEXT NOT NULL,PRIMARY KEY(kind,bid_no,bid_ord))')
     db.execute('CREATE INDEX IF NOT EXISTS bid_notices_seen_idx ON bid_notices(last_seen DESC)')
+    db.execute('CREATE INDEX IF NOT EXISTS bid_notices_number_ordinal_idx ON bid_notices(bid_no,bid_ord)')
     cols=[r[1] for r in db.execute('PRAGMA table_info(bid_notices)').fetchall()]
     if 'sw_candidate' not in cols:
         db.execute('ALTER TABLE bid_notices ADD COLUMN sw_candidate INTEGER NOT NULL DEFAULT 0')

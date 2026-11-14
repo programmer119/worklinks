@@ -946,6 +946,8 @@ def open_bid_db():
     con.execute('PRAGMA busy_timeout=15000')
     con.execute('CREATE TABLE IF NOT EXISTS bid_notices (kind TEXT NOT NULL, bid_no TEXT NOT NULL, bid_ord TEXT NOT NULL, payload TEXT NOT NULL, first_seen TEXT NOT NULL, last_seen TEXT NOT NULL, PRIMARY KEY (kind,bid_no,bid_ord))')
     con.execute('CREATE INDEX IF NOT EXISTS bid_notices_seen_idx ON bid_notices(last_seen DESC)')
+    # Latest-ordinal anti-join uses bid_no without kind; the PK starts with kind.
+    con.execute('CREATE INDEX IF NOT EXISTS bid_notices_number_ordinal_idx ON bid_notices(bid_no,bid_ord)')
     fields=[row[1] for row in con.execute('PRAGMA table_info(bid_notices)').fetchall()]
     if 'sw_candidate' not in fields:
         con.execute('ALTER TABLE bid_notices ADD COLUMN sw_candidate INTEGER NOT NULL DEFAULT 0')
