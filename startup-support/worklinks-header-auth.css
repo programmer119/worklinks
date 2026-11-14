@@ -40,7 +40,7 @@ html[data-worklinks-auth-state="locked"] body > main{visibility:hidden!important
 .worklinks-auth-gate h2{margin:24px 0 10px;font-size:22px;line-height:1.35;letter-spacing:-.4px}
 .worklinks-auth-gate p{margin:0 0 26px;color:#596779;font-size:15px;line-height:1.65;overflow-wrap:anywhere}
 .worklinks-auth-gate-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.worklinks-auth-gate-actions a,.worklinks-auth-gate-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 22px;border-radius:10px;border:1px solid #173e6c;background:#173e6c;color:#fff;text-decoration:none;font:750 15px/1.4 inherit;cursor:pointer}
+.worklinks-auth-gate-actions a,.worklinks-auth-gate-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 22px;border-radius:10px;border:1px solid #173e6c;background:#173e6c;color:#fff;text-decoration:none;font-size:15px;font-weight:750;line-height:1.4;font-family:inherit;cursor:pointer}
 .worklinks-auth-gate-actions button{border-color:#c7d4e3;background:#fff;color:#173e6c}
 .worklinks-auth-gate-actions [hidden]{display:none!important}
 .worklinks-auth-gate-actions a:hover{background:#245589}
