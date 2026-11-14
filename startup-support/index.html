@@ -1144,24 +1144,25 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{font-size:24px}
 }
 
-/* Changcom: keep tender title on the left and budget anchored to the far right.
-   Use the available CARD width, not the entire browser viewport. */
+/* Changcom amount alignment, 2026-11-14.
+   Match the visible height of a two-line heading with one single-line price.
+   The content sets its own height: no empty forced headline block. */
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-core{
  container:changcom-card / inline-size
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
  display:grid;grid-template-columns:minmax(0,1fr) max-content;
  align-items:center;justify-content:stretch;
- column-gap:14px;row-gap:0;min-width:0;min-height:78px
+ column-gap:12px;row-gap:0;min-width:0;min-height:0
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline h3{
- min-width:0;width:auto;margin:0;
- font-size:clamp(22px,2.7cqw,26px);line-height:1.4;
- word-break:keep-all;overflow-wrap:break-word;hyphens:none;
- align-self:center
+ min-width:0;width:auto;margin:0;align-self:center;
+ font-size:clamp(20px,3.2cqw,26px);line-height:1.35;
+ font-weight:850;word-break:keep-all;overflow-wrap:break-word;hyphens:none
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-card-title{
- min-width:0;word-break:keep-all;overflow-wrap:break-word;hyphens:none
+ display:block;min-width:0;white-space:normal;
+ line-height:inherit;word-break:keep-all;overflow-wrap:break-word;hyphens:none
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
  display:flex;min-width:0;width:auto;max-width:100%;
@@ -1169,40 +1170,38 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
  display:block;flex:none;width:max-content;max-width:100%;
- margin:0 0 0 auto;padding:0;
- text-align:right;white-space:nowrap;overflow:visible;text-overflow:clip;
- font-size:clamp(34px,4.5cqw,48px);line-height:1.18;
+ margin:0;padding:0;white-space:nowrap;overflow:visible;text-overflow:clip;
+ font-size:clamp(48px,7.6cqw,62px);line-height:1.05;
  font-weight:900;letter-spacing:-.7px;color:#102c53;
- font-variant-numeric:tabular-nums
+ text-align:right;font-variant-numeric:tabular-nums
 }
 #jobsView[data-job-mode="partner"] #jobCards .job-bid-method-cell.job-business-meta{
  display:inline-flex;align-items:baseline;gap:0
 }
-/* Only genuinely narrow cards stack price onto a separate right-aligned line. */
-@container changcom-card (max-width:520px){
+/* Only narrow cards that cannot fit both readable texts will stack.
+   A usual ~650px Changcom card stays strictly left title / right price. */
+@container changcom-card (max-width:550px){
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
-  grid-template-columns:minmax(0,1fr);row-gap:5px;min-height:0
+  grid-template-columns:minmax(0,1fr);row-gap:4px;min-height:0
  }
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
-  width:100%;max-width:100%;justify-self:stretch;justify-content:flex-end;
-  align-self:auto
+  width:100%;max-width:100%;justify-self:stretch;justify-content:flex-end
  }
  #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
-  font-size:clamp(26px,7.2cqw,36px);margin-left:auto;
-  text-align:right;white-space:normal;word-break:keep-all
+  font-size:clamp(28px,6cqw,40px);white-space:normal;
+  word-break:keep-all;text-align:right;margin-left:auto
  }
 }
-/* Fallback in older browsers without container queries. */
 @supports not (container-type:inline-size){
- @media(max-width:560px){
+ @media(max-width:590px){
   #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline{
-   grid-template-columns:minmax(0,1fr);row-gap:5px;min-height:0
+   grid-template-columns:minmax(0,1fr);row-gap:4px;min-height:0
   }
   #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side{
    width:100%;max-width:100%;justify-self:stretch;justify-content:flex-end
   }
   #jobsView[data-job-mode="partner"] #jobCards .job-mini .job-headline-side .job-amount{
-   margin-left:auto;text-align:right;white-space:normal;font-size:28px
+   font-size:30px;white-space:normal;word-break:keep-all;margin-left:auto
   }
  }
 }
