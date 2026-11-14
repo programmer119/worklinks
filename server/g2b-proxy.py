@@ -23,6 +23,7 @@ BIND_HOST = os.environ.get('BIND_HOST', '127.0.0.1')
 TLS_CERT_FILE = os.environ.get('G2B_TLS_CERT_FILE', '').strip()
 TLS_KEY_FILE = os.environ.get('G2B_TLS_KEY_FILE', '').strip()
 SECRET_PATH = os.environ.get('G2B_SECRET_PATH', '/home/worklinks/g2b/secrets/g2b.env')
+OPERATING_KEY_PATH = os.environ.get('G2B_OPERATING_KEY_PATH', '').strip()
 API_BASE = 'https://apis.data.go.kr/1230000/ad/BidPublicInfoService02'
 AWARD_BASE = 'https://apis.data.go.kr/1230000/as/ScsbidInfoService'
 CONTRACT_BASE = 'https://apis.data.go.kr/1230000/ao/CntrctInfoService'
@@ -62,6 +63,7 @@ def api_ledger_event(ledger,kind,key,outcome,**fields):
 
 
 def get_key():
+    # Legacy key remains available ONLY to other separately subscribed APIs.
     k = os.environ.get('G2B_SERVICE_KEY', '').strip()
     if k: return k
     try:
@@ -71,6 +73,20 @@ def get_key():
                     return line.split('=', 1)[1].strip()
     except (OSError, IOError): pass
     return ''
+
+
+def get_a02_key():
+    # A02 uses the same independently verified operating key as B1/B2/B3.
+    # Fail closed if its explicitly configured file is missing or invalid.
+    if OPERATING_KEY_PATH:
+        try:
+            with open(OPERATING_KEY_PATH, 'r') as f:
+                for line in f:
+                    if line.startswith('G2B_STANDARD_SERVICE_KEY='):
+                        return line.split('=', 1)[1].strip()
+        except (OSError, IOError): pass
+        return ''
+    return get_key()
 
 class ApiError(Exception):
     def __init__(self, msg, status=502):
@@ -147,7 +163,8 @@ def upstream_rate_diagnostics():
             'notProviderAccountUsage':True,'utcDate':today,'services':records}
 
 def request_api(base, operation, params):
-    token = get_key()
+    # Scope the shared credential to A02; leave other subscribed services alone.
+    token = get_a02_key() if base == API_BASE else get_key()
     if not token: raise ApiError('secret_not_configured', 503)
     args = {'serviceKey':token, 'type':'json'}
     args.update(params)

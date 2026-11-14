@@ -31,6 +31,7 @@ def shared_ledger():
 
 DB_PATH=os.environ.get('G2B_DB_PATH','/app/data/bids.sqlite3')
 KEY_FILE=os.environ.get('G2B_SECRET_PATH','/run/secrets/g2b.env')
+OPERATING_KEY_FILE=os.environ.get('G2B_OPERATING_KEY_PATH','').strip()
 API_ROOT='https://apis.data.go.kr/1230000/ad/BidPublicInfoService02'
 OPERATIONS={
  'servc':'getBidPblancListInfoServcPPSSrch02',
@@ -55,6 +56,14 @@ signal.signal(signal.SIGTERM,shutdown)
 signal.signal(signal.SIGINT,shutdown)
 
 def secret():
+    # Keep the crawler on the same verified operating credential as B1/B2/B3.
+    if OPERATING_KEY_FILE:
+        with open(OPERATING_KEY_FILE,encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('G2B_STANDARD_SERVICE_KEY='):
+                    value=line.split('=',1)[1].strip()
+                    if value:return value
+        raise RuntimeError('g2b_operating_key_missing')
     value=os.environ.get('G2B_SERVICE_KEY','').strip()
     if value:return value
     with open(KEY_FILE,encoding='utf-8') as f:
