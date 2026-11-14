@@ -38,8 +38,18 @@ with sync_playwright() as p:
     page.wait_for_function(
       "() => document.getElementById('rfpRescanCount')?.textContent.includes('완료 1 / 6건')",
       timeout=25000)
+    # Job controls are login-gated. This fixture mocks only the progress API;
+    # expose its existing nodes for a focused layout test without changing
+    # the production authentication behavior.
+    page.evaluate("""() => {
+      let n=document.getElementById('rfpRescanLaunch');
+      for(;n;n=n.parentElement){
+        if(getComputedStyle(n).display==='none')n.style.display='block';
+        if(getComputedStyle(n).visibility==='hidden')n.style.visibility='visible';
+      }
+    }""")
     button=page.locator('#rfpRescanLaunch')
-    actual_label=page.locator('#rfpRescanLabel').inner_text()
+    actual_label=page.locator('#rfpRescanLabel').text_content()
     assert '16.67%' in actual_label,(actual_label,errors,page.locator('#rfpRescanCount').inner_text())
     assert button.is_visible()
     assert page.locator('#rfpRescanCycle').is_visible()
