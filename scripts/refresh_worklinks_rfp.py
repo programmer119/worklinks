@@ -10,6 +10,7 @@ import io
 import json
 import os
 import shutil
+import sqlite3
 import threading
 from pathlib import Path
 import re
@@ -421,6 +422,61 @@ def pending_urgent_recovery(path=CHANGCOM_URGENT_RECOVERY):
         print('RFP_URGENT_QUEUE_UNAVAILABLE',type(ex).__name__,flush=True)
         return set()
 
+def iter_saved_sw_pages():
+    """Use the already-mounted local SQLite, not 18 proxy HTTP pages per batch.
+
+    The same bid_notices + license-cache rows back /saved?sw=1. The database
+    is opened read-only; no government requests or snapshot mutations occur.
+    """
+    local_db=ROOT/'bids.sqlite3'
+    if local_db.is_file():
+        try:
+            with sqlite3.connect('file:'+str(local_db)+'?mode=ro',
+                                 uri=True,timeout=15) as db:
+                db.execute('PRAGMA busy_timeout=15000')
+                try:
+                    query=("SELECT b.payload,q.payload FROM bid_notices b "
+                           "LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no "
+                           "AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
+                           "WHERE b.sw_candidate=1 ORDER BY b.last_seen DESC "
+                           "LIMIT ? OFFSET ?")
+                    db.execute("SELECT 1 FROM bid_license_cache LIMIT 1")
+                except sqlite3.OperationalError:
+                    query=("SELECT b.payload,NULL FROM bid_notices b "
+                           "WHERE b.sw_candidate=1 ORDER BY b.last_seen DESC "
+                           "LIMIT ? OFFSET ?")
+                offset=0
+                while True:
+                    values=db.execute(query,(500,offset)).fetchall()
+                    if not values:break
+                    rows=[]
+                    for payload,qual in values:
+                        try:item=json.loads(payload)
+                        except (TypeError,ValueError):continue
+                        if isinstance(item,dict):
+                            if qual:
+                                try:item['bidEligibility']=json.loads(qual)
+                                except (TypeError,ValueError):pass
+                            rows.append(item)
+                    yield rows
+                    offset+=len(values)
+                    if len(values)<500:break
+                print('RFP_SAVED_DISCOVERY_LOCAL_SQLITE',offset,flush=True)
+                return
+        except sqlite3.Error as error:
+            print('RFP_LOCAL_SQLITE_FALLBACK',type(error).__name__,flush=True)
+    for offset in range(0,100000,500):
+        data=fetch_json(BASE+'saved?sw=1&limit=500&offset='+str(offset))
+        if not data.get('ok'):
+            raise RuntimeError('RFP_DISCOVER_SERVER_ERROR '+str(data.get('error') or 'unknown'))
+        rows=data.get('items') or []
+        if not rows:break
+        yield rows
+        if offset+len(rows)>=int(data.get('totalCount') or 0):break
+    else:
+        print('RFP_DISCOVER_PAGINATION_LIMIT_REACHED','offset_limit',100000)
+
+
 def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None):
     """Visit ALL indexed SW bids; retain past scan timestamps to rotate fairly.
 
@@ -446,13 +502,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
     today=dt.datetime.now(tz).date()
     utc=dt.datetime.now(dt.timezone.utc)
     try:
-        for offset in range(0,100000,500):
-            data=fetch_json(BASE+'saved?sw=1&limit=500&offset='+str(offset))
-            if not data.get('ok'):
-                print('RFP_DISCOVER_SERVER_ERROR',data.get('error','unknown'))
-                break
-            total=int(data.get('totalCount') or 0)
-            rows=data.get('items') or []
+        for rows in iter_saved_sw_pages():
             for item in rows:
                 no=str(item.get('bidNo') or '')
                 if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11})',no):continue
@@ -535,9 +585,6 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                       date if date is not None and date>=today else today+dt.timedelta(days=3650),
                       0 if item.get('kind')=='servc' else 1,key)
                 seen[key]=(rank,no,order,date.isoformat() if date else '')
-            if not rows or offset+len(rows)>=total:break
-        else:
-            print('RFP_DISCOVER_PAGINATION_LIMIT_REACHED','offset_limit',100000)
     except Exception as error:
         print('SAVED_NOTICE_DISCOVERY_UNAVAILABLE',type(error).__name__,str(error)[:140])
     # Old parser versions still get retried after all currently open/unread
