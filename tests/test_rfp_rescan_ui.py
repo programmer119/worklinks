@@ -30,9 +30,37 @@ with sync_playwright() as p:
         calls.append(route.request.url)
         route.fulfill(status=200,content_type='application/json',
                       body=json.dumps(fake,ensure_ascii=False))
+    # Access the modal as an authenticated member, rather than trying to
+    # inspect controls hidden by the login gate.
+    def auth(route):
+        path=route.request.url.split('?',1)[0]
+        cors={'access-control-allow-origin':'*',
+              'access-control-allow-methods':'GET, POST, OPTIONS',
+              'access-control-allow-headers':'authorization, content-type, accept'}
+        if route.request.method=='OPTIONS':
+            route.fulfill(status=204,headers=cors)
+        elif path.endswith('/v1/config/p47'):
+            route.fulfill(status=200,json={'project':{'slug':'p47'},'environment':'production'},headers=cors)
+        elif path.endswith('/v1/me'):
+            route.fulfill(status=200,json={
+                'user':{'id':'progress-qa-user','email':'progress-qa@example.com'},
+                'membership':{'status':'active'}},headers=cors)
+        else:
+            route.fulfill(status=200,json={'ok':True},headers=cors)
+    page.route('https://api-authhub.suaveforge.com/**',auth)
+    page.route('**/api/g2b/worklinks-state*',lambda route: route.fulfill(
+        status=200,json={'ok':True,'records':[]},
+        headers={'access-control-allow-origin':'*'}))
+    page.add_init_script("""
+      if(location.hostname==='127.0.0.1'){
+        localStorage.setItem('authhub:p47:production:session',
+          JSON.stringify({accessToken:'qa-access',refreshToken:'qa-refresh'}));
+      }
+    """)
     # Match cache-busting query parameters as well as the bare URL.
     page.route('**/api/g2b/rfp-rescan-progress*',respond)
     page.goto(url,wait_until='domcontentloaded',timeout=60000)
+    page.locator('#worklinks-auth-gate').wait_for(state='hidden',timeout=25000)
     page.wait_for_function(
       "() => document.getElementById('rfpRescanCount')?.textContent.includes('완료 1 / 6건')",
       timeout=25000)
