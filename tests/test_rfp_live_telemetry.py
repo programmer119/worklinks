@@ -33,6 +33,23 @@ with tempfile.TemporaryDirectory() as temp:
     assert workers['manifest']['retryEpoch']>time.time()+3500
     files=[row for row in snapshot['items'] if row['fileName']=='사업제안요청서.pdf']
     assert len(files)==1 and files[0]['bytesDone']==524288
+    started=files[0]['startedEpoch']
+    first_byte_epoch=files[0]['byteProgressEpoch']
+    assert started>0 and first_byte_epoch>=started,snapshot
+    time.sleep(.02)
+    activity.record('download','R26BK00000001:000',file_key='f1',
+                    file_name='사업제안요청서.pdf',phase='전송 중',
+                    bytes_done=524288,bytes_total=2097152,files_done=0,files_total=3)
+    steady=[row for row in activity.snapshot()['items'] if row['fileName']=='사업제안요청서.pdf'][0]
+    assert steady['startedEpoch']==started
+    assert steady['byteProgressEpoch']==first_byte_epoch,steady
+    time.sleep(.02)
+    activity.record('download','R26BK00000001:000',file_key='f1',
+                    file_name='사업제안요청서.pdf',phase='전송 중',
+                    bytes_done=1048576,bytes_total=2097152,files_done=0,files_total=3)
+    advanced=[row for row in activity.snapshot()['items'] if row['fileName']=='사업제안요청서.pdf'][0]
+    assert advanced['startedEpoch']==started
+    assert advanced['byteProgressEpoch']>first_byte_epoch,advanced
     assert files[0]['bytesTotal']==2097152
     assert files[0]['filesTotal']==3
     error=[row for row in snapshot['items'] if row['status']=='retry']
@@ -41,6 +58,15 @@ with tempfile.TemporaryDirectory() as temp:
                     file_name='사업제안요청서.pdf',phase='저장 완료',
                     status='done',bytes_done=2097152,bytes_total=2097152)
     assert any(item['status']=='done' for item in activity.snapshot()['items'])
+    activity.record('download','R26BK00000001:000',file_key='f1',
+                    file_name='사업제안요청서.pdf',phase='재전송',
+                    status='retry',retry_epoch=time.time()+60,error='HTTP 503')
+    activity.record('download','R26BK00000001:000',file_key='f1',
+                    file_name='사업제안요청서.pdf',phase='전송 중',
+                    status='working',bytes_done=0,bytes_total=2097152)
+    restarted=[row for row in activity.snapshot()['items'] if row['fileName']=='사업제안요청서.pdf'][0]
+    assert restarted['startedEpoch']>started, restarted
+
     # A lock on telemetry may not crash the actual workers.
     original=activity.connect
     def fail_connect(*args,**kwargs):
