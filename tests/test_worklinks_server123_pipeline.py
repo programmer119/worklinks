@@ -177,6 +177,27 @@ with tempfile.TemporaryDirectory() as temporary:
     assert fair['rfpOpenRepairUpgradeBatch']==12
     again=m.iteration(now+7,count_repair)
     assert repair_calls==['ocr'],repair_calls
+    # A successful continuous first-time scan must not be blocked by a
+    # scheduled OCR or top-500 repair job, regardless of batch count.
+    keep=m.read_state()
+    keep['rfpUpgradeActive']=True
+    keep['rfpUpgrade']={'status':'ok','attemptEpoch':now+7}
+    keep['rfpOpenRepair']={'status':'ok','attemptEpoch':0}
+    keep['rfpRepair']={'status':'ok','attemptEpoch':0}
+    keep['rfpUpgradeBatchesCompleted']=101
+    m.publish_state(keep)
+    repair_blockers=[]
+    def nonblocking_runner(args,**kwargs):
+        if any(v in args[1] for v in (
+                'repair_open_rfp_cached_attachments.py',
+                'repair_changcom_top500_rfp.py')):
+            repair_blockers.append(args[1])
+        return mock_runner(args,**kwargs)
+    active_next=m.iteration(now+8,nonblocking_runner)
+    assert active_next['rfpUpgrade']['status']=='ok'
+    assert not repair_blockers,repair_blockers
+    print('WORKLINKS_CONTINUOUS_SCAN_NOT_BLOCKED_BY_REPAIRS=PASS')
+
     print('WORKLINKS_RFP_UPGRADE_12_BATCH_OCR_FAIRNESS=PASS')
 
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
