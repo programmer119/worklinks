@@ -3,6 +3,7 @@ import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl } from './worklinks-h
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
+const AUTH_UI_BUILD = '20261114-auth-watch-v3';
 const GUEST = {
   applied: 'externaltools_startup_support_status_v1',
   hidden: 'worklinks_startup_support_hidden_v1',
@@ -68,7 +69,7 @@ function setAuthGate(mode='login',message='로그인이 필요합니다.'){
     ? '연결 상태를 확인한 후 다시 시도해 주세요. 기존 저장 기록은 삭제되지 않습니다.'
     : '다시 로그인하면 기존 계정의 저장 기록을 이어서 사용할 수 있습니다.';
   if(login)login.href=worklinksHostedAuthUrl('login');
-  if(login)login.hidden=mode==='error';
+  if(login)login.hidden=mode==='error'||mode==='checking';
   if(retry)retry.hidden=mode!=='error';
   gate.hidden=false;
 }
@@ -490,11 +491,20 @@ async function bootstrap(){
   }
 }
 window.addEventListener('online',()=>{if(state.account){if(!state.serverReady)reconcileServer().catch(()=>{});else flush().catch(()=>{})}});
-window.addEventListener('focus',()=>{
-  const identity=state.account;
-  if(!identity||!state.client)return;
-  // Verify first: avoid sending expired tokens to the data API on focus.
-  validSession(state.client).then(session=>{
+// Existing open tabs need their own heartbeat; a new deployment does not replace
+// JavaScript that is already running inside those tabs.
+let verificationInFlight=null;
+function revalidateAuthenticatedSession(blockWhileChecking=false){
+  const identity=state.account,client=state.client;
+  if(!identity||!client)return Promise.resolve();
+  if(!client.session()?.accessToken){
+    expireSession(identity);
+    return Promise.resolve();
+  }
+  if(verificationInFlight)return verificationInFlight;
+  if(blockWhileChecking)setAuthGate('checking','로그인 상태 확인 중');
+  verificationInFlight=(async()=>{
+    const session=await validSession(client);
     if(identity!==state.account)return;
     if(!session||session.identity!==identity){
       expireSession(identity);
@@ -506,15 +516,46 @@ window.addEventListener('focus',()=>{
     if(!state.serverReady)reconcileServer().catch(()=>{});
     else if(!state.busy&&Object.keys(decode(accountKeys(identity).pending)).length)
       flush().catch(()=>{});
-  }).catch(()=>{
-    // A transient connection failure is NOT a logout. Access stays fail-closed
-    // until a successful verification, while local account records are retained.
+  })().catch(()=>{
+    // A temporary network error must not erase tokens or stored account records.
     if(identity===state.account){
       publishPartnerAccess(false);
       setAuthGate('error','로그인 연결을 확인할 수 없습니다.');
     }
-  });
+  }).finally(()=>{verificationInFlight=null;});
+  return verificationInFlight;
+}
+window.addEventListener('focus',()=>revalidateAuthenticatedSession(true));
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden)revalidateAuthenticatedSession(true);
 });
+// Validate an actively viewed tab even when the user never switches windows.
+setInterval(()=>{
+  if(!document.hidden)revalidateAuthenticatedSession(false);
+},45000);
+
+// A tiny, cache-busted version marker makes future open tabs adopt deployed
+// authentication fixes without requiring the user to reload the page manually.
+let checkingUiVersion=false;
+async function checkAuthUiVersion(){
+  if(checkingUiVersion||document.hidden||document.body?.dataset.worklinksAuthCallback==='true')return;
+  checkingUiVersion=true;
+  try{
+    const response=await fetch('./worklinks-auth-version.txt?check='+Date.now(),{
+      cache:'no-store',signal:AbortSignal.timeout(7000)
+    });
+    if(!response.ok)return;
+    const latest=(await response.text()).trim();
+    if(!/^[a-zA-Z0-9._-]{6,80}$/.test(latest)||latest===AUTH_UI_BUILD)return;
+    setAuthGate('checking','화면 업데이트 적용 중');
+    location.reload();
+  }catch{
+    // A version check must not interrupt normal authenticated use.
+  }finally{checkingUiVersion=false;}
+}
+window.addEventListener('focus',checkAuthUiVersion);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAuthUiVersion();});
+setInterval(checkAuthUiVersion,120000);
 window.addEventListener('storage',event=>{
   if(!state.client||event.key!==state.client.key)return;
   if(!event.newValue&&state.account)
