@@ -1187,6 +1187,9 @@ def rfp_progress_worker_status(state_path):
             return {'available':False}
     except (OSError, IOError, ValueError):
         return {'available':False}
+    def safe_epoch(value):
+        try:return max(0,float(value or 0))
+        except (ValueError,TypeError):return 0
     tasks={}
     for name in ('rfp', 'rfpUpgrade', 'rfpRepair', 'rfpOpenRepair'):
         entry=state.get(name)
@@ -1194,8 +1197,8 @@ def rfp_progress_worker_status(state_path):
             continue
         tasks[name]={
             'status':str(entry.get('status') or 'unknown')[:60],
-            'attemptEpoch':float(entry.get('attemptEpoch') or 0),
-            'successEpoch':float(entry.get('successEpoch') or 0)
+            'attemptEpoch':safe_epoch(entry.get('attemptEpoch')),
+            'successEpoch':safe_epoch(entry.get('successEpoch'))
         }
     return {'available':True, 'upgradeActive':state.get('rfpUpgradeActive') is True,
             'tasks':tasks}
@@ -1237,6 +1240,7 @@ def rfp_rescan_progress():
     # Never imply the progress endpoint starts an asynchronous scan.
     report['trigger']='server123_parser_version_upgrade_and_scheduled_worker'
     report['worker']=rfp_progress_worker_status(state_path)
+    report['progressCacheSeconds']=8
     with _RFP_PROGRESS_LOCK:
         _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+8)
     return report
