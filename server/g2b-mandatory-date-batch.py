@@ -22,8 +22,8 @@ SOURCES=('license','serviceProducts','mandatoryJointRegion','regionalIncentives'
 ROWS=999
 MAX_PAGES=500
 MAX_CALLS_PER_RUN=18
-DAILY_CALL_BUDGET=120
-HOURLY_CALL_BUDGET=24
+DAILY_CALL_BUDGET=48
+HOURLY_CALL_BUDGET=12
 KST=dt.timezone(dt.timedelta(hours=9))
 
 def now():
@@ -247,8 +247,14 @@ def save_extra(db,day,rows_by_source,allowed):
                     if prior.get('complete') is True:continue
                 except (ValueError,TypeError):pass
             sources={}
+            previous=(prior.get('sources') if existing and isinstance(prior,dict) else {}) or {}
             for source in groups:
                 items=groups[source].get((no,order),[])
+                if not items and isinstance(previous.get(source),dict) and (
+                        previous[source].get('ok') is True and
+                        previous[source].get('complete') is True):
+                    sources[source]=previous[source]
+                    continue
                 sources[source]={
                     'ok':bool(items),'complete':bool(items),'totalCount':len(items),
                     'items':[{str(k)[:72]:str(v)[:350] for k,v in list(item.items())[:42]
