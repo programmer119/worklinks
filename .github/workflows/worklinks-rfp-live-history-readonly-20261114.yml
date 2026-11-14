@@ -67,4 +67,27 @@ jobs:
                 'latestChecked': [key_info(k,v) for t,k,v in sorted(scanned,reverse=True)[:12]],
                 'latestAttempts': [key_info(k,v) for t,k,v in sorted(attempted,reverse=True)[:12]]},
                 ensure_ascii=False,separators=(',',':')),flush=True)
+          # Group identical checkedAt timestamps as batch-level scan starts.
+          recent=[]
+          for key,v in index.items():
+              if not isinstance(v,dict):continue
+              when=parse(v.get('checkedAt'))
+              if when and now-dt.timedelta(minutes=30)<=when<=now:
+                  recent.append((when,key,v))
+          groups=collections.defaultdict(list)
+          for when,key,v in recent:
+              groups[when].append((key,v))
+          ordered=sorted(groups.items())
+          prev=None
+          for when,grp in ordered:
+              files=[f for key,v in grp for f in v.get('files') or [] if isinstance(f,dict)]
+              errorcounts=collections.Counter(str(f.get('errorCategory') or '') for f in files if f.get('readable') is not True)
+              start_kst=when.astimezone(dt.timezone(dt.timedelta(hours=9))).isoformat()
+              gap=round((when-prev).total_seconds(),2) if prev else None
+              print('HISTORY_BATCH',json.dumps({'timeKST':start_kst,'notices':len(grp),
+                   'files':len(files),'readableFiles':sum(f.get('readable') is True for f in files),
+                   'unreadableFiles':sum(f.get('readable') is not True for f in files),
+                   'gapFromPreviousBatchStartSec':gap,'fileErrors':dict(errorcounts),
+                   'noticeIds':[k for k,_ in grp]},ensure_ascii=False,separators=(',',':')),flush=True)
+              prev=when
           PY
