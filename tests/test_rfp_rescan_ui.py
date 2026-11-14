@@ -10,8 +10,8 @@ url='http://127.0.0.1:18766/startup-support/index.html?view=jobs'
 fake={
     'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
     'asOf':'2026-11-14T12:00:00+09:00',
-    'remainingPercent':83.3,
-    'counts':{'total':6,'completed':1,'remaining':5,'legacy':2,
+    'remainingPercent':83.3,'rescanPercent':33.3,
+    'counts':{'total':6,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
               'unscanned':1,'failed':1,'incomplete':1,'unknownDeadline':2},
     'stages':{
       'classification':{'total':6,'done':3,'remaining':3},
@@ -33,7 +33,7 @@ with sync_playwright() as p:
     page.route('**/api/g2b/rfp-rescan-progress',respond)
     page.goto(url,wait_until='domcontentloaded',timeout=60000)
     page.wait_for_function(
-      "() => document.getElementById('rfpRescanLabel')?.textContent.includes('83.3%')",
+      "() => document.getElementById('rfpRescanLabel')?.textContent.includes('33.3%')",
       timeout=25000)
     button=page.locator('#rfpRescanLaunch')
     account=page.locator('#worklinks-auth-header')
@@ -47,7 +47,7 @@ with sync_playwright() as p:
     assert modal.is_visible()
     text=page.locator('#rfpRescanContent').inner_text()
     for term in ['관리 대상','6','최신 판독 완료','판독 필요','5','구버전','2','최초 미판독','1',
-                 '실패','검증 미완료','역할·인원','인력 요구사항','HWPX 해석','83.3%']:
+                 '실패','검증 미완료','역할·인원','인력 요구사항','HWPX 해석','33.3%']:
         assert term in text,(term,text)
     assert len(calls)>=1
     page.locator('#rfpRescanClose').click()
