@@ -8,6 +8,7 @@ on:
       - 'scripts/refresh_worklinks_rfp.py'
       - 'startup-support/index.html'
       - 'tests/test_rfp_rescan_progress.py'
+      - 'tests/test_rfp_rolling_coverage.py'
       - 'tests/test_rfp_rescan_ui.py'
       - '.github/workflows/worklinks-rfp-rescan-progress-qa.yml'
   workflow_dispatch:
