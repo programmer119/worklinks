@@ -748,8 +748,8 @@ def mandatory_enrichment_date_page(source,from_time,to_time,page,rows):
     """Fetch one full period/page shared by many notice IDs. Never single-bid."""
     operation=MANDATORY_BATCH_OPERATIONS.get(source)
     if not operation:raise ApiError('invalid_mandatory_batch_source',400)
-    if not (re.fullmatch(r'\\d{12}',from_time) and
-            re.fullmatch(r'\\d{12}',to_time)):
+    if not (re.fullmatch(r'\d{12}',from_time) and
+            re.fullmatch(r'\d{12}',to_time)):
         raise ApiError('invalid_mandatory_batch_date',400)
     try:
         start=datetime.datetime.strptime(from_time,'%Y%m%d%H%M')
