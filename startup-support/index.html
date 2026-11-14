@@ -4536,7 +4536,11 @@ function jobRequirementBadges(x){
     ' · 인력 '+(pv.staffingRoleVersions?.length?
       pv.staffingRoleVersions.map(n=>n?'v'+n:'미기록').join('/'):
       '미기록')+
-    ' · '+(pv.current?'최신 판독 완료':'최신 판독 미완료'):
+    ' · 인력요건 '+(pv.staffingFactVersions?.length?
+      pv.staffingFactVersions.map(n=>n?'v'+n:'미기록').join('/'):
+      '미기록')+
+    ' · HWPX '+(pv.hwpxReaderVersion?'v'+pv.hwpxReaderVersion:'미기록')+
+    ' · '+(pv.current?'최신 판독 완료':'재판독 필요'):
     '판독 버전: 기록 없음 · 최신 판독 확인 필요';
   const onsiteDetails='<strong class="job-req-onsite-title">상주 여부</strong>'+onsitePrimary+
    '<div class="job-req-onsite-meta">'+htmlEscape(versionSummary)+'</div>'+
