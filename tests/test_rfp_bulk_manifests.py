@@ -45,8 +45,15 @@ def make_items(day,source):
 calls=[]
 def fetch(url):
     parts=urllib.parse.urlparse(url)
-    assert parts.path=='/api/g2b/rfp-attachment-batch',parts.path
     q=dict(urllib.parse.parse_qsl(parts.query))
+    if parts.path=='/api/g2b/rfp-attachment-single':
+        assert q['bidNo']==third,q
+        calls.append((new_day,'single',0))
+        return {'ok':True,'bidNo':third,'order':'000',
+                'attachments':{'ok':True,'complete':True,'items':[],
+                               'count':0},
+                'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+    assert parts.path=='/api/g2b/rfp-attachment-batch',parts.path
     assert 'bidNo' not in q and q['rows']=='2'
     day=dt.datetime.strptime(q['from'],'%Y%m%d%H%M').date().isoformat()
     assert q['to'].endswith('2359')
@@ -78,7 +85,7 @@ with tempfile.TemporaryDirectory() as tmp:
         # metadata when more pages exist or any source remains incomplete.
         bulk.MAX_FETCH_PER_PASS=1
         partial=planner.populate_one_day()
-        assert partial.get('partial') is True,partial
+        assert partial.get('probed') is True,partial
         assert queue.bulk_manifest(new_keys[0]) is None
         assert len(calls)==1,calls
         bulk.MAX_FETCH_PER_PASS=18
@@ -96,6 +103,8 @@ with tempfile.TemporaryDirectory() as tmp:
         assert a['region']['ok'] is False,'region must NOT have been queried'
         assert queue.claim_download(ready_manifest=True)[0] in new_keys
         calls_after_new=len(calls)
+        older_probe=planner.populate_one_day()
+        assert older_probe.get('probed') is True,older_probe
         older=planner.populate_one_day()
         assert older['new']==1,older
         assert queue.bulk_manifest(old_keys[0])['attachments']['count']==1
@@ -153,6 +162,12 @@ try:
     except proxy.ApiError as ex:assert ex.status==400
     else:raise AssertionError('provider 7-day bound not enforced')
     assert len(seen)==1
+    single=proxy.rfp_attachment_single(first,'000')
+    assert single['ok'] is True and single['attachments']['complete']
+    assert single['region']['ok'] is False
+    assert len(seen)==4,seen  # one batch + exactly THREE doc operations
+    assert set(op for op,_ in seen[1:])==set(proxy.RFP_BATCH_SOURCES.values())
+    assert not any('PrtcptPsblRgn' in op for op,_ in seen)
 finally:
     g['request_api']=saved
-print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
+print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER_AND_THREE_SOURCE_FALLBACK=PASS',flush=True)
