@@ -1,13 +1,14 @@
 name: WorkLinks source-backed RFP throughput regression
 on:
   push:
-    branches: [main, fix/rfp-archive-retention-and-cap-20261114]
+    branches: [main, fix/rfp-download-prefetch-8-20261114]
     paths:
       - 'scripts/refresh_worklinks_rfp.py'
       - 'scripts/rfp_call_ledger.py'
       - 'server/worklinks-server123-pipeline.py'
       - 'scripts/repair_open_rfp_cached_attachments.py'
       - 'tests/test_rfp_speed_regression.py'
+      - 'tests/test_rfp_download_prefetch.py'
       - 'tests/test_rfp_call_ledger.py'
       - 'tests/test_rfp_archive_retention.py'
       - 'tests/test_worklinks_server123_pipeline.py'
@@ -25,6 +26,7 @@ jobs:
         run: |
           python3 -m py_compile scripts/rfp_call_ledger.py scripts/refresh_worklinks_rfp.py server/worklinks-server123-pipeline.py
           python3 tests/test_rfp_speed_regression.py
+          python3 tests/test_rfp_download_prefetch.py
           python3 tests/test_rfp_call_ledger.py
           python3 tests/test_rfp_archive_retention.py
           python3 tests/test_rfp_staffing_roles.py
