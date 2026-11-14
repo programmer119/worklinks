@@ -4,6 +4,7 @@ on:
     branches: [fix/worklinks-partner-standard-cache-20261114]
     paths:
       - 'startup-support/index.html'
+      - 'tests/worklinks-jobs-regression.cjs'
       - '.github/workflows/worklinks-partner-b2-cache-ci-20261114.yml'
   workflow_dispatch:
 permissions:
