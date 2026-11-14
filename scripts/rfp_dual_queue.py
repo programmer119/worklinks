@@ -116,6 +116,28 @@ class RfpDualQueue:
                 "DELETE FROM rfp_dual_notices WHERE closes_on<>'' AND closes_on<?",
                 (day.isoformat(),)).rowcount
 
+    def retire_superseded(self,latest):
+        """Retire previous ordinals, officially canceled or no-longer-SW bids."""
+        if not latest:return 0
+        with self.connect() as db:
+            rows=db.execute('SELECT notice_key FROM rfp_dual_notices').fetchall()
+        stale=[]
+        for (key,) in rows:
+            try:no,ordinal=key.rsplit(':',1);number=int(ordinal)
+            except (ValueError,TypeError):continue
+            current=latest.get(no)
+            if current is None:continue
+            if (number<int(current['order']) or current['cancelled'] or
+                    not current['sw']):
+                stale.append((key,))
+        for start in range(0,len(stale),64):
+            with self.connect() as db:
+                chunk=stale[start:start+64]
+                db.executemany('DELETE FROM rfp_dual_notices WHERE notice_key=?',chunk)
+                db.executemany('DELETE FROM rfp_bulk_manifests WHERE notice_key=?',chunk)
+                db.executemany('DELETE FROM rfp_bulk_unmatched WHERE notice_key=?',chunk)
+        return len(stale)
+
     def reset_stale(self):
         """Safe only at process start; a lost worker can be resumed from raw bytes."""
         with self.connect() as db:

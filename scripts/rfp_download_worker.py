@@ -163,10 +163,12 @@ def discover_all(queue):
     # Preserve unknown dates in the dual queue; the existing bulk manifest
     # gate never falls back to one government API request per notice.
     selected=[(no,order,closes) for no,order,closes in selected]
+    old_retired=queue.retire_superseded(reader.latest_notice_versions())
     added=queue.enqueue(selected,reader_fingerprint())
     retired=queue.retire_expired()
     print('RFP_DUAL_QUEUE_DISCOVERY',json.dumps({
         'allEligible':len(selected),'new':added,'expiredRetired':retired,
+        'supersededOrCancelledRetired':old_retired,
         'queue':queue.stats()},separators=(',',':')),flush=True)
     return len(selected)
 

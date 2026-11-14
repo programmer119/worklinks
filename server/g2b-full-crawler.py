@@ -19,6 +19,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import hashlib
+import zlib
 
 _G2B_LEDGER=None
 def shared_ledger():
@@ -186,7 +187,8 @@ def compact(x,kind):
       'title':get('bidNtceNm'),'org':get('ntceInsttNm','dminsttNm'),'agency':get('dminsttNm'),
       'posted':get('bidNtceDt'),'closes':get('bidClseDt'),'budget':get('asignBdgtAmt','presmptPrce'),
       'bidMethod':get('bidMethdNm'),'openingAt':get('opengDt'),
-      'url':get('bidNtceDtlUrl'),'state':get('bidNtceSttusNm'),
+      'url':get('bidNtceDtlUrl'),'noticeKind':get('ntceKindNm'),
+      'state':get('ntceKindNm','bidNtceSttusNm'),
       'contract':get('cntrctCnclsMthdNm'),
       'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),
       'awardFloorRate':get('sucsfbidLwltRate'),'awardFieldsVerified':True,
@@ -299,10 +301,58 @@ def scan(db,key,days,reason):
     log('RUN_COMPLETE',message)
     return True
 
+def recover_cached_notice_kind(db):
+    """Fill discarded official status from verified crawler pages; no HTTP."""
+    path=os.environ.get('WORKLINKS_RFP_LEDGER_DB','').strip()
+    if not path or not os.path.isfile(path):return 0
+    recovered={}
+    windows=db.execute('SELECT kind,day,pages FROM crawl_windows WHERE pages>0').fetchall()
+    with sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=20) as archive:
+        for kind,day,pages in windows:
+            for page in range(1,min(1000,int(pages or 0))+1):
+                value=json.dumps(('crawler_v1',kind,day,page,ROWS),
+                                 ensure_ascii=False,separators=(',',':'))
+                key=hashlib.sha256(value.encode('utf-8')).hexdigest()
+                blob=archive.execute("""SELECT payload FROM verified_cache
+                    WHERE media_type='json' AND request_key=?""",(key,)).fetchone()
+                if not blob:continue
+                try:doc=json.loads(zlib.decompress(blob[0]))
+                except (ValueError,TypeError,zlib.error):continue
+                for raw in doc.get('items') or ():
+                    if not isinstance(raw,dict):continue
+                    state=str(raw.get('ntceKindNm') or '').strip()
+                    no=str(raw.get('bidNtceNo') or '')
+                    if state and no:
+                        recovered[(kind,no,str(raw.get('bidNtceOrd') or '0').zfill(3))]=state
+    if not recovered:return 0
+    updated=[]
+    for kind,no,order,payload in db.execute(
+            'SELECT kind,bid_no,bid_ord,payload FROM bid_notices'):
+        state=recovered.get((kind,no,str(order or '0').zfill(3)))
+        if not state:continue
+        try:notice=json.loads(payload)
+        except (ValueError,TypeError):continue
+        if notice.get('state') or notice.get('noticeKind'):continue
+        notice['state']=state
+        notice['noticeKind']=state
+        updated.append((json.dumps(notice,ensure_ascii=False,separators=(',',':')),
+                        ts(),kind,no,order))
+    for start in range(0,len(updated),128):
+        with db:
+            db.executemany("""UPDATE bid_notices SET payload=?,changed_at=?
+                WHERE kind=? AND bid_no=? AND bid_ord=?""",updated[start:start+128])
+    log('OFFICIAL_NOTICE_KIND_CACHE_RECOVERED','sourceMatches',len(recovered),
+        'noticeRows',len(updated))
+    return len(updated)
+
+
 def main():
     key=secret()
     db=connect()
     try:
+        try:recover_cached_notice_kind(db)
+        except (sqlite3.Error,OSError,ValueError) as err:
+            log('NOTICE_KIND_CACHE_RECOVERY_ERROR',type(err).__name__)
         # First launch or incomplete initial backfill: repeat until all windows pass.
         while not SHUTDOWN:
             start=dt.datetime.now(dt.timezone.utc)

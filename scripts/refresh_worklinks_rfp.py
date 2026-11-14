@@ -424,6 +424,30 @@ def pending_urgent_recovery(path=CHANGCOM_URGENT_RECOVERY):
         print('RFP_URGENT_QUEUE_UNAVAILABLE',type(ex).__name__,flush=True)
         return set()
 
+def notice_is_cancelled(value):
+    """Only official kind/state fields, never titles, prove cancellation."""
+    return bool(re.search(r'취소|철회|폐기',
+                         str(value.get('noticeKind') or value.get('state') or '')))
+
+
+def latest_notice_versions():
+    """Latest ordinal per bid number across ALL saved kinds and SW flags."""
+    dbpath=ROOT/'bids.sqlite3'
+    if not dbpath.is_file():return {}
+    latest={}
+    with sqlite3.connect('file:'+str(dbpath)+'?mode=ro',uri=True,timeout=15) as db:
+        for no,ordn,payload,sw in db.execute(
+                'SELECT bid_no,bid_ord,payload,sw_candidate FROM bid_notices'):
+            try:numeric=int(ordn or 0)
+            except (ValueError,TypeError):continue
+            if no in latest and numeric<=latest[no]['order']:continue
+            try:item=json.loads(payload)
+            except (TypeError,ValueError):continue
+            latest[no]={'order':numeric,'sw':bool(sw),
+                        'cancelled':notice_is_cancelled(item)}
+    return latest
+
+
 def iter_saved_sw_pages():
     """Use the already-mounted local SQLite, not 18 proxy HTTP pages per batch.
 
@@ -440,12 +464,18 @@ def iter_saved_sw_pages():
                     query=("SELECT b.payload,q.payload FROM bid_notices b "
                            "LEFT JOIN bid_license_cache q ON b.bid_no=q.bid_no "
                            "AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "
-                           "WHERE b.sw_candidate=1 ORDER BY b.last_seen DESC "
+                           "WHERE b.sw_candidate=1 AND NOT EXISTS ("
+                           "SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no "
+                           "AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER)) "
+                           "ORDER BY b.last_seen DESC "
                            "LIMIT ? OFFSET ?")
                     db.execute("SELECT 1 FROM bid_license_cache LIMIT 1")
                 except sqlite3.OperationalError:
                     query=("SELECT b.payload,NULL FROM bid_notices b "
-                           "WHERE b.sw_candidate=1 ORDER BY b.last_seen DESC "
+                           "WHERE b.sw_candidate=1 AND NOT EXISTS ("
+                           "SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no "
+                           "AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER)) "
+                           "ORDER BY b.last_seen DESC "
                            "LIMIT ? OFFSET ?")
                 offset=0
                 while True:
@@ -456,6 +486,7 @@ def iter_saved_sw_pages():
                         try:item=json.loads(payload)
                         except (TypeError,ValueError):continue
                         if isinstance(item,dict):
+                            if notice_is_cancelled(item):continue
                             if qual:
                                 try:item['bidEligibility']=json.loads(qual)
                                 except (TypeError,ValueError):pass
@@ -473,7 +504,7 @@ def iter_saved_sw_pages():
             raise RuntimeError('RFP_DISCOVER_SERVER_ERROR '+str(data.get('error') or 'unknown'))
         rows=data.get('items') or []
         if not rows:break
-        yield rows
+        yield [x for x in rows if isinstance(x,dict) and not notice_is_cancelled(x)]
         if offset+len(rows)>=int(data.get('totalCount') or 0):break
     else:
         print('RFP_DISCOVER_PAGINATION_LIMIT_REACHED','offset_limit',100000)
@@ -500,6 +531,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
         (CLASSIFICATION_VERSION,HWPX_READER_VERSION,
          STAFFING_ROLE_SCAN_VERSION,STAFFING_FACT_SCAN_VERSION))
     seen={}
+    current_keys=set()
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
     utc=dt.datetime.now(dt.timezone.utc)
@@ -512,6 +544,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                 end=datestr(item.get('closes'))
                 date=dt.datetime.strptime(end,'%Y%m%d').date() if end else None
                 key=no+':'+order
+                current_keys.add(key)
                 cached=prior.get(key) or {}
                 retry=needs_hwpx_reader_retry(cached)
                 # A past legal review never exempts the source from a newer parser.
@@ -594,6 +627,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
     # notices; they never displace an urgent live bidder's first source scan.
     for key,cached in prior.items():
         if upgrade_only:break
+        if key not in current_keys:continue
         if not isinstance(cached,dict):continue
         if cached.get('classificationVersion')==CLASSIFICATION_VERSION and not needs_hwpx_reader_retry(cached):
             continue

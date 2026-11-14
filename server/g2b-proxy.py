@@ -295,7 +295,9 @@ def format_bid(x, kind):
             'agency':get('dminsttNm'),'posted':get('bidNtceDt'),
             'closes':get('bidClseDt'),'budget':get('asignBdgtAmt','presmptPrce'),
             'url':link if link and link.startswith('https://') else '',
-            'state':get('bidNtceSttusNm'),'contract':get('cntrctCnclsMthdNm'),
+            'noticeKind':get('ntceKindNm'),
+            'state':get('ntceKindNm','bidNtceSttusNm'),
+            'contract':get('cntrctCnclsMthdNm'),
             'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),
             'awardFloorRate':get('sucsfbidLwltRate'),'awardFieldsVerified':True}
 
