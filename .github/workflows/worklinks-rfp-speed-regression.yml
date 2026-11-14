@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/worklinks-server123-pipeline.py'
       - 'tests/test_rfp_speed_regression.py'
       - '.github/workflows/worklinks-rfp-speed-regression.yml'
   workflow_dispatch:
@@ -17,7 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate parser compiles and source-backed speed regressions pass
         run: |
-          python3 -m py_compile scripts/refresh_worklinks_rfp.py
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py server/worklinks-server123-pipeline.py
           python3 tests/test_rfp_speed_regression.py
           python3 tests/test_rfp_call_ledger.py
           python3 tests/test_rfp_staffing_roles.py
+          python3 tests/test_worklinks_server123_pipeline.py
