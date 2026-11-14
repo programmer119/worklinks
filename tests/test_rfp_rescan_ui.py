@@ -27,6 +27,16 @@ fake={
                                'updatedEpoch':1794630000,'stale':False},
                    'scan':{'status':'running','error':'','retryEpoch':0,
                            'updatedEpoch':1794630000,'stale':False}},
+        'downloadGroup':{
+            'available':True,'activeCount':8,'startedEpoch':0,
+            'stalledCount':0,'oldestStallSeconds':0,'recentErrors':[],
+            'files':[{'noticeKey':'R26BK00000001:000',
+                'name':'사업제안요청서.pdf','bytesDone':524288,
+                'bytesTotal':2097152,'startedEpoch':0,'lastBytesEpoch':0}]
+                +[{'noticeKey':'R26BK0000000'+str(n)+':000',
+                    'name':'첨부파일'+str(n)+'.pdf','bytesDone':0,
+                    'bytesTotal':1048576,'startedEpoch':0,'lastBytesEpoch':0}
+                  for n in range(2,9)]},
         'items':[{'lane':'download','noticeKey':'R26BK00000001:000',
                   'fileName':'사업제안요청서.pdf','phase':'전송 중','status':'working',
                   'bytesDone':524288,'bytesTotal':2097152,
@@ -44,6 +54,7 @@ for item in fake['activity']['items']:
     item['updatedEpoch']=time.time()
 for worker in fake['activity']['workers'].values():
     worker['updatedEpoch']=time.time()
+fake['activity']['downloadGroup']['startedEpoch']=time.time()-12
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True)
     page=browser.new_page(viewport={'width':1310,'height':820})
@@ -105,7 +116,9 @@ with sync_playwright() as p:
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
     assert '원본 다운로드' in body and '850 / 1,000건' in body,body
-    assert '사업제안요청서.pdf' in body and '0.50MB / 2.00MB' in body,body
+    assert '사업제안요청서.pdf 외 7개' in body,body
+    assert '다운로드 중 00:' in body,body
+    assert '0.50MB / 2.00MB' in body,body
     assert '공식 API 호출 제한' in body and '인력조건.hwp' in body,body
     page.evaluate("""() => {
       window._rfpFileLiveRow=document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track');
@@ -133,6 +146,11 @@ with sync_playwright() as p:
     fake['counts'].update(completed=2,remaining=4,unscanned=0)
     fake['lanes']['download']['done']=851
     fake['activity']['items'][0]['bytesDone']=1048576
+    fake['activity']['downloadGroup']['activeCount']=7
+    fake['activity']['downloadGroup']['files']=fake['activity']['downloadGroup']['files'][:7]
+    fake['activity']['downloadGroup']['files'][0]['bytesDone']=1048576
+    fake['activity']['downloadGroup']['recentErrors']=[{'name':'첨부파일8.pdf',
+        'reason':'upstream_http_429','retryEpoch':time.time()+300,'updatedEpoch':time.time()}]
     fake['lanes']['manifest']['done']=920
     fake['asOf']='2026-11-14T12:01:00+09:00'
     page.evaluate("() => refreshRfpRescanProgress(true)")
@@ -143,6 +161,9 @@ with sync_playwright() as p:
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
     assert '851 / 1,000건' in page.locator('#rfpRescanContent').text_content()
     assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
+    assert '사업제안요청서.pdf 외 6개' in page.locator('#rfpRescanContent').text_content()
+    assert '오류 1건' in page.locator('#rfpRescanContent').text_content()
+    assert '공식 API 호출 제한' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate("""() => window._rfpFileLiveRow ===
       document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track')"""), 'file row must not remount'
 
