@@ -1059,6 +1059,159 @@ def saved_rfp_search_state(row, compact=False):
             'excerpts':excerpts,'officialFiles':official_files,
             'fileStatuses':file_statuses}
 
+
+# The progress endpoint is strictly read-only. The UI never enqueues G2B work.
+# An upgrade is defined by the versions of the parser actually deployed to
+# server123, not by the newest version that happens to exist on GitHub Pages.
+_RFP_PROGRESS_CACHE={'until':0,'signature':None,'result':None}
+_RFP_PROGRESS_LOCK=threading.Lock()
+
+
+def rfp_deadline_kst(value):
+    """Return known deadline in KST; missing/invalid dates are NOT counted as open."""
+    raw=str(value or '').strip()
+    match=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})(?:[T\s]*(\d{1,2}):?(\d{2}))?',raw)
+    if not match:return None
+    try:
+        hour=int(match.group(4)) if match.group(4) is not None else 23
+        minute=int(match.group(5)) if match.group(5) is not None else 59
+        return datetime.datetime(int(match.group(1)),int(match.group(2)),
+          int(match.group(3)),hour,minute,
+          tzinfo=datetime.timezone(datetime.timedelta(hours=9)))
+    except (ValueError,TypeError):
+        return None
+
+
+def rfp_stage_checks(row,latest):
+    """Version and *source completeness* jointly determine completion."""
+    if not isinstance(row,dict):
+        return {'classification':False,'roles':False,'facts':False,'hwpx':None}
+    files=[f for f in row.get('files') or [] if isinstance(f,dict)]
+    readable=[f for f in files if f.get('readable') is True and
+              f.get('staffingScopeExcluded') is not True]
+    source_ok=row.get('status')=='text_extracted_requires_review'
+    cls=source_ok and bool(readable) and row.get('manifestComplete') is True and \
+        int(row.get('classificationVersion') or 0)>=latest['classificationVersion'] and \
+        all(f.get('sourceTextScanComplete') is True and
+            f.get('qualificationScanTruncated') is not True for f in readable)
+    role=source_ok and row.get('staffingRoleScanComplete') is True and bool(readable) and \
+        all(f.get('sourceTextScanComplete') is True and
+            int(f.get('staffingRoleScanVersion') or 0)>=latest['staffingRoleScanVersion'] and
+            f.get('staffingRoleScanTruncated') is not True for f in readable)
+    facts=source_ok and bool(readable) and row.get('staffingRoleScanComplete') is True and \
+        all(f.get('sourceTextScanComplete') is True and
+            int(f.get('staffingFactScanVersion') or 0)>=latest['staffingFactScanVersion']
+            for f in readable)
+    hwpx_files=[f for f in readable if str(f.get('name') or '').lower().endswith('.hwpx')]
+    hwpx=(None if not hwpx_files else
+        all(f.get('sourceTextScanComplete') is True for f in hwpx_files) and
+        int(row.get('hwpxReaderVersion') or 0)>=latest['hwpxReaderVersion'])
+    return {'classification':bool(cls),'roles':bool(role),'facts':bool(facts),
+            'hwpx':hwpx}
+
+
+def rfp_progress_from_rows(rows,index,latest,asof=None):
+    """Count *all* unique unexpired saved SW notices, never a top-500 subset."""
+    if not isinstance(index,dict) or not isinstance(latest,dict):
+        raise ValueError('rfp_progress_missing_verified_inputs')
+    required=('classificationVersion','staffingRoleScanVersion',
+              'staffingFactScanVersion','hwpxReaderVersion')
+    if not all(isinstance(latest.get(k),int) and latest[k]>0 for k in required):
+        raise ValueError('rfp_progress_version_manifest_invalid')
+    now=asof or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    if now.tzinfo is None:raise ValueError('rfp_progress_clock_not_timezone_aware')
+    unique=set()
+    summary={'total':0,'completed':0,'remaining':0,'legacy':0,
+             'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0}
+    stages={k:{'total':0,'done':0,'remaining':0} for k in
+            ('classification','roles','facts','hwpx')}
+    for bid_no,ordn,payload in rows:
+        key=str(bid_no or '')+':'+str(ordn or '000').zfill(3)
+        if key in unique:continue
+        unique.add(key)
+        try:obj=json.loads(payload) if isinstance(payload,str) else payload
+        except (ValueError,TypeError):continue
+        if not isinstance(obj,dict):continue
+        cutoff=rfp_deadline_kst(obj.get('closes'))
+        if cutoff is None:
+            summary['unknownDeadline']+=1
+            continue
+        if cutoff<now:continue
+        summary['total']+=1
+        row=index.get(key)
+        checks=rfp_stage_checks(row,latest)
+        for stage,valid in checks.items():
+            if valid is None:continue
+            stages[stage]['total']+=1
+            stages[stage]['done']+=int(valid is True)
+            stages[stage]['remaining']+=int(valid is False)
+        status=str((row or {}).get('status') or '')
+        if not isinstance(row,dict) or status in ('','not_scanned','unscanned'):
+            cat='unscanned'
+        elif status!='text_extracted_requires_review':
+            cat='failed'
+        elif all(v is not False for v in checks.values()) and \
+                all(v is True for v in (checks['classification'],checks['roles'],checks['facts'])):
+            cat='completed'
+        elif any(int((row or {}).get(k) or 0)<latest[k] for k in
+                 ('classificationVersion','hwpxReaderVersion') if
+                 k!='hwpxReaderVersion' or checks['hwpx'] is not None) or \
+             any(int(f.get('staffingRoleScanVersion') or 0)<latest['staffingRoleScanVersion'] or
+                 int(f.get('staffingFactScanVersion') or 0)<latest['staffingFactScanVersion']
+                 for f in (row.get('files') or []) if isinstance(f,dict) and f.get('readable') is True
+                     and f.get('staffingScopeExcluded') is not True):
+            cat='legacy'
+        else:cat='incomplete'
+        summary[cat]+=1
+    summary['remaining']=summary['total']-summary['completed']
+    assert summary['remaining']==sum(summary[k] for k in
+                                    ('legacy','unscanned','failed','incomplete'))
+    percent=(round(100.0*summary['remaining']/summary['total'],1)
+             if summary['total'] else None)
+    return {'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
+            'asOf':now.isoformat(),'latest':latest,'counts':summary,
+            'remainingPercent':percent,'stages':stages,
+            'basis':'one exact bid number and ordinal; known deadlines only',
+            'noGovernmentApiCalls':True}
+
+
+def rfp_rescan_progress():
+    """Read local crawler+RFP index only; cache 45s to protect live DB."""
+    version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
+    try:
+        stamp=os.stat(version_path).st_mtime
+        with open(version_path,'r') as file:doc=json.load(file)
+        latest=doc['latest']
+        if doc.get('ok') is not True or doc.get('schemaVersion')!=1:
+            raise ValueError('invalid_deployed_parser_manifest')
+    except (OSError,IOError,ValueError,KeyError,TypeError):
+        raise ApiError('deployed_scanner_versions_unavailable',503)
+    index=read_saved_rfp_evidence_index()
+    if index is None:raise ApiError('rfp_index_unavailable',503)
+    try:
+        db_mtime=os.stat(G2B_DB_PATH).st_mtime
+        index_mtime=os.stat(os.path.join(SNAPSHOT_ROOT,'rfp-coverage-index.json')).st_mtime
+    except OSError:
+        raise ApiError('rfp_source_files_unavailable',503)
+    sig=(stamp,db_mtime,index_mtime)
+    with _RFP_PROGRESS_LOCK:
+        if _RFP_PROGRESS_CACHE['signature']==sig and \
+           _RFP_PROGRESS_CACHE['result'] is not None and \
+           time.time()<_RFP_PROGRESS_CACHE['until']:
+            return _RFP_PROGRESS_CACHE['result']
+    con=open_bid_db()
+    try:
+        bids=con.execute("SELECT bid_no,bid_ord,payload FROM bid_notices "
+                         "WHERE sw_candidate=1 ORDER BY last_seen DESC").fetchall()
+    finally:con.close()
+    report=rfp_progress_from_rows(bids,index,latest)
+    # Never imply the progress endpoint starts an asynchronous scan.
+    report['trigger']='server123_parser_version_upgrade_and_scheduled_worker'
+    with _RFP_PROGRESS_LOCK:
+        _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+45)
+    return report
+
+
 def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
     try:
@@ -1732,6 +1885,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,standard_sync_status())
             if u.path == '/api/g2b/standard-bid':
                 return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
+            if u.path == '/api/g2b/rfp-rescan-progress':
+                return self.reply(200,rfp_rescan_progress())
             if u.path == '/api/g2b/saved':
                 try: limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except ValueError: raise ApiError('invalid_saved_pagination',400)
