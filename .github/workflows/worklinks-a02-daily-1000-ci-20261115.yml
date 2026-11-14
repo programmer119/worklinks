@@ -1,0 +1,33 @@
+name: WorkLinks A02 standard 1000 per day date-batch budget regression
+on:
+  push:
+    branches: [fix/rfp-a02-batch-budget-match-1000-20261115]
+    paths:
+      - 'scripts/rfp_bulk_manifests.py'
+      - '.github/workflows/worklinks-a02-daily-1000-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source budget, durable pages and bounded upstream retry logic
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile scripts/rfp_bulk_manifests.py
+          python3 tests/test_rfp_bulk_manifests.py
+          python3 tests/test_rfp_quota_resume.py
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0,'scripts')
+          import rfp_bulk_manifests as m
+          assert m.DAILY_LIMIT==1000
+          assert m.HOURLY_LIMIT==m.DAILY_LIMIT
+          assert m.MAX_FETCH_PER_PASS==18
+          assert m.ROWS==999
+          print('RFP_A02_REQUEST_BUDGET_1000_AND_RESUMABLE_PAGES=PASS',flush=True)
+          PY
