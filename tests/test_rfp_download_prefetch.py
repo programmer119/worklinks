@@ -25,7 +25,7 @@ def simulated_download(url,*,rate_gate=None):
         busy+=1
         maximum=max(maximum,busy)
         observed.add(url)
-    time.sleep(.12)
+    time.sleep(.40)
     with lock:busy-=1
     return ('original:'+url).encode()
 
