@@ -1661,6 +1661,9 @@ def preflight_rfp_metadata(unscanned, fetcher=None, sample_size=4):
     return staged
 
 def process(no,ordn,metadata=None,previous=None):
+    phase={'downloadSeconds':0.0,'extractSeconds':0.0,
+           'analysisSeconds':0.0,'textCacheHits':0,'filesProcessed':0,
+           'deferredImageFiles':0}
     data=(metadata if metadata is not None else fetch_json(
         BASE+'bid-evidence?'+urllib.parse.urlencode({'bidNo':no,'order':ordn})))
     docs=data.get('attachments') or {}
@@ -1736,17 +1739,28 @@ def process(no,ordn,metadata=None,previous=None):
                 name.lower().endswith(('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp'))):
             record.update(errorCategory='ocr_deferred_to_repair',
                           sourceTextScanComplete=False,ocrDeferred=True)
+            phase['deferredImageFiles']+=1
             saved_slots[position]=record
             continue
         try:
-            # Tie even a failed binary download to its exact public notice.
+            # Measure file work separately from page retrieval, metadata and
+            # whole-index JSON publication; worker threads may overlap.
+            phase['filesProcessed']+=1
+            timer=time.perf_counter()
             try:
                 _NOTICE_CONTEXT.notice_key=no+':'+ordn
                 raw=download(url)
             finally:
                 _NOTICE_CONTEXT.notice_key=None
-            extracted,source_evidence,text_cache_hit=extract_cached_text(name,raw)
+                phase['downloadSeconds']+=time.perf_counter()-timer
+            timer=time.perf_counter()
+            try:
+                extracted,source_evidence,text_cache_hit=extract_cached_text(name,raw)
+            finally:
+                phase['extractSeconds']+=time.perf_counter()-timer
+            phase['textCacheHits']+=int(text_cache_hit)
             content=normalize_extracted_text(extracted)
+            timer=time.perf_counter()
             if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.webp')) else 100):
                 raise ValueError('no_searchable_text')
             triggers,snippets=parse_clauses(content)
@@ -1754,6 +1768,7 @@ def process(no,ordn,metadata=None,previous=None):
             staffing_roles=extract_staffing_roles(content,name,url)
             staffing_facts=extract_staffing_facts(content,name,url)
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
+            phase['analysisSeconds']+=time.perf_counter()-timer
             record.update({'readable':True,'textChars':len(content),
                            **scan,
                            'sourceTextScanComplete':scan.get('sourceTextScanComplete') is True and
@@ -1800,7 +1815,7 @@ def process(no,ordn,metadata=None,previous=None):
             'contractPerformanceVerified':False,
             'manifestSignature':official_manifest_signature(data),
             'manifestCheckedAt':dt.datetime.now(dt.timezone.utc).isoformat(),
-            'manifestChangePending':False}
+            'manifestChangePending':False,'_stageTimings':phase}
 
 def staffing_summary(item):
     """Bounded, per-notice role evidence in the cumulative lightweight index."""
@@ -2164,6 +2179,9 @@ def main():
     # so one unavailable PDF does not starve the entire 16-minute job.
     preloaded=preflight_rfp_metadata(uncached)
     stage_done('preflight_metadata')
+    file_phase_totals={'downloadSeconds':0.0,'extractSeconds':0.0,
+                       'analysisSeconds':0.0,'textCacheHits':0,'filesProcessed':0,
+                       'deferredImageFiles':0}
     with ThreadPoolExecutor(max_workers=4) as pool:
         tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn)),
                            old.get(no+':'+ordn) or prior_index.get(no+':'+ordn)):
@@ -2173,6 +2191,10 @@ def main():
             key=no+':'+ordn
             try:
                 data=future.result()
+                profile=data.pop('_stageTimings',None)
+                if profile:
+                    for name,value in profile.items():
+                        file_phase_totals[name]+=value
                 data['checkedAt']=now.isoformat()
                 data['classificationVersion']=CLASSIFICATION_VERSION
                 data['hwpxReaderVersion']=HWPX_READER_VERSION
@@ -2337,6 +2359,8 @@ def main():
     print('RFP_BATCH_TIMING',json.dumps({
         'selected':len(selected),'actualProcess':len(uncached),
         'existingBackfill':cached_staffing_upgrades,
+        'filePhaseTotals':{k:round(v,4) if isinstance(v,float) else v
+                           for k,v in file_phase_totals.items()},
         'phaseSeconds':stage_seconds,
         'totalSeconds':round(sum(stage_seconds.values()),4)},
         separators=(',',':')),flush=True)
