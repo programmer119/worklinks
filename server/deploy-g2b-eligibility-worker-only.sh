@@ -6,24 +6,28 @@ DK=/home/ggul-docker/bin/docker
 SOCKET=unix:///home/ggul-docker/run/docker.sock
 BASE=/home/worklinks/g2b
 SOURCE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/server/g2b-eligibility-worker.py"
+MANDATORY_SOURCE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/server/g2b-mandatory-date-batch.py"
 TARGET="$BASE/g2b-eligibility-worker.py"
+MANDATORY_TARGET="$BASE/g2b-mandatory-date-batch.py"
 BACKUP="$BASE/g2b-eligibility-worker.py.pre-backfill-fix"
 WORKER=worklinks-g2b-eligibility
 IMG=python:3.11-alpine
 dk(){ "$DK" -H "$SOCKET" "$@"; }
-test -s "$SOURCE" && test -s "$BASE/data/bids.sqlite3"
+test -s "$SOURCE" && test -s "$MANDATORY_SOURCE" && test -s "$BASE/data/bids.sqlite3"
 test -x "$DK" && test -S /home/ggul-docker/run/docker.sock
 [[ "$(curl -fsS --max-time 8 'http://127.0.0.1:18192/api/g2b/status')" == *'"ok":true'* ]]
-if cmp -s "$SOURCE" "$TARGET" && [[ "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" == true ]]; then
+if cmp -s "$SOURCE" "$TARGET" && cmp -s "$MANDATORY_SOURCE" "$MANDATORY_TARGET" && [[ "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" == true ]]; then
  echo 'WORKLINKS_ELIGIBILITY_WORKER_ALREADY_CURRENT=PASS'
  exit 0
 fi
 dk run --rm -v "$SOURCE:/tmp/g2b-eligibility-worker.py:ro" "$IMG" \
  python -c 'import ast;ast.parse(open("/tmp/g2b-eligibility-worker.py").read());print("ELIGIBILITY_WORKER_SYNTAX=PASS")'
 test -f "$TARGET" && cp -p "$TARGET" "$BACKUP" || true
+if test -f "$MANDATORY_TARGET";then cp -p "$MANDATORY_TARGET" "$MANDATORY_TARGET.rollback";fi
 restore(){
  echo 'WORKLINKS_ELIGIBILITY_WORKER_ROLLBACK=attempt'
  if test -s "$BACKUP";then cp -p "$BACKUP" "$TARGET";fi
+ if test -s "$MANDATORY_TARGET.rollback";then cp -p "$MANDATORY_TARGET.rollback" "$MANDATORY_TARGET";fi
  dk rm -f "$WORKER" >/dev/null 2>&1 || true
  if test -s "$TARGET";then start_worker || true;fi
 }
@@ -35,12 +39,14 @@ start_worker(){
   -e G2B_QUAL_BATCH=200 -e G2B_QUAL_POLL=180 \
     -e WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1 \
   -v "$TARGET:/app/g2b-eligibility-worker.py:ro" \
+  -v "$MANDATORY_TARGET:/app/g2b-mandatory-date-batch.py:ro" \
   -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
   -v "$BASE/data:/app/data" \
   "$IMG" python -u /app/g2b-eligibility-worker.py >/dev/null
 }
 trap restore ERR
 install -m 0644 "$SOURCE" "$TARGET"
+install -m 0644 "$MANDATORY_SOURCE" "$MANDATORY_TARGET"
 dk rm -f "$WORKER" >/dev/null 2>&1 || true
 start_worker
 sleep 5
