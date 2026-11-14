@@ -1251,6 +1251,27 @@ def read_rfp_notice_checkpoints(index):
     return current,changes[:12],len(changes)
 
 
+def rfp_dual_lane_progress(path):
+    """Two factual per-notice queues; this API NEVER starts downloads/scans."""
+    if not os.path.isfile(path):return {'available':False}
+    try:
+        with sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=2) as db:
+            rows=db.execute('''SELECT download_status,scan_status,COUNT(*)
+                FROM rfp_dual_notices GROUP BY download_status,scan_status''').fetchall()
+    except (sqlite3.Error,OSError):
+        return {'available':False}
+    total=sum(n for _,_,n in rows)
+    return {'available':True,
+            'download':{'total':total,
+                'done':sum(n for a,_,n in rows if a=='ready'),
+                'active':sum(n for a,_,n in rows if a=='fetching'),
+                'failed':sum(n for a,_,n in rows if a=='retry')},
+            'scan':{'total':total,
+                'done':sum(n for _,b,n in rows if b=='done'),
+                'active':sum(n for _,b,n in rows if b=='scanning'),
+                'failed':sum(n for _,b,n in rows if b=='retry')}}
+
+
 def rfp_rescan_progress():
     """Read-only saved-data progress, cached <= 8s for the 10s UI cadence."""
     version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
@@ -1294,6 +1315,8 @@ def rfp_rescan_progress():
     # Never imply the progress endpoint starts an asynchronous scan.
     report['trigger']='server123_parser_version_upgrade_and_scheduled_worker'
     report['worker']=rfp_progress_worker_status(state_path)
+    report['lanes']=rfp_dual_lane_progress(
+        os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3'))
     report['progressCacheSeconds']=8
     with _RFP_PROGRESS_LOCK:
         _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+8)
