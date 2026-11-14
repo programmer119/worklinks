@@ -215,10 +215,10 @@ class CallLedger:
             try:val=int(os.environ.get(name,str(default)))
             except ValueError:val=default
             return min(max(val,minimum),maximum)
-        return (number('WORKLINKS_RFP_LEDGER_MAX_MB',4096,256,16384)*1048576,
+        return (number('WORKLINKS_RFP_LEDGER_MAX_MB',8192,256,16384)*1048576,
                 number('WORKLINKS_RFP_DISK_RESERVE_MB',5120,512,32768)*1048576)
 
-    def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=7,
+    def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=0,
                       unknown_days=30, json_days=30, event_days=60,
                       compact=True):
         """Delete only expired/orphan archived bytes; retain any live notice ref.
