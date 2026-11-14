@@ -1178,8 +1178,31 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
             'noGovernmentApiCalls':True}
 
 
+def rfp_progress_worker_status(state_path):
+    """Expose only safe, factual scheduler timestamps and statuses."""
+    try:
+        with open(state_path, 'r') as stream:
+            state=json.load(stream)
+        if not isinstance(state, dict):
+            return {'available':False}
+    except (OSError, IOError, ValueError):
+        return {'available':False}
+    tasks={}
+    for name in ('rfp', 'rfpUpgrade', 'rfpRepair', 'rfpOpenRepair'):
+        entry=state.get(name)
+        if not isinstance(entry, dict):
+            continue
+        tasks[name]={
+            'status':str(entry.get('status') or 'unknown')[:60],
+            'attemptEpoch':float(entry.get('attemptEpoch') or 0),
+            'successEpoch':float(entry.get('successEpoch') or 0)
+        }
+    return {'available':True, 'upgradeActive':state.get('rfpUpgradeActive') is True,
+            'tasks':tasks}
+
+
 def rfp_rescan_progress():
-    """Read local crawler+RFP index only; cache 45s to protect live DB."""
+    """Read-only saved-data progress, cached <= 8s for the 10s UI cadence."""
     version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
     try:
         stamp=os.stat(version_path).st_mtime
@@ -1192,11 +1215,14 @@ def rfp_rescan_progress():
     index=read_saved_rfp_evidence_index()
     if index is None:raise ApiError('rfp_index_unavailable',503)
     try:
-        db_mtime=os.stat(G2B_DB_PATH).st_mtime
-        index_mtime=os.stat(os.path.join(SNAPSHOT_ROOT,'rfp-coverage-index.json')).st_mtime
+        db_mtime=os.stat(G2B_DB_PATH).st_mtime_ns
+        index_mtime=os.stat(os.path.join(SNAPSHOT_ROOT,'rfp-coverage-index.json')).st_mtime_ns
     except OSError:
         raise ApiError('rfp_source_files_unavailable',503)
-    sig=(stamp,db_mtime,index_mtime)
+    state_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),'pipeline-scheduler-state.json')
+    try:worker_mtime=os.stat(state_path).st_mtime_ns
+    except OSError:worker_mtime=None
+    sig=(stamp,db_mtime,index_mtime,worker_mtime)
     with _RFP_PROGRESS_LOCK:
         if _RFP_PROGRESS_CACHE['signature']==sig and \
            _RFP_PROGRESS_CACHE['result'] is not None and \
@@ -1210,8 +1236,9 @@ def rfp_rescan_progress():
     report=rfp_progress_from_rows(bids,index,latest)
     # Never imply the progress endpoint starts an asynchronous scan.
     report['trigger']='server123_parser_version_upgrade_and_scheduled_worker'
+    report['worker']=rfp_progress_worker_status(state_path)
     with _RFP_PROGRESS_LOCK:
-        _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+45)
+        _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+8)
     return report
 
 
