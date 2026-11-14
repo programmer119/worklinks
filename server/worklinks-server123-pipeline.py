@@ -331,6 +331,12 @@ def iteration(current=None, runner=None):
             ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
         prior = state.get(kind) or {}
+        # Long OCR repair retries cannot starve a version-upgrade backlog.
+        # Give repairs one bounded turn per 12 published upgrade batches.
+        if kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True:
+            completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
+            previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
+            if completed-previous_repair<12:continue
         if kind=='rfpUpgrade':
             if state.get('rfpUpgradeActive') is not True:continue
             # A successful batch never waits for the clock. A failed batch or
@@ -343,7 +349,8 @@ def iteration(current=None, runner=None):
         state[kind] = entry
         publish_state(state)
         try:
-            more=run_once(kind, runner=runner)
+            more=run_once(kind, runner=runner,
+                _single=(kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True))
             finished=time.time()
             if kind=='rfpUpgrade':
                 state['rfpUpgradeBatchesCompleted']=int(state.get('rfpUpgradeBatchesCompleted') or 0)+(1 if more is not False else 0)
@@ -372,6 +379,8 @@ def iteration(current=None, runner=None):
                 entry.update(failureStreak=streak,retryAfterEpoch=time.time()+delay)
                 log('PIPELINE_RFP_DRAIN_BACKOFF',delay,'seconds',message)
             log('PIPELINE_JOB_RETRY_NEXT_CYCLE', kind, entry['error'])
+        if kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True:
+            state['rfpOpenRepairUpgradeBatch']=int(state.get('rfpUpgradeBatchesCompleted') or 0)
         state[kind] = entry
         publish_state(state)
     return state
