@@ -3081,6 +3081,20 @@ async function refreshQualificationReview(){
  }catch(e){/* No completed review is inferred when snapshot unavailable. */}
 }
 var rfpSnapshotByNotice=new Map(),rfpSnapshotCheckedAt='',rfpSnapshotLoading=false;
+var rfpScanProvenanceByNotice=new Map(),rfpScanProvenanceLatest=null;
+async function refreshRfpScanProvenance(){
+ try{
+  const response=await fetch('./rfp-scan-provenance.json',{cache:'no-store'});
+  if(!response.ok)return;
+  const source=await response.json();
+  if(source.ok!==true||source.schemaVersion!==1||!source.byNotice)return;
+  rfpScanProvenanceByNotice=new Map(Object.entries(source.byNotice));
+  rfpScanProvenanceLatest=source.latest||null;
+  scheduleJobsRender();
+  if(activeDetailJobId){const x=getJobById(activeDetailJobId);if(x)renderJobDetail(x)}
+ }catch(error){/* Never invent current parser versions when the inventory is missing. */}
+}
+void refreshRfpScanProvenance();
 var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved database pages.
 // A compact, official-byte-verified fact feed is a read-only recovery path
 // when the cumulative server123 RFP scanner has not yet published its batch.
@@ -4039,6 +4053,7 @@ function jobRequirementEvidence(x){
  const key=id.bidNo+':'+id.order;
  const full=rfpSnapshotByNotice.get(key)||null;
  const saved=jobSearchRfpState.get(key)||jobListRfpState.get(key)||null;
+ const provenance=rfpScanProvenanceByNotice.get(key)||null;
  const partnerEvidence=changcomPrecheckByNotice.get(key)||null;
  const staff=partnerEvidence?.staffingClassification||null;
  const clauses=[];
@@ -4053,7 +4068,7 @@ function jobRequirementEvidence(x){
    clauses.push({text:String(c.text),type:c.type,required:false,file:c.sourceFile||''});
  }
  if(staff?.evidence?.text)clauses.push({text:String(staff.evidence.text),type:'staff_proof',required:false,file:staff.evidence.sourceFile||''});
- const tried=!!full||saved?.seen===true||!!staff?.evidence;
+ const tried=!!full||saved?.seen===true||!!staff?.evidence||!!provenance;
  // A fetched notice without an executed RFP scan is pending, not an extraction failure.
  const scanNotRun=!!saved&&!Array.isArray(full?.files)&&
    (saved.rfpScanStatus==='not_scanned'||saved.status==='not_scanned'||
@@ -4167,10 +4182,23 @@ function jobRequirementEvidence(x){
    if(!tried)return {key:'not_checked',label:'확인안함',
      reason:'공고 원문 API 수집·검증 호출 기록 없음'};
    if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고 수집 후 RFP 스캔 미실행 · 상주 조건 판독 필요'};
-   if(!staffingSourceReadComplete)return {key:'failed',label:'확인실패',
-     reason:'상주 조건을 확인할 원문·첨부 수집 또는 판독이 완료되지 않음'};
-   // A completed source review without an onsite requirement is treated as offsite.
-   // Incomplete source reviews remain failed/checking/not_checked above.
+   if(!staffingSourceReadComplete){
+     if(saved?.status==='text_extracted_requires_review'||provenance?.status==='text_extracted_requires_review')
+       return {key:'checking',label:'확인중',
+         reason:'원문 추출은 되었으나 최신 상주·인력 판독 완료 근거가 없어 재검증 필요'};
+     return {key:'failed',label:'확인실패',
+       reason:'상주 조건을 확인할 원문·첨부 수집 또는 판독이 완료되지 않음'};
+   }
+   // A negative finding requires a verified CURRENT full-source staffing scan.
+   // Legacy or unversioned extracted text is never proof of no onsite duty.
+   const fullCurrent=fullScanComplete&&
+     Number(full?.classificationVersion)>=23&&Number(full?.hwpxReaderVersion)>=3&&
+     full.files.filter(f=>f.readable===true).length>0&&
+     full.files.filter(f=>f.readable===true).every(f=>
+       Number(f.staffingRoleScanVersion)>=4&&Number(f.staffingFactScanVersion)>=2);
+   if(provenance?.current!==true&&!fullCurrent)
+     return {key:'checking',label:'확인중',
+       reason:'구버전·버전 미기록 판독 결과 · 최신 판독 완료 후 상주 미기재 여부 판단'};
    return {key:'offsite',label:'비상주',reason:'상주 요구사항 미기재'};
  }
  let site=onsiteChoice();
@@ -4405,7 +4433,7 @@ function jobRequirementEvidence(x){
    requirements:displayedRequirements,workloads:effortRows,
    totalManMonths:total?Number(total.manMonths):null,
    sourceFiles:[...new Set(effortRows.map(f=>String(f.sourceFile||'')).filter(Boolean))]},
-  meta:{full,saved,staff,clauses,tried,scanFailed,fullyReviewed}
+  meta:{full,saved,staff,provenance,clauses,tried,scanFailed,fullyReviewed}
  };
 }
 function jobRequirementBadges(x){
@@ -4502,7 +4530,16 @@ function jobRequirementBadges(x){
    siteRequirement?
     '<div class="job-req-onsite-person"><strong>'+htmlEscape(String(siteRequirement.label||'상주 근무조건'))+'</strong></div>':
    '<div class="job-req-onsite-note">'+htmlEscape(status)+'</div>';
+  const pv=evidence.meta.provenance;
+  const versionSummary=pv?
+   '판독 버전: RFP '+(pv.classificationVersion?'v'+pv.classificationVersion:'미기록')+
+    ' · 인력 '+(pv.staffingRoleVersions?.length?
+      pv.staffingRoleVersions.map(n=>n?'v'+n:'미기록').join('/'):
+      '미기록')+
+    ' · '+(pv.current?'최신 판독 완료':'최신 판독 미완료'):
+    '판독 버전: 기록 없음 · 최신 판독 확인 필요';
   const onsiteDetails='<strong class="job-req-onsite-title">상주 여부</strong>'+onsitePrimary+
+   '<div class="job-req-onsite-meta">'+htmlEscape(versionSummary)+'</div>'+
    (onsiteSource?.text?
     '<div class="job-req-onsite-meta">'+htmlEscape(String(onsiteSource.text).replace(/\s+/g,' ').slice(0,210))+'</div>':'')+
    (onsiteSource?.file?'<div class="job-req-onsite-source">출처: '+
