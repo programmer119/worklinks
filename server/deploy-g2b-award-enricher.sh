@@ -49,6 +49,7 @@ start_worker(){
     -e AWARD_MAX_REQUESTS_PER_CYCLE=2 \
     -e AWARD_INTERVAL_SECONDS=3600 \
     -e AWARD_REQUEST_GAP_SECONDS=15 \
+    -e WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1 \
     -v "$TARGET:/app/g2b-award-enricher.py:ro" \
     -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
     -v "$TARGET_SNAPSHOT:/app/official-awards-snapshot.json:ro" \
