@@ -1,0 +1,37 @@
+name: WorkLinks flexible staffing badge regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'startup-support/index.html'
+      - 'startup-support/tests/role_count_discretion.cjs'
+      - '.github/workflows/worklinks-role-count-discretion-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify staffing requirements states and badge semantics
+        run: node startup-support/tests/role_count_discretion.cjs
+      - name: Verify production HTML has new label and updated version
+        run: |
+          python3 - <<'PY'
+          from urllib.request import urlopen,Request
+          from pathlib import Path
+          import time
+          needle=b'20261114-staffing-free-v5'
+          for i in range(35):
+              try:
+                  req=Request('https://worklinks.suaveforge.com/startup-support/?_staffing_qa='+str(time.time_ns()),headers={'Cache-Control':'no-cache'})
+                  with urlopen(req,timeout=20) as resp: page=resp.read()
+                  if needle in page and '인원 자율'.encode() in page:
+                      print('LIVE_FLEXIBLE_STAFFING_BADGE_SOURCE = PASS')
+                      break
+              except Exception as e: print('RETRY',str(e)[:120])
+              time.sleep(4)
+          else:raise AssertionError('Latest staffing UI not deployed')
+          PY
