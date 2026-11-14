@@ -1,0 +1,27 @@
+name: WorkLinks historical award auto fallback restoration regression
+on:
+  push:
+    branches: [fix/restore-historical-awards-auto-20261115]
+    paths:
+      - 'server/deploy-g2b-award-enricher.sh'
+      - 'tests/test_worklinks_bulk_only_auto.py'
+      - 'tests/test_award_enricher.py'
+      - '.github/workflows/worklinks-award-auto-restore-ci-20261115.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test bounded award enrichment, downtime recovery, quota and retry limits
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          bash -n server/deploy-g2b-award-enricher.sh
+          python3 -m py_compile server/g2b-award-enricher.py
+          python3 tests/test_award_enricher.py
+          python3 tests/test_worklinks_bulk_only_auto.py
+          echo HISTORICAL_AWARD_AUTO_RESTORATION_CI=PASS
