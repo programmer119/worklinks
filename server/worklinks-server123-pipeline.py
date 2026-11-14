@@ -257,6 +257,7 @@ def run_once(kind, runner=None, _single=False):
         sys.path.insert(0,str(SCRIPTS))
         from rfp_dual_queue import RfpDualQueue
         q=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+        q.reconcile_legacy_ready()
         q.recover_stale_scans()
         if q.ready_count()==0:
             counters=q.stats()
@@ -349,8 +350,11 @@ def run_once(kind, runner=None, _single=False):
                 for record in records:
                     key=str(record.get('key') or '')
                     if re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',key):
-                        queue.scan_finished(key,bool(record.get('ok')),
-                                            'scan_unverified_or_incomplete')
+                        if record.get('redownload') is True:
+                            queue.mark_download_missing(key)
+                        else:
+                            queue.scan_finished(key,bool(record.get('ok')),
+                                                'scan_unverified_or_incomplete')
         log('PIPELINE_PUBLISHED', kind,
             'outputs', ','.join(result.name for result in outputs))
         if kind=='rfpOpenRepair' and _single:
