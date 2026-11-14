@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory() as root:
     def fake_get(url):
         assert 'bid-evidence?' in url
         return meta
-    def fake_download(url,*,rate_gate=None,progress=None):
+    def fake_download(url,*,rate_gate=None,progress=None,on_retry=None):
         nonlocal_var=None
         global active,max_parallel,downloaded
         with lock:
