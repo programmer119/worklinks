@@ -53,6 +53,10 @@ class RfpDualQueue:
                 items_json TEXT NOT NULL, saved_at TEXT NOT NULL,
                 PRIMARY KEY(day,source,page)
             )''')
+            db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_unmatched(
+                notice_key TEXT PRIMARY KEY, retry_epoch REAL NOT NULL,
+                reason TEXT NOT NULL DEFAULT ''
+            )''')
             db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_request_budget(
                 started_at TEXT NOT NULL, source TEXT NOT NULL, day TEXT NOT NULL,
                 page INTEGER NOT NULL
@@ -141,6 +145,8 @@ class RfpDualQueue:
                 sources=excluded.sources,saved_at=excluded.saved_at''',
                 [(key,json.dumps(metadata,ensure_ascii=False,separators=(',',':')),
                   'ordinary,eorder,detail',now_utc()) for key,metadata in records.items()])
+            db.executemany('DELETE FROM rfp_bulk_unmatched WHERE notice_key=?',
+                           [(key,) for key in records])
         return len(records)
 
     def bulk_manifest(self,key):
@@ -149,12 +155,24 @@ class RfpDualQueue:
                 WHERE notice_key=?''',(key,)).fetchone()
         return json.loads(row[0]) if row else None
 
-    def unprepared_notices(self):
+    def unprepared_notices(self,eligible_only=False):
+        """Deferred unmatched notices remain incomplete, not silently finished."""
         with self.connect() as db:
             return [x[0] for x in db.execute('''SELECT notice_key FROM rfp_dual_notices
                 WHERE download_status IN ('pending','retry')
                 AND NOT EXISTS(SELECT 1 FROM rfp_bulk_manifests
-                    WHERE rfp_bulk_manifests.notice_key=rfp_dual_notices.notice_key)''')]
+                    WHERE rfp_bulk_manifests.notice_key=rfp_dual_notices.notice_key)
+                AND (?=0 OR NOT EXISTS(SELECT 1 FROM rfp_bulk_unmatched
+                    WHERE rfp_bulk_unmatched.notice_key=rfp_dual_notices.notice_key
+                      AND retry_epoch>?))''',(int(eligible_only),time.time()))]
+
+    def defer_bulk_unmatched(self,keys,seconds,reason):
+        if not keys:return
+        with self.connect() as db:
+            db.executemany('''INSERT INTO rfp_bulk_unmatched(notice_key,retry_epoch,reason)
+                VALUES(?,?,?) ON CONFLICT(notice_key) DO UPDATE SET
+                retry_epoch=excluded.retry_epoch,reason=excluded.reason''',
+                [(key,time.time()+seconds,str(reason)[:120]) for key in keys])
 
     def downloaded(self,key,metadata,done,total):
         payload=json.dumps(metadata,ensure_ascii=False,separators=(',',':'))
