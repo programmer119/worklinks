@@ -2094,8 +2094,8 @@ function paintRfpCountdown(){
  ring.classList.toggle('error',!!rfpRescanProgressError&&!loading);
  const launch=document.getElementById('rfpRescanLaunch');
  if(launch)launch.setAttribute('aria-label','판독 '+(rfpRescanProgress?.counts?rfpProgressNumber(rfpRescanProgress.counts.completed)+' / '+rfpProgressNumber(rfpRescanProgress.counts.total)+'건':'현황 확인 중')+' · '+(loading?'조회 중':(rfpRescanProgressError?'조회 오류 · ':'')+'다음 조회 '+remain+'초'));
+ if(typeof window.paintRfpLiveCountdown==='function')window.paintRfpLiveCountdown();
 }
-if(typeof window.paintRfpLiveCountdown==='function')window.paintRfpLiveCountdown();
 const RFP_PROGRESS_POLL_MS=10000;
 const RFP_PROGRESS_TIMEOUT_MS=15000;
 function rfpProgressNumber(n){return Number(n||0).toLocaleString('ko-KR')}
