@@ -19,6 +19,12 @@ from collections import defaultdict
 DATA=os.environ.get('G2B_DB_PATH','/app/data/bids.sqlite3')
 LOCAL=os.environ.get('G2B_LOCAL_API','http://127.0.0.1:18192/api/g2b')
 SOURCES=('license','serviceProducts','mandatoryJointRegion','regionalIncentives')
+OPERATIONS={
+ 'license':'getBidPblancListInfoLicenseLimit02',
+ 'serviceProducts':'getBidPblancListInfoServcPurchsObjPrdct02',
+ 'mandatoryJointRegion':'getBidPblancJntcontrctDutyRgnListInfo02',
+ 'regionalIncentives':'getBidPblancIncntvRgnListInfo02'
+}
 ROWS=999
 MAX_PAGES=500
 MAX_CALLS_PER_RUN=18
@@ -261,7 +267,7 @@ def save_extra(db,day,rows_by_source,allowed):
                     'items':[{str(k)[:72]:str(v)[:350] for k,v in list(item.items())[:42]
                               if v is not None and not str(k).lower().startswith('servicekey')}
                              for item in items[:100]],
-                    'operation':source,
+                    'operation':OPERATIONS[source],
                     'state':'verified_row_in_date_batch' if items else 'not_returned_for_date'}
             complete=all(z['complete'] for z in sources.values())
             payload={'ok':complete,'complete':complete,'bidNo':no,'order':order,
