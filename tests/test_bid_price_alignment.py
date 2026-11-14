@@ -205,7 +205,7 @@ partner_html = (
     '<div id="jobCards" class="cards"'
     ' style="width:640px;max-width:calc(100vw - 24px)">'
     + changcom_card(
-        '2027년 노후계획도시정보플랫폼 운영 및 유지관리',
+        '2027년 노후계획도시정비플랫폼 운영 및 유지관리',
         '1억 8,000만원')
     + '</div></div></body></html>'
 )
@@ -219,8 +219,8 @@ with sync_playwright() as p:
             const a = document.querySelector('#jobsView .job-amount').getBoundingClientRect();
             const h = document.querySelector('#jobsView .job-headline').getBoundingClientRect();
             return {
-                titleLeft:t.left,titleRight:t.right,titleTop:t.top,titleBottom:t.bottom,
-                priceLeft:a.left,priceRight:a.right,priceTop:a.top,priceBottom:a.bottom,
+                titleLeft:t.left,titleRight:t.right,titleTop:t.top,titleBottom:t.bottom,\n                titleHeight:t.height,titleFont:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-headline h3')).fontSize),\n                titleLineHeight:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-headline h3')).lineHeight),
+                priceLeft:a.left,priceRight:a.right,priceTop:a.top,priceBottom:a.bottom,\n                priceHeight:a.height,priceFont:parseFloat(getComputedStyle(document.querySelector('#jobsView .job-amount')).fontSize),
                 headlineRight:h.right,
                 overflow:document.documentElement.scrollWidth>innerWidth+1
             };
@@ -231,7 +231,7 @@ with sync_playwright() as p:
             assert rect["priceTop"]>=rect["titleBottom"]-1,(width,rect)
         else:
             assert rect["priceLeft"]>=rect["titleRight"]-1,(width,rect)
-            assert rect["priceTop"]<rect["titleBottom"],(width,rect)
+            assert rect["priceTop"]<rect["titleBottom"],(width,rect)\n            assert 1.8<=rect["titleHeight"]/rect["titleLineHeight"]<=2.1,(width,rect)\n            assert rect["priceFont"]>rect["titleFont"]*2,(width,rect)\n            assert abs(rect["titleTop"]-rect["priceTop"])<=4,(width,rect)\n            assert abs(rect["titleBottom"]-rect["priceBottom"])<=4,(width,rect)
         print("CHANGCOM_COMPACT_PRICE_LAYOUT_PASS",width,rect,flush=True)
         page.close()
     browser.close()
