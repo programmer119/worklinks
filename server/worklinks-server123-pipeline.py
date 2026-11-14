@@ -16,6 +16,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import threading
 import tempfile
 import time
 
@@ -550,12 +551,21 @@ def main():
             'rfpOpenOcrLimit', RFP_OPEN_OCR_LIMIT,
              'qualificationBatch', QUALIFICATION_BATCH)
         last_archive_cleanup=0.0
+        archive_cleanup_thread=None
+        def safe_archive_cleanup():
+            try:prune_rfp_archive()
+            except Exception as error:
+                log('RFP_ARCHIVE_RETENTION_FAILED',type(error).__name__)
         while True:
             state=iteration()
-            if time.monotonic()-last_archive_cleanup>=3600:
-                try:prune_rfp_archive()
-                except (OSError,sqlite3.Error,ValueError) as error:
-                    log('RFP_ARCHIVE_RETENTION_FAILED',type(error).__name__)
+            # Archive maintenance is never allowed to block the continuous
+            # scanner; only one bounded cleanup job may run at a time.
+            if (time.monotonic()-last_archive_cleanup>=3600 and
+                    (archive_cleanup_thread is None or
+                     not archive_cleanup_thread.is_alive())):
+                archive_cleanup_thread=threading.Thread(
+                    target=safe_archive_cleanup,name='rfp-archive-retention',daemon=True)
+                archive_cleanup_thread.start()
                 last_archive_cleanup=time.monotonic()
             drain=state.get('rfpUpgrade') or {}
             # Continuous scan while candidates exist. Keep ordinary scheduled
