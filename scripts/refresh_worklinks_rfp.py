@@ -2361,6 +2361,7 @@ def main():
             prior['classificationVersion']=2
     success=0
     failed_refresh={}
+    scan_validity={}
     uncached=[]
     if dual_scan:
         uncached=[(no,ordn) for no,ordn,_ in selected]
@@ -2406,6 +2407,7 @@ def main():
             key=no+':'+ordn
             try:
                 data=future.result()
+                scan_validity[key]=data.get('status')=='text_extracted_requires_review'
                 profile=data.pop('_stageTimings',None)
                 if profile:
                     for name,value in profile.items():
@@ -2437,6 +2439,7 @@ def main():
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
+                scan_validity[key]=False
                 reason=('metadata_http_'+str(e.code) if isinstance(e,urllib.error.HTTPError)
                         else classify_failure(e))
                 failed={'status':'metadata_fetch_failed','reasonCode':reason,
@@ -2592,7 +2595,7 @@ def main():
         # The parent worker commits final queue statuses only AFTER publishing
         # both validated RFP snapshots, so a crash cannot lose scan evidence.
         scan_outcomes=[{'key':no+':'+ordn,
-                        'ok':str((results.get(no+':'+ordn) or {}).get('status') or '')=='text_extracted_requires_review'}
+                        'ok':scan_validity.get(no+':'+ordn) is True}
                        for no,ordn in uncached]
         print('RFP_DUAL_SCAN_RESULT',json.dumps(scan_outcomes,separators=(',',':')),flush=True)
     stage_done('rebuild_and_write_coverage')
