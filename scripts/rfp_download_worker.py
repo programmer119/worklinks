@@ -18,6 +18,7 @@ import urllib.parse
 import refresh_worklinks_rfp as reader
 from rfp_call_ledger import cache_key
 from rfp_dual_queue import RfpDualQueue
+import rfp_live_activity as live
 from rfp_bulk_manifests import BulkManifestPlanner, BulkManifestQuota, BulkManifestError
 
 DATA=Path(os.environ.get('G2B_PIPELINE_DATA','/app/data'))
@@ -111,6 +112,7 @@ def source_retry_seconds(error):
 def download_one(queue,claim,halt):
     key,closes=claim
     bid,ordinal=key.split(':',1)
+    live.record('download',key,phase='첨부파일 준비',status='working')
     if halt.is_set():
         queue.download_failed(key,'upstream_paused',retry_seconds=600)
         return False
@@ -146,20 +148,35 @@ def download_one(queue,claim,halt):
                 ('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')):
                 continue
             if url not in seen:seen.add(url);urls.append(url)
+        live.record('download',key,phase='파일 다운로드',status='working',files_total=len(urls))
         reader._NOTICE_CONTEXT.notice_key=key
         reader._NOTICE_CONTEXT.closes_on=closes
         ledger=reader.active_rfp_ledger()
         if ledger is None:raise RuntimeError('durable_binary_ledger_not_configured')
-        for url in urls:
+        for index,url in enumerate(urls):
             if halt.is_set():raise ProviderBackoff('provider_paused')
             # The approved download() reuses compressed originals by hash;
             # it only opens official HTTPS when the verified bytes are absent.
-            data=reader.download(url,rate_gate=FILE_PACE)
+            file_name=next((approved[0] for item in manifest
+                for approved in [reader.legal_file(item)]
+                if approved and approved[1]==url),'공식 첨부파일')
+            file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24]
+            def progress(received,total,complete):
+                live.record('download',key,file_key=file_key,file_name=file_name,
+                    phase='저장 완료' if complete else '전송 중',
+                    status='done' if complete else 'working',bytes_done=received,
+                    bytes_total=total,files_done=index+(1 if complete else 0),
+                    files_total=len(urls))
+            progress(0,0,False)
+            data=reader.download(url,rate_gate=FILE_PACE,progress=progress)
             stored=ledger.get_bytes(cache_key('official_attachment',url))
             if stored is None or hashlib.sha256(data).digest()!=hashlib.sha256(stored).digest():
                 raise RuntimeError('original_archive_not_verified_or_storage_quota')
             del data,stored
+            live.record('download',key,phase='파일 다운로드',status='working',
+                        files_done=index+1,files_total=len(urls))
         queue.downloaded(key,meta,len(urls),len(urls))
+        live.record('download',key,phase='다운로드 완료',status='done',files_done=len(urls),files_total=len(urls))
         return True
     except ProviderBackoff as exc:
         # Old metadata quota errors do not block a downloaded, verified
@@ -167,12 +184,14 @@ def download_one(queue,claim,halt):
         is_manifest_metadata=BULK_ENABLED and detects_upstream_limit(str(exc))
         queue.download_failed(key,str(exc),
                               retry_seconds=(60 if is_manifest_metadata else 21600))
+        live.record('download',key,phase='API 제한',status='retry',retry_epoch=time.time()+(60 if is_manifest_metadata else 21600),error=str(exc))
         return False
     except Exception as exc:
         delay=21600 if detects_upstream_limit(str(exc)) else 300
         if delay==21600:halt.set()
         queue.download_failed(key,type(exc).__name__+': '+str(exc)[:110],
                               retry_seconds=delay)
+        live.record('download',key,phase='다운로드 실패',status='retry',retry_epoch=time.time()+delay,error=str(exc))
         return False
     finally:
         reader._NOTICE_CONTEXT.notice_key=None
@@ -184,6 +203,8 @@ def run_forever():
     os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
     queue=RfpDualQueue(QUEUE)
     queue.reset_stale()
+    live.worker('download','running')
+    live.worker('manifest','running')
     planner=(BulkManifestPlanner(queue,DATA/'bids.sqlite3',
                                   reader.fetch_json,META_PACE,
                                   allow_exceptions=True)
@@ -203,6 +224,7 @@ def run_forever():
                 now-last_planner_pass>=3):
             last_planner_pass=now
             try:
+                live.worker('manifest','running')
                 result=planner.populate_one_day()
                 if result.get('calls') or result.get('new'):
                     print('RFP_BULK_MANIFEST_PROGRESS',
@@ -214,6 +236,7 @@ def run_forever():
                 # boundary, NOT an arbitrary hour from this exception.
                 seconds=int(exc.retry_after_seconds)
                 planner_pause_until=time.time()+seconds
+                live.worker('manifest','retry',str(exc),planner_pause_until)
                 print('RFP_BULK_LOCAL_CALL_BUDGET_PAUSE',
                       str(exc),'retrySeconds',seconds,flush=True)
             except Exception as exc:
@@ -225,6 +248,7 @@ def run_forever():
                 # retry a bounded read of the same cached page after 30 sec.
                 seconds=source_retry_seconds(problem)
                 planner_pause_until=time.time()+seconds
+                live.worker('manifest','retry',problem,planner_pause_until)
                 print('RFP_BULK_OFFICIAL_SOURCE_UNAVAILABLE',
                     type(exc).__name__,problem[:140],
                     'retryAfterEpoch',round(planner_pause_until),
@@ -236,6 +260,7 @@ def run_forever():
                       json.dumps({'notices':revived,'basis':'verified_bulk_manifest'}),
                       flush=True)
         if time.time()<halted_until:
+            live.worker('download','retry','upstream provider pause',halted_until)
             time.sleep(min(10,halted_until-time.time()))
             continue
         halt=threading.Event()
@@ -245,6 +270,7 @@ def run_forever():
             if row:claimed.append(row)
             else:break
         if not claimed:
+            live.worker('download','running')
             time.sleep(POLL_SECONDS)
             continue
         good=0
@@ -255,8 +281,10 @@ def run_forever():
                 good+=int(task.result() is True)
         if halt.is_set():
             halted_until=time.time()+1800
+            live.worker('download','retry','provider rate limit',halted_until)
             print('RFP_DOWNLOAD_PROVIDER_PAUSE',json.dumps(
                 {'seconds':1800,'claimed':len(claimed)},separators=(',',':')),flush=True)
+        if not halt.is_set():live.worker('download','running')
         print('RFP_DUAL_DOWNLOAD_BATCH',json.dumps(
             {'started':len(claimed),'downloaded':good,'workers':WORKERS,
              'queue':queue.stats()},separators=(',',':')),flush=True)
