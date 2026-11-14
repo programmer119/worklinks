@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""No-network proof: scheduled jobs cannot call one official API per notice."""
+"""No-network proof: required bulk work and bounded award fallback keep distinct behavior."""
 import importlib.util
 import os
 from pathlib import Path
@@ -40,7 +40,11 @@ assert "kind in ('rfp','rfpRepair')" in pipeline
 assert "os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1'" in pipeline
 download=(ROOT/'scripts/rfp_download_worker.py').read_text(encoding='utf-8')
 assert 'BulkManifestPlanner' in download
-for deploy in ('deploy-g2b-eligibility-worker-only.sh','deploy-g2b-award-enricher.sh'):
-    source=(ROOT/'server'/deploy).read_text(encoding='utf-8')
-    assert 'WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1' in source
-print('AUTOMATIC_SINGLE_NOTICE_OFF_NO_NETWORK=PASS',flush=True)
+eligibility_deploy=(ROOT/'server/deploy-g2b-eligibility-worker-only.sh').read_text(encoding='utf-8')
+assert '-e WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1' in eligibility_deploy
+award_deploy=(ROOT/'server/deploy-g2b-award-enricher.sh').read_text(encoding='utf-8')
+assert '-e WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1' not in award_deploy
+assert 'OLD_PAUSED=0' in award_deploy and 'test "$OLD_PAUSED" = 0' in award_deploy
+assert 'AWARD_MAX_REQUESTS_PER_CYCLE=2' in award_deploy
+assert 'AWARD_INTERVAL_SECONDS=3600' in award_deploy
+print('ESSENTIAL_BULK_AND_AWARD_FALLBACK_NO_NETWORK=PASS',flush=True)
