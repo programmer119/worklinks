@@ -79,4 +79,25 @@ with patch.dict(os.environ,{'WORKLINKS_RFP_DEFER_OCR':'1'}):
         assert result['files'][0]['errorCategory']=='ocr_deferred_to_repair'
         assert result['files'][0]['sourceTextScanComplete'] is False
 
-print('RFP_SPEED_REGRESSION=PASS extracted-text-cache, first-time-drain, no-Tesseract-in-bulk, deferred-images')
+
+# Production stage contains a symlink to the already-downloaded bid SQLite.
+# Discovery must use it rather than issue 18 HTTP requests on every 8-item batch.
+import json,sqlite3
+with tempfile.TemporaryDirectory() as root:
+    db=Path(root)/'bids.sqlite3'
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices(bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER,last_seen TEXT)')
+        con.execute('CREATE TABLE bid_license_cache(bid_no TEXT,bid_ord TEXT,payload TEXT)')
+        for i in range(3):
+            bid='R26BK0180000'+str(i+1)
+            item={'bidNo':bid,'order':'000','kind':'servc','closes':deadline}
+            con.execute('INSERT INTO bid_notices VALUES(?,?,?,?,?)',
+                        (bid,'000',json.dumps(item),1,'2026-11-14'))
+    with patch.object(m,'ROOT',Path(root)):
+        with patch.dict(os.environ,{'WORKLINKS_RFP_UPGRADE_ONLY':'1'}):
+            with patch.object(m,'fetch_json',side_effect=AssertionError('unexpected proxy HTTP request')):
+                local_selected=m.discover(3,prior=prior,targets=set(),
+                                          manifest_probe_out=[],priority=set())
+                assert len(local_selected)==3,local_selected
+
+print('RFP_SPEED_REGRESSION=PASS extracted-text-cache, first-time-drain, no-Tesseract-in-bulk, deferred-images, local-SQLite')
