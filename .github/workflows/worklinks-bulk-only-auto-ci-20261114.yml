@@ -1,0 +1,35 @@
+name: WorkLinks no automatic single-notice API regression
+on:
+  push:
+    branches: [fix/worklinks-bulk-only-auto-20261114]
+    paths:
+      - 'server/g2b-eligibility-worker.py'
+      - 'server/g2b-award-enricher.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'server/deploy-g2b-eligibility-worker-only.sh'
+      - 'server/deploy-g2b-award-enricher.sh'
+      - 'scripts/rfp_download_worker.py'
+      - 'tests/test_worklinks_bulk_only_auto.py'
+      - '.github/workflows/worklinks-bulk-only-auto-ci-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline guard and existing regression tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          bash -n server/deploy-g2b-eligibility-worker-only.sh server/deploy-g2b-award-enricher.sh
+          python3 -m py_compile server/g2b-eligibility-worker.py server/g2b-award-enricher.py server/worklinks-server123-pipeline.py scripts/rfp_download_worker.py
+          python3 tests/test_worklinks_bulk_only_auto.py
+          python3 tests/test_g2b_eligibility_worker.py
+          python3 tests/test_award_enricher.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          python3 tests/test_rfp_bulk_manifests.py
+          python3 tests/test_rfp_dual_queue.py
+          echo NO_AUTOMATIC_SINGLE_NOTICE_CI=PASS
