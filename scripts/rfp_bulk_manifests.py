@@ -18,11 +18,13 @@ SOURCES=('ordinary','eorder','detail')
 ROWS=999
 MAX_PAGES_PER_DAY_SOURCE=500
 MAX_FETCH_PER_PASS=18
-DAILY_LIMIT=180
-# Old 36/hour self-throttle left 1,585 notices without lists while the
-# official A02 proxy circuit breaker was inactive. Period calls already
-# have paced starts (0.8s) and a separate rolling daily budget, so do
-# not impose an unsupported additional 36/hour starvation window.
+# A02 is allocated 1000 daily requests. The former internal cap 180
+# stopped essential bulk attachment-list collection at 1924/2315, even while
+# the source's circuit breaker was clear. Align the cap to the service budget.
+# Cached date pages and all existing request ledger rows remain durable.
+DAILY_LIMIT=1000
+# No additional unsupported hourly cap. The existing 0.8-second pacing,
+# daily ledger, and official API circuit breaker still apply.
 HOURLY_LIMIT=DAILY_LIMIT
 
 class BulkManifestError(RuntimeError):
