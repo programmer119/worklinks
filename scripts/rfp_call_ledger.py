@@ -5,6 +5,7 @@ Only records actually observed after installation; historical totals remain hist
 A 'cache_hit' is never counted as a fresh upstream HTTP call.
 """
 import datetime as dt
+import fcntl
 from contextlib import contextmanager
 import hashlib
 import json
@@ -221,12 +222,29 @@ class CallLedger:
     def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=0,
                       unknown_days=30, json_days=30, event_days=60,
                       compact=True):
-        """Delete only expired/orphan archived bytes; retain any live notice ref.
+        """Run one non-overlapping, bounded retention pass.
 
-        Legacy archives are linked to their notice from historical HTTP events.
-        Unknown-deadline archives expire after a bounded fallback lifetime.
-        Nothing here touches original RFP scan evidence or API snapshot files.
+        The independent flock prevents manual + scheduler cleanups from
+        racing; the scan worker never needs this lock to fetch/parse files.
         """
+        lock_path=Path(str(self.path)+'.prune.lock')
+        with lock_path.open('a') as lock:
+            try:fcntl.flock(lock.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
+            except BlockingIOError:
+                return {'status':'already_running','attachmentsDeleted':0,
+                        'deletedCompressedBytes':0}
+            try:
+                return self._prune_expired_unlocked(
+                    deadline_by_notice,today=today,grace_days=grace_days,
+                    unknown_days=unknown_days,json_days=json_days,
+                    event_days=event_days,compact=compact)
+            finally:
+                fcntl.flock(lock.fileno(),fcntl.LOCK_UN)
+
+    def _prune_expired_unlocked(self, deadline_by_notice=None, *, today=None,
+                               grace_days=0,unknown_days=30,json_days=30,
+                               event_days=60,compact=True):
+        """Short SQLite transactions; never hold a write lock while planning."""
         deadlines=deadline_by_notice or {}
         today=today or dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).date()
         if isinstance(today,dt.datetime):today=today.date()
@@ -239,23 +257,30 @@ class CallLedger:
         json_deleted=0
         events_deleted=0
         deleted_payload_bytes=0
+        def still_active(refs,created):
+            if not refs:return (today-created).days<unknown
+            for notice,stored_close in refs:
+                date=self._close_date(deadlines.get(notice) or stored_close)
+                if date is not None:
+                    if today<=date+dt.timedelta(days=grace):return True
+                elif (today-created).days<unknown:
+                    return True
+            return False
+
+        # One-time legacy reference migration, committed before the scan plan.
         with self._connect() as db:
-            db.execute('BEGIN IMMEDIATE')
+            db.execute('PRAGMA busy_timeout=1000')
             if not db.execute("SELECT 1 FROM ledger_meta WHERE key='legacy_refs_migrated'").fetchone():
                 db.execute('''INSERT OR IGNORE INTO attachment_refs(request_key,notice_key,closes_on)
                     SELECT DISTINCT e.request_key,e.notice_key,''
                     FROM call_events e INNER JOIN verified_cache c
-                       ON c.request_key=e.request_key AND c.media_type='bytes'
+                        ON c.request_key=e.request_key AND c.media_type='bytes'
                     WHERE e.kind IN ('attachment_http','attachment_reuse')
                       AND e.notice_key IS NOT NULL AND e.notice_key<>'' ''')
                 db.execute("INSERT INTO ledger_meta(key,value) VALUES('legacy_refs_migrated',?)",
                            (utcnow(),))
-            # Notice metadata can be corrected after an archive was saved.
-            for notice,close in deadlines.items():
-                date=self._close_date(close)
-                if date:
-                    db.execute('UPDATE attachment_refs SET closes_on=? WHERE notice_key=?',
-                               (date.isoformat(),notice))
+        # All selection is read-only, so scan workers can keep writing.
+        with self._connect() as db:
             refs={}
             for key,notice,close in db.execute(
                     'SELECT request_key,notice_key,closes_on FROM attachment_refs'):
@@ -265,57 +290,70 @@ class CallLedger:
                     "SELECT request_key,stored_at,length(payload) FROM verified_cache WHERE media_type='bytes'"):
                 try:created=dt.datetime.fromisoformat(stamp).date()
                 except (TypeError,ValueError):created=today
-                keep=False
-                candidates=refs.get(key,[])
-                if not candidates:
-                    keep=(today-created).days<unknown
-                else:
-                    for notice,stored_close in candidates:
-                        date=self._close_date(deadlines.get(notice) or stored_close)
-                        if date:
-                            if today<=date+dt.timedelta(days=grace):
-                                keep=True
-                                break
-                        elif (today-created).days<unknown:
-                            keep=True
-                            break
-                if not keep:to_remove.append((key,int(payload_size or 0)))
-            for key,size in to_remove:
-                db.execute("DELETE FROM verified_cache WHERE request_key=? AND media_type='bytes'",
-                           (key,))
-                db.execute("DELETE FROM attachment_refs WHERE request_key=?",(key,))
-                archived_deleted+=1
-                deleted_payload_bytes+=size
-            json_deleted=db.execute(
-                "DELETE FROM verified_cache WHERE media_type='json' AND stored_at < ?",
-                (cutoff_json,)).rowcount
-            events_deleted=db.execute(
-                "DELETE FROM call_events WHERE occurred_at < ?",(cutoff_events,)).rowcount
+                if not still_active(refs.get(key,[]),created):
+                    to_remove.append((key,int(payload_size or 0)))
+        # Maximum 16 attachments per transaction: deleting multi-GB archives
+        # must never block an unrelated checkpoint or new raw-file save for 30s.
+        for offset in range(0,len(to_remove),16):
+            chunk=to_remove[offset:offset+16]
+            with self._connect() as db:
+                db.execute('PRAGMA busy_timeout=1000')
+                # Check newly added references before deleting an old archive.
+                actual=[]
+                for key,size in chunk:
+                    linked=db.execute(
+                        'SELECT notice_key,closes_on FROM attachment_refs WHERE request_key=?',
+                        (key,)).fetchall()
+                    row=db.execute(
+                        "SELECT stored_at FROM verified_cache WHERE request_key=? AND media_type='bytes'",
+                        (key,)).fetchone()
+                    if row is None:continue
+                    try:created=dt.datetime.fromisoformat(row[0]).date()
+                    except (ValueError,TypeError):created=today
+                    if not still_active(linked,created):actual.append((key,size))
+                for key,size in actual:
+                    db.execute("DELETE FROM verified_cache WHERE request_key=? AND media_type='bytes'",
+                               (key,))
+                    db.execute("DELETE FROM attachment_refs WHERE request_key=?",(key,))
+                archived_deleted+=len(actual)
+                deleted_payload_bytes+=sum(size for _,size in actual)
+        # Old JSON and telemetry are independently bounded. Avoid a giant
+        # DELETE transaction that stalls current RFP work.
+        with self._connect() as db:
+            db.execute('PRAGMA busy_timeout=1000')
+            old_json=[x[0] for x in db.execute(
+                "SELECT request_key FROM verified_cache WHERE media_type='json' AND stored_at<? LIMIT 64",
+                (cutoff_json,))]
+            if old_json:
+                db.executemany("DELETE FROM verified_cache WHERE request_key=?",
+                               [(key,) for key in old_json])
+            json_deleted=len(old_json)
+        with self._connect() as db:
+            db.execute('PRAGMA busy_timeout=1000')
+            events_deleted=db.execute('''DELETE FROM call_events WHERE id IN
+                (SELECT id FROM call_events WHERE occurred_at<? LIMIT 1000)''',
+                (cutoff_events,)).rowcount
+        with self._connect() as db:
             remaining=db.execute(
                 "SELECT COUNT(*),COALESCE(SUM(length(payload)),0) FROM verified_cache WHERE media_type='bytes'"
             ).fetchone()
-        # SQLite deletion may leave reusable free pages. Compact safely when
-        # enough disk space exists; otherwise preserve data and retry later.
-        file_before=self.path.stat().st_size if self.path.exists() else 0
+        # Physical compaction is opt-in: a multi-GB VACUUM can starve all
+        # ongoing RFP writers even when the retention pass itself is fast.
         reclaimed=0
-        try:
-            with sqlite3.connect(str(self.path),timeout=1) as db:
-                db.execute('PRAGMA busy_timeout=1000')
-                if compact:db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
-                free_pages=db.execute('PRAGMA freelist_count').fetchone()[0]
-                page_size=db.execute('PRAGMA page_size').fetchone()[0]
-                reclaimable=free_pages*page_size
-                incremental=db.execute('PRAGMA auto_vacuum').fetchone()[0]==2
-                if compact and reclaimable>=32*1048576:
-                    if incremental:
-                        db.execute('PRAGMA incremental_vacuum')
-                    elif (shutil.disk_usage(self.path.parent).free >=
-                          file_before*2+512*1048576):
+        if compact and os.environ.get('WORKLINKS_RFP_ARCHIVE_ALLOW_VACUUM')=='1':
+            before=self.path.stat().st_size if self.path.exists() else 0
+            try:
+                with sqlite3.connect(str(self.path),timeout=1) as db:
+                    db.execute('PRAGMA busy_timeout=1000')
+                    free=db.execute('PRAGMA freelist_count').fetchone()[0]
+                    size=db.execute('PRAGMA page_size').fetchone()[0]
+                    if (free*size>=256*1048576 and
+                            shutil.disk_usage(self.path.parent).free >= before*2+512*1048576):
                         db.execute('VACUUM')
-            reclaimed=max(0,file_before-self.path.stat().st_size)
-        except (sqlite3.Error,OSError):
-            pass  # Cannot block active reader or cause disk pressure.
-        return {'attachmentsDeleted':archived_deleted,
+                reclaimed=max(0,before-self.path.stat().st_size)
+            except (sqlite3.Error,OSError):
+                pass
+        return {'status':'ok','attachmentsDeleted':archived_deleted,
                 'deletedCompressedBytes':deleted_payload_bytes,
                 'jsonDeleted':json_deleted,'eventsDeleted':events_deleted,
                 'attachmentsRemaining':remaining[0],
