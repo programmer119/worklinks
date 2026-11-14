@@ -1202,6 +1202,61 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   }
  }
 }
+/* General jobs: no empty sector placeholder, oversized blank slot, or
+   tiny price drifting below the title. Keep conditional pay wording visible. */
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline{
+ display:grid;grid-template-columns:minmax(0,1fr) max-content;
+ align-items:center;justify-content:stretch;column-gap:10px;row-gap:0;min-height:0
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline h3{
+ min-width:0;width:auto;margin:0;align-self:center;
+ font-size:18px;line-height:1.36;word-break:keep-all;overflow-wrap:break-word
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline-badge:empty{
+ display:none!important;min-height:0!important
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline-side{
+ display:flex;flex-direction:column;align-items:flex-end;justify-self:end;
+ align-self:center;justify-content:center;min-width:0;max-width:100%
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline-side .job-amount{
+ display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+ max-width:100%;width:auto;margin:0;white-space:normal;overflow:visible;
+ font-size:19px;line-height:1.2;font-weight:850;color:#102c53;
+ text-align:right;word-break:keep-all;overflow-wrap:break-word
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-amount-main{
+ display:inline-flex;gap:5px;align-items:baseline;white-space:nowrap
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-amount-prefix{
+ color:#52657c;font-weight:750;font-size:12px;line-height:1.1
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-amount-value{
+ color:#102c53;font-size:clamp(20px,2.3cqw,27px);font-weight:900;
+ line-height:1.15;letter-spacing:-.5px;font-variant-numeric:tabular-nums
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-amount-note{
+ color:#68778c;font-size:11px;line-height:1.25;font-weight:650
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-core{
+ container:general-job-card / inline-size;gap:5px
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-eligibility-row:has(.job-eligibility-content:empty){
+ display:none
+}
+#jobsView:not([data-job-mode="partner"]) #jobCards .job-highlights{min-height:34px}
+@container general-job-card (max-width:500px){
+ #jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline{
+  grid-template-columns:minmax(0,1fr);row-gap:5px
+ }
+ #jobsView:not([data-job-mode="partner"]) #jobCards .job-mini .job-headline-side{
+  width:100%;justify-self:stretch;align-items:flex-end
+ }
+ #jobsView:not([data-job-mode="partner"]) #jobCards .job-amount-value{
+  font-size:clamp(20px,5.6cqw,26px)
+ }
+}
+
 </style>
 <div id="worklinks-auth-recovery-slot"></div>
 <div class="note">전체 탭에서 유형 구분 없이 모두 볼 수 있습니다. 오래 열려 있거나 사업자 준비 후 볼 공고는 각 항목의 '사업자' 버튼으로 직접 사업자 탭에 보낼 수 있습니다. 자동 분류하지 않습니다. 숨김 탭에서는 숨긴 항목을 한 번에 확인·복원할 수 있습니다. 지원가능에는 '확인 필요' 항목도 함께 표시합니다. 오늘 마감 → 조기 종료 가능(선착순·예산 소진) → 일반 마감 임박순이며, 이미 마감된 항목은 뒤로 보내며, 지원완료 항목은 일반 목록에서 바로 제외되고 상단 지원완료 필터에서 확인할 수 있습니다.</div></div>
@@ -2792,6 +2847,17 @@ function jobAmountLabel(raw){
   return Math.round(n/10000).toLocaleString('ko-KR')+'만원';
  }
  return t||'예산 미확인';
+}
+/* Preserve the source's provisional salary wording, but give the amount
+   a readable hierarchy. Never turn estimated monthly pay into a bid budget. */
+function jobCardAmountMarkup(x){
+ const original=jobAmountLabel(x.amount);
+ if(/^g2b-/.test(String(x.id||'')))return htmlEscape(original);
+ const parts=original.match(/^(예상\s*월|월|예상)\s+([0-9,]+\s*(?:만원|원))(?:\s*\/\s*(계약조건\s*확인))?$/);
+ if(!parts)return htmlEscape(original);
+ return '<span class="job-amount-main"><span class="job-amount-prefix">'+htmlEscape(parts[1])+'</span>'+
+  '<strong class="job-amount-value">'+htmlEscape(parts[2])+'</strong></span>'+
+  (parts[3]?'<span class="job-amount-note">'+htmlEscape(parts[3])+'</span>':'');
 }
 function extractBudget(s){
  const v=String(s||'').replace(/,/g,'');
@@ -5505,7 +5571,7 @@ function renderJobs(){
       '<div class="job-core">'+
        '<div class="job-headline"><h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title)+'</button></h3>'+
        '<div class="job-headline-side"><div class="job-headline-badge">'+bidBusinessArea(x)+'</div>'+
-       '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div></div>'+
+       '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+jobCardAmountMarkup(x)+'</span></div></div>'+
        bidMethodCardMarkup(x,member&&partnerMode)+
        jobCollectionMarkup(x)+
        '<div class="job-eligibility-row"><div class="job-eligibility-content">'+qualification+jobRequirementBadges(x)+partner+'</div></div>'+
