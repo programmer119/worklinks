@@ -16,12 +16,14 @@ def load(path,name):
 eligibility=load('server/g2b-eligibility-worker.py','worklinks_eligibility_bulk_gate')
 award=load('server/g2b-award-enricher.py','worklinks_award_bulk_gate')
 with patch.dict(os.environ,{FLAG:'1'}):
-    class ExpectedSleep(Exception):pass
-    with patch.object(eligibility.time,'sleep',side_effect=ExpectedSleep),\
-         patch.object(eligibility.urllib.request,'urlopen',side_effect=AssertionError('no single HTTP')):
-        try:eligibility.main()
-        except ExpectedSleep:pass
-        else:raise AssertionError('qualification worker did not block automatic notice calls')
+    # The mandatory service must NOT idle: it must delegate to date batching.
+    main_source=(ROOT/'server/g2b-eligibility-worker.py').read_text()
+    assert 'QUALIFICATION_BATCH_COLLECTION_STARTED' in main_source
+    assert 'module.run_forever()' in main_source
+    assert 'g2b-mandatory-date-batch.py' in main_source
+    batch_source=(ROOT/'server/g2b-mandatory-date-batch.py').read_text()
+    assert 'mandatory-enrichment-batch?' in batch_source
+    assert "'bidNtceNo'" in batch_source  # parse returned IDs, never request IDs
     with tempfile.TemporaryDirectory() as tmp:
         import sqlite3
         db=sqlite3.connect(str(Path(tmp)/'awards.sqlite3'))
@@ -37,7 +39,7 @@ pipeline=(ROOT/'server/worklinks-server123-pipeline.py').read_text(encoding='utf
 assert "kind in ('rfp','rfpRepair')" in pipeline
 assert "os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1'" in pipeline
 download=(ROOT/'scripts/rfp_download_worker.py').read_text(encoding='utf-8')
-assert 'allow_exceptions=False' in download
+assert 'BulkManifestPlanner' in download
 for deploy in ('deploy-g2b-eligibility-worker-only.sh','deploy-g2b-award-enricher.sh'):
     source=(ROOT/'server'/deploy).read_text(encoding='utf-8')
     assert 'WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE=1' in source
