@@ -1,0 +1,47 @@
+name: WorkLinks RFP parser version inventory
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'startup-support/rfp-coverage-index.json'
+      - 'scripts/build_worklinks_rfp_provenance.py'
+      - 'tests/test_rfp_scan_provenance.py'
+      - '.github/workflows/worklinks-rfp-scan-provenance.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-rfp-parser-provenance
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate parser version mapping without network calls
+        run: python3 tests/test_rfp_scan_provenance.py
+      - name: Build and publish lightweight cumulative parser provenance
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 tests/test_rfp_scan_provenance.py
+            python3 scripts/build_worklinks_rfp_provenance.py
+            git add startup-support/rfp-scan-provenance.json
+            if git diff --cached --quiet; then
+              echo RFP_PROVENANCE_ALREADY_CURRENT
+              exit 0
+            fi
+            git commit -m 'data: publish per-notice RFP parser provenance'
+            if git push origin HEAD:main; then
+              echo RFP_PROVENANCE_DEPLOYED
+              exit 0
+            fi
+            echo "RFP_PROVENANCE_PUSH_RETRY_$attempt"
+          done
+          exit 1
