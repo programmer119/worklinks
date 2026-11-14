@@ -2245,7 +2245,13 @@ def main():
                     results[key]=data
                 # Progress becomes visible and durable immediately for THIS
                 # notice, even while other futures remain in flight.
-                publish_notice_checkpoint(key,results[key],reader_fingerprint)
+                try:
+                    publish_notice_checkpoint(key,results[key],reader_fingerprint)
+                except (OSError,sqlite3.Error,ValueError) as checkpoint_error:
+                    # Never discard a successfully parsed RFP because the
+                    # supplementary live-progress DB was temporarily locked.
+                    print('RFP_NOTICE_CHECKPOINT_FAILED',key,
+                          type(checkpoint_error).__name__,flush=True)
                 print('RFP_SCAN',key,data['status'],'FILES',len(data.get('files',[])),flush=True)
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
@@ -2263,7 +2269,13 @@ def main():
                     failed_refresh[key]='metadata_fetch_failed'
                 else:
                     results[key]=failed
-                publish_notice_checkpoint(key,results[key],reader_fingerprint)
+                try:
+                    publish_notice_checkpoint(key,results[key],reader_fingerprint)
+                except (OSError,sqlite3.Error,ValueError) as checkpoint_error:
+                    # Never discard a successfully parsed RFP because the
+                    # supplementary live-progress DB was temporarily locked.
+                    print('RFP_NOTICE_CHECKPOINT_FAILED',key,
+                          type(checkpoint_error).__name__,flush=True)
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
     stage_done('process_notices')
     if not results:raise SystemExit('NO_RFP_RESULT')
