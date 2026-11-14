@@ -2108,11 +2108,18 @@ function paintRfpRescanProgress(){
  const workItem=[worker?.tasks?.rfpUpgrade,worker?.tasks?.rfp].filter(Boolean).sort((a,b)=>Number(b.attemptEpoch||0)-Number(a.attemptEpoch||0))[0]||null;
  const workerNames={started:'실행 중',ok:'최근 작업 완료',failed:'최근 작업 실패',parser_versions_upgraded:'재판독 대상 생성',interrupted_retry_on_restart:'중단 후 재실행',unknown:'상태 미확인'};
  const workerStatus=workItem?(workerNames[workItem.status]||'상태 확인 필요'):'상태 미확인';
+ const upgradeTask=worker?.tasks?.rfpUpgrade||null;
+ const nextUpgrade=Number(worker?.nextUpgradeEpoch||0);
+ const upgradeRunning=upgradeTask?.status==='started';
+ const nextUpgradeText=upgradeRunning?'재판독 실행 중':
+   (worker?.upgradeActive&&nextUpgrade>0?
+      (nextUpgrade*1000>Date.now()?'다음 재판독 예정 '+rfpClock(nextUpgrade*1000):'다음 재판독 차례 도래'):
+      (worker?.upgradeActive?'재판독 일정 확인 중':'재판독 작업 비활성'));
  count.textContent='완료 '+rfpProgressNumber(complete)+' / '+rfpProgressNumber(all)+'건';
  label.textContent=pct+'%'+(delayed?' · 갱신 지연':'');
  fill.style.width=pct+'%';
  const button=document.getElementById('rfpRescanLaunch');
- if(button)button.title='마지막 조회 '+rfpClock(rfpRescanLastSuccessAt)+' · 집계 '+String(info.asOf||'미확인')+(delayed?' · 재조회 실패':'');
+ if(button)button.title='완료 '+rfpProgressNumber(complete)+' / '+rfpProgressNumber(all)+'건 · '+nextUpgradeText+' · 서버 조회 10초 주기'+(delayed?' · 최신 조회 실패':'');
  paintRfpCountdown();
  const stageNames={classification:'RFP 조건',roles:'역할·인원',facts:'인력 요구사항',hwpx:'HWPX 해석'};
  const stages=Object.entries(info.stages||{}).map(([name,st])=>{
@@ -2155,7 +2162,7 @@ function paintRfpRescanProgress(){
   '<div class="rfp-rescan-server-note">마지막 조회 '+htmlEscape(rfpClock(rfpRescanLastSuccessAt))+
   ' · 서버 집계 '+htmlEscape(String(info.asOf||'시각 미확인').replace('T',' ').slice(0,19))+
   ' · 직전 조회 대비 완료 '+(rfpRescanLastDelta>0?'+':'')+rfpRescanLastDelta+'건</div>'+ 
-  (worker?'<div class="rfp-rescan-server-note">서버 재판독: '+htmlEscape(workerStatus)+(worker.upgradeActive?' · 재판독 대상 처리 활성화':'')+(workItem?.attemptEpoch?' · 최근 시작 '+htmlEscape(rfpClock(workItem.attemptEpoch*1000)):'')+'</div>':'');
+  (worker?'<div class="rfp-rescan-server-note">서버 재판독 '+htmlEscape(workerStatus)+(upgradeTask?.successEpoch?' · 최근 완료 '+htmlEscape(rfpClock(upgradeTask.successEpoch*1000)):'')+' · '+htmlEscape(nextUpgradeText)+(worker.upgradePeriodSeconds?' · 처리 간격 '+Math.round(worker.upgradePeriodSeconds/60)+'분':'')+'</div>':'');
  if(delayed)document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
 }
 async function refreshRfpRescanProgress(force=false){
