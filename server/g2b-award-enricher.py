@@ -263,6 +263,12 @@ def write_status(db, when, requests, stored, errors, msg, cooldown=None):
 
 def cycle(db, fetch=http_awards, now=None, maximum=MAX_REQUESTS, gap=GAP_SECONDS):
     now = now or dt.datetime.now(dt.timezone.utc)
+    if os.environ.get('WORKLINKS_NO_AUTOMATIC_SINGLE_NOTICE')=='1':
+        # B2 date-batch index remains the source for new award facts.
+        # Preserve existing verified historic cache; do not requery per notice.
+        write_status(db,now,0,0,0,'bulk_only_no_single_upstream',None)
+        return {'requests':0,'stored':0,'errors':0,
+                'state':'bulk_only_no_single_upstream'}
     paused = db.execute('SELECT cooldown_until FROM bid_award_worker_status WHERE id=1').fetchone()
     if paused and parse_time(paused[0]) and parse_time(paused[0]) > now:
         return {'requests':0,'stored':0,'errors':0,'state':'cooldown'}
