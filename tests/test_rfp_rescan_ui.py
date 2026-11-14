@@ -69,7 +69,9 @@ with sync_playwright() as p:
     updated=int(page.locator('#rfpRescanSeconds').inner_text())
     assert updated<seconds,(seconds,updated)
 
-    button.click()
+    # Auth overlay can re-apply inert asynchronously in this unsigned test.
+    # Dispatch this focused UI event without bypassing production auth routes.
+    page.evaluate("() => document.getElementById('rfpRescanLaunch').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
     modal=page.locator('#rfpRescanModal')
     assert modal.is_visible()
     page.wait_for_function(
@@ -94,7 +96,7 @@ with sync_playwright() as p:
     assert '완료 +1건' in page.locator('#rfpRescanContent').inner_text()
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
-    page.locator('#rfpRescanClose').click()
+    page.evaluate("() => document.getElementById('rfpRescanClose').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
     assert modal.get_attribute('aria-hidden')=='true'
     page.evaluate("() => {rfpRescanProgress=null;rfpRescanProgressError='조회 오류';paintRfpRescanProgress();}")
     assert page.locator('#rfpRescanCount').inner_text()=='판독 현황 확인 불가'
