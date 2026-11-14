@@ -101,7 +101,8 @@ with tempfile.TemporaryDirectory() as tmp:
     assert queue.enqueue([('R26BK99990001','000','')],'reader-v2')==1
     assert queue.retire_expired(today=dt.date(2026,11,14))==0
     assert queue.stats()['total']==1001
-    keys={row[0] for row in queue.connect().execute(
-        'SELECT notice_key FROM rfp_dual_notices').fetchall()}
+    with queue.connect() as connection:
+        keys={row[0] for row in connection.execute(
+            'SELECT notice_key FROM rfp_dual_notices').fetchall()}
     assert 'R26BK99990001:000' in keys
 print('RFP_DUAL_QUEUE_1000_FULL_DOWNLOAD_INDEPENDENT_SCAN=PASS')
