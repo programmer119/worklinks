@@ -1,0 +1,31 @@
+name: WorkLinks A02 and B123 shared operating-key no-network regression
+on:
+  push:
+    branches: [fix/g2b-shared-operational-key-source-20261114]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'server/g2b-full-crawler.py'
+      - 'server/deploy-g2b-api-only.sh'
+      - 'server/deploy-g2b-crawler-only.sh'
+      - 'tests/test_g2b_shared_operating_key.py'
+      - '.github/workflows/worklinks-g2b-shared-operating-key-ci-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile + validate both A02 loaders and existing API regressions offline
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          bash -n server/deploy-g2b-api-only.sh
+          bash -n server/deploy-g2b-crawler-only.sh
+          python3 -m py_compile server/g2b-proxy.py server/g2b-full-crawler.py
+          python3 tests/test_g2b_shared_operating_key.py
+          python3 tests/test_bid_evidence.py
+          python3 tests/test_g2b_standard_worker.py
+          echo G2B_OPERATING_KEY_SOURCE_CI=PASS
