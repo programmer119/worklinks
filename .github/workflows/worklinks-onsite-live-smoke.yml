@@ -43,7 +43,8 @@ jobs:
           assert "if(rfpSnapshotLoading&&!full&&!staffingSourceReadComplete)" in page
           assert "상주 여부</strong>" in page
           assert "label:'상주 확인'" not in page
-          assert "return {key:'not_specified',label:'상주 미확정'" in page
+          assert "return {key:'offsite',label:'비상주',reason:'상주 요구사항 미기재'}" in page
+          assert "if(provenance?.current!==true&&!fullCurrent)" in page
           north=data['byNotice']['R26BK01783957:000']
           assert north['sha256']=='0bac97cb72b9f30cdeb2e00cd6dbab748c2faf00d2d8da5eb78fc9a97e64b645'
           assert any(f.get('kind')=='headcount_recommended' and
