@@ -9,9 +9,10 @@ DOCKER=/home/ggul-docker/bin/docker
 SOCKET=unix:///home/ggul-docker/run/docker.sock
 IMG=python:3.11-alpine
 SECRET="$BASE/secrets/g2b.env"
+OPERATING_SECRET="$BASE/secrets/g2b-standard.env"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/server/g2b-proxy.py"
 dk(){ "$DOCKER" -H "$SOCKET" "$@"; }
-for file in "$DOCKER" "$TARGET" "$SRC" "$SECRET" "$BASE/data/bids.sqlite3"; do
+for file in "$DOCKER" "$TARGET" "$SRC" "$SECRET" "$OPERATING_SECRET" "$BASE/data/bids.sqlite3"; do
   test -s "$file" || { echo "PREFLIGHT_MISSING=$file"; exit 5; }
 done
 dk image inspect "$IMG" >/dev/null
@@ -60,11 +61,13 @@ start_api(){
  dk run -d --name "$API" --restart unless-stopped --network host \
   -e PORT=18192 -e G2B_SECRET_PATH=/run/secrets/g2b.env \
   -e G2B_DB_PATH=/app/data/bids.sqlite3 \
+  -e G2B_OPERATING_KEY_PATH=/run/secrets/g2b-standard.env \
   -e WORKLINKS_RFP_LEDGER_DB=/app/data/rfp-request-ledger.sqlite3 \
   -e G2B_QUAL_REPORT=/app/reports/qualification-year.json \
   -v "$TARGET:/app/g2b-proxy.py:ro" \
   -v "$BASE/pipeline/scripts/rfp_call_ledger.py:/app/rfp_call_ledger.py:ro" \
   -v "$SECRET:/run/secrets/g2b.env:ro" \
+  -v "$OPERATING_SECRET:/run/secrets/g2b-standard.env:ro" \
   -v "$BASE/data:/app/data" \
   -v "$BASE/reports:/app/reports:ro" \
   "$IMG" python -u /app/g2b-proxy.py >/dev/null
