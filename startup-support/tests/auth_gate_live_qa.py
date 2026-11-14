@@ -4,7 +4,7 @@ import time
 from playwright.sync_api import sync_playwright
 
 URL = "https://worklinks.suaveforge.com/startup-support/?view=jobs"
-REVISION = "20261114-auth-watch-v3"
+REVISION = "20261114-auth-retry-v4"
 CORS = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, POST, OPTIONS",
@@ -31,9 +31,12 @@ def install_fake_auth(page, revoked):
         if path.endswith("/v1/config/p47"):
             status, body = 200, {"project": {"slug": "p47"}, "environment": "production"}
         elif path.endswith("/v1/me"):
-            status, body = (401, {"error": "invalid_token"}) if revoked["value"] else (
-                200, {"user": {"id": "qa-user", "email": "qa@example.com"}, "membership": {"status": "active"}}
-            )
+            if revoked.get("unavailable"):
+                status, body = 503, {"error": "temporary_unavailable"}
+            else:
+                status, body = (401, {"error": "invalid_token"}) if revoked["value"] else (
+                    200, {"user": {"id": "qa-user", "email": "qa@example.com"}, "membership": {"status": "active"}}
+                )
         elif path.endswith("/v1/auth/p47/refresh"):
             status, body = (401, {"error": "expired_refresh"}) if revoked["value"] else (
                 200, {"accessToken": "qa-token", "refreshToken": "qa-refresh"}
@@ -114,5 +117,40 @@ with sync_playwright() as pw:
     page.clock.fast_forward(46000)
     assert_locked(page, "로그인이 만료되었습니다.")
     print("ACTIVE_TAB_EXPIRY_HEARTBEAT=PASS", flush=True)
+    context.close()
+
+    # Reproduce the user's failed-auth screenshot. A click must retry the
+    # actual /v1/me call (not reload), report persistent failures, and recover.
+    transient = {"value": False, "unavailable": True}
+    context = browser.new_context(viewport={"width": 1440, "height": 900})
+    context.add_init_script("""
+        if (location.hostname === 'worklinks.suaveforge.com') {
+          localStorage.setItem(
+            'authhub:p47:production:session',
+            JSON.stringify({accessToken: 'qa-token', refreshToken: 'qa-refresh'})
+          );
+        }
+    """)
+    page = context.new_page()
+    install_fake_auth(page, transient)
+    page.goto(URL, wait_until="domcontentloaded", timeout=60000)
+    wait_for_live_revision(page)
+    page.get_by_text("로그인 상태를 확인할 수 없습니다.", exact=True).wait_for(timeout=20000)
+    assert page.locator("#worklinks-auth-gate-retry").is_visible(), "Retry button missing"
+    assert page.locator("#worklinks-auth-gate-login").is_visible(), "Login fallback missing"
+    assert page.locator("body > main").evaluate("(e)=>e.inert")
+    assert page.evaluate("localStorage.getItem('authhub:p47:production:session')") is not None
+    navigations = []
+    page.on("framenavigated", lambda frame: navigations.append(frame.url) if frame == page.main_frame else None)
+    page.locator("#worklinks-auth-gate-retry").click()
+    page.get_by_text("다시 확인 1회 실패", exact=False).wait_for(timeout=20000)
+    assert not navigations, "Retry reloaded page instead of rechecking authentication"
+    transient["unavailable"] = False
+    page.locator("#worklinks-auth-gate-retry").click()
+    page.locator(".worklinks-auth-dropdown").wait_for(state="visible", timeout=30000)
+    page.locator("#worklinks-auth-gate").wait_for(state="hidden", timeout=30000)
+    assert not navigations, "Recovered retry unexpectedly reloaded page"
+    assert page.locator("body > main").evaluate("(e)=>not e.inert")
+    print("AUTH_RETRY_FAIL_THEN_RECOVER_WITHOUT_RELOAD=PASS", flush=True)
     context.close()
     browser.close()
