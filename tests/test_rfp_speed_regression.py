@@ -52,4 +52,31 @@ with patch.dict(os.environ,{'WORKLINKS_RFP_UPGRADE_ONLY':'1'}),\
     selected=m.discover(3,prior=prior,targets=set(),manifest_probe_out=[],priority=set())
     keys=[no+':'+ordn for no,ordn,_ in selected]
     assert keys==['R26BK01800001:000','R26BK01800002:000','R26BK01800003:000'],keys
-print('RFP_SPEED_REGRESSION=PASS extraction-cache, hash-isolation, incomplete-not-cached, all-first-time-drain')
+
+# Bulk scan must NOT invoke Tesseract for image-only PDF pages.
+import types
+class FakePage:
+    def __init__(self,text):self.text=text;self.images=[object()]
+    def extract_text(self):return self.text
+    def get_contents(self):return object()
+fake_pdf=types.SimpleNamespace(PdfReader=lambda raw:types.SimpleNamespace(
+    pages=[FakePage('Original source-qualified text'),FakePage('')]))
+with patch.dict(sys.modules,{'pypdf':fake_pdf}):
+    with patch.dict(os.environ,{'WORKLINKS_RFP_DEFER_OCR':'1'}):
+        with patch.object(m,'_ocr_pdf_page',side_effect=AssertionError('OCR invoked in bulk scan')):
+            text,audit=m._extract_pdf_with_audit(b'pdf_test_bytes')
+            assert text=='Original source-qualified text'
+            assert audit['sourceComplete'] is False and audit['unresolvedPages']==[2]
+            assert audit['ocrAttemptedPages']==0
+
+source='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadFile.do?bidPbancNo=R26BK01800001'
+meta={'attachments':{'ok':True,'complete':True,'items':[{'name':'scan.png','url':source}],
+    'count':1,'eorderCount':1,'noticeDetailDocumentCount':1},
+    'noticeDocuments':{'ok':True,'complete':True}}
+with patch.dict(os.environ,{'WORKLINKS_RFP_DEFER_OCR':'1'}):
+    with patch.object(m,'download',side_effect=AssertionError('image download must be deferred')):
+        result=m.process('R26BK01800001','000',metadata=meta)
+        assert result['files'][0]['errorCategory']=='ocr_deferred_to_repair'
+        assert result['files'][0]['sourceTextScanComplete'] is False
+
+print('RFP_SPEED_REGRESSION=PASS extracted-text-cache, first-time-drain, no-Tesseract-in-bulk, deferred-images')
