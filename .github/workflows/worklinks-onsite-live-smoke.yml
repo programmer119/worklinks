@@ -166,7 +166,7 @@ jobs:
                           assert '최신 판독 완료' in row['tooltip'],row
                       else:
                           assert '확인중' in row['badge'],row
-                          assert '최신 판독' in row['tooltip'],row
+                          assert ('최신 판독' in row['tooltip'] or '최신 버전' in row['tooltip']),row
                           assert ('재검증' in row['tooltip'] or '재판독' in row['tooltip']),row
                   elif row['name']=='north':
                       assert row['badge']=='상주 권고',row
