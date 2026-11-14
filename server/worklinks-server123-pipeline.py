@@ -27,7 +27,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
-RFP_DRAIN_ALGORITHM_VERSION = 'continuous-open-sw-async-image-ocr-v2-20261114'
+RFP_DRAIN_ALGORITHM_VERSION = 'continuous-open-sw-nonblocking-repairs-v3-20261114'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
@@ -336,12 +336,17 @@ def iteration(current=None, runner=None):
             ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
         prior = state.get(kind) or {}
-        # Long OCR repair retries cannot starve a version-upgrade backlog.
-        # Give repairs one bounded turn per 12 published upgrade batches.
-        if kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True:
-            completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
-            previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
-            if completed-previous_repair<12:continue
+        # Scanner and repair jobs share a single serial scheduler. Never let
+        # 100s+ OCR/repair jobs stop the successful first-time scan queue.
+        # Paused/empty drains may safely run repairs while scanning is idle.
+        if kind in ('rfpOpenRepair','rfpRepair') and state.get('rfpUpgradeActive') is True:
+            drain_status=str((state.get('rfpUpgrade') or {}).get('status') or '')
+            if drain_status in ('started','ok','parser_versions_upgraded','drain_algorithm_upgraded'):
+                continue
+            if kind=='rfpOpenRepair' and drain_status!='no_eligible_now':
+                completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
+                previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
+                if completed-previous_repair<12:continue
         if kind=='rfpUpgrade':
             if state.get('rfpUpgradeActive') is not True:continue
             # A successful batch never waits for the clock. A failed batch or
