@@ -1499,7 +1499,8 @@ def rfp_rescan_progress():
                             e.error_text FROM rfp_live_events e
                             JOIN rfp_dual_notices n ON n.notice_key=e.notice_key
                             WHERE e.lane='download' AND e.file_key<>''
-                              AND e.status='working' AND n.download_status='fetching'
+                              AND e.status='working' AND e.phase='전송 중'
+                              AND n.download_status='fetching'
                               AND e.updated_epoch>?
                             ORDER BY e.started_epoch ASC,e.notice_key ASC
                             LIMIT 24''',(now_epoch-210,)).fetchall()
