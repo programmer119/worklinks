@@ -122,4 +122,32 @@ jobs:
                       mis['index_extracted_but_server_state_missing']+=1
               print('RFP_AUDIT_SERVER_STATUSES',json.dumps(dict(srv.most_common()),ensure_ascii=False),flush=True)
               print('RFP_AUDIT_SERVER_MISMATCH',json.dumps({'counts':dict(mis),'samples':sm},ensure_ascii=False),flush=True)
+
+              matrix=collections.Counter();server_flags=collections.Counter();cross_examples=collections.defaultdict(list)
+              for key,bid in cohort.items():
+                  record=idx.get(key) or {}
+                  ix='extracted' if record.get('status')=='text_extracted_requires_review' else (
+                      'not_indexed' if not record else 'other:'+str(record.get('status')))
+                  state=(server.get(key) or {}).get('rfpSavedState') or {}
+                  server_status=str(state.get('rfpScanStatus') or state.get('status') or 'missing')
+                  sv='extracted' if server_status=='text_extracted_requires_review' else server_status
+                  matrix[ix+' | '+sv]+=1
+                  label=ix+' | '+sv
+                  if len(cross_examples[label])<4:cross_examples[label].append(key)
+                  if not state:continue
+                  if sv=='extracted':
+                      server_flags['server_text_extracted']+=1
+                      count=int(state.get('documentCount') or 0)
+                      readable=int(state.get('effectiveReadableCount') or state.get('readableCount') or 0)
+                      if state.get('complete') is True and state.get('scanComplete') is True and count>0 and readable==count:
+                          server_flags['server_full_source_complete']+=1
+                      if state.get('staffingRoleScanComplete') is True and readable>0:
+                          server_flags['server_staffing_scan_complete']+=1
+                      if state.get('staffingRoleScanComplete') is not True:
+                          server_flags['server_staffing_scan_incomplete']+=1
+                      if not count:server_flags['server_extracted_document_count_zero']+=1
+                      if count>0 and readable<count:server_flags['server_extracted_partially_readable']+=1
+              print('RFP_AUDIT_CROSS_MATRIX',json.dumps(dict(matrix.most_common()),ensure_ascii=False),flush=True)
+              print('RFP_AUDIT_CROSS_SAMPLES',json.dumps(cross_examples,ensure_ascii=False),flush=True)
+              print('RFP_AUDIT_SERVER_COMPLETENESS',json.dumps(dict(server_flags.most_common()),ensure_ascii=False),flush=True)
           PY
