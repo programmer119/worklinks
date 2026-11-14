@@ -40,7 +40,7 @@ class BulkManifestPlanner:
         with sqlite3.connect('file:'+str(self.bids_db)+'?mode=ro',uri=True,timeout=12) as db:
             rows=db.execute('''SELECT bid_no,bid_ord,payload
                 FROM bid_notices WHERE sw_candidate=1''').fetchall()
-        desired=set(self.queue.unprepared_notices())
+        desired=set(self.queue.unprepared_notices(eligible_only=True))
         result={}
         for no,order,payload in rows:
             key=str(no)+':'+str(order or '000').zfill(3)
@@ -170,7 +170,7 @@ class BulkManifestPlanner:
                 name=str(row.get('name') or '')[:160]
                 url=str(row.get('url') or '')
                 item={'name':name,'url':url,'source':row.get('source')}
-                if source=='detail':all_detail.append(item)
+                if source=='detail' and (name or url):all_detail.append(item)
                 if url and url in seen:continue
                 if url:seen.add(url)
                 if name or url:merged.append(item)
@@ -203,8 +203,22 @@ class BulkManifestPlanner:
             if items is None:
                 return {'new':0,'day':day,'calls':calls,'partial':True}
             sources[source]=items
-        manifests={key:self._notice_meta(key,sources) for key in keys}
+        # A full-date response can legitimately contain no attachment files,
+        # but it cannot establish that an entirely absent notice was checked.
+        # Avoid a per-notice fallback storm: hold unmatched notices for a
+        # later bounded exception pass; never publish an invented empty list.
+        present={key:False for key in keys}
+        for items in sources.values():
+            for item in items:
+                key=str(item.get('bidNo'))+':'+str(item.get('order'))
+                if key in present:present[key]=True
+        verified={key for key,found in present.items() if found}
+        missing=sorted(keys-verified)
+        manifests={key:self._notice_meta(key,sources) for key in verified}
         count=self.queue.save_bulk_manifests(manifests)
-        return {'new':count,'day':day,'calls':calls,'sourceCounts':
-                {src:len(items) for src,items in sources.items()},
+        if missing:
+            # Retry on another planning window rather than hammer the same day.
+            self.queue.defer_bulk_unmatched(missing,3600,'not_present_in_complete_date_batch')
+        return {'new':count,'day':day,'calls':calls,'unmatched':len(missing),
+                'sourceCounts':{src:len(items) for src,items in sources.items()},
                 'pending':len(self.queue.unprepared_notices())}
