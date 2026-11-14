@@ -59,12 +59,17 @@ with sync_playwright() as p:
     modal=page.locator('#rfpRescanModal')
     assert modal.is_visible()
     page.wait_for_function(
-      "() => document.querySelector('#rfpRescanContent')?.textContent.includes('서버 재판독')",
+      "() => document.querySelector('#rfpRescanContent')?.textContent.includes('미완료 구성')",
       timeout=12000)
     body=page.locator('#rfpRescanContent').inner_text()
-    for term in ('관리 대상','6','최신 판독 완료','1','재판독 필요','구버전',
-                 '최초 미판독','역할·인원','16.67%','서버 재판독','판독 중','원문 판독 중'):
+    for term in ('전체','6','완료','1','미완료','5','구버전',
+                 '최초 미판독','역할·인원','16.67%','판독 진행 중'):
         assert term in body,(term,body)
+    assert '재판독 필요' not in body
+    assert '진행률 =' not in body
+    assert '완료된 배치' not in body
+    assert '서버 집계' not in body
+    assert page.locator('.rfp-rescan-metric').count()==3
 
     # A new server result must actually update both completed numerator and percentage.
     fake['counts'].update(completed=2,remaining=4,unscanned=0)
@@ -74,9 +79,28 @@ with sync_playwright() as p:
       "() => document.getElementById('rfpRescanCount')?.textContent.includes('완료 2 / 6건')",
       timeout=12000)
     assert '33.33%' in page.locator('#rfpRescanLabel').inner_text()
-    assert '완료 +1건' in page.locator('#rfpRescanContent').inner_text()
+    assert '미완료' in page.locator('#rfpRescanContent').inner_text()
+    assert page.locator('.rfp-rescan-pending strong').inner_text()=='4'
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
+    # A count of zero legacy rescans is not zero remaining work.
+    fake['counts']={'total':2582,'completed':954,'remaining':1628,'rescanRequired':0,
+        'legacy':0,'unscanned':1424,'failed':46,'incomplete':158,'unknownDeadline':84}
+    fake['asOf']='2026-11-14T20:04:33+09:00'
+    page.evaluate("() => refreshRfpRescanProgress(true)")
+    page.wait_for_function(
+      "() => document.querySelector('.rfp-rescan-pending strong')?.textContent === '1,628'",
+      timeout=12000)
+    content=page.locator('#rfpRescanContent').inner_text()
+    assert '954' in content and '2,582' in content and '1,628' in content,content
+    assert '최초 미판독 1,424건' in content.replace('\\n',' '),content
+    assert '실패 46건' in content.replace('\\n',' '),content
+    assert '검증 미완료 158건' in content.replace('\\n',' '),content
+    assert '재판독 필요' not in content and '구버전 재판독 0.0%' not in content,content
+    assert '36.95%' in content,content
+    assert '마감일 미확인 84건 제외' in content,content
+    assert page.locator('.rfp-rescan-foot,.rfp-rescan-server-note').count()==0
+
     page.locator('#rfpRescanClose').click()
     assert modal.get_attribute('aria-hidden')=='true'
     page.evaluate("() => {rfpRescanProgress=null;rfpRescanProgressError='조회 오류';paintRfpRescanProgress();}")
