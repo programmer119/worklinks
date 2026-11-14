@@ -1198,18 +1198,24 @@ def rfp_progress_worker_status(state_path):
         tasks[name]={
             'status':str(entry.get('status') or 'unknown')[:60],
             'attemptEpoch':safe_epoch(entry.get('attemptEpoch')),
-            'successEpoch':safe_epoch(entry.get('successEpoch'))
+            'successEpoch':safe_epoch(entry.get('successEpoch')),
+            'retryAfterEpoch':safe_epoch(entry.get('retryAfterEpoch')),
+            'failureStreak':int(entry.get('failureStreak') or 0)
         }
     upgrade_active=state.get('rfpUpgradeActive') is True
     try:
         upgrade_period=max(0,int(state.get('rfpUpgradePeriodSeconds') or 0))
     except (ValueError,TypeError):
         upgrade_period=0
-    last_attempt=(tasks.get('rfpUpgrade') or {}).get('attemptEpoch') or 0
-    next_attempt=last_attempt+upgrade_period if upgrade_active and upgrade_period and last_attempt else 0
+    upgrade_task=tasks.get('rfpUpgrade') or {}
+    # A successful batch restarts immediately: only genuine backoff has an ETA.
+    next_attempt=upgrade_task.get('retryAfterEpoch') or 0
+    status=upgrade_task.get('status')
     return {'available':True,'upgradeActive':upgrade_active,
+            'continuousDrain':upgrade_active and status in ('started','ok'),
             'upgradePeriodSeconds':upgrade_period,
             'nextUpgradeEpoch':next_attempt,
+            'upgradeBatchesCompleted':int(state.get('rfpUpgradeBatchesCompleted') or 0),
             'tasks':tasks}
 
 
