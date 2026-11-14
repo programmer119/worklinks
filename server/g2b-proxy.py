@@ -765,6 +765,10 @@ def rfp_attachment_batch_page(source,from_time,to_time,page,rows):
         if not re.fullmatch(r'\d{3}',order):
             raise ApiError('invalid_rfp_batch_order')
         if source=='detail':
+            # A valid notice may have zero attached files. Retain a source
+            # presence marker, but never treat it as a downloadable file.
+            normalized.append({'bidNo':bid,'order':order,'presence':True,
+                               'source':'notice_detail'})
             for pos in range(1,11):
                 url=str(row.get('ntceSpecDocUrl'+str(pos)) or '').strip()
                 name=str(row.get('ntceSpecFileNm'+str(pos)) or '').strip()
@@ -786,9 +790,11 @@ def rfp_attachment_batch_page(source,from_time,to_time,page,rows):
             'rawCount':len(source_rows),'items':normalized}
 
 
-def bid_evidence_query(bid_no, order):
-    """Four official A02 sources; include ordinary attachments beyond e-order."""
-    regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
+def bid_evidence_query(bid_no, order, include_region=True):
+    """Three file sources, plus region only for the ordinary evidence endpoint."""
+    regions=(_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
+             if include_region else {'ok':False,'complete':False,'count':0,
+                                     'items':[],'error':'not_requested_for_attachment_recovery'})
     # The ordinary attachment operation can contain the actual RFP even when
     # e-order has no rows. Treat absence and upstream failure differently.
     ordinary=_bid_evidence_fetch('getBidPblancListInfoAtchFileInfo02',bid_no,order)
@@ -2062,6 +2068,22 @@ class Handler(BaseHTTPRequestHandler):
                     raise ApiError('invalid_rfp_batch_pagination',400)
                 return self.reply(200,rfp_attachment_batch_page(
                     get('source'),get('from'),get('to'),page,rows))
+            if u.path == '/api/g2b/rfp-attachment-exception':
+                # Only exceptional notice misses may use a targeted lookup.
+                # Never spend a fourth government call on the region API.
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if (not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no)
+                        or not re.fullmatch(r'\d{3}',order)):
+                    raise ApiError('invalid_bid_identifier',400)
+                return self.reply(200,bid_evidence_query(
+                    bid_no,order,include_region=False))
             if u.path == '/api/g2b/upstream-rate-status':
                 return self.reply(200,upstream_rate_diagnostics())
             if u.path == '/api/g2b/crawl-status':
