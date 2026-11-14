@@ -1254,19 +1254,27 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
         raise ValueError('rfp_progress_version_manifest_invalid')
     now=asof or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
     if now.tzinfo is None:raise ValueError('rfp_progress_clock_not_timezone_aware')
+    latest_by_no={}
+    for no,ordn,payload in rows:
+        try:number=int(ordn or 0)
+        except (TypeError,ValueError):continue
+        if no not in latest_by_no or number>latest_by_no[no][0]:
+            latest_by_no[no]=(number,(no,ordn,payload))
     unique=set()
     summary={'total':0,'completed':0,'remaining':0,'legacy':0,
              'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0,
               'unknownDeadlineCompleted':0,'unknownDeadlinePending':0}
     stages={k:{'total':0,'done':0,'remaining':0} for k in
             ('classification','roles','facts','hwpx')}
-    for bid_no,ordn,payload in rows:
+    for _,(bid_no,ordn,payload) in latest_by_no.values():
         key=str(bid_no or '')+':'+str(ordn or '000').zfill(3)
         if key in unique:continue
         unique.add(key)
         try:obj=json.loads(payload) if isinstance(payload,str) else payload
         except (ValueError,TypeError):continue
         if not isinstance(obj,dict):continue
+        if re.search('취소|철회|폐기',
+             str(obj.get('noticeKind') or obj.get('state') or '')):continue
         cutoff=rfp_deadline_kst(obj.get('closes'))
         if cutoff is None:
             # Direct/letter bids can lack electronic close timestamps in official
@@ -1456,8 +1464,11 @@ def rfp_rescan_progress():
             return _RFP_PROGRESS_CACHE['result']
     con=open_bid_db()
     try:
-        bids=con.execute("SELECT bid_no,bid_ord,payload FROM bid_notices "
-                         "WHERE sw_candidate=1 ORDER BY last_seen DESC").fetchall()
+        bids=con.execute("""SELECT b.bid_no,b.bid_ord,b.payload FROM bid_notices b
+              WHERE b.sw_candidate=1 AND NOT EXISTS (
+                SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no
+                AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER))
+              ORDER BY b.last_seen DESC""").fetchall()
     finally:con.close()
     live_index,recent_notices,unpublished_count=read_rfp_notice_checkpoints(index)
     report=rfp_progress_from_rows(bids,live_index,latest)
@@ -1580,12 +1591,14 @@ def query_saved_open_inventory():
         rows=con.execute("SELECT b.payload,q.payload,"+series+
             " FROM bid_notices b LEFT JOIN bid_license_cache q ON "+
             "b.bid_no=q.bid_no AND q.bid_ord=printf('%03d',CAST(b.bid_ord AS INTEGER)) "+
-            join+" WHERE b.sw_candidate=1 "+
+            join+""" WHERE b.sw_candidate=1 AND NOT EXISTS (
+                SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no
+                AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER)) """+
             "ORDER BY b.last_seen DESC,b.kind,b.bid_no DESC").fetchall()
     finally:
         con.close()
     allowed=('kind','bidNo','order','title','org','agency','posted','closes',
-             'budget','url','state','contract','awardMethod','awardMethodCode',
+             'budget','url','state','noticeKind','contract','awardMethod','awardMethodCode',
              'awardFloorRate','purchsObjPrdctList')
     kept=[];expired=0;cancelled=0;unknown=0
     for payload,license_payload,history_json,years in rows:
@@ -1594,7 +1607,7 @@ def query_saved_open_inventory():
             raise ApiError('inventory_invalid_record',503) from exc
         if not isinstance(raw,dict) or not raw.get('bidNo'):
             raise ApiError('inventory_invalid_record',503)
-        if re.search('취소|철회|폐기',str(raw.get('state') or '')):
+        if re.search('취소|철회|폐기',str(raw.get('noticeKind') or raw.get('state') or '')):
             cancelled+=1
             continue
         deadline=rfp_deadline_kst(raw.get('closes'))
@@ -1622,7 +1635,12 @@ def query_saved_bids(limit,offset,only_sw=False,query=''):
     con=open_bid_db()
     try:
         total=con.execute('SELECT COUNT(*) FROM bid_notices').fetchone()[0]
-        matching=con.execute('SELECT COUNT(*) FROM bid_notices WHERE sw_candidate=1').fetchone()[0]
+        matching=con.execute("""SELECT COUNT(*) FROM bid_notices b
+            WHERE b.sw_candidate=1 AND NOT EXISTS (
+              SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no
+              AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER))
+              AND COALESCE(json_extract(b.payload,'$.noticeKind'),
+                 json_extract(b.payload,'$.state'),'') NOT LIKE '%취소%'""").fetchone()[0]
         history=bool(con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='recurring_projects'").fetchone())
         sel='b.payload'+(',r.history_json,r.repeat_years' if history else ',NULL,0')+',q.payload,x.payload'
         from_sql=' FROM bid_notices b '
@@ -1639,6 +1657,11 @@ def query_saved_bids(limit,offset,only_sw=False,query=''):
         values=[]
         if only_sw:
             clauses.append('b.sw_candidate=1')
+            clauses.append("""NOT EXISTS (
+                SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no
+                AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER))""")
+            clauses.append("""COALESCE(json_extract(b.payload,'$.noticeKind'),
+                json_extract(b.payload,'$.state'),'') NOT LIKE '%취소%'""")
         if query:
             # Search already-stored rows ONLY. No call to any government API.
             # instr() treats %, quotes and underscores as literal text.
