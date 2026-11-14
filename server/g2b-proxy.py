@@ -2402,6 +2402,11 @@ class Handler(BaseHTTPRequestHandler):
                     raise ApiError('invalid_bid_identifier',400)
                 return self.reply(200,bid_extra_query(bid_no,order,collect=True))
             if u.path == '/api/g2b/bid-evidence':
+                # Legacy automatic RFP reader must NOT multiply upstream calls
+                # by notice. Bulk manifests + bounded exceptions own the queue.
+                # Browser's explicit single-notice detail view is unaffected.
+                if self.headers.get('User-Agent','').startswith('WorkLinks-RFP-ReadOnly/'):
+                    raise ApiError('automatic_rfp_per_notice_metadata_disabled_use_batch',409)
                 bid_no=get('bidNo').strip()
                 order=get('order','000').strip()
                 if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):

@@ -247,6 +247,10 @@ def repair_preflight():
 def run_once(kind, runner=None, _single=False):
     """Run one job in an isolated writable workspace, atomic publish on success."""
     dual_enabled=(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1')
+    if dual_enabled and kind in ('rfp','rfpRepair'):
+        # Fail closed even if this function is invoked directly, bypassing
+        # the outer scheduler's skip branch.
+        raise RuntimeError('legacy_single_bid_metadata_job_disabled_in_dual_queue')
     if kind=='rfpUpgrade' and dual_enabled and runner is None:
         # Waiting on original downloads must NOT create an expensive 80MB
         # staged scan workspace, nor report the full backlog as complete.
