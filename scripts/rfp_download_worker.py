@@ -113,8 +113,14 @@ def download_one(queue,claim,halt):
     key,closes=claim
     bid,ordinal=key.split(':',1)
     live.record('download',key,phase='첨부파일 준비',status='working')
+    active_file_key=''
+    active_file_name=''
+    active_files_done=0
+    active_files_total=0
     if halt.is_set():
         queue.download_failed(key,'upstream_paused',retry_seconds=600)
+        live.record('download',key,phase='공식 API 제한',status='retry',
+                    retry_epoch=time.time()+600,error='upstream_paused')
         return False
     try:
         if BULK_ENABLED:
@@ -155,23 +161,41 @@ def download_one(queue,claim,halt):
         if ledger is None:raise RuntimeError('durable_binary_ledger_not_configured')
         for index,url in enumerate(urls):
             if halt.is_set():raise ProviderBackoff('provider_paused')
+            active_files_done=index
+            active_files_total=len(urls)
             # The approved download() reuses compressed originals by hash;
             # it only opens official HTTPS when the verified bytes are absent.
             file_name=next((approved[0] for item in manifest
                 for approved in [reader.legal_file(item)]
                 if approved and approved[1]==url),'공식 첨부파일')
             file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24]
+            active_file_key=file_key
+            active_file_name=file_name
+            last_network_error=''
             def progress(received,total,complete):
                 live.record('download',key,file_key=file_key,file_name=file_name,
-                    phase='저장 완료' if complete else '전송 중',
-                    status='done' if complete else 'working',bytes_done=received,
-                    bytes_total=total,files_done=index+(1 if complete else 0),
-                    files_total=len(urls))
+                    phase='원본 검증 중' if complete else '전송 중',
+                    status='working',bytes_done=received,
+                    bytes_total=total,files_done=index,
+                    files_total=len(urls),error=last_network_error)
+            def on_retry(error,seconds):
+                nonlocal last_network_error
+                last_network_error=type(error).__name__+': '+str(error)[:95]
+                live.record('download',key,file_key=file_key,file_name=file_name,
+                    phase='전송 오류 · 재연결 예정',status='retry',
+                    files_done=index,files_total=len(urls),
+                    retry_epoch=time.time()+seconds,error=last_network_error)
             progress(0,0,False)
-            data=reader.download(url,rate_gate=FILE_PACE,progress=progress)
+            data=reader.download(url,rate_gate=FILE_PACE,progress=progress,on_retry=on_retry)
             stored=ledger.get_bytes(cache_key('official_attachment',url))
             if stored is None or hashlib.sha256(data).digest()!=hashlib.sha256(stored).digest():
                 raise RuntimeError('original_archive_not_verified_or_storage_quota')
+            live.record('download',key,file_key=file_key,file_name=file_name,
+                        phase='저장 검증 완료',status='done',
+                        bytes_done=len(data),bytes_total=len(data),
+                        files_done=index+1,files_total=len(urls))
+            active_file_key=''
+            active_file_name=''
             del data,stored
             live.record('download',key,phase='파일 다운로드',status='working',
                         files_done=index+1,files_total=len(urls))
@@ -184,14 +208,26 @@ def download_one(queue,claim,halt):
         is_manifest_metadata=BULK_ENABLED and detects_upstream_limit(str(exc))
         queue.download_failed(key,str(exc),
                               retry_seconds=(60 if is_manifest_metadata else 21600))
-        live.record('download',key,phase='API 제한',status='retry',retry_epoch=time.time()+(60 if is_manifest_metadata else 21600),error=str(exc))
+        retry_at=time.time()+(60 if is_manifest_metadata else 21600)
+        live.record('download',key,phase='API 제한',status='retry',retry_epoch=retry_at,error=str(exc))
+        if active_file_key:
+            live.record('download',key,file_key=active_file_key,file_name=active_file_name,
+                        phase='API 제한 · 재시도 예정',status='retry',
+                        files_done=active_files_done,files_total=active_files_total,
+                        retry_epoch=retry_at,error=str(exc))
         return False
     except Exception as exc:
         delay=21600 if detects_upstream_limit(str(exc)) else 300
         if delay==21600:halt.set()
         queue.download_failed(key,type(exc).__name__+': '+str(exc)[:110],
                               retry_seconds=delay)
-        live.record('download',key,phase='다운로드 실패',status='retry',retry_epoch=time.time()+delay,error=str(exc))
+        retry_at=time.time()+delay
+        live.record('download',key,phase='다운로드 실패',status='retry',retry_epoch=retry_at,error=str(exc))
+        if active_file_key:
+            live.record('download',key,file_key=active_file_key,file_name=active_file_name,
+                        phase='파일 전송 실패 · 자동 재시도',status='retry',
+                        files_done=active_files_done,files_total=active_files_total,
+                        retry_epoch=retry_at,error=type(exc).__name__+': '+str(exc)[:110])
         return False
     finally:
         reader._NOTICE_CONTEXT.notice_key=None
