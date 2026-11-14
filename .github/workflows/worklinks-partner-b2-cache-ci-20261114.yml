@@ -1,0 +1,38 @@
+name: WorkLinks partner award facts local B2/B3 no-provider regression
+on:
+  push:
+    branches: [fix/worklinks-partner-standard-cache-20261114]
+    paths:
+      - 'startup-support/index.html'
+      - 'tests/worklinks-jobs-regression.cjs'
+      - '.github/workflows/worklinks-partner-b2-cache-ci-20261114.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check inline JS, no official automatic award/contract lookups, baseline UI tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          source=Path('startup-support/index.html').read_text()
+          start=source.index('async function refreshPartnerAwardEvidence(p)')
+          end=source.index('async function refreshContractCapability()',start)
+          body=source[start:end]
+          assert '/standard-bid?bidNo=' in body
+          assert '/awards?bidNo=' not in body
+          assert '/contract-evidence?bidNo=' not in body
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',source,re.S|re.I)
+          Path('/tmp/worklinks-partner-b2.js').write_text('\n'.join(scripts))
+          print('PARTNER_NO_SINGLE_UPSTREAM_BY_DEFAULT=PASS')
+          PY
+          node --check /tmp/worklinks-partner-b2.js
+          node tests/worklinks-jobs-regression.cjs
+          echo PARTNER_B23_CACHED_EVIDENCE_REGRESSION=PASS

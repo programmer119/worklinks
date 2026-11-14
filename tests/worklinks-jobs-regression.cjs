@@ -324,8 +324,9 @@ assert.ok(source.includes('data.company.regionCode'));
 
 // Provenance: only exact G2B bidNo + official winner business number are accepted.
 assert.ok(source.includes('awardBidNos:["R25BK00826083","20221204854"]'));
-assert.ok(source.includes("String(r.bidwinnrBizno||'').replace(/\\D/g,'')!==bizno"));
-assert.ok(source.includes("String(r.bidNtceNo||'')!==bids[i]"));
+assert.ok(source.includes("String(a.winnerBizno||'')!==bizno"));
+assert.ok(source.includes("a?.source!=='B2'"));
+assert.ok(source.includes("c?.source==='B3'"));
 assert.ok(source.includes("if(id==='experience'&&p.awardEvidence?.length)"));
 assert.ok(source.includes("낙찰은 계약이행 실적증명의 대체 자료가 아님"));
 assert.ok(source.includes("'joint','공동수급 금지','ok'"),
