@@ -61,6 +61,26 @@ with tempfile.TemporaryDirectory() as root:
     assert max_parallel>=2,max_parallel
     assert downloaded==32,downloaded
     assert queue.ready_count()==32,stats
+    ready=queue.claim_ready(1)
+    assert len(ready)==1
+    verify=ready[0][2]['downloadVerifiedFiles']
+    assert len(verify)==1 and verify[0]['sha256']==__import__('hashlib').sha256(b'archive raw').hexdigest()
+    assert verify[0]['url']==meta['attachments']['items'][0]['url']
+    queue.scan_release([ready[0][0]])
+    # No file means no downloader work and no scanner invocation.
+    empty_key='R26BK88888888:000'
+    queue.enqueue([('R26BK88888888','000','2099-12-31')],'r1')
+    empty={'attachments':{'ok':True,'complete':True,'items':[]},
+           'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+    with patch.object(worker.reader,'fetch_json',return_value=empty),\
+         patch.object(worker.reader,'download',side_effect=AssertionError('must not download')),\
+         patch.object(worker.META_PACE,'acquire',return_value=None):
+        chosen=queue.claim_download()
+        assert chosen[0]==empty_key,chosen
+        assert worker.download_one(queue,chosen,halt)
+    with queue.connect() as conn:
+        assert conn.execute('SELECT download_status,scan_status FROM rfp_dual_notices WHERE notice_key=?',(empty_key,)).fetchone()==('no_attachments','skipped')
+    assert queue.stats()['scan']['failed']==0
     # Retriable metadata failures do not consume the scan queue or pretend
     # work is finished.
     another=('R26BK99999998','000','2099-12-31')
@@ -75,7 +95,7 @@ with tempfile.TemporaryDirectory() as root:
     assert halt.is_set()
     stats=queue.stats()
     assert stats['download']['failed']==1
-    assert stats['scan']['done']==0
+    assert stats['scan']['done']==1
     print('RFP_SEPARATE_DOWNLOAD_WORKER_8_LANES_NO_SCANNER=PASS',
           {'downloaded':downloaded,'maximumConcurrent':max_parallel,
            'queuedForScan':stats['download']['done']},flush=True)
