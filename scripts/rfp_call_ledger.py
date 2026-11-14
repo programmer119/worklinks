@@ -285,6 +285,14 @@ class CallLedger:
             for key,notice,close in db.execute(
                     'SELECT request_key,notice_key,closes_on FROM attachment_refs'):
                 refs.setdefault(key,[]).append((notice,close))
+            # Persist corrected official deadlines without holding one
+            # transaction across the entire saved-notice inventory.
+            corrected={}
+            for links in refs.values():
+                for notice,stored_close in links:
+                    official=self._close_date(deadlines.get(notice))
+                    if stored_close and official and official.isoformat()!=stored_close:
+                        corrected[notice]=official.isoformat()
             to_remove=[]
             for key,stamp,payload_size in db.execute(
                     "SELECT request_key,stored_at,length(payload) FROM verified_cache WHERE media_type='bytes'"):
@@ -292,6 +300,13 @@ class CallLedger:
                 except (TypeError,ValueError):created=today
                 if not still_active(refs.get(key,[]),created):
                     to_remove.append((key,int(payload_size or 0)))
+        changes=list(corrected.items())
+        for offset in range(0,len(changes),16):
+            with self._connect() as db:
+                db.execute('PRAGMA busy_timeout=1000')
+                db.executemany(
+                    "UPDATE attachment_refs SET closes_on=? WHERE notice_key=?",
+                    [(date,notice) for notice,date in changes[offset:offset+16]])
         # Maximum 16 attachments per transaction: deleting multi-GB archives
         # must never block an unrelated checkpoint or new raw-file save for 30s.
         for offset in range(0,len(to_remove),16):
