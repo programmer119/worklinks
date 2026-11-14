@@ -50,6 +50,19 @@ with tempfile.TemporaryDirectory() as temp:
     advanced=[row for row in activity.snapshot()['items'] if row['fileName']=='사업제안요청서.pdf'][0]
     assert advanced['startedEpoch']==started
     assert advanced['byteProgressEpoch']>first_byte_epoch,advanced
+    import sqlite3
+    with sqlite3.connect(path) as db:
+        db.execute("""UPDATE rfp_live_events SET byte_progress_epoch=?
+            WHERE lane='download' AND notice_key=? AND file_key='f1'""",
+            (time.time()-190,'R26BK00000001:000'))
+    hung=activity.stalled_downloads(['R26BK00000001:000'],idle_seconds=180)
+    assert len(hung)==1 and hung[0]['fileName']=='사업제안요청서.pdf',hung
+    assert activity.stalled_downloads(['unclaimed'],idle_seconds=180)==[]
+    activity.record('download','R26BK00000001:000',file_key='f1',
+                    file_name='사업제안요청서.pdf',phase='전송 중',
+                    bytes_done=1572864,bytes_total=2097152)
+    assert activity.stalled_downloads(['R26BK00000001:000'],idle_seconds=180)==[]
+
     assert files[0]['bytesTotal']==2097152
     assert files[0]['filesTotal']==3
     error=[row for row in snapshot['items'] if row['status']=='retry']
