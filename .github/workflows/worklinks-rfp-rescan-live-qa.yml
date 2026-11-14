@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import json
+          import json,time
           from playwright.sync_api import sync_playwright
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True)
@@ -31,8 +31,12 @@ jobs:
               page.on('request',lambda q:progress_requests.append(q.url) if '/rfp-rescan-progress' in q.url else saved_requests.append(q.url) if '/saved?sw=1' in q.url else None)
               page.on('response',lambda r:progress_success.append(r.status) if '/rfp-rescan-progress' in r.url and r.status==200 else None)
               page.on('requestfailed',lambda q:failures.append({'url':q.url,'error':q.failure}) if '/rfp-rescan-progress' in q.url else None)
-              page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
+              for attempt in range(8):
+                  page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs&qa='+str(attempt),wait_until='domcontentloaded',timeout=60000)
+                  if 'const savedWindow=g2bCompactScreen()?160:400' in page.content():break
+                  time.sleep(5)
               assert 'const savedWindow=g2bCompactScreen()?160:400' in page.content(),'new bounded loader not deployed'
+              progress_requests.clear();progress_success.clear();failures.clear();saved_requests.clear()
               print('NEW_FRONTEND_DEPLOYED=TRUE',flush=True)
               for i in range(10):
                   page.wait_for_timeout(5000)
