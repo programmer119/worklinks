@@ -2352,7 +2352,7 @@ def main():
        'scope':'누적 공식 RFP 다운로드·텍스트 스캔 이력(적격 판정 아님)',
        'reviewComplete':False,'scannedNoticeCount':len(coverage),
        'byNotice':coverage}
-    COVERAGE_DEST.write_text(json.dumps(cumulative,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    COVERAGE_DEST.write_text(json.dumps(cumulative,ensure_ascii=False,separators=(',',':'))+'\n',encoding='utf-8')
     stage_done('rebuild_and_write_coverage')
     print('RFP_SNAPSHOT_READY','DETAIL_RECORDS',len(output['byNotice']),
           'CUMULATIVE_SCANNED',len(coverage),'NEW_READABLE',success)
