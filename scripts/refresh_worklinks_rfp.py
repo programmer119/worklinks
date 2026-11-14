@@ -1857,6 +1857,10 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
     prefetch_positions=iter(_eligible_prefetch_positions(
         primary_manifest,processing_order,reusable)) if prefetch is not None else iter(())
     notice_key=no+':'+ordn
+    live_trace=None
+    if os.environ.get('WORKLINKS_RFP_DUAL_SCAN_ONLY')=='1':
+        import rfp_live_activity as live_trace
+    if live_trace:live_trace.record('scan',notice_key,phase='문서 판독 준비',status='working',files_total=len(primary_manifest))
     close_date=_NOTICE_DEADLINES.get(notice_key,'')
     def refill():
         if prefetch is None:return
@@ -1868,12 +1872,16 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
     refill()
     for position in processing_order:
         item=primary_manifest[position]
+        if live_trace:
+            live_trace.record('scan',notice_key,phase='문서 판독',status='working',files_done=len(saved_slots),files_total=len(primary_manifest))
         public=legal_file(item)
         if not public:
             saved_slots[position]={'name':str(item.get('name') or '')[:160],'readable':False,
                           'errorCategory':invalid_file_reason(item)}
             continue
         name,url=public
+        if live_trace:
+            live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='텍스트 추출 준비',status='working')
         # Same filename stem + verified PDF in this notice: use PDF only.
         # Do not download the duplicate HWP and never mark it readable.
         companion=verified_pdf_companion({'name':name},list(saved_slots.values()))
@@ -1939,6 +1947,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                     _NOTICE_CONTEXT.notice_key=None
                     _NOTICE_CONTEXT.closes_on=''
                     phase['downloadSeconds']+=time.perf_counter()-timer
+            if live_trace:live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='텍스트 추출',status='working')
             timer=time.perf_counter()
             try:
                 extracted,source_evidence,text_cache_hit=extract_cached_text(name,raw)
@@ -1949,6 +1958,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             timer=time.perf_counter()
             if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.webp')) else 100):
                 raise ValueError('no_searchable_text')
+            if live_trace:live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='조건·인원 판독',status='working')
             triggers,snippets=parse_clauses(content)
             candidate_rules=extract_rule_candidates(content,name)
             staffing_roles=extract_staffing_roles(content,name,url)
@@ -1976,6 +1986,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
         except Exception as ex:
             record['errorCategory']=classify_failure(ex)
             record['error']=type(ex).__name__+': '+str(ex)[:90]
+        if live_trace:live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='판독 완료' if record.get('readable') else '판독 오류',status='done' if record.get('readable') else 'retry',error=str(record.get('errorCategory') or ''))
         saved_slots[position]=record
     saved=[saved_slots[i] for i in range(len(primary_manifest))]
     annotate_official_pdf_siblings(saved)
@@ -2437,6 +2448,9 @@ def main():
             try:
                 data=future.result()
                 scan_validity[key]=data.get('status')=='text_extracted_requires_review'
+                if dual_scan:
+                    import rfp_live_activity as live_trace
+                    live_trace.record('scan',key,phase='판독 완료' if scan_validity[key] else '판독 결과 확인 필요',status='done' if scan_validity[key] else 'retry',retry_epoch=0 if scan_validity[key] else time.time()+3600,error='' if scan_validity[key] else str(data.get('reasonCode') or data.get('status') or ''))
                 profile=data.pop('_stageTimings',None)
                 if profile:
                     for name,value in profile.items():
@@ -2469,6 +2483,9 @@ def main():
                 success+=int(data['status']=='text_extracted_requires_review')
             except Exception as e:
                 scan_validity[key]=False
+                if dual_scan:
+                    import rfp_live_activity as live_trace
+                    live_trace.record('scan',key,phase='판독 오류',status='retry',retry_epoch=time.time()+3600,error=str(e))
                 reason=('metadata_http_'+str(e.code) if isinstance(e,urllib.error.HTTPError)
                         else classify_failure(e))
                 failed={'status':'metadata_fetch_failed','reasonCode':reason,
