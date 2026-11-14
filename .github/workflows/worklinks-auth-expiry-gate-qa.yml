@@ -60,3 +60,5 @@ jobs:
             print('LOGIN_GATE_VISIBLE=PASS')
             browser.close()
           PY
+      - name: Reproduce logout and revoked session on live page
+        run: python3 startup-support/tests/auth_gate_live_qa.py
