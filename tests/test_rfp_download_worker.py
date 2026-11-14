@@ -32,14 +32,16 @@ with tempfile.TemporaryDirectory() as root:
     def fake_get(url):
         assert 'bid-evidence?' in url
         return meta
-    def fake_download(url,*,rate_gate=None):
+    def fake_download(url,*,rate_gate=None,progress=None):
         nonlocal_var=None
         global active,max_parallel,downloaded
         with lock:
             active+=1
             max_parallel=max(max_parallel,active)
             downloaded+=1
+        if progress:progress(4,11,False)
         time.sleep(.04)
+        if progress:progress(11,11,True)
         with lock:active-=1
         return b'archive raw'
     halt=threading.Event()
