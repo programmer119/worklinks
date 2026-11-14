@@ -2008,6 +2008,16 @@ def bounded_detail_snapshot(records, max_records=240, max_bytes=MAX_PUBLISHED_RF
 
 
 def main():
+    # Measure the actual production wall-clock phases per scheduled batch.
+    # Final summary is emitted AFTER snapshot save so the parent worker's
+    # last-15-lines log captures it without relying on speculative ratios.
+    stage_clock=time.perf_counter()
+    stage_seconds={}
+    def stage_done(label):
+        nonlocal stage_clock
+        now_clock=time.perf_counter()
+        stage_seconds[label]=round(now_clock-stage_clock,4)
+        stage_clock=now_clock
     parser=argparse.ArgumentParser()
     parser.add_argument('--limit',type=int,default=14)
     args=parser.parse_args()
@@ -2032,6 +2042,7 @@ def main():
               if re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',k)}
     selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
                       priority=priority)
+    stage_done('load_and_discover')
     if os.environ.get('WORKLINKS_RFP_UPGRADE_ONLY')=='1':
         print('RFP_UPGRADE_SELECT_COUNT',len(selected),flush=True)
     if os.environ.get('WORKLINKS_RFP_REQUIRE_EXACT_PRIORITY')=='1':
@@ -2056,6 +2067,7 @@ def main():
                              if backfill_limit else 0)
     if cached_staffing_upgrades:
         print('RFP_CACHED_STAFFING_REPARSED',cached_staffing_upgrades,flush=True)
+    stage_done('cached_backfill')
     # Preserve historical evidence while normalizing old ambiguous "unavailable"
     # entries with explicit zero-row API evidence. This is NOT proof that no RFP exists.
     for key,prior in results.items():
@@ -2092,6 +2104,7 @@ def main():
     # Official requests are bounded; four independent notices run concurrently
     # so one unavailable PDF does not starve the entire 16-minute job.
     preloaded=preflight_rfp_metadata(uncached)
+    stage_done('preflight_metadata')
     with ThreadPoolExecutor(max_workers=4) as pool:
         tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn)),
                            old.get(no+':'+ordn) or prior_index.get(no+':'+ordn)):
@@ -2132,12 +2145,14 @@ def main():
                 else:
                     results[key]=failed
                 print('RFP_SCAN_ERROR',key,reason,flush=True)
+    stage_done('process_notices')
     if not results:raise SystemExit('NO_RFP_RESULT')
     details,omitted=bounded_detail_snapshot(results)
     output={'ok':True,'generatedAt':now.isoformat(),'scope':'공식 공고첨부 텍스트 발췌·키워드 근거(비최종판정)',
             'reviewComplete':False,'detailOmittedFromRollingCache':omitted,
             'byNotice':details}
     DEST.write_text(json.dumps(output,ensure_ascii=False,separators=(',',':'))+'\n',encoding='utf-8')
+    stage_done('write_detail_json')
     if DEST.stat().st_size>MAX_PUBLISHED_RFP_BYTES:
         raise SystemExit('RFP_DETAIL_SNAPSHOT_FILE_TOO_LARGE')
     coverage=dict(prior_index)
@@ -2257,6 +2272,13 @@ def main():
        'reviewComplete':False,'scannedNoticeCount':len(coverage),
        'byNotice':coverage}
     COVERAGE_DEST.write_text(json.dumps(cumulative,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    stage_done('rebuild_and_write_coverage')
     print('RFP_SNAPSHOT_READY','DETAIL_RECORDS',len(output['byNotice']),
           'CUMULATIVE_SCANNED',len(coverage),'NEW_READABLE',success)
+    print('RFP_BATCH_TIMING',json.dumps({
+        'selected':len(selected),'actualProcess':len(uncached),
+        'existingBackfill':cached_staffing_upgrades,
+        'phaseSeconds':stage_seconds,
+        'totalSeconds':round(sum(stage_seconds.values()),4)},
+        separators=(',',':')),flush=True)
 if __name__=='__main__':main()
