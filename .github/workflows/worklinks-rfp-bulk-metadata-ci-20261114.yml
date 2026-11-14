@@ -1,7 +1,7 @@
 name: WorkLinks batched RFP metadata no-network regression
 on:
   push:
-    branches: [fix/rfp-batched-attachment-manifests-20261114, fix/rfp-bulk-missing-verification-20261114]
+    branches: [fix/rfp-batched-attachment-manifests-20261114, fix/rfp-bulk-missing-verification-20261114, fix/rfp-provider-page-clamp-20261114]
     paths:
       - 'server/g2b-proxy.py'
       - 'server/worklinks-server123-pipeline.py'
