@@ -181,6 +181,7 @@ def staffing_effective_file_complete(file, files):
     if (file.get('readable') is True and
             file.get('sourceTextScanComplete') is True and
             int(file.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+            int(file.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
             file.get('staffingRoleScanTruncated') is not True):
         return True
     return (file.get('skippedDuplicateFormat') is True and
@@ -222,6 +223,7 @@ def staffing_scan_pending(record):
         return False
     return any(f.get('readable') is True and
                (int(f.get('staffingRoleScanVersion') or 0)<STAFFING_ROLE_SCAN_VERSION
+                or int(f.get('staffingFactScanVersion') or 0)<STAFFING_FACT_SCAN_VERSION
                 or f.get('staffingRoleScanTruncated') is True)
                for f in files)
 
@@ -409,6 +411,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
     # Bounded, opt-in migration of OLD successful parses ahead of new scans.
     # This is a ranking hint, never evidence that a missing document is readable.
     prefer_legacy=os.environ.get('WORKLINKS_RFP_PREFER_LEGACY_SCAN')=='1'
+    upgrade_only=os.environ.get('WORKLINKS_RFP_UPGRADE_ONLY')=='1'
     seen={}
     tz=dt.timezone(dt.timedelta(hours=9))
     today=dt.datetime.now(tz).date()
@@ -464,7 +467,20 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                 staff_missing=staffing_scan_pending(cached)
                 legacy_outdated=(cached.get('status')=='text_extracted_requires_review' and
                                  (int(cached.get('classificationVersion') or 0)<CLASSIFICATION_VERSION or
-                                  int(cached.get('hwpxReaderVersion') or 0)<HWPX_READER_VERSION))
+                                  int(cached.get('hwpxReaderVersion') or 0)<HWPX_READER_VERSION or
+                                  staff_missing))
+                if upgrade_only:
+                    if not legacy_outdated or temporal!=0:continue
+                    # Fair rotation: a failed migration cannot monopolize every run.
+                    last_attempt=str(cached.get('lastAttemptAt') or '')
+                    try:
+                        when=dt.datetime.fromisoformat(last_attempt.replace('Z','+00:00'))
+                        if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
+                    except (ValueError,TypeError):pass
+                    seen[key]=((0 if key in targets else 1,
+                                str(cached.get('lastAttemptAt') or cached.get('checkedAt') or ''),
+                                key),no,order,date.isoformat() if date else '')
+                    continue
                 rank=(-3 if key in priority and temporal==0 else
                       -2 if prefer_legacy and legacy_outdated and key in targets and temporal==0 else
                       -2 if key in urgent and key in targets and temporal==0 else
@@ -486,6 +502,7 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
     # Old parser versions still get retried after all currently open/unread
     # notices; they never displace an urgent live bidder's first source scan.
     for key,cached in prior.items():
+        if upgrade_only:break
         if not isinstance(cached,dict):continue
         if cached.get('classificationVersion')==CLASSIFICATION_VERSION and not needs_hwpx_reader_retry(cached):
             continue
@@ -1616,6 +1633,7 @@ def process(no,ordn,metadata=None,previous=None):
         # reparse this official file (cached bytes if present, otherwise download).
         if (retained and
                 int(retained.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
+                int(retained.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
                 retained.get('staffingRoleScanTruncated') is not True):
             saved_slots[position]=dict(retained)
             continue
@@ -1972,6 +1990,8 @@ def main():
               if re.fullmatch(r'R\d{2}BK\d{8}:\d{3}',k)}
     selected=discover(limit,prior,targets=targets,manifest_probe_out=manifest_probes,
                       priority=priority)
+    if os.environ.get('WORKLINKS_RFP_UPGRADE_ONLY')=='1':
+        print('RFP_UPGRADE_SELECT_COUNT',len(selected),flush=True)
     if os.environ.get('WORKLINKS_RFP_REQUIRE_EXACT_PRIORITY')=='1':
         selected_keys={no+':'+ordn for no,ordn,_ in selected}
         if not priority or selected_keys!=priority or len(selected)!=len(priority):
@@ -2023,7 +2043,7 @@ def main():
     preloaded=preflight_rfp_metadata(uncached)
     with ThreadPoolExecutor(max_workers=4) as pool:
         tasks={pool.submit(process,no,ordn,preloaded.get((no,ordn)),
-                           old.get(no+':'+ordn)):
+                           old.get(no+':'+ordn) or prior_index.get(no+':'+ordn)):
                (no,ordn) for no,ordn in uncached}
         for future in as_completed(tasks):
             no,ordn=tasks[future]
