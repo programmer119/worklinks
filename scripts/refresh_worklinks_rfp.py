@@ -470,14 +470,21 @@ def discover(limit,prior=None,targets=None,manifest_probe_out=None,priority=None
                                   int(cached.get('hwpxReaderVersion') or 0)<HWPX_READER_VERSION or
                                   staff_missing))
                 if upgrade_only:
-                    if not legacy_outdated or temporal!=0:continue
-                    # Fair rotation: a failed migration cannot monopolize every run.
+                    # A parser upgrade must drain ALL actionable open work:
+                    # never-scanned bids and outdated evidence, not only legacy successes.
+                    # Expired/unknown-deadline bids remain available to the ordinary job.
+                    if temporal!=0:continue
+                    # Avoid repeatedly hitting a broken official endpoint or re-downloading
+                    # an unchanged unreadable file within its 24-hour retry cooldown.
                     last_attempt=str(cached.get('lastAttemptAt') or '')
-                    try:
-                        when=dt.datetime.fromisoformat(last_attempt.replace('Z','+00:00'))
-                        if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
-                    except (ValueError,TypeError):pass
+                    if last_attempt:
+                        try:
+                            when=dt.datetime.fromisoformat(last_attempt.replace('Z','+00:00'))
+                            if when.tzinfo and utc-when<dt.timedelta(hours=24):continue
+                        except (ValueError,TypeError):pass
                     seen[key]=((0 if key in targets else 1,
+                                0 if not cached else 1,
+                                0 if legacy_outdated else 1,
                                 str(cached.get('lastAttemptAt') or cached.get('checkedAt') or ''),
                                 key),no,order,date.isoformat() if date else '')
                     continue
