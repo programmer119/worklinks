@@ -74,7 +74,7 @@ def log(*values):
 
 
 def deployed_rfp_reader_versions():
-    """Versions read from deployed parser source, never from GitHub's HEAD."""
+    """Read the version constants from the scanner actually installed on server123."""
     source=(SCRIPTS/'refresh_worklinks_rfp.py').read_text(encoding='utf-8')
     names={'CLASSIFICATION_VERSION':'classificationVersion',
            'STAFFING_ROLE_SCAN_VERSION':'staffingRoleScanVersion',
@@ -82,10 +82,18 @@ def deployed_rfp_reader_versions():
            'HWPX_READER_VERSION':'hwpxReaderVersion'}
     result={}
     for variable,field in names.items():
-        matched=re.search(r'(?m)^'+variable+r'\s*=\s*(\d+)\s*    try:
-        result = json.loads(STATE.read_text(encoding='utf-8'))
-        return result if isinstance(result, dict) else {}
-    except (OSError, ValueError):
+        matched=re.search(r'(?m)^'+variable+r'\\s*=\\s*([0-9]+)',source)
+        if not matched:
+            raise RuntimeError('deployed_rfp_parser_version_missing_'+variable)
+        result[field]=int(matched.group(1))
+    return result
+
+
+def read_state():
+    try:
+        result=json.loads(STATE.read_text(encoding='utf-8'))
+        return result if isinstance(result,dict) else {}
+    except (OSError,ValueError):
         return {}
 
 
