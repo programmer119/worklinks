@@ -704,7 +704,6 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .rfp-rescan-cycle.fetching{background:#fff8eb;border-color:#e9c999}
 .rfp-rescan-cycle.error{background:#fff7ed;border-color:#fed7aa}
 .rfp-rescan-cycle.error>span{color:#b45309}
-.rfp-rescan-server-note{margin:12px 0 0;font-size:12px;color:#526173;line-height:1.6}
 .rfp-rescan-modal{position:fixed;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.52);padding:18px}
 .rfp-rescan-modal.open{display:flex}
 .rfp-rescan-dialog{width:min(600px,100%);max-height:calc(100dvh - 36px);overflow:auto;border-radius:15px;border:1px solid #d7e0ea;background:#fff;padding:23px 24px;box-shadow:0 20px 65px rgba(15,23,42,.26);outline:none}
@@ -712,7 +711,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .rfp-rescan-head h2{font-size:21px;margin:0 0 5px;line-height:1.4}
 .rfp-rescan-head p{font-size:13px;color:#526173;margin:0;line-height:1.55}
 .rfp-rescan-close{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#334155;min-width:36px;min-height:36px;cursor:pointer;font-size:21px}
-.rfp-rescan-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:24px 0 16px}
+.rfp-rescan-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 14px}
 .rfp-rescan-metric{min-width:0}
 .rfp-rescan-metric span{display:block;color:#526173;font-size:13px;font-weight:750}
 .rfp-rescan-metric strong{display:block;color:#1c2f43;font-size:27px;line-height:1.4;font-variant-numeric:tabular-nums}
@@ -726,7 +725,18 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .rfp-rescan-stage-label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;color:#334155}
 .rfp-rescan-stage-label strong{color:#182c40;font-weight:850;font-variant-numeric:tabular-nums}
 .rfp-rescan-stage-track{height:7px}
-.rfp-rescan-foot{border-top:1px solid #e6eaf0;margin:20px 0 0;padding-top:12px;font-size:12.5px;line-height:1.7;color:#5d6775}
+.rfp-rescan-pending strong{color:#a54828}
+.rfp-rescan-progress-label{display:flex;justify-content:space-between;align-items:center;color:#475569;font-size:14px;font-weight:750;margin:0 0 8px}
+.rfp-rescan-progress-label strong{font-size:17px;color:#244f83;font-variant-numeric:tabular-nums}
+.rfp-rescan-breakdown{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap;margin:12px 0 2px;font-size:13px;color:#415167;line-height:1.5}
+.rfp-rescan-breakdown>strong{color:#1c2f43;white-space:nowrap;font-weight:800}
+.rfp-rescan-breakdown>div{display:flex;flex-wrap:wrap;gap:5px 14px}
+.rfp-rescan-breakdown b{font-weight:600;color:#526173}
+.rfp-rescan-status{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;border-top:1px solid #e7ebf0;margin-top:18px;padding-top:12px;font-size:13px;color:#526173}
+.rfp-rescan-status strong{font-size:14px;color:#286a62}
+.rfp-rescan-status.is-error strong{color:#b45309}
+.rfp-rescan-excluded{margin-left:auto;color:#94603b}
+
 .rfp-rescan-unknown{margin-top:7px;font-size:13px;color:#a15b22}
 .rfp-rescan-refresh-warning{padding:10px 12px;margin:12px 0;border:1px solid #f1cb93;background:#fff8ef;border-radius:8px;color:#805110;font-size:13px;line-height:1.55}.rfp-rescan-refresh-warning .rfp-rescan-retry{margin-left:8px}
 .rfp-rescan-service-error{padding:16px 0 3px;color:#25354a}.rfp-rescan-service-error strong{font-size:17px}.rfp-rescan-service-error p{font-size:14px;line-height:1.6;color:#526173;margin:8px 0 15px}.rfp-rescan-retry{border:1px solid #a4b7ce;border-radius:8px;background:#f4f8fd;color:#15395e;font-size:14px;font-weight:800;padding:9px 15px;cursor:pointer}
@@ -1044,8 +1054,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 <div id="rfpRescanModal" class="rfp-rescan-modal" role="dialog" aria-modal="true" aria-labelledby="rfpRescanModalTitle" aria-hidden="true">
   <div class="rfp-rescan-dialog" id="rfpRescanDialog" tabindex="-1">
     <div class="rfp-rescan-head"><div>
-      <h2 id="rfpRescanModalTitle">공고 판독 진행 현황</h2>
-      <p>마감 전 SW 공고 · 공고번호와 차수 기준 중복 제거</p>
+      <h2 id="rfpRescanModalTitle">공고 판독 현황</h2>
+      <p>마감 전 SW 공고 · 중복 제외</p>
     </div><button type="button" class="rfp-rescan-close" id="rfpRescanClose" aria-label="닫기">×</button></div>
     <div id="rfpRescanContent" aria-live="polite">실제 운영 서버의 집계를 조회하고 있어요.</div>
   </div>
@@ -2115,8 +2125,9 @@ function paintRfpRescanProgress(){
   document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
   return;
  }
- const counts=info.counts,remain=Number(info.rescanPercent);
+ const counts=info.counts;
  const complete=Number(counts.completed),all=Number(counts.total);
+ const remaining=Math.max(0,Number(counts.remaining));
  const pct=all?Math.max(0,Math.min(100,100*complete/all)).toFixed(2):'0.00';
  const delayed=Boolean(rfpRescanProgressError);
  const worker=info.worker?.available===true?info.worker:null;
@@ -2158,34 +2169,36 @@ function paintRfpRescanProgress(){
      '" aria-valuemin="0" aria-valuemax="100"><span style="width:'+
      progress.toFixed(1)+'%"></span></span></div>';
  }).join('');
+ const breakdown=[
+   ['최초 미판독',counts.unscanned],['검증 미완료',counts.incomplete],
+   ['실패',counts.failed],['구버전',counts.legacy]
+ ].filter(([,value])=>Number(value)>0)
+  .map(([name,value])=>'<span><b>'+htmlEscape(name)+'</b> '+rfpProgressNumber(value)+'건</span>')
+  .join('');
+ const statusLabel=upgradeTask?.status==='failed'?'판독 작업 오류':
+   continuous?(upgradeTask?.status==='started'?'판독 진행 중':'연속 판독 중'):
+   retryPending?'재시도 준비 중':
+   worker?.upgradeActive?'판독 작업 확인 중':
+   worker?'판독 작업 중지':'판독 작업 상태 미확인';
+ const retryLabel=retryPending?' · '+htmlEscape(rfpClock(nextUpgrade*1000))+' 재시도':'';
  panel.innerHTML=
-  (delayed?'<div class="rfp-rescan-refresh-warning" role="status">최신 집계를 갱신하지 못했습니다. 아래 수치는 마지막 정상 조회 결과입니다. <button type="button" id="rfpRescanRetry" class="rfp-rescan-retry">다시 조회</button></div>':'')+
+  (delayed?'<div class="rfp-rescan-refresh-warning" role="status">최신 집계 조회 실패 · 마지막 정상 수치 표시 <button type="button" id="rfpRescanRetry" class="rfp-rescan-retry">다시 조회</button></div>':'')+
   '<div class="rfp-rescan-totals">'+
-   '<div class="rfp-rescan-metric"><span>관리 대상</span><strong>'+rfpProgressNumber(all)+'</strong></div>'+
-   '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong>'+rfpProgressNumber(complete)+'</strong></div>'+
-   '<div class="rfp-rescan-metric"><span>재판독 필요</span><strong>'+rfpProgressNumber(counts.rescanRequired)+'</strong></div>'+
+   '<div class="rfp-rescan-metric"><span>전체</span><strong>'+rfpProgressNumber(all)+'</strong></div>'+
+   '<div class="rfp-rescan-metric"><span>완료</span><strong>'+rfpProgressNumber(complete)+'</strong></div>'+
+   '<div class="rfp-rescan-metric rfp-rescan-pending"><span>미완료</span><strong>'+rfpProgressNumber(remaining)+'</strong></div>'+
   '</div>'+
+  '<div class="rfp-rescan-progress-label">전체 진행률 <strong>'+pct+'%</strong></div>'+
   '<span class="rfp-rescan-big-track" role="progressbar" aria-label="전체 최신 판독 완료" aria-valuenow="'+
     pct+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+pct+'%"></span></span>'+
-  '<div class="rfp-rescan-legend"><span>완료 <b>'+pct+'%</b></span>'+
-   '<span>구버전 재판독 <b>'+remain.toFixed(1)+'%</b></span></div>'+
-  '<div class="rfp-rescan-legend">'+
-   '<span>구버전 <b>'+rfpProgressNumber(counts.legacy)+'건</b></span>'+
-   '<span>최초 미판독 <b>'+rfpProgressNumber(counts.unscanned)+'건</b></span>'+
-   '<span>실패 <b>'+rfpProgressNumber(counts.failed)+'건</b></span>'+
-   '<span>검증 미완료 <b>'+rfpProgressNumber(counts.incomplete)+'건</b></span>'+
-  '</div>'+
-  '<h3 class="rfp-rescan-section-title">기능별 판독 완료</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
-  (counts.unknownDeadline?'<div class="rfp-rescan-unknown">마감일 확인 불가 '+
-    rfpProgressNumber(counts.unknownDeadline)+'건은 전체 대상에서 제외</div>':'')+
-  '<p class="rfp-rescan-foot">진행률 = 최신 판독 완료 공고 ÷ 전체 관리 대상 공고. 10초마다 새 집계를 조회합니다. '+
-  '이 화면은 운영 서버에 저장된 결과만 보여줍니다. 미판독·실패·구버전 재처리는 서버 작업자가 수행해야 하며 이 버튼은 재판독을 시작하지 않습니다.'+
-  '<span style="display:block">확인 기준: '+htmlEscape(String(info.asOf||'').replace('T',' ').slice(0,19))+
-  ' · 판독 완료는 입찰 자격 충족을 의미하지 않습니다.</span></p>'+
-  '<div class="rfp-rescan-server-note">마지막 조회 '+htmlEscape(rfpClock(rfpRescanLastSuccessAt))+
-  ' · 서버 집계 '+htmlEscape(String(info.asOf||'시각 미확인').replace('T',' ').slice(0,19))+
-  ' · 직전 조회 대비 완료 '+(rfpRescanLastDelta>0?'+':'')+rfpRescanLastDelta+'건</div>'+ 
-  (worker?'<div class="rfp-rescan-server-note">서버 재판독 '+htmlEscape(workerStatus)+(upgradeTask?.successEpoch?' · 최근 배치 완료 '+htmlEscape(rfpClock(upgradeTask.successEpoch*1000)):'')+' · '+htmlEscape(nextUpgradeText)+(worker.upgradeBatchesCompleted?' · 완료된 배치 '+rfpProgressNumber(worker.upgradeBatchesCompleted)+'회':'')+'</div>':'');
+  '<div class="rfp-rescan-breakdown"><strong>미완료 구성</strong><div>'+
+    (breakdown||'없음')+'</div></div>'+
+  '<h3 class="rfp-rescan-section-title">기능별 판독</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
+  '<div class="rfp-rescan-status'+(upgradeTask?.status==='failed'?' is-error':'')+'">'+
+     '<strong>'+htmlEscape(statusLabel)+'</strong>'+retryLabel+
+     (Number(counts.unknownDeadline)>0?
+       '<span class="rfp-rescan-excluded">마감일 미확인 '+rfpProgressNumber(counts.unknownDeadline)+'건 제외</span>':'')+
+  '</div>';
  if(delayed)document.getElementById('rfpRescanRetry')?.addEventListener('click',()=>void refreshRfpRescanProgress(true));
 }
 async function refreshRfpRescanProgress(force=false){
