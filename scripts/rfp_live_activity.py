@@ -86,7 +86,21 @@ def worker(lane,status,error='',retry_epoch=0):
           (lane,str(status)[:32],str(error)[:180],float(retry_epoch or 0),time.time()))
 
 
-def stalled_downloads(notice_keys,idle_seconds=180,path=None):
+def recover_interrupted_downloads():
+    """Release orphaned file activity on downloader subprocess restart.
+
+    The durable notice queue is reset separately by RfpDualQueue.reset_stale;
+    archived verified originals remain intact and are reused.
+    """
+    with connect() as db:
+        now=time.time()
+        return db.execute('''UPDATE rfp_live_events
+            SET status='retry',phase='다운로드 프로세스 재시작 · 복구',
+                retry_epoch=?,error_text='worker_restart_reclaim',
+                updated_epoch=? WHERE lane='download' AND file_key<>''
+                AND status='working' ''',(now,now)).rowcount
+
+def stalled_downloads(notice_keys,idle_seconds=180,path=None,min_updated_epoch=0):
     """Observe only this process's currently claimed files; no API requests.
 
     The separate download parent can relaunch a non-responsive subprocess
@@ -105,7 +119,8 @@ def stalled_downloads(notice_keys,idle_seconds=180,path=None):
             rows=db.execute('''SELECT notice_key,file_key,file_name,
                     byte_progress_epoch,updated_epoch FROM rfp_live_events
                 WHERE lane='download' AND file_key<>'' AND status='working'
-                  AND phase='전송 중' AND notice_key IN ('''+values+''')''',keys).fetchall()
+                  AND phase='전송 중' AND updated_epoch>=? AND notice_key IN ('''+values+''')''',
+                [float(min_updated_epoch or 0),*keys]).fetchall()
         now=time.time()
         return [{'noticeKey':key,'fileKey':fk,'fileName':name,
                  'idleSeconds':int(now-(advanced or updated))}
@@ -151,3 +166,5 @@ def _nonfatal(fn):
 
 record=_nonfatal(record)
 worker=_nonfatal(worker)
+
+recover_interrupted_downloads=_nonfatal(recover_interrupted_downloads)
