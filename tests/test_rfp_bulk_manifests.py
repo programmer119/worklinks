@@ -37,7 +37,8 @@ def make_items(day,source):
         if source=='eorder':
             return [{'bidNo':first,'order':'000','name':'first.pdf','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/first.pdf','source':'eorder'}]
         if source=='detail':
-            return [{'bidNo':second,'order':'000','name':'detail.pdf','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/detail.pdf','source':'notice_detail'}]
+            return [{'bidNo':second,'order':'000','name':'detail.pdf','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/detail.pdf','source':'notice_detail'},
+                    {'bidNo':third,'order':'000','presence':True,'source':'notice_detail'}]
     if day==old_day and source=='ordinary':
         return [{'bidNo':other,'order':'000','name':'old.hwp','url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/old.hwp','source':'notice_attachment_api'}]
     return []
@@ -153,6 +154,34 @@ try:
     except proxy.ApiError as ex:assert ex.status==400
     else:raise AssertionError('provider 7-day bound not enforced')
     assert len(seen)==1
+    # Absence from all date-list sources is not evidence of zero attachments.
+    # An official detail row without any documents DOES establish presence.
 finally:
     g['request_api']=saved
+# A completely absent notice must remain incomplete, not a fake zero-file
+# download. The exceptional lookup is bounded to one notice/three operations.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    db=root/'bids.sqlite3'
+    missed='R26BK00010009'
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
+        con.execute('INSERT INTO bid_notices VALUES (?,?,?,1)',
+                    (missed,'000',json.dumps({'posted':new_day+'T10:00:00'})))
+    q=RfpDualQueue(root/'queue.sqlite3')
+    q.enqueue([(missed,'000','2099-12-31')],'r1')
+    def no_rows(url):
+        v=urllib.parse.urlparse(url)
+        assert v.path=='/api/g2b/rfp-attachment-batch'
+        args=dict(urllib.parse.parse_qsl(v.query))
+        return {'ok':True,'source':args['source'],'page':int(args['page']),
+                'totalCount':0,'rawCount':0,'items':[]}
+    x=bulk.BulkManifestPlanner(q,db,no_rows,NoDelay(),allow_exceptions=False)
+    state=x.populate_one_day()
+    assert state['new']==0 and state['unmatched']==1,state
+    assert q.bulk_manifest(missed+':000') is None
+    assert q.unprepared_notices()==[missed+':000']
+    assert x.posted_days()=={},'deferred missing should not spin in a tight loop'
+    print('RFP_MISSING_BATCH_NOTICE_REMAINS_INCOMPLETE=PASS',flush=True)
+
 print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
