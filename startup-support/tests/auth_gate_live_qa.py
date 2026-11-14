@@ -53,6 +53,7 @@ def open_session(browser, revoked):
         }
     """)
     page = context.new_page()
+    page.clock.install()
     install_fake_auth(page, revoked)
     page.goto(URL, wait_until="domcontentloaded", timeout=60000)
     page.locator(".worklinks-auth-dropdown").wait_for(state="visible", timeout=30000)
@@ -92,5 +93,14 @@ with sync_playwright() as pw:
     page.evaluate("window.dispatchEvent(new Event('focus'))")
     assert_locked(page, "로그인이 만료되었습니다.")
     print("REVOKED_SESSION_GATE=PASS", flush=True)
+    context.close()
+
+    # No tab switch and no user click: the 45s session heartbeat must still lock it.
+    revoked = {"value": False}
+    context, page = open_session(browser, revoked)
+    revoked["value"] = True
+    page.clock.fast_forward(46000)
+    assert_locked(page, "로그인이 만료되었습니다.")
+    print("ACTIVE_TAB_EXPIRY_HEARTBEAT=PASS", flush=True)
     context.close()
     browser.close()
