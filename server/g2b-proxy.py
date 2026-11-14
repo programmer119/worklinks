@@ -786,6 +786,62 @@ def rfp_attachment_batch_page(source,from_time,to_time,page,rows):
             'rawCount':len(source_rows),'items':normalized}
 
 
+def rfp_attachment_single(bid_no,order):
+    """Sparse/missing-only fallback: exactly THREE official document sources.
+
+    Unlike the legacy four-source bid-evidence, never request participation
+    regions just to obtain attachments.
+    """
+    if not (re.fullmatch(r'[A-Za-z0-9-]{8,40}',str(bid_no)) and
+            re.fullmatch(r'\d{3}',str(order))):
+        raise ApiError('invalid_bid_identifier',400)
+    aggregated={}
+    for label,op in RFP_BATCH_SOURCES.items():
+        outcome=_bid_evidence_fetch(op,bid_no,order)
+        if outcome.get('ok') is not True or outcome.get('complete') is not True:
+            reason=str(outcome.get('error') or 'incomplete_official_source')
+            raise ApiError('rfp_single_source_unavailable_'+reason[:110],503)
+        normalized=[]
+        for row in outcome.get('items') or []:
+            if label=='detail':
+                for pos in range(1,11):
+                    name=str(row.get('ntceSpecFileNm'+str(pos)) or '').strip()
+                    url=str(row.get('ntceSpecDocUrl'+str(pos)) or '').strip()
+                    if not url and not name:continue
+                    normalized.append({'name':name[:160],
+                        'url':url if url.startswith('https://') else '',
+                        'source':'notice_detail'})
+            else:
+                name=_pick(row,['atchFileNm','atchFileName','fileNm',
+                                'fileName','eorderAtchFileNm'])
+                url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl',
+                               'fileDownloadUrl','eorderAtchFileUrl'])
+                if name or url:
+                    normalized.append({'name':name[:160],
+                        'url':url if url.startswith('https://') else '',
+                        'source':'eorder' if label=='eorder' else 'notice_attachment_api'})
+        aggregated[label]=normalized
+    items=[];seen=set()
+    for source in ('ordinary','eorder','detail'):
+        for item in aggregated[source]:
+            url=item.get('url') or ''
+            if url and url in seen:continue
+            if url:seen.add(url)
+            items.append(item)
+    return {'ok':True,'bidNo':bid_no,'order':order,
+            'region':{'ok':False,'complete':False,
+                      'error':'not_requested_for_rfp_download'},
+            'attachments':{'ok':True,'complete':True,'count':len(items),
+                'items':items,'generalCount':len(aggregated['ordinary']),
+                'eorderCount':len(aggregated['eorder']),
+                'noticeDetailDocumentCount':len(aggregated['detail']),
+                'sourceCoverage':'three_exact_official_sources_no_region'},
+            'noticeDocuments':{'ok':True,'complete':True,
+                'items':aggregated['detail'],
+                'count':len(aggregated['detail'])},
+            'manifestOrigin':'verified_sparse_exact_three_sources'}
+
+
 def bid_evidence_query(bid_no, order):
     """Four official A02 sources; include ordinary attachments beyond e-order."""
     regions=_bid_evidence_fetch('getBidPblancListInfoPrtcptPsblRgn02',bid_no,order)
@@ -2046,6 +2102,15 @@ class Handler(BaseHTTPRequestHandler):
                 project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
                 return self.reply(200, worklinks_state_get(project, user_id))
             if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/rfp-attachment-single':
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                return self.reply(200,rfp_attachment_single(
+                    get('bidNo'),get('order','000')))
             if u.path == '/api/g2b/rfp-attachment-batch':
                 # Enforce server-local access: this expensive read must not
                 # be exposed as a public unauthenticated quota-spending API.
