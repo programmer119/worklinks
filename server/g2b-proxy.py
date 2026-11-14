@@ -1529,6 +1529,15 @@ def rfp_rescan_progress():
                             seen_notices.add(key)
                             recent_errors.append((name,reason,retry,updated))
                             if len(recent_errors)==3:break
+                        # A transient HTTP error can recover before the next 10s
+                        # poll. Preserve its visible cause while that file resumes.
+                        for active in active_files:
+                            if active['error'] and not any(
+                                    row[0]==active['name'] and row[1]==active['error']
+                                    for row in recent_errors):
+                                recent_errors.insert(0,(active['name'],
+                                    '재연결 중: '+active['error'],0,active['updatedEpoch']))
+                        recent_errors=recent_errors[:3]
                         download_group={'available':True,'activeCount':len(active_files),
                             'startedEpoch':min((f['startedEpoch'] for f in active_files),default=0),
                             'files':active_files[:8],
