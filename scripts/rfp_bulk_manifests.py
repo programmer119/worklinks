@@ -19,7 +19,11 @@ ROWS=999
 MAX_PAGES_PER_DAY_SOURCE=500
 MAX_FETCH_PER_PASS=18
 DAILY_LIMIT=180
-HOURLY_LIMIT=36
+# Old 36/hour self-throttle left 1,585 notices without lists while the
+# official A02 proxy circuit breaker was inactive. Period calls already
+# have paced starts (0.8s) and a separate rolling daily budget, so do
+# not impose an unsupported additional 36/hour starvation window.
+HOURLY_LIMIT=DAILY_LIMIT
 
 class BulkManifestError(RuntimeError):
     pass
