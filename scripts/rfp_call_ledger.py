@@ -181,7 +181,7 @@ class CallLedger:
             return None
         return self._store(key,'json',raw,source_revision=source_revision)
 
-    def save_bytes(self,key,raw,*,source_revision='',max_bytes=24_000_000,
+    def save_bytes(self,key,raw,*,source_revision='',max_bytes=100_000_000,
                    notice_key=None,closes_on=''):
         if len(raw)>max_bytes:
             self.record('cache',key,'payload_above_cache_limit',
