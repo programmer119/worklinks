@@ -110,8 +110,11 @@ class BulkManifestPlanner:
             raise BulkManifestError('batch_page_count_unprofitable')
         existing={row[0] for row in saved}
         fetched=0
-        for page in range(1,pages+1):
-            if page in existing:continue
+        page=1
+        while page<=pages:
+            if page in existing:
+                page+=1
+                continue
             if fetched>=MAX_FETCH_PER_PASS:
                 return None,fetched
             self._reserve_api_call(source,day,page)
@@ -141,9 +144,7 @@ class BulkManifestPlanner:
             for item in payload['items']:
                 if not isinstance(item,dict):
                     raise BulkManifestError('batch_invalid_attachment_item')
-                key=str(item.get('bidNo') or '')+':'+str(item.get('order') or '000').zfill(3)
-                if key in needed_keys:
-                    filtered.append(item)
+                filtered.append(item)  # retain all rows for newly discovered notices
             with self.queue.connect() as db:
                 db.execute('''INSERT OR REPLACE INTO rfp_bulk_pages
                     (day,source,page,total_count,raw_count,items_json,saved_at)
@@ -153,8 +154,7 @@ class BulkManifestPlanner:
                      dt.datetime.now(dt.timezone.utc).isoformat()))
             fetched+=1
             pages=expected
-            if page==1 and pages>MAX_PAGES_PER_DAY_SOURCE:
-                raise BulkManifestError('batch_page_count_unprofitable')
+            page+=1
         return self._cached_pages(day,source),fetched
 
     @staticmethod
