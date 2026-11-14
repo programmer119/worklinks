@@ -105,8 +105,8 @@
   if(scanActive)activeParts.push('판독 '+number(scanActive)+'건');
   if(scanWorkerActive&&!scanActive)activeParts.push('판독 배치 실행');
   const delta=Number(rfpRescanLastDelta||0);
-  updateField(panel,'liveChange',delayed?'마지막 정상 집계 표시':
-   activeParts.join(' · ')||(delta>0?'최근 판독 +'+number(delta)+'건':''));
+  if(delta>0)activeParts.push('최근 판독 +'+number(delta)+'건');
+  updateField(panel,'liveChange',delayed?'마지막 정상 집계 표시':activeParts.join(' · '));
   for(const [key,name] of laneKeys.concat(stageKeys)){
    const node=panel.querySelector('[data-rfp-stage="'+key+'"]');
    if(!node)continue;
