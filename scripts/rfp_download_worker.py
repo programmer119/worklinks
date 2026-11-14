@@ -10,10 +10,13 @@ import datetime as dt
 import hashlib
 import json
 import os
+import tempfile
 from pathlib import Path
 import threading
 import time
 import urllib.parse
+import urllib.request
+import urllib.error
 
 import refresh_worklinks_rfp as reader
 from rfp_call_ledger import cache_key
@@ -47,6 +50,89 @@ class Pace:
 
 META_PACE=Pace(0.8)
 FILE_PACE=Pace(0.125)  # 8 file starts/sec for 8 independent download workers
+
+
+def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
+                                       rate_gate=None,progress=None,on_retry=None):
+    """Bounded-memory official GET -> temporary file -> verified compressed SQLite BLOB.
+
+    The original is never held as a single Python bytes object. Previously
+    verified archives are checked with incremental BLOB reads and reused.
+    """
+    reqkey=cache_key('official_attachment',url)
+    reusable=ledger.verified_bytes_info(reqkey)
+    if reusable is not None:
+        ledger.link_attachment(reqkey,notice_key,closes_on)
+        ledger.record('attachment_reuse',reqkey,'verified_bytes_reused',
+                      notice_key=notice_key,response_sha256=reusable['sha256'])
+        if progress:progress(reusable['bytes'],reusable['bytes'],True)
+        return reusable
+    request=urllib.request.Request(url,headers={
+        'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+    for attempt in range(3):
+        if rate_gate is not None:rate_gate.acquire()
+        raw_path=None
+        try:
+            with reader.OPENER.open(request,timeout=35) as response:
+                status=getattr(response,'status',200)
+                raw_length=int(response.headers.get('Content-Length') or '0')
+                if raw_length>reader.MAX_FILE:
+                    raise ValueError('large_file: content_length='+str(raw_length))
+                bytes_received=0
+                digest=hashlib.sha256()
+                last_progress=0.0
+                with tempfile.NamedTemporaryFile(
+                        dir=ledger.path.parent,prefix='.rfp-download-',
+                        suffix='.part',delete=False) as original:
+                    raw_path=Path(original.name)
+                    if progress:progress(0,raw_length,False)
+                    while True:
+                        chunk=response.read(min(256*1024,reader.MAX_FILE+1-bytes_received))
+                        if not chunk:break
+                        bytes_received+=len(chunk)
+                        if bytes_received>reader.MAX_FILE:
+                            raise ValueError('large_file: received='+str(bytes_received))
+                        digest.update(chunk)
+                        original.write(chunk)
+                        tick=time.monotonic()
+                        if progress and (tick-last_progress>=0.4 or
+                                (raw_length and bytes_received>=raw_length)):
+                            progress(bytes_received,raw_length,False)
+                            last_progress=tick
+                if raw_length and bytes_received!=raw_length:
+                    raise ValueError('download_length_mismatch')
+            ledger.record('attachment_http',reqkey,'http_ok',
+                          http_status=status,notice_key=notice_key,
+                          response_sha256=digest.hexdigest(),
+                          detail='bytes='+str(bytes_received))
+            archived=ledger.save_file(reqkey,raw_path,max_bytes=reader.MAX_FILE,
+                                      notice_key=notice_key,closes_on=closes_on)
+            if (archived is None or archived['sha256']!=digest.hexdigest() or
+                    archived['bytes']!=bytes_received):
+                raise RuntimeError('original_archive_not_verified_or_storage_quota')
+            if progress:progress(bytes_received,raw_length or bytes_received,True)
+            return archived
+        except (urllib.error.HTTPError,urllib.error.URLError,
+                TimeoutError,ConnectionError,ValueError) as exc:
+            ledger.record('attachment_http',reqkey,'http_failed',
+                          notice_key=notice_key,
+                          http_status=getattr(exc,'code',None),
+                          error_class=type(exc).__name__,detail=str(exc)[:160])
+            if isinstance(exc,urllib.error.HTTPError):
+                if reader.official_missing_reference(exc):
+                    raise reader.OfficialAttachmentReferenceMissing(
+                        'official_attachment_reference_missing_422') from exc
+                retry=exc.code in (429,500,502,503,504)
+            else:
+                retry=isinstance(exc,(TimeoutError,ConnectionError,urllib.error.URLError))
+            if not retry or attempt==2:raise
+            if on_retry:on_retry(exc,1.5*(attempt+1))
+            time.sleep(1.5*(attempt+1))
+        finally:
+            if raw_path is not None:
+                try:raw_path.unlink()
+                except FileNotFoundError:pass
+    raise RuntimeError('unexpected_original_download_retry_exhausted')
 
 def configure_reader():
     # Reuse the current approved official-source client and file hash ledger.
@@ -193,20 +279,18 @@ def download_one(queue,claim,halt):
                     files_done=index,files_total=len(urls),
                     retry_epoch=time.time()+seconds,error=last_network_error)
             progress(0,0,False)
-            data=reader.download(url,rate_gate=FILE_PACE,progress=progress,on_retry=on_retry)
-            stored=ledger.get_bytes(cache_key('official_attachment',url))
-            if stored is None or hashlib.sha256(data).digest()!=hashlib.sha256(stored).digest():
-                raise RuntimeError('original_archive_not_verified_or_storage_quota')
+            stored=stream_original_to_verified_ledger(
+                url,ledger,key,closes,rate_gate=FILE_PACE,
+                progress=progress,on_retry=on_retry)
             verified_files.append({'name':file_name,'url':url,
-                                   'sha256':hashlib.sha256(stored).hexdigest(),
-                                   'bytes':len(stored)})
+                                   'sha256':stored['sha256'],
+                                   'bytes':stored['bytes']})
             live.record('download',key,file_key=file_key,file_name=file_name,
                         phase='저장 검증 완료',status='done',
-                        bytes_done=len(data),bytes_total=len(data),
+                        bytes_done=stored['bytes'],bytes_total=stored['bytes'],
                         files_done=index+1,files_total=len(urls))
             active_file_key=''
             active_file_name=''
-            del data,stored
             live.record('download',key,phase='파일 다운로드',status='working',
                         files_done=index+1,files_total=len(urls))
         meta=dict(meta,downloadVerifiedFiles=verified_files)
@@ -228,7 +312,14 @@ def download_one(queue,claim,halt):
                         retry_epoch=retry_at,error=str(exc))
         return False
     except Exception as exc:
-        delay=21600 if detects_upstream_limit(str(exc)) else 300
+        if isinstance(exc,reader.OfficialAttachmentReferenceMissing):
+            # A verified missing official file ID is not a transient network
+            # failure; retain the error for inspection instead of 5-minute abuse.
+            delay=86400
+        elif str(exc).startswith('large_file:'):
+            delay=86400
+        else:
+            delay=21600 if detects_upstream_limit(str(exc)) else 300
         if delay==21600:halt.set()
         queue.download_failed(key,type(exc).__name__+': '+str(exc)[:110],
                               retry_seconds=delay)
