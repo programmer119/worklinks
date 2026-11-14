@@ -6,6 +6,7 @@ on:
       - 'server/g2b-proxy.py'
       - 'server/deploy-g2b-api-only.sh'
       - 'tests/test_bid_evidence.py'
+      - 'tests/worklinks-jobs-regression.cjs'
       - 'tests/test_worklinks_deploy_runner_policy.py'
       - '.github/workflows/worklinks-g2b-api-deploy.yml'
   workflow_dispatch:
