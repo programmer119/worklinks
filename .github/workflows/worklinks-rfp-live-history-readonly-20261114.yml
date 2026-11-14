@@ -1,0 +1,70 @@
+name: WorkLinks real RFP history in last 10 and 30 minutes (read only)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-rfp-live-history-readonly-20261114.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read and summarize server123 live RFP history (no writes or upstream G2B calls)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections, datetime as dt, gzip, json, urllib.request, time
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          def get(path):
+              t=time.monotonic()
+              req=urllib.request.Request(base+path,headers={'Accept-Encoding':'gzip','User-Agent':'WorkLinks-OneTime-ReadOnly-History/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=50) as resp:
+                  raw=resp.read()
+                  enc=resp.headers.get('Content-Encoding') or ''
+              if 'gzip' in enc:raw=gzip.decompress(raw)
+              return json.loads(raw),round(time.monotonic()-t,3),len(raw)
+          report,rt,rs=get('rfp-rescan-progress?history=20261114')
+          now=dt.datetime.fromisoformat(report['asOf']).astimezone(dt.timezone.utc)
+          print('HISTORY_BASELINE',json.dumps({'asOf':report['asOf'],'counts':report['counts'],'worker':report['worker'],'requestSeconds':rt},ensure_ascii=False),flush=True)
+          doc,rt,rs=get('snapshot?name=rfp-coverage-index')
+          index=doc.get('byNotice') or {}
+          print('HISTORY_INDEX_LOADED',json.dumps({'rows':len(index),'bytes':rs,'fetchSeconds':rt,'generatedAt':doc.get('generatedAt')},ensure_ascii=False),flush=True)
+          def parse(v):
+              if not v:return None
+              try:
+                  out=dt.datetime.fromisoformat(str(v).replace('Z','+00:00'))
+                  return out.replace(tzinfo=dt.timezone.utc) if out.tzinfo is None else out.astimezone(dt.timezone.utc)
+              except Exception:return None
+          def key_info(key,item):
+              files=[f for f in item.get('files') or [] if isinstance(f,dict)]
+              return {'id':key,'checkedAt':item.get('checkedAt'),'lastAttemptAt':item.get('lastAttemptAt'),
+               'status':item.get('status'),'lastAttemptStatus':item.get('lastAttemptStatus'),
+               'classificationVersion':item.get('classificationVersion'),'staffingRoleScanComplete':item.get('staffingRoleScanComplete'),
+               'files':len(files),'readable':sum(x.get('readable') is True for x in files),
+               'unreadable':sum(x.get('readable') is not True for x in files)}
+          for minutes in (10,30,60):
+              start=now-dt.timedelta(minutes=minutes)
+              scanned=[];attempted=[];either=[]
+              for key,v in index.items():
+                  if not isinstance(v,dict):continue
+                  checked=parse(v.get('checkedAt'));attempt=parse(v.get('lastAttemptAt'))
+                  if checked and start<=checked<=now:scanned.append((checked,key,v))
+                  if attempt and start<=attempt<=now:attempted.append((attempt,key,v))
+                  if (checked and start<=checked<=now) or (attempt and start<=attempt<=now):
+                      either.append((max(x for x in [checked,attempt] if x),key,v))
+              status=collections.Counter(str(v.get('status') or 'unknown') for _,_,v in scanned)
+              attempts=collections.Counter(str(v.get('lastAttemptStatus') or 'not_recorded') for _,_,v in attempted)
+              buckets=collections.Counter(t.astimezone(dt.timezone(dt.timedelta(hours=9))).strftime('%H:%M')[:-1]+'0'
+                      for t,_,_ in scanned)
+              checked_files=sum(len(v.get('files') or []) for _,_,v in scanned)
+              print('HISTORY_WINDOW',json.dumps({'windowMin':minutes,'from':start.isoformat(),
+                'to':now.isoformat(),'checkedAtNoticeCount':len(scanned),
+                'lastAttemptAtNoticeCount':len(attempted),'eitherCount':len(either),
+                'checkedFilesTotal':checked_files,'checkedStatuses':dict(status),'attemptStatuses':dict(attempts),
+                'bucket10minByCheckedAt':dict(sorted(buckets.items())),
+                'latestChecked': [key_info(k,v) for t,k,v in sorted(scanned,reverse=True)[:12]],
+                'latestAttempts': [key_info(k,v) for t,k,v in sorted(attempted,reverse=True)[:12]]},
+                ensure_ascii=False,separators=(',',':')),flush=True)
+          PY
