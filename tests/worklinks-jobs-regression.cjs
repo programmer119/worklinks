@@ -912,7 +912,8 @@ assert.ok(sampleMethod.includes('낙찰코드: 낙010001') && sampleMethod.inclu
 assert.ok(!sampleMethod.includes('>낙찰코드<'),'award code must not take a visible cell');
 const methodWithoutFloor=(code,rate='',extra={})=>methodView({id:'g2b-servc-R26BK00000101-000',
  noticeNumber:'R26BK00000101',awardMethodCode:code,awardFloorRate:rate,...extra});
-assert.ok(methodWithoutFloor('낙030005').includes('하한율 비적용'),'non-applicable must NOT be a failed fetch');
+assert.ok(methodWithoutFloor('낙030005').includes('job-bid-method-cell not_applicable') &&
+          methodWithoutFloor('낙030005').includes('비적용'),'non-applicable must NOT be a failed fetch');
 assert.ok(methodWithoutFloor('낙030001').includes('조사 미완료'),'no official evidence must NOT be called a source error');
 assert.ok(methodWithoutFloor('낙030001','',{awardFieldsVerified:true}).includes('원본 미기재'),
  'missing numeric floor with verified original must be source-missing');
