@@ -2144,6 +2144,22 @@ function paintRfpRescanProgress(){
  const button=document.getElementById('rfpRescanLaunch');
  if(button)button.title='완료 '+rfpProgressNumber(complete)+' / '+rfpProgressNumber(all)+'건 · '+nextUpgradeText+' · 서버 조회 10초 주기'+(delayed?' · 최신 조회 실패':'');
  paintRfpCountdown();
+ const laneData=info.lanes?.available===true?info.lanes:null;
+ const laneBars=laneData?[
+   ['원본 다운로드',laneData.download],['문서 스캔',laneData.scan]
+ ].map(([name,st])=>{
+   const done=Math.max(0,Number(st?.done||0)),total=Math.max(0,Number(st?.total||0));
+   const percentage=total?Math.min(100,100*done/total):0;
+   const errors=Math.max(0,Number(st?.failed||0));
+   return '<div class="rfp-rescan-stage-row"><div class="rfp-rescan-stage-label"><span>'+
+     htmlEscape(name)+'</span><strong>'+rfpProgressNumber(done)+' / '+
+     rfpProgressNumber(total)+'건 · '+percentage.toFixed(1)+'%'+
+     (errors?' · 재시도 '+rfpProgressNumber(errors):'')+'</strong></div>'+
+     '<span class="rfp-rescan-stage-track" role="progressbar" aria-label="'+
+     htmlEscape(name)+' 완료" aria-valuenow="'+percentage.toFixed(1)+
+     '" aria-valuemin="0" aria-valuemax="100"><span style="width:'+
+     percentage.toFixed(1)+'%"></span></span></div>';
+ }).join(''):'';
  const stageNames={classification:'RFP 조건',roles:'역할·인원',facts:'인력 요구사항',hwpx:'HWPX 해석'};
  const stages=Object.entries(info.stages||{}).map(([name,st])=>{
   const applicable=Number(st.total)>0;
@@ -2175,6 +2191,7 @@ function paintRfpRescanProgress(){
    '<span>실패 <b>'+rfpProgressNumber(counts.failed)+'건</b></span>'+
    '<span>검증 미완료 <b>'+rfpProgressNumber(counts.incomplete)+'건</b></span>'+
   '</div>'+
+  (laneBars?'<h3 class="rfp-rescan-section-title">작업 진행</h3><div class="rfp-rescan-stages">'+laneBars+'</div>':'')+
   '<h3 class="rfp-rescan-section-title">기능별 판독 완료</h3><div class="rfp-rescan-stages">'+stages+'</div>'+
   (counts.unknownDeadline?'<div class="rfp-rescan-unknown">마감일 확인 불가 '+
     rfpProgressNumber(counts.unknownDeadline)+'건은 전체 대상에서 제외</div>':'')+
