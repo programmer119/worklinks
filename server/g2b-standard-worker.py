@@ -49,6 +49,10 @@ SECRET_PATH = os.environ.get("G2B_STANDARD_KEY_PATH", "/run/secrets/g2b-standard
 PAGE_ROWS = 999
 B2_ROWS = 500  # smaller pages protect against provider 999-row B2 read timeouts
 MAX_PAGES = 35
+B2_MAX_PAGES = 100  # 50,000 B2 rows/day; verified 2026-11-10 has 21,039 (43 pages).
+
+def page_limit(service):
+    return B2_MAX_PAGES if service == "B2" else MAX_PAGES
 OPERATIONS = {
     "B1": "getDataSetOpnStdBidPblancInfo",
     "B2": "getDataSetOpnStdScsbidInfo",
@@ -182,7 +186,7 @@ def request_page(service, day, page, key, fetch=None):
     except (TypeError, ValueError):
         raise ProviderFailure("invalid_total") from None
     requested_rows = B2_ROWS if service == "B2" else PAGE_ROWS
-    if total < 0 or total > MAX_PAGES * requested_rows or len(items) > requested_rows:
+    if total < 0 or total > page_limit(service) * requested_rows or len(items) > requested_rows:
         raise ProviderFailure("unbounded_window")
     valid_items=[x for x in items if isinstance(x, dict)]
     if ledger is not None:
@@ -197,7 +201,7 @@ def collect_window(service, day, key, budget, fetch=None):
     page_rows = B2_ROWS if service == "B2" else PAGE_ROWS
     total, first = request_budgeted(service, day, 1, key, budget, fetch)
     pages = max(1, (total + page_rows - 1) // page_rows)
-    if pages > MAX_PAGES:
+    if pages > page_limit(service):
         raise ProviderFailure("window_too_large")
     rows = list(first)
     for page in range(2, pages + 1):
@@ -393,7 +397,8 @@ def save_window(db, service, day, rows, pages):
     return len(values)
 
 
-def run(days=2, max_requests=90, fetch=None, db_path=DB_PATH, key=None):
+def run(days=2, max_requests=90, fetch=None, db_path=DB_PATH, key=None,
+        only_day=None, only_service=None):
     key = key or get_key()
     db = connect(db_path)
     budget = [0, int(max_requests)]
@@ -404,16 +409,24 @@ def run(days=2, max_requests=90, fetch=None, db_path=DB_PATH, key=None):
         with db:
             db.execute("UPDATE std_run_status SET last_run=?,message=? WHERE id=1",
                        (now_utc(), "running"))
-        # Always start with the latest *completed* KST day.
-        for offset in range(1, int(days) + 1):
-            day = (today - dt.timedelta(days=offset)).strftime("%Y%m%d")
-            for service in ("B1", "B2", "B3"):
+        # Target one historical gap without re-fetching unrelated B1/B3 datasets.
+        windows = ([(int((today - dt.datetime.strptime(only_day, "%Y%m%d").date()).days),
+                     only_day)] if only_day else
+                   [(offset, (today - dt.timedelta(days=offset)).strftime("%Y%m%d"))
+                    for offset in range(1, int(days) + 1)])
+        services = (only_service,) if only_service else ("B1", "B2", "B3")
+        for offset, day in windows:
+            for service in services:
                 exists = db.execute("SELECT received,refreshed_at FROM std_windows WHERE service=? AND day=?",
                                     (service, day)).fetchone()
                 if exists:
                     try:
                         previous = dt.datetime.fromisoformat(exists[1].replace("Z", "+00:00"))
-                        fresh = dt.datetime.now(dt.timezone.utc) - previous < dt.timedelta(hours=12)
+                        # Re-fetch recent 2 complete dates; skip older complete
+                        # windows so 5 daily B2 reloads cannot consume quota.
+                        fresh = (offset >= 3 or
+                                 dt.datetime.now(dt.timezone.utc) - previous <
+                                 dt.timedelta(hours=12))
                     except (TypeError,ValueError):
                         fresh = False
                     if fresh:
@@ -439,11 +452,12 @@ def run(days=2, max_requests=90, fetch=None, db_path=DB_PATH, key=None):
             if errors:
                 # Fail closed without moving on to fresh API windows after errors.
                 break
-        outcome = "completed" if not errors else "partial:" + errors[0]
+        outcome = ("targeted_completed" if only_day else "completed") if not errors else "partial:" + errors[0]
         with db:
+            # Targeted repairs do not claim full scheduled-window success.
             db.execute("""UPDATE std_run_status SET last_success=CASE WHEN ? THEN ? ELSE last_success END,
                requests=?, windows=?, message=? WHERE id=1""",
-                       (int(not errors), now_utc(), budget[0], windows_done, outcome))
+                       (int(not errors and not only_day), now_utc(), budget[0], windows_done, outcome))
         totals = {table: db.execute("SELECT COUNT(*) FROM " + table).fetchone()[0]
                   for table in ("std_windows", "std_notices", "std_awards", "std_contracts")}
         print("STD_SYNC_FINAL " + json.dumps({
@@ -459,11 +473,25 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--days", type=int, default=7)
     parser.add_argument("--max-requests", type=int, default=90)
+    parser.add_argument("--only-day", type=str, default=None,
+                        help="Repair a completed KST YYYYMMDD window")
+    parser.add_argument("--only-service", choices=("B1", "B2", "B3"), default=None)
     arg = parser.parse_args()
     if not (1 <= arg.days <= 7 and 3 <= arg.max_requests <= 150):
         raise SystemExit("invalid_bounds")
+    if arg.only_service and not arg.only_day:
+        raise SystemExit("only_service_requires_only_day")
+    if arg.only_day:
+        try:
+            target = dt.datetime.strptime(arg.only_day, "%Y%m%d").date()
+        except ValueError:
+            raise SystemExit("invalid_target_day")
+        delta = (dt.datetime.now(KST).date() - target).days
+        if not 1 <= delta <= 14:
+            raise SystemExit("only_completed_days_within_14")
     try:
-        sys.exit(run(days=arg.days, max_requests=arg.max_requests))
+        sys.exit(run(days=arg.days, max_requests=arg.max_requests,
+                     only_day=arg.only_day, only_service=arg.only_service))
     except (OSError, ValueError, sqlite3.Error) as exc:
         print("STD_SYNC_FATAL " + type(exc).__name__, flush=True)
         sys.exit(3)
