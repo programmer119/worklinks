@@ -90,7 +90,7 @@
   for(const [name,value] of Object.entries({
    total:number(all),complete:number(done),rescanRequired:number(counts.rescanRequired),
    unscanned:number(counts.unscanned),legacy:number(counts.legacy),
-   failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(1)+'%'
+   failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
   }))updateField(panel,name,value);
   const totalBar=panel.querySelector('.rfp-rescan-big-track');
   totalBar.setAttribute('aria-valuenow',pct.toFixed(1));
@@ -137,7 +137,7 @@
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
   count.textContent='완료 '+number(done)+' / '+number(all)+'건';
-  label.textContent=pct.toFixed(1)+'%'+(delayed?' · 갱신 지연':'');
+  label.textContent=pct.toFixed(2)+'%'+(delayed?' · 갱신 지연':'');
   fill.style.width=pct.toFixed(2)+'%';
   const next=document.getElementById('rfpRescanNext');
   if(next)next.textContent=delayed?'조회 오류':active?'작업 중':worker?.upgradeActive?'진행 확인 중':'현황';
