@@ -1,0 +1,27 @@
+name: WorkLinks RFP live per-notice progress regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_rfp_rescan_progress.py'
+      - 'tests/test_rfp_upgrade_queue.py'
+      - '.github/workflows/worklinks-rfp-notice-by-notice-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify each completed notice appears independently without waiting for batch
+        run: |
+          python3 -m py_compile server/g2b-proxy.py scripts/refresh_worklinks_rfp.py server/worklinks-server123-pipeline.py
+          python3 tests/test_rfp_rescan_progress.py
+          python3 tests/test_rfp_upgrade_queue.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          echo RFP_PER_NOTICE_DURABLE_PROGRESS_TESTED_PASS
