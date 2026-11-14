@@ -70,6 +70,35 @@ with tempfile.TemporaryDirectory() as t:
         assert all_['totalCount']==3 and all_['searchMode']=='none',all_
         matched=[x for x in all_['items'] if x['bidNo']==a]
         assert len(matched)==1 and matched[0]['rfpSavedState']['staffingFacts'][0]['label']==requirements[0]['label']
+        # Full-scope counter must include all unexpired notices, regardless of
+        # the first 400 paginated cards. Unknown deadline is tracked, not hidden.
+        import datetime
+        future=(datetime.datetime.now(datetime.timezone.utc)+
+                datetime.timedelta(days=14)).strftime('%Y-%m-%d %H:%M:%S')
+        persist([
+          {'kind':'servc','bidNo':'R26BK12340001','order':'0',
+           'title':'AI 플랫폼 개발 최신 공고','org':'미래기관','closes':future},
+          {'kind':'servc','bidNo':'R26BK12340002','order':'000',
+           'title':'SW 관리 취소 공고','org':'미래기관','state':'공고취소','closes':future},
+          {'kind':'servc','bidNo':'R26BK12340003','order':'001',
+           'title':'AI 개발 마감 불명 공고','org':'미래기관','closes':''}
+        ])
+        with m['open_bid_db']() as db:
+            db.execute("""INSERT OR REPLACE INTO bid_license_cache
+              (bid_no,bid_ord,payload,checked_at) VALUES (?,?,?,?)""",
+              ('R26BK12340001','000',json.dumps({
+                'ok':True,'complete':True,'requirements':[{
+                  'name':'컴퓨터관련서비스사업','codes':['1468']}]}),'2026-11-14'))
+            db.commit()
+        inventory=m['query_saved_open_inventory']()
+        assert inventory['complete'] is True and inventory['noGovernmentApiCalls'] is True,inventory
+        by_no={row['bidNo']:row for row in inventory['items']}
+        assert inventory['includedCount']==len(by_no),inventory
+        assert 'R26BK12340001' in by_no and 'R26BK12340003' in by_no,inventory
+        assert 'R26BK12340002' not in by_no,inventory
+        assert by_no['R26BK12340001']['bidEligibility']['requirements'][0]['codes']==['1468']
+        assert inventory['unknownDeadline']>=1 and inventory['cancelledExcluded']>=1,inventory
+        assert inventory['includedCount']<inventory['totalStoredSw'],inventory
         try:search(10,0,True,'A'*81)
         except m['ApiError']:pass
         else:raise AssertionError('long search query accepted')
