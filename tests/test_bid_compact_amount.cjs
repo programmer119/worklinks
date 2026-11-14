@@ -22,7 +22,8 @@ for(const [input,expected] of [
  ['100000000','1억']
 ]) {
  assert.equal(jobCardCompactBudget(input),expected,input);
- assert.equal(jobCardAmountMarkup({id:'g2b-'+input,amount:input}),expected,input);
+ for(const id of ['g2b-'+input,'g2b-precheck-R26BK00000000:000','R26BK00000000:000','saved-bid-1','worklinks-job-1'])
+  assert.equal(jobCardAmountMarkup({id,amount:input}),expected,id+' / '+input);
 }
 assert.equal(jobCardCompactBudget('99900000'),jobAmountLabel('99900000'),
  'sub-1억 amounts keep existing display');
