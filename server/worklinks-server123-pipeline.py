@@ -24,7 +24,8 @@ SCRIPTS = Path(os.environ.get('G2B_PIPELINE_SCRIPTS', '/app/scripts'))
 STATE = DATA / 'pipeline-scheduler-state.json'
 SOURCE_API = os.environ.get('WORKLINKS_G2B_API', 'http://127.0.0.1:18192/api/g2b')
 RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
-RFP_UPGRADE_PERIOD = max(600, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
+# Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
+RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
@@ -322,26 +323,54 @@ def run_once(kind, runner=None, _single=False):
 def iteration(current=None, runner=None):
     now = float(time.time() if current is None else current)
     state = read_state()
-    # Persistent timestamps, not sleep-only, protect against restart loops.
+    # Periodic tasks remain scheduled. Triggered RFP drain continues as soon
+    # as the previous successful batch atomically publishes its checkpoint.
     jobs = (('rfp', RFP_PERIOD), ('rfpUpgrade', RFP_UPGRADE_PERIOD), ('actionable', SHORTLIST_PERIOD),
             ('awardFallback', AWARD_FALLBACK_PERIOD),
             ('rfpOpenRepair', RFP_OPEN_OCR_PERIOD), ('rfpRepair', RFP_REPAIR_PERIOD),
             ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
-        if kind=='rfpUpgrade' and state.get('rfpUpgradeActive') is not True:continue
-        previous = float((state.get(kind) or {}).get('attemptEpoch') or 0)
-        if now - previous < period:
-            continue
+        prior = state.get(kind) or {}
+        if kind=='rfpUpgrade':
+            if state.get('rfpUpgradeActive') is not True:continue
+            # A successful batch never waits for the clock. A failed batch or
+            # temporarily empty eligible queue respects its persisted retry time.
+            if now < float(prior.get('retryAfterEpoch') or 0):continue
+        else:
+            previous=float(prior.get('attemptEpoch') or 0)
+            if now - previous < period:continue
         entry = {'attemptEpoch': now, 'status': 'started'}
         state[kind] = entry
         publish_state(state)
         try:
             more=run_once(kind, runner=runner)
-            if kind=='rfpUpgrade' and more is False:
-                state['rfpUpgradeActive']=False
-            entry.update(status='ok', successEpoch=time.time())
+            finished=time.time()
+            if kind=='rfpUpgrade':
+                state['rfpUpgradeBatchesCompleted']=int(state.get('rfpUpgradeBatchesCompleted') or 0)+(1 if more is not False else 0)
+                if more is False:
+                    # No eligible item *now* does not mean the 2k+ remaining
+                    # notices are complete: some may need official-file retry.
+                    entry.update(status='no_eligible_now',successEpoch=finished,
+                                 retryAfterEpoch=finished+RFP_UPGRADE_PERIOD)
+                    log('PIPELINE_RFP_NO_ELIGIBLE_NOW_RECHECK',RFP_UPGRADE_PERIOD)
+                else:
+                    entry.update(status='ok',successEpoch=finished)
+                    log('PIPELINE_RFP_CONTINUE_NEXT_BATCH',state['rfpUpgradeBatchesCompleted'])
+            else:
+                entry.update(status='ok',successEpoch=finished)
         except Exception as error:
-            entry.update(status='failed', error=type(error).__name__ + ': ' + str(error)[:180])
+            message=type(error).__name__ + ': ' + str(error)[:180]
+            entry.update(status='failed', error=message)
+            if kind=='rfpUpgrade':
+                streak=int(prior.get('failureStreak') or 0)+1
+                upper=message.upper()
+                # Do not overload government endpoints when quotas or a
+                # transient outage have been explicitly observed.
+                delay=(21600 if 'DAILY_QUOTA' in upper or 'DAILY_COOLDOWN' in upper
+                       else 300 if 'RATE_LIMIT' in upper or 'TRANSIENT_LIMIT' in upper
+                       else min(3600,60*2**min(streak,5)))
+                entry.update(failureStreak=streak,retryAfterEpoch=time.time()+delay)
+                log('PIPELINE_RFP_DRAIN_BACKOFF',delay,'seconds',message)
             log('PIPELINE_JOB_RETRY_NEXT_CYCLE', kind, entry['error'])
         state[kind] = entry
         publish_state(state)
@@ -452,8 +481,14 @@ def main():
             'rfpOpenOcrLimit', RFP_OPEN_OCR_LIMIT,
              'qualificationBatch', QUALIFICATION_BATCH)
         while True:
-            iteration()
-            time.sleep(90)
+            state=iteration()
+            drain=state.get('rfpUpgrade') or {}
+            # Continuous scan while candidates exist. Keep ordinary scheduled
+            # jobs fair (one bounded RFP batch per loop) and never spin while
+            # the upstream service is rate-limited or no items are eligible.
+            time.sleep(1 if (state.get('rfpUpgradeActive') is True and
+                              drain.get('status')=='ok') else
+                       15 if state.get('rfpUpgradeActive') is True else 90)
 
 
 if __name__ == '__main__':
