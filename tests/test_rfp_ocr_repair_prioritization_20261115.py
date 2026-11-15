@@ -13,9 +13,12 @@ ole={'name':'bill.xls','errorCategory':'hwp5txt_failed','readable':False}
 plain={'name':'contract.hwp','errorCategory':'no_searchable_text','readable':False}
 hard={'name':'legacy.hwp','errorCategory':'hwp5txt_failed','readable':False}
 huge={'name':'contract.pdf','errorCategory':'source_extraction_timeout_deferred','readable':False}
-assert repair.repair_file_priority(pdf)<repair.repair_file_priority(hard)
+assert repair.repair_file_priority(hard)<repair.repair_file_priority(pdf)
 assert repair.repair_file_priority(ole)<repair.repair_file_priority(hard)
 assert repair.repair_file_priority(plain)<repair.repair_file_priority(huge)
+long_rfp={'name':'제안요청서.hwpx','readable':True,
+          'qualificationScanTruncated':True,'sourceTextScanComplete':False}
+assert repair.repair_file_priority(long_rfp)<repair.repair_file_priority(pdf)
 
 now=dt.datetime.now(dt.timezone.utc)
 candidates=[
@@ -25,10 +28,10 @@ candidates=[
 ]
 chosen,used=repair.choose_repair_batch(candidates,limit=3,max_files=8)
 assert [x[0] for x in chosen]==[
-    'R26BK00000002:000','R26BK00000003:000','R26BK00000001:000'
+    'R26BK00000001:000','R26BK00000002:000','R26BK00000003:000'
 ],chosen
-assert used==7,used  # 1 OCR + 3 XLS + 3 HWP (not blocked by 10/15 members)
-assert [x[-1] for x in chosen]==[1,3,3],chosen
+assert used==7,used  # 3 HWP + 1 OCR + 3 XLS; large manifests remain eligible
+assert [x[-1] for x in chosen]==[3,1,3],chosen
 assert repair.choose_repair_batch(candidates,limit=2,max_files=3)[1]==3
 assert repair.choose_repair_batch(candidates,limit=3,max_files=1)[1]==1
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
