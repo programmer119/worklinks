@@ -51,7 +51,7 @@ with tempfile.TemporaryDirectory() as tmp:
         assert evidence['ocrTesseractSeconds']>=0,evidence
         assert evidence['ocrPdfTotalSeconds']>=0,evidence
         assert evidence['ocrReceiptWriteSeconds']>=0,evidence
-        assert evidence['ocrPdfOpenedOnce'] if 'ocrPdfOpenedOnce' in evidence else True
+        assert evidence['pdfSources'][0]['ocrPdfOpenedOnce'] is True,evidence
         assert len(calls)==1,('one PyMuPDF PDF handle should serve 3 pages',len(calls))
         assert mockocr.call_count==3,mockocr.call_count
         assert images.call_count==0,('page.images invoked on image-only contents',images.call_count)
