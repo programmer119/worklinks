@@ -19,7 +19,8 @@ spec.loader.exec_module(m)
 # generic reason shared by every retry.
 assert m.scan_failure_diagnosis({'status':'text_extracted_requires_review',
     'manifestComplete':True,'staffingRoleScanComplete':False,
-    'files':[{'name':'bad.pdf','readable':False,
+    'files':[{'name':'good.pdf','readable':True,'sourceTextScanComplete':True},
+             {'name':'bad.pdf','readable':False,
               'errorCategory':'pdf_ocr_incomplete'}]},{
     'classificationVersion':23,'staffingRoleScanVersion':4,
     'staffingFactScanVersion':2,'hwpxReaderVersion':3
