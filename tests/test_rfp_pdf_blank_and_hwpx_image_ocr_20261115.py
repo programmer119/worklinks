@@ -113,5 +113,5 @@ with patch.dict(os.environ,{'WORKLINKS_RFP_DEFER_OCR':'0'}):
     except ValueError as e:
         assert str(e)=='hwpx_image_ocr_incomplete',str(e)
 
-assert repair.READER_ATTEMPT_VERSION.endswith('embedded-image-v8')
+assert repair.READER_ATTEMPT_VERSION.endswith('v9-page-resume')
 print('RFP_PDF_PIXEL_BLANK_AND_HWPX_EMBEDDED_IMAGE_OCR=PASS')

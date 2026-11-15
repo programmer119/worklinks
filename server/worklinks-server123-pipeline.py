@@ -44,7 +44,7 @@ RFP_OCR_SCAN_BATCH_INTERVAL = 4
 # When download-ready work is on scan-retry cooldown, OCR repair is independent
 # of upstream file requests and must continue using saved verified originals.
 RFP_OCR_IDLE_PERIOD = 120
-RFP_OPEN_READER_VERSION='pdf25-blank-hwpx-embedded-image-v8'
+RFP_OPEN_READER_VERSION='pdf25-blank-hwpx-embedded-image-v9-page-resume'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
 # Explicit short-lived recovery selection; candidates rotate out once fully scanned.
@@ -529,6 +529,10 @@ def run_once(kind, runner=None, _single=False):
         elif kind=='rfpOpenRepair':
             # Bulk scanner defers OCR, but isolated repair MUST actually run it.
             env.pop('WORKLINKS_RFP_DEFER_OCR',None)
+            # The resume cache persists per-page OCR receipts in DATA, never
+            # in the temporary snapshot directory. Batch restarts continue
+            # with the first uncached page of the exact PDF SHA.
+            env['WORKLINKS_RFP_OCR_PAGE_CACHE_DB']=str(DATA/'rfp-ocr-page-cache.sqlite3')
             # A few nested one-page scanned PDFs can legitimately need >90s.
             env['WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS']='180'
         if kind in ('rfp','rfpUpgrade'):
