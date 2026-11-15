@@ -1686,6 +1686,216 @@ def rfp_dual_lane_progress(path,cohort=None):
                 'failed':sum(n for _,b,n in rows if b=='retry')}}
 
 
+def rfp_rescan_cause_report(limit=40,offset=0):
+    """Read-only per-notice and per-original root causes for the *exact* live cohort.
+
+    No OCR, network procurement calls, retries or DB writes. This report keeps
+    both overlapping technical reasons and the exclusive UI count category.
+    """
+    if not (1<=limit<=150 and 0<=offset<=5000):
+        raise ApiError('rfp_cause_pagination_invalid',400)
+    vpath=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
+    try:
+        with open(vpath,'r') as fd:
+            vdoc=json.load(fd)
+        versions=vdoc['latest']
+        if vdoc.get('ok') is not True or vdoc.get('schemaVersion')!=1:
+            raise ValueError('version_manifest_not_verified')
+    except (OSError,ValueError,KeyError,TypeError):
+        raise ApiError('rfp_version_manifest_unavailable',503)
+    indexed=read_saved_rfp_evidence_index()
+    if indexed is None:raise ApiError('rfp_index_unavailable',503)
+    current,_,_=read_rfp_notice_checkpoints(indexed)
+    queue_path=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3')
+    try:
+        with sqlite3.connect('file:'+queue_path+'?mode=ro',uri=True,timeout=3) as db:
+            excluded={k for (k,) in db.execute("""
+                SELECT q.notice_key FROM rfp_dual_notices q
+                WHERE q.download_status='no_attachments' AND q.scan_status='skipped'
+                AND EXISTS(SELECT 1 FROM rfp_bulk_manifests m
+                           WHERE m.notice_key=q.notice_key)""")}
+    except (sqlite3.Error,OSError):
+        raise ApiError('rfp_exclusion_queue_unavailable',503)
+    con=open_bid_db()
+    try:
+        bids=con.execute("""SELECT b.bid_no,b.bid_ord,b.payload FROM bid_notices b
+            WHERE b.sw_candidate=1 AND NOT EXISTS(
+                SELECT 1 FROM bid_notices newer WHERE newer.bid_no=b.bid_no
+                AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER))
+            ORDER BY b.last_seen DESC""").fetchall()
+    finally:con.close()
+    asof=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    authoritative=rfp_progress_from_rows(bids,current,versions,asof=asof,
+                                          include_scope=True,excluded_keys=excluded)
+    managed,completed=authoritative.pop('_cohortKeys')
+    latest_rows={}
+    for bid_no,order,payload in bids:
+        key=str(bid_no or '')+':'+str(order or '000').zfill(3)
+        if key not in latest_rows:
+            try:latest_rows[key]=json.loads(payload) if isinstance(payload,str) else payload
+            except (ValueError,TypeError):latest_rows[key]={}
+    ocr_errors={'pdf_ocr_incomplete','ocr_deferred_to_repair',
+                'pdf_unreadable_page','image_ocr_incomplete',
+                'hwpx_image_ocr_deferred_to_repair'}
+    v12=str(versions.get('ocrReaderVersion') or '')
+    records=[]
+    category_counts=Counter()
+    root_counts=Counter()
+    issue_counts=Counter()
+    file_error_counts=Counter()
+    stage_missing_counts=Counter()
+    for key in sorted(managed-excluded-completed):
+        doc=current.get(key) or {}
+        bid=latest_rows.get(key) or {}
+        files=[f for f in doc.get('files') or [] if isinstance(f,dict)] if isinstance(doc,dict) else []
+        checks=rfp_stage_checks(doc,versions)
+        status=str(doc.get('status') or '')
+        problems=[]
+        issues=set()
+        for f in files:
+            if f.get('staffingScopeExcluded') is True:
+                continue
+            # Verified PDF duplicates should not be counted as failed HWP originals.
+            if f.get('skippedDuplicateFormat') is True and f.get('alternatePdfEvidence'):
+                continue
+            err=str(f.get('errorCategory') or '').strip()
+            text_done=f.get('sourceTextScanComplete') is True
+            read_done=f.get('readable') is True
+            qual_partial=f.get('qualificationScanTruncated') is True or int(f.get('unmatchedQualificationAnchorCount') or 0)>0
+            role_partial=f.get('staffingRoleScanTruncated') is True
+            role_old=read_done and int(f.get('staffingRoleScanVersion') or 0)<int(versions['staffingRoleScanVersion'])
+            facts_old=read_done and int(f.get('staffingFactScanVersion') or 0)<int(versions['staffingFactScanVersion'])
+            if read_done and text_done and not qual_partial and not role_partial and not role_old and not facts_old:
+                continue
+            attempt=str(f.get('lastReaderAttemptVersion') or '')
+            if err in ocr_errors:
+                detail_code='ocr_old_reader_version' if attempt!=v12 else 'ocr_v12_attempt_still_incomplete'
+            elif err:
+                detail_code='source_error:'+err
+            elif not read_done:
+                detail_code='unreadable_without_error_category'
+            elif not text_done:
+                detail_code='source_text_incomplete'
+            elif qual_partial:
+                detail_code='qualification_coverage_incomplete'
+            elif role_partial:
+                detail_code='role_extraction_truncated'
+            elif role_old or facts_old:
+                detail_code='file_parser_version_outdated'
+            else:
+                detail_code='other_file_scan_incomplete'
+            issues.add(detail_code)
+            file_error_counts[err or detail_code]+=1
+            evidence=f.get('extractionEvidence') or {}
+            pdfs=evidence.get('pdfSources') or []
+            problems.append({
+                'name':str(f.get('name') or '')[:185],
+                'reason':detail_code,
+                'errorCategory':err,
+                'errorDetail':str(f.get('errorDetail') or f.get('error') or '')[:250],
+                'readable':read_done,'sourceTextScanComplete':text_done,
+                'lastReaderAttemptVersion':attempt,
+                'lastReaderAttemptAt':str(f.get('lastReaderAttemptAt') or '')[:35],
+                'ocrBatchDeferredPages':int(evidence.get('ocrBatchDeferredPages') or 0),
+                'ocrFailedPages':int(evidence.get('ocrFailedPages') or 0),
+                'ocrRecoveredPages':int(evidence.get('ocrRecoveredPages') or 0),
+                'pdfSources':[{
+                    'sourceFile':str(p.get('sourceFile') or '')[:150],
+                    'pdfPages':int(p.get('pdfPages') or 0),
+                    'unresolvedPages':list(p.get('unresolvedPages') or [])[:25],
+                    'ocrFailureDetails':list(p.get('ocrFailureDetails') or [])[:6]}
+                    for p in pdfs[:8] if isinstance(p,dict)],
+                'qualificationTruncated':qual_partial,
+                'staffingRoleScanTruncated':role_partial,
+                'staffingRoleVersion':int(f.get('staffingRoleScanVersion') or 0),
+                'staffingFactVersion':int(f.get('staffingFactScanVersion') or 0)
+                })
+        if not isinstance(doc,dict) or status in ('','not_scanned','unscanned'):
+            category='unscanned'
+        elif any(str(f.get('errorCategory') or '') in ocr_errors
+                 and f.get('staffingScopeExcluded') is not True
+                 and f.get('skippedDuplicateFormat') is not True
+                 and str(f.get('lastReaderAttemptVersion') or '')!=v12
+                 for f in files):
+            category='legacy'
+        elif status!='text_extracted_requires_review':
+            category='failed'
+        elif all(v is not False for v in checks.values()) and all(
+                v is True for v in (checks['classification'],checks['roles'],checks['facts'])):
+            category='completed'
+        elif any(int(doc.get(k) or 0)<versions[k]
+                 for k in ('classificationVersion','hwpxReaderVersion')
+                 if k!='hwpxReaderVersion' or checks['hwpx'] is not None) or any(
+                 int(f.get('staffingRoleScanVersion') or 0)<versions['staffingRoleScanVersion'] or
+                 int(f.get('staffingFactScanVersion') or 0)<versions['staffingFactScanVersion']
+                 for f in files if f.get('readable') is True and
+                 f.get('staffingScopeExcluded') is not True):
+            category='legacy'
+        else:
+            category='incomplete'
+        if category=='completed':
+            # If evidence changes mid-read, never misclassify a completed notice as a failure.
+            continue
+        category_counts[category]+=1
+        for stage in ('classification','roles','facts','hwpx'):
+            if checks.get(stage) is False:
+                stage_missing_counts[stage]+=1
+        if doc.get('manifestComplete') is not True:
+            issues.add('manifest_incomplete')
+        if doc.get('staffingRoleScanComplete') is not True:
+            issues.add('role_scan_flag_incomplete')
+        if int(doc.get('classificationVersion') or 0)<versions['classificationVersion']:
+            issues.add('classification_version_outdated')
+        if checks['hwpx'] is False:
+            issues.add('hwpx_reader_incomplete')
+        for code in issues:issue_counts[code]+=1
+        root=(
+            'ocr_reader_not_retried' if 'ocr_old_reader_version' in issues
+            else 'ocr_retried_still_incomplete' if 'ocr_v12_attempt_still_incomplete' in issues
+            else 'other_file_extraction_failure' if any(x.startswith('source_error:') for x in issues)
+            else 'unreadable_file' if 'unreadable_without_error_category' in issues
+            else 'manifest_not_complete' if 'manifest_incomplete' in issues
+            else 'scan_coverage_incomplete' if any(x in issues for x in
+                ('source_text_incomplete','qualification_coverage_incomplete','role_extraction_truncated'))
+            else 'parser_version_outdated' if any('version_outdated' in x for x in issues)
+            else 'role_scan_incomplete' if 'role_scan_flag_incomplete' in issues
+            else 'unclassified_missing_verified_evidence'
+        )
+        root_counts[root]+=1
+        records.append({
+            'noticeKey':key,
+            'title':str(bid.get('title') or bid.get('bidNtceNm') or '')[:160],
+            'deadline':str(bid.get('closes') or '')[:35],
+            'category':category,'rootCause':root,
+            'issues':sorted(issues),'stagePassed':checks,
+            'scanStatus':status,'manifestComplete':doc.get('manifestComplete') is True,
+            'classificationVersion':int(doc.get('classificationVersion') or 0),
+            'staffingRoleScanComplete':doc.get('staffingRoleScanComplete') is True,
+            'fileCount':len(files),'problemFileCount':len(problems),
+            'files':problems[:30]})
+    records.sort(key=lambda x:(x['rootCause'],x['noticeKey']))
+    expected=authoritative['counts']
+    return {
+        'ok':True,'asOf':asof.isoformat(),
+        'scope':'actionable_saved_sw_bid_notices_24h',
+        'counts':expected,
+        'actualIssueNoticeCount':len(records),
+        'categoryCounts':dict(category_counts),
+        'primaryCauseCounts':dict(root_counts),
+        'overlappingIssueNoticeCounts':dict(issue_counts),
+        'problemFileErrorCounts':dict(file_error_counts),
+        'stageMissingNoticeCounts':dict(stage_missing_counts),
+        'scanCompleteCount':len(completed),
+        'verifiedExcludedNotices':len(managed&excluded),
+        'missingDeadline':{
+            'total':expected.get('unknownDeadline'),
+            'completed':expected.get('unknownDeadlineCompleted'),
+            'pending':expected.get('unknownDeadlinePending')},
+        'offset':offset,'limit':limit,'totalResults':len(records),
+        'records':records[offset:offset+limit],'upstreamCalls':0,
+        'note':'Primary causes are mutually exclusive; overlapping issues and file errors may have multiple counts per notice.'}
+
+
 def rfp_ocr_repair_attribution():
     """Read-only proof of files actually recovered by the installed OCR repair reader.
 
@@ -2873,6 +3083,13 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
             if u.path == '/api/g2b/rfp-rescan-progress':
                 return self.reply(200,rfp_rescan_progress())
+            if u.path == '/api/g2b/rfp-rescan-causes':
+                try:
+                    cause_limit=int(get('limit','40'))
+                    cause_offset=int(get('offset','0'))
+                except (ValueError,TypeError):
+                    raise ApiError('rfp_cause_pagination_invalid',400)
+                return self.reply(200,rfp_rescan_cause_report(cause_limit,cause_offset))
             if u.path == '/api/g2b/rfp-ocr-repair-attribution':
                 return self.reply(200,rfp_ocr_repair_attribution())
             if u.path == '/api/g2b/rfp-card-evidence':
