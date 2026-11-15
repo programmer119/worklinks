@@ -38,7 +38,6 @@ def counted_open(*a,**kw):
 with tempfile.TemporaryDirectory() as tmp:
     with patch.dict(os.environ,{'WORKLINKS_RFP_OCR_PAGE_CACHE_DB':str(Path(tmp)/'pages.sqlite3'),
                                 'WORKLINKS_RFP_DEFER_OCR':'0'}),\
-         patch.object(reader.shutil,'which',return_value='/usr/bin/tesseract'),\
          patch.object(reader.subprocess,'run',return_value=SimpleNamespace(
              returncode=0,stdout=('조달청 입찰 자격 조건 및 사업 요건 처리 ' * 4).encode(),stderr=b'')) as mockocr,\
          patch.object(pymupdf,'open',side_effect=counted_open),\
