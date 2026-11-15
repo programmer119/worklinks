@@ -1326,6 +1326,15 @@ def rfp_stage_checks(row,latest):
     readable=[f for f in files if f.get('readable') is True and
               f.get('staffingScopeExcluded') is not True]
     source_ok=row.get('status')=='text_extracted_requires_review'
+    # A readable sibling does not certify a failed OCR member. Keep the
+    # notice incomplete until the exact failed file is source-complete.
+    unresolved_ocr={'pdf_ocr_incomplete','ocr_deferred_to_repair',
+        'pdf_unreadable_page','image_ocr_incomplete',
+        'hwpx_image_ocr_deferred_to_repair'}
+    if any(str(f.get('errorCategory') or '') in unresolved_ocr
+           and f.get('readable') is not True
+           and f.get('staffingScopeExcluded') is not True for f in files):
+        source_ok=False
     cls=source_ok and bool(readable) and row.get('manifestComplete') is True and \
         int(row.get('classificationVersion') or 0)>=latest['classificationVersion'] and \
         all(f.get('sourceTextScanComplete') is True and
