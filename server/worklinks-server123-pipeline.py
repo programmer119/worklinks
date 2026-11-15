@@ -764,8 +764,8 @@ def iteration(current=None, runner=None):
             # Production run_once() only returns True if the cached-original
             # repair plan selected at least one actual notice. Test runners
             # have no real plan and must not create a synthetic busy loop.
-            state['rfpOpenRepairHasMore']=(more is True and runner is None
-                and entry.get('status')=='ok')
+            state['rfpOpenRepairHasMore']=(entry.get('status')=='ok'
+                and more is True and runner is None)
         if kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True:
             state['rfpOpenRepairUpgradeBatch']=int(state.get('rfpUpgradeBatchesCompleted') or 0)
         state[kind] = entry
