@@ -8,6 +8,8 @@ on:
       - scripts/refresh_worklinks_rfp.py
       - tests/test_worklinks_server123_pipeline.py
       - tests/test_open_cached_rfp_repair.py
+      - tests/test_rfp_original_format_and_short_text_20261115.py
+      - server/Dockerfile.worklinks-pipeline
       - .github/workflows/worklinks-rfp-repair-fairness-20261115.yml
 permissions:
   contents: read
@@ -20,6 +22,8 @@ jobs:
       - name: Verify scanner fairness and original handoff
         run: |
           python3 -m py_compile server/worklinks-server123-pipeline.py scripts/repair_open_rfp_cached_attachments.py scripts/refresh_worklinks_rfp.py
+          python3 -m pip install --quiet xlrd==2.0.2 xlwt==1.3.0
+          python3 tests/test_rfp_original_format_and_short_text_20261115.py
           python3 tests/test_worklinks_server123_pipeline.py
           python3 tests/test_open_cached_rfp_repair.py
           python3 tests/test_rfp_verified_file_handoff.py
