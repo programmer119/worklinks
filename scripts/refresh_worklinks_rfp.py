@@ -1391,9 +1391,13 @@ def extract(name,raw):
         if attached is not None:attached.append(details)
         return text
     raise ValueError('unsupported_format')
+# Full-document evidence is retained up to 1M characters; beyond that it
+# remains incomplete instead of silently declaring a truncated scan valid.
+RFP_QUALIFICATION_TEXT_LIMIT=1_000_000
+
 def parse_clauses(text):
     text=re.sub(r'[\u200b\ufeff\x00]','',text)
-    text=text[:350_000]
+    text=text[:RFP_QUALIFICATION_TEXT_LIMIT]
     triggers={name:len(re.findall(rx,text,re.I)) for name,rx in SIGNALS.items()}
     snippets=[]
     lines=re.split(r'\n+',text)
@@ -1416,7 +1420,7 @@ STAFFING_ROLE_SCAN_VERSION=4
 # Independent of staffing role extraction: do not trigger fresh government API
 # calls merely because the presentation of source-backed conditions improved.
 STAFFING_FACT_SCAN_VERSION=2
-STAFFING_ROLE_TEXT_LIMIT=350_000
+STAFFING_ROLE_TEXT_LIMIT=RFP_QUALIFICATION_TEXT_LIMIT
 try:
     from staffing_facts import extract_staffing_facts
 except ModuleNotFoundError as exc:
@@ -1563,7 +1567,7 @@ def extract_rule_candidates(text,filename):
     Candidates are evidence, not an authoritative exhaustive list. Adjacent PDF
     wrapped lines are included to retain their registration/certificate verbs.
     """
-    raw_lines=[' '.join(line.split()) for line in re.split(r'\n+',text[:350_000])]
+    raw_lines=[' '.join(line.split()) for line in re.split(r'\n+',text[:RFP_QUALIFICATION_TEXT_LIMIT])]
     rules={
       'industry_code':r'업종\s*코드|업종코드|업종으로\s*입찰|소프트웨어사업자|학술.?연구용역|정보통신공사업',
       'direct_production':r'직접\s*생산|세부\s*품명\s*번호|공간정보\s*DB\s*구축',
@@ -1887,7 +1891,7 @@ def audit_qualification_scan(text, candidates, include_missing=False):
         if not matched:
             missing.append(line[:180])
             if include_missing:missing_full.append(line)
-    complete=(len(text)<=350_000 and not missing)
+    complete=(len(text)<=RFP_QUALIFICATION_TEXT_LIMIT and not missing)
     result={'sourceTextScanComplete':complete,
             'qualificationAnchorCount':len(anchor_lines),
             'unmatchedQualificationAnchorCount':len(missing),
@@ -2195,7 +2199,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                            'sourceSha256':hashlib.sha256(raw).hexdigest(),
                            'textSha256':hashlib.sha256(content.encode('utf-8')).hexdigest(),
                            'extractedTextCacheHit':text_cache_hit,
-                           'qualificationScanTruncated':len(content)>350_000,
+                           'qualificationScanTruncated':len(content)>RFP_QUALIFICATION_TEXT_LIMIT,
                            'clauseCandidatesTruncated':False,
                            'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
                            'staffingFactScanVersion':STAFFING_FACT_SCAN_VERSION,
