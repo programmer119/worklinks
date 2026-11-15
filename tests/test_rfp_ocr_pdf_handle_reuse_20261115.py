@@ -8,13 +8,13 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch,PropertyMock
 import pymupdf
-from pypdf import PdfWriter
-from pypdf._page import PageObject
-from pypdf.generic import DecodedStreamObject,NameObject
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 import refresh_worklinks_rfp as reader
+from pypdf import PdfWriter
+from pypdf._page import PageObject
+from pypdf.generic import DecodedStreamObject,NameObject
 
 def scanned(count,blank=False):
     writer=PdfWriter()
