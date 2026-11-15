@@ -4,7 +4,7 @@ import time
 from playwright.sync_api import sync_playwright
 
 URL = "https://worklinks.suaveforge.com/startup-support/?view=jobs"
-REVISION = "20261115-direct-relogin-v1"
+REVISION = "20261115-silent-relogin-v2"
 CORS = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, POST, OPTIONS",
@@ -100,6 +100,32 @@ with sync_playwright() as pw:
     page.get_by_role("button", name="로그아웃", exact=True).click()
     assert_locked(page, "로그아웃되었습니다.")
     print("MANUAL_LOGOUT_GATE=PASS", flush=True)
+    context.close()
+
+    # Direct login must use the existing refresh credential without navigating
+    # to AuthHub when an account session can still be legitimately refreshed.
+    recoverable={"value":False}
+    context,page=open_session(browser,recoverable)
+    page.evaluate("""() => {
+      const key='authhub:p47:production:session';
+      const current=JSON.parse(localStorage.getItem(key));
+      delete current.accessToken;
+      localStorage.setItem(key,JSON.stringify(current));
+      window.dispatchEvent(new Event('focus'));
+    }""")
+    assert_locked(page,"로그인이 만료되었습니다.")
+    assert page.evaluate("""() =>
+      Boolean(JSON.parse(localStorage.getItem('authhub:p47:production:session')||'{}').refreshToken)
+    """),"refresh token incorrectly erased"
+    navigations=[]
+    page.on("framenavigated",lambda frame:navigations.append(frame.url)
+        if frame==page.main_frame else None)
+    page.locator("#worklinks-auth-gate-login").click()
+    page.locator("#worklinks-auth-gate").wait_for(state="hidden",timeout=30000)
+    page.locator(".worklinks-auth-dropdown").wait_for(state="visible",timeout=30000)
+    assert not navigations,"Re-login navigated away despite a valid refresh token"
+    assert page.locator("body > main").evaluate("(e)=>!e.inert")
+    print("ONE_CLICK_REFRESH_RECOVERY_NO_LOGIN_PAGE=PASS",flush=True)
     context.close()
 
     revoked = {"value": False}
