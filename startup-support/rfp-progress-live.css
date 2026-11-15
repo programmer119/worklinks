@@ -162,3 +162,11 @@
 #rfpRescanModal .rfp-rescan-features [data-status="active"] .rfp-stage-aggregate-fill{background:var(--rfp-running)}
 #rfpRescanModal .rfp-rescan-features .rfp-rescan-stage-row[data-status="warning"] .rfp-rescan-stage-note{color:var(--rfp-retry)}
 #rfpRescanModal .rfp-rescan-features .rfp-rescan-stage-row[data-status="danger"] .rfp-rescan-stage-note{color:var(--rfp-error)}
+
+/* Mini trigger and 10-second refresh must use the same status palette. */
+#rfpRescanMiniFill{background:#2363ca}
+#rfpRescanMiniFill[data-status="success"]{background:#087747}
+#rfpRescanCycle.fetching{background:#eaf1fc;border-color:#b8cff0}
+#rfpRescanCycle.fetching>span{color:#2363ca}
+#rfpRescanCycle.error{background:#fff1f0;border-color:#edb9b5}
+#rfpRescanCycle.error>span{color:#b42318}
