@@ -27,7 +27,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v12-provenance-rescan'
+READER_ATTEMPT_VERSION='pdf25-blank-hwpml-psm611-v13-20261116'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
