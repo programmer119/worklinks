@@ -1534,7 +1534,7 @@ def extract(name,raw):
                         image_bytes=archive.read(image_name)
                         try:
                             page_text=_extract_image_with_audit(image_bytes)
-                        except (ValueError,subprocess.TimeoutExpired) as error:
+                        except (ValueError,OSError,subprocess.TimeoutExpired) as error:
                             raise ValueError('hwpx_image_ocr_incomplete') from error
                         if sum(c.isalnum() for c in page_text)<12:
                             raise ValueError('hwpx_image_ocr_incomplete')
