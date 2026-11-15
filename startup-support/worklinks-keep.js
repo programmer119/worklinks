@@ -9,6 +9,117 @@ const jsonPost=(path,data)=>call(path,{method:'POST',body:JSON.stringify(data)})
 const state={user:'',mine:[],members:[],watch:[],watchMember:null,
   watchId:'',mode:'all',shareEnabled:false,shareAlias:'',
   ownLoaded:false,memberLoaded:false,busy:new Set(),watchSerial:0,loading:false};
+const WATCH_SELECTION_PREFIX='worklinks_keep_watch_target_v1:';
+const WATCH_SEEN_PREFIX='worklinks_keep_watch_seen_v1:';
+const WATCH_DESKTOP_PREFIX='worklinks_keep_watch_desktop_v1:';
+const originalPageTitle=document.title;
+let watchRequest=null,watchRequestId='',watchAlertCount=0;
+const watchStorageGet=key=>{try{return localStorage.getItem(key)}catch{return null}};
+const watchStorageSet=(key,value)=>{try{localStorage.setItem(key,value)}catch{}};
+function watchSelectedKey(user){return WATCH_SELECTION_PREFIX+user}
+function watchSeenKey(user,member){return WATCH_SEEN_PREFIX+user+':'+member}
+function storedWatchTarget(user){
+  const target=watchStorageGet(watchSelectedKey(user))||'';
+  return /^[a-zA-Z0-9_-]{8,128}$/.test(target)?target:'';
+}
+function rememberedWatchIds(user,member){
+  try{
+    const record=JSON.parse(watchStorageGet(watchSeenKey(user,member))||'null');
+    return Array.isArray(record?.ids)?new Set(record.ids.filter(x=>typeof x==='string')):null;
+  }catch{return null}
+}
+function rememberWatchIds(user,member,items){
+  watchStorageSet(watchSeenKey(user,member),JSON.stringify({
+    ids:items.map(x=>x.id),updatedAt:Date.now()
+  }));
+}
+function browserAlertEnabled(){
+  return watchStorageGet(WATCH_DESKTOP_PREFIX+state.user)!=='off';
+}
+function updateNotificationButton(){
+  const b=byId('keepNotifyButton');
+  if(!b)return;
+  b.hidden=!state.user||state.mode!=='watch'||!state.watchId;
+  if(b.hidden)return;
+  if(!('Notification' in window)){
+    b.textContent='알림 미지원';b.disabled=true;return;
+  }
+  b.disabled=false;
+  if(Notification.permission==='denied'){
+    b.textContent='🔕 알림 차단됨';
+    b.title='브라우저의 사이트 설정에서 알림을 허용하세요. 앱 안의 알림은 계속 표시됩니다.';
+  }else if(Notification.permission==='granted'){
+    const on=browserAlertEnabled();
+    b.textContent=on?'🔔 알림 켜짐':'🔕 알림 꺼짐';
+    b.title=on?'클릭하면 데스크톱 알림을 끕니다.':'클릭하면 데스크톱 알림을 켭니다.';
+  }else{
+    b.textContent='🔔 알림 켜기';
+    b.title='다른 브라우저 탭을 보고 있어도 새 킵을 데스크톱 알림으로 받습니다.';
+  }
+}
+async function toggleDesktopAlerts(){
+  if(!state.user||!state.watchId||!('Notification' in window))return;
+  if(Notification.permission==='denied'){
+    status('브라우저 사이트 설정에서 알림을 허용해야 합니다. 앱 내 알림은 계속 표시됩니다.',true);
+  }else if(Notification.permission==='granted'){
+    const enabled=!browserAlertEnabled();
+    watchStorageSet(WATCH_DESKTOP_PREFIX+state.user,enabled?'on':'off');
+    status(enabled?'데스크톱 관전 알림을 켰습니다.':'데스크톱 관전 알림을 껐습니다.');
+  }else{
+    const permission=await Notification.requestPermission();
+    if(permission==='granted'){
+      watchStorageSet(WATCH_DESKTOP_PREFIX+state.user,'on');
+      status('데스크톱 알림을 켰습니다. 다른 탭을 보고 있어도 알려드립니다.');
+    }else status('데스크톱 알림은 허용되지 않았습니다. 앱 내 알림은 계속 표시됩니다.',true);
+  }
+  updateNotificationButton();
+}
+function openWatchedList(){
+  if(!currentUser()||!state.watchId)return;
+  state.mode='watch';
+  if(typeof window.setWorkspaceView==='function')window.setWorkspaceView('jobs');
+  render();
+  const toast=byId('worklinksWatchAlert');
+  if(toast)toast.remove();
+  watchAlertCount=0;
+  document.title=originalPageTitle;
+  window.focus();
+}
+function showWatchAdditionAlert(items,member){
+  if(!items.length||!state.watchId||!currentUser())return;
+  const name=String(member?.name||'관전 대상').slice(0,48);
+  watchAlertCount+=items.length;
+  let toast=byId('worklinksWatchAlert');
+  if(!toast){
+    toast=document.createElement('aside');
+    toast.id='worklinksWatchAlert';
+    toast.className='worklinks-watch-alert';
+    toast.setAttribute('role','alert');
+    toast.innerHTML='<div class="worklinks-watch-alert-message"></div>'+
+      '<div class="worklinks-watch-alert-actions">'+
+      '<button type="button" data-watch-open>관전 목록 보기</button>'+
+      '<button type="button" data-watch-dismiss aria-label="알림 닫기">닫기</button></div>';
+    toast.querySelector('[data-watch-open]').addEventListener('click',openWatchedList);
+    toast.querySelector('[data-watch-dismiss]').addEventListener('click',()=>{
+      toast.remove();watchAlertCount=0;document.title=originalPageTitle;
+    });
+    document.body.appendChild(toast);
+  }
+  const last=items[0]?.title||'새 공고';
+  toast.querySelector('.worklinks-watch-alert-message').textContent=
+    '🔔 '+name+'님이 킵 '+watchAlertCount+'건을 추가했습니다.\n'+
+    String(last).slice(0,100)+(watchAlertCount>1?' 외 '+(watchAlertCount-1)+'건':'');
+  document.title='🔔 '+watchAlertCount+'건 · '+originalPageTitle;
+  if('Notification' in window&&Notification.permission==='granted'&&
+      browserAlertEnabled()&&(document.hidden||!document.hasFocus())){
+    try{
+      const notice=new Notification(name+'님이 킵 '+items.length+'건 추가',{
+        body:String(last).slice(0,120),tag:'worklinks-watch-'+state.watchId
+      });
+      notice.onclick=()=>{notice.close();openWatchedList()};
+    }catch{/* Browser/system notification unavailable; keep in-page alert. */}
+  }
+}
 function status(message,isError=false){
   const el=byId('keepStatus');
   if(el){el.textContent=message||'';el.dataset.error=isError?'true':'false';}
@@ -50,6 +161,7 @@ function render(){
   if(document.activeElement!==checkbox)checkbox.checked=state.shareEnabled;
   const alias=byId('keepShareAlias');
   if(document.activeElement!==alias)alias.value=state.shareAlias;
+  updateNotificationButton();
   refreshCards();
 }
 function refreshCards(){
@@ -123,23 +235,60 @@ async function loadMembers(){
     status('관전 대상 조회 실패 · '+String(err.message||err).slice(0,80),true);
   }
 }
-async function loadWatch(id){
-  const serial=++state.watchSerial;
-  state.watchId=id||'';state.watch=[];state.watchMember=null;render();
-  if(!id||!currentUser())return;
-  status('선택한 회원의 킵 목록 확인 중');
-  try{
+// Keep the selected target subscribed regardless of which WorkLinks workspace
+// is visible. Never notify for the initial snapshot; only newly added IDs.
+async function syncWatch(id){
+  const user=currentUser(),serial=state.watchSerial;
+  if(!id||!user||document.documentElement.dataset.worklinksAuthState!=='granted')return false;
+  if(watchRequest&&watchRequestId===id)return watchRequest;
+  const request=(async()=>{
     const result=await call('/worklinks-keep-watch?member='+encodeURIComponent(id));
-    if(serial!==state.watchSerial||state.watchId!==id||!currentUser())return;
-    if(!result?.ok||!result.readOnly||!Array.isArray(result.items))throw Error('watch_invalid_response');
-    state.watch=result.items;state.watchMember=result.member;
-    status('읽기 전용 관전 · '+state.watch.length+'건');
-    render();
-  }catch(err){
-    if(serial!==state.watchSerial)return;
-    state.watch=[];state.watchMember=null;
-    status('관전 불가 · 공유가 해제됐거나 조회에 실패했습니다.',true);render();
+    if(serial!==state.watchSerial||state.watchId!==id||user!==currentUser()||
+       document.documentElement.dataset.worklinksAuthState!=='granted')return false;
+    if(!result?.ok||!result.readOnly||!Array.isArray(result.items))
+      throw Error('watch_invalid_response');
+    const seen=rememberedWatchIds(user,id);
+    const added=seen?result.items.filter(x=>x&&typeof x.id==='string'&&!seen.has(x.id)):[];
+    rememberWatchIds(user,id,result.items);
+    const changed=state.watch.length!==result.items.length||
+      state.watch.some((x,i)=>x.id!==result.items[i]?.id||x.savedAt!==result.items[i]?.savedAt);
+    state.watch=result.items;
+    state.watchMember=result.member;
+    const member=state.members.find(x=>x.id===id);
+    if(member)member.count=result.items.length;
+    if(state.mode==='watch'){
+      status('읽기 전용 관전 · '+state.watch.length+'건');
+      if(changed)render();
+    }
+    if(added.length)showWatchAdditionAlert(added,result.member);
+    return true;
+  })();
+  watchRequest=request;watchRequestId=id;
+  try{return await request}
+  catch(err){
+    if(serial!==state.watchSerial||user!==currentUser()||state.watchId!==id)return false;
+    if(Number(err?.status)===404){
+      state.watchId='';state.watch=[];state.watchMember=null;
+      watchStorageSet(watchSelectedKey(user),'');
+      status('관전 종료 · 대상 회원의 공유가 해제됐습니다.',true);
+      render();
+    }else if(state.mode==='watch'){
+      status('관전 목록 확인 실패 · '+keepFailureReason(err),true);
+    }
+    return false;
+  }finally{
+    if(watchRequest===request){watchRequest=null;watchRequestId='';}
   }
+}
+async function loadWatch(id){
+  const user=currentUser();
+  ++state.watchSerial;
+  state.watchId=id||'';state.watch=[];state.watchMember=null;
+  if(user)watchStorageSet(watchSelectedKey(user),state.watchId);
+  render();
+  if(!id||!user){status('');return}
+  status('선택한 회원의 킵 목록 확인 중');
+  await syncWatch(id);
 }
 async function toggleKeep(id){
   if(!currentUser()||state.busy.has(id))return;
@@ -189,18 +338,25 @@ function accountChanged(){
   if(!next){
     state.user='';state.mine=[];state.watch=[];state.members=[];
     state.watchId='';state.mode='all';state.ownLoaded=false;
-    state.shareEnabled=false;state.shareAlias='';state.watchSerial++;render();return;
+    state.shareEnabled=false;state.shareAlias='';state.watchSerial++;
+    byId('worklinksWatchAlert')?.remove();
+    watchAlertCount=0;document.title=originalPageTitle;
+    render();return;
   }
   if(next===state.user)return;
   state.user=next;state.mode='all';state.mine=[];state.watch=[];
-  state.watchId='';state.members=[];state.watchSerial++;state.ownLoaded=false;
+  state.watchId=storedWatchTarget(next);state.members=[];state.watchSerial++;state.ownLoaded=false;
   state.shareEnabled=false;state.shareAlias='';state.memberLoaded=false;
+  byId('worklinksWatchAlert')?.remove();
+  watchAlertCount=0;document.title=originalPageTitle;
   render();loadMine().catch(()=>{});
+  if(state.watchId)syncWatch(state.watchId).catch(()=>{});
 }
 for(const key of ['all','mine','watch']){
   byId('keepMode'+key[0].toUpperCase()+key.slice(1))?.addEventListener('click',()=>modeChange(key));
 }
 byId('keepMemberSelect')?.addEventListener('change',e=>loadWatch(e.target.value));
+byId('keepNotifyButton')?.addEventListener('click',toggleDesktopAlerts);
 byId('keepSaveShare')?.addEventListener('click',saveSharing);
 document.addEventListener('click',event=>{
   const button=event.target.closest('[data-keep-toggle]');
@@ -213,13 +369,24 @@ window.worklinksKeeps={
   keepButton:id=>state.mode==='watch'?'':keepButton(id),
   getMode:()=>state.mode,
   activeItems:()=>state.mode==='mine'?state.mine:state.mode==='watch'?state.watch:[],
-  refresh:loadMine
+  refresh:loadMine,
+  pollWatch:()=>state.watchId?syncWatch(state.watchId):Promise.resolve(false)
 };
 window.addEventListener('worklinks:partner-access',accountChanged);
 accountChanged();
+// Poll in the background as well as on other WorkLinks workspace tabs.
+// Browsers may throttle hidden tabs; focus/visibility immediately catches up.
 setInterval(()=>{
-  if(!currentUser()||document.hidden||!byId('jobsView')?.classList.contains('on'))return;
-  if(state.mode==='watch')loadMembers().then(()=>{
-    if(state.watchId)loadWatch(state.watchId);
-  }).catch(()=>{});
+  if(!currentUser()||!state.watchId)return;
+  syncWatch(state.watchId).catch(()=>{});
+},10000);
+setInterval(()=>{
+  if(!currentUser()||document.hidden||state.mode!=='watch')return;
+  loadMembers().catch(()=>{});
 },45000);
+window.addEventListener('focus',()=>{
+  if(state.watchId)syncWatch(state.watchId).catch(()=>{});
+});
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&state.watchId)syncWatch(state.watchId).catch(()=>{});
+});
