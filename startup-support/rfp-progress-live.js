@@ -122,6 +122,11 @@
     const hasFailure=Boolean(stalled||errors.length||worker?.status==='retry'||
                               (worker?.stale&&group?.available));
     const failed=Math.max(0,Number(lane?.failed||0));
+    const confirmed=Math.max(0,Number(lane?.errors||0));
+    const processed=Math.max(0,Number(lane?.processed||0));
+    const total=Math.max(0,Number(lane?.total||0));
+    const normal=Math.max(0,Number(lane?.done||0));
+    const detail=Array.isArray(lane?.errorDetails)?lane.errorDetails:[];
     const note=errors[0];
     let caption='현재 전송 파일 없음',description='',
         badge=activeCount?activeCount+'개 전송 중':'진행 확인 중';
@@ -157,6 +162,12 @@
     }else if(worker?.stale){
      caption='서버 전송 상태 갱신 끊김';
      badge='작업 상태 확인 필요';
+    }else if(confirmed>0&&processed===total&&total>0){
+     caption='정상 '+normal+'건 · 오류 '+confirmed+'건 · 전체 '+total+'건';
+     badge='처리 완료';
+    }else if(confirmed>0){
+     caption='정상 '+normal+'건 · 오류 '+confirmed+'건 · 전체 '+total+'건';
+     badge='오류 확정 '+confirmed+'건';
     }else if(failed>0&&errors.length){
      caption='파일 다운로드 오류';
      badge='재시도 '+failed+'건';
@@ -167,6 +178,13 @@
      caption='현재 전송 파일 없음';
      badge=failed>0?'재시도 대상 '+failed+'건':'다음 다운로드 준비 중';
     }
+    if(confirmed>0){
+     const errorLabels=detail.flatMap(item=>(item.files||[]).map(f=>
+       item.noticeKey+' / '+(f.name||'파일명 미제공')+
+       ' / HTTP '+(f.httpStatus||'—')+' / '+formatRfpError(f.reason)));
+     description=[description,'확정 오류 '+confirmed+'건'+
+       (errorLabels.length?' · '+errorLabels.slice(0,2).join(' ; '):'')].filter(Boolean).join(' · ');
+    }
     if(stale&&group?.available){badge='집계 갱신 지연';description='마지막 정상 집계 · '+description;}
     updateRfpText(state,badge);
     updateRfpText(label,caption);
@@ -175,11 +193,15 @@
       Math.max(0,Math.min(100,100*Number(main.bytesDone||0)/Number(main.bytesTotal))):0;
     const width=filePct.toFixed(1)+'%';
     if(fileFill.style.width!==width)fileFill.style.width=width;
-    node.classList.toggle('has-rfp-error',hasFailure||stale);
+    node.classList.toggle('has-rfp-error',hasFailure||stale||confirmed>0);
+    node.classList.toggle('has-rfp-confirmed-error',confirmed>0);
     const tooltipFiles=files.map(x=>(x.name||x.noticeKey||'공식 첨부파일')+' '+fmtBytes(x.bytesDone)+
       (x.bytesTotal>0?'/'+fmtBytes(x.bytesTotal):'')).join('\n');
     const tooltip=[caption,description,tooltipFiles,
-      ...errors.map(x=>'오류: '+formatRfpError(x.reason)+' · '+retryRfpText(x.retryEpoch,now))]
+      ...errors.map(x=>'오류: '+formatRfpError(x.reason)+' · '+retryRfpText(x.retryEpoch,now)),
+      ...detail.flatMap(item=>(item.files||[]).map(f=>
+        '확정 오류 '+item.noticeKey+' · '+(f.name||'파일명 미제공')+' · HTTP '+
+        (f.httpStatus||'—')+' · '+formatRfpError(f.reason)))]
       .filter(Boolean).join('\n');
     if(track.title!==tooltip)track.title=tooltip;
     continue;
@@ -305,15 +327,21 @@
    const available=stage&&Number.isFinite(Number(stage.total));
    const total=available?Math.max(0,Number(stage.total)):0;
    const completed=available?Math.max(0,Math.min(total,Number(stage.done||0))):0;
-   const progress=total?Math.max(0,Math.min(100,100*completed/total)):0;
+   const processed=key==='download'&&available?
+     Math.max(completed,Math.min(total,Number(stage.processed??completed))):completed;
+   const errors=key==='download'&&available?Math.max(0,Number(stage.errors||0)):0;
+   const progress=total?Math.max(0,Math.min(100,100*processed/total)):0;
    const stageActive=Boolean(!delayed&&available&&
     ((key==='download'&&Number(stage.active||0)>0)||
      (key==='scan'&&(Number(stage.active||0)>0||scanWorkerActive))));
    let state=available?(total?progress.toFixed(1)+'%':'해당 없음'):'집계 미제공';
    if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
-   else if(available&&total&&completed===total)state='완료';
+   else if(available&&total&&processed===total)state='처리 완료';
+   else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
    else if(key==='manifest'&&available&&total&&completed<total)state='순차 확보';
-   updateField(panel,key+'Count',available?number(completed)+' / '+number(total)+'건':'—');
+   updateField(panel,key+'Count',available?
+     (key==='download'?'정상 '+number(completed)+' · 오류 '+number(errors)+' · 전체 '+number(total)+'건':
+     number(completed)+' / '+number(total)+'건'):'—');
    updateField(panel,key+'State',state);
    node.classList.toggle('is-active',stageActive);
    const track=node.querySelector('.rfp-rescan-stage-track');
