@@ -31,6 +31,12 @@ candidates=[
     (0,now+dt.timedelta(days=3),'short',{},'verified_download_queue',1,repair.repair_completion_score(one,[short]))]
 chosen,files=repair.choose_repair_batch(candidates,limit=1,max_files=2)
 assert [r[0] for r in chosen]==['short'],chosen
+# A hard HWP/ZIP notice must not repeatedly occupy the first slot while a
+# single-OCR-file notice is ready to become fully verified.
+koica=( -1,now,'koica',{},'verified_download_queue',2,(0,2,9))
+one_pdf=(0,now,'pdf-one-left',{},'verified_download_queue',1,(0,1,2))
+selected,_=repair.choose_repair_batch([koica,one_pdf],limit=1,max_files=2)
+assert selected[0][0]=='pdf-one-left',selected
 # No progress without previously completed pages must NOT cause repeat forever.
 broken={'files':[dict(long,lastReaderAttemptVersion=repair.READER_ATTEMPT_VERSION)]}
 assert repair.reader_retry_files(broken)==broken['files']

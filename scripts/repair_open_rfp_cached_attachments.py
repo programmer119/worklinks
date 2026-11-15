@@ -25,7 +25,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v10-fair-resume'
+READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v11-finish-first'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -131,7 +131,11 @@ def choose_repair_batch(candidates,limit,max_files):
         # item[6]: (additional non-retryable broken files, unfinished files,
         #             estimated OCR pages). The lowest unfinished work first.
         score=item[6] if len(item)>6 else (0,1,0)
-        return (item[0],score[0],score[1],score[2],item[1],item[2])
+        # Finishing a whole notice outranks the reader class of a single
+        # file: 1 remaining PDF should not wait behind a notice with 2+
+        # incomplete HWP/ZIP companions. Within equal completion distance,
+        # preserve the established safer reader-category priority.
+        return (score[0],score[1],item[0],score[2],item[1],item[2])
     for item in sorted(candidates,key=priority):
         _priority,deadline,key,metadata,source,nfiles=item[:6]
         if len(chosen)>=limit or used>=max_files:break
