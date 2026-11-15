@@ -254,6 +254,7 @@ class BulkManifestPlanner:
     def _notice_meta(key,source_items):
         merged=[]
         all_detail=[]
+        excluded_nonpublic=[]
         seen=set()
         general=0;eorder=0
         for source in SOURCES:
@@ -263,6 +264,14 @@ class BulkManifestPlanner:
                 name=str(row.get('name') or '')[:160]
                 url=str(row.get('url') or '')
                 item={'name':name,'url':url,'source':row.get('source')}
+                if source=='eorder':
+                    item['documentCategory']=str(row.get('documentCategory') or '').strip()
+                    # Official "긴급발주사유서" is an internal e-order
+                    # document role, distinct from the current "제안요청정보"
+                    # files. Keep a trace but do not download a stale ref.
+                    if item['documentCategory']=='긴급발주사유서':
+                        excluded_nonpublic.append({**item,'reason':'not_public_proposal_attachment'})
+                        continue
                 if source=='detail' and (name or url):all_detail.append(item)
                 if url and url in seen:continue
                 if url:seen.add(url)
@@ -274,7 +283,8 @@ class BulkManifestPlanner:
             'attachments':{'ok':True,'complete':True,'count':len(merged),
                  'items':merged,'generalCount':general,'eorderCount':eorder,
                  'noticeDetailDocumentCount':len(all_detail),
-                 'sourceCoverage':'all_three_official_paginated_date_sources'},
+                 'sourceCoverage':'all_three_official_paginated_date_sources',
+                 'excludedNonPublicDocuments':excluded_nonpublic},
             'noticeDocuments':{'ok':True,'complete':True,'items':all_detail,
                                'count':len(all_detail),
                                'source':'official_paginated_notice_detail'},
