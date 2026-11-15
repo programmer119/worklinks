@@ -23,7 +23,7 @@
     '<span class="rfp-rescan-live-spacer"></span>'+
     '<span class="rfp-rescan-poll" id="rfpRescanModalRefresh">조회 중…</span></div>'+
    '<div class="rfp-rescan-totals">'+
-    '<div class="rfp-rescan-metric"><span>관리 대상</span><strong data-rfp-field="total">—</strong></div>'+
+    '<div class="rfp-rescan-metric"><span>판독 대상</span><strong data-rfp-field="total">—</strong></div>'+
     '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong data-rfp-field="complete">—</strong></div>'+
     '<div class="rfp-rescan-metric"><span>남은 문서 판독</span><strong data-rfp-field="rescanRequired">—</strong></div></div>'+
    '<div class="rfp-rescan-overview"><span>판독 대상 중 완료</span><strong data-rfp-field="pct">—</strong></div>'+
@@ -31,7 +31,8 @@
    '<div class="rfp-rescan-breakdown"><span>최초 미판독 <b data-rfp-field="unscanned">—</b></span>'+
     '<span>구버전 <b data-rfp-field="legacy">—</b></span>'+
     '<span>실패 <b data-rfp-field="failed">—</b></span>'+
-    '<span>검증 미완료 <b data-rfp-field="incomplete">—</b></span>'+    '<span>판독 제외 <b data-rfp-field="excluded">—</b></span></div>'+
+    '<span>검증 미완료 <b data-rfp-field="incomplete">—</b></span></div>'+ 
+    '<details class="rfp-rescan-excluded-detail"><summary>집계 상세</summary><span>전체 관리 공고 <b data-rfp-field="allNotices">—</b>건 · 판독 제외 <b data-rfp-field="excluded">—</b>건</span></details>'+
    '<div class="rfp-rescan-section-header"><h3>작업 진행</h3>'+
     '<span>첨부목록 확보·원본 다운로드 → 별도 문서 판독</span></div>'+
    '<div class="rfp-rescan-lanes">'+laneKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
@@ -357,7 +358,7 @@
   const scanActive=Math.max(0,Number(lanes?.scan?.active||0));
   const active=!delayed&&(dlNotices>0||dlFiles>0||scanActive>0||scanWorkerActive);
   for(const [name,value] of Object.entries({
-   total:number(all),complete:number(done),rescanRequired:number(Math.max(0,Number(counts.remaining??(eligible-done)))),
+   total:number(eligible),allNotices:number(all),complete:number(done),rescanRequired:number(Math.max(0,Number(counts.remaining??(eligible-done)))),
    excluded:number(excluded),unscanned:number(counts.unscanned),legacy:number(counts.legacy),
    failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
   }))updateField(panel,name,value);
