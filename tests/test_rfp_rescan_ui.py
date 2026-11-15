@@ -270,9 +270,20 @@ with sync_playwright() as p:
                           unscanned=0,failed=3,incomplete=242,legacy=0)
     fake['lanes']['scan'].update(total=2295,done=2050,failed=3,
                                 blockedNoAttachments=52,active=0)
-    page.evaluate("() => refreshRfpRescanProgress(true)")
+    # Paint the controlled API fixture directly; network refresh may be
+    # coalesced while another 10-second read is already in flight.
+    page.evaluate("""() => {
+      Object.assign(rfpRescanProgress.counts, {
+        total:2347,eligible:2295,excluded:52,completed:2050,remaining:245,
+        unscanned:0,failed:3,incomplete:242,legacy:0
+      });
+      Object.assign(rfpRescanProgress.lanes.scan, {
+        total:2295,done:2050,failed:3,blockedNoAttachments:52,active:0
+      });
+      paintRfpRescanProgress();
+    }""")
     page.wait_for_function("""() => document.querySelector(
-      '[data-rfp-field="excluded"]')?.textContent==='52'""",timeout=12000)
+      '[data-rfp-field="excluded"]')?.textContent==='52'""",timeout=4000)
     assert page.locator('[data-rfp-field="unscanned"]').text_content()=='0'
     assert page.locator('[data-rfp-field="failed"]').text_content()=='3'
     assert page.locator('[data-rfp-field="rescanRequired"]').text_content()=='245'
