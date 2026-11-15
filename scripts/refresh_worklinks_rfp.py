@@ -1352,6 +1352,7 @@ def classify_failure(error):
            'legacy_xls_reader_failed','legacy_xls_reader_unavailable',
            'legacy_xls_size_limit','legacy_xls_too_many_sheets',
            'invalid_legacy_xls','hml_xml_parse_failed','hml_xml_truncated',
+           'unrecognized_hwpml_root',
            'hwp_record_fallback_too_large','hwp_record_fallback_invalid_text_record',
            'hwp_record_fallback_invalid_ole','hwp_record_fallback_missing_sections',
            'hwp_record_fallback_timeout','hwp_record_fallback_failed',
@@ -1639,6 +1640,10 @@ def ole_document_kind(name,raw):
 
 
 def detected_source_format(name,raw):
+    # Some genuine G2B .hwpx downloads are HWPML XML files, not ZIP packages.
+    if (str(name).lower().endswith(('.hwp','.hwpx','.hml')) and
+            raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(b'<?xml')):
+        return 'hwpml_xml'
     if raw.startswith(b'%PDF-'):return 'pdf'
     if raw.startswith(_OLE_HEADER):return 'xls' if ole_document_kind(name,raw)=='.xls' else 'hwp'
     if raw.startswith(b'PK\x03\x04'):return 'zip_or_ooxml'
@@ -1804,6 +1809,20 @@ def _extract_dispatch(name,raw):
         n='.pdf'
     elif raw.startswith(_OLE_HEADER):
         n=ole_document_kind(name,raw)
+    elif (n.endswith(('.hwpx','.hwp','.hml')) and
+          raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(b'<?xml')):
+        # HWPML is a standalone XML alternative to ZIP-based HWPX. Verify
+        # its root and reject unrelated/malformed XML instead of assuming
+        # that a .hwpx filename guarantees a ZIP archive.
+        if len(raw)>MAX_FILE:raise ValueError('large_file')
+        try:
+            source_root=ET.fromstring(raw)
+        except ET.ParseError as error:
+            raise ValueError('hml_xml_parse_failed') from error
+        root_name=source_root.tag.rsplit('}',1)[-1].lower()
+        if root_name not in ('hwpml','hml'):
+            raise ValueError('unrecognized_hwpml_root')
+        n='.hml'
     elif raw.startswith(b'PK\x03\x04'):
         # Identify Office XML formats by internal paths. Otherwise this is
         # an ordinary attachment archive, regardless of its .pdf/.hwp name.
