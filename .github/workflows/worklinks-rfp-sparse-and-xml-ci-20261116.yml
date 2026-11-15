@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install reader dependencies
-        run: python3 -m pip install -q pypdf pymupdf pillow
+        run: python3 -m pip install -q 'pypdf<7' pymupdf pillow
       - name: Test real-content-aware parser and sparse OCR fallback
         run: |
           python3 -m py_compile scripts/refresh_worklinks_rfp.py
