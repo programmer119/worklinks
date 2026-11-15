@@ -29,7 +29,7 @@ context={'raw':raw,'document':None,'pdfOpenSeconds':0.0,
 try:
     with patch.dict(os.environ,{'WORKLINKS_RFP_OCR_COLORSPACE':'gray',
                                   'WORKLINKS_RFP_OCR_REGION_PROBE':'1',
-                                  'WORKLINKS_RFP_OCR_REGION_PROBE_SAMPLE':'1'}),\\
+                                  'WORKLINKS_RFP_OCR_REGION_PROBE_SAMPLE':'1'}),\
          patch.object(reader.subprocess,'run',side_effect=outputs) as call:
         reader._DOCUMENT_SCAN.ocr_render_cache=context
         actual=reader._ocr_pdf_page(raw,0)
