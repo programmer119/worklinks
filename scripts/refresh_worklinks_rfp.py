@@ -724,21 +724,34 @@ def official_missing_reference(error):
 
 
 def _ocr_pdf_page(raw,index):
-    """Render one image-only page and OCR with installed local Korean Tesseract."""
+    """OCR a page with one reusable PyMuPDF handle per verified PDF source.
+
+    Cached page receipts are written independently by the calling PDF reader.
+    A standalone call still opens and closes its own handle, preserving the
+    old public helper contract and regression fixtures.
+    """
     if not shutil.which('tesseract'):
         raise ValueError('pdf_ocr_engine_unavailable')
     try:
         import pymupdf
     except ImportError as exc:
         raise ValueError('pdf_ocr_renderer_unavailable') from exc
-    with pymupdf.open(stream=raw,filetype='pdf') as document:
+    context=getattr(_DOCUMENT_SCAN,'ocr_render_cache',None)
+    reusable=isinstance(context,dict) and context.get('raw') is raw
+    document=context.get('document') if reusable else None
+    own_document=not reusable
+    if document is None:
+        started=time.perf_counter()
+        document=pymupdf.open(stream=raw,filetype='pdf')
+        if reusable:
+            context['document']=document
+            context['pdfOpenSeconds']+=time.perf_counter()-started
+    try:
+        start=time.perf_counter()
         page=document.load_page(index)
         zoom=min(PDF_OCR_TARGET_DPI/72.0,
                  (MAX_PDF_OCR_PIXELS/max(1.0,page.rect.width*page.rect.height))**.5)
-        # FitZ rounds each rendered dimension to whole pixels. The analytical
-        # area can be under 12M while the actual pixmap crosses the limit by
-        # a few thousand pixels (observed: 12,001,929 vs 12,000,000).
-        # Retrying a slightly smaller raster preserves OCR coverage.
+        # FitZ rounds each raster dimension. Reduce zoom on real pixel overflow.
         for _ in range(4):
             pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
             actual_pixels=pix.width*pix.height
@@ -748,13 +761,27 @@ def _ocr_pdf_page(raw,index):
         else:
             raise ValueError('pdf_ocr_page_too_large')
         png=pix.tobytes('png')
-    result=subprocess.run(
-        ['tesseract','stdin','stdout','-l','kor+eng','--psm','3',
-         '--dpi',str(max(72,int(72*zoom)))],
-        input=png,capture_output=True,timeout=22,check=False)
-    if result.returncode:
-        raise ValueError('pdf_ocr_engine_failed')
-    return result.stdout.decode('utf-8','replace')
+        if reusable:
+            context['renderSeconds']+=time.perf_counter()-start
+            context['renderPixels']+=actual_pixels
+        # Keep original 300-DPI ceiling and language/PSM settings until a
+        # representative corpus proves a lower resolution retains text.
+        ocr_started=time.perf_counter()
+        try:
+            result=subprocess.run(
+                ['tesseract','stdin','stdout','-l','kor+eng','--psm','3',
+                 '--dpi',str(max(72,int(72*zoom)))],
+                input=png,capture_output=True,timeout=22,check=False)
+        finally:
+            if reusable:
+                context['tesseractSeconds']+=time.perf_counter()-ocr_started
+        if result.returncode:
+            raise ValueError('pdf_ocr_engine_failed')
+        return result.stdout.decode('utf-8','replace')
+    finally:
+        if own_document:
+            document.close()
+
 
 
 def _extract_image_with_audit(raw):
@@ -833,6 +860,16 @@ def _extract_pdf_with_audit(raw):
     parts=[];missing=[];attempted=[];recovered=[];restored=[]
     deferred=[];failed=[];failure_details=[];untouched_blanks=[]
     connection,digest,cached=_pdf_ocr_page_cache(raw)
+    # The reusable PDF handle is lazy: a native-text-only PDF never opens
+    # PyMuPDF. One image-only PDF uses ONE handle across all OCR pages.
+    previous_render_cache=getattr(_DOCUMENT_SCAN,'ocr_render_cache',None)
+    render_cache={'raw':raw,'document':None,'pdfOpenSeconds':0.0,
+                  'renderSeconds':0.0,'tesseractSeconds':0.0,'renderPixels':0}
+    _DOCUMENT_SCAN.ocr_render_cache=render_cache
+    overall_started=time.perf_counter()
+    native_seconds=0.0
+    image_check_seconds=0.0
+    receipt_write_seconds=0.0
     # Share a single pass budget across nested PDFs in the same ZIP.
     # A failed or stalled page can take at most 28 seconds in Tesseract;
     # stop starting new pages with fewer than 32 seconds to spare.
@@ -843,13 +880,24 @@ def _extract_pdf_with_audit(raw):
     budget=float(os.environ.get('WORKLINKS_RFP_OCR_PASS_SECONDS') or PDF_OCR_PASS_SECONDS)
     try:
         for i,page in enumerate(document.pages):
+            # SHA + page-index verified OCR receipts are safe to reuse before
+            # re-parsing PDF object streams. Long documents no longer repeat
+            # native extraction/image inspection on already completed pages.
+            if i in cached:
+                parts.append(cached[i])
+                recovered.append(i+1)
+                restored.append(i+1)
+                continue
+            phase=time.perf_counter()
             try:
                 natural=page.extract_text() or ''
             except Exception:
                 natural=''
+            native_seconds+=time.perf_counter()-phase
             if natural.strip():
                 parts.append(natural)
                 continue
+            phase=time.perf_counter()
             content_stream=page.get_contents()
             if content_stream is None:
                 has_content=False
@@ -858,17 +906,17 @@ def _extract_pdf_with_audit(raw):
                     has_content=bool(content_stream.get_data().strip())
                 except Exception:
                     has_content=True
-            try:
-                has_images=bool(page.images)
-            except Exception:
-                has_images=True
+            # page.images can decode a large image XObject. Nonempty content
+            # already proves the page isn't empty; NEVER inspect its images.
+            has_images=True
+            if not has_content:
+                try:
+                    has_images=bool(page.images)
+                except Exception:
+                    has_images=True
+            image_check_seconds+=time.perf_counter()-phase
             if not has_content and not has_images:
                 untouched_blanks.append(i+1)
-                continue
-            if i in cached:
-                parts.append(cached[i])
-                recovered.append(i+1)
-                restored.append(i+1)
                 continue
             if (len(attempted)>=MAX_PDF_OCR_PAGES or
                     time.monotonic()-started>max(0.0,budget-32.0)):
@@ -897,6 +945,7 @@ def _extract_pdf_with_audit(raw):
             parts.append(value)
             recovered.append(i+1)
             if connection is not None:
+                receipt_started=time.perf_counter()
                 encoded=value.encode('utf-8')
                 connection.execute('''INSERT OR IGNORE INTO rfp_pdf_ocr_page_receipts
                     (pdf_sha256,page_index,reader_version,text,text_sha256,stored_at)
@@ -905,6 +954,7 @@ def _extract_pdf_with_audit(raw):
                      hashlib.sha256(encoded).hexdigest(),
                      dt.datetime.now(dt.timezone.utc).isoformat()))
                 connection.commit()
+                receipt_write_seconds+=time.perf_counter()-receipt_started
         text='\n'.join(parts)
         info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
               'ocrRecoveredPages':len(recovered),'ocrRestoredPages':len(restored),
@@ -912,13 +962,31 @@ def _extract_pdf_with_audit(raw):
               'ocrFailureDetails':failure_details[:30],
               'unresolvedPages':missing[:30],
               'genuinelyBlankPages':len(untouched_blanks),
+              'ocrPdfOpenSeconds':round(render_cache['pdfOpenSeconds'],3),
+              'ocrRenderSeconds':round(render_cache['renderSeconds'],3),
+              'ocrTesseractSeconds':round(render_cache['tesseractSeconds'],3),
+              'ocrNativeTextSeconds':round(native_seconds,3),
+              'ocrImageCheckSeconds':round(image_check_seconds,3),
+              'ocrReceiptWriteSeconds':round(receipt_write_seconds,3),
+              'ocrPdfTotalSeconds':round(time.perf_counter()-overall_started,3),
+              'ocrRenderedPixels':render_cache['renderPixels'],
+              'ocrPdfOpenedOnce':render_cache['document'] is not None,
               'sourceComplete':not missing,
               'extractionMethod':'pdf_native_ocr' if recovered or attempted else 'pdf_native'}
         if not text.strip():
             raise ValueError('pdf_ocr_incomplete' if missing else 'no_searchable_text')
         return text,info
     finally:
-        if connection is not None:connection.close()
+        try:
+            if render_cache['document'] is not None:
+                render_cache['document'].close()
+        finally:
+            if previous_render_cache is None:
+                try:del _DOCUMENT_SCAN.ocr_render_cache
+                except AttributeError:pass
+            else:
+                _DOCUMENT_SCAN.ocr_render_cache=previous_render_cache
+            if connection is not None:connection.close()
 
 
 def extract_with_source_status(name,raw):
@@ -942,6 +1010,13 @@ def extract_with_source_status(name,raw):
                      'ocrRestoredPages':sum(x.get('ocrRestoredPages',0) for x in pdf_stats),
                      'ocrBatchDeferredPages':sum(x.get('ocrBatchDeferredPages',0) for x in pdf_stats),
                      'ocrFailedPages':sum(x.get('ocrFailedPages',0) for x in pdf_stats),
+                     'ocrPdfOpenSeconds':round(sum(x.get('ocrPdfOpenSeconds',0) for x in pdf_stats),3),
+                     'ocrRenderSeconds':round(sum(x.get('ocrRenderSeconds',0) for x in pdf_stats),3),
+                     'ocrTesseractSeconds':round(sum(x.get('ocrTesseractSeconds',0) for x in pdf_stats),3),
+                     'ocrNativeTextSeconds':round(sum(x.get('ocrNativeTextSeconds',0) for x in pdf_stats),3),
+                     'ocrImageCheckSeconds':round(sum(x.get('ocrImageCheckSeconds',0) for x in pdf_stats),3),
+                     'ocrReceiptWriteSeconds':round(sum(x.get('ocrReceiptWriteSeconds',0) for x in pdf_stats),3),
+                     'ocrPdfTotalSeconds':round(sum(x.get('ocrPdfTotalSeconds',0) for x in pdf_stats),3),
                      'pdfSources':pdf_stats[:24],
                      'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
                      'extractionMethod':('hwp_record_fallback' if _DOCUMENT_SCAN.hwp_record_fallback
