@@ -98,6 +98,29 @@ def main():
                 device_scale_factor=1, is_mobile=True, has_touch=True,
             )
             page.on("pageerror", lambda exc: errors.append(str(exc)))
+            # Reproduce a verified member in the browser. WorkLinks now
+            # intentionally hides all workspace views until AuthHub permits access.
+            # The test retains the real gate rather than disabling it.
+            page.add_init_script("""() => {
+                localStorage.setItem('authhub:p47:production:session',
+                    JSON.stringify({accessToken:'mobile-qa-token',refreshToken:'mobile-qa-refresh'}));
+            }""")
+            def auth_route(route):
+                path=urlparse(route.request.url).path
+                if route.request.method=="OPTIONS":
+                    route.fulfill(status=204,headers={"access-control-allow-origin":"*",
+                        "access-control-allow-headers":"authorization, content-type"})
+                    return
+                if path.endswith("/v1/config/p47"):
+                    body={"project":{"slug":"p47"},"environment":"production"}
+                elif path.endswith("/v1/me"):
+                    body={"user":{"id":"mobile-qa-member","email":"qa@example.com"},
+                          "membership":{"status":"active"}}
+                else:
+                    body={"ok":True}
+                route.fulfill(status=200,content_type="application/json",
+                    headers={"access-control-allow-origin":"*"},body=json.dumps(body))
+            page.route("https://api-authhub.suaveforge.com/**",auth_route)
             page.route("**/api/g2b/**", api_route)
             page.goto(base, wait_until="domcontentloaded", timeout=30000)
             page.locator("#supportView.on").wait_for(timeout=15000)
@@ -166,8 +189,10 @@ def main():
             # Partner bid screening is private by default. For the rest of
             # this browser-only regression, simulate a verified membership
             # event; never relax the production authentication guard.
+            # A verified member has partner access; the decision summary itself
+            # stays hidden in the public Jobs view.
             assert page.locator("#jobDecisionSummary").is_hidden()
-            assert not page.evaluate("worklinksPartnerAccess()")
+            assert page.evaluate("worklinksPartnerAccess()")
             page.evaluate("""() => {
                 window.worklinksMemberAuthenticated=true;
                 document.documentElement.dataset.worklinksPartnerAccess='granted';
