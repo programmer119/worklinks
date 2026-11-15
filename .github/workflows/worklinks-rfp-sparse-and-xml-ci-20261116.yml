@@ -1,0 +1,22 @@
+name: WorkLinks sparse OCR and misnamed HWPML regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/refresh_worklinks_rfp.py
+      - tests/test_rfp_sparse_and_misnamed_hwpx_20261116.py
+      - .github/workflows/worklinks-rfp-sparse-and-xml-ci-20261116.yml
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install reader dependencies
+        run: python3 -m pip install -q pypdf pymupdf pillow
+      - name: Test real-content-aware parser and sparse OCR fallback
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py
+          python3 tests/test_rfp_sparse_and_misnamed_hwpx_20261116.py
