@@ -828,7 +828,7 @@ def _extract_pdf_with_audit(raw):
     document=PdfReader(io.BytesIO(raw))
     if len(document.pages)>450:raise ValueError('pdf_over_page_limit')
     parts=[];missing=[];attempted=[];recovered=[];restored=[]
-    deferred=[];failed=[];untouched_blanks=[]
+    deferred=[];failed=[];failure_details=[];untouched_blanks=[]
     connection,digest,cached=_pdf_ocr_page_cache(raw)
     try:
         for i,page in enumerate(document.pages):
@@ -870,13 +870,17 @@ def _extract_pdf_with_audit(raw):
             attempted.append(i+1)
             try:
                 value=_ocr_pdf_page(raw,i)
-            except (ValueError,subprocess.TimeoutExpired):
+            except (ValueError,subprocess.TimeoutExpired) as error:
                 missing.append(i+1)
                 failed.append(i+1)
+                failure_details.append({'page':i+1,
+                    'reason':'ocr_timeout_22s' if isinstance(error,subprocess.TimeoutExpired)
+                    else str(error)[:120]})
                 continue
             if sum(c.isalnum() for c in value)<12:
                 missing.append(i+1)
                 failed.append(i+1)
+                failure_details.append({'page':i+1,'reason':'ocr_text_below_12_alphanumeric'})
                 continue
             parts.append(value)
             recovered.append(i+1)
@@ -893,6 +897,7 @@ def _extract_pdf_with_audit(raw):
         info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
               'ocrRecoveredPages':len(recovered),'ocrRestoredPages':len(restored),
               'ocrBatchDeferredPages':len(deferred),'ocrFailedPages':len(failed),
+              'ocrFailureDetails':failure_details[:30],
               'unresolvedPages':missing[:30],
               'genuinelyBlankPages':len(untouched_blanks),
               'sourceComplete':not missing,
@@ -923,6 +928,7 @@ def extract_with_source_status(name,raw):
                      'ocrRestoredPages':sum(x.get('ocrRestoredPages',0) for x in pdf_stats),
                      'ocrBatchDeferredPages':sum(x.get('ocrBatchDeferredPages',0) for x in pdf_stats),
                      'ocrFailedPages':sum(x.get('ocrFailedPages',0) for x in pdf_stats),
+                     'pdfSources':pdf_stats[:24],
                      'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
                      'extractionMethod':('hwp_record_fallback' if _DOCUMENT_SCAN.hwp_record_fallback
                          else 'hwpx_embedded_image_ocr' if _DOCUMENT_SCAN.hwpx_image_ocr
@@ -1451,7 +1457,7 @@ def extract(name,raw):
                               '.hml','.htm','.html',
                               '.png','.jpg','.jpeg','.bmp','.webp','.tif','.tiff'}:
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
-                    value=extract(Path(inner).name,archive.read(entry))
+                    value=extract(inner,archive.read(entry))
                     if not value.strip():raise ValueError('no_searchable_text')
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix=='.zip':
@@ -1462,7 +1468,7 @@ def extract(name,raw):
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     _DOCUMENT_SCAN.zip_depth=depth+1
                     try:
-                        value=extract(Path(inner).name,archive.read(entry))
+                        value=extract(inner,archive.read(entry))
                     finally:_DOCUMENT_SCAN.zip_depth=depth
                     if not value.strip():raise ValueError('no_searchable_text')
                     parts.append('FILE '+inner+'\n'+value)
@@ -1606,6 +1612,7 @@ def extract(name,raw):
             return native_text
     if n.endswith('.pdf'):
         text,details=_extract_pdf_with_audit(raw)
+        details['sourceFile']=str(name)[:200]
         attached=getattr(_DOCUMENT_SCAN,'pdf',None)
         if attached is not None:attached.append(details)
         return text
