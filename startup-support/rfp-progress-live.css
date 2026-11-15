@@ -43,9 +43,11 @@
  padding:0 9px 5px;color:#23364f;font-size:12.5px;line-height:1.25;
  font-weight:550;text-align:left;white-space:nowrap;
 }
-#rfpRescanModal .rfp-stage-focus-name{display:block;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis}
+#rfpRescanModal .rfp-stage-focus-name{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 46%;overflow:hidden}
+#rfpRescanModal .rfp-download-current-name{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#rfpRescanModal .rfp-download-more-count{flex:none;white-space:nowrap;font-weight:800;color:#243c63}
 #rfpRescanModal .rfp-stage-focus-metric{
- display:block;min-width:0;max-width:65%;flex:0 1 auto;
+ display:block;min-width:0;max-width:51%;flex:0 1 auto;
  overflow:hidden;text-overflow:ellipsis;text-align:right;
  font-variant-numeric:tabular-nums;
 }
