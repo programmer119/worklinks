@@ -267,8 +267,8 @@ def main():
                 firstPassTags:[...document.querySelectorAll('#jobCards .job-basic-signal')]
                     .map(e=>e.textContent.trim()),
                 firstPassCounts:{
-                    checked:Number(document.querySelector('[data-verdict-count="adv-3"]')?.textContent||0),
-                    aligned:Number(document.querySelector('[data-verdict-count="adv-2"]')?.textContent||0)
+                    checked:(parseInt(document.querySelector('[data-verdict-count="adv-3"]')?.textContent,10)||0),
+                    aligned:(parseInt(document.querySelector('[data-verdict-count="adv-2"]')?.textContent,10)||0)
                 }
             })""")
             assert census["indexed"] > 100, census
