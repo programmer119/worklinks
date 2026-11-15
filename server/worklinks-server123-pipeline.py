@@ -399,7 +399,7 @@ def run_once(kind, runner=None, _single=False):
             queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
             published=json.loads((SEEDS/'rfp-coverage-index.json').read_text('utf-8'))
             saved=published.get('byNotice') or {}
-            versions=deployed_rfp_reader_versions()
+            versions=None
             for line in (completed.stdout or '').splitlines():
                 if not line.startswith('RFP_DUAL_SCAN_RESULT '):continue
                 records=json.loads(line.split(' ',1)[1])
@@ -411,6 +411,8 @@ def run_once(kind, runner=None, _single=False):
                         else:
                             ok=bool(record.get('ok'))
                             row=saved.get(key) or {}
+                            if not ok and versions is None:
+                                versions=deployed_rfp_reader_versions()
                             reason='' if ok else scan_failure_diagnosis(row,versions)
                             queue.scan_finished(key,ok,reason,
                                                 scan_evidence_signature(row) if not ok else '')
