@@ -599,9 +599,9 @@ def run_once(kind, runner=None, _single=False):
             # Mark scans finished ONLY after both validated archives are
             # durably published. An interrupted publish is always retryable.
             from rfp_dual_queue import RfpDualQueue, scan_evidence_signature
-            from rfp_management_reconcile import read_evidence
             queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
-            authoritative_versions,authoritative_evidence=read_evidence(DATA)
+            authoritative_versions=None
+            authoritative_evidence=None
             published=json.loads((SEEDS/'rfp-coverage-index.json').read_text('utf-8'))
             saved=published.get('byNotice') or {}
             versions=None
@@ -616,10 +616,16 @@ def run_once(kind, runner=None, _single=False):
                         else:
                             # Current scan checkpoint may already contain a later
                             # verified OCR repair of these exact files.
-                            verified=authoritative_evidence.get(key) or {}
-                            versions=authoritative_versions
-                            ok=bool(record.get('ok')) or rfp_coverage_complete(verified,versions)
-                            row=verified if ok else (saved.get(key) or {})
+                            ok=bool(record.get('ok'))
+                            verified={}
+                            if not ok:
+                                if authoritative_evidence is None:
+                                    from rfp_management_reconcile import read_evidence
+                                    authoritative_versions,authoritative_evidence=read_evidence(DATA)
+                                verified=authoritative_evidence.get(key) or {}
+                                versions=authoritative_versions
+                                ok=rfp_coverage_complete(verified,versions)
+                            row=verified if ok and verified else (saved.get(key) or {})
                             if not ok and versions is None:
                                 versions=deployed_rfp_reader_versions()
                             reason='' if ok else scan_failure_diagnosis(row,versions)
