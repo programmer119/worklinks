@@ -1,0 +1,37 @@
+name: WorkLinks PDF and HWPX OCR defect regression 20261115
+on:
+  push:
+    branches:
+      - fix/rfp-pdf-blank-pixel-and-hwpx-bmp-ocr-20261115
+    paths:
+      - scripts/refresh_worklinks_rfp.py
+      - scripts/repair_open_rfp_cached_attachments.py
+      - server/worklinks-server123-pipeline.py
+      - tests/test_rfp_pdf_blank_and_hwpx_image_ocr_20261115.py
+      - .github/workflows/worklinks-rfp-pdf-hwpx-ocr-fix-20261115.yml
+  pull_request:
+    paths:
+      - scripts/refresh_worklinks_rfp.py
+      - tests/test_rfp_pdf_blank_and_hwpx_image_ocr_20261115.py
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test OCR fixes without external government requests
+        run: |
+          python3 -m pip install --quiet pypdf pymupdf Pillow
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/repair_open_rfp_cached_attachments.py server/worklinks-server123-pipeline.py
+          python3 tests/test_rfp_pdf_blank_and_hwpx_image_ocr_20261115.py
+          python3 tests/test_rfp_pdf_ocr_and_missing_ref.py
+          python3 tests/test_rfp_magic.py
+          python3 tests/test_rfp_hwp_records_fallback_20261115.py
+          python3 tests/test_rfp_long_document_coverage_20261115.py
+          python3 tests/test_rfp_repair_error_provenance_20261115.py
+          python3 tests/test_rfp_verified_file_handoff.py
+          python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
+          python3 tests/test_open_cached_rfp_repair.py
+          echo RFP_PDF_AND_HWPX_OCR_SOURCE_REGRESSION=PASS
