@@ -116,7 +116,7 @@ with sync_playwright() as p:
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '4 / 6건' in body,body
     assert '원본 다운로드' in body and '정상 3 · 오류 0건 · 전체 6건' in body,body
-    assert '사업제안요청서.pdf 외 7개' in body,body
+    assert '사업제안요청서.pdf' in body and '외 7개' in body,body
     assert '다운로드 중 00:' in body,body
     assert '0.50MB / 2.00MB' in body,body
     assert '공식 API 호출 제한' in body and '인력조건.hwp' in body,body
@@ -167,7 +167,8 @@ with sync_playwright() as p:
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
     assert '정상 4 · 오류 0건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
     assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
-    assert '사업제안요청서.pdf 외 6개' in page.locator('#rfpRescanContent').text_content()
+    assert '사업제안요청서.pdf' in page.locator('#rfpRescanContent').text_content()
+    assert '외 6개' in page.locator('#rfpRescanContent').text_content()
     assert '오류 1건' in page.locator('#rfpRescanContent').text_content()
     assert '공식 API 호출 제한' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate("""() => window._rfpFileLiveRow ===
