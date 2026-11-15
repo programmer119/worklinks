@@ -1469,7 +1469,12 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
              if summary['eligible'] else None)
     rescan_percent=(round(100.0*summary['rescanRequired']/summary['eligible'],1)
                     if summary['eligible'] else None)
-    report={'ok':True,'schemaVersion':1,'scope':'actionable_saved_sw_bid_notices_24h',
+    report={'ok':True,'schemaVersion':1,
+            # Stable v1 scope token keeps already-open 10-second polling tabs
+            # working across the 24-hour management-cohort release.
+            'scope':'unexpired_saved_sw_bid_notices',
+            'managementScope':'actionable_saved_sw_bid_notices_24h',
+            'minimumHoursToDeadline':24,
             'asOf':now.isoformat(),'latest':latest,'counts':summary,
             'ocrRescan':{'readerVersion':str(latest.get('ocrReaderVersion') or ''),
                          'targetNotices':ocr_rescan_notices,'targetFiles':ocr_rescan_files},
