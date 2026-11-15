@@ -43,5 +43,5 @@ document.getElementById('city').addEventListener('change',e=>{ui.city=e.target.v
 document.getElementById('activeOnly').addEventListener('change',e=>{ui.activeOnly=e.target.checked;render()});
 fetch('./spaces-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{rows=data.items;document.getElementById('sourceInfo').textContent='확인일: '+data.asOf+' · '+data.criteria+' · 상세 출처: 각 카드의 공식 링크';const p=new URLSearchParams(location.search);const area=p.get('region');if(['서울','서울 외','전국'].includes(area))ui.region=area;const type=p.get('type');if(cats.includes(type))ui.type=type;render()}).catch(err=>{document.getElementById('count').textContent='목록을 불러오지 못했습니다.';document.getElementById('content').innerHTML='<div class="blank">네트워크 연결 후 새로고침해 주세요. ('+esc(err.message)+')</div>'});
 })();
-</script><script type="module" src="./worklinks-header-auth.js?v=20261112-2"></script>
+</script><script type="module" src="./worklinks-header-auth.js?v=20261115-direct-relogin-v1"></script>
 </body></html>
