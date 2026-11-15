@@ -1017,6 +1017,10 @@ def extract_with_source_status(name,raw):
     prior_hwp=getattr(_DOCUMENT_SCAN,'hwp_record_fallback',None)
     prior_hwpx_image=getattr(_DOCUMENT_SCAN,'hwpx_image_ocr',None)
     previous_ocr_start=getattr(_DOCUMENT_SCAN,'ocr_started_at',None)
+    previous_format_times=getattr(_DOCUMENT_SCAN,'format_times',None)
+    previous_extract_stack=getattr(_DOCUMENT_SCAN,'extract_stack',None)
+    _DOCUMENT_SCAN.format_times={}
+    _DOCUMENT_SCAN.extract_stack=[]
     _DOCUMENT_SCAN.hwp_record_fallback=False
     _DOCUMENT_SCAN.hwpx_image_ocr=False
     _DOCUMENT_SCAN.ocr_started_at=time.monotonic()
@@ -1038,6 +1042,9 @@ def extract_with_source_status(name,raw):
                      'ocrImageCheckSeconds':round(sum(x.get('ocrImageCheckSeconds',0) for x in pdf_stats),3),
                      'ocrReceiptWriteSeconds':round(sum(x.get('ocrReceiptWriteSeconds',0) for x in pdf_stats),3),
                      'ocrPdfTotalSeconds':round(sum(x.get('ocrPdfTotalSeconds',0) for x in pdf_stats),3),
+                     'extractFormatTimes':{k:{'calls':v['calls'],
+                         'exclusiveSeconds':round(v['exclusiveSeconds'],3)}
+                         for k,v in _DOCUMENT_SCAN.format_times.items()},
                      'pdfSources':pdf_stats[:24],
                      'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
                      'extractionMethod':('hwp_record_fallback' if _DOCUMENT_SCAN.hwp_record_fallback
@@ -1062,6 +1069,14 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.ocr_started_at
             except AttributeError:pass
         else:_DOCUMENT_SCAN.ocr_started_at=previous_ocr_start
+        if previous_format_times is None:
+            try:del _DOCUMENT_SCAN.format_times
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.format_times=previous_format_times
+        if previous_extract_stack is None:
+            try:del _DOCUMENT_SCAN.extract_stack
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.extract_stack=previous_extract_stack
 
 
 def classify_failure(error):
@@ -1521,7 +1536,7 @@ def extract_markup_document(name,raw):
     return html.unescape(''.join(parser.parts))
 
 
-def extract(name,raw):
+def _extract_dispatch(name,raw):
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
     n=name.lower()
@@ -1731,6 +1746,43 @@ def extract(name,raw):
         if attached is not None:attached.append(details)
         return text
     raise ValueError('unsupported_format')
+
+
+def extract(name,raw):
+    """Trace EXCLUSIVE parsing time per source type, including nested archives.
+
+    All recursive calls pass through here. The outer ZIP's elapsed time does
+    not get charged twice: child elapsed time is subtracted from its parent.
+    Profiling is active only inside extract_with_source_status, never for
+    the downloader or ordinary direct helpers.
+    """
+    profile=getattr(_DOCUMENT_SCAN,'format_times',None)
+    if profile is None:
+        return _extract_dispatch(name,raw)
+    stack=getattr(_DOCUMENT_SCAN,'extract_stack',None)
+    if stack is None:
+        stack=[]
+        _DOCUMENT_SCAN.extract_stack=stack
+    suffix=Path(str(name)).suffix.lower().lstrip('.') or 'unknown'
+    if raw.startswith(b'%PDF-'):
+        suffix='pdf'
+    elif raw.startswith(_OLE_HEADER) and suffix not in ('hwp','xls'):
+        suffix='ole'
+    started=time.perf_counter()
+    frame={'child':0.0}
+    stack.append(frame)
+    try:
+        return _extract_dispatch(name,raw)
+    finally:
+        total=time.perf_counter()-started
+        stack.pop()
+        if stack:
+            stack[-1]['child']+=total
+        item=profile.setdefault(suffix,{'calls':0,'exclusiveSeconds':0.0})
+        item['calls']+=1
+        item['exclusiveSeconds']+=max(0.0,total-frame['child'])
+
+
 # Full-document evidence is retained up to 1M characters; beyond that it
 # remains incomplete instead of silently declaring a truncated scan valid.
 RFP_QUALIFICATION_TEXT_LIMIT=1_000_000
