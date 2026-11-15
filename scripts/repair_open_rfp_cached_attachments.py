@@ -88,6 +88,13 @@ def repair_file_priority(f):
     """Prioritize reader-fixable, already downloaded files over repeated HWP failures."""
     category=str(f.get('errorCategory') or '')
     suffix=Path(str(f.get('name') or '')).suffix.lower()
+    # Image-only HWPX members in two verified nine-document ZIP notices used
+    # to make the entire archive no_searchable_text. Reader v7 recognizes
+    # BinData/BMP OCR: recheck these saved ZIPs promptly, without any GET.
+    if category=='no_searchable_text' and suffix=='.zip':
+        return -3
+    if category=='hwpx_image_ocr_deferred_to_repair':
+        return -3
     # Reader v6 solves a verified pyhwp ColumnSet failure by decoding every
     # native HWP5 text record. Retry these proven new-reader fixes before OCR.
     if category=='hwp5txt_failed':

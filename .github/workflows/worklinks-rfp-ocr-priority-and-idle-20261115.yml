@@ -1,7 +1,7 @@
 name: WorkLinks OCR priority and retry-idle drain
 on:
   push:
-    branches: [fix/rfp-hwp-repair-priority-20261115, fix/rfp-ocr-repair-priority-and-idle-drain-20261115, main]
+    branches: [fix/rfp-prioritize-scanned-hwpx-zip-20261115, fix/rfp-hwp-repair-priority-20261115, fix/rfp-ocr-repair-priority-and-idle-drain-20261115, main]
     paths:
       - server/worklinks-server123-pipeline.py
       - scripts/repair_open_rfp_cached_attachments.py
