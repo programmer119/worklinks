@@ -86,3 +86,10 @@
  #rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row+.rfp-rescan-stage-row{padding-top:6px}
  #rfpRescanModal .rfp-rescan-features{margin-top:5px}
 }
+
+#rfpRescanModal .rfp-download-error-count{appearance:none;background:transparent;border:0;padding:0 1px;color:#b42318;font:inherit;font-weight:800;cursor:pointer}
+#rfpRescanModal .rfp-download-error-count:disabled{color:#64748b;cursor:default}
+#rfpRescanModal .rfp-download-error-count:not(:disabled):hover{text-decoration:underline}
+#rfpRescanModal .rfp-download-error-details{margin-top:5px;padding:10px 12px;border:1px solid #e7b2ae;border-radius:7px;background:#fff7f7;color:#842029;font-size:12.5px;line-height:1.6;overflow-wrap:anywhere}
+#rfpRescanModal .rfp-download-error-details[hidden]{display:none}
+#rfpRescanModal .rfp-download-error-details>strong{display:block;margin-bottom:3px}
