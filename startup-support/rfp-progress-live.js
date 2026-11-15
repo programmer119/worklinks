@@ -25,7 +25,7 @@
    '<div class="rfp-rescan-totals">'+
     '<div class="rfp-rescan-metric"><span>관리 대상</span><strong data-rfp-field="total">—</strong></div>'+
     '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong data-rfp-field="complete">—</strong></div>'+
-    '<div class="rfp-rescan-metric"><span>판독 미완료</span><strong data-rfp-field="rescanRequired">—</strong></div></div>'+
+    '<div class="rfp-rescan-metric"><span>남은 문서 판독</span><strong data-rfp-field="rescanRequired">—</strong></div></div>'+
    '<div class="rfp-rescan-overview"><span>전체 판독 완료</span><strong data-rfp-field="pct">—</strong></div>'+
    '<div class="rfp-rescan-big-track" role="progressbar" aria-label="전체 최신 판독 완료" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span style="width:0%"></span></div>'+
    '<div class="rfp-rescan-breakdown"><span>최초 미판독 <b data-rfp-field="unscanned">—</b></span>'+
@@ -131,6 +131,16 @@
    const state=node.querySelector('[data-rfp-field="'+key+'State"]');
    const lane=info?.lanes?.[key];
    const worker=activity?.workers?.[key];
+   // A verified manifest is complete even if its original download is pending.
+   if(key==='manifest'&&Number(lane?.total)>0&&Number(lane?.done)>=Number(lane.total)){
+    updateRfpText(state,'확보 완료');
+    updateRfpText(label,'첨부목록 전부 확보 · 원본 다운로드는 별도 진행');
+    updateRfpText(metric,'');
+    fileFill.style.width='0%';
+    node.classList.remove('has-rfp-error','has-rfp-confirmed-error');
+    track.title='첨부목록 확보 100% · 다운로드·판독 작업과 별도';
+    continue;
+   }
    // Exact physical file transfers from the server, not the eight notice slots.
    if(key==='download'){
     const group=activity?.downloadGroup;
@@ -278,8 +288,10 @@
     name='서버 작업 기록 갱신 끊김';
    }else if(!activity?.available){
     name='실시간 파일 정보 연결 확인 필요';
+   }else if(key==='manifest'&&Number(lane?.total)>0){
+    name='첨부목록 미확보 '+number(Math.max(0,Number(lane.total)-Number(lane.done||0)))+'건 · 공식 목록 재확인 필요';
    }else if(active>0){
-    name='진행 중 · 파일별 정보 갱신 확인 필요';
+    name='진행 상태 확인 필요 · 세부 작업 정보 미제공';
    }
    if(key==='scan'&&Number(lane?.blockedNoAttachments||0)>0)
     bits.push('공식 첨부파일 없음 '+Number(lane.blockedNoAttachments)+'건');
@@ -334,7 +346,7 @@
   const scanActive=Math.max(0,Number(lanes?.scan?.active||0));
   const active=!delayed&&(dlNotices>0||dlFiles>0||scanActive>0||scanWorkerActive);
   for(const [name,value] of Object.entries({
-   total:number(all),complete:number(done),rescanRequired:number(counts.remaining),
+   total:number(all),complete:number(done),rescanRequired:number(Math.max(0,all-done)),
    unscanned:number(counts.unscanned),legacy:number(counts.legacy),
    failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
   }))updateField(panel,name,value);
@@ -369,7 +381,8 @@
     ((key==='download'&&Number(stage.active||0)>0)||
      (key==='scan'&&(Number(stage.active||0)>0||scanWorkerActive))));
    let state=available?(total?progress.toFixed(1)+'%':'해당 없음'):'집계 미제공';
-   if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
+   if(key==='manifest'&&available&&total&&completed===total)state='확보 완료';
+   else if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
    else if(available&&total&&processed===total)state='처리 완료';
    else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
    else if(key==='scan'&&available&&Number(stage.blockedNoAttachments||0)>0)
