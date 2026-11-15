@@ -160,6 +160,7 @@
     const processed=Math.max(0,Number(lane?.processed||0));
     const total=Math.max(0,Number(lane?.total||0));
     const normal=Math.max(0,Number(lane?.done||0));
+    const verifiedComplete=total>0&&normal===total&&confirmed===0;
     const detail=Array.isArray(lane?.errorDetails)?lane.errorDetails:[];
     const note=errors[0];
     let caption='현재 전송 파일 없음',description='',
@@ -208,6 +209,14 @@
      caption='현재 전송 파일 없음';
      badge=failed>0?'재시도 대상 '+failed+'건':'다음 다운로드 준비 중';
     }
+    // Confirmed failures outrank scheduled retries, regardless of whether
+    // the worker is currently online. Only 100% successful work can say complete.
+    if(confirmed>0)badge='원본 오류 '+confirmed+'건';
+    if(verifiedComplete){
+     caption='모든 원본 정상 다운로드 완료';
+     badge='정상 완료';
+     description='';
+    }
     if(stale&&group?.available)badge='집계 갱신 지연';
     updateRfpText(state,badge);
     if(main){
@@ -238,7 +247,7 @@
       Math.max(0,Math.min(100,100*Number(main.bytesDone||0)/Number(main.bytesTotal))):0;
     const width=filePct.toFixed(1)+'%';
     if(fileFill.style.width!==width)fileFill.style.width=width;
-    node.classList.toggle('has-rfp-error',(!main&&hasFailure)||stale);
+    node.classList.toggle('has-rfp-error',!verifiedComplete&&((!main&&hasFailure)||stale));
     node.classList.remove('has-rfp-confirmed-error');
     const tooltipFiles=files.map(x=>(x.name||x.noticeKey||'공식 첨부파일')+' '+fmtBytes(x.bytesDone)+
       (x.bytesTotal>0?'/'+fmtBytes(x.bytesTotal):'')).join('\n');
@@ -441,8 +450,8 @@
     (key==='download'&&errors>0)?'danger':
     blocked?'warning':
     stageActive?'active':
-    retry?'warning':
-    available&&total>0&&completed===total?'success':'neutral';
+    available&&total>0&&completed===total?'success':
+    retry?'warning':'neutral';
    node.dataset.status=status;
   }
   const unknownTotal=Math.max(0,Number(counts.unknownDeadline||0));
