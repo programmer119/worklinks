@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 root=Path(__file__).resolve().parents[1]
 url='http://127.0.0.1:18766/startup-support/index.html?view=jobs'
 fake={
-    'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
+    'ok':True,'schemaVersion':1,'scope':'actionable_saved_sw_bid_notices_24h',
     'asOf':'2026-11-14T12:00:00+09:00',
     'remainingPercent':83.3,'rescanPercent':33.3,
     'counts':{'total':6,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
@@ -17,7 +17,7 @@ fake={
               'roles':{'total':6,'done':2,'remaining':4},
               'facts':{'total':6,'done':2,'remaining':4},
               'hwpx':{'total':2,'done':1,'remaining':1}},
-    'lanes':{'available':True,'scope':'unexpired_saved_sw_bid_notices','manifest':{'total':6,'done':4},
+    'lanes':{'available':True,'scope':'actionable_saved_sw_bid_notices_24h','manifest':{'total':6,'done':4},
              'download':{'total':6,'done':3,'processed':3,'errors':0,'active':2,'failed':2},
              'scan':{'total':6,'done':1,'active':4,'failed':0,'blockedNoAttachments':1,'notQueued':0}},
     'activity':{'available':True,
