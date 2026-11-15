@@ -943,6 +943,25 @@ def _pdf_ocr_page_cache(raw):
         raise
 
 
+def _pdf_native_text_objects_present(raw,index,cache):
+    """Fast MuPDF display-list test; fail closed to pypdf on any uncertainty.
+
+    A rendered scan with no PDF text drawing operators needs OCR, not a
+    potentially costly pypdf text parser. Visible, stroked and invisible
+    native PDF text still follows the original pypdf extraction path.
+    One MuPDF document is reused for rendering the subsequent OCR pages.
+    """
+    import pymupdf
+    document=cache.get('document')
+    if document is None:
+        opened=time.perf_counter()
+        document=pymupdf.open(stream=raw,filetype='pdf')
+        cache['document']=document
+        cache['pdfOpenSeconds']+=time.perf_counter()-opened
+    page=document.load_page(index)
+    return any(str(entry[0]).endswith('text') for entry in page.get_bboxlog())
+
+
 def _extract_pdf_with_audit(raw):
     """OCR at most 24 NEW pages per pass; resume from SHA-verified page cache.
 
@@ -966,6 +985,10 @@ def _extract_pdf_with_audit(raw):
     native_seconds=0.0
     image_check_seconds=0.0
     receipt_write_seconds=0.0
+    fast_native_probe_seconds=0.0
+    fast_native_probe_pages=0
+    fast_native_skip_pages=0
+    fast_native_fallbacks=0
     # Share a single pass budget across nested PDFs in the same ZIP.
     # A failed or stalled page can take at most 28 seconds in Tesseract;
     # stop starting new pages with fewer than 32 seconds to spare.
@@ -984,12 +1007,31 @@ def _extract_pdf_with_audit(raw):
                 recovered.append(i+1)
                 restored.append(i+1)
                 continue
-            phase=time.perf_counter()
-            try:
-                natural=page.extract_text() or ''
-            except Exception:
-                natural=''
-            native_seconds+=time.perf_counter()-phase
+            # Pure scanned pages can spend seconds in pypdf.extract_text()
+            # despite having no PDF text object. Check the MuPDF display-list
+            # first; skip pypdf only when native text is provably absent.
+            should_parse_native=True
+            if os.environ.get('WORKLINKS_RFP_FAST_SKIP_PYPDF_NATIVE')=='1':
+                probe_started=time.perf_counter()
+                try:
+                    should_parse_native=_pdf_native_text_objects_present(
+                        raw,i,render_cache)
+                    fast_native_probe_pages+=1
+                    if not should_parse_native:fast_native_skip_pages+=1
+                except Exception:
+                    # Ambiguous/malformed source: preserve the old reader.
+                    fast_native_fallbacks+=1
+                    should_parse_native=True
+                finally:
+                    fast_native_probe_seconds+=time.perf_counter()-probe_started
+            natural=''
+            if should_parse_native:
+                phase=time.perf_counter()
+                try:
+                    natural=page.extract_text() or ''
+                except Exception:
+                    natural=''
+                native_seconds+=time.perf_counter()-phase
             if natural.strip():
                 parts.append(natural)
                 continue
@@ -1062,6 +1104,10 @@ def _extract_pdf_with_audit(raw):
               'ocrRenderSeconds':round(render_cache['renderSeconds'],3),
               'ocrTesseractSeconds':round(render_cache['tesseractSeconds'],3),
               'ocrNativeTextSeconds':round(native_seconds,3),
+              'ocrNativeFastProbeSeconds':round(fast_native_probe_seconds,3),
+              'ocrNativeFastProbePages':fast_native_probe_pages,
+              'ocrNativeFastSkippedPages':fast_native_skip_pages,
+              'ocrNativeFastFallbacks':fast_native_fallbacks,
               'ocrImageCheckSeconds':round(image_check_seconds,3),
               'ocrReceiptWriteSeconds':round(receipt_write_seconds,3),
               'ocrPdfTotalSeconds':round(time.perf_counter()-overall_started,3),
@@ -1117,6 +1163,10 @@ def extract_with_source_status(name,raw):
                      'ocrRenderSeconds':round(sum(x.get('ocrRenderSeconds',0) for x in pdf_stats),3),
                      'ocrTesseractSeconds':round(sum(x.get('ocrTesseractSeconds',0) for x in pdf_stats),3),
                      'ocrNativeTextSeconds':round(sum(x.get('ocrNativeTextSeconds',0) for x in pdf_stats),3),
+                     'ocrNativeFastProbeSeconds':round(sum(x.get('ocrNativeFastProbeSeconds',0) for x in pdf_stats),3),
+                     'ocrNativeFastProbePages':sum(x.get('ocrNativeFastProbePages',0) for x in pdf_stats),
+                     'ocrNativeFastSkippedPages':sum(x.get('ocrNativeFastSkippedPages',0) for x in pdf_stats),
+                     'ocrNativeFastFallbacks':sum(x.get('ocrNativeFastFallbacks',0) for x in pdf_stats),
                      'ocrImageCheckSeconds':round(sum(x.get('ocrImageCheckSeconds',0) for x in pdf_stats),3),
                      'ocrReceiptWriteSeconds':round(sum(x.get('ocrReceiptWriteSeconds',0) for x in pdf_stats),3),
                      'ocrPdfTotalSeconds':round(sum(x.get('ocrPdfTotalSeconds',0) for x in pdf_stats),3),
