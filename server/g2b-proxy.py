@@ -1417,13 +1417,29 @@ def rfp_dual_lane_progress(path):
             # file list is complete. Read only: no procurement requests.
             manifest_done=db.execute('''SELECT COUNT(*) FROM rfp_bulk_manifests m
                 JOIN rfp_dual_notices n ON n.notice_key=m.notice_key''').fetchone()[0]
+            confirmed=db.execute('''SELECT notice_key,metadata_json FROM rfp_dual_notices
+                WHERE download_status='error_confirmed'
+                ORDER BY updated_at DESC LIMIT 25''').fetchall()
     except (sqlite3.Error,OSError):
         return {'available':False}
     total=sum(n for _,_,n in rows)
+    successful=sum(n for a,_,n in rows if a in ('ready','no_attachments'))
+    errors=sum(n for a,_,n in rows if a=='error_confirmed')
+    error_details=[]
+    for key,raw in confirmed:
+        try:doc=json.loads(raw)
+        except (ValueError,TypeError):doc={}
+        files=doc.get('downloadErrorFiles') or []
+        error_details.append({'noticeKey':key,
+            'files':[{'name':str(f.get('name') or '')[:180],
+                      'reason':str(f.get('reason') or '')[:120],
+                      'httpStatus':f.get('httpStatus')}
+                     for f in files if isinstance(f,dict)][:24]})
     return {'available':True,
             'manifest':{'total':total,'done':min(manifest_done,total)},
             'download':{'total':total,
-                'done':sum(n for a,_,n in rows if a in ('ready','no_attachments')),
+                'done':successful,'processed':successful+errors,
+                'errors':errors,'errorDetails':error_details,
                 'skipped':sum(n for a,_,n in rows if a=='no_attachments'),
                 'active':sum(n for a,_,n in rows if a=='fetching'),
                 'failed':sum(n for a,_,n in rows if a=='retry')},
