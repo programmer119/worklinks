@@ -1015,6 +1015,48 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 }
 
 
+
+/* Member-owned kept jobs and read-only spectator panel. */
+#keepToolbar[hidden],#keepListPanel[hidden]{display:none!important}
+.keep-toolbar{margin:9px 0 10px;padding:10px 12px;border:1px solid #d9e2ed;background:#fff;border-radius:12px}
+.keep-toolbar-main{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.keep-toolbar-main>button{border:1px solid #d2dce8;border-radius:9px;background:#fff;color:#27405c;padding:8px 13px;min-height:38px;font-size:15px;font-weight:800;cursor:pointer}
+.keep-toolbar-main>button.on{background:#173e6c;border-color:#173e6c;color:#fff}
+.keep-toolbar-main>button:focus-visible,.job-keep-button:focus-visible,.keep-job-link:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+.keep-toolbar-main label{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800}
+#keepMemberSelect{min-width:160px;max-width:300px;min-height:38px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}
+.keep-share-details{margin-left:auto;position:relative}
+.keep-share-details>summary{list-style:none;cursor:pointer;border:1px solid #cbd5e1;border-radius:9px;padding:8px 12px;min-height:38px;font-weight:800;font-size:14px;color:#334155}
+.keep-share-details>summary::-webkit-details-marker{display:none}
+.keep-share-options{position:absolute;z-index:48;right:0;top:calc(100% + 7px);width:min(330px,90vw);padding:15px;border-radius:11px;border:1px solid #cbd5e1;background:#fff;box-shadow:0 10px 26px #172e4a26;display:grid;gap:10px}
+.keep-share-options label{display:flex;align-items:center;gap:8px;font-size:14px;color:#334155}
+.keep-share-options input[type=text]{min-width:0;min-height:38px;padding:7px 10px;font-size:15px;border:1px solid #cbd5e1;border-radius:8px}
+.keep-share-options input[type=checkbox]{width:19px;height:19px;accent-color:#173e6c}
+.keep-share-options button{min-height:38px;border:0;border-radius:8px;background:#173e6c;color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+.keep-share-options small{font-size:13px;line-height:1.45;color:#64748b}
+.keep-status{min-height:0;margin:5px 2px 0;font-size:13px;color:#52667e}
+.keep-status:empty{display:none}
+.keep-status[data-error=true]{color:#b42318}
+#keepListPanel{margin:8px 0}
+#keepListHeading{font-size:17px;margin:10px 0;font-weight:850;color:#172e4a}
+#keepListCards.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.keep-job-card{padding:15px;display:flex;gap:12px;justify-content:space-between;align-items:flex-start;min-width:0;border:1px solid #dfe6f0;border-radius:12px}
+.keep-job-main{min-width:0;display:grid;gap:8px}
+.keep-job-title{font-size:16px;font-weight:850;line-height:1.45;color:#15345c;overflow-wrap:anywhere}
+.keep-job-meta{font-size:14px;color:#475569;line-height:1.45}
+.keep-job-amount{font-size:15px;font-weight:800;color:#263b54}
+.keep-job-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:7px;min-width:92px}
+.job-keep-button{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#475569;padding:7px 10px;font-size:14px;font-weight:800;min-height:34px;cursor:pointer;white-space:nowrap}
+.job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
+.keep-job-link{color:#174b80;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap}
+.keep-empty{padding:24px 12px;border:1px dashed #cad5e4;border-radius:12px;color:#64748b;font-size:15px;text-align:center;grid-column:1/-1}
+#jobsView[data-keep-mode=mine] #jobCards,#jobsView[data-keep-mode=watch] #jobCards,
+#jobsView[data-keep-mode=mine] #g2bMore,#jobsView[data-keep-mode=watch] #g2bMore,
+#jobsView[data-keep-mode=mine] .job-quick-search,#jobsView[data-keep-mode=watch] .job-quick-search,
+#jobsView[data-keep-mode=mine] #generalJobFilters,#jobsView[data-keep-mode=watch] #generalJobFilters,
+#jobsView[data-keep-mode=mine] #changcomJobFilters,#jobsView[data-keep-mode=watch] #changcomJobFilters,
+#jobsView[data-keep-mode=mine] #jobVerdictFilter,#jobsView[data-keep-mode=watch] #jobVerdictFilter{display:none!important}
+@media(max-width:700px){#keepListCards.cards{grid-template-columns:1fr}.keep-share-details{margin-left:0}.keep-toolbar-main{gap:6px}.keep-toolbar-main>button{font-size:14px;padding:7px 10px}}
 </style>
   <link rel="stylesheet" href="./rfp-progress-live.css?v=20261115-status-palette-v1">
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
@@ -1387,6 +1429,28 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 
 
   </div>
+  <div id="keepToolbar" class="keep-toolbar" hidden>
+    <div class="keep-toolbar-main" role="group" aria-label="회원 킵 목록과 관전">
+      <button id="keepModeAll" class="on" type="button" aria-pressed="true">전체 일감</button>
+      <button id="keepModeMine" type="button" aria-pressed="false">내 킵 <span id="keepMineCount">0</span></button>
+      <button id="keepModeWatch" type="button" aria-pressed="false">관전</button>
+      <label id="keepMemberWrap" for="keepMemberSelect" hidden>대상 <select id="keepMemberSelect" aria-label="킵 목록 관전 회원 선택"><option value="">관전 대상 선택</option></select></label>
+      <details id="keepShareDetails" class="keep-share-details"><summary>내 목록 공유 설정</summary>
+        <div class="keep-share-options">
+          <label for="keepShareAlias">관전 목록 표시 이름</label>
+          <input id="keepShareAlias" type="text" maxlength="32" placeholder="다른 회원에게 보여줄 이름" autocomplete="off">
+          <label for="keepShareEnabled"><input type="checkbox" id="keepShareEnabled">다른 회원의 관전 허용</label>
+          <button type="button" id="keepSaveShare">공유 설정 저장</button>
+          <small>허용 시 킵한 공고만 보입니다. 계정·지원기록은 공유되지 않습니다.</small>
+        </div>
+      </details>
+    </div>
+    <p id="keepStatus" class="keep-status" role="status" aria-live="polite"></p>
+  </div>
+  <section id="keepListPanel" hidden aria-label="회원 킵 목록">
+    <h3 id="keepListHeading"></h3>
+    <div class="cards" id="keepListCards"></div>
+  </section>
   <div class="cards" id="jobCards"></div>
   <div class="row" style="margin:12px 0;text-align:center"><button type="button" class="partner-launch" id="g2bMore" style="display:none">저장된 SW 공고 200건 더 보기</button></div>
 </section>
@@ -1870,6 +1934,7 @@ document.getElementById("partnersClose").addEventListener("click",closePartnerMo
 partnerModal.addEventListener("click",function(e){if(e.target===partnerModal)closePartnerModal()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&partnerModal.classList.contains("open"))closePartnerModal()});
 document.getElementById("jobCards").addEventListener("click",function(e){
+ if(e.target.closest('[data-keep-toggle]'))return;
  const requirement=e.target.closest('[data-job-requirement]');
  if(requirement){
   e.preventDefault();e.stopPropagation();
@@ -5416,6 +5481,17 @@ function bidMethodCardMarkup(x,showBusinessArea=false){
      htmlEscape(value||'정보 없음')+'</strong></div>';
   }).join('')+(showBusinessArea&&bidBusinessArea(x)?'<div class="job-bid-method-cell job-business-meta">'+bidBusinessArea(x)+'</div>':'')+'</div>';
 }
+window.worklinksKeepSnapshotFor=function(id){
+ const x=getJobById(id);
+ if(!x)return null;
+ const when=jobTimeInfo(x);
+ return {
+  title:String(x.title||''),url:String(jobOriginUrl(x)||''),
+  org:String(x.org||''),amount:String(jobAmountLabel(x.amount)||''),
+  deadline:String(when?.text||''),entry:String(x.entry||''),
+  type:String(x.type||''),noticeNumber:String(x.noticeNumber||'')
+ };
+};
 function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
@@ -5699,6 +5775,7 @@ function renderJobs(){
        '<div class="job-eligibility-row"><div class="job-eligibility-content">'+qualification+jobRequirementBadges(x)+partner+'</div></div>'+
        (member&&partnerMode?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
        '<div class="job-highlights">'+historyMarkup+
+          (window.worklinksKeeps?.keepButton(x.id)||'')+
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 공고 원문을 새 탭에서 열기" title="공고 원문 새 탭에서 열기">공고 원문 ↗</a>'+
        '</div></div></article>';
   }).join(''):'<div class="emptycard">'+
@@ -6219,4 +6296,4 @@ document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){categ
  var note=root.querySelector('.src-status-note');note.textContent='기준: 본등록 '+itemsList.length+'건 중 '+total+'건 ('+(include?'마감 포함':'마감 제외')+'). 출처 URL 도메인이 정확히 일치하는 항목만 집계 · 미분류 '+(total-matched)+'건. 링크 없는 묶음·포털을 통한 타 기관 공고는 0건으로 보일 수 있으며 미검색 또는 공고 없음의 의미가 아닙니다.';
  }
  root.querySelectorAll('[data-src-expired]').forEach(function(b){b.addEventListener('click',function(){root.querySelectorAll('[data-src-expired]').forEach(function(z){z.classList.toggle('on',z===b);z.setAttribute('aria-pressed',z===b?'true':'false')});refresh()})});refresh();})();
-</script><script type="module" src="./worklinks-account.js?v=20261115-auth500-refresh-v4"></script></main></body></html>
+</script><script type="module" src="./worklinks-account.js?v=20261115-auth500-refresh-v4"></script><script type="module" src="./worklinks-keep.js?v=20261115-keep-watch-v1"></script></main></body></html>
