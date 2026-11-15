@@ -989,6 +989,55 @@ def _extract_pdf_with_audit(raw):
     fast_native_probe_pages=0
     fast_native_skip_pages=0
     fast_native_fallbacks=0
+    native_fast_mode=os.environ.get('WORKLINKS_RFP_FAST_MUPDF_NATIVE')=='1'
+    native_fast_accepted=False
+    native_fast_reason='disabled'
+    native_fast_validation_seconds=0.0
+    native_fast_validation_pages=0
+    native_fast_mupdf_seconds=0.0
+    native_fast_mupdf_pages=0
+    native_fast_pypdf_seconds=0.0
+    native_fast_fallback_pages=0
+    native_fast_samples={}
+    # Long native-text PDFs can have 100s of pages. Validate samples against
+    # the old pypdf extraction BEFORE using a faster PyMuPDF path. A mismatch
+    # means the entire document retains the old reader (no silent text loss).
+    # Short PDFs retain pypdf; there is no meaningful win to justify a swap.
+    if native_fast_mode and len(document.pages)>=32:
+        native_fast_reason='validation_failed'
+        verify_started=time.perf_counter()
+        try:
+            import pymupdf
+            opened=time.perf_counter()
+            mupdf_doc=pymupdf.open(stream=raw,filetype='pdf')
+            render_cache['document']=mupdf_doc
+            render_cache['pdfOpenSeconds']+=time.perf_counter()-opened
+            if len(mupdf_doc)!=len(document.pages):
+                native_fast_reason='page_count_mismatch'
+            else:
+                total=len(document.pages)
+                samples=sorted(set([0,1,total-1]+list(range(0,total,24))))
+                valid=True
+                for sample in samples:
+                    original=document.pages[sample].extract_text() or ''
+                    trial=mupdf_doc.load_page(sample).get_text('text',sort=False) or ''
+                    native_fast_validation_pages+=1
+                    native_fast_samples[sample]=original
+                    # Ignore only whitespace differences; order and every
+                    # nonspace character must be exactly equal.
+                    if (re.sub(r'\\s+','',original)!=re.sub(r'\\s+','',trial)
+                            or '\\ufffd' in trial):
+                        valid=False
+                        native_fast_reason='native_text_sample_mismatch'
+                        break
+                if valid:
+                    native_fast_accepted=True
+                    native_fast_reason='sampled_text_verified'
+        except Exception as exc:
+            native_fast_reason='probe_'+type(exc).__name__
+        native_fast_validation_seconds=time.perf_counter()-verify_started
+    elif native_fast_mode:
+        native_fast_reason='short_pdf_original_reader'
     # Share a single pass budget across nested PDFs in the same ZIP.
     # A failed or stalled page can take at most 28 seconds in Tesseract;
     # stop starting new pages with fewer than 32 seconds to spare.
@@ -1007,11 +1056,39 @@ def _extract_pdf_with_audit(raw):
                 recovered.append(i+1)
                 restored.append(i+1)
                 continue
-            # Pure scanned pages can spend seconds in pypdf.extract_text()
-            # despite having no PDF text object. Check the MuPDF display-list
-            # first; skip pypdf only when native text is provably absent.
+            # On long verified PDFs, native MuPDF text is much cheaper than
+            # running a complete pypdf text decoder on every page. The sample
+            # gate above verifies nonwhitespace content, including order.
+            # Individual uncertain pages always fall back to pypdf.
+            natural=''
             should_parse_native=True
-            if os.environ.get('WORKLINKS_RFP_FAST_SKIP_PYPDF_NATIVE')=='1':
+            if native_fast_accepted:
+                if i in native_fast_samples:
+                    natural=native_fast_samples[i]
+                    should_parse_native=False
+                else:
+                    phase=time.perf_counter()
+                    try:
+                        rendered=render_cache['document'].load_page(i)
+                        natural=rendered.get_text('text',sort=False) or ''
+                        if '\\ufffd' in natural:
+                            raise ValueError('unmapped_mupdf_character')
+                        native_fast_mupdf_pages+=1
+                        should_parse_native=False
+                        if not natural.strip():
+                            # A MuPDF empty string is not proof a different
+                            # reader cannot recover text. Trust no-text ONLY
+                            # if its display list has no text objects.
+                            should_parse_native=any(
+                                str(x[0]).endswith('text') for x in rendered.get_bboxlog())
+                            if should_parse_native:
+                                native_fast_fallback_pages+=1
+                    except Exception:
+                        should_parse_native=True
+                        native_fast_fallback_pages+=1
+                    finally:
+                        native_fast_mupdf_seconds+=time.perf_counter()-phase
+            elif os.environ.get('WORKLINKS_RFP_FAST_SKIP_PYPDF_NATIVE')=='1':
                 probe_started=time.perf_counter()
                 try:
                     should_parse_native=_pdf_native_text_objects_present(
@@ -1019,19 +1096,19 @@ def _extract_pdf_with_audit(raw):
                     fast_native_probe_pages+=1
                     if not should_parse_native:fast_native_skip_pages+=1
                 except Exception:
-                    # Ambiguous/malformed source: preserve the old reader.
                     fast_native_fallbacks+=1
                     should_parse_native=True
                 finally:
                     fast_native_probe_seconds+=time.perf_counter()-probe_started
-            natural=''
             if should_parse_native:
                 phase=time.perf_counter()
                 try:
                     natural=page.extract_text() or ''
                 except Exception:
                     natural=''
-                native_seconds+=time.perf_counter()-phase
+                elapsed=time.perf_counter()-phase
+                native_fast_pypdf_seconds+=elapsed
+                native_seconds+=elapsed
             if natural.strip():
                 parts.append(natural)
                 continue
@@ -1104,6 +1181,15 @@ def _extract_pdf_with_audit(raw):
               'ocrRenderSeconds':round(render_cache['renderSeconds'],3),
               'ocrTesseractSeconds':round(render_cache['tesseractSeconds'],3),
               'ocrNativeTextSeconds':round(native_seconds,3),
+              'ocrNativeMuPdfEnabled':native_fast_mode,
+              'ocrNativeMuPdfAccepted':native_fast_accepted,
+              'ocrNativeMuPdfDecision':native_fast_reason,
+              'ocrNativeMuPdfVerifiedPages':native_fast_validation_pages,
+              'ocrNativeMuPdfValidationSeconds':round(native_fast_validation_seconds,3),
+              'ocrNativeMuPdfTextSeconds':round(native_fast_mupdf_seconds,3),
+              'ocrNativeMuPdfTextPages':native_fast_mupdf_pages,
+              'ocrNativeMuPdfPypdfSeconds':round(native_fast_pypdf_seconds,3),
+              'ocrNativeMuPdfFallbackPages':native_fast_fallback_pages,
               'ocrNativeFastProbeSeconds':round(fast_native_probe_seconds,3),
               'ocrNativeFastProbePages':fast_native_probe_pages,
               'ocrNativeFastSkippedPages':fast_native_skip_pages,
@@ -1163,6 +1249,12 @@ def extract_with_source_status(name,raw):
                      'ocrRenderSeconds':round(sum(x.get('ocrRenderSeconds',0) for x in pdf_stats),3),
                      'ocrTesseractSeconds':round(sum(x.get('ocrTesseractSeconds',0) for x in pdf_stats),3),
                      'ocrNativeTextSeconds':round(sum(x.get('ocrNativeTextSeconds',0) for x in pdf_stats),3),
+                     'ocrNativeMuPdfAcceptedFiles':sum(x.get('ocrNativeMuPdfAccepted') is True for x in pdf_stats),
+                     'ocrNativeMuPdfVerifiedPages':sum(x.get('ocrNativeMuPdfVerifiedPages',0) for x in pdf_stats),
+                     'ocrNativeMuPdfValidationSeconds':round(sum(x.get('ocrNativeMuPdfValidationSeconds',0) for x in pdf_stats),3),
+                     'ocrNativeMuPdfTextSeconds':round(sum(x.get('ocrNativeMuPdfTextSeconds',0) for x in pdf_stats),3),
+                     'ocrNativeMuPdfTextPages':sum(x.get('ocrNativeMuPdfTextPages',0) for x in pdf_stats),
+                     'ocrNativeMuPdfFallbackPages':sum(x.get('ocrNativeMuPdfFallbackPages',0) for x in pdf_stats),
                      'ocrNativeFastProbeSeconds':round(sum(x.get('ocrNativeFastProbeSeconds',0) for x in pdf_stats),3),
                      'ocrNativeFastProbePages':sum(x.get('ocrNativeFastProbePages',0) for x in pdf_stats),
                      'ocrNativeFastSkippedPages':sum(x.get('ocrNativeFastSkippedPages',0) for x in pdf_stats),
