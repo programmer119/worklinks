@@ -1686,6 +1686,101 @@ def rfp_dual_lane_progress(path,cohort=None):
                 'failed':sum(n for _,b,n in rows if b=='retry')}}
 
 
+def rfp_ocr_repair_attribution():
+    """Read-only proof of files actually recovered by the installed OCR repair reader.
+
+    A reduced 'needs rescan' count is NOT proof of a successful repair:
+    attempted-but-still-broken files are counted separately. Only persisted
+    SHA-verified, source-complete files carrying this exact reader version
+    qualify as repaired. Excludes <24h and unknown-deadline notices.
+    """
+    version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
+    try:
+        with open(version_path,'r') as fd:
+            manifest=json.load(fd)
+        latest=manifest['latest']
+        reader_version=str(latest.get('ocrReaderVersion') or '')
+        if not reader_version:
+            raise ValueError('ocr_reader_version_missing')
+    except (OSError,ValueError,KeyError,TypeError):
+        raise ApiError('deployed_ocr_reader_version_unavailable',503)
+    saved=read_saved_rfp_evidence_index()
+    if saved is None:
+        raise ApiError('rfp_evidence_index_unavailable',503)
+    live,_,_=read_rfp_notice_checkpoints(saved)
+    con=open_bid_db()
+    try:
+        bids=con.execute("""SELECT b.bid_no,b.bid_ord,b.payload FROM bid_notices b
+            WHERE b.sw_candidate=1 AND NOT EXISTS(
+                SELECT 1 FROM bid_notices newer
+                WHERE newer.bid_no=b.bid_no
+                AND CAST(newer.bid_ord AS INTEGER)>CAST(b.bid_ord AS INTEGER))
+            ORDER BY b.last_seen DESC""").fetchall()
+    finally:
+        con.close()
+    progress=rfp_progress_from_rows(bids,live,latest,include_scope=True)
+    managed,completed=progress.pop('_cohortKeys')
+    results={'ok':True,'scope':'actionable_saved_sw_bid_notices_24h',
+        'readerVersion':reader_version,'eligibleNotices':len(managed),
+        'noticesWithV12Success':0,'filesRecoveredByV12':0,
+        'ocrPdfOrArchiveFilesRecovered':0,'ocrPageRecoveredFiles':0,
+        'completedNoticesWithV12RecoveredFiles':0,
+        'completedNoticesWithV12OcrPdfOrArchiveFiles':0,
+        'attemptedFilesStillIncomplete':0,'attemptedNoticesStillIncomplete':0,
+        'sampleVerifiedRecoveries':[],'upstreamCalls':0}
+    for key in managed:
+        row=live.get(key)
+        if not isinstance(row,dict):
+            continue
+        success=0
+        pdf_success=0
+        pending=0
+        for f in (row.get('files') or []):
+            if not isinstance(f,dict) or str(f.get('lastReaderAttemptVersion') or '')!=reader_version:
+                continue
+            passed=(f.get('readable') is True and
+                    f.get('sourceTextScanComplete') is True and
+                    bool(f.get('sourceSha256')))
+            if not passed:
+                pending+=1
+                continue
+            success+=1
+            e=f.get('extractionEvidence') or {}
+            label=str(f.get('name') or '')
+            source=e.get('pdfSources') or []
+            is_pdf=(label.lower().endswith('.pdf')
+                    or int(e.get('pdfFiles') or 0)>0
+                    or int(e.get('pdfPages') or 0)>0
+                    or bool(source))
+            if is_pdf:
+                pdf_success+=1
+            if (int(e.get('ocrRecoveredPages') or 0)>0 or
+                    int(e.get('ocrAttemptedPages') or 0)>0 or
+                    int(e.get('ocrRestoredPages') or 0)>0 or
+                    any(int(q.get('ocrRecoveredPages') or 0)>0
+                            or int(q.get('ocrAttemptedPages') or 0)>0
+                            for q in source if isinstance(q,dict))):
+                results['ocrPageRecoveredFiles']+=1
+            if len(results['sampleVerifiedRecoveries'])<10:
+                results['sampleVerifiedRecoveries'].append({
+                    'noticeKey':key,'file':label[:130],
+                    'sourceShaVerified':True,
+                    'pdfOrArchiveSource':is_pdf,
+                    'recordedAttemptAt':str(f.get('lastReaderAttemptAt') or '')[:35],
+                    'noticeComplete':key in completed})
+        results['filesRecoveredByV12']+=success
+        results['ocrPdfOrArchiveFilesRecovered']+=pdf_success
+        results['attemptedFilesStillIncomplete']+=pending
+        results['noticesWithV12Success']+=int(success>0)
+        results['attemptedNoticesStillIncomplete']+=int(pending>0)
+        if key in completed and success:
+            results['completedNoticesWithV12RecoveredFiles']+=1
+        if key in completed and pdf_success:
+            results['completedNoticesWithV12OcrPdfOrArchiveFiles']+=1
+    results['caveat']='Counts are persisted v12 file-level successes, not all increases in overall completion.'
+    return results
+
+
 def rfp_rescan_progress():
     """Read-only saved-data progress, cached <= 8s for the 10s UI cadence."""
     version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
@@ -2770,6 +2865,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
             if u.path == '/api/g2b/rfp-rescan-progress':
                 return self.reply(200,rfp_rescan_progress())
+            if u.path == '/api/g2b/rfp-ocr-repair-attribution':
+                return self.reply(200,rfp_ocr_repair_attribution())
             if u.path == '/api/g2b/rfp-card-evidence':
                 return self.reply(200,rfp_card_evidence_batch(get('keys')))
             if u.path == '/api/g2b/saved-inventory':
