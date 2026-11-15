@@ -108,6 +108,98 @@ class RfpDualQueue:
                             WHERE notice_key=? AND closes_on<>?''',(val,key,val))
         return added
 
+    def reconcile_management(self,managed,latest_valid,fingerprint):
+        """Idempotently restore the real known-deadline cohort.
+
+        A validated historical scan requires no new download. An old queue
+        'done' is NEVER proof of current-version RFP completeness. Preserve
+        verified binaries, metadata, retries, and independent unknown-date work.
+        """
+        valid=set(latest_valid)
+        if not isinstance(managed,dict) or not valid.issubset(managed):
+            raise ValueError('invalid_management_cohort')
+        if not isinstance(fingerprint,str) or not fingerprint:
+            raise ValueError('invalid_reader_fingerprint')
+        with self.connect() as db:
+            old={key:(download,scan,version,closes)
+                for key,download,scan,version,closes in db.execute('''
+                    SELECT notice_key,download_status,scan_status,
+                    reader_fingerprint,closes_on FROM rfp_dual_notices''')}
+        tally={'managed':len(managed),'latestValid':len(valid),
+               'missingAdded':0,'previouslyValidAdded':0,
+               'obsoleteDoneRequeued':0,'verifiedEmptyBlocked':0,
+               'completedEvidenceReconciled':0,
+               'outsideScopePreserved':len(set(old)-set(managed))}
+        entries=sorted(managed.items())
+        for offset in range(0,len(entries),64):
+            with self.connect() as db:
+                for key,closes in entries[offset:offset+64]:
+                    present=old.get(key)
+                    is_valid=key in valid
+                    if present is None:
+                        status='evidence_complete' if is_valid else 'pending'
+                        scan='done' if is_valid else 'pending'
+                        db.execute('''INSERT OR IGNORE INTO rfp_dual_notices(
+                            notice_key,closes_on,reader_fingerprint,download_status,
+                            scan_status,updated_at) VALUES(?,?,?,?,?,?)''',
+                            (key,closes,fingerprint,status,scan,now_utc()))
+                        if is_valid:tally['previouslyValidAdded']+=1
+                        else:tally['missingAdded']+=1
+                        continue
+                    download,scan,version,old_close=present
+                    # Do not change an active downloader or scanner claim.
+                    if download=='fetching' or scan=='scanning':
+                        continue
+                    new_download=download
+                    new_scan=scan
+                    retry_reset=False
+                    if is_valid:
+                        if download in ('pending','retry','evidence_complete'):
+                            new_download='evidence_complete'
+                        if scan!='done':
+                            new_scan='done'
+                            retry_reset=True
+                            tally['completedEvidenceReconciled']+=1
+                    elif download=='evidence_complete':
+                        # A previously valid index was invalidated by a new
+                        # parser/manifest. Obtain/reuse real originals again.
+                        new_download='pending'
+                        new_scan='pending'
+                        retry_reset=True
+                        tally['obsoleteDoneRequeued']+=1
+                    elif scan in ('done','skipped'):
+                        if download=='ready':
+                            new_scan='pending'
+                            retry_reset=True
+                            tally['obsoleteDoneRequeued']+=1
+                        elif download=='no_attachments':
+                            # Officially complete empty manifest; cannot scan
+                            # a nonexistent original and must never lie "done".
+                            tally['verifiedEmptyBlocked']+=1
+                        elif download=='error_confirmed':
+                            # Permanent verified HTTP 422 can reopen only on
+                            # an actual official attachment reference change.
+                            new_scan='pending'
+                            retry_reset=True
+                        else:
+                            new_scan='pending'
+                            retry_reset=True
+                    if (new_download,new_scan,version,old_close)!=(
+                            download,scan,fingerprint,closes):
+                        db.execute('''UPDATE rfp_dual_notices
+                            SET download_status=?,scan_status=?,
+                                reader_fingerprint=?,closes_on=?,
+                                scan_retry_epoch=CASE WHEN ? THEN 0
+                                    ELSE scan_retry_epoch END,
+                                download_retry_epoch=CASE WHEN ?='evidence_complete'
+                                    THEN 0 ELSE download_retry_epoch END,
+                                updated_at=?
+                            WHERE notice_key=? AND download_status<> 'fetching'
+                              AND scan_status<> 'scanning' ''',
+                            (new_download,new_scan,fingerprint,closes,
+                             int(retry_reset),new_download,now_utc(),key))
+        return tally
+
     def retire_expired(self,today=None):
         """Retire past-close notices. Raw originals are retained/pruned elsewhere."""
         day=today or dt.datetime.now(KST).date()
