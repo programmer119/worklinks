@@ -1278,7 +1278,7 @@ def rfp_stage_checks(row,latest):
             'hwpx':hwpx}
 
 
-def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False):
+def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,excluded_keys=None):
     """Count *all* unique unexpired saved SW notices, never a top-500 subset."""
     if not isinstance(index,dict) or not isinstance(latest,dict):
         raise ValueError('rfp_progress_missing_verified_inputs')
@@ -1297,7 +1297,9 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False):
     unique=set()
     managed_keys=set()
     completed_keys=set()
-    summary={'total':0,'completed':0,'remaining':0,'legacy':0,
+    verified_exclusions=set(excluded_keys or ())
+    summary={'total':0,'eligible':0,'excluded':0,
+             'completed':0,'remaining':0,'legacy':0,
              'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0,
               'unknownDeadlineCompleted':0,'unknownDeadlinePending':0}
     stages={k:{'total':0,'done':0,'remaining':0} for k in
@@ -1327,6 +1329,12 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False):
         if cutoff<now:continue
         summary['total']+=1
         managed_keys.add(key)
+        # A complete official three-source manifest with zero documents is
+        # a terminal scan exclusion, never an unscanned or failed scan.
+        if key in verified_exclusions:
+            summary['excluded']+=1
+            continue
+        summary['eligible']+=1
         row=index.get(key)
         checks=rfp_stage_checks(row,latest)
         for stage,valid in checks.items():
@@ -1354,14 +1362,16 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False):
         summary[cat]+=1
         if cat=='completed':completed_keys.add(key)
     assert summary['unknownDeadlineCompleted']+summary['unknownDeadlinePending']==summary['unknownDeadline']
-    summary['remaining']=summary['total']-summary['completed']
+    summary['remaining']=summary['eligible']-summary['completed']
     summary['rescanRequired']=summary['legacy']
+    assert summary['total']==summary['eligible']+summary['excluded']
+    assert summary['eligible']==summary['completed']+summary['remaining']
     assert summary['remaining']==sum(summary[k] for k in
                                     ('legacy','unscanned','failed','incomplete'))
-    percent=(round(100.0*summary['remaining']/summary['total'],1)
-             if summary['total'] else None)
-    rescan_percent=(round(100.0*summary['rescanRequired']/summary['total'],1)
-                    if summary['total'] else None)
+    percent=(round(100.0*summary['remaining']/summary['eligible'],1)
+             if summary['eligible'] else None)
+    rescan_percent=(round(100.0*summary['rescanRequired']/summary['eligible'],1)
+                    if summary['eligible'] else None)
     report={'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
             'asOf':now.isoformat(),'latest':latest,'counts':summary,
             'remainingPercent':percent,'rescanPercent':rescan_percent,'stages':stages,
@@ -1472,7 +1482,9 @@ def rfp_cohort_lanes(path,managed,valid):
     # failed scan. Only genuinely completed scans can become outdated.
     queue_valid={key for key in present if entries[key][1]=='done'}
     stale_done=queue_valid-valid
-    skipped_missing={key for key in cohort if entries.get(key)==('no_attachments','skipped')}
+    skipped_missing={key for key in cohort if
+                     entries.get(key)==('no_attachments','skipped') and
+                     key in manifests}
     verified_sources=valid|({key for key in cohort if key in manifests})
     source_received=valid|({key for key in cohort if entries.get(key,('',))[0]
                          in ('ready','no_attachments','evidence_complete')})
@@ -1512,7 +1524,8 @@ def rfp_cohort_lanes(path,managed,valid):
                    'errors':len(confirmed_keys),'errorDetails':error_details,
                    'skipped':len(skipped_missing),'active':active_download,
                    'failed':retry_download},
-       'scan':{'total':total,'done':len(valid),'active':active_scan,
+       'scan':{'total':total-len(skipped_missing),
+               'done':len(valid),'active':active_scan,
                'failed':retry_scan,'blockedNoAttachments':len(skipped_missing-valid),
                'staleQueueComplete':len(stale_done),
                'notQueued':len(pending_missing)}}
@@ -1608,7 +1621,18 @@ def rfp_rescan_progress():
               ORDER BY b.last_seen DESC""").fetchall()
     finally:con.close()
     live_index,recent_notices,unpublished_count=read_rfp_notice_checkpoints(index)
-    report=rfp_progress_from_rows(bids,live_index,latest,include_scope=True)
+    queue_path=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3')
+    try:
+        with sqlite3.connect('file:'+queue_path+'?mode=ro',uri=True,timeout=3) as scan_queue:
+            excluded_keys={key for (key,) in scan_queue.execute('''
+                SELECT q.notice_key FROM rfp_dual_notices q
+                WHERE q.download_status='no_attachments' AND q.scan_status='skipped'
+                AND EXISTS(SELECT 1 FROM rfp_bulk_manifests m
+                           WHERE m.notice_key=q.notice_key)''')}
+    except (sqlite3.Error,OSError,IOError):
+        raise ApiError('rfp_scan_exclusion_queue_unavailable',503)
+    report=rfp_progress_from_rows(bids,live_index,latest,
+           include_scope=True,excluded_keys=excluded_keys)
     managed_keys,validated_keys=report.pop('_cohortKeys')
     report['noticeProgressMode']='per_notice_durable_checkpoint'
     report['recentNoticeUpdates']=recent_notices
