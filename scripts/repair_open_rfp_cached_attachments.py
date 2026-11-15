@@ -395,6 +395,15 @@ def update_counts(rec,now,additions):
     fs=rec['files']
     rec['readableDocumentCount']=sum(f.get('readable') is True for f in fs)
     rec['unreadableDocumentCount']=len(fs)-rec['readableDocumentCount']
+    # Correct the cumulative notice status when a SHA-verified reparse has
+    # recovered readable source. Never leave a successful PDF/HWPX repair
+    # labeled text_unavailable; legal conditions still require later review.
+    if (rec['readableDocumentCount']>0 and
+        rec.get('manifestComplete') is True and
+        rec.get('status') in ('text_unavailable','download_not_verified',
+                              'text_extracted_requires_review')):
+        rec['status']='text_extracted_requires_review'
+        rec['reasonCode']='readable_text_requires_full_review'
     rec['checkedAt']=now
     rec['classificationVersion']=rfp.CLASSIFICATION_VERSION
     rec['signatureReaderRepair']=REPAIR_VERSION
