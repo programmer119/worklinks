@@ -77,6 +77,7 @@ print('WORKLINKS_KEEP_WATCH_ROUTES=PASS')
 import threading
 from urllib.request import Request,urlopen
 from urllib.error import HTTPError
+from unittest import mock
 assert put('p47','member-11111111',record)['ok']
 assert share('p47','member-11111111',{'enabled':True,'alias':'개발 1팀'})['ok']
 def fixture_identity(header):
