@@ -2534,10 +2534,6 @@ def main():
             key=no+':'+ordn
             try:
                 data=future.result()
-                scan_validity[key]=data.get('status')=='text_extracted_requires_review'
-                if dual_scan:
-                    import rfp_live_activity as live_trace
-                    live_trace.record('scan',key,phase='판독 완료' if scan_validity[key] else '판독 결과 확인 필요',status='done' if scan_validity[key] else 'retry',retry_epoch=0 if scan_validity[key] else time.time()+3600,error='' if scan_validity[key] else str(data.get('reasonCode') or data.get('status') or ''))
                 profile=data.pop('_stageTimings',None)
                 if profile:
                     for name,value in profile.items():
@@ -2557,6 +2553,25 @@ def main():
                     print('RFP_PRIOR_DETAIL_PRESERVED',key,data['status'],flush=True)
                 else:
                     results[key]=data
+                # A syntactically extracted text is not a current-version
+                # complete scan. Use EXACTLY the dashboard's published evidence
+                # completeness rules before marking the independent queue done.
+                if dual_scan:
+                    from rfp_management_reconcile import latest_complete
+                    versions={'classificationVersion':CLASSIFICATION_VERSION,
+                              'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
+                              'staffingFactScanVersion':STAFFING_FACT_SCAN_VERSION,
+                              'hwpxReaderVersion':HWPX_READER_VERSION}
+                    scan_validity[key]=latest_complete(compact_coverage(results[key]),versions)
+                    import rfp_live_activity as live_trace
+                    live_trace.record('scan',key,
+                        phase='최신 판독 완료' if scan_validity[key] else '판독 조건 미충족 · 재확인',
+                        status='done' if scan_validity[key] else 'retry',
+                        retry_epoch=0 if scan_validity[key] else time.time()+3600,
+                        error='' if scan_validity[key] else
+                        str(data.get('reasonCode') or data.get('status') or 'latest_evidence_incomplete'))
+                else:
+                    scan_validity[key]=data.get('status')=='text_extracted_requires_review'
                 # Progress becomes visible and durable immediately for THIS
                 # notice, even while other futures remain in flight.
                 try:
