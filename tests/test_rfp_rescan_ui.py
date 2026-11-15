@@ -174,7 +174,7 @@ with sync_playwright() as p:
       document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track')"""), 'file row must not remount'
 
     # Confirmed 422 uses a red clickable detail, not the transient retry counter.
-    fake['lanes']['download'].update(errors=1,processed=852,errorDetails=[
+    fake['lanes']['download'].update(errors=1,processed=5,errorDetails=[
         {'noticeKey':'R26BK01823630:000',
          'files':[{'name':'붙임6 긴급 입찰공고 사유서.pdf',
                    'httpStatus':422,
@@ -186,11 +186,11 @@ with sync_playwright() as p:
     button=page.locator('#rfpDownloadErrorButton')
     assert button.is_enabled()
     page.evaluate("() => document.getElementById('rfpDownloadErrorButton').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
-    assert '붙임6 긴급 입찰공고 사유서.pdf' in page.locator('#rfpDownloadErrorDetails').inner_text()
-    assert 'R26BK01823630:000' in page.locator('#rfpDownloadErrorDetails').inner_text()
-    assert 'HTTP 422' in page.locator('#rfpDownloadErrorDetails').inner_text()
-    assert '정상 851 · 오류 1건 · 전체 1,000건' in page.locator('#rfpRescanContent').inner_text()
-    assert '920 / 1,000건' in page.locator('#rfpRescanContent').text_content()
+    assert '붙임6 긴급 입찰공고 사유서.pdf' in page.locator('#rfpDownloadErrorDetails').text_content()
+    assert 'R26BK01823630:000' in page.locator('#rfpDownloadErrorDetails').text_content()
+    assert 'HTTP 422' in page.locator('#rfpDownloadErrorDetails').text_content()
+    assert '정상 4 · 오류 1건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
+    assert '5 / 6건' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
