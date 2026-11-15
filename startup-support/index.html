@@ -2159,6 +2159,15 @@ function paintRfpCountdown(){
 const RFP_PROGRESS_POLL_MS=10000;
 const RFP_PROGRESS_TIMEOUT_MS=15000;
 function rfpProgressNumber(n){return Number(n||0).toLocaleString('ko-KR')}
+function rfpProgressTotalsConsistent(counts){
+ if(!counts)return false;
+ const fields=['total','eligible','excluded','completed','remaining','legacy','rescanRequired'];
+ if(!fields.every(k=>Number.isSafeInteger(counts[k])&&counts[k]>=0))return false;
+ return counts.total===counts.eligible+counts.excluded&&
+   counts.eligible===counts.completed+counts.remaining&&
+   counts.rescanRequired===counts.legacy;
+}
+
 function paintRfpRescanProgress(){return window.paintRfpLiveProgress();}
 async function refreshRfpRescanProgress(force=false){
  if(rfpRescanBusy)return rfpRescanBusy;
@@ -2174,9 +2183,8 @@ async function refreshRfpRescanProgress(force=false){
    if(!res.ok)throw Error('운영 집계 HTTP '+res.status);
    const report=await res.json();
    if(report?.ok!==true||report?.schemaVersion!==1||
-      report?.scope!=='unexpired_saved_sw_bid_notices'||!report?.counts||
-      report.counts.total!==report.counts.completed+report.counts.remaining||
-      report.counts.rescanRequired!==report.counts.legacy)
+      report?.scope!=='unexpired_saved_sw_bid_notices'||
+      !rfpProgressTotalsConsistent(report?.counts))
     throw Error('집계 데이터 형식 오류');
    const previous=rfpRescanProgress;
    const prevCount=previous?.counts?.completed;
