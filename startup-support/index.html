@@ -1050,7 +1050,6 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
 .keep-job-link{color:#174b80;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap}
 .keep-empty{padding:24px 12px;border:1px dashed #cad5e4;border-radius:12px;color:#64748b;font-size:15px;text-align:center;grid-column:1/-1}
-#jobsView[data-keep-mode=mine] #jobCards,#jobsView[data-keep-mode=watch] #jobCards,
 #jobsView[data-keep-mode=mine] #g2bMore,#jobsView[data-keep-mode=watch] #g2bMore,
 #jobsView[data-keep-mode=mine] .job-quick-search,#jobsView[data-keep-mode=watch] .job-quick-search,
 #jobsView[data-keep-mode=mine] #generalJobFilters,#jobsView[data-keep-mode=watch] #generalJobFilters,
@@ -1447,10 +1446,6 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
     </div>
     <p id="keepStatus" class="keep-status" role="status" aria-live="polite"></p>
   </div>
-  <section id="keepListPanel" hidden aria-label="회원 킵 목록">
-    <h3 id="keepListHeading"></h3>
-    <div class="cards" id="keepListCards"></div>
-  </section>
   <div class="cards" id="jobCards"></div>
   <div class="row" style="margin:12px 0;text-align:center"><button type="button" class="partner-launch" id="g2bMore" style="display:none">저장된 SW 공고 200건 더 보기</button></div>
 </section>
@@ -3351,9 +3346,60 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.ge
 /* This compares only observable requirements; a match is never "100%" until all
    tender attachments, license alternatives, documentation and delivery rules have been verified. */
 var bidEligibilityCache=new Map(),activeDetailJobId=null,jobDetailPriorFocus=null,eligibilityLoading=new Set();
+// Kept lists display the *same* cards and detail modal as the ordinary list.
+// These rows supplement only notices missing from the initial paged DB window.
+var worklinksKeptFullRows=new Map(),worklinksKeptResolveTime=new Map(),worklinksKeptPending=new Map();
+function worklinksKeptFallback(item){
+ const id=String(item?.id||'');
+ if(!id)return null;
+ const bid=String(item.noticeNumber|| (id.match(/R\\d{2}BK\\d{8}/)||[])[0]||'');
+ const m=id.match(/^g2b-(servc|thng|cnstwk|frgcpt)-[^-]+-(\\d{3})$/);
+ const deadline=String(item.deadline||'');
+ return {id,title:String(item.title||id),url:String(item.url||''),
+  org:String(item.org||'발주기관 미확인'),amount:String(item.amount||''),
+  type:String(item.type||'나라장터 · 저장 공고'),entry:String(item.entry||'business'),
+  noticeNumber:bid,noticeOrder:m?m[2]:'000',kind:m?m[1]:'',
+  period:deadline.includes('~')?deadline:'입찰마감 '+deadline,
+  reason:'킵 목록에 저장된 공고 · 최신 원문은 공고 원문 링크에서 확인',
+  condition:'상세 조건을 조회 중입니다. 공고 원문을 우선 확인하세요.'};
+}
+if(typeof window!=='undefined')window.worklinksHydrateKeptJobs=async function(items){
+ const pending=[];
+ for(const item of (Array.isArray(items)?items:[])){
+  const id=String(item?.id||'');
+  if(!id)continue;
+  const original=jobs.concat(g2bLiveJobs,jobSearchRemote,g2bFilterInventory).find(x=>x.id===id);
+  if(original){worklinksKeptFullRows.set(id,original);continue;}
+  if(!worklinksKeptFullRows.has(id))worklinksKeptFullRows.set(id,worklinksKeptFallback(item));
+  if(worklinksKeptPending.has(id)){pending.push(worklinksKeptPending.get(id));continue;}
+  const match=id.match(/^g2b-(servc|thng|cnstwk|frgcpt)-(R\\d{2}BK\\d{8})-(\\d{3})$/);
+  if(!match||Date.now()-(worklinksKeptResolveTime.get(id)||0)<30000)continue;
+  worklinksKeptResolveTime.set(id,Date.now());
+  const work=(async()=>{
+   try{
+    // Saved SQLite search only; no G2B upstream requests are made.
+    const response=await g2bFetch('/saved?sw=1&limit=40&offset=0&q='+encodeURIComponent(match[2]));
+    const record=(response.items||[]).find(row=>
+      String(row.bidNo||'')===match[2]&&
+      String(row.order||'000').padStart(3,'0')===match[3]&&String(row.kind||'')===match[1]);
+    if(!record)return;
+    const detail=g2bCardFromServer(record);
+    if(detail){
+      worklinksKeptFullRows.set(id,detail);
+      scheduleJobsRender();
+    }
+   }catch(error){
+    // Keep the original saved item's normal clickable card visible while offline.
+   }finally{worklinksKeptPending.delete(id)}
+  })();
+  worklinksKeptPending.set(id,work);pending.push(work);
+ }
+ if(pending.length)await Promise.all(pending);
+};
 function getJobById(id){
  const regular=jobs.concat(g2bLiveJobs,jobSearchRemote,g2bFilterInventory).find(function(x){return x.id===id});
  if(regular)return regular;
+ if(worklinksKeptFullRows.has(id))return worklinksKeptFullRows.get(id);
  // Evidence-backed shortlist items can be shown before the paginated archive
  // reaches them; keep their detail view reachable via the normal card action.
  if(/^g2b-precheck-/.test(String(id||''))&&changcomActionableData?.bids){
@@ -5499,7 +5545,8 @@ function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
- if(!jobsInitialDataReady&&!(jobSearchText&&jobSearchServerTotal!==null)){
+ if(!jobsInitialDataReady&&!(jobSearchText&&jobSearchServerTotal!==null)&&
+  !(window.worklinksKeeps?.getMode?.()!=='all'&&window.worklinksKeeps?.activeItems?.().length)){
   jobRenderDirty=true;
   el.innerHTML='<div class="emptycard">서버 DB에 저장된 공고를 불러오는 중입니다. 수집은 서버에서 별도로 진행됩니다.</div>';
   const summary=document.getElementById('partnerSummary');
@@ -5526,7 +5573,17 @@ function renderJobs(){
   g2bFilterInventoryState==='ready';
  const fullRows=fullFilterReady?
   [...new Map(g2bFilterInventory.concat(g2bLiveJobs).map(x=>[x.id,x])).values()]:g2bLiveJobs;
+ const keepMode=window.worklinksKeeps?.getMode?.()||'all';
+ const keepItems=keepMode==='all'?[]:(window.worklinksKeeps?.activeItems?.()||[]);
+ const keepOrder=new Map(keepItems.map((item,index)=>[String(item.id),index]));
  const raw=jobs.concat(fullRows,jobSearchText?jobSearchRemote:[]);
+ if(keepMode!=='all'){
+  for(const item of keepItems){
+   if(!item?.id)continue;
+   const full=getJobById(item.id)||worklinksKeptFallback(item);
+   if(full){worklinksKeptFullRows.set(item.id,full);raw.push(full)}
+  }
+ }
  // Use the verified static index without fetching tender bodies or parsing RFP text.
  // Add a bounded set to the SAME standard card grid when server paging is incomplete.
  if(member&&partnerMode&&changcomActionableData?.bids){
@@ -5546,7 +5603,9 @@ function renderJobs(){
   }
  }
  const rejected=raw.filter(x=>x.kind&&jobSoftwareScope(x)==='out').length;
- const all=collapseSimilarNotices(raw.filter(x=>!(x.kind&&jobSoftwareScope(x)==='out')));
+ const all=keepMode==='all'?
+  collapseSimilarNotices(raw.filter(x=>!(x.kind&&jobSoftwareScope(x)==='out'))):
+  [...new Map(raw.filter(x=>keepOrder.has(x.id)).map(x=>[x.id,x])).values()];
  const active=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key!=='closed'});
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
@@ -5653,7 +5712,7 @@ function renderJobs(){
    document.getElementById(id)?.replaceChildren();
  }
  const filter=jobFilter;
- if(filter==='sources'){
+ if(keepMode==='all'&&filter==='sources'){
   document.getElementById('jobVerdictFilter').hidden=true;
   document.getElementById('g2bMore').style.display='none';
   jobAvailableRows=0;
@@ -5661,18 +5720,20 @@ function renderJobs(){
  }else{
   const sort=document.getElementById('jobSort').value;
   const selectedCompany=filter==='partner'&&selectedPartnerId!=='all'?partners.find(p=>p.id===selectedPartnerId):null;
-  const scopeRows=(jobSearchText?all.map(function(x){return {x,time:jobTimeInfo(x)}}):
+  const scopeRows=(keepMode!=='all'?all.map(function(x){return {x,time:jobTimeInfo(x)}}):
+   jobSearchText?all.map(function(x){return {x,time:jobTimeInfo(x)}}):
    partnerMode&&jobPartnerShowClosed?closed:filter==='closed'?closed:active).filter(function(o){
+    if(keepMode!=='all')return true;
     const x=o.x;
     if(filter==='all'||filter==='closed')return true;
     if(filter==='partner')return jobMatchesSelectedPartner(x,selectedPartnerId);
     return x.entry===filter;
   });
   if(member&&partnerMode)refreshVerdictFilters(scopeRows,selectedCompany);
-  let list=scopeRows.filter(o=>
+  let list=keepMode!=='all'?scopeRows:scopeRows.filter(o=>
    matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&
    (!jobSearchText||jobSearchMatches(o.x,jobSearchNormalized(jobSearchText))));
-  list.sort(function(a,b){
+  if(keepMode==='all')list.sort(function(a,b){
     if(filter==='closed'||(partnerMode&&jobPartnerShowClosed))return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
     if(sort==='qualified'){
      const ar=basicBidSignal(a.x)?.tier||0;
@@ -5724,7 +5785,9 @@ function renderJobs(){
     const ad=a.time.end===null?Infinity:a.time.end,bd=b.time.end===null?Infinity:b.time.end;
     return ad-bd||(b.time.start||0)-(a.time.start||0)||a.x.title.localeCompare(b.x.title,'ko');
   });
-  if(filter==='partner'){
+  else list.sort((a,b)=>(keepOrder.get(a.x.id)??Number.MAX_SAFE_INTEGER)-
+                      (keepOrder.get(b.x.id)??Number.MAX_SAFE_INTEGER));
+  if(keepMode==='all'&&filter==='partner'){
    const selected=partners.find(p=>p.id===selectedPartnerId);
    const companyList=selected?[selected]:partners;
    const countByType=type=>list.filter(o=>companyList.some(p=>verdict(o.x,p).type===type)).length;
@@ -5737,7 +5800,7 @@ function renderJobs(){
   jobAvailableRows=list.length;
   const serverMore=!fullFilterReady&&(!!g2bSavedLoadError||(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal));
   const more=document.getElementById('g2bMore');
-  more.style.display=list.length>jobRenderLimit||serverMore?'inline-block':'none';
+  more.style.display=keepMode!=='all'?'none':(list.length>jobRenderLimit||serverMore?'inline-block':'none');
   more.textContent=g2bSavedLoadError?'서버 공고 다시 불러오기 · 일부 목록만 표시':jobRenderLimit<list.length?
    '일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · '+jobPageStep()+'건 더 보기':
    '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지';
@@ -5782,7 +5845,9 @@ function renderJobs(){
          '<a class="job-source-link" href="'+htmlEscape(jobOriginUrl(x))+'" target="_blank" rel="noopener noreferrer" data-external-source="1" aria-label="'+htmlEscape(x.title)+' 공고 원문을 새 탭에서 열기" title="공고 원문 새 탭에서 열기">공고 원문 ↗</a>'+
        '</div></div></article>';
   }).join(''):'<div class="emptycard">'+
-   (jobSearchText?'검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.':'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
+   (keepMode==='mine'?'킵한 공고가 없습니다. 공고 카드에서 ☆ 킵으로 추가하세요.':
+    keepMode==='watch'?'관전 대상의 킵 공고가 없습니다.':
+    jobSearchText?'검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.':'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
  }
  if(!fullFilterReady&&g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal){
   const progress=' · 현재 로드 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 기준 (더 보기 가능)';
