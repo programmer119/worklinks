@@ -5484,7 +5484,7 @@ function bidMethodCardMarkup(x,showBusinessArea=false){
      htmlEscape(value||'정보 없음')+'</strong></div>';
   }).join('')+(showBusinessArea&&bidBusinessArea(x)?'<div class="job-bid-method-cell job-business-meta">'+bidBusinessArea(x)+'</div>':'')+'</div>';
 }
-window.worklinksKeepSnapshotFor=function(id){
+if(typeof window!=='undefined')window.worklinksKeepSnapshotFor=function(id){
  const x=getJobById(id);
  if(!x)return null;
  const when=jobTimeInfo(x);
