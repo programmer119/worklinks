@@ -552,6 +552,15 @@ def main():
         except BlockingIOError:
             log('PIPELINE_LOCK_HELD_EXIT')
             return 1
+        if os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1':
+            # A restarted exclusive scheduler has no surviving owned scanner.
+            # Reclaim interrupted scans immediately rather than trapping
+            # downloaded originals in 'scanning' for the 40-minute stale TTL.
+            sys.path.insert(0,str(SCRIPTS))
+            from rfp_dual_queue import RfpDualQueue
+            reclaimed=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3').recover_stale_scans(seconds=0)
+            if reclaimed:
+                log('RFP_RECLAIM_INTERRUPTED_SCANS_AFTER_RESTART',reclaimed)
         # Exclusive lock means no other pipeline owner can be using these
         # temporary scan workspaces. Remove crash/deploy leftovers (often
         # hundreds of MB) before retrying interrupted work.
