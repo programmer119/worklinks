@@ -78,8 +78,11 @@ def too_sparse(command,**kwargs):
     return SimpleNamespace(returncode=0,stdout='A'.encode(),stderr=b'')
 with patch.object(rfp.shutil,'which',return_value='/usr/bin/tesseract'),\
      patch.object(rfp.subprocess,'run',side_effect=too_sparse):
-    _,evidence=rfp.extract_with_source_status('sparse.pdf',pdf)
-assert evidence['sourceComplete'] is False
-assert evidence['ocrFailedPages']==1
-assert evidence['pdfSources'][0]['ocrFailureDetails'][0]['reason']=='ocr_text_below_12_alphanumeric'
+    try:
+        rfp.extract_with_source_status('sparse.pdf',pdf)
+    except ValueError as err:
+        assert str(err)=='pdf_ocr_incomplete',str(err)
+    else:
+        raise AssertionError('Sparse PDF must not pass full-source verification')
+assert calls==['3','6','11'],calls
 print('RFP_SPARSE_300DPI_PSM6_PSM11_AND_HWPML_XML_FIX=PASS')
