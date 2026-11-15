@@ -42,17 +42,21 @@ jobs:
               browser=p.chromium.launch(headless=True)
               page=browser.new_page(viewport={'width':1440,'height':900},device_scale_factor=1)
               page.goto('https://worklinks.suaveforge.com/startup-support/?view=jobs',wait_until='domcontentloaded',timeout=60000)
-              page.locator('#jobsView.on').wait_for(timeout=25000)
-              # Live browser tests run anonymously. Verify the partner panel is
-              # protected, then simulate a granted member session in this test
-              # page only; never change the production authorization guard.
+              # Anonymous production visits are intentionally locked. This is
+              # a visual-layout test, not the separate live AuthHub regression.
+              # Unlock only this ephemeral Playwright page; production stays gated.
+              page.locator('#worklinks-auth-gate').wait_for(state='visible',timeout=25000)
               assert not page.evaluate("worklinksPartnerAccess()")
               assert page.locator('#jobDecisionSummary').is_hidden()
               page.evaluate("""() => {
+                document.documentElement.dataset.worklinksAuthState='granted';
+                document.querySelector('body > main').inert=false;
+                document.querySelector('#worklinks-auth-gate').hidden=true;
                 window.worklinksMemberAuthenticated=true;
                 document.documentElement.dataset.worklinksPartnerAccess='granted';
                 window.dispatchEvent(new Event('worklinks:partner-access'));
               }""")
+              page.locator('#jobsView.on').wait_for(state='visible',timeout=25000)
               # The private screening summary belongs to the Changcom
               # workspace, not the general public Jobs workspace.
               page.evaluate("setWorkspaceView('changcom')")
