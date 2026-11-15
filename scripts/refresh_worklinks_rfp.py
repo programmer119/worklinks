@@ -2178,7 +2178,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             phase['textCacheHits']+=int(text_cache_hit)
             content=normalize_extracted_text(extracted)
             timer=time.perf_counter()
-            if len(content.strip())<(30 if name.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.webp')) else 100):
+            if sum(ch.isalnum() for ch in content)<12:
                 raise ValueError('no_searchable_text')
             if live_trace:live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='조건·인원 판독',status='working')
             triggers,snippets=parse_clauses(content)
