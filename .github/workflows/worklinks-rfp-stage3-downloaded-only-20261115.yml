@@ -1,0 +1,36 @@
+name: WorkLinks stage-3 downloaded-only gate regression
+on:
+  push:
+    branches:
+      - fix/rfp-repair-downloaded-only-20261115
+      - main
+    paths:
+      - scripts/repair_open_rfp_cached_attachments.py
+      - scripts/rfp_dual_queue.py
+      - tests/test_open_cached_rfp_repair.py
+      - tests/test_rfp_verified_file_handoff.py
+      - .github/workflows/worklinks-rfp-stage3-downloaded-only-20261115.yml
+  pull_request:
+    paths:
+      - scripts/repair_open_rfp_cached_attachments.py
+      - scripts/rfp_dual_queue.py
+      - tests/test_open_cached_rfp_repair.py
+      - tests/test_rfp_verified_file_handoff.py
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse scanner and regression tests
+        run: |
+          python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py tests/test_open_cached_rfp_repair.py
+      - name: Verified original handoff, no missing-file reads, and independent queues
+        run: |
+          python3 tests/test_open_cached_rfp_repair.py
+          python3 tests/test_rfp_verified_file_handoff.py
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_rfp_independent_workers_and_scan.py
+          echo RFP_STAGE3_DOWNLOAD_RECEIPT_GATE=PASS
