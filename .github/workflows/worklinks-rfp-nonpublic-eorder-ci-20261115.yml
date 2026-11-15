@@ -1,0 +1,28 @@
+name: WorkLinks current public RFP attachment and internal eorder 422 regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'scripts/rfp_bulk_manifests.py'
+      - 'scripts/rfp_reconcile_nonpublic_eorder.py'
+      - 'tests/test_rfp_reconcile_nonpublic_eorder.py'
+      - 'tests/test_rfp_bulk_manifests.py'
+      - '.github/workflows/worklinks-rfp-nonpublic-eorder-ci-20261115.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify official eorder document roles and safe SHA-verified queue recovery without network
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile server/g2b-proxy.py scripts/rfp_bulk_manifests.py scripts/rfp_reconcile_nonpublic_eorder.py
+          python3 tests/test_rfp_bulk_manifests.py
+          python3 tests/test_rfp_reconcile_nonpublic_eorder.py
+          python3 tests/test_rfp_download_worker.py
+          echo WORKLINKS_EORDER_CURRENT_PUBLIC_ATTACHMENT_REGRESSION_PASS
