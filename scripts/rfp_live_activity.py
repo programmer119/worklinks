@@ -75,6 +75,16 @@ def record(lane,notice_key,file_key='',file_name='',phase='',status='working',
              max(0,int(bytes_total or 0)),max(0,int(files_done or 0)),
              max(0,int(files_total or 0)),float(retry_epoch or 0),str(error)[:180],
              now,now,now))
+        if lane=='scan':
+            # The parent scheduler is blocked while the child scanner runs.
+            # Refresh scan worker heartbeat from actual file-level evidence;
+            # a previous 'waiting_for_download' must not remain on screen.
+            db.execute("""INSERT INTO rfp_live_workers(
+                lane,status,error_text,retry_epoch,updated_epoch)
+                VALUES('scan','running','',0,?)
+                ON CONFLICT(lane) DO UPDATE SET status='running',
+                    error_text='',retry_epoch=0,updated_epoch=excluded.updated_epoch""",
+                (now,))
 
 def worker(lane,status,error='',retry_epoch=0):
     if lane not in ('manifest','download','scan'):return
