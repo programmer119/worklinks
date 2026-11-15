@@ -1417,9 +1417,15 @@ def rfp_dual_lane_progress(path):
             # file list is complete. Read only: no procurement requests.
             manifest_done=db.execute('''SELECT COUNT(*) FROM rfp_bulk_manifests m
                 JOIN rfp_dual_notices n ON n.notice_key=m.notice_key''').fetchone()[0]
-            confirmed=db.execute('''SELECT notice_key,metadata_json FROM rfp_dual_notices
-                WHERE download_status='error_confirmed'
-                ORDER BY updated_at DESC LIMIT 25''').fetchall()
+            columns={x[1] for x in db.execute('PRAGMA table_info(rfp_dual_notices)')}
+            # Older read-only regression fixtures may lack these optional
+            # detail columns. Production has both and returns full evidence.
+            if {'metadata_json','updated_at'}.issubset(columns):
+                confirmed=db.execute('''SELECT notice_key,metadata_json FROM rfp_dual_notices
+                    WHERE download_status='error_confirmed'
+                    ORDER BY updated_at DESC LIMIT 25''').fetchall()
+            else:
+                confirmed=[]
     except (sqlite3.Error,OSError):
         return {'available':False}
     total=sum(n for _,_,n in rows)
