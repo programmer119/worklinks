@@ -1444,7 +1444,12 @@ def rfp_cohort_lanes(path,managed,valid):
                          in ('ready','no_attachments','evidence_complete')})
     confirmed_keys={key for key in cohort if entries.get(key,('',))[0]=='error_confirmed'}
     pending_missing=not_queued-valid
-    active_manifest=sum(1 for key in present if entries[key][0] in ('pending','retry'))
+    # A pending/retry download is NOT an active attachment-list collection.
+    # The manifest is already complete for such notices once present in
+    # verified_sources. Count only still-unprepared notices as outstanding.
+    pending_manifest=sum(1 for key in present
+                         if key not in verified_sources and
+                         entries[key][0] in ('pending','retry'))
     active_download=sum(1 for key in present if entries[key][0]=='fetching')
     active_scan=sum(1 for key in present if entries[key][1]=='scanning')
     retry_download=sum(1 for key in present if entries[key][0]=='retry')
@@ -1466,7 +1471,8 @@ def rfp_cohort_lanes(path,managed,valid):
        'total':total,'outsideScopeQueue':len(set(entries)-cohort),
        'missingFromQueue':len(not_queued),'missingIncomplete':len(pending_missing),
        'manifest':{'total':total,'done':len(verified_sources),
-                   'active':active_manifest,'failed':retry_download},
+                   'remaining':total-len(verified_sources),
+                   'pending':pending_manifest,'active':0,'failed':0},
        'download':{'total':total,'done':len(source_received),
                    'processed':len(source_received|confirmed_keys),
                    'errors':len(confirmed_keys),'errorDetails':error_details,
