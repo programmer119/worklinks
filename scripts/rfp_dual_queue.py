@@ -144,6 +144,17 @@ class RfpDualQueue:
             db.execute("UPDATE rfp_dual_notices SET download_status='pending' WHERE download_status='fetching'")
             # Scanner claims are recovered on their own timeout, not on downloader restart.
 
+    def release_old_official_missing_retries(self):
+        """One-time migration: recheck old 24h HTTP 422 retries with terminal handling."""
+        with self.connect() as db:
+            return db.execute('''UPDATE rfp_dual_notices
+                SET download_status='pending',download_retry_epoch=0,
+                    last_error='official_missing_reference_verify_once',
+                    updated_at=?
+                WHERE download_status='retry' AND
+                    last_error LIKE '%official_attachment_reference_missing_422%' ''',
+                (now_utc(),)).rowcount
+
     def release_old_metadata_quota_retries(self):
         """A verified bulk manifest supersedes stale per-notice metadata quota failures.
 
@@ -180,6 +191,27 @@ class RfpDualQueue:
         # Publish a complete three-source manifest atomically, never partial.
         if not records:return 0
         with self.connect() as db:
+            # Confirmed errors are terminal only for the present official file references.
+            # A genuinely changed official manifest reopens just that notice.
+            for key,metadata in records.items():
+                row=db.execute('''SELECT metadata_json FROM rfp_dual_notices
+                    WHERE notice_key=? AND download_status='error_confirmed' ''',
+                    (key,)).fetchone()
+                if row is None:continue
+                try:previous=json.loads(row[0] or '{}')
+                except (ValueError,TypeError):previous={}
+                def references(doc):
+                    items=((doc.get('attachments') or {}).get('items') or [])
+                    return sorted((str(x.get('name') or ''),str(x.get('url') or ''))
+                                  for x in items if isinstance(x,dict))
+                if references(previous)!=references(metadata):
+                    db.execute('''UPDATE rfp_dual_notices
+                        SET download_status='pending',scan_status='pending',
+                        download_retry_epoch=0,scan_retry_epoch=0,
+                        metadata_json='',download_done=0,download_total=0,
+                        last_error='official_attachment_references_changed',
+                        updated_at=? WHERE notice_key=? AND
+                        download_status='error_confirmed' ''',(now_utc(),key))
             db.executemany('''INSERT INTO rfp_bulk_manifests(
                 notice_key,metadata_json,sources,saved_at)
                 VALUES (?,?,?,?) ON CONFLICT(notice_key) DO UPDATE SET
@@ -288,6 +320,34 @@ class RfpDualQueue:
                 WHERE notice_key=? AND download_status='fetching' ''',
                 (payload,int(done),int(total),now_utc(),key))
 
+    def download_unavailable(self,key,metadata,verified_files,error_files):
+        """Terminal official 422: retain verified originals; never mark missing as saved.
+
+        The notice does NOT enter the scanner's ready queue. New official
+        attachment references can reopen it through save_bulk_manifests.
+        """
+        if not error_files or any(
+            not isinstance(item,dict) or item.get('httpStatus')!=422 or
+            not item.get('url') for item in error_files):
+            raise ValueError('terminal_error_requires_verified_official_422')
+        if any(not isinstance(item,dict) or
+               not item.get('sha256') or not item.get('url')
+               for item in verified_files):
+            raise ValueError('terminal_error_verified_receipts_invalid')
+        data=dict(metadata,downloadVerifiedFiles=verified_files,
+                  downloadErrorFiles=error_files)
+        with self.connect() as db:
+            db.execute('''UPDATE rfp_dual_notices SET
+                download_status='error_confirmed',scan_status='pending',
+                metadata_json=?,download_done=?,download_total=?,
+                download_retry_epoch=0,scan_retry_epoch=0,
+                last_error='official_attachment_reference_missing_422',
+                updated_at=?
+                WHERE notice_key=? AND download_status='fetching' ''',
+                (json.dumps(data,ensure_ascii=False,separators=(',',':')),
+                 len(verified_files),len(verified_files)+len(error_files),
+                 now_utc(),key))
+
     def download_failed(self,key,reason,retry_seconds=180):
         with self.connect() as db:
             db.execute('''UPDATE rfp_dual_notices SET download_status='retry',
@@ -358,8 +418,10 @@ class RfpDualQueue:
         scan_done=sum(n for _,scan,n in rows if scan in ('done','skipped'))
         skipped=sum(n for _,scan,n in rows if scan=='skipped')
         # "retry" is retriable, not a fabricated completed action.
+        confirmed=sum(n for download,_,n in rows if download=='error_confirmed')
         return {'available':True,'total':total,
                 'download':{'total':total,'done':downloaded,
+                            'processed':downloaded+confirmed,'errors':confirmed,
                             'active':sum(n for download,_,n in rows if download=='fetching'),
                             'failed':sum(n for download,_,n in rows if download=='retry')},
                 'scan':{'total':total,'done':scan_done,'skipped':skipped,
@@ -377,6 +439,8 @@ class RfpDualQueue:
         return {'available':True,'total':total,
                 'download':{'total':total,
                             'done':sum(n for a,_,n in rows if a in ('ready','no_attachments')),
+                            'processed':sum(n for a,_,n in rows if a in ('ready','no_attachments','error_confirmed')),
+                            'errors':sum(n for a,_,n in rows if a=='error_confirmed'),
                             'active':sum(n for a,_,n in rows if a=='fetching'),
                             'failed':sum(n for a,_,n in rows if a=='retry')},
                 'scan':{'total':total,
