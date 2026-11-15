@@ -125,8 +125,12 @@ with sync_playwright() as p:
     }""")
 
     assert '문서 판독' in body and '1 / 6건' in body,body
+    page.wait_for_function("""() => document.querySelector('[data-rfp-field="scanExcluded"]')
+      ?.textContent?.includes('판독 제외 1건')""",timeout=12000)
     assert page.locator('[data-rfp-field="scanExcluded"]').inner_text()==(
-        '판독 제외 1건 · 공식 첨부목록 0개 확인 (판독 실패 아님)')
+        '판독 제외 1건 · 공식 첨부목록 0개 확인 (판독 실패 아님)'),(
+         page.locator('[data-rfp-field="scanExcluded"]').text_content(),
+         page.locator('#rfpRescanContent').text_content())
     assert '공식 첨부파일 없음 1건' not in page.locator(
         '[data-rfp-stage="scan"] .rfp-rescan-stage-track').inner_text()
 
