@@ -116,10 +116,12 @@ with tempfile.TemporaryDirectory() as root:
                 'official_attachment_reference_missing_422')
         return {'sha256':'c'*64,'bytes':90}
     halt.clear()
-    with patch.object(worker.reader,'fetch_json',return_value=partial),\\
-         patch.object(worker.reader,'active_rfp_ledger',return_value=FakeLedger()),\\
-         patch.object(worker,'stream_original_to_verified_ledger',side_effect=partial_download),\\
-         patch.object(worker.META_PACE,'acquire',return_value=None):
+    with (
+         patch.object(worker.reader,'fetch_json',return_value=partial),
+         patch.object(worker.reader,'active_rfp_ledger',return_value=FakeLedger()),
+         patch.object(worker,'stream_original_to_verified_ledger',side_effect=partial_download),
+         patch.object(worker.META_PACE,'acquire',return_value=None),
+    ):
         claim=queue.claim_download()
         assert claim[0]==missing_key
         assert worker.download_one(queue,claim,halt)
