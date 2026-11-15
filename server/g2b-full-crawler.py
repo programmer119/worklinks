@@ -203,6 +203,20 @@ def save(db,items):
         kind=x.get('kind','')
         no=x.get('bidNo','')
         if kind not in OPERATIONS or not no:continue
+        # Different official endpoints omit ntceKindNm. Never let a partial
+        # response silently erase a previously verified notice/cancel status.
+        if not x.get('noticeKind'):
+            prior=db.execute('''SELECT payload FROM bid_notices
+                WHERE kind=? AND bid_no=? AND bid_ord=?''',
+                (kind,str(no),str(x.get('order','0')))).fetchone()
+            if prior:
+                try:stored=json.loads(prior[0] or '{}')
+                except (ValueError,TypeError):stored={}
+                previous=str(stored.get('noticeKind') or '').strip()
+                if previous:
+                    x=dict(x,noticeKind=previous)
+                    if not x.get('state') or x.get('state')=='일반공고':
+                        x['state']=previous
         values.append((kind,str(no),str(x.get('order','0')),json.dumps(x,ensure_ascii=False,separators=(',',':')),now,now))
     if not values:return 0
     with db:
