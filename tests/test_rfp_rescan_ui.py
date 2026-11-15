@@ -288,6 +288,8 @@ with sync_playwright() as p:
     assert page.locator('[data-rfp-field="failed"]').text_content()=='3'
     assert page.locator('[data-rfp-field="rescanRequired"]').text_content()=='245'
     assert page.locator('[data-rfp-field="pct"]').text_content()=='89.32%'
+    assert page.locator('#rfpRescanCount').text_content()=='완료 2,050 / 2,295건'
+    assert '판독 제외 52건' in page.locator('#rfpRescanCount').get_attribute('title')
     assert page.locator('[data-rfp-field="scanCount"]').text_content().startswith('2,050 / 2,295'),page.locator('[data-rfp-field="scanCount"]').text_content()
     print('WORKLINKS_RFP_NO_FILE_52_VISIBLE_BUCKETS=PASS')
 
