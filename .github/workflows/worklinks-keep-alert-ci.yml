@@ -1,0 +1,26 @@
+name: WorkLinks spectator keep background alert QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - startup-support/worklinks-keep.js
+      - startup-support/index.html
+      - tests/test_worklinks_watch_alerts.py
+      - .github/workflows/worklinks-keep-alert-ci.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  spectator-alert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser QA
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Verify foreground and background spectator notifications
+        run: |
+          node --check startup-support/worklinks-keep.js
+          python3 tests/test_worklinks_watch_alerts.py
