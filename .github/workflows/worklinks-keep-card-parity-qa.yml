@@ -23,20 +23,27 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import time,urllib.request,json
+          import json,pathlib
+          from urllib.parse import urlparse
           from playwright.sync_api import sync_playwright
-          release='20261115-keep-cards-v3'
           base='https://worklinks.suaveforge.com/startup-support/'
-          for attempt in range(24):
-              with urllib.request.urlopen(base+'worklinks-auth-version.txt?check='+str(time.time()),timeout=12) as response:
-                  published=response.read().decode('utf-8').strip()
-              print('KEEP_CARD_PRODUCTION_RELEASE',attempt,published,flush=True)
-              if published==release:break
-              time.sleep(5)
-          else:raise AssertionError('production still serves old keep cards')
+          root=(pathlib.Path.cwd()/'startup-support').resolve()
           with sync_playwright() as pw:
               browser=pw.chromium.launch(headless=True)
               page=browser.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
+              def serve_checkout(route):
+                  path=urlparse(route.request.url).path.split('/startup-support/',1)[-1]
+                  target=(root/(path or 'index.html')).resolve()
+                  if target.is_file() and target.is_relative_to(root):
+                      typ='application/javascript' if target.suffix=='.js' else (
+                          'text/css' if target.suffix=='.css' else (
+                          'text/html' if target.suffix=='.html' else 'text/plain'))
+                      route.fulfill(status=200,content_type=typ,body=target.read_bytes())
+                  else:
+                      route.continue_()
+              # Same production origin/API, but exact source from this commit.
+              # No user account, token, or production record is modified.
+              page.route('https://worklinks.suaveforge.com/startup-support/**',serve_checkout)
               page.goto(base+'?view=jobs',wait_until='domcontentloaded',timeout=60000)
               page.wait_for_function("typeof renderJobs==='function' && typeof window.worklinksHydrateKeptJobs==='function' && !!document.getElementById('jobCards')",timeout=35000)
               page.evaluate("""() => {
@@ -50,54 +57,81 @@ jobs:
                 startJobsDataWhenVisible();
               }""")
               page.wait_for_function("jobsInitialDataReady && document.querySelectorAll('#jobCards .job-mini[data-job-card]').length>=6",timeout=90000)
-              result=page.evaluate("""() => {
-                const all=[...document.querySelectorAll('#jobCards .job-mini[data-job-card]')];
-                const ids=all.slice(0,6).map(x=>x.dataset.jobCard);
-                if(ids.length!==6)throw Error('six base notices unavailable');
-                const items=ids.map(id=>({id,...window.worklinksKeepSnapshotFor(id)}));
-                window.__qaMode='all';window.__qaItems=items;
-                const keepButton=id=>window.__qaMode==='watch'?'':(
-                  '<button type="button" class="job-keep-button" data-keep-toggle="'+id+'">★ 킵</button>');
-                window.worklinksKeeps={getMode:()=>window.__qaMode,
-                  activeItems:()=>window.__qaItems,keepButton,has:id=>ids.includes(id)};
-                const canonical=html=>html.replace(/<button[^>]*data-keep-toggle="[^"]*"[^>]*>[^<]*<[/]button>/g,'');
-                renderJobs();
-                const normal=new Map([...document.querySelectorAll('#jobCards .job-mini')]
-                  .filter(el=>ids.includes(el.dataset.jobCard))
-                  .map(el=>[el.dataset.jobCard,canonical(el.outerHTML)]));
-                window.__qaMode='mine';renderJobs();
-                const saved=[...document.querySelectorAll('#jobCards .job-mini[data-job-card]')];
-                const ownCount=saved.length;
-                const sameOriginalMarkup=saved.every(el=>
-                  normal.has(el.dataset.jobCard)&&
-                  normal.get(el.dataset.jobCard)===canonical(el.outerHTML));
-                const originalControls=saved.every(el=>
-                  !!el.querySelector('[data-job-detail]')&&
-                  !!el.querySelector('[data-external-source]')&&
-                  !!el.querySelector('.job-day')&&
-                  !!el.querySelector('[data-keep-toggle]'));
-                window.__qaMode='watch';renderJobs();
-                const watched=[...document.querySelectorAll('#jobCards .job-mini[data-job-card]')];
-                const watchCount=watched.length;
-                const watchReadOnly=watched.every(el=>!el.querySelector('[data-keep-toggle]'));
-                const watchedOriginalMarkup=watched.every(el=>
-                  normal.has(el.dataset.jobCard)&&
-                  normal.get(el.dataset.jobCard)===canonical(el.outerHTML));
-                window.__qaMode='mine';renderJobs();
-                const first=document.querySelector('#jobCards .job-mini[data-job-card]');
-                window.__qaClickedId=first?.dataset.jobCard;
-                first?.click();
-                return {ids,ownCount,watchCount,sameOriginalMarkup,
-                  originalControls,watchReadOnly,watchedOriginalMarkup,
-                  clicked:window.__qaClickedId,
-                  activeDetail:activeDetailJobId,
-                  fullCardCount:document.querySelectorAll('#jobCards article.job-mini').length};
+              sample=page.evaluate("""() => {
+                const cards=[...document.querySelectorAll('#jobCards article.job-mini[data-job-card]')].slice(0,6);
+                const items=cards.map(el=>({id:el.dataset.jobCard,...window.worklinksKeepSnapshotFor(el.dataset.jobCard)}));
+                if(items.length!==6)throw Error('six original job cards not available');
+                window.__qaItems=items;
+                // Mock the two member API responses only inside this QA browser.
+                window.worklinksKeepCurrentUser=()=> 'qa-member-11111111';
+                window.worklinksKeepRequest=async path=>{
+                  if(path==='/worklinks-keep')return {ok:true,items,shareEnabled:true,shareAlias:'QA member'};
+                  if(path==='/worklinks-keep-members')return {ok:true,members:[
+                    {id:'member-22222222',name:'Other member',count:6}]};
+                  if(path.startsWith('/worklinks-keep-watch?'))return {ok:true,
+                    readOnly:true,items,member:{id:'member-22222222',name:'Other member'}};
+                  throw Error('QA attempted unsupported API '+path);
+                };
+                document.documentElement.dataset.worklinksAuthState='granted';
+                window.dispatchEvent(new Event('worklinks:partner-access'));
+                return {ids:items.map(x=>x.id)};
               }""")
+              page.wait_for_function("""() => window.worklinksKeeps?.has(window.__qaItems[0].id) &&
+                document.getElementById('keepMineCount')?.textContent==='6'""",timeout=20000)
+              page.evaluate("""() => {
+                document.getElementById('keepModeAll').click();
+                renderJobs();
+                window.__qaBaseCards=new Map([...document.querySelectorAll('#jobCards article.job-mini')]
+                  .filter(el=>window.__qaItems.some(item=>item.id===el.dataset.jobCard))
+                  .map(el=>[el.dataset.jobCard,el.cloneNode(true)]));
+              }""")
+              page.locator('#keepModeMine').click(timeout=10000)
+              page.wait_for_function("""() =>
+                document.querySelector('#jobsView')?.dataset.keepMode==='mine' &&
+                document.querySelectorAll('#jobCards article.job-mini[data-job-card]').length===6""",timeout=20000)
+              owned=page.evaluate("""() => {
+                const norm=el=>{const copy=el.cloneNode(true);
+                  copy.querySelectorAll('[data-keep-toggle]').forEach(button=>button.remove());
+                  return copy.outerHTML};
+                const cards=[...document.querySelectorAll('#jobCards article.job-mini[data-job-card]')];
+                return {count:cards.length,ids:cards.map(el=>el.dataset.jobCard),
+                  identical:cards.every(el=>window.__qaBaseCards.has(el.dataset.jobCard)&&
+                    norm(window.__qaBaseCards.get(el.dataset.jobCard))===norm(el)),
+                  interactive:cards.every(el=>el.querySelector('.job-day')&&
+                    el.querySelector('[data-job-detail]')&&el.querySelector('[data-external-source]')&&
+                    el.querySelector('[data-keep-toggle]'))};
+              }""")
+              # Real browser pointer click; not a synthetic direct function call.
+              page.locator('#jobCards article.job-mini[data-job-card]').first.click(timeout=12000,force=True)
+              clicked=page.evaluate("({selected:activeDetailJobId,expected:window.__qaItems[0].id})")
+              page.evaluate("document.getElementById('keepModeWatch').click()")
+              page.wait_for_function("""() => document.getElementById('keepMemberSelect').options.length===2""",timeout=15000)
+              page.evaluate("""() => {
+                const select=document.getElementById('keepMemberSelect');
+                select.value='member-22222222';
+                select.dispatchEvent(new Event('change',{bubbles:true}));
+              }""")
+              page.wait_for_function("""() => document.querySelector('#jobsView')?.dataset.keepMode==='watch' &&
+                window.worklinksKeeps.activeItems().length===6 &&
+                document.querySelectorAll('#jobCards article.job-mini[data-job-card]').length===6""",timeout=20000)
+              watched=page.evaluate("""() => {
+                const norm=el=>{const copy=el.cloneNode(true);
+                  copy.querySelectorAll('[data-keep-toggle]').forEach(button=>button.remove());
+                  return copy.outerHTML};
+                const cards=[...document.querySelectorAll('#jobCards article.job-mini[data-job-card]')];
+                return {count:cards.length,identical:cards.every(el=>
+                  window.__qaBaseCards.has(el.dataset.jobCard)&&
+                  norm(window.__qaBaseCards.get(el.dataset.jobCard))===norm(el)),
+                  readOnly:cards.every(el=>!el.querySelector('[data-keep-toggle]')),
+                  clickable:cards.every(el=>!!el.querySelector('[data-job-detail]')&&
+                    !!el.querySelector('[data-external-source]'))};
+              }""")
+              result={'sample':sample,'owned':owned,'watch':watched,'click':clicked}
               print('WORKLINKS_KEEP_CARD_BROWSER_CHECK',json.dumps(result,ensure_ascii=False),flush=True)
-              assert result['ownCount']==6 and result['watchCount']==6,result
-              assert result['sameOriginalMarkup'] and result['watchedOriginalMarkup'],result
-              assert result['originalControls'] and result['watchReadOnly'],result
-              assert result['activeDetail']==result['clicked'],result
+              assert owned['count']==6 and watched['count']==6,result
+              assert owned['identical'] and watched['identical'],result
+              assert owned['interactive'] and watched['readOnly'] and watched['clickable'],result
+              assert clicked['selected']==clicked['expected'],result
               print('WORKLINKS_KEPT_SIX_ORIGINAL_CARD_AND_DETAIL_CLICK=PASS')
               browser.close()
           PY
