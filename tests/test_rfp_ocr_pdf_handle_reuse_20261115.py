@@ -69,6 +69,6 @@ blank=scanned(2,blank=True)
 with patch.object(reader,'_ocr_pdf_page',return_value='입찰 참가 자격 검사 조달청 입찰') as ocr:
     _,ev=reader.extract_with_source_status('blank-page.pdf',blank)
     assert ev['ocrAttemptedPages']==1,ev
-    assert ev['genuinelyBlankPages']==1,ev
+    assert ev['pdfSources'][0]['genuinelyBlankPages']==1,ev
     assert ocr.call_count==1
 print('PDF_OCR_OPEN_ONCE_NO_REDUNDANT_IMAGES_AND_HASHED_PAGE_CACHE_PASS')
