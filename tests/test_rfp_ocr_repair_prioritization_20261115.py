@@ -38,4 +38,19 @@ assert used==7,used  # 3 HWP + 1 OCR + 3 XLS; large manifests remain eligible
 assert [x[-1] for x in chosen]==[3,3,1],chosen
 assert repair.choose_repair_batch(candidates,limit=2,max_files=3)[1]==3
 assert repair.choose_repair_batch(candidates,limit=3,max_files=1)[1]==1
+# Production OCR batches have three file slots: reserve two for
+# never-attempted current reader failures and spend at most one per notice.
+# Preserve a third slot for normal completion-first repairs.
+legacy_a=(0,now,'legacy-A',{},'verified_download_queue',3,(0,3,45),True)
+legacy_b=(0,now+dt.timedelta(hours=1),'legacy-B',{},'verified_download_queue',2,(0,2,16),True)
+normal=(0,now,'completed-soon',{},'verified_download_queue',1,(0,1,1),False)
+fair,fair_files=repair.choose_repair_batch([normal,legacy_a,legacy_b],
+    limit=3,max_files=3,per_notice_cap=1,minimum_old_ocr=2)
+assert [r[0] for r in fair]==['legacy-B','legacy-A','completed-soon'],fair
+assert [r[-1] for r in fair]==[1,1,1] and fair_files==3,(fair,fair_files)
+# A two-file legacy record cannot monopolize all three worker slots.
+fair2,slots=repair.choose_repair_batch([legacy_a,normal],2,3,
+    per_notice_cap=1,minimum_old_ocr=2)
+assert [r[0] for r in fair2]==['legacy-A','completed-soon']
+assert slots==2
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
