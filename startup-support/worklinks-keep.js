@@ -22,26 +22,8 @@ function keepButton(id){
     '" title="'+(selected?'내 킵에서 제외':'내 킵에 추가')+'">'+
     (selected?'★ 킵':'☆ 킵')+'</button>';
 }
-function safeHref(url){const value=String(url||'');return value.startsWith('https://')||value.startsWith('http://')?value:''}
-function keptMarkup(item){
-  const title=esc(item.title||item.id), org=esc(item.org||'발주기관 미확인');
-  const amount=String(item.amount||'').trim();
-  const deadline=String(item.deadline||'').trim();
-  const url=safeHref(item.url);
-  const own=state.mode==='mine';
-  return '<article class="card keep-job-card" data-keep-item="'+esc(item.id)+'">'+
-    '<div class="keep-job-main">'+
-      '<div class="keep-job-title">'+title+'</div>'+
-      '<div class="keep-job-meta">'+org+
-      (deadline?' · '+esc(deadline):'')+'</div>'+
-      (amount?'<strong class="keep-job-amount">'+esc(amount)+'</strong>':'')+
-    '</div>'+
-    '<div class="keep-job-actions">'+
-      (own?'<button type="button" class="job-keep-button active" data-keep-toggle="'+esc(item.id)+'" aria-label="'+title+' 킵 해제">★ 킵</button>':'')+
-      (url?'<a class="keep-job-link" target="_blank" rel="noopener noreferrer" href="'+esc(url)+'">공고 원문 ↗</a>':'')+
-    '</div>'+
-  '</article>';
-}
+// Kept and watched notices always use the original #jobCards renderer.
+
 function render(){
   const active=!!currentUser(),view=byId('jobsView'),toolbar=byId('keepToolbar');
   if(!view||!toolbar)return;
@@ -68,19 +50,14 @@ function render(){
   if(document.activeElement!==checkbox)checkbox.checked=state.shareEnabled;
   const alias=byId('keepShareAlias');
   if(document.activeElement!==alias)alias.value=state.shareAlias;
-  const content=byId('keepListCards');
-  let list=state.mode==='mine'?state.mine:state.mode==='watch'?state.watch:[];
-  content.innerHTML=list.length?list.map(keptMarkup).join(''):
-    '<div class="keep-empty">'+(state.mode==='mine'?
-      (state.ownLoaded?'킵한 일감이 없습니다. 공고 카드의 ☆ 킵을 눌러 추가하세요.':'내 킵 목록을 불러오는 중입니다.'):
-      state.watchId?'선택한 회원이 공유한 킵 목록이 비어 있습니다.':
-      '관전할 회원을 선택하세요.')+'</div>';
-  const heading=byId('keepListHeading');
-  heading.textContent=state.mode==='mine'?'내 킵 · '+state.mine.length+'건':
-    state.mode==='watch'?'관전 · '+(state.watchMember?.name||'대상 선택')+' · '+list.length+'건':'';
+  refreshCards();
 }
 function refreshCards(){
   if(typeof window.scheduleJobsRender==='function')window.scheduleJobsRender();
+  if(state.mode!=='all'&&typeof window.worklinksHydrateKeptJobs==='function')
+    window.worklinksHydrateKeptJobs(state.mode==='mine'?state.mine:state.watch).catch(()=>{
+      status('일부 공고의 원본 조회를 완료하지 못했습니다. 원문 링크는 계속 이용할 수 있습니다.',true);
+    });
 }
 let mineLoadPromise=null;
 function keepFailureReason(error){
@@ -231,7 +208,13 @@ document.addEventListener('click',event=>{
   event.preventDefault();event.stopPropagation();
   toggleKeep(button.dataset.keepToggle);
 });
-window.worklinksKeeps={has:savedById,keepButton,getMode:()=>state.mode,refresh:loadMine};
+window.worklinksKeeps={
+  has:savedById,
+  keepButton:id=>state.mode==='watch'?'':keepButton(id),
+  getMode:()=>state.mode,
+  activeItems:()=>state.mode==='mine'?state.mine:state.mode==='watch'?state.watch:[],
+  refresh:loadMine
+};
 window.addEventListener('worklinks:partner-access',accountChanged);
 accountChanged();
 setInterval(()=>{
