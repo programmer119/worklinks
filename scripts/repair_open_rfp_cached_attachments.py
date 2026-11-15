@@ -363,7 +363,10 @@ def run(data_dir,limit,execute=False,max_files=400):
     known_full=[(detail,'rolling_full_scan'),(older,'prior_batch_scan'),
                 (archived,'archived_batch_scan')]
     ledger=root/'rfp-request-ledger.sqlite3'
-    queue_path=root/'rfp-dual-queue.sqlite3'
+    # The scheduler runs repair in an isolated temporary workspace.
+    # Resolve the live stage-2 queue from the explicitly supplied server path.
+    queue_path=Path(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE_DB') or
+                    root/'rfp-dual-queue.sqlite3')
     ready_downloads=verified_download_queue(queue_path)
     entries=read_json(coverage_path).get('byNotice') or {}
     now=dt.datetime.now(dt.timezone.utc)

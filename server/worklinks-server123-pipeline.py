@@ -283,9 +283,12 @@ def run_once(kind, runner=None, _single=False):
                    WORKLINKS_RFP_ROLE_PRIORITY_KEYS=RFP_STAFFING_PRIORITY_KEYS,
                    WORKLINKS_RFP_LEDGER_DB=str(DATA/'rfp-request-ledger.sqlite3'),
                    WORKLINKS_RFP_NOTICE_PROGRESS_DB=str(DATA/'rfp-notice-progress.sqlite3'))
+        if kind in ('rfpUpgrade','rfpOpenRepair'):
+            # Both stage-3 readers use the actual persistent stage-2 queue;
+            # the isolated repair workspace does not contain this SQLite DB.
+            env['WORKLINKS_RFP_DUAL_QUEUE_DB']=str(DATA/'rfp-dual-queue.sqlite3')
         if kind=='rfpUpgrade' and dual_enabled:
             env['WORKLINKS_RFP_DUAL_SCAN_ONLY']='1'
-            env['WORKLINKS_RFP_DUAL_QUEUE_DB']=str(DATA/'rfp-dual-queue.sqlite3')
         if kind in ('rfp','rfpUpgrade'):
             # OCR repair remains full-fidelity, but the bulk scanner never
             # holds every other notice behind multi-page Tesseract.
