@@ -1,0 +1,103 @@
+name: WorkLinks keep and watch original-card browser QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/worklinks-keep-card-parity-qa.yml'
+      - 'startup-support/index.html'
+      - 'startup-support/worklinks-keep.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Chromium for real card click and layout checks
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install chromium
+      - name: Validate six kept cards are original clickable job thumbnails
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import time,urllib.request,json
+          from playwright.sync_api import sync_playwright
+          release='20261115-keep-cards-v3'
+          base='https://worklinks.suaveforge.com/startup-support/'
+          for attempt in range(24):
+              with urllib.request.urlopen(base+'worklinks-auth-version.txt?check='+str(time.time()),timeout=12) as response:
+                  published=response.read().decode('utf-8').strip()
+              print('KEEP_CARD_PRODUCTION_RELEASE',attempt,published,flush=True)
+              if published==release:break
+              time.sleep(5)
+          else:raise AssertionError('production still serves old keep cards')
+          with sync_playwright() as pw:
+              browser=pw.chromium.launch(headless=True)
+              page=browser.new_page(viewport={'width':1440,'height':1000},device_scale_factor=1)
+              page.goto(base+'?view=jobs',wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_function("typeof renderJobs==='function' && typeof window.worklinksHydrateKeptJobs==='function' && !!document.getElementById('jobCards')",timeout=35000)
+              page.evaluate("""() => {
+                // Simulate display-only logged-in context. Never forge server tokens.
+                document.querySelector('body > main').inert=false;
+                document.getElementById('worklinks-auth-gate').hidden=true;
+                window.worklinksMemberAuthenticated=true;
+                document.documentElement.dataset.worklinksPartnerAccess='granted';
+                jobFilter='all'; jobVerdictFilter='all'; jobRenderLimit=100;
+                setWorkspaceView('jobs');
+                startJobsDataWhenVisible();
+              }""")
+              page.wait_for_function("jobsInitialDataReady && document.querySelectorAll('#jobCards .job-mini[data-job-card]').length>=6",timeout=90000)
+              result=page.evaluate("""() => {
+                const all=[...document.querySelectorAll('#jobCards .job-mini[data-job-card]')];
+                const ids=all.slice(0,6).map(x=>x.dataset.jobCard);
+                if(ids.length!==6)throw Error('six base notices unavailable');
+                const items=ids.map(id=>({id,...window.worklinksKeepSnapshotFor(id)}));
+                window.__qaMode='all';window.__qaItems=items;
+                const keepButton=id=>window.__qaMode==='watch'?'':(
+                  '<button type="button" class="job-keep-button" data-keep-toggle="'+id+'">★ 킵</button>');
+                window.worklinksKeeps={getMode:()=>window.__qaMode,
+                  activeItems:()=>window.__qaItems,keepButton,has:id=>ids.includes(id)};
+                const canonical=html=>html.replace(/<button[^>]*data-keep-toggle="[^"]*"[^>]*>[^<]*<\\/button>/g,'');
+                renderJobs();
+                const normal=new Map([...document.querySelectorAll('#jobCards .job-mini')]
+                  .filter(el=>ids.includes(el.dataset.jobCard))
+                  .map(el=>[el.dataset.jobCard,canonical(el.outerHTML)]));
+                window.__qaMode='mine';renderJobs();
+                const saved=[...document.querySelectorAll('#jobCards .job-mini[data-job-card]')];
+                const ownCount=saved.length;
+                const sameOriginalMarkup=saved.every(el=>
+                  normal.has(el.dataset.jobCard)&&
+                  normal.get(el.dataset.jobCard)===canonical(el.outerHTML));
+                const originalControls=saved.every(el=>
+                  !!el.querySelector('[data-job-detail]')&&
+                  !!el.querySelector('[data-external-source]')&&
+                  !!el.querySelector('.job-day')&&
+                  !!el.querySelector('[data-keep-toggle]'));
+                window.__qaMode='watch';renderJobs();
+                const watched=[...document.querySelectorAll('#jobCards .job-mini[data-job-card]')];
+                const watchCount=watched.length;
+                const watchReadOnly=watched.every(el=>!el.querySelector('[data-keep-toggle]'));
+                const watchedOriginalMarkup=watched.every(el=>
+                  normal.has(el.dataset.jobCard)&&
+                  normal.get(el.dataset.jobCard)===canonical(el.outerHTML));
+                window.__qaMode='mine';renderJobs();
+                const first=document.querySelector('#jobCards .job-mini[data-job-card]');
+                window.__qaClickedId=first?.dataset.jobCard;
+                first?.click();
+                return {ids,ownCount,watchCount,sameOriginalMarkup,
+                  originalControls,watchReadOnly,watchedOriginalMarkup,
+                  clicked:window.__qaClickedId,
+                  activeDetail:activeDetailJobId,
+                  fullCardCount:document.querySelectorAll('#jobCards article.job-mini').length};
+              }""")
+              print('WORKLINKS_KEEP_CARD_BROWSER_CHECK',json.dumps(result,ensure_ascii=False),flush=True)
+              assert result['ownCount']==6 and result['watchCount']==6,result
+              assert result['sameOriginalMarkup'] and result['watchedOriginalMarkup'],result
+              assert result['originalControls'] and result['watchReadOnly'],result
+              assert result['activeDetail']==result['clicked'],result
+              print('WORKLINKS_KEPT_SIX_ORIGINAL_CARD_AND_DETAIL_CLICK=PASS')
+              browser.close()
+          PY
