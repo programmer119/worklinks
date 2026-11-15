@@ -25,7 +25,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf24-image-zip-hwpx-xls-hml-v4'
+READER_ATTEMPT_VERSION='pdf24-image-zip-hwpx-xls-hml-long-v5'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -302,7 +302,7 @@ def process_one(key,scan,meta,ledger,file_limit=None):
             roles=rfp.extract_staffing_roles(text,label,item['url'])
             facts=rfp.extract_staffing_facts(text,label,item['url'])
             audit=rfp.preserve_unclassified_qualification(text,label,clauses)
-            if len(text)>350000 or audit.get('sourceTextScanComplete') is not True:
+            if len(text)>rfp.RFP_QUALIFICATION_TEXT_LIMIT or audit.get('sourceTextScanComplete') is not True:
                 f['errorCategory']='source_scan_incomplete'
                 f['error']='source_scan_incomplete: document exceeds clause coverage or anchors remain unmatched'
                 f['partialTextChars']=len(text)
