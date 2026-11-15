@@ -8,6 +8,7 @@ Existing GitHub snapshots are seed/fallback and are never deleted by this worker
 import datetime as dt
 import fcntl
 import gzip
+import collections
 import json
 import re
 import sqlite3
@@ -81,6 +82,43 @@ TIMEOUT = {'rfpUpgrade': 2100, 'rfp': 2100, 'rfpRepair': 2100, 'rfpOpenRepair': 
 
 def log(*values):
     print(dt.datetime.now(dt.timezone.utc).isoformat(), *values, flush=True)
+
+
+def scan_failure_diagnosis(row, versions):
+    """Explain failed stage-3 gates using already published evidence, not
+    another source request. Does not classify or extract document contents.
+    """
+    data=row if isinstance(row,dict) else {}
+    status=str(data.get('status') or 'missing')
+    files=[f for f in (data.get('files') or []) if isinstance(f,dict)]
+    readable=[f for f in files if f.get('readable') is True
+              and f.get('staffingScopeExcluded') is not True]
+    file_failures=collections.Counter(str(f.get('errorCategory') or '')
+              for f in files if f.get('readable') is not True
+              and f.get('errorCategory')
+              and f.get('staffingScopeExcluded') is not True
+              and f.get('skippedDuplicateFormat') is not True)
+    common=file_failures.most_common(1)[0][0] if file_failures else ''
+    if status!='text_extracted_requires_review':
+        gate='scan_extraction_'+status
+    elif data.get('manifestComplete') is not True:
+        gate='scan_manifest_incomplete'
+    elif not readable:
+        gate='scan_no_readable_source'
+    elif any(f.get('sourceTextScanComplete') is not True for f in readable):
+        gate='scan_source_incomplete'
+    elif any(f.get('qualificationScanTruncated') is True for f in readable):
+        gate='scan_qualification_truncated'
+    elif data.get('staffingRoleScanComplete') is not True:
+        gate='scan_staffing_incomplete'
+    elif any(f.get('staffingRoleScanTruncated') is True for f in readable):
+        gate='scan_staffing_truncated'
+    elif any(int(f.get('staffingRoleScanVersion') or 0)<
+             int(versions.get('staffingRoleScanVersion') or 0) for f in readable):
+        gate='scan_staffing_version_old'
+    else:
+        gate='scan_validation_incomplete'
+    return (gate+(':'+common if common else ''))[:140]
 
 
 def deployed_rfp_reader_versions():
@@ -357,8 +395,11 @@ def run_once(kind, runner=None, _single=False):
         if kind=='rfpUpgrade' and dual_enabled:
             # Mark scans finished ONLY after both validated archives are
             # durably published. An interrupted publish is always retryable.
-            from rfp_dual_queue import RfpDualQueue
+            from rfp_dual_queue import RfpDualQueue, scan_evidence_signature
             queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+            published=json.loads((SEEDS/'rfp-coverage-index.json').read_text('utf-8'))
+            saved=published.get('byNotice') or {}
+            versions=deployed_rfp_reader_versions()
             for line in (completed.stdout or '').splitlines():
                 if not line.startswith('RFP_DUAL_SCAN_RESULT '):continue
                 records=json.loads(line.split(' ',1)[1])
@@ -368,8 +409,30 @@ def run_once(kind, runner=None, _single=False):
                         if record.get('redownload') is True:
                             queue.mark_download_missing(key)
                         else:
-                            queue.scan_finished(key,bool(record.get('ok')),
-                                                'scan_unverified_or_incomplete')
+                            ok=bool(record.get('ok'))
+                            row=saved.get(key) or {}
+                            reason='' if ok else scan_failure_diagnosis(row,versions)
+                            queue.scan_finished(key,ok,reason,
+                                                scan_evidence_signature(row) if not ok else '')
+                            if not ok:
+                                log('RFP_SCAN_RETRY_CAUSE',key,reason)
+        if kind=='rfpOpenRepair' and dual_enabled:
+            # A published OCR repair may complete a previously failed notice.
+            # Reconcile now, not only on the independent 10-minute discovery.
+            from rfp_dual_queue import RfpDualQueue
+            from rfp_management_reconcile import read_evidence, management_scope
+            queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+            versions,evidence=read_evidence(DATA)
+            reopened=queue.reopen_changed_scan_evidence(evidence)
+            managed,valid=management_scope(DATA)
+            fingerprint=':'.join(str(versions[k]) for k in
+                ('classificationVersion','hwpxReaderVersion',
+                 'staffingRoleScanVersion','staffingFactScanVersion'))
+            tally=queue.reconcile_management(managed,valid,fingerprint)
+            log('RFP_SCAN_POST_REPAIR_RECONCILED',
+                json.dumps({'newEvidenceReopened':reopened,
+                   'validCompleted':tally['completedEvidenceReconciled']},
+                   separators=(',',':')))
         log('PIPELINE_PUBLISHED', kind,
             'outputs', ','.join(result.name for result in outputs))
         if kind=='rfpOpenRepair' and _single:
