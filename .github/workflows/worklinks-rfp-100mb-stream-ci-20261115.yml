@@ -1,9 +1,14 @@
 name: WorkLinks 100 MB streaming and 422 regression
 on:
   push:
-    branches: [fix/rfp-streamed-100mb-20261115]
+    branches: [main, fix/rfp-streamed-100mb-20261115]
     paths:
       - 'scripts/rfp_download_worker.py'
+      - 'scripts/rfp_dual_queue.py'
+      - 'server/g2b-proxy.py'
+      - 'startup-support/rfp-progress-live.js'
+      - 'startup-support/rfp-progress-live.css'
+      - 'tests/test_rfp_dual_queue.py'
       - 'scripts/rfp_call_ledger.py'
       - 'scripts/refresh_worklinks_rfp.py'
       - 'tests/test_rfp_streamed_100mb.py'
@@ -25,7 +30,8 @@ jobs:
       - name: Verify streaming original archive, actual 81 MB fixture, 422 error and existing worker/ledger tests
         run: |
           set -Eeuo pipefail
-          python3 -m py_compile scripts/rfp_download_worker.py scripts/rfp_call_ledger.py scripts/refresh_worklinks_rfp.py
+          python3 -m py_compile scripts/rfp_download_worker.py scripts/rfp_dual_queue.py scripts/rfp_call_ledger.py scripts/refresh_worklinks_rfp.py server/g2b-proxy.py
+          node --check startup-support/rfp-progress-live.js
           python3 tests/test_rfp_streamed_100mb.py
           python3 tests/test_rfp_call_ledger.py
           python3 tests/test_rfp_download_worker.py
