@@ -563,7 +563,9 @@ def run_once(kind, runner=None, _single=False):
         elif kind == 'rfpOpenRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
                        '--data-dir', str(root), '--limit', '3',
-                       '--max-files', '3', '--workers', '3', '--execute']
+                       '--max-files', '3', '--workers', '3',
+                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '2',
+                       '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
                        '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
