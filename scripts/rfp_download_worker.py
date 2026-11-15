@@ -252,6 +252,7 @@ def download_one(queue,claim,halt):
         if not urls:
             raise ValueError('nonempty_official_manifest_has_no_downloadable_url')
         verified_files=[]
+        error_files=[]
         live.record('download',key,phase='파일 다운로드',status='working',files_total=len(urls))
         reader._NOTICE_CONTEXT.notice_key=key
         reader._NOTICE_CONTEXT.closes_on=closes
@@ -284,9 +285,23 @@ def download_one(queue,claim,halt):
                     files_done=index,files_total=len(urls),
                     retry_epoch=time.time()+seconds,error=last_network_error)
             progress(0,0,False)
-            stored=stream_original_to_verified_ledger(
-                url,ledger,key,closes,rate_gate=FILE_PACE,
-                progress=progress,on_retry=on_retry)
+            try:
+                stored=stream_original_to_verified_ledger(
+                    url,ledger,key,closes,rate_gate=FILE_PACE,
+                    progress=progress,on_retry=on_retry)
+            except reader.OfficialAttachmentReferenceMissing:
+                # Official JSON 422 explicitly says this reference is absent.
+                # Preserve successful originals, continue independent files,
+                # and never retry this unchanged reference every 24 hours.
+                error_files.append({'name':file_name,'url':url,
+                    'httpStatus':422,'reason':'official_attachment_reference_missing_422'})
+                live.record('download',key,file_key=file_key,file_name=file_name,
+                    phase='공식 원본 조회 불가 확정',status='done',
+                    files_done=index+1,files_total=len(urls),
+                    error='official_attachment_reference_missing_422')
+                active_file_key=''
+                active_file_name=''
+                continue
             verified_files.append({'name':file_name,'url':url,
                                    'sha256':stored['sha256'],
                                    'bytes':stored['bytes']})
@@ -298,6 +313,15 @@ def download_one(queue,claim,halt):
             active_file_name=''
             live.record('download',key,phase='파일 다운로드',status='working',
                         files_done=index+1,files_total=len(urls))
+        if error_files:
+            queue.download_unavailable(key,meta,verified_files,error_files)
+            live.record('download',key,phase='다운로드 처리 종료 · 원본 오류 확정',
+                        status='done',files_done=len(urls),files_total=len(urls),
+                        error='official_missing_reference_422')
+            print('RFP_DOWNLOAD_CONFIRMED_ERRORS',json.dumps({
+                'notice':key,'verifiedFiles':len(verified_files),
+                'errorFiles':error_files},ensure_ascii=False,separators=(',',':')),flush=True)
+            return True
         meta=dict(meta,downloadVerifiedFiles=verified_files)
         queue.downloaded(key,meta,len(urls),len(urls))
         live.record('download',key,phase='다운로드 완료',status='done',files_done=len(urls),files_total=len(urls))
@@ -491,6 +515,9 @@ def run_forever():
     os.environ.setdefault('WORKLINKS_RFP_DEFER_OCR','1')
     queue=RfpDualQueue(QUEUE)
     queue.reset_stale()
+    missing_recheck=queue.release_old_official_missing_retries()
+    print('RFP_OLD_422_TERMINAL_RECHECK',
+          json.dumps({'notices':missing_recheck}),flush=True)
     migration=queue.reconcile_legacy_ready()
     print('RFP_VERIFIED_RECEIPT_MIGRATION',json.dumps(migration,separators=(',',':')),flush=True)
     live.recover_interrupted_downloads()
