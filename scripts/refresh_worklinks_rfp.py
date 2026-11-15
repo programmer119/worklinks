@@ -141,6 +141,10 @@ PDF_OCR_PAGE_CACHE_VERSION=1
 PDF_OCR_PASS_SECONDS=115
 MAX_PDF_OCR_PIXELS=12_000_000
 PDF_OCR_TARGET_DPI=300
+# Three independent OCR files already run in parallel. Avoid Tesseract
+# spawning competing OpenMP threads inside each process. A/B benchmark on
+# exact verified Korean PDF showed identical OCR text and shorter wall time.
+PDF_OCR_TESSERACT_OMP_THREADS=1
 MAX_DOCUMENTS=24
 # Per-member AND total XML caps are needed for safe HWPX decompression.
 # 3MB per member was rejecting real official documents before text extraction.
@@ -771,7 +775,8 @@ def _ocr_pdf_page(raw,index):
             result=subprocess.run(
                 ['tesseract','stdin','stdout','-l','kor+eng','--psm','3',
                  '--dpi',str(max(72,int(72*zoom)))],
-                input=png,capture_output=True,timeout=22,check=False)
+                input=png,capture_output=True,timeout=22,check=False,
+                env=dict(os.environ,OMP_THREAD_LIMIT=str(PDF_OCR_TESSERACT_OMP_THREADS)))
         finally:
             if reusable:
                 context['tesseractSeconds']+=time.perf_counter()-ocr_started
@@ -971,6 +976,7 @@ def _extract_pdf_with_audit(raw):
               'ocrPdfTotalSeconds':round(time.perf_counter()-overall_started,3),
               'ocrRenderedPixels':render_cache['renderPixels'],
               'ocrPdfOpenedOnce':render_cache['document'] is not None,
+              'ocrTesseractThreads':PDF_OCR_TESSERACT_OMP_THREADS,
               'sourceComplete':not missing,
               'extractionMethod':'pdf_native_ocr' if recovered or attempted else 'pdf_native'}
         if not text.strip():
