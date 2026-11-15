@@ -126,7 +126,7 @@ with sync_playwright() as p:
 
     assert '문서 판독' in body and '1 / 6건' in body,body
     assert '판독 미완료' in body and '5' in body,body
-    cohort_lane_values={key:page.locator('[data-rfp-field="'+key+'Count"]').inner_text()
+    cohort_lane_values={key:page.locator('[data-rfp-field="'+key+'Count"]').text_content()
                         for key in ('manifest','download','scan')}
     assert all('6' in value for value in cohort_lane_values.values()),cohort_lane_values
     assert page.locator('#rfpLiveDetails').count()==0, 'duplicate detail cards must be removed'
