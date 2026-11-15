@@ -26,7 +26,7 @@ jobs:
                   if r.headers.get('Content-Encoding')=='gzip':raw=gzip.decompress(raw)
               return json.loads(raw)
           progress=fetch('rfp-rescan-progress')
-          cause=fetch('rfp-rescan-causes?limit=200&offset=0')
+          cause=fetch('rfp-rescan-causes?limit=150&offset=0')
           attribution=fetch('rfp-ocr-repair-attribution')
           print('RFP121_COUNTS',json.dumps({'asOf':cause.get('asOf'),'expected':cause.get('counts'),
             'actual':cause.get('actualIssueNoticeCount'),'root':cause.get('primaryCauseCounts'),
