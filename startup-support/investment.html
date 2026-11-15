@@ -69,5 +69,5 @@ fetch('https://api-suaveforge.suaveforge.com:18458/api/g2b/snapshot?name=investm
 .then(r=>r.ok?r:fetch('./investment-opportunities.json?cache='+Date.now(),{cache:'no-store'}))
 .then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{if(!Array.isArray(d.opportunities))throw Error('데이터 형식 오류');state=d;draw()}).catch(e=>{$('error').textContent='수집 목록 확인 실패: '+e.message;$('cards').innerHTML='<div class="empty">수집 데이터를 읽을 수 없습니다.</div>'});
 })();
-</script><script type="module" src="./worklinks-header-auth.js?v=20261112-2"></script>
+</script><script type="module" src="./worklinks-header-auth.js?v=20261115-direct-relogin-v1"></script>
 </body></html>
