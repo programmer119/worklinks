@@ -600,6 +600,10 @@ def run_once(kind, runner=None, _single=False):
                             'extractWallSeconds':timing('extractWallSeconds'),
                             'pdfTotalSeconds':timing('pdfTotalSeconds'),
                             'nativeTextSeconds':timing('nativeTextSeconds'),
+                            'nativeFastProbeSeconds':timing('nativeFastProbeSeconds'),
+                            'nativeFastProbePages':sum(int(x.get('nativeFastProbePages') or 0) for x in profiles),
+                            'nativeFastSkippedPages':sum(int(x.get('nativeFastSkippedPages') or 0) for x in profiles),
+                            'nativeFastFallbacks':sum(int(x.get('nativeFastFallbacks') or 0) for x in profiles),
                             'imageCheckSeconds':timing('imageCheckSeconds'),
                             'pdfOpenSeconds':timing('pdfOpenSeconds'),
                             'receiptWriteSeconds':timing('receiptWriteSeconds'),
@@ -630,7 +634,8 @@ def run_once(kind, runner=None, _single=False):
                         report['pdfTotalSeconds']-report['renderSeconds']-
                         report['tesseractSeconds']-report['nativeTextSeconds']-
                         report['imageCheckSeconds']-report['pdfOpenSeconds']-
-                        report['receiptWriteSeconds']),3)
+                        report['receiptWriteSeconds']-
+                        report['nativeFastProbeSeconds']),3)
                     report['pageAverageSeconds']=round(
                         (report['renderSeconds']+report['tesseractSeconds'])/pages,3)
                     target=DATA/'ocr-runtime-profile.json'
