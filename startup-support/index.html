@@ -4447,7 +4447,24 @@ function jobRequirementEvidence(x){
  const key=id.bidNo+':'+id.order;
  const full=rfpSnapshotByNotice.get(key)||null;
  const saved=jobSearchRfpState.get(key)||jobListRfpState.get(key)||null;
- const provenance=rfpScanProvenanceByNotice.get(key)||null;
+ const publishedProvenance=rfpScanProvenanceByNotice.get(key)||null;
+ const cardScan=jobSearchRfpState.get(key)||jobListRfpState.get(key)||null;
+ // Prefer newer server checkpoint evidence over an older Pages inventory.
+ const cardTime=Date.parse(cardScan?.checkedAt||'')||0;
+ const inventoryTime=Date.parse(publishedProvenance?.checkedAt||'')||0;
+ const cardHasVersions=cardScan?.seen===true&&
+   Number.isFinite(Number(cardScan.classificationVersion))&&
+   cardScan.versionSource;
+ const provenance=cardHasVersions&&
+   (cardTime>inventoryTime||!publishedProvenance)?{
+    classificationVersion:cardScan.classificationVersion,
+    hwpxReaderVersion:cardScan.hwpxReaderVersion,
+    staffingRoleVersions:cardScan.staffingRoleVersions||[],
+    staffingFactVersions:cardScan.staffingFactVersions||[],
+    current:cardScan.parserCurrent===true,
+    checkedAt:cardScan.checkedAt,
+    versionSource:cardScan.versionSource
+   }:publishedProvenance;
  const partnerEvidence=changcomPrecheckByNotice.get(key)||null;
  const staff=partnerEvidence?.staffingClassification||null;
  const clauses=[];
@@ -4960,8 +4977,8 @@ function jobRequirementBadges(x){
     ' · HWPX '+(pv.hwpxReaderVersion?'v'+pv.hwpxReaderVersion:'미기록')+
     ' · '+(pv.current?'최신 판독 완료':'재판독 필요'):
     evidence.meta.saved?.status==='text_extracted_requires_review'?
-    '원문 추출 기록 있음 · 판독기 버전 미기록 · 재판독 필요':
-    '판독 버전 기록 없음 · 최신 판독 확인 필요';
+    '원문 추출 기록 있음 · 판독 버전 조회 미완료 (저장 여부 확인 필요)':
+    '판독 버전 기록 확인 필요';
   const onsiteDetails='<strong class="job-req-onsite-title">상주 여부</strong>'+onsitePrimary+
    '<div class="job-req-onsite-meta">'+htmlEscape(versionSummary)+'</div>'+
    (onsiteSource?.text?
