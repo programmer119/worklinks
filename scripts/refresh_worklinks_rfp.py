@@ -889,7 +889,7 @@ def _extract_pdf_with_audit(raw):
                      hashlib.sha256(encoded).hexdigest(),
                      dt.datetime.now(dt.timezone.utc).isoformat()))
                 connection.commit()
-        text='\\n'.join(parts)
+        text='\n'.join(parts)
         info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
               'ocrRecoveredPages':len(recovered),'ocrRestoredPages':len(restored),
               'ocrBatchDeferredPages':len(deferred),'ocrFailedPages':len(failed),
