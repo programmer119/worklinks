@@ -1,0 +1,46 @@
+name: WorkLinks cached RFP card evidence and 4-insurance UI regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_card_evidence_batch.py'
+      - '.github/workflows/worklinks-rfp-insurance-card-batch-ci-20261115.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test cached 100-key scan evidence and validate inline browser JavaScript
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile server/g2b-proxy.py tests/test_rfp_card_evidence_batch.py
+          python3 tests/test_rfp_card_evidence_batch.py
+          python3 - <<'PY'
+          import re,pathlib
+          source=pathlib.Path('startup-support/index.html').read_text()
+          assert 'ensureVisibleRfpCardEvidence(list.slice(0,jobRenderLimit))' in source
+          assert "g2bFetch('/rfp-card-evidence?keys='" in source
+          assert 'if(!saved?.seen&&!Array.isArray(full?.files))' in source
+          scripts=[]
+          for i,match in enumerate(re.finditer(
+                  r'<script([^>]*)>(.*?)</script>',source,re.I|re.S)):
+              attrs,body=match.group(1),match.group(2)
+              if re.search(r'\bsrc\s*=',attrs,re.I) or re.search(
+                      r'type\s*=\s*["\']application/json',attrs,re.I):continue
+              if body.strip():
+                  path=pathlib.Path('/tmp/worklinks-inline-'+str(i)+'.js')
+                  path.write_text(body)
+                  scripts.append(path)
+          assert scripts
+          print('WORKLINKS_JS_SCRIPT_COUNT',len(scripts))
+          pathlib.Path('/tmp/worklinks-inline-list').write_text(
+              '\n'.join(map(str,scripts)))
+          PY
+          while IFS= read -r path;do node --check "$path";done </tmp/worklinks-inline-list
+          echo RFP_INSURANCE_CARD_BATCH_UI_SYNTAX_PASS
