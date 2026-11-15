@@ -90,7 +90,7 @@ with patch.dict(os.environ,{'WORKLINKS_RFP_DEFER_OCR':'0'}),\
 outer=io.BytesIO()
 with zipfile.ZipFile(outer,'w') as archive:
     archive.writestr('3. 제안요청서.hwpx',
-        zipfile.ZipFile if False else hwpx)
+        hwpx)
     archive.writestr('7. 영향평가 결과서.hwpx',hwpx)
 with patch.dict(os.environ,{'WORKLINKS_RFP_DEFER_OCR':'0'}),\
      patch.object(reader,'_extract_image_with_audit',
