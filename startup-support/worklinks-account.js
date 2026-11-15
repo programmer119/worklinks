@@ -236,7 +236,10 @@ async function validSession(client){
     if(!session.accessToken)session=await client.refresh();
     try{me=await client.me()}
     catch(error){
-      if(error.status!==401)throw error;
+      // Older AuthHub builds incorrectly return HTTP 500 for an expired JWT.
+      // A single refresh remains safe: AuthHub independently validates the
+      // refresh token and the subsequent /v1/me identity and membership.
+      if(![401,500].includes(Number(error?.status))||!client.session()?.refreshToken)throw error;
       session=await client.refresh();
       me=await client.me();
     }
