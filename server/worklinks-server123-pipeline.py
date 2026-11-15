@@ -604,6 +604,17 @@ def run_once(kind, runner=None, _single=False):
                             'pdfOpenSeconds':timing('pdfOpenSeconds'),
                             'receiptWriteSeconds':timing('receiptWriteSeconds'),
                             'extractOutsidePdfSeconds':timing('extractOutsidePdfSeconds')}
+                    per_format={}
+                    for item in profiles:
+                        for fmt,record in (item.get('extractFormatTimes') or {}).items():
+                            if not isinstance(record,dict):continue
+                            if fmt not in ('pdf','hwp','hwpx','zip','docx','xlsx','xls','pptx','png','jpg','jpeg','other'):
+                                fmt='other'
+                            row=per_format.setdefault(fmt,{'calls':0,'seconds':0.0})
+                            row['calls']+=int(record.get('calls') or 0)
+                            row['seconds']+=float(record.get('exclusiveSeconds') or 0)
+                    report['formatTimeBreakdown']={k:{'calls':v['calls'],
+                        'seconds':round(v['seconds'],3)} for k,v in per_format.items()}
                     report['unaccountedPdfSeconds']=round(max(0,
                         report['pdfTotalSeconds']-report['renderSeconds']-
                         report['tesseractSeconds']-report['nativeTextSeconds']-
