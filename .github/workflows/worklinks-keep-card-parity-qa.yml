@@ -124,7 +124,8 @@ jobs:
               }""")
               page.wait_for_function("""() => document.querySelector('#jobsView')?.dataset.keepMode==='watch' &&
                 window.worklinksKeeps.activeItems().length===6 &&
-                document.querySelectorAll('#jobCards article.job-mini[data-job-card]').length===6""",timeout=20000)
+                document.querySelectorAll('#jobCards article.job-mini[data-job-card]').length===6 &&
+                document.querySelectorAll('#jobCards [data-keep-toggle]').length===0""",timeout=20000)
               watched=page.evaluate("""() => {
                 const norm=el=>{const copy=el.cloneNode(true);
                   copy.querySelectorAll('[data-keep-toggle]').forEach(button=>button.remove());
