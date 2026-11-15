@@ -727,6 +727,42 @@ def official_missing_reference(error):
         return False
 
 
+def _ocr_pdf_region_candidate(page,pymupdf):
+    """Conservative ink-containing ROI at 96 DPI; returns PDF-point clip.
+
+    This does NOT claim to recognize text semantically. Any unusual page,
+    nonwhite border, rotation or near-full crop falls back to whole-page OCR.
+    High-resolution OCR rendering continues at the original target DPI.
+    """
+    from PIL import Image
+    if page.rotation:
+        return None,0.0
+    thumbnail=page.get_pixmap(matrix=pymupdf.Matrix(96/72,96/72),
+                             colorspace=pymupdf.csGRAY,alpha=False)
+    img=Image.frombytes('L',(thumbnail.width,thumbnail.height),thumbnail.samples)
+    width,height=img.size
+    if min(width,height)<64:
+        return None,0.0
+    points=((0,0),(width//2,0),(width-1,0),(0,height//2),
+            (width-1,height//2),(0,height-1),(width//2,height-1),
+            (width-1,height-1))
+    if any(img.getpixel(pos)<235 for pos in points):
+        return None,0.0
+    bbox=img.point(lambda p:255 if p<225 else 0).getbbox()
+    if not bbox:return None,0.0
+    padding=24
+    x0=max(0,bbox[0]-padding);y0=max(0,bbox[1]-padding)
+    x1=min(width,bbox[2]+padding);y1=min(height,bbox[3]+padding)
+    ratio=(x1-x0)*(y1-y0)/(width*height)
+    if ratio<0.05 or ratio>0.82:
+        return None,ratio
+    clip=pymupdf.Rect(page.rect.x0+x0*page.rect.width/width,
+                      page.rect.y0+y0*page.rect.height/height,
+                      page.rect.x0+x1*page.rect.width/width,
+                      page.rect.y0+y1*page.rect.height/height)&page.rect
+    return clip,ratio
+
+
 def _ocr_pdf_page(raw,index):
     """OCR a page with one reusable PyMuPDF handle per verified PDF source.
 
@@ -796,7 +832,48 @@ def _ocr_pdf_page(raw,index):
                 context.setdefault('pageProfiles',[]).append(page_profile)
         if result.returncode:
             raise ValueError('pdf_ocr_engine_failed')
-        return result.stdout.decode('utf-8','replace')
+        baseline=result.stdout.decode('utf-8','replace')
+        # Real-source A/B only. Production output and SHA page receipts remain
+        # EXACTLY baseline; ROI is never trusted as legal qualification evidence.
+        # Probe a bounded one-in-N PDFs, one page each, with its own 8s limit.
+        if (reusable and os.environ.get('WORKLINKS_RFP_OCR_REGION_PROBE')=='1'
+                and not context.get('regionProbeDone')):
+            context['regionProbeDone']=True
+            try:
+                denominator=max(1,min(100,int(
+                    os.environ.get('WORKLINKS_RFP_OCR_REGION_PROBE_SAMPLE') or 4)))
+                if int.from_bytes(hashlib.sha256(raw).digest()[:2],'big')%denominator==0:
+                    t=time.perf_counter()
+                    clip,area=_ocr_pdf_region_candidate(page,pymupdf)
+                    probe={'page':index+1,'areaRatio':round(area,3),
+                           'method':'96dpi_conservative_foreground_300dpi_ocr_psm4'}
+                    if clip is not None:
+                        candidate=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),
+                            alpha=False,colorspace=color_space,clip=clip)
+                        if candidate.width*candidate.height<=MAX_PDF_OCR_PIXELS:
+                            test=subprocess.run(
+                                ['tesseract','stdin','stdout','-l','kor+eng','--psm','4',
+                                 '--dpi',str(max(72,int(72*zoom)))],
+                                input=candidate.tobytes('png'),capture_output=True,
+                                timeout=8,check=False,env=dict(os.environ,
+                                   OMP_THREAD_LIMIT=str(PDF_OCR_TESSERACT_OMP_THREADS)))
+                            other=test.stdout.decode('utf-8','replace')
+                            original_tokens=set(re.findall(r'[^\\W_]{2,}',baseline))
+                            candidate_tokens=set(re.findall(r'[^\\W_]{2,}',other))
+                            probe.update(status='compared' if test.returncode==0 else 'engine_failed',
+                                baselineChars=len(baseline),regionChars=len(other),
+                                exactMatch=(other==baseline),
+                                baselineTokenRetention=round(
+                                  len(original_tokens&candidate_tokens)/len(original_tokens),3)
+                                  if original_tokens else None)
+                        else:probe['status']='region_over_pixel_limit'
+                    else:probe['status']='no_safe_region'
+                    probe['seconds']=round(time.perf_counter()-t,3)
+                    context.setdefault('regionProbe',[]).append(probe)
+            except (ValueError,TypeError,OSError,subprocess.TimeoutExpired,MemoryError) as exc:
+                context.setdefault('regionProbe',[]).append(
+                    {'page':index+1,'status':'probe_unavailable','reason':type(exc).__name__})
+        return baseline
     finally:
         if own_document:
             document.close()
@@ -992,6 +1069,7 @@ def _extract_pdf_with_audit(raw):
               'ocrPdfOpenedOnce':render_cache['document'] is not None,
               'ocrTesseractThreads':PDF_OCR_TESSERACT_OMP_THREADS,
               'ocrPageProfiles':render_cache.get('pageProfiles',[])[:MAX_PDF_OCR_PAGES],
+              'ocrRegionProbe':render_cache.get('regionProbe',[])[:2],
               'sourceComplete':not missing,
               'extractionMethod':'pdf_native_ocr' if recovered or attempted else 'pdf_native'}
         if not text.strip():
