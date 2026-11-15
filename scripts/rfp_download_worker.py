@@ -169,11 +169,21 @@ def discover_all(queue):
     old_retired=queue.retire_superseded(reader.latest_notice_versions())
     added=queue.enqueue(selected,reader_fingerprint())
     retired=queue.retire_expired()
+    # Authoritative saved-SW cohort is broader than reader.discover's
+    # prioritized subset. Reconcile it even when all priority work drained.
+    # This is LOCAL read-only source inspection plus durable queue writes:
+    # never calls procurement APIs, re-downloads valid prior scans or
+    # discards the separately tracked unknown-deadline queue.
+    from rfp_management_reconcile import management_scope
+    managed,latest_valid=management_scope(DATA)
+    reconciled=queue.reconcile_management(managed,latest_valid,reader_fingerprint())
+    print('RFP_MANAGEMENT_SCOPE_RECONCILED',
+          json.dumps(reconciled,ensure_ascii=False,separators=(',',':')),flush=True)
     print('RFP_DUAL_QUEUE_DISCOVERY',json.dumps({
-        'allEligible':len(selected),'new':added,'expiredRetired':retired,
+        'prioritySelected':len(selected),'new':added,'expiredRetired':retired,
         'supersededOrCancelledRetired':old_retired,
-        'queue':queue.stats()},separators=(',',':')),flush=True)
-    return len(selected)
+        'management':reconciled,'queue':queue.stats()},separators=(',',':')),flush=True)
+    return len(managed)
 
 def detects_upstream_limit(text):
     raw=str(text).lower()
