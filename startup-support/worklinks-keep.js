@@ -22,7 +22,7 @@ function keepButton(id){
     '" title="'+(selected?'내 킵에서 제외':'내 킵에 추가')+'">'+
     (selected?'★ 킵':'☆ 킵')+'</button>';
 }
-function safeHref(url){return /^https?:\\/\\//i.test(String(url||''))?String(url):''}
+function safeHref(url){const value=String(url||'');return value.startsWith('https://')||value.startsWith('http://')?value:''}
 function keptMarkup(item){
   const title=esc(item.title||item.id), org=esc(item.org||'발주기관 미확인');
   const amount=String(item.amount||'').trim();
