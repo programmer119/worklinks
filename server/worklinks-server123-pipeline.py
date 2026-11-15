@@ -597,7 +597,18 @@ def run_once(kind, runner=None, _single=False):
                             'targetDpi':300,'documents':len(profiles),'ocrPages':pages,
                             'renderSeconds':timing('renderSeconds'),
                             'tesseractSeconds':timing('tesseractSeconds'),
-                            'extractWallSeconds':timing('extractWallSeconds')}
+                            'extractWallSeconds':timing('extractWallSeconds'),
+                            'pdfTotalSeconds':timing('pdfTotalSeconds'),
+                            'nativeTextSeconds':timing('nativeTextSeconds'),
+                            'imageCheckSeconds':timing('imageCheckSeconds'),
+                            'pdfOpenSeconds':timing('pdfOpenSeconds'),
+                            'receiptWriteSeconds':timing('receiptWriteSeconds'),
+                            'extractOutsidePdfSeconds':timing('extractOutsidePdfSeconds')}
+                    report['unaccountedPdfSeconds']=round(max(0,
+                        report['pdfTotalSeconds']-report['renderSeconds']-
+                        report['tesseractSeconds']-report['nativeTextSeconds']-
+                        report['imageCheckSeconds']-report['pdfOpenSeconds']-
+                        report['receiptWriteSeconds']),3)
                     report['pageAverageSeconds']=round(
                         (report['renderSeconds']+report['tesseractSeconds'])/pages,3)
                     target=DATA/'ocr-runtime-profile.json'
