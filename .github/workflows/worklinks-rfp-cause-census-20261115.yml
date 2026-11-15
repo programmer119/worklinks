@@ -1,0 +1,87 @@
+name: WorkLinks current RFP failed and incomplete cause census
+on:
+  push:
+    branches: [diagnostics/rfp-eight-readonly-20261115]
+    paths:
+      - .github/workflows/worklinks-rfp-cause-census-20261115.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Read live report and categorise saved RFP records without modification
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import gzip,json,urllib.request,collections,datetime
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'Accept-Encoding':'gzip','User-Agent':'WorkLinks-ReadOnly-Census/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=75) as r:
+                  data=r.read()
+                  if 'gzip' in str(r.headers.get('Content-Encoding','')): data=gzip.decompress(data)
+              return json.loads(data)
+          def show(tag,x):print(tag+' '+json.dumps(x,ensure_ascii=False,separators=(',',':'),default=str),flush=True)
+          p=get('rfp-rescan-progress')
+          show('LIVE',{'asOf':p.get('asOf'),'counts':p.get('counts'),'lanes':p.get('lanes'),
+                      'workers':(p.get('activity') or {}).get('workers'),'worker':p.get('worker'),
+                      'activity':(p.get('activity') or {}).get('items',[])[:12]})
+          idx=get('snapshot?name=rfp-coverage-index').get('byNotice') or {}
+          show('INDEX',{'total':len(idx)})
+          inv=get('saved-inventory')
+          show('INVENTORY_META', {k:v for k,v in inv.items() if k!='items'})
+          bids=inv.get('items') or []
+          latest=p.get('latest') or {}
+          failures=collections.Counter()
+          incompletes=collections.Counter()
+          subfail=collections.Counter()
+          subinc=collections.Counter()
+          samples=collections.defaultdict(list)
+          open_seen=set()
+          for bid in bids:
+              key=str(bid.get('bidNo') or '')+':'+str(bid.get('order') or '000').zfill(3)
+              if key in open_seen:continue
+              open_seen.add(key)
+              if not bid.get('closes'):continue
+              row=idx.get(key)
+              if not isinstance(row,dict):
+                  failures['unscanned']+=1;continue
+              status=str(row.get('status') or '')
+              if status!='text_extracted_requires_review':
+                  failures[status or '(empty)']+=1
+                  fs=row.get('files') or []
+                  if fs:
+                      for f in fs:
+                          if f.get('readable') is not True:
+                              subfail[f.get('errorCategory') or '(none)']+=1
+                  if len(samples['failed'])<20:samples['failed'].append({'key':key,'status':status,'manifest':row.get('manifestComplete'),'files':[{ 'name':f.get('name'),'reason':f.get('errorCategory')} for f in fs[:4]]})
+                  continue
+              fs=[f for f in row.get('files') or [] if isinstance(f,dict)]
+              readable=[f for f in fs if f.get('readable') is True and f.get('staffingScopeExcluded') is not True]
+              cls=bool(readable) and row.get('manifestComplete') is True and int(row.get('classificationVersion') or 0)>=latest['classificationVersion'] and all(f.get('sourceTextScanComplete') is True and f.get('qualificationScanTruncated') is not True for f in readable)
+              role=row.get('staffingRoleScanComplete') is True and bool(readable) and all(f.get('sourceTextScanComplete') is True and int(f.get('staffingRoleScanVersion') or 0)>=latest['staffingRoleScanVersion'] and f.get('staffingRoleScanTruncated') is not True for f in readable)
+              fact=bool(readable) and row.get('staffingRoleScanComplete') is True and all(f.get('sourceTextScanComplete') is True and int(f.get('staffingFactScanVersion') or 0)>=latest['staffingFactScanVersion'] for f in readable)
+              hx=[f for f in readable if str(f.get('name') or '').lower().endswith('.hwpx')]
+              hwpx=(not hx or (all(f.get('sourceTextScanComplete') is True for f in hx) and int(row.get('hwpxReaderVersion') or 0)>=latest['hwpxReaderVersion']))
+              if cls and role and fact and hwpx:continue
+              reasons=[]
+              if row.get('manifestComplete') is not True:reasons.append('manifest_incomplete')
+              if not readable:reasons.append('no_readable_file')
+              if any(f.get('readable') is not True for f in fs):reasons.append('some_files_unreadable')
+              if any(f.get('sourceTextScanComplete') is not True for f in readable):reasons.append('source_scan_incomplete')
+              if any(f.get('qualificationScanTruncated') is True for f in readable):reasons.append('source_scan_truncated')
+              if row.get('staffingRoleScanComplete') is not True:reasons.append('role_scan_flag_false')
+              if not cls:reasons.append('classification_gate_false')
+              if not role:reasons.append('role_gate_false')
+              if not fact:reasons.append('staffing_fact_gate_false')
+              if not hwpx:reasons.append('hwpx_gate_false')
+              for reason in reasons:incompletes[reason]+=1
+              signature=','.join(reasons)
+              subinc[signature]+=1
+              if len(samples['incomplete'])<25:samples['incomplete'].append({'key':key,'reasons':reasons,'manifest':row.get('manifestComplete'),'sourceStatus':status,'numFiles':len(fs),'readable':len(readable),'files':[{ 'name':f.get('name'),'readable':f.get('readable'),'reason':f.get('errorCategory')} for f in fs[:3]]})
+          show('CAUSE_COUNTS',{'openByInventory':len(open_seen),'snapshotFailedStatuses':dict(failures),'failedFileErrors':dict(subfail),
+                               'incompleteOverlappingReasons':dict(incompletes),'incompleteSignaturesTop20':subinc.most_common(20)})
+          show('SAMPLES',dict(samples))
+          PY
