@@ -190,6 +190,14 @@ def rfp_coverage_complete(row, versions):
         return False
     if row.get('manifestComplete') is not True or row.get('staffingRoleScanComplete') is not True:
         return False
+    unresolved_ocr={'pdf_ocr_incomplete','ocr_deferred_to_repair',
+        'pdf_unreadable_page','image_ocr_incomplete',
+        'hwpx_image_ocr_deferred_to_repair'}
+    if any(isinstance(f,dict) and f.get('readable') is not True
+           and f.get('staffingScopeExcluded') is not True
+           and str(f.get('errorCategory') or '') in unresolved_ocr
+           for f in row.get('files') or []):
+        return False
     files=[f for f in row.get('files') or [] if isinstance(f,dict) and
            f.get('readable') is True and f.get('staffingScopeExcluded') is not True]
     if not files or int(row.get('classificationVersion') or 0)<int(versions.get('classificationVersion') or 999):
