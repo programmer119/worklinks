@@ -120,7 +120,7 @@ def repair_file_priority(f):
     return 3
 
 
-def choose_repair_batch(candidates,limit,max_files):
+def choose_repair_batch(candidates,limit,max_files,per_notice_cap=3,minimum_old_ocr=0):
     """Complete easily recoverable notices first, then longer OCR documents.
 
     Keep reader-category priority, while avoiding a 91-page incomplete PDF
@@ -138,10 +138,18 @@ def choose_repair_batch(candidates,limit,max_files):
         # incomplete HWP/ZIP companions. Within equal completion distance,
         # preserve the established safer reader-category priority.
         return (score[0],score[1],item[0],score[2],item[1],item[2])
-    for item in sorted(candidates,key=priority):
+    ordered=sorted(candidates,key=priority)
+    # Each small production batch reserves capacity for legacy OCR records that
+    # have NEVER had a run with the deployed reader. Otherwise completion-first
+    # ranking can repeatedly starve two/three-file notices behind short PDFs.
+    old=[item for item in ordered if len(item)>7 and item[7] is True]
+    reserved=old[:max(0,int(minimum_old_ocr))]
+    reserved_ids={id(item) for item in reserved}
+    ordered=reserved+[item for item in ordered if id(item) not in reserved_ids]
+    for item in ordered:
         _priority,deadline,key,metadata,source,nfiles=item[:6]
         if len(chosen)>=limit or used>=max_files:break
-        allowance=min(3,nfiles,max_files-used)
+        allowance=min(max(1,int(per_notice_cap)),nfiles,max_files-used)
         if allowance<=0:continue
         chosen.append((key,deadline,metadata,source,allowance))
         used+=allowance
@@ -632,7 +640,8 @@ def verified_complete_for_early_checkpoint(record,metadata):
     return True
 
 
-def run(data_dir,limit,execute=False,max_files=400,workers=1):
+def run(data_dir,limit,execute=False,max_files=400,workers=1,
+        per_notice_cap=3,minimum_old_ocr=0):
     root=Path(data_dir)
     snap=root/'snapshots'
     coverage_path=snap/'rfp-coverage-index.json'
@@ -676,14 +685,27 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1):
             categories['download_manifest_mismatch']+=1;continue
         src='verified_download_queue'
         categories['ready']+=1
+        old_ocr=any(
+            str(f.get('errorCategory') or '') in (
+                'pdf_ocr_incomplete','ocr_deferred_to_repair',
+                'pdf_unreadable_page','image_ocr_incomplete',
+                'hwpx_image_ocr_deferred_to_repair')
+            and f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION
+            for f in broken)
         candidates.append((min(repair_file_priority(f) for f in broken),
                            ends,key,meta,src,len(broken),
-                           repair_completion_score(scan,broken)))
-    selected,selected_file_count=choose_repair_batch(candidates,limit,max_files)
+                           repair_completion_score(scan,broken),old_ocr))
+    selected,selected_file_count=choose_repair_batch(candidates,limit,max_files,
+        per_notice_cap=per_notice_cap,minimum_old_ocr=minimum_old_ocr)
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
       'selectedProblemFiles':selected_file_count,
+      'legacyReadyCandidates':sum(item[7] is True for item in candidates),
+      'legacySelectedNotices':sum(any(item[2]==chosen[0] and item[7] is True
+                                 for item in candidates) for chosen in selected),
+      'selectedIds':[chosen[0] for chosen in selected],
+      'filesPerNoticeCap':max(1,int(per_notice_cap)),
       'noGovernmentMetadataAPICalls':True,
       'noGovernmentAttachmentGETs':True},ensure_ascii=False),flush=True)
     if not execute:return {'plan':dict(categories),'selected':len(selected)}
@@ -850,6 +872,10 @@ if __name__=='__main__':
     p.add_argument('--execute',action='store_true')
     p.add_argument('--workers',type=int,default=1,
                    help='parallel OCR workers; maximum 3 to protect server123')
+    p.add_argument('--per-notice-file-cap',type=int,default=3)
+    p.add_argument('--minimum-old-ocr',type=int,default=0)
     args=p.parse_args()
     run(args.data_dir,max(1,min(args.limit,300)),args.execute,
-        max(1,min(args.max_files,600)),max(1,min(args.workers,3)))
+        max(1,min(args.max_files,600)),max(1,min(args.workers,3)),
+        per_notice_cap=max(1,min(args.per_notice_file_cap,3)),
+        minimum_old_ocr=max(0,min(args.minimum_old_ocr,3)))
