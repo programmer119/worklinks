@@ -1,0 +1,52 @@
+name: WorkLinks member keep and spectator verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - server/g2b-proxy.py
+      - server/deploy-g2b-api-only.sh
+      - startup-support/index.html
+      - startup-support/worklinks-account.js
+      - startup-support/worklinks-keep.js
+      - tests/test_worklinks_keep_watch.py
+      - .github/workflows/worklinks-keep-watch-ci.yml
+  pull_request:
+    paths:
+      - server/g2b-proxy.py
+      - startup-support/index.html
+      - startup-support/worklinks-account.js
+      - startup-support/worklinks-keep.js
+      - tests/test_worklinks_keep_watch.py
+      - .github/workflows/worklinks-keep-watch-ci.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate member keep API and spectator access isolation
+        run: |
+          python3 -m py_compile server/g2b-proxy.py
+          WORKLINKS_G2B_SOURCE=server/g2b-proxy.py python3 tests/test_worklinks_keep_watch.py
+          WORKLINKS_G2B_SOURCE=server/g2b-proxy.py python3 tests/test_worklinks_user_state.py
+      - name: Validate script syntax and member controls
+        run: |
+          node --input-type=module --check < startup-support/worklinks-account.js
+          node --check startup-support/worklinks-keep.js
+          python3 - <<'PY'
+          import pathlib,re
+          html=pathlib.Path('startup-support/index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script(?:\\s[^>]*)?>(.*?)</script>',html,re.S)
+          inline=max(scripts,key=len)
+          assert len(inline)>20000
+          pathlib.Path('/tmp/worklinks-keep-page.js').write_text(inline,encoding='utf-8')
+          for key in ('id="keepModeMine"','id="keepModeWatch"','id="keepShareEnabled"',
+                      'window.worklinksKeepSnapshotFor','data-keep-toggle',
+                      'worklinks-keep.js?v='):
+              assert key in html,key
+          print('WORKLINKS_KEEP_UI_PRESENT=PASS')
+          PY
+          node --check /tmp/worklinks-keep-page.js
+          echo WORKLINKS_KEEP_WATCH_FRONTEND_SYNTAX=PASS
