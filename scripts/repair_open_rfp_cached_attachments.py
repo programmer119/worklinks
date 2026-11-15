@@ -285,12 +285,14 @@ def process_one(key,scan,meta,ledger,file_limit=None):
             if receipt is None:
                 raise VerifiedOriginalMissing('file_not_in_completed_download_receipt')
             raw,origin=fetch_verified_raw(item,ledger,str(receipt['sha256']))
+            f['detectedFormat']=rfp.detected_source_format(label,raw)
             extracted,evidence,_=rfp.extract_cached_text(label,raw)
             text=rfp.normalize_extracted_text(extracted)
             if not evidence['sourceComplete']:
                 f['extractionEvidence']=evidence
                 f['partialTextChars']=len(text)
                 f['errorCategory']='pdf_ocr_incomplete'
+                f['error']='pdf_ocr_incomplete: unresolved PDF pages in source'
                 counts['pdf_ocr_incomplete']+=1
                 continue
             if sum(ch.isalnum() for ch in text)<12:
@@ -301,6 +303,10 @@ def process_one(key,scan,meta,ledger,file_limit=None):
             facts=rfp.extract_staffing_facts(text,label,item['url'])
             audit=rfp.preserve_unclassified_qualification(text,label,clauses)
             if len(text)>350000 or audit.get('sourceTextScanComplete') is not True:
+                f['errorCategory']='source_scan_incomplete'
+                f['error']='source_scan_incomplete: document exceeds clause coverage or anchors remain unmatched'
+                f['partialTextChars']=len(text)
+                f['extractionEvidence']=evidence
                 counts['still_scan_incomplete']+=1
                 continue
             digest=hashlib.sha256(raw).hexdigest()
@@ -325,8 +331,9 @@ def process_one(key,scan,meta,ledger,file_limit=None):
             raise
         except Exception as exc:
             classification=rfp.classify_failure(exc)
+            f['errorCategory']=classification
+            f['error']=type(exc).__name__+': '+str(exc)[:165]
             if classification=='official_attachment_reference_missing_422':
-                f['errorCategory']=classification
                 f['lastHttpStatus']=422
                 counts['official_attachment_reference_missing_422']+=1
             counts['file_error_'+type(exc).__name__]+=1
@@ -384,6 +391,38 @@ def update_counts(rec,now,additions):
     rec['staffingRoleScanComplete']=bool(rec.get('manifestComplete') is True and
         all(rfp.staffing_effective_file_complete(f,fs) for f in fs))
     if additions:update_evidence(rec,additions,now)
+
+
+def merge_verified_repair_attempt(live,entry):
+    """Publish every attempted reader result while protecting newer successful scans.
+
+    Prior logic only copied 422/PDF-incomplete errors. An XLS failure could
+    remain labeled 'hwp5txt_failed' even after a new XLS reader had run.
+    """
+    if entry.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION:
+        return False
+    if live.get('readable') is True and live.get('sourceTextScanComplete') is True:
+        return False
+    complete=(entry.get('readable') is True and
+              entry.get('sourceTextScanComplete') is True and
+              bool(entry.get('sourceSha256')))
+    if complete:
+        live.update(entry)
+        for field in ('errorCategory','error','lastHttpStatus'):
+            live.pop(field,None)
+    else:
+        # An incomplete source never becomes a success just because an OCR
+        # engine was attempted. Preserve the actual reader result for triage.
+        for field in ('errorCategory','error','lastHttpStatus','extractionEvidence',
+                      'partialTextChars','detectedFormat','textChars',
+                      'lastReaderAttemptVersion','lastReaderAttemptAt'):
+            if field in entry:live[field]=entry[field]
+        if entry.get('errorCategory')!='official_attachment_reference_missing_422':
+            live.pop('lastHttpStatus',None)
+    for field in ('alternatePdfEvidence','alternatePdfSourceSha256',
+                  'alternatePdfEvidenceMode'):
+        if entry.get(field):live[field]=entry[field]
+    return complete
 
 
 def run(data_dir,limit,execute=False,max_files=400):
@@ -463,29 +502,7 @@ def run(data_dir,limit,execute=False,max_files=400):
                 [str(f.get('name') or '') for f in fixed_files]):
                 tally['changed_while_repairing']+=1;continue
             for i,entry in enumerate(fixed_files):
-                live=live_files[i]
-                if (entry.get('readable') is True and
-                      entry.get('sourceTextScanComplete') is True and
-                      entry.get('sourceSha256') and
-                      (live.get('readable') is not True or
-                       live.get('sourceTextScanComplete') is not True)):
-                    live.update(entry)
-                    # dict.update does not delete a formerly failed file's
-                    # error key. A new verified success must remove it.
-                    live.pop('errorCategory',None)
-                    live.pop('error',None)
-                    live.pop('lastHttpStatus',None)
-                elif entry.get('errorCategory') in (
-                       'official_attachment_reference_missing_422','pdf_ocr_incomplete'):
-                    for field in ('errorCategory','lastHttpStatus','extractionEvidence',
-                                  'partialTextChars'):
-                        if field in entry:live[field]=entry[field]
-                if live.get('readable') is not True or live.get('sourceTextScanComplete') is not True:
-                    for field in ('lastReaderAttemptVersion','lastReaderAttemptAt'):
-                        if entry.get(field):live[field]=entry[field]
-                for field in ('alternatePdfEvidence','alternatePdfSourceSha256',
-                              'alternatePdfEvidenceMode'):
-                    if entry.get(field):live[field]=entry[field]
+                merge_verified_repair_attempt(live_files[i],entry)
             update_counts(current,timestamp,additions)
             applied[key]={'readable':current['readableDocumentCount'],
                           'total':len(live_files),'repaired':len(additions)}
