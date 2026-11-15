@@ -51,3 +51,5 @@ jobs:
           assert cause.get('upstreamCalls')==0
           PY
 # v13 postdeploy live audit after OCR fairness + XML HWPML + sparse-page fallback
+
+# v14 after verified production deployment, 20261116
