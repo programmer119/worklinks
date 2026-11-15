@@ -4,7 +4,31 @@ const PROJECT='p47';
 const AUTH_API='https://api-authhub.suaveforge.com';
 const CALLBACK='https://worklinks.suaveforge.com/startup-support/auth-callback.html';
 
+const PREFERRED_PROVIDER_KEY='worklinks:p47:last-auth-method';
+const SOCIAL_PROVIDERS=new Set(['google','kakao','naver','microsoft','apple']);
+export function rememberWorklinksAuthProvider(provider){
+  const chosen=String(provider||'').trim().toLowerCase();
+  if(!SOCIAL_PROVIDERS.has(chosen)&&chosen!=='password')return;
+  try{localStorage.setItem(PREFERRED_PROVIDER_KEY,chosen)}catch{}
+}
+function preferredLoginProvider(){
+  try{
+    const provider=String(localStorage.getItem(PREFERRED_PROVIDER_KEY)||'').trim().toLowerCase();
+    return SOCIAL_PROVIDERS.has(provider)?provider:'';
+  }catch{return ''}
+}
+
 export function worklinksHostedAuthUrl(mode='login'){
+  // Returning social members go directly to AuthHub's approved OAuth start.
+  // No extra hosted method-chooser click; AuthHub still owns authentication.
+  const previous=mode==='login'?preferredLoginProvider():'';
+  if(previous){
+    const direct=new URL(AUTH_API+'/v1/oauth/'+PROJECT+'/'+previous+'/start');
+    direct.searchParams.set('environment','production');
+    direct.searchParams.set('redirect_uri',CALLBACK);
+    direct.searchParams.set('state','/startup-support/');
+    return direct.href;
+  }
   const url=new URL('https://authhub.suaveforge.com/login/');
   url.searchParams.set('project',PROJECT);
   url.searchParams.set('environment','production');
