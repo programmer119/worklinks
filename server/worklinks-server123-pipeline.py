@@ -184,6 +184,156 @@ def read_state():
         return {}
 
 
+def rfp_coverage_complete(row, versions):
+    """Only a full current-version, source-backed scan can protect old evidence."""
+    if not isinstance(row,dict) or row.get('status')!='text_extracted_requires_review':
+        return False
+    if row.get('manifestComplete') is not True or row.get('staffingRoleScanComplete') is not True:
+        return False
+    files=[f for f in row.get('files') or [] if isinstance(f,dict) and
+           f.get('readable') is True and f.get('staffingScopeExcluded') is not True]
+    if not files or int(row.get('classificationVersion') or 0)<int(versions.get('classificationVersion') or 999):
+        return False
+    for f in files:
+        if f.get('sourceTextScanComplete') is not True or f.get('qualificationScanTruncated') is True:
+            return False
+        if f.get('staffingRoleScanTruncated') is True:
+            return False
+        if int(f.get('staffingRoleScanVersion') or 0)<int(versions.get('staffingRoleScanVersion') or 999):
+            return False
+        if int(f.get('staffingFactScanVersion') or 0)<int(versions.get('staffingFactScanVersion') or 999):
+            return False
+    hwpx=any(str(f.get('name') or '').lower().endswith('.hwpx') for f in files)
+    return not hwpx or int(row.get('hwpxReaderVersion') or 0)>=int(versions.get('hwpxReaderVersion') or 999)
+
+
+def rfp_same_verified_manifest(left,right):
+    """Do not protect an older scan when a changed official manifest is known."""
+    if not isinstance(left,dict) or not isinstance(right,dict):
+        return False
+    if left.get('manifestChangePending') or right.get('manifestChangePending'):
+        return False
+    a=str(left.get('manifestSignature') or '')
+    b=str(right.get('manifestSignature') or '')
+    if a or b:
+        return bool(a and b and a==b)
+    x=[f for f in left.get('files') or [] if isinstance(f,dict)]
+    y=[f for f in right.get('files') or [] if isinstance(f,dict)]
+    if not x or len(x)!=len(y):
+        return False
+    if [f.get('name') for f in x]!=[f.get('name') for f in y]:
+        return False
+    for old,new in zip(x,y):
+        old_sha=str(old.get('sourceSha256') or '')
+        new_sha=str(new.get('sourceSha256') or '')
+        if old_sha and new_sha and old_sha!=new_sha:
+            return False
+    return True
+
+
+def rfp_prefer_evidence(candidate,previous,versions):
+    if not isinstance(previous,dict):
+        return candidate
+    if not isinstance(candidate,dict):
+        return previous
+    if rfp_same_verified_manifest(candidate,previous):
+        candidate_ok=rfp_coverage_complete(candidate,versions)
+        previous_ok=rfp_coverage_complete(previous,versions)
+        if previous_ok and not candidate_ok:
+            return previous
+        if candidate_ok and not previous_ok:
+            return candidate
+    return (candidate if str(candidate.get('checkedAt') or '')>=
+            str(previous.get('checkedAt') or '') else previous)
+
+
+def merge_rfp_coverage_before_publish(stage):
+    """Rebase an isolated scan on today's live index and per-notice checkpoints.
+
+    A long OCR batch must never erase a shorter repair already published while
+    it was running. A valid complete scan of unchanged originals cannot become
+    incomplete just because fast stage-3 defers OCR.
+    """
+    source=json.loads(stage.read_text(encoding='utf-8'))
+    if source.get('ok') is not True or not isinstance(source.get('byNotice'),dict):
+        raise ValueError('invalid_staged_rfp_coverage')
+    versions_path=SEEDS/'rfp-scanner-versions.json'
+    try:
+        versions=json.loads(versions_path.read_text(encoding='utf-8'))['latest']
+    except (OSError,ValueError,KeyError,TypeError):
+        versions={}
+    rows=dict(source['byNotice'])
+    live=SEEDS/'rfp-coverage-index.json'
+    if live.is_file():
+        prior=json.loads(live.read_text(encoding='utf-8'))
+        if prior.get('ok') is not True or not isinstance(prior.get('byNotice'),dict):
+            raise ValueError('invalid_live_rfp_coverage')
+        for key,record in prior['byNotice'].items():
+            rows[key]=rfp_prefer_evidence(rows.get(key),record,versions)
+    progress=DATA/'rfp-notice-progress.sqlite3'
+    protected=0
+    if progress.is_file():
+        with sqlite3.connect('file:'+str(progress)+'?mode=ro',uri=True,timeout=12) as db:
+            checkpoints=db.execute(
+                'SELECT notice_key,checked_at,evidence_json FROM rfp_notice_checkpoints').fetchall()
+        for key,checked,raw in checkpoints:
+            try:record=json.loads(raw)
+            except (ValueError,TypeError):continue
+            if not isinstance(record,dict) or str(record.get('checkedAt') or '')!=str(checked):
+                continue
+            selected=rfp_prefer_evidence(record,rows.get(key),versions)
+            if selected is record:
+                protected+=1
+            rows[key]=selected
+    source['byNotice']=rows
+    stage.write_text(json.dumps(source,ensure_ascii=False,separators=(',',':'))+'\n',
+                     encoding='utf-8')
+    log('RFP_COVERAGE_REBASED',json.dumps({
+        'notices':len(rows),'checkpointsPreferred':protected},separators=(',',':')))
+    return rows
+
+
+def publish_verified_repair_checkpoints(keys):
+    """Advance only genuinely complete repaired evidence, never a partial error.
+
+    The same authoritative SQLite checkpoint is read by the public API and the
+    scan queue reconciler; writing only a JSON snapshot is not durable.
+    """
+    if not keys:return 0
+    source=json.loads((SEEDS/'rfp-coverage-index.json').read_text(encoding='utf-8'))
+    rows=source['byNotice']
+    versions=json.loads((SEEDS/'rfp-scanner-versions.json').read_text(encoding='utf-8'))['latest']
+    dbpath=DATA/'rfp-notice-progress.sqlite3'
+    published=0
+    with sqlite3.connect(str(dbpath),timeout=15) as db:
+        db.execute('PRAGMA busy_timeout=15000')
+        db.execute('''CREATE TABLE IF NOT EXISTS rfp_notice_checkpoints(
+            notice_key TEXT PRIMARY KEY,checked_at TEXT NOT NULL,evidence_json TEXT NOT NULL)''')
+        for key in keys:
+            row=rows.get(key)
+            if not rfp_coverage_complete(row,versions):
+                continue
+            checked=str(row.get('checkedAt') or '')
+            if not checked:continue
+            previous=db.execute(
+                'SELECT checked_at,evidence_json FROM rfp_notice_checkpoints WHERE notice_key=?',(key,)
+            ).fetchone()
+            if previous:
+                try:prior=json.loads(previous[1])
+                except (TypeError,ValueError):prior={}
+                if rfp_prefer_evidence(row,prior,versions) is not row:
+                    continue
+            payload=json.dumps(row,ensure_ascii=False,separators=(',',':'))
+            db.execute('''INSERT INTO rfp_notice_checkpoints(notice_key,checked_at,evidence_json)
+                VALUES(?,?,?) ON CONFLICT(notice_key) DO UPDATE SET
+                checked_at=excluded.checked_at,evidence_json=excluded.evidence_json
+                WHERE excluded.checked_at>=rfp_notice_checkpoints.checked_at''',
+                (key,checked,payload))
+            published+=1
+    log('RFP_OCR_VERIFIED_CHECKPOINTS',published,'of',len(keys))
+    return published
+
+
 def publish_atomic(src, destination):
     """Prepare gzip and JSON files before replace, never publish partial bytes."""
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -427,9 +577,20 @@ def run_once(kind, runner=None, _single=False):
             return False
         outputs = [root / ('snapshots' if kind in ('rfpRepair','rfpOpenRepair') else 'startup-support') / name
                    for name in PUBLISHED[kind]]
+        repaired_keys=[]
+        for result in outputs:
+            if result.name!='rfp-coverage-index.json':continue
+            if kind=='rfpOpenRepair':
+                staged=json.loads(result.read_text(encoding='utf-8')).get('byNotice') or {}
+                earlier=json.loads((SEEDS/'rfp-coverage-index.json').read_text(encoding='utf-8')).get('byNotice') or {}
+                repaired_keys=[key for key,item in staged.items() if isinstance(item,dict) and
+                    str(item.get('checkedAt') or '')>str((earlier.get(key) or {}).get('checkedAt') or '')]
+            merge_rfp_coverage_before_publish(result)
         quality_guard(kind, outputs)
         for result in outputs:
             publish_atomic(result, SEEDS / result.name)
+        if kind=='rfpOpenRepair' and repaired_keys:
+            publish_verified_repair_checkpoints(repaired_keys)
         if kind=='rfpUpgrade' and dual_enabled:
             # Mark scans finished ONLY after both validated archives are
             # durably published. An interrupted publish is always retryable.
@@ -447,8 +608,12 @@ def run_once(kind, runner=None, _single=False):
                         if record.get('redownload') is True:
                             queue.mark_download_missing(key)
                         else:
-                            ok=bool(record.get('ok'))
-                            row=saved.get(key) or {}
+                            # Current scan checkpoint may already contain a later
+                            # verified OCR repair of these exact files.
+                            verified=read_evidence(DATA)[1].get(key) or {}
+                            versions=versions or deployed_rfp_reader_versions()
+                            ok=bool(record.get('ok')) or rfp_coverage_complete(verified,versions)
+                            row=verified if ok else (saved.get(key) or {})
                             if not ok and versions is None:
                                 versions=deployed_rfp_reader_versions()
                             reason='' if ok else scan_failure_diagnosis(row,versions)
