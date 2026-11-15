@@ -202,7 +202,7 @@ def main():
             # workspace, not the public general-jobs workspace.
             page.evaluate("setWorkspaceView('changcom')")
             page.wait_for_function(
-                "() => worklinksPartnerAccess() && workspaceActiveView==='changcom' && document.querySelector('#jobDecisionSummary')?.textContent?.includes('적격 후보')",
+                "() => worklinksPartnerAccess() && workspaceActiveView==='changcom' && !jobRenderDirty && document.querySelectorAll('#jobCards .job-mini').length > 0",
                 timeout=15000
             )
             assert page.evaluate("jobRenderLimit") == 24
