@@ -595,7 +595,9 @@ def run_once(kind, runner=None, _single=False):
             # Mark scans finished ONLY after both validated archives are
             # durably published. An interrupted publish is always retryable.
             from rfp_dual_queue import RfpDualQueue, scan_evidence_signature
+            from rfp_management_reconcile import read_evidence
             queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+            authoritative_versions,authoritative_evidence=read_evidence(DATA)
             published=json.loads((SEEDS/'rfp-coverage-index.json').read_text('utf-8'))
             saved=published.get('byNotice') or {}
             versions=None
@@ -610,8 +612,8 @@ def run_once(kind, runner=None, _single=False):
                         else:
                             # Current scan checkpoint may already contain a later
                             # verified OCR repair of these exact files.
-                            verified=read_evidence(DATA)[1].get(key) or {}
-                            versions=versions or deployed_rfp_reader_versions()
+                            verified=authoritative_evidence.get(key) or {}
+                            versions=authoritative_versions
                             ok=bool(record.get('ok')) or rfp_coverage_complete(verified,versions)
                             row=verified if ok else (saved.get(key) or {})
                             if not ok and versions is None:
