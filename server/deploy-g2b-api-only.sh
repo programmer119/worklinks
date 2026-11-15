@@ -36,6 +36,7 @@ dk run --rm \
   -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_g2b_standard_api.py:/app/test_g2b_standard_api.py:ro" \
   "$IMG" python /app/test_g2b_standard_api.py
 dk run --rm -e WORKLINKS_STATE_DB=/tmp/worklinks-state-test.sqlite3 -v "$NEXT:/app/g2b-proxy.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_worklinks_user_state.py:/app/test_worklinks_user_state.py:ro" "$IMG" python /app/test_worklinks_user_state.py
+dk run --rm -e WORKLINKS_STATE_DB=/tmp/worklinks-keep-test.sqlite3 -e WORKLINKS_G2B_SOURCE=/app/g2b-proxy.py -v "$NEXT:/app/g2b-proxy.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_worklinks_keep_watch.py:/app/test_worklinks_keep_watch.py:ro" "$IMG" python /app/test_worklinks_keep_watch.py
 dk run --rm -i -v "$NEXT:/app/api.py:ro" -e G2B_DB_PATH=/tmp/test.sqlite3 "$IMG" python - <<'PY'
 import datetime,json,runpy
 p=runpy.run_path('/app/api.py',run_name='preflight_test')
