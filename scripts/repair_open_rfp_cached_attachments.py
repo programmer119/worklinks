@@ -27,7 +27,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf25-blank-hwpml-psm611-v13-20261116'
+READER_ATTEMPT_VERSION='pdf25-blank-hwpml-strict-v14-20261116'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -75,13 +75,23 @@ def open_candidates(data_dir,now):
     return sorted(found.items(),key=lambda row:(row[1],row[0]))
 
 
+def false_hwpml_v13_success(file):
+    """v13 mistakenly used the HTML parser on standalone HWPML .hwpx,
+    incorporating embedded BINDATA as qualification text. Repair exact
+    provenance even if the prior record was marked source complete.
+    """
+    return (file.get('detectedFormat')=='hwpml_xml'
+        and file.get('lastReaderAttemptVersion')=='pdf25-blank-hwpml-psm611-v13-20261116')
+
+
 def failed_files(scan):
     files=scan.get('files') or []
     # Do not download or retry an HWP that a fully read, same-name official
     # PDF already covers. Keep the HWP binary explicitly unread.
     return [f for f in files if isinstance(f,dict)
        and not rfp.hwp_covered_by_verified_pdf(f,files)
-       and (f.get('readable') is not True or f.get('sourceTextScanComplete') is not True
+       and (false_hwpml_v13_success(f)
+            or f.get('readable') is not True or f.get('sourceTextScanComplete') is not True
             or f.get('qualificationScanTruncated') is True
             or int(f.get('unmatchedQualificationAnchorCount') or 0)>0)]
 
@@ -564,7 +574,9 @@ def merge_verified_repair_attempt(live,entry):
     """
     if entry.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION:
         return False
-    if live.get('readable') is True and live.get('sourceTextScanComplete') is True:
+    if (live.get('readable') is True and
+            live.get('sourceTextScanComplete') is True and
+            not false_hwpml_v13_success(live)):
         return False
     complete=(entry.get('readable') is True and
               entry.get('sourceTextScanComplete') is True and
