@@ -127,6 +127,37 @@ with tempfile.TemporaryDirectory() as tmp:
         bulk.ROWS=original_rows
         bulk.MAX_FETCH_PER_PASS=original_pass
 
+# Public proposal-document view must not include internal emergency
+# procurement justifications left in the official e-order history.
+# The same filename under the current "기타문서" role stays downloadable.
+eorder_base='https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/downloadRfpFile.do'
+def link(seq):
+    return eorder_base+'?rfpNo=R26DH00060272&rfpOrd=000&rfpUntyAtchFileNo='+str(seq)
+active=bulk.BulkManifestPlanner._notice_meta(first+':000',{
+ 'ordinary':[
+    {'bidNo':first,'order':'000','name':'공고서.pdf',
+     'url':'https://www.g2b.go.kr/pn/pnp/pnpe/UntyAtchFile/notice.pdf',
+     'source':'notice_attachment_api'}],
+ 'eorder':[
+    {'bidNo':first,'order':'000','name':'(붙임3) 긴급입찰사유서.pdf',
+     'url':link(1),'source':'eorder','documentCategory':'긴급발주사유서'},
+    {'bidNo':first,'order':'000','name':'제안요청서.hwp',
+     'url':link(19),'source':'eorder','documentCategory':'제안요청서'},
+    {'bidNo':first,'order':'000','name':'긴급입찰사유서.pdf',
+     'url':link(21),'source':'eorder','documentCategory':'기타문서'},
+    {'bidNo':first,'order':'000','name':'새 분류 문서.pdf',
+     'url':link(25),'source':'eorder','documentCategory':'기타문서'}],
+ 'detail':[{'bidNo':first,'order':'000','presence':True,'source':'notice_detail'}]})
+assert len(active['attachments']['items'])==4,active
+assert [x['url'] for x in active['attachments']['items'] if x.get('source')=='eorder']==[
+    link(19),link(21),link(25)],active
+assert active['attachments']['excludedNonPublicDocuments']==[
+    {'name':'(붙임3) 긴급입찰사유서.pdf','url':link(1),
+     'source':'eorder','documentCategory':'긴급발주사유서',
+     'reason':'not_public_proposal_attachment'}],active
+assert active['attachments']['complete'] is True
+print('RFP_NONPUBLIC_EORDER_REF_EXCLUDED_WITH_CURRENT_FILES_PRESERVED=PASS',flush=True)
+
 # Proxy adapter uses exactly one official source operation per page and
 # refuses ranges over seven days before spending an upstream request.
 spec=importlib.util.spec_from_file_location('rfp_batch_proxy',ROOT/'server'/'g2b-proxy.py')
@@ -149,6 +180,17 @@ try:
     assert result['items'][0]['bidNo']==first
     assert len(seen)==1 and seen[0][0]=='getBidPblancListInfoAtchFileInfo02'
     assert seen[0][1]['inqryDiv']==1 and seen[0][1]['numOfRows']==999
+    # Bulk adapter must propagate category from the original e-order row.
+    def eorder_request(base,operation,params):
+        assert operation=='getBidPblancListInfoEorderAtchFileInfo02'
+        return {'items':[{'bidNtceNo':first,'bidNtceOrd':'000',
+            'eorderAtchFileNm':'(붙임3) 긴급입찰사유서.pdf',
+            'eorderDocDivNm':'긴급발주사유서',
+            'atchFileUrl':link(1)}], 'totalCount':1}
+    g['request_api']=eorder_request
+    eorder_page=proxy.rfp_attachment_batch_page('eorder',start,end,1,999)
+    assert eorder_page['items'][0]['documentCategory']=='긴급발주사유서',eorder_page
+    g['request_api']=fake_request
     assert 'bidNtceNo' not in seen[0][1],seen
     try:
         proxy.rfp_attachment_batch_page('ordinary','202610010000','202610102359',1,999)
