@@ -29,3 +29,5 @@ jobs:
           echo WORKLINKS_RFP_OCR_REPAIR_CONTINUOUS_PRIORITY_PASS
 
 # v14 strict HWPML dispatch retains truncated HML classification and scanner fairness.
+
+# v14 CI: strict HWPML parser + long-document full coverage regression.
