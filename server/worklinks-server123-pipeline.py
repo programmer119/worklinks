@@ -559,6 +559,25 @@ def ensure_independent_downloader(current):
 _RFP_DOWNLOAD_PROCESS=None
 _RFP_DOWNLOAD_LAST_LAUNCH=-100
 
+def supervise_independent_downloader(stop=None):
+    """Reap and restart the downloader even when a scanner iteration blocks.
+
+    Scanner work can occupy iteration() for many minutes. The downloader must
+    have its own independent supervision loop, not wait for the scan loop.
+    Only this thread owns downloader process creation.
+    """
+    while stop is None or not stop.is_set():
+        try:
+            ensure_independent_downloader(read_state())
+        except (OSError,RuntimeError,ValueError) as error:
+            log('RFP_DOWNLOADER_SUPERVISOR_RETRY',
+                type(error).__name__,str(error)[:180])
+        if stop is None:
+            time.sleep(5)
+        elif stop.wait(5):
+            break
+
+
 def main():
     DATA.mkdir(parents=True, exist_ok=True)
     SEEDS.mkdir(parents=True, exist_ok=True)
@@ -680,6 +699,12 @@ def main():
             'rfpLimit', RFP_LIMIT, 'rfpRepairLimit', RFP_REPAIR_LIMIT,
             'rfpOpenOcrLimit', RFP_OPEN_OCR_LIMIT,
              'qualificationBatch', QUALIFICATION_BATCH)
+        # Downloader supervision must not depend on slow stage-3 scans.
+        downloader_watchdog=threading.Thread(
+            target=supervise_independent_downloader,
+            name='rfp-independent-downloader-supervisor',daemon=True)
+        downloader_watchdog.start()
+        log('RFP_INDEPENDENT_DOWNLOADER_SUPERVISOR_STARTED')
         last_archive_cleanup=0.0
         archive_cleanup_thread=None
         def safe_archive_cleanup(compact):
@@ -687,7 +712,6 @@ def main():
             except Exception as error:
                 log('RFP_ARCHIVE_RETENTION_FAILED',type(error).__name__)
         while True:
-            ensure_independent_downloader(read_state())
             state=iteration()
             # Keep scan health visible independently of the downloader.
             try:
