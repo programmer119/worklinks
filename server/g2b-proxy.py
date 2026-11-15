@@ -1030,6 +1030,21 @@ def read_saved_rfp_evidence_index():
             _SEARCH_RFP_SNAPSHOT.update(modified=modified,byNotice=doc['byNotice'])
         return _SEARCH_RFP_SNAPSHOT['byNotice']
 
+def rfp_card_evidence_batch(raw_keys):
+    """Return only persisted scan summaries for visible cards, with zero G2B calls."""
+    keys=[x.strip() for x in str(raw_keys or '').split(',') if x.strip()]
+    if (not keys or len(keys)>100 or len(set(keys))!=len(keys) or
+            any(not re.fullmatch(r'(?:R\\d{2}BK\\d{8}|\\d{11}):\\d{3}',key)
+                for key in keys)):
+        raise ApiError('invalid_rfp_card_evidence_keys',400)
+    source=read_saved_rfp_evidence_index()
+    if source is None:
+        raise ApiError('rfp_source_index_unavailable',503)
+    return {'ok':True,'sourceAvailable':True,'byNotice':{
+        key:saved_rfp_search_state(source.get(key),compact=True) for key in keys},
+        'count':len(keys),'upstreamCalls':0}
+
+
 def saved_rfp_search_state(row, compact=False):
     """Expose persisted RFP scan provenance; never call official API on page load."""
     if not isinstance(row,dict):
@@ -2486,6 +2501,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
             if u.path == '/api/g2b/rfp-rescan-progress':
                 return self.reply(200,rfp_rescan_progress())
+            if u.path == '/api/g2b/rfp-card-evidence':
+                return self.reply(200,rfp_card_evidence_batch(get('keys')))
             if u.path == '/api/g2b/saved-inventory':
                 return self.reply(200,query_saved_open_inventory())
             if u.path == '/api/g2b/saved':
