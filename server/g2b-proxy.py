@@ -1365,6 +1365,8 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
     unique=set()
     managed_keys=set()
     completed_keys=set()
+    ocr_rescan_notices=0
+    ocr_rescan_files=0
     verified_exclusions=set(excluded_keys or ())
     summary={'total':0,'eligible':0,'excluded':0,
              'completed':0,'remaining':0,'legacy':0,
@@ -1394,7 +1396,9 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
                   and check['hwpx'] is not False)
             summary['unknownDeadlineCompleted' if done else 'unknownDeadlinePending']+=1
             continue
-        if cutoff<now:continue
+        # Live work is actionable only when at least 24 hours remain. This
+        # must match the cached-original OCR repairer's open_candidates gate.
+        if cutoff<=now+datetime.timedelta(hours=24):continue
         summary['total']+=1
         managed_keys.add(key)
         # A complete official three-source manifest with zero documents is
@@ -1411,8 +1415,24 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
             stages[stage]['done']+=int(valid is True)
             stages[stage]['remaining']+=int(valid is False)
         status=str((row or {}).get('status') or '')
+        ocr_reader=str(latest.get('ocrReaderVersion') or '')
+        ocr_failure_categories={'pdf_ocr_incomplete','ocr_deferred_to_repair',
+            'pdf_unreadable_page','image_ocr_incomplete',
+            'hwpx_image_ocr_deferred_to_repair'}
+        old_ocr_files=[f for f in ((row or {}).get('files') or [])
+            if isinstance(f,dict) and f.get('staffingScopeExcluded') is not True
+            and f.get('skippedDuplicateFormat') is not True
+            and str(f.get('errorCategory') or '') in ocr_failure_categories
+            and str(f.get('lastReaderAttemptVersion') or '')!=ocr_reader] if ocr_reader else []
+        if old_ocr_files:
+            ocr_rescan_notices+=1
+            ocr_rescan_files+=len(old_ocr_files)
         if not isinstance(row,dict) or status in ('','not_scanned','unscanned'):
             cat='unscanned'
+        elif old_ocr_files:
+            # The OCR repair reader has its own version; a failed file last
+            # attempted with an older reader is a real upgrade-rescan target.
+            cat='legacy'
         elif status!='text_extracted_requires_review':
             cat='failed'
         elif all(v is not False for v in checks.values()) and \
@@ -1440,8 +1460,10 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
              if summary['eligible'] else None)
     rescan_percent=(round(100.0*summary['rescanRequired']/summary['eligible'],1)
                     if summary['eligible'] else None)
-    report={'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
+    report={'ok':True,'schemaVersion':1,'scope':'actionable_saved_sw_bid_notices_24h',
             'asOf':now.isoformat(),'latest':latest,'counts':summary,
+            'ocrRescan':{'readerVersion':str(latest.get('ocrReaderVersion') or ''),
+                         'targetNotices':ocr_rescan_notices,'targetFiles':ocr_rescan_files},
             'remainingPercent':percent,'rescanPercent':rescan_percent,'stages':stages,
             'basis':'one exact bid number and ordinal; known deadlines only',
             'noGovernmentApiCalls':True}
