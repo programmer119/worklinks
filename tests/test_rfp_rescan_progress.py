@@ -97,6 +97,16 @@ assert rechecked['counts']['incomplete']==1,rechecked
 assert rechecked['ocrRescan']['targetFiles']==0,rechecked
 print('RFP_OCR_READER_VERSION_RESCAN_AND_24H_COHORT=PASS')
 
+# The authoritative queue must not treat a partially OCR-failed ZIP notice
+# as verified-complete merely because a different PDF sibling was readable.
+import sys
+sys.path.insert(0,str(root/'scripts'))
+import rfp_management_reconcile as reconcile
+mixed={**good(),'files':good()['files']+[ocr_file]}
+assert reconcile.latest_complete(mixed,ocr_latest) is False
+assert reconcile.latest_complete(good(),ocr_latest) is True
+print('RFP_OCR_FAILED_MEMBER_QUEUE_RECONCILIATION=PASS')
+
 
 # One completed notice becomes visible without waiting for all eight batch tasks.
 import os
