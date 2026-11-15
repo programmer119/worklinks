@@ -887,6 +887,7 @@ def bid_evidence_query(bid_no, order, include_region=True):
     bid_year_match=re.match(r'^R(\d{2})',str(bid_no or ''))
     notice_year=(2000+int(bid_year_match.group(1)) if bid_year_match else None)
     skipped_outdated=[]
+    skipped_nonpublic=[]
     for source,origin in ((ordinary,'notice_attachment_api'),(attachments,'eorder')):
         for row in source['items']:
             name=_pick(row,['atchFileNm','atchFileName','fileNm','fileName','eorderAtchFileNm'])
@@ -904,7 +905,7 @@ def bid_evidence_query(bid_no, order, include_region=True):
                 if origin=='eorder':
                     item['documentCategory']=str(row.get('eorderDocDivNm') or '').strip()
                     if item['documentCategory']=='긴급발주사유서':
-                        skipped_outdated.append({'name':name,'url':url,'source':origin,
+                        skipped_nonpublic.append({'name':name,'url':url,'source':origin,
                           'documentCategory':item['documentCategory'],
                           'reason':'not_public_proposal_attachment'})
                         continue
@@ -930,6 +931,7 @@ def bid_evidence_query(bid_no, order, include_region=True):
                        'eorderCount':attachments['count'],
                        'skippedOutdatedEorderCount':len(skipped_outdated),
                        'skippedOutdatedEorderItems':skipped_outdated[:12],
+                       'excludedNonPublicDocuments':skipped_nonpublic[:64],
                        'noticeDetailDocumentCount':len(notice_docs['items']),
                        'rawFields':sorted(ordinary['items'][0].keys()) if ordinary['items']
                            else sorted(attachments['items'][0].keys()) if attachments['items'] else [],
