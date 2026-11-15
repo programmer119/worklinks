@@ -40,7 +40,7 @@ index={
 }
 result=calc(rows,index,latest,asof=now)
 counts=result['counts']
-assert counts=={'total':6,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
+assert counts=={'total':6,'eligible':6,'excluded':0,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
                 'unscanned':1,'failed':1,'incomplete':1,'unknownDeadline':1,
                 'unknownDeadlineCompleted':0,'unknownDeadlinePending':1},counts
 assert result['stages']['classification']=={'total':6,'done':3,'remaining':3},result['stages']
@@ -54,6 +54,16 @@ checked_unknown=calc(rows,{**index,'R26BK00000008:000':good()},latest,asof=now)[
 assert checked_unknown['unknownDeadlineCompleted']==1
 assert checked_unknown['unknownDeadlinePending']==0
 assert calc([],index,latest,asof=now)['rescanPercent'] is None
+# A verified no-file notice is terminally excluded from actionable scan.
+# It must not be falsely marked failed or first-time unscanned.
+no_file={'R26BK00000005:000','R26BK00000006:000'}
+fixed=calc(rows,index,latest,asof=now,excluded_keys=no_file)['counts']
+assert fixed['total']==6 and fixed['eligible']==4 and fixed['excluded']==2,fixed
+assert fixed['completed']==1 and fixed['remaining']==3,fixed
+assert fixed['failed']==0 and fixed['unscanned']==0,fixed
+assert fixed['legacy']==2 and fixed['incomplete']==1,fixed
+assert fixed['completed']+fixed['remaining']+fixed['excluded']==fixed['total'],fixed
+print('WORKLINKS_RFP_NO_FILE_BUCKET_SEPARATION=PASS',fixed)
 print('WORKLINKS_RFP_RESCAN_PROGRESS_REGRESSION=PASS',counts)
 
 
@@ -159,6 +169,7 @@ with tempfile.TemporaryDirectory() as temp:
                          [(key,) for key in ids])
     stage=p['rfp_cohort_lanes'](str(path),set(ids),set())
     assert stage['scan']['blockedNoAttachments']==1,stage
+    assert stage['scan']['total']==1,stage
     assert stage['scan']['failed']==0,stage
     assert stage['scan']['staleQueueComplete']==1,stage
     assert stage['scan']['active']==0,stage
