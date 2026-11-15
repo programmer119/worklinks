@@ -169,7 +169,7 @@ with sync_playwright() as p:
     assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
     assert '사업제안요청서.pdf' in page.locator('#rfpRescanContent').text_content()
     assert '외 6개' in page.locator('#rfpRescanContent').text_content()
-    assert '오류 1건' in page.locator('#rfpRescanContent').text_content()
+    assert '오류 1건' not in page.locator('[data-rfp-stage="download"] .rfp-rescan-stage-track').inner_text()
     assert '공식 API 호출 제한' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate("""() => window._rfpFileLiveRow ===
       document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track')"""), 'file row must not remount'
