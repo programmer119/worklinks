@@ -822,8 +822,15 @@ assert.ok(source.includes('opportunityMarkup'));
 assert.ok(source.includes('bidAdvantageOrder(bidAdvantageFromHistory(pastCompetitionSummary(a.x)))'));
 assert.ok(source.includes('value="competition"'));
 assert.ok(source.includes("document.querySelectorAll('[data-verdict-filter]')"));
-assert.ok(source.includes("let list=scopeRows.filter(o=>") &&
-  source.includes("matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&"));
+assert.ok(source.includes("let list=keepMode!=='all'?scopeRows:scopeRows.filter(o=>") &&
+  source.includes("matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&"),
+  'normal list must retain verdict filtering; kept list uses the same original cards');
+assert.ok(source.includes('data-job-card')&&source.includes('data-job-detail'),
+  'kept cards must retain the original clickable detail markers');
+assert.ok(source.includes("const keepMode=window.worklinksKeeps?.getMode?.()||'all'"));
+assert.ok(source.includes("if(keepMode==='all')list.sort(function(a,b){") &&
+  source.includes('else list.sort((a,b)=>'),
+  'saved items retain owner order while regular view keeps its normal sort');
 assert.ok(source.includes('participationStrip(x,comparisonCompanies)'));
 assert.ok(!source.includes("if(jobSoftwareScope(x)!=='candidate')return '';"),'cannot leave thumbnail without bidder status');
 const unscoped=verdictMod.participationVerdict({kind:'thng'},bidder);
