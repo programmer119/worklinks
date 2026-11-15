@@ -4855,7 +4855,10 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,code){
-  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 자율',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원 자율',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:((code==='onsite'&&['onsite','onsite_recommended','onsite_negotiable','offsite'].includes(v.key))||(code==='insurance'&&v.key==='employment_proof')?v.label:name));
+  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 자율',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원 자율',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):
+   code==='insurance'?(v.key==='employment_proof'?v.label:name+' '+(v.key==='not_required'?'불필요':v.label)):
+   ((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:
+    (code==='onsite'&&['onsite','onsite_recommended','onsite_negotiable','offsite'].includes(v.key)?v.label:name));
   const roles=code==='roles'?evidence.roles.items:[];
   const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
   const roleRows=roles.slice(0,4).map(record=>{
