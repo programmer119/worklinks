@@ -97,3 +97,68 @@
 #rfpRescanModal .rfp-download-error-details{margin-top:5px;padding:10px 12px;border:1px solid #e7b2ae;border-radius:7px;background:#fff7f7;color:#842029;font-size:12.5px;line-height:1.6;overflow-wrap:anywhere}
 #rfpRescanModal .rfp-download-error-details[hidden]{display:none}
 #rfpRescanModal .rfp-download-error-details>strong{display:block;margin-bottom:3px}
+
+
+/* One shared semantic palette for the entire RFP monitor.
+   Blue = working; green = verified success; amber = retry/blocked;
+   red = confirmed failure; slate = neutral. No color for mere totals. */
+#rfpRescanModal{
+ --rfp-running:#2363ca;
+ --rfp-running-soft:#d6e4fa;
+ --rfp-success:#087747;
+ --rfp-success-soft:#d7f3e4;
+ --rfp-retry:#98600d;
+ --rfp-retry-soft:#fff2d9;
+ --rfp-error:#b42318;
+ --rfp-error-soft:#fde5e3;
+ --rfp-neutral:#4b5c70;
+ --rfp-track:#edf1f5;
+}
+#rfpRescanModal .rfp-rescan-totals .rfp-rescan-metric strong,
+#rfpRescanModal .rfp-rescan-stage-label strong{color:#1c2f43}
+#rfpRescanModal [data-rfp-field="complete"]{color:var(--rfp-success)!important}
+#rfpRescanModal .rfp-rescan-big-track{background:var(--rfp-track)}
+#rfpRescanModal .rfp-rescan-big-track>span{background:var(--rfp-running)}
+#rfpRescanModal .rfp-rescan-big-track[data-status="success"]>span{background:var(--rfp-success)}
+#rfpRescanMiniFill[data-status="success"]{background:#087747}
+#rfpRescanModal .rfp-rescan-stage-note{color:var(--rfp-neutral)}
+#rfpRescanModal .rfp-rescan-stage-row[data-status="active"] .rfp-rescan-stage-note{color:var(--rfp-running)}
+#rfpRescanModal .rfp-rescan-stage-row[data-status="success"] .rfp-rescan-stage-note{color:var(--rfp-success)}
+#rfpRescanModal .rfp-rescan-stage-row[data-status="warning"] .rfp-rescan-stage-note{color:var(--rfp-retry)}
+#rfpRescanModal .rfp-rescan-stage-row[data-status="danger"] .rfp-rescan-stage-note{color:var(--rfp-error)}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row .rfp-rescan-stage-track{
+ background:var(--rfp-track);border-color:#dfe7f1;
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row[data-status="active"] .rfp-rescan-stage-track{
+ border-color:#b8cff0;
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row[data-status="success"] .rfp-rescan-stage-track{
+ border-color:#b5dfcb;
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row[data-status="warning"] .rfp-rescan-stage-track{
+ border-color:#ead4a5;background:#fffaf0;
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row[data-status="danger"] .rfp-rescan-stage-track{
+ border-color:#ecc5c2;background:#fff8f7;
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row .rfp-stage-aggregate-fill{
+ background:var(--rfp-running);
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row[data-status="success"] .rfp-stage-aggregate-fill{
+ background:var(--rfp-success);
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row .rfp-stage-file-fill{
+ background:var(--rfp-running-soft);
+}
+#rfpRescanModal .rfp-rescan-lanes .rfp-rescan-stage-row .rfp-stage-error-fill{
+ display:block;position:absolute;bottom:0;height:5px;
+ background:var(--rfp-error);z-index:1;border-radius:0;
+ transition:left .25s linear,width .25s linear;pointer-events:none;
+}
+#rfpRescanModal .rfp-download-success-count{color:var(--rfp-success);font-weight:850}
+#rfpRescanModal .rfp-download-error-count:not(:disabled){color:var(--rfp-error)}
+#rfpRescanModal .rfp-download-error-count:disabled{color:var(--rfp-neutral)}
+#rfpRescanModal .rfp-rescan-features [data-status="success"] .rfp-stage-aggregate-fill{background:var(--rfp-success)}
+#rfpRescanModal .rfp-rescan-features [data-status="active"] .rfp-stage-aggregate-fill{background:var(--rfp-running)}
+#rfpRescanModal .rfp-rescan-features .rfp-rescan-stage-row[data-status="warning"] .rfp-rescan-stage-note{color:var(--rfp-retry)}
+#rfpRescanModal .rfp-rescan-features .rfp-rescan-stage-row[data-status="danger"] .rfp-rescan-stage-note{color:var(--rfp-error)}
