@@ -135,6 +135,7 @@ CHANGCOM_URGENT_RECOVERY=ROOT/'startup-support/audits/changcom-priority-rfp-reco
 MAX_FILE=100_000_000
 # OCR is local-only and bounded to prevent runaway attachment processing.
 MAX_PDF_OCR_PAGES=24
+PDF_OCR_PAGE_CACHE_VERSION=1
 MAX_PDF_OCR_PIXELS=12_000_000
 PDF_OCR_TARGET_DPI=300
 MAX_DOCUMENTS=24
@@ -781,68 +782,126 @@ def _extract_image_with_audit(raw):
     return text
 
 
+def _pdf_ocr_page_cache(raw):
+    """Validated PDF-SHA + page-number OCR receipts survive bounded child exit.
+
+    The file is internal to server123 and contains only derived page text.
+    Production repair sets the explicit path; ordinary fast scans never do.
+    """
+    location=os.environ.get('WORKLINKS_RFP_OCR_PAGE_CACHE_DB')
+    if not location:return None,'',{}
+    path=Path(location)
+    path.parent.mkdir(parents=True,exist_ok=True)
+    connection=sqlite3.connect(str(path),timeout=25)
+    try:
+        connection.execute('PRAGMA busy_timeout=25000')
+        connection.execute('''CREATE TABLE IF NOT EXISTS rfp_pdf_ocr_page_receipts (
+            pdf_sha256 TEXT NOT NULL,
+            page_index INTEGER NOT NULL,
+            reader_version INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            text_sha256 TEXT NOT NULL,
+            stored_at TEXT NOT NULL,
+            PRIMARY KEY(pdf_sha256,page_index,reader_version))''')
+        digest=hashlib.sha256(raw).hexdigest()
+        previous=connection.execute(
+            'SELECT page_index,text,text_sha256 FROM rfp_pdf_ocr_page_receipts '
+            'WHERE pdf_sha256=? AND reader_version=?',
+            (digest,PDF_OCR_PAGE_CACHE_VERSION)).fetchall()
+        cached={index:value for index,value,signature in previous
+            if hashlib.sha256(value.encode('utf-8')).hexdigest()==signature
+            and sum(c.isalnum() for c in value)>=12}
+        return connection,digest,cached
+    except BaseException:
+        connection.close()
+        raise
+
+
 def _extract_pdf_with_audit(raw):
-    """Keep readable native pages; OCR only pages lacking native text."""
+    """OCR at most 24 NEW pages per pass; resume from SHA-verified page cache.
+
+    A page cap is a work-slice boundary, never a permanent document cutoff.
+    Successful individual pages are committed immediately so even a bounded
+    extractor timeout cannot discard already completed OCR.
+    """
     from pypdf import PdfReader
     document=PdfReader(io.BytesIO(raw))
     if len(document.pages)>450:raise ValueError('pdf_over_page_limit')
-    parts=[];missing=[];attempted=[];recovered=[];untouched_blanks=[]
-    for i,page in enumerate(document.pages):
-        try:
-            natural=page.extract_text() or ''
-        except Exception:
-            natural=''
-        if natural.strip():
-            parts.append(natural)
-            continue
-        content_stream=page.get_contents()
-        # A page may have a /Contents object with zero actual bytes. It is
-        # still blank: no raster OCR can extract meaningful text from it.
-        if content_stream is None:
-            has_content=False
-        else:
+    parts=[];missing=[];attempted=[];recovered=[];restored=[]
+    deferred=[];failed=[];untouched_blanks=[]
+    connection,digest,cached=_pdf_ocr_page_cache(raw)
+    try:
+        for i,page in enumerate(document.pages):
             try:
-                has_content=bool(content_stream.get_data().strip())
+                natural=page.extract_text() or ''
             except Exception:
-                # Unknown streams fail closed and remain OCR candidates.
-                has_content=True
-        try:
-            has_images=bool(page.images)
-        except Exception:
-            has_images=True
-        if not has_content and not has_images:
-            untouched_blanks.append(i+1)
-            continue
-        if len(attempted)>=MAX_PDF_OCR_PAGES:
-            missing.append(i+1)
-            continue
-        # Bulk index/eligibility scan must never block its 8-notice batch on
-        # multi-page Tesseract. Preserve the unresolved pages for the isolated
-        # cached attachment OCR-repair job, which runs with this flag OFF.
-        if os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1':
-            missing.append(i+1)
-            continue
-        attempted.append(i+1)
-        try:
-            value=_ocr_pdf_page(raw,i)
-        except (ValueError,subprocess.TimeoutExpired):
-            missing.append(i+1)
-            continue
-        # A short recognition artifact must not clear legal evidence.
-        if sum(c.isalnum() for c in value)<12:
-            missing.append(i+1)
-            continue
-        parts.append(value)
-        recovered.append(i+1)
-    text='\n'.join(parts)
-    info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
-          'ocrRecoveredPages':len(recovered),'unresolvedPages':missing[:30],
-          'genuinelyBlankPages':len(untouched_blanks),
-          'sourceComplete':not missing,
-          'extractionMethod':'pdf_native_ocr' if attempted else 'pdf_native'}
-    if not text.strip():
-        raise ValueError('pdf_ocr_incomplete' if missing else 'no_searchable_text')
-    return text,info
+                natural=''
+            if natural.strip():
+                parts.append(natural)
+                continue
+            content_stream=page.get_contents()
+            if content_stream is None:
+                has_content=False
+            else:
+                try:
+                    has_content=bool(content_stream.get_data().strip())
+                except Exception:
+                    has_content=True
+            try:
+                has_images=bool(page.images)
+            except Exception:
+                has_images=True
+            if not has_content and not has_images:
+                untouched_blanks.append(i+1)
+                continue
+            if i in cached:
+                parts.append(cached[i])
+                recovered.append(i+1)
+                restored.append(i+1)
+                continue
+            if len(attempted)>=MAX_PDF_OCR_PAGES:
+                missing.append(i+1)
+                deferred.append(i+1)
+                continue
+            if os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1':
+                missing.append(i+1)
+                deferred.append(i+1)
+                continue
+            attempted.append(i+1)
+            try:
+                value=_ocr_pdf_page(raw,i)
+            except (ValueError,subprocess.TimeoutExpired):
+                missing.append(i+1)
+                failed.append(i+1)
+                continue
+            if sum(c.isalnum() for c in value)<12:
+                missing.append(i+1)
+                failed.append(i+1)
+                continue
+            parts.append(value)
+            recovered.append(i+1)
+            if connection is not None:
+                encoded=value.encode('utf-8')
+                connection.execute('''INSERT OR IGNORE INTO rfp_pdf_ocr_page_receipts
+                    (pdf_sha256,page_index,reader_version,text,text_sha256,stored_at)
+                    VALUES(?,?,?,?,?,?)''',
+                    (digest,i,PDF_OCR_PAGE_CACHE_VERSION,value,
+                     hashlib.sha256(encoded).hexdigest(),
+                     dt.datetime.now(dt.timezone.utc).isoformat()))
+                connection.commit()
+        text='\\n'.join(parts)
+        info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
+              'ocrRecoveredPages':len(recovered),'ocrRestoredPages':len(restored),
+              'ocrBatchDeferredPages':len(deferred),'ocrFailedPages':len(failed),
+              'unresolvedPages':missing[:30],
+              'genuinelyBlankPages':len(untouched_blanks),
+              'sourceComplete':not missing,
+              'extractionMethod':'pdf_native_ocr' if recovered or attempted else 'pdf_native'}
+        if not text.strip():
+            raise ValueError('pdf_ocr_incomplete' if missing else 'no_searchable_text')
+        return text,info
+    finally:
+        if connection is not None:connection.close()
 
 
 def extract_with_source_status(name,raw):
@@ -861,6 +920,9 @@ def extract_with_source_status(name,raw):
                      'pdfPages':sum(x['pdfPages'] for x in pdf_stats),
                      'ocrAttemptedPages':sum(x['ocrAttemptedPages'] for x in pdf_stats),
                      'ocrRecoveredPages':sum(x['ocrRecoveredPages'] for x in pdf_stats),
+                     'ocrRestoredPages':sum(x.get('ocrRestoredPages',0) for x in pdf_stats),
+                     'ocrBatchDeferredPages':sum(x.get('ocrBatchDeferredPages',0) for x in pdf_stats),
+                     'ocrFailedPages':sum(x.get('ocrFailedPages',0) for x in pdf_stats),
                      'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
                      'extractionMethod':('hwp_record_fallback' if _DOCUMENT_SCAN.hwp_record_fallback
                          else 'hwpx_embedded_image_ocr' if _DOCUMENT_SCAN.hwpx_image_ocr
