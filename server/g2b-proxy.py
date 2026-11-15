@@ -844,9 +844,15 @@ def rfp_attachment_batch_page(source,from_time,to_time,page,rows):
             url=_pick(row,['atchFileUrl','atchFileInfoUrl','fileUrl',
                            'fileDownloadUrl','eorderAtchFileUrl'])
             if name or url:
-                normalized.append({'bidNo':bid,'order':order,'name':name[:160],
+                item={'bidNo':bid,'order':order,'name':name[:160],
                     'url':url if url.startswith('https://') else '',
-                    'source':'eorder' if source=='eorder' else 'notice_attachment_api'})
+                    'source':'eorder' if source=='eorder' else 'notice_attachment_api'}
+                if source=='eorder':
+                    # Preserve the official document role. Emergency order
+                    # justifications are not the publicly listed proposal
+                    # attachments and can contain retired file references.
+                    item['documentCategory']=str(row.get('eorderDocDivNm') or '').strip()
+                normalized.append(item)
     return {'ok':True,'source':source,'from':from_time,'to':to_time,
             'page':page,'rows':rows,'totalCount':count,
             'rawCount':len(source_rows),'items':normalized}
@@ -893,7 +899,16 @@ def bid_evidence_query(bid_no, order, include_region=True):
             if url and not re.match(r'^https://',url,re.I):url=''
             if url and url in seen_urls:continue
             if url:seen_urls.add(url)
-            if name or url:normalized_attachments.append({'name':name,'url':url,'source':origin})
+            if name or url:
+                item={'name':name,'url':url,'source':origin}
+                if origin=='eorder':
+                    item['documentCategory']=str(row.get('eorderDocDivNm') or '').strip()
+                    if item['documentCategory']=='긴급발주사유서':
+                        skipped_outdated.append({'name':name,'url':url,'source':origin,
+                          'documentCategory':item['documentCategory'],
+                          'reason':'not_public_proposal_attachment'})
+                        continue
+                normalized_attachments.append(item)
     for item in notice_docs['items']:
         url=item.get('url') or ''
         if url and url not in seen_urls:
