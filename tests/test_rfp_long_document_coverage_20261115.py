@@ -9,7 +9,7 @@ import repair_open_rfp_cached_attachments as repair
 
 assert r.RFP_QUALIFICATION_TEXT_LIMIT==1_000_000
 assert r.STAFFING_ROLE_TEXT_LIMIT==r.RFP_QUALIFICATION_TEXT_LIMIT
-text=('일반 사업 소개 문서의 설명입니다.\n'*13000)
+text=('일반 사업 소개 문서의 설명입니다.\n'*18000)
 assert len(text)>350000
 text+='\n투입 인력: 개발자 2명\n'
 assert len(text)<r.RFP_QUALIFICATION_TEXT_LIMIT
