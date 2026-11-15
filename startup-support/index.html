@@ -4536,14 +4536,24 @@ function jobRequirementEvidence(x){
  const id=jobBidIdentity(x);if(!id)return null;
  const key=id.bidNo+':'+id.order;
  const full=rfpSnapshotByNotice.get(key)||null;
- const saved=rfpBestCardScan(key);
+ // Keep this comparison self-contained: the evidence renderer is also
+ // executed independently by offline regression tests and detail panes.
+ const saved=[jobSearchRfpState.get(key),jobListRfpState.get(key)]
+  .filter(Boolean).sort((a,b)=>
+   Number(b?.seen===true&&typeof b.parserCurrent==='boolean'&&!!b.versionSource)-
+   Number(a?.seen===true&&typeof a.parserCurrent==='boolean'&&!!a.versionSource)||
+   (Date.parse(b.checkedAt||'')||0)-(Date.parse(a.checkedAt||'')||0))[0]||null;
  const publishedProvenance=typeof rfpScanProvenanceByNotice==='undefined'?null:
    rfpScanProvenanceByNotice.get(key)||null;
  const cardScan=saved;
  // Prefer newer server checkpoint evidence over an older Pages inventory.
  const cardTime=Date.parse(cardScan?.checkedAt||'')||0;
  const inventoryTime=Date.parse(publishedProvenance?.checkedAt||'')||0;
- const cardHasVersions=rfpCardHasCurrentVersion(cardScan);
+ const cardHasVersions=cardScan?.seen===true&&
+  typeof cardScan.parserCurrent==='boolean'&&!!cardScan.versionSource&&
+  Number(cardScan.classificationVersion)>0&&
+  Array.isArray(cardScan.staffingRoleVersions)&&
+  Array.isArray(cardScan.staffingFactVersions);
  const provenance=cardHasVersions&&
    (cardScan.parserCurrent===true||cardTime>=inventoryTime||!publishedProvenance)?{
     classificationVersion:cardScan.classificationVersion,
