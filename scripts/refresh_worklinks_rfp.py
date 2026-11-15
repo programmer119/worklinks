@@ -1809,7 +1809,7 @@ def _extract_dispatch(name,raw):
         n='.pdf'
     elif raw.startswith(_OLE_HEADER):
         n=ole_document_kind(name,raw)
-    elif (n.endswith(('.hwpx','.hwp','.hml')) and
+    elif (n.endswith(('.hwpx','.hwp')) and
           raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(b'<?xml')):
         # HWPML is a standalone XML alternative to ZIP-based HWPX. Verify
         # its root and reject unrelated/malformed XML instead of assuming
