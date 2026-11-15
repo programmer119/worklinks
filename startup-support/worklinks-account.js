@@ -486,6 +486,18 @@ async function activateVerifiedSession(session){
   buttons(session);
 }
 let directLoginBusy=false;
+async function recoverStoredLogin(client){
+  // A short, bounded retry recovers transient AuthHub 5xx errors without
+  // repeatedly reloading the page or presenting a credential chooser.
+  for(let attempt=0;attempt<2;attempt++){
+    try{return await validSession(client)}
+    catch(error){
+      if(![429,500,502,503,504].includes(Number(error?.status))||attempt===1)throw error;
+      await new Promise(resolve=>setTimeout(resolve,450));
+    }
+  }
+  return null;
+}
 async function directReLogin(event){
   if(event)event.preventDefault();
   if(directLoginBusy)return;
@@ -497,27 +509,37 @@ async function directReLogin(event){
       location.pathname+location.search+location.hash);
     const client=state.client;
     const stored=client?.session();
+    const resumeUrl=worklinksHostedAuthUrl('login');
+    const socialProviderStart=new URL(resumeUrl).pathname.startsWith(
+      '/v1/oauth/'+WORKLINKS_AUTH_PROJECT+'/');
     if(!state.explicitlyLoggedOut&&client&&(stored?.accessToken||stored?.refreshToken)){
-      setAuthGate('checking','자동 로그인 확인 중','기존 계정 인증을 확인하고 있습니다.');
+      setAuthGate('checking','자동 로그인 복구 중','저장된 계정으로 인증을 다시 연결합니다.');
       try{
-        const verified=await validSession(client);
+        const verified=await recoverStoredLogin(client);
         if(verified){
           await activateVerifiedSession(verified);
           return;
         }
       }catch(error){
         if(!terminalAuthError(error)){
-          showAuthCheckError('자동 로그인 연결을 확인할 수 없습니다.',error);
-          return;
+          if(!socialProviderStart){
+            // A 5xx outage cannot be fixed by showing the same login page.
+            // Keep local records/tokens intact and permit another explicit retry.
+            showAuthCheckError('자동 로그인 연결을 확인할 수 없습니다.',error);
+            return;
+          }
+          // Reauthenticate with the member's remembered social provider
+          // directly. Do not send them through the AuthHub method chooser.
+        }else{
+          try{client.storage?.removeItem(client.key)}catch{}
         }
-        // An explicitly rejected session cannot be used to bypass authentication.
-        try{client.storage?.removeItem(client.key)}catch{}
       }
     }
-    // No valid/refreshable session remains. For a previously verified social
-    // provider, jump straight to that provider rather than AuthHub's chooser.
-    // Email/password logins cannot be renewed without credentials.
-    location.assign(worklinksHostedAuthUrl('login'));
+    // The remembered social provider starts OAuth directly, usually reusing
+    // the browser's existing provider session. AuthHub still verifies access.
+    // Email/password sessions without valid stored credentials cannot be
+    // authenticated automatically and require the normal hosted login.
+    location.assign(resumeUrl);
   }finally{
     directLoginBusy=false;
     if(link)link.removeAttribute('aria-disabled');
