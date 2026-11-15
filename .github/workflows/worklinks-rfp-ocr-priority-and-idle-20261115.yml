@@ -1,0 +1,27 @@
+name: WorkLinks OCR priority and retry-idle drain
+on:
+  push:
+    branches: [fix/rfp-ocr-repair-priority-and-idle-drain-20261115, main]
+    paths:
+      - server/worklinks-server123-pipeline.py
+      - scripts/repair_open_rfp_cached_attachments.py
+      - tests/test_worklinks_server123_pipeline.py
+      - tests/test_rfp_ocr_repair_prioritization_20261115.py
+      - .github/workflows/worklinks-rfp-ocr-priority-and-idle-20261115.yml
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify verified-file OCR fairness and per-file budget
+        run: |
+          python3 -m py_compile server/worklinks-server123-pipeline.py scripts/repair_open_rfp_cached_attachments.py
+          python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          python3 tests/test_open_cached_rfp_repair.py
+          python3 tests/test_rfp_verified_file_handoff.py
+          python3 tests/test_rfp_dual_queue.py
+          echo WORKLINKS_RFP_OCR_REPAIR_CONTINUOUS_PRIORITY_PASS

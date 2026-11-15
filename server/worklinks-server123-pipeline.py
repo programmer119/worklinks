@@ -40,6 +40,9 @@ RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900
 # During continuous stage-3 scanning, interleave one small local-only OCR repair
 # after every four successfully published scan batches instead of starving it.
 RFP_OCR_SCAN_BATCH_INTERVAL = 4
+# When download-ready work is on scan-retry cooldown, OCR repair is independent
+# of upstream file requests and must continue using saved verified originals.
+RFP_OCR_IDLE_PERIOD = 120
 RFP_OPEN_READER_VERSION='pdf24-image-zip-hwpx-xls-hml-v4'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
@@ -403,6 +406,7 @@ def iteration(current=None, runner=None):
             # Keep cached-file OCR repair, which uses zero upstream metadata calls.
             continue
         ocr_due_to_batches=False
+        ocr_due_idle=False
         if kind in ('rfpOpenRepair','rfpRepair') and state.get('rfpUpgradeActive') is True:
             # Legacy top500 repair is excluded from the independent scan lane.
             if kind=='rfpRepair':
@@ -413,9 +417,12 @@ def iteration(current=None, runner=None):
             completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
             previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
             ocr_due_to_batches=(completed-previous_repair>=RFP_OCR_SCAN_BATCH_INTERVAL)
-            # Never let a continuously successful scan starve already verified
-            # OCR work. Other periodic jobs retain their own intervals.
-            if not ocr_due_to_batches:
+            last_attempt=float(prior.get('attemptEpoch') or 0)
+            ocr_due_idle=(drain_status in ('waiting_for_download','no_eligible_now','failed')
+                          and now-last_attempt>=RFP_OCR_IDLE_PERIOD)
+            # One local-only repair slice between scan batches, or every two
+            # minutes while the main scan is blocked on retry/eligibility.
+            if not (ocr_due_to_batches or ocr_due_idle):
                 continue
         if kind=='rfpUpgrade':
             if state.get('rfpUpgradeActive') is not True:continue
@@ -424,7 +431,7 @@ def iteration(current=None, runner=None):
             if now < float(prior.get('retryAfterEpoch') or 0):continue
         else:
             previous=float(prior.get('attemptEpoch') or 0)
-            if now - previous < period and not ocr_due_to_batches:continue
+            if now - previous < period and not (ocr_due_to_batches or ocr_due_idle):continue
         entry = {'attemptEpoch': now, 'status': 'started'}
         state[kind] = entry
         publish_state(state)
