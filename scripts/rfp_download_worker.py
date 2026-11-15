@@ -364,7 +364,13 @@ def run_manifest_forever(queue,planner):
                 if result.get('calls') or result.get('new'):
                     print('RFP_BULK_MANIFEST_PROGRESS',
                           json.dumps(result,separators=(',',':')),flush=True)
-                if result.get('new')==0 and result.get('calls')==0:
+                if result.get('retryAfterSeconds'):
+                    planner_pause_until=time.time()+max(
+                        1,int(result['retryAfterSeconds']))
+                    live.worker('manifest','retry',
+                                'official_exception_budget_or_provider_retry',
+                                planner_pause_until)
+                elif result.get('new')==0 and result.get('calls')==0:
                     planner_pause_until=time.time()+60
             except BulkManifestQuota as exc:
                 seconds=int(exc.retry_after_seconds)
