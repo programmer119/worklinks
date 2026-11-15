@@ -3372,24 +3372,33 @@ if(typeof window!=='undefined')window.worklinksHydrateKeptJobs=async function(it
   if(original){worklinksKeptFullRows.set(id,original);continue;}
   if(!worklinksKeptFullRows.has(id))worklinksKeptFullRows.set(id,worklinksKeptFallback(item));
   if(worklinksKeptPending.has(id)){pending.push(worklinksKeptPending.get(id));continue;}
-  const match=id.match(/^g2b-(servc|thng|cnstwk|frgcpt)-(R\d{2}BK\d{8})-(\d{3})$/);
-  if(!match||Date.now()-(worklinksKeptResolveTime.get(id)||0)<30000)continue;
+  const regular=id.match(/^g2b-(servc|thng|cnstwk|frgcpt)-(R\d{2}BK\d{8})-(\d{3})$/);
+  const precheck=id.match(/^g2b-precheck-(R\d{2}BK\d{8}):(\d{3})$/);
+  if((!regular&&!precheck)||Date.now()-(worklinksKeptResolveTime.get(id)||0)<30000)continue;
+  const number=regular?regular[2]:precheck[1],order=regular?regular[3]:precheck[2];
   worklinksKeptResolveTime.set(id,Date.now());
   const work=(async()=>{
    try{
-    // Saved SQLite search only; no G2B upstream requests are made.
-    const response=await g2bFetch('/saved?sw=1&limit=40&offset=0&q='+encodeURIComponent(match[2]));
-    const record=(response.items||[]).find(row=>
-      String(row.bidNo||'')===match[2]&&
-      String(row.order||'000').padStart(3,'0')===match[3]&&String(row.kind||'')===match[1]);
+    // Saved SQLite only. Include archived/previous ordinals when the user's
+    // original kept notice is no longer in the current SW-only shortlist.
+    let record=null;
+    for(const sw of [1,0]){
+      const response=await g2bFetch('/saved?sw='+sw+'&limit=40&offset=0&q='+encodeURIComponent(number));
+      record=(response.items||[]).find(row=>
+        String(row.bidNo||'')===number&&
+        String(row.order||'000').padStart(3,'0')===order&&
+        (!regular||String(row.kind||'')===regular[1]));
+      if(record)break;
+    }
     if(!record)return;
     const detail=g2bCardFromServer(record);
     if(detail){
+      detail.id=id;
       worklinksKeptFullRows.set(id,detail);
       scheduleJobsRender();
     }
    }catch(error){
-    // Keep the original saved item's normal clickable card visible while offline.
+    // Keep the user's saved notice in its normal clickable card while offline.
    }finally{worklinksKeptPending.delete(id)}
   })();
   worklinksKeptPending.set(id,work);pending.push(work);
