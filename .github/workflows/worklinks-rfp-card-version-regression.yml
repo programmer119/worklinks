@@ -1,0 +1,32 @@
+name: WorkLinks saved RFP card version API and UI regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'server/deploy-g2b-api-only.sh'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_saved_list_version_20261116.py'
+      - 'tests/test_rfp_card_version_frontend_20261116.cjs'
+      - '.github/workflows/worklinks-rfp-card-version-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  versioned-cards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify Python API and JS syntax
+        run: |
+          python -m py_compile server/g2b-proxy.py tests/test_rfp_saved_list_version_20261116.py
+          node --check tests/test_rfp_card_version_frontend_20261116.cjs
+          bash -n server/deploy-g2b-api-only.sh
+      - name: Confirm current saved-list and card APIs agree for screenshot notices
+        run: python tests/test_rfp_saved_list_version_20261116.py
+      - name: Verify missing-version card requests and latest-state rendering
+        run: node tests/test_rfp_card_version_frontend_20261116.cjs
