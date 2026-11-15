@@ -369,6 +369,8 @@ def process_one(key,scan,meta,ledger,file_limit=None):
                     'receiptWriteSeconds':evidence.get('ocrReceiptWriteSeconds'),
                     'extractOutsidePdfSeconds':round(max(0,extract_elapsed-float(evidence.get('ocrPdfTotalSeconds') or 0)),3),
                     'extractFormatTimes':evidence.get('extractFormatTimes') or {},
+                    'ocrRegionProbe':[probe for pdf in evidence.get('pdfSources',[]) if isinstance(pdf,dict)
+                        for probe in pdf.get('ocrRegionProbe',[]) if isinstance(probe,dict)][:4],
                     'sourceComplete':evidence.get('sourceComplete')},
                     ensure_ascii=False,separators=(',',':')),flush=True)
             text=rfp.normalize_extracted_text(extracted)
