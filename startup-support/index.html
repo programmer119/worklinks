@@ -3532,16 +3532,33 @@ var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved d
 // The card list receives only the first 400 saved DB records, whereas the
 // source index contains thousands. Resolve visible missing cards in batches.
 var rfpCardEvidenceRequested=new Set(),rfpCardEvidenceFetchErrors=new Set();
+function rfpCardHasCurrentVersion(state){
+ return state?.seen===true&&
+  typeof state.parserCurrent==='boolean'&&
+  !!state.versionSource&&
+  Number(state.classificationVersion)>0&&
+  Array.isArray(state.staffingRoleVersions)&&
+  Array.isArray(state.staffingFactVersions);
+}
+function rfpBestCardScan(key){
+ // A compact unversioned /saved row must never obscure a newer verified
+ // checkpoint from /rfp-card-evidence.
+ const found=[jobSearchRfpState.get(key),jobListRfpState.get(key)].filter(Boolean);
+ found.sort((a,b)=>
+   Number(rfpCardHasCurrentVersion(b))-Number(rfpCardHasCurrentVersion(a))||
+   (Date.parse(b.checkedAt||'')||0)-(Date.parse(a.checkedAt||'')||0));
+ return found[0]||null;
+}
 function ensureVisibleRfpCardEvidence(rows){
  const pending=[];
  for(const row of rows){
   const id=jobBidIdentity(row.x||row);
   if(!id)continue;
   const key=id.bidNo+':'+id.order;
-  const full=rfpSnapshotByNotice.get(key);
-  if((full&&Array.isArray(full.files)&&full.files.length)||
-      jobListRfpState.has(key)||jobSearchRfpState.has(key)||
-      rfpCardEvidenceRequested.has(key))continue;
+  // A scanned row is not enough: onsite '비상주' requires verified CURRENT
+  // scanner versions. Query missing versions even when /saved provided a row.
+  const state=rfpBestCardScan(key);
+  if(rfpCardHasCurrentVersion(state)||rfpCardEvidenceRequested.has(key))continue;
   rfpCardEvidenceRequested.add(key);
   pending.push(key);
  }
@@ -4519,18 +4536,16 @@ function jobRequirementEvidence(x){
  const id=jobBidIdentity(x);if(!id)return null;
  const key=id.bidNo+':'+id.order;
  const full=rfpSnapshotByNotice.get(key)||null;
- const saved=jobSearchRfpState.get(key)||jobListRfpState.get(key)||null;
+ const saved=rfpBestCardScan(key);
  const publishedProvenance=typeof rfpScanProvenanceByNotice==='undefined'?null:
    rfpScanProvenanceByNotice.get(key)||null;
- const cardScan=jobSearchRfpState.get(key)||jobListRfpState.get(key)||null;
+ const cardScan=saved;
  // Prefer newer server checkpoint evidence over an older Pages inventory.
  const cardTime=Date.parse(cardScan?.checkedAt||'')||0;
  const inventoryTime=Date.parse(publishedProvenance?.checkedAt||'')||0;
- const cardHasVersions=cardScan?.seen===true&&
-   Number.isFinite(Number(cardScan.classificationVersion))&&
-   cardScan.versionSource;
+ const cardHasVersions=rfpCardHasCurrentVersion(cardScan);
  const provenance=cardHasVersions&&
-   (cardTime>inventoryTime||!publishedProvenance)?{
+   (cardScan.parserCurrent===true||cardTime>=inventoryTime||!publishedProvenance)?{
     classificationVersion:cardScan.classificationVersion,
     hwpxReaderVersion:cardScan.hwpxReaderVersion,
     staffingRoleVersions:cardScan.staffingRoleVersions||[],
