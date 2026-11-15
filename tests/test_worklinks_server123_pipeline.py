@@ -161,7 +161,7 @@ with tempfile.TemporaryDirectory() as temporary:
     keep['rfpUpgradeActive']=True
     keep['rfpUpgrade']={'status':'failed','attemptEpoch':now+4,
                        'retryAfterEpoch':time.time()+3600}
-    keep['rfpOpenRepair']={'status':'ok','attemptEpoch':0}
+    keep['rfpOpenRepair']={'status':'ok','attemptEpoch':now-50}
     keep['rfpUpgradeBatchesCompleted']=3
     keep['rfpOpenRepairUpgradeBatch']=0
     m.publish_state(keep)
