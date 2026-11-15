@@ -155,39 +155,61 @@ def metadata_for(key,scan,stored,ledgerpath,archive=None):
     return None,'metadata_missing'
 
 
-def fetch_verified_raw(source,ledgerpath):
-    """Use local verified bytes when available; else one *attachment* GET."""
-    url=source['url']
-    legal=rfp.legal_file(source)
-    if not legal:raise ValueError('unapproved_official_file_url')
-    key=cache_key('official_attachment',url)
-    if ledgerpath.exists():
-        with sqlite3.connect('file:'+str(ledgerpath)+'?mode=ro',uri=True,timeout=15) as conn:
-            row=conn.execute("SELECT payload,sha256 FROM verified_cache WHERE request_key=? AND media_type='bytes'",
-                              (key,)).fetchone()
-        if row:
-            try:
-                raw=zlib.decompress(row[0])
-                if (len(raw)<=rfp.MAX_FILE and hashlib.sha256(raw).hexdigest()==row[1]):
-                    return raw,'verified_cache'
-            except (zlib.error,TypeError):pass
-    # Does NOT use bid-evidence, A02, or any public data API.
-    req=rfp.urllib.request.Request(url,headers={
-        'User-Agent':'Mozilla/5.0','Referer':'https://www.g2b.go.kr/'})
+class VerifiedOriginalMissing(RuntimeError):
+    """Second-stage verified original or its stored bytes are unavailable."""
+
+
+def verified_download_queue(path):
+    """Only notices completed by the independent downloader are scan-eligible."""
+    if not path.is_file():
+        return {}
     try:
-        with rfp.OPENER.open(req,timeout=35) as response:
-            if int(response.headers.get('Content-Length') or 0)>rfp.MAX_FILE:
-                raise ValueError('large_file')
-            raw=response.read(rfp.MAX_FILE+1)
-            if len(raw)>rfp.MAX_FILE:raise ValueError('large_file')
-            if getattr(response,'status',200)!=200:
-                raise ValueError('unexpected_http_status')
-    except rfp.urllib.error.HTTPError as ex:
-        if rfp.official_missing_reference(ex):
-            raise rfp.OfficialAttachmentReferenceMissing(
-                'official_attachment_reference_missing_422') from ex
-        raise
-    return raw,'official_attachment_GET'
+        with sqlite3.connect('file:'+str(path)+'?mode=ro',uri=True,timeout=12) as db:
+            rows=db.execute("""SELECT notice_key,download_total,download_done,metadata_json
+                FROM rfp_dual_notices WHERE download_status='ready'""").fetchall()
+    except (sqlite3.Error,OSError):
+        return {}
+    ready={}
+    for key,total,done,payload in rows:
+        try:
+            meta=json.loads(payload)
+            if not isinstance(meta,dict):
+                continue
+            receipts=meta.get('downloadVerifiedFiles')
+            if (not isinstance(receipts,list) or not receipts or
+                    len(receipts)!=total or done!=total or
+                    any(not isinstance(f,dict) or
+                        not f.get('url') or not f.get('sha256') or
+                        len(str(f['sha256']))!=64 for f in receipts)):
+                continue
+        except (TypeError,ValueError,AttributeError):
+            continue
+        ready[key]=meta
+    return ready
+
+
+def fetch_verified_raw(source,ledgerpath,expected_sha):
+    """Read ONLY the downloader's SHA-verified bytes. No network fallback."""
+    url=source.get('url') or ''
+    if not rfp.legal_file(source):
+        raise ValueError('unapproved_official_file_url')
+    if not isinstance(expected_sha,str) or len(expected_sha)!=64:
+        raise VerifiedOriginalMissing('download_receipt_sha_missing')
+    key=cache_key('official_attachment',url)
+    if not ledgerpath.is_file():
+        raise VerifiedOriginalMissing('verified_original_ledger_missing')
+    with sqlite3.connect('file:'+str(ledgerpath)+'?mode=ro',uri=True,timeout=15) as conn:
+        row=conn.execute("SELECT payload,sha256 FROM verified_cache WHERE request_key=? AND media_type='bytes'",
+                         (key,)).fetchone()
+    if row is None or row[1]!=expected_sha:
+        raise VerifiedOriginalMissing('verified_original_not_in_downloader_cache')
+    try:
+        raw=zlib.decompress(row[0])
+    except (zlib.error,TypeError) as exc:
+        raise VerifiedOriginalMissing('verified_original_corrupt') from exc
+    if len(raw)>rfp.MAX_FILE or hashlib.sha256(raw).hexdigest()!=expected_sha:
+        raise VerifiedOriginalMissing('verified_original_hash_mismatch')
+    return raw,'verified_cache'
 
 
 def process_one(key,scan,meta,ledger):
@@ -205,6 +227,8 @@ def process_one(key,scan,meta,ledger):
     # Examine all notice siblings together. The single-file wrapper here
     # previously lost the verified PDF companion and retried covered HWP.
     pending=reader_retry_files(scan)
+    receipts={f['url']:f for f in meta.get('downloadVerifiedFiles') or []
+              if isinstance(f,dict) and f.get('url') and f.get('sha256')}
     for f in scan['files']:
         if f not in pending:continue
         f['lastReaderAttemptVersion']=READER_ATTEMPT_VERSION
@@ -221,7 +245,10 @@ def process_one(key,scan,meta,ledger):
             counts['invalid_official_url']+=1
             continue
         try:
-            raw,origin=fetch_verified_raw(item,ledger)
+            receipt=receipts.get(item['url'])
+            if receipt is None:
+                raise VerifiedOriginalMissing('file_not_in_completed_download_receipt')
+            raw,origin=fetch_verified_raw(item,ledger,str(receipt['sha256']))
             extracted,evidence,_=rfp.extract_cached_text(label,raw)
             text=rfp.normalize_extracted_text(extracted)
             if not evidence['sourceComplete']:
@@ -256,7 +283,10 @@ def process_one(key,scan,meta,ledger):
             latest.append({'name':label,'sourceUrl':item['url'],
                            'readable':True,'clauseCandidates':clauses})
             counts['file_repaired']+=1
-            counts['cache_hit' if origin=='verified_cache' else 'official_file_GET']+=1
+            counts['cache_hit']+=1
+        except VerifiedOriginalMissing:
+            # Missing originals belong to the downloader, never the parser.
+            raise
         except Exception as exc:
             classification=rfp.classify_failure(exc)
             if classification=='official_attachment_reference_missing_422':
@@ -333,6 +363,8 @@ def run(data_dir,limit,execute=False,max_files=400):
     known_full=[(detail,'rolling_full_scan'),(older,'prior_batch_scan'),
                 (archived,'archived_batch_scan')]
     ledger=root/'rfp-request-ledger.sqlite3'
+    queue_path=root/'rfp-dual-queue.sqlite3'
+    ready_downloads=verified_download_queue(queue_path)
     entries=read_json(coverage_path).get('byNotice') or {}
     now=dt.datetime.now(dt.timezone.utc)
     open_rows=open_candidates(root,now)
@@ -351,9 +383,13 @@ def run(data_dir,limit,execute=False,max_files=400):
         if not broken:
             categories['already_attempted_this_reader_version']+=1
             continue
-        meta,src=metadata_for(key,scan,stored,ledger,known_full)
+        # Snapshot metadata and file URLs are NEVER scanning eligibility.
+        meta=ready_downloads.get(key)
         if not meta:
-            categories['metadata_missing']+=1;continue
+            categories['waiting_for_verified_download']+=1;continue
+        if not metadata_valid(meta,scan):
+            categories['download_manifest_mismatch']+=1;continue
+        src='verified_download_queue'
         categories['ready']+=1
         if len(selected)<limit and selected_file_count+len(broken)<=max_files:
             selected.append((key,ends,meta,src))
@@ -362,9 +398,10 @@ def run(data_dir,limit,execute=False,max_files=400):
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
       'selectedProblemFiles':selected_file_count,
-      'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
+      'noGovernmentMetadataAPICalls':True,
+      'noGovernmentAttachmentGETs':True},ensure_ascii=False),flush=True)
     if not execute:return {'plan':dict(categories),'selected':len(selected)}
-    if not selected:return {'result':'no_eligible_cached_metadata'}
+    if not selected:return {'result':'no_eligible_verified_download'}
     lock=open(root/'rfp-open-repair.lock','a+')
     fcntl.flock(lock,fcntl.LOCK_EX)
     results={};tally=Counter();pending={}
@@ -436,8 +473,18 @@ def run(data_dir,limit,execute=False,max_files=400):
             if not isinstance(latest,dict) or not metadata_valid(meta,latest):
                 tally['changed_while_repairing']+=1;continue
             if not reader_retry_files(latest):continue
+            fresh=verified_download_queue(queue_path).get(key)
+            if (not fresh or fresh.get('downloadVerifiedFiles')!=meta.get('downloadVerifiedFiles')):
+                tally['download_receipt_changed']+=1;continue
             work=json.loads(json.dumps(latest,ensure_ascii=False))
-            additions,counters=process_one(key,work,meta,ledger)
+            try:
+                additions,counters=process_one(key,work,meta,ledger)
+            except VerifiedOriginalMissing as exc:
+                from rfp_dual_queue import RfpDualQueue
+                RfpDualQueue(queue_path).mark_download_missing(key)
+                tally['returned_to_downloader']+=1
+                print('OPEN_RFP_RETURNED_TO_DOWNLOADER',key,str(exc)[:100],flush=True)
+                continue
             tally.update(counters)
             if not additions and not any(counters.get(k) for k in (
                  'official_attachment_reference_missing_422','pdf_ocr_incomplete',
@@ -448,7 +495,8 @@ def run(data_dir,limit,execute=False,max_files=400):
         print('OPEN_RFP_CACHED_REPAIR_RESULT',json.dumps({
           'noticesUpdated':len(results),'counters':dict(tally),
           'remainingWithoutSavedMetadata':categories['metadata_missing'],
-          'noGovernmentMetadataAPICalls':True},ensure_ascii=False),flush=True)
+          'noGovernmentMetadataAPICalls':True,
+      'noGovernmentAttachmentGETs':True},ensure_ascii=False),flush=True)
         return results
     finally:
         fcntl.flock(lock,fcntl.LOCK_UN)
