@@ -123,6 +123,27 @@ with tempfile.TemporaryDirectory() as tmp:
             assert ledger.get_bytes(cancel_key) is None
             assert ledger.get_bytes(shared_key)==b'SHARED_BYTES'
 
+# Repeated official endpoints with no ntceKindNm must never erase a
+# previously verified registration, change, or cancellation on the same ordinal.
+with sqlite3.connect(':memory:') as db:
+    db.execute("""CREATE TABLE bid_notices(
+      kind TEXT NOT NULL,bid_no TEXT NOT NULL,bid_ord TEXT NOT NULL,
+      payload TEXT NOT NULL,first_seen TEXT NOT NULL,last_seen TEXT NOT NULL,
+      sw_candidate INTEGER NOT NULL DEFAULT 0,changed_at TEXT NOT NULL DEFAULT '',
+      PRIMARY KEY(kind,bid_no,bid_ord))""")
+    sample={'kind':'thng','bidNo':'R26BK00999999','order':'000',
+            'title':'시스템 유지관리','state':'등록공고','noticeKind':'등록공고'}
+    missing=dict(sample,state='',noticeKind='')
+    crawler['save'](db,[dict(sample)])
+    crawler['save'](db,[dict(missing)])
+    saved=json.loads(db.execute('SELECT payload FROM bid_notices').fetchone()[0])
+    assert (saved.get('noticeKind'),saved.get('state'))==('등록공고','등록공고'),saved
+    sample['state']=sample['noticeKind']='취소공고'
+    crawler['save'](db,[dict(sample)])
+    crawler['save'](db,[dict(missing)])
+    saved=json.loads(db.execute('SELECT payload FROM bid_notices').fetchone()[0])
+    assert (saved.get('noticeKind'),saved.get('state'))==('취소공고','취소공고'),saved
+
 now=dt.datetime(2026,11,15,tzinfo=dt.timezone(dt.timedelta(hours=9)))
 versions=[
   ('R26BK01700001','000',{'closes':'2026-11-30','state':'등록공고'}),
