@@ -921,7 +921,10 @@ def main():
         manifest={'ok':True,'schemaVersion':1,'latest':manifest_versions,
                   'generatedAt':dt.datetime.now(dt.timezone.utc).isoformat()}
         manifest_path=SEEDS/'rfp-scanner-versions.json'
-        previous_manifest=read_json(manifest_path)
+        try:
+            previous_manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+        except (OSError,ValueError):
+            previous_manifest={}
         parser_changed=(previous_versions!=current_versions or not manifest_path.is_file())
         ocr_changed=str((previous_manifest.get('latest') or {}).get('ocrReaderVersion') or '')!=RFP_OPEN_READER_VERSION
         if parser_changed or ocr_changed:
