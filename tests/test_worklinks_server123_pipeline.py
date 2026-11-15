@@ -6,6 +6,7 @@ import sys
 from unittest.mock import patch
 import importlib.util
 import json
+import sqlite3
 from pathlib import Path
 import tempfile
 import time
@@ -273,6 +274,37 @@ with tempfile.TemporaryDirectory() as temporary:
         m.run_once('rfpUpgrade',dual_runner)
     assert dual.stats()['scan']['done']==1,dual.stats()
     print('WORKLINKS_DUAL_SCAN_COMMIT_AFTER_SNAPSHOT_PUBLISH=PASS')
+
+    # Child scanner estimated 1 hour, but the durable queue has the actual
+    # next attempt or an evidence-change hold. Live UI must not show the old
+    # one-hour estimate, and success must clear stale file retry events.
+    with dual.connect() as con:
+        con.execute("""CREATE TABLE IF NOT EXISTS rfp_live_events(
+            lane TEXT,notice_key TEXT,file_key TEXT,phase TEXT,
+            status TEXT,retry_epoch REAL,error_text TEXT,updated_epoch REAL)""")
+        con.executemany("""INSERT INTO rfp_live_events
+            VALUES('scan',?,?,?,'retry',?,'old hourly retry',0)""",[
+              ('R26BK01808709:000','','판독 오류',time.time()+3600),
+              ('R26BK01808709:000','file1','판독 오류',time.time()+3600)])
+        con.execute("""UPDATE rfp_dual_notices
+            SET scan_status='retry',scan_retry_epoch=2147483647,
+                last_error='scan_staffing_incomplete:pdf_ocr_incomplete'
+            WHERE notice_key='R26BK01808709:000'""")
+    m.sync_scan_retry_activity(dual,'R26BK01808709:000')
+    with dual.connect() as con:
+        rows=con.execute("""SELECT file_key,phase,status,retry_epoch,error_text
+             FROM rfp_live_events WHERE notice_key='R26BK01808709:000'""").fetchall()
+        assert len(rows)==2 and all(r[3]==0 for r in rows),rows
+        assert '변경 필요' in rows[0][1] and 'pdf_ocr_incomplete' in rows[0][4],rows
+        con.execute("""UPDATE rfp_dual_notices SET scan_status='done',
+            scan_retry_epoch=0,last_error=''
+            WHERE notice_key='R26BK01808709:000'""")
+    m.sync_scan_retry_activity(dual,'R26BK01808709:000')
+    with dual.connect() as con:
+        rows=con.execute("""SELECT file_key,status,retry_epoch,error_text
+            FROM rfp_live_events WHERE notice_key='R26BK01808709:000'""").fetchall()
+        assert rows==[('','done',0.0,'')],rows
+    print('WORKLINKS_RFP_RETRY_UI_CLOCK_MATCHES_PERSISTED_QUEUE=PASS')
 
     historical={'ok':True,'byNotice':{'R26BK00000000:000':{},'R26BK01808709:000':{}}}
     (m.SEEDS/'rfp-coverage-index.json').write_text(json.dumps(historical))
