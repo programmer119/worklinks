@@ -1025,8 +1025,8 @@ def _extract_pdf_with_audit(raw):
                     native_fast_samples[sample]=original
                     # Ignore only whitespace differences; order and every
                     # nonspace character must be exactly equal.
-                    if (re.sub(r'\\s+','',original)!=re.sub(r'\\s+','',trial)
-                            or '\\ufffd' in trial):
+                    if (re.sub(r'\s+','',original)!=re.sub(r'\s+','',trial)
+                            or '\ufffd' in trial):
                         valid=False
                         native_fast_reason='native_text_sample_mismatch'
                         break
@@ -1071,7 +1071,7 @@ def _extract_pdf_with_audit(raw):
                     try:
                         rendered=render_cache['document'].load_page(i)
                         natural=rendered.get_text('text',sort=False) or ''
-                        if '\\ufffd' in natural:
+                        if '\ufffd' in natural:
                             raise ValueError('unmapped_mupdf_character')
                         native_fast_mupdf_pages+=1
                         should_parse_native=False
