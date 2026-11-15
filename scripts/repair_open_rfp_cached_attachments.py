@@ -257,7 +257,7 @@ def process_one(key,scan,meta,ledger):
                 f['errorCategory']='pdf_ocr_incomplete'
                 counts['pdf_ocr_incomplete']+=1
                 continue
-            if len(text.strip())<(30 if label.lower().endswith(('.xlsx','.pptx','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')) else 100):
+            if sum(ch.isalnum() for ch in text)<12:
                 raise ValueError('no_searchable_text')
             triggers,snippets=rfp.parse_clauses(text)
             clauses=rfp.extract_rule_candidates(text,label)
