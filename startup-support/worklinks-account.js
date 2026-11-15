@@ -1,9 +1,9 @@
 import { AuthHubClient } from './authhub-client.js';
-import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl } from './worklinks-header-auth.js';
+import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl, rememberWorklinksAuthProvider } from './worklinks-header-auth.js?v=20261115-direct-relogin-1';
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
-const AUTH_UI_BUILD = '20261114-amount-compact-v6';
+const AUTH_UI_BUILD = '20261115-direct-relogin-v1';
 const GUEST = {
   applied: 'externaltools_startup_support_status_v1',
   hidden: 'worklinks_startup_support_hidden_v1',
@@ -107,6 +107,7 @@ function expireSession(account, message='로그인이 만료되었습니다.'){
   if(!account||account!==state.account)return;
   // Do not call remote logout on expiry: a failed remote request must not
   // delay cleanup, and local account changes must never be erased.
+  rememberWorklinksAuthProvider(state.client?.session()?.onboarding?.provider);
   showAuthExpiry(message);
   try{state.client?.storage?.removeItem(state.client.key)}catch{}
   guestRestore();
@@ -474,6 +475,7 @@ async function bootstrap(){
       const result=await state.client.consumeOAuthCallback(location.href);
       if(result?.pendingApproval)throw Error('가입 승인 대기');
       if(!result)throw Error('인증 코드 없음');
+      rememberWorklinksAuthProvider(result?.onboarding?.provider);
       const previous=sessionStorage.getItem('worklinks_auth_return_url')||'/startup-support/';
       sessionStorage.removeItem('worklinks_auth_return_url');
       const destination=previous.startsWith('/startup-support/')&&!previous.includes('auth-callback.html')
@@ -485,7 +487,9 @@ async function bootstrap(){
     return;
   }
   try{
-    const previouslySignedIn=Boolean(state.client.session()?.accessToken);
+    const existing=state.client.session();
+    const previouslySignedIn=Boolean(existing?.accessToken);
+    if(previouslySignedIn)rememberWorklinksAuthProvider(existing?.onboarding?.provider);
     const session=await validSession(state.client);
     if(!session){
       if(previouslySignedIn)showAuthExpiry();
