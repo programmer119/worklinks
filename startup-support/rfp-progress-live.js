@@ -194,10 +194,10 @@
      badge='작업 상태 확인 필요';
     }else if(confirmed>0&&processed===total&&total>0){
      caption='현재 전송 파일 없음';
-     badge='처리 완료';
+     badge='원본 오류 '+confirmed+'건';
     }else if(confirmed>0){
      caption='현재 전송 파일 없음';
-     badge='다음 다운로드 준비 중';
+     badge='원본 오류 '+confirmed+'건 · 다음 파일 준비';
     }else if(failed>0&&errors.length){
      caption='파일 다운로드 오류';
      badge='재시도 '+failed+'건';
@@ -377,11 +377,18 @@
      Math.max(completed,Math.min(total,Number(stage.processed??completed))):completed;
    const errors=key==='download'&&available?Math.max(0,Number(stage.errors||0)):0;
    const progress=total?Math.max(0,Math.min(100,100*processed/total)):0;
+   // Files actually received are successful; confirmed missing originals are
+   // a separate red segment. Never paint confirmed errors as blue success.
+   const successProgress=key==='download'&&total?
+     Math.max(0,Math.min(100,100*completed/total)):progress;
+   const errorProgress=key==='download'&&total?
+     Math.max(0,Math.min(100-successProgress,100*errors/total)):0;
    const stageActive=Boolean(!delayed&&available&&
     ((key==='download'&&Number(stage.active||0)>0)||
      (key==='scan'&&(Number(stage.active||0)>0||scanWorkerActive))));
    let state=available?(total?progress.toFixed(1)+'%':'해당 없음'):'집계 미제공';
-   if(key==='manifest'&&available&&total&&completed===total)state='확보 완료';
+   if(key==='download'&&errors>0)state='원본 오류 '+number(errors)+'건';
+   else if(key==='manifest'&&available&&total&&completed===total)state='확보 완료';
    else if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
    else if(available&&total&&processed===total)state='처리 완료';
    else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
@@ -396,7 +403,10 @@
      const next=caption+'오류 '+number(errors)+'건'+suffix;
      if(countNode.dataset.value!==next){
       countNode.dataset.value=next;
-      countNode.replaceChildren(document.createTextNode(caption));
+      const success=document.createElement('span');
+      success.className='rfp-download-success-count';
+      success.textContent='정상 '+number(completed);
+      countNode.replaceChildren(success,document.createTextNode(' · '));
       const button=document.createElement('button');
       button.id='rfpDownloadErrorButton';
       button.type='button';
@@ -413,13 +423,50 @@
    const track=node.querySelector('.rfp-rescan-stage-track');
    track.classList.toggle('is-active',stageActive);
    track.setAttribute('aria-valuenow',progress.toFixed(1));
-   track.querySelector('.rfp-stage-aggregate-fill').style.width=progress.toFixed(2)+'%';
+   track.querySelector('.rfp-stage-aggregate-fill').style.width=successProgress.toFixed(2)+'%';
+   let errorBar=track.querySelector('.rfp-stage-error-fill');
+   if(key==='download'&&!errorBar){
+    errorBar=document.createElement('span');
+    errorBar.className='rfp-stage-error-fill';
+    errorBar.setAttribute('aria-hidden','true');
+    track.append(errorBar);
+   }
+   if(errorBar){
+    errorBar.style.left=successProgress.toFixed(2)+'%';
+    errorBar.style.width=errorProgress>0?'max(4px, '+errorProgress.toFixed(2)+'%)':'0%';
+   }
+   const blocked=key==='scan'&&Number(stage?.blockedNoAttachments||0)>0;
+   const retry=Number(stage?.failed||0)>0;
+   const status=delayed?'warning':
+    (key==='download'&&errors>0)?'danger':
+    blocked?'warning':
+    stageActive?'active':
+    retry?'warning':
+    available&&total>0&&completed===total?'success':'neutral';
+   node.dataset.status=status;
   }
   const unknownTotal=Math.max(0,Number(counts.unknownDeadline||0));
   panel.querySelector('#rfpRescanUnknown').hidden=!unknownTotal;
   updateField(panel,'unknown',number(unknownTotal)+'건 · 별도 판독 '+
    number(counts.unknownDeadlineCompleted)+' / '+number(unknownTotal)+'건');
   window.paintRfpLaneFocus();
+  // The focus renderer updates live text, but semantic status belongs to
+  // the authoritative stage counters and is applied above on every poll.
+  const allStages=[...laneKeys,...stageKeys];
+  for(const [key] of allStages){
+   const node=panel.querySelector('[data-rfp-stage="'+key+'"]');
+   if(!node)continue;
+   const state=node.querySelector('[data-rfp-field="'+key+'State"]');
+   if(state&&node.dataset.status==='success'){
+    if(key==='manifest')updateRfpText(state,'확보 완료');
+    else if(key==='download')updateRfpText(state,'전체 정상 완료');
+    else if(key==='scan')updateRfpText(state,'최신 판독 완료');
+   }
+  }
+  const completeNotice=done===all&&all>0;
+  totalBar.dataset.status=completeNotice?'success':'active';
+  const mini=document.querySelector('#rfpRescanMiniFill');
+  if(mini)mini.dataset.status=completeNotice?'success':'active';
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
   count.textContent='완료 '+number(done)+' / '+number(all)+'건';
