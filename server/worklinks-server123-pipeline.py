@@ -37,6 +37,9 @@ RFP_REPAIR_PERIOD = max(3600, int(os.environ.get('G2B_RFP_REPAIR_PERIOD', 3600))
 RFP_REPAIR_LIMIT = max(1, min(120, int(os.environ.get('G2B_RFP_REPAIR_LIMIT', 48))))
 # Local OCR repair uses only stored source URLs, no government metadata API calls.
 RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900)))
+# During continuous stage-3 scanning, interleave one small local-only OCR repair
+# after every four successfully published scan batches instead of starving it.
+RFP_OCR_SCAN_BATCH_INTERVAL = 4
 RFP_OPEN_READER_VERSION='pdf24-image-zip-hwpx-v3'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
@@ -390,23 +393,30 @@ def iteration(current=None, runner=None):
             ('qualification', QUALIFICATION_PERIOD))
     for kind, period in jobs:
         prior = state.get(kind) or {}
-        # Scanner and repair jobs share a single serial scheduler. Never let
-        # 100s+ OCR/repair jobs stop the successful first-time scan queue.
-        # Paused/empty drains may safely run repairs while scanning is idle.
+        # The scanner and OCR repair share a serial snapshot publisher.
+        # A bounded cached-original OCR pass is fair after four scan batches,
+        # even while the normal scan queue remains continuously active.
         if (os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1'
                 and kind in ('rfp','rfpRepair')):
             # Legacy RFP and frozen top500 repair use bid-evidence per notice.
             # The split queue + period-batched manifest replaces those paths.
             # Keep cached-file OCR repair, which uses zero upstream metadata calls.
             continue
+        ocr_due_to_batches=False
         if kind in ('rfpOpenRepair','rfpRepair') and state.get('rfpUpgradeActive') is True:
-            drain_status=str((state.get('rfpUpgrade') or {}).get('status') or '')
-            if drain_status in ('started','ok','parser_versions_upgraded','drain_algorithm_upgraded'):
+            # Legacy top500 repair is excluded from the independent scan lane.
+            if kind=='rfpRepair':
                 continue
-            if kind=='rfpOpenRepair' and drain_status!='no_eligible_now':
-                completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
-                previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
-                if completed-previous_repair<12:continue
+            drain_status=str((state.get('rfpUpgrade') or {}).get('status') or '')
+            if drain_status=='started':
+                continue
+            completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
+            previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
+            ocr_due_to_batches=(completed-previous_repair>=RFP_OCR_SCAN_BATCH_INTERVAL)
+            # Never let a continuously successful scan starve already verified
+            # OCR work. Other periodic jobs retain their own intervals.
+            if not ocr_due_to_batches:
+                continue
         if kind=='rfpUpgrade':
             if state.get('rfpUpgradeActive') is not True:continue
             # A successful batch never waits for the clock. A failed batch or
@@ -414,7 +424,7 @@ def iteration(current=None, runner=None):
             if now < float(prior.get('retryAfterEpoch') or 0):continue
         else:
             previous=float(prior.get('attemptEpoch') or 0)
-            if now - previous < period:continue
+            if now - previous < period and not ocr_due_to_batches:continue
         entry = {'attemptEpoch': now, 'status': 'started'}
         state[kind] = entry
         publish_state(state)
@@ -423,7 +433,7 @@ def iteration(current=None, runner=None):
                 _single=(kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True))
             finished=time.time()
             if kind=='rfpUpgrade':
-                state['rfpUpgradeBatchesCompleted']=int(state.get('rfpUpgradeBatchesCompleted') or 0)+(1 if more is not False else 0)
+                state['rfpUpgradeBatchesCompleted']=int(state.get('rfpUpgradeBatchesCompleted') or 0)+(1 if more is True else 0)
                 if more=='download_wait':
                     entry.update(status='waiting_for_download',successEpoch=finished,
                                  retryAfterEpoch=finished+5)
