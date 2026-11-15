@@ -26,12 +26,12 @@
     '<div class="rfp-rescan-metric"><span>관리 대상</span><strong data-rfp-field="total">—</strong></div>'+
     '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong data-rfp-field="complete">—</strong></div>'+
     '<div class="rfp-rescan-metric"><span>남은 문서 판독</span><strong data-rfp-field="rescanRequired">—</strong></div></div>'+
-   '<div class="rfp-rescan-overview"><span>전체 판독 완료</span><strong data-rfp-field="pct">—</strong></div>'+
+   '<div class="rfp-rescan-overview"><span>판독 대상 중 완료</span><strong data-rfp-field="pct">—</strong></div>'+
    '<div class="rfp-rescan-big-track" role="progressbar" aria-label="전체 최신 판독 완료" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span style="width:0%"></span></div>'+
    '<div class="rfp-rescan-breakdown"><span>최초 미판독 <b data-rfp-field="unscanned">—</b></span>'+
     '<span>구버전 <b data-rfp-field="legacy">—</b></span>'+
     '<span>실패 <b data-rfp-field="failed">—</b></span>'+
-    '<span>검증 미완료 <b data-rfp-field="incomplete">—</b></span></div>'+
+    '<span>검증 미완료 <b data-rfp-field="incomplete">—</b></span>'+    '<span>판독 제외 <b data-rfp-field="excluded">—</b></span></div>'+
    '<div class="rfp-rescan-section-header"><h3>작업 진행</h3>'+
     '<span>첨부목록 확보·원본 다운로드 → 별도 문서 판독</span></div>'+
    '<div class="rfp-rescan-lanes">'+laneKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
@@ -342,7 +342,9 @@
   const counts=info.counts;
   const all=Math.max(0,Number(counts.total||0));
   const done=Math.max(0,Number(counts.completed||0));
-  const pct=all?Math.max(0,Math.min(100,100*done/all)):0;
+  const excluded=Math.max(0,Number(counts.excluded||0));
+  const eligible=Math.max(0,Number(counts.eligible??Math.max(0,all-excluded)));
+  const pct=eligible?Math.max(0,Math.min(100,100*done/eligible)):0;
   const number=rfpProgressNumber;
   const delayed=Boolean(rfpRescanProgressError);
   const lanes=info.lanes?.available===true?info.lanes:null;
@@ -355,8 +357,8 @@
   const scanActive=Math.max(0,Number(lanes?.scan?.active||0));
   const active=!delayed&&(dlNotices>0||dlFiles>0||scanActive>0||scanWorkerActive);
   for(const [name,value] of Object.entries({
-   total:number(all),complete:number(done),rescanRequired:number(Math.max(0,all-done)),
-   unscanned:number(counts.unscanned),legacy:number(counts.legacy),
+   total:number(all),complete:number(done),rescanRequired:number(Math.max(0,Number(counts.remaining??(eligible-done)))),
+   excluded:number(excluded),unscanned:number(counts.unscanned),legacy:number(counts.legacy),
    failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
   }))updateField(panel,name,value);
   const totalBar=panel.querySelector('.rfp-rescan-big-track');
