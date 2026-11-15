@@ -3391,6 +3391,40 @@ async function refreshRfpScanProvenance(){
 }
 void refreshRfpScanProvenance();
 var jobListRfpState=new Map(); // Read-only per-notice coverage from the saved database pages.
+// The card list receives only the first 400 saved DB records, whereas the
+// source index contains thousands. Resolve visible missing cards in batches.
+var rfpCardEvidenceRequested=new Set(),rfpCardEvidenceFetchErrors=new Set();
+function ensureVisibleRfpCardEvidence(rows){
+ const pending=[];
+ for(const row of rows){
+  const id=jobBidIdentity(row.x||row);
+  if(!id)continue;
+  const key=id.bidNo+':'+id.order;
+  const full=rfpSnapshotByNotice.get(key);
+  if((full&&Array.isArray(full.files)&&full.files.length)||
+      jobListRfpState.has(key)||jobSearchRfpState.has(key)||
+      rfpCardEvidenceRequested.has(key))continue;
+  rfpCardEvidenceRequested.add(key);
+  pending.push(key);
+ }
+ for(let i=0;i<pending.length;i+=100){
+  const keys=pending.slice(i,i+100);
+  void g2bFetch('/rfp-card-evidence?keys='+encodeURIComponent(keys.join(',')))
+   .then(result=>{
+    if(result?.ok!==true||result.sourceAvailable!==true)
+     throw new Error('saved_scan_index_unavailable');
+    for(const key of keys){
+     const state=result.byNotice?.[key];
+     if(state&&typeof state==='object')jobListRfpState.set(key,state);
+    }
+    scheduleJobsRender();
+   })
+   .catch(error=>{
+    for(const key of keys)rfpCardEvidenceFetchErrors.add(key);
+    scheduleJobsRender();
+   });
+ }
+}
 // A compact, official-byte-verified fact feed is a read-only recovery path
 // when the cumulative server123 RFP scanner has not yet published its batch.
 async function refreshVerifiedStaffingFacts(){
@@ -4423,6 +4457,11 @@ function jobRequirementEvidence(x){
   if(positive&&bidStage.test(positive.text))
    return {key:'required_at_bid',label:'입찰 시 필요',reason:'입찰 참가·제안서 제출 등 입찰 단계까지 충족해야 하는 조건이 원문에 명시됨'};
   if(rfpSnapshotLoading&&!full&&!insuranceSourceReadComplete)return {key:'checking',label:'확인중',reason:'저장된 첨부문서 판독자료를 확인하는 중 · 미판독 또는 요건 없음으로 확정하지 않음'};
+  if(!saved?.seen&&!Array.isArray(full?.files)){
+   if(rfpCardEvidenceFetchErrors.has(key))
+    return {key:'failed',label:'자료연결 실패',reason:'문서 판독 결과가 아니라 화면의 저장자료 조회 연결에 실패함 · 다시 조회 필요'};
+   return {key:'checking',label:'확인중',reason:'공고별 완료된 판독자료를 일괄 조회하는 중 · 판독 실패로 간주하지 않음'};
+  }
   if(!tried)return {key:'not_checked',label:'확인안함',reason:'관련 공고 원문 API 수집·검증 호출 기록 없음'};
   if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고는 수집됐으나 첨부문서 판독이 실행되지 않음 · 판독 실행 필요'};
   if(insuranceSourceReadComplete&&mentioned.length&&mentioned.every(c=>negative.test(c.text)))
@@ -5623,6 +5662,7 @@ function renderJobs(){
   more.textContent=g2bSavedLoadError?'서버 공고 다시 불러오기 · 일부 목록만 표시':jobRenderLimit<list.length?
    '일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · '+jobPageStep()+'건 더 보기':
    '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지';
+  ensureVisibleRfpCardEvidence(list.slice(0,jobRenderLimit));
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
     const historyCompetition=pastCompetitionSummary(x);
