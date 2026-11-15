@@ -319,4 +319,68 @@ with tempfile.TemporaryDirectory() as root:
     assert entries==[(1,151,999)],entries
     print('RFP_BULK_OLD_1000_ROW_CACHE_MIGRATED_TO_999=PASS',flush=True)
 
+# Backlog drainage regression: missing date-list entries must not be
+# stranded behind a two-exception-per-day cap or 1-hour blanket deferral.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    db=root/'bids.sqlite3'
+    missed=['R26BK0002'+str(i).zfill(4) for i in range(6)]
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
+        for no in missed:
+            con.execute('INSERT INTO bid_notices VALUES (?,?,?,1)',
+                        (no,'000',json.dumps({'posted':new_day+'T10:00:00'})))
+    q=RfpDualQueue(root/'queue.sqlite3')
+    q.enqueue([(no,'000','2099-12-31') for no in missed],'r1')
+    exception_calls=[]
+    def missing_batch_fetch(url):
+        parsed=urllib.parse.urlparse(url)
+        if parsed.path=='/api/g2b/rfp-attachment-exception':
+            args=dict(urllib.parse.parse_qsl(parsed.query))
+            exception_calls.append(args['bidNo'])
+            return {'ok':True,
+                'attachments':{'ok':True,'complete':True,
+                    'items':[{'name':'verified.pdf',
+                              'url':'https://www.g2b.go.kr/verified.pdf'}]},
+                'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+        args=dict(urllib.parse.parse_qsl(parsed.query))
+        assert parsed.path=='/api/g2b/rfp-attachment-batch',parsed.path
+        return {'ok':True,'source':args['source'],'page':int(args['page']),
+                'totalCount':0,'rawCount':0,'items':[]}
+    planner=bulk.BulkManifestPlanner(q,db,missing_batch_fetch,NoDelay())
+    first_pass=planner.populate_one_day()
+    assert first_pass['new']==bulk.MAX_EXCEPTIONS_PER_PASS,first_pass
+    assert len(q.unprepared_notices())==2
+    second_pass=planner.populate_one_day()
+    assert second_pass['new']==2,second_pass
+    assert len(q.unprepared_notices())==0
+    assert len(exception_calls)==6 and len(set(exception_calls))==6
+    print('RFP_MISSING_MANIFEST_BACKLOG_CONTINUOUS_DRAIN=PASS',flush=True)
+
+# Unknown posted dates may not be silently excluded from all manifest work.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    db=root/'bids.sqlite3'
+    bid='R26BK00029999'
+    with sqlite3.connect(db) as con:
+        con.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
+        con.execute('INSERT INTO bid_notices VALUES (?,?,?,1)',
+                    (bid,'000',json.dumps({'posted':''})))
+    q=RfpDualQueue(root/'queue.sqlite3')
+    q.enqueue([(bid,'000','2099-12-31')],'r1')
+    seen=[]
+    def unknown_date_fetch(url):
+        parsed=urllib.parse.urlparse(url)
+        assert parsed.path=='/api/g2b/rfp-attachment-exception',parsed.path
+        seen.append(parsed.path)
+        return {'ok':True,
+            'attachments':{'ok':True,'complete':True,'items':[]},
+            'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+    planner=bulk.BulkManifestPlanner(q,db,unknown_date_fetch,NoDelay())
+    result=planner.populate_one_day()
+    assert result['new']==1 and len(seen)==1,result
+    assert q.bulk_manifest(bid+':000')['attachments']['complete'] is True
+    assert q.unprepared_notices()==[]
+    print('RFP_UNKNOWN_POSTED_DATE_EXCEPTION_RECOVERY=PASS',flush=True)
+
 print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
