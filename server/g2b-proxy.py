@@ -1040,9 +1040,69 @@ def rfp_card_evidence_batch(raw_keys):
     source=read_saved_rfp_evidence_index()
     if source is None:
         raise ApiError('rfp_source_index_unavailable',503)
-    return {'ok':True,'sourceAvailable':True,'byNotice':{
-        key:saved_rfp_search_state(source.get(key),compact=True) for key in keys},
-        'count':len(keys),'upstreamCalls':0}
+    # The live progress API overlays newer per-notice checkpoints. Card evidence
+    # must read those SAME persisted results, or it reports an obsolete "version
+    # unrecorded" scan after the scanner has already completed that notice.
+    # Query only requested keys (<=100); never read the full checkpoint backlog.
+    rows={key:source.get(key) for key in keys}
+    checkpoint_keys=set()
+    progress_db=os.path.join(os.path.dirname(G2B_DB_PATH),
+                             'rfp-notice-progress.sqlite3')
+    try:
+        with sqlite3.connect('file:'+progress_db+'?mode=ro',uri=True,timeout=3) as db:
+            placeholders=','.join('?' for _ in keys)
+            updates=db.execute(
+                'SELECT notice_key,checked_at,evidence_json '
+                'FROM rfp_notice_checkpoints WHERE notice_key IN ('+placeholders+')',
+                keys).fetchall()
+        for key,checked_at,raw in updates:
+            try:record=json.loads(raw)
+            except (ValueError,TypeError):continue
+            if not isinstance(record,dict) or str(record.get('checkedAt') or '')!=str(checked_at):
+                continue
+            if str((rows.get(key) or {}).get('checkedAt') or '')>=str(checked_at):
+                continue
+            rows[key]=record
+            checkpoint_keys.add(key)
+    except (sqlite3.Error,OSError):
+        # The published index remains usable if the supplementary DB is absent.
+        pass
+    latest=None
+    try:
+        with open(os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')) as f:
+            version_doc=json.load(f)
+        if version_doc.get('ok') is True and version_doc.get('schemaVersion')==1:
+            v=version_doc.get('latest')
+            needed=('classificationVersion','staffingRoleScanVersion',
+                    'staffingFactScanVersion','hwpxReaderVersion')
+            if isinstance(v,dict) and all(isinstance(v.get(k),int) and v[k]>0 for k in needed):
+                latest=v
+    except (OSError,ValueError,TypeError):
+        pass
+    by_notice={}
+    for key,row in rows.items():
+        state=saved_rfp_search_state(row,compact=True)
+        if isinstance(row,dict):
+            readable=[f for f in row.get('files') or []
+                      if isinstance(f,dict) and f.get('readable') is True
+                      and f.get('staffingScopeExcluded') is not True]
+            state.update(
+                checkedAt=str(row.get('checkedAt') or ''),
+                classificationVersion=int(row.get('classificationVersion') or 0),
+                hwpxReaderVersion=int(row.get('hwpxReaderVersion') or 0),
+                staffingRoleVersions=sorted({int(f.get('staffingRoleScanVersion') or 0)
+                                             for f in readable}),
+                staffingFactVersions=sorted({int(f.get('staffingFactScanVersion') or 0)
+                                             for f in readable}),
+                versionSource='checkpoint' if key in checkpoint_keys else 'coverage_index')
+            if latest is not None:
+                stages=rfp_stage_checks(row,latest)
+                state['parserCurrent']=bool(
+                    stages['classification'] and stages['roles'] and
+                    stages['facts'] and stages['hwpx'] is not False)
+        by_notice[key]=state
+    return {'ok':True,'sourceAvailable':True,'byNotice':by_notice,
+            'count':len(keys),'upstreamCalls':0}
 
 
 def saved_rfp_search_state(row, compact=False):
