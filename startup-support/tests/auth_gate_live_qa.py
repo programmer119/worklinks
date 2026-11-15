@@ -4,7 +4,7 @@ import time
 from playwright.sync_api import sync_playwright
 
 URL = "https://worklinks.suaveforge.com/startup-support/?view=jobs"
-REVISION = "20261115-silent-relogin-v2"
+REVISION = "20261115-keep-cards-v4"
 CORS = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, POST, OPTIONS",
