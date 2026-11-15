@@ -1,0 +1,52 @@
+name: WorkLinks 121 unresolved RFP cause live audit 20261116
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-rfp-121-live-audit-20261116.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Fetch authoritative live 121 report without government calls
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections,gzip,json,urllib.request
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          def fetch(name):
+              req=urllib.request.Request(base+name,headers={'Accept-Encoding':'gzip',
+                'User-Agent':'WorkLinks-121-Cause-Audit-ReadOnly/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=60) as r:
+                  raw=r.read()
+                  if r.headers.get('Content-Encoding')=='gzip':raw=gzip.decompress(raw)
+              return json.loads(raw)
+          progress=fetch('rfp-rescan-progress')
+          cause=fetch('rfp-rescan-causes?limit=200&offset=0')
+          attribution=fetch('rfp-ocr-repair-attribution')
+          print('RFP121_COUNTS',json.dumps({'asOf':cause.get('asOf'),'expected':cause.get('counts'),
+            'actual':cause.get('actualIssueNoticeCount'),'root':cause.get('primaryCauseCounts'),
+            'category':cause.get('categoryCounts'),'overlaps':cause.get('overlappingIssueNoticeCounts'),
+            'fileErrors':cause.get('problemFileErrorCounts'),'scanStatus':progress.get('worker')},
+            ensure_ascii=False,separators=(',',':')),flush=True)
+          print('RFP121_OCR_ATTRIBUTION',json.dumps(attribution,ensure_ascii=False,separators=(',',':')),flush=True)
+          by=collections.defaultdict(list)
+          for row in cause.get('records') or []:
+              root=row.get('rootCause','other')
+              sample={'notice':row.get('noticeKey'),'deadline':row.get('deadline'),
+                'status':row.get('scanStatus'),'files':[
+                  {'name':f.get('name'),'error':f.get('errorCategory'),'reason':f.get('reason'),
+                   'attempt':f.get('lastReaderAttemptVersion'),'detail':f.get('errorDetail'),
+                   'format':f.get('detectedFormat'),'deferred':f.get('ocrBatchDeferredPages'),
+                   'ocrFailed':f.get('ocrFailedPages'),'pdfs':f.get('pdfSources')}
+                  for f in (row.get('files') or [])[:4]]}
+              by[root].append(sample)
+          for category,items in by.items():
+              print('RFP121_ROOT_GROUP',json.dumps({'root':category,'count':len(items),'samples':items[:12]},
+                ensure_ascii=False,separators=(',',':')),flush=True)
+          assert cause.get('upstreamCalls')==0
+          PY
