@@ -1201,7 +1201,7 @@ def extract_hwp_record_paragraphs(raw):
             sections=sorted(
                 ('/'.join(item) for item in src.listdir()
                  if len(item)==2 and item[0]=='BodyText'
-                    and re.fullmatch(r'Section\\d+',item[1])),
+                    and re.fullmatch(r'Section\d+',item[1])),
                 key=lambda path:int(path.rsplit('Section',1)[1]))
     except Exception as exc:
         raise ValueError('hwp_record_fallback_invalid_ole') from exc
