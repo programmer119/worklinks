@@ -3,7 +3,7 @@ import { renderWorklinksHeaderAuth, worklinksHostedAuthUrl, rememberWorklinksAut
 
 const API_BASE = 'https://api-suaveforge.suaveforge.com:18458/api/g2b';
 const CALLBACK = 'https://worklinks.suaveforge.com/startup-support/auth-callback.html';
-const AUTH_UI_BUILD = '20261115-direct-relogin-v1';
+const AUTH_UI_BUILD = '20261115-silent-relogin-v2';
 const GUEST = {
   applied: 'externaltools_startup_support_status_v1',
   hidden: 'worklinks_startup_support_hidden_v1',
@@ -15,7 +15,7 @@ const INTENT_PREFIX='worklinks_support_intents_v1:';
 const intentsFor=key=>decode(INTENT_PREFIX+key);
 const timeOf=x=>Number(x?.at)||0;
 const remoteTime=x=>Date.parse(x?.updatedAt||'')||0;
-const state = {client:null,token:'',account:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
+const state = {client:null,token:'',account:'',expiredAccount:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
 let authRetryAttempts=0;
 let manualAuthRetryInFlight=false;
 function authErrorDetail(error){
@@ -108,8 +108,11 @@ function expireSession(account, message='로그인이 만료되었습니다.'){
   // Do not call remote logout on expiry: a failed remote request must not
   // delay cleanup, and local account changes must never be erased.
   rememberWorklinksAuthProvider(state.client?.session()?.onboarding?.provider);
+  // Keep a potentially valid refresh token for the member's direct one-click
+  // recovery. The workspace is locked and never reads account records until
+  // AuthHub verifies membership and identity again.
+  state.expiredAccount=account;
   showAuthExpiry(message);
-  try{state.client?.storage?.removeItem(state.client.key)}catch{}
   guestRestore();
   buttons(null);
 }
@@ -226,9 +229,10 @@ async function api(path,options={},retryAuth=true){
 }
 async function validSession(client){
   let session=client.session();
-  if(!session?.accessToken)return null;
+  if(!session?.accessToken&&!session?.refreshToken)return null;
   try{
     let me;
+    if(!session.accessToken)session=await client.refresh();
     try{me=await client.me()}
     catch(error){
       if(error.status!==401)throw error;
@@ -463,6 +467,60 @@ async function loadAuthConfig(){
     return legacy;
   }
 }
+async function activateVerifiedSession(session){
+  if(!session?.identity||!session.token)throw Error('verified_session_missing');
+  if(state.expiredAccount&&state.expiredAccount!==session.identity)
+    throw Error('authhub_identity_changed');
+  state.account=session.identity;
+  state.token=session.token;
+  state.serverReady=false;
+  state.expiredAccount='';
+  clearAuthExpiry();
+  publishPartnerAccess(true);
+  // Local data is read only after AuthHub /v1/me validates active membership.
+  applyAccount([]);
+  await reconcileServer();
+  buttons(session);
+}
+let directLoginBusy=false;
+async function directReLogin(event){
+  if(event)event.preventDefault();
+  if(directLoginBusy)return;
+  directLoginBusy=true;
+  const link=$('worklinks-auth-gate-login');
+  if(link)link.setAttribute('aria-disabled','true');
+  try{
+    sessionStorage.setItem('worklinks_auth_return_url',
+      location.pathname+location.search+location.hash);
+    const client=state.client;
+    const stored=client?.session();
+    if(client&&(stored?.accessToken||stored?.refreshToken)){
+      setAuthGate('checking','자동 로그인 확인 중','기존 계정 인증을 확인하고 있습니다.');
+      try{
+        const verified=await validSession(client);
+        if(verified){
+          await activateVerifiedSession(verified);
+          return;
+        }
+      }catch(error){
+        if(!terminalAuthError(error)){
+          showAuthCheckError('자동 로그인 연결을 확인할 수 없습니다.',error);
+          return;
+        }
+        // An explicitly rejected session cannot be used to bypass authentication.
+        try{client.storage?.removeItem(client.key)}catch{}
+      }
+    }
+    // No valid/refreshable session remains. For a previously verified social
+    // provider, jump straight to that provider rather than AuthHub's chooser.
+    // Email/password logins cannot be renewed without credentials.
+    location.assign(worklinksHostedAuthUrl('login'));
+  }finally{
+    directLoginBusy=false;
+    if(link)link.removeAttribute('aria-disabled');
+  }
+}
+
 async function bootstrap(){
   let config;
   try{config=await loadAuthConfig()}
@@ -488,7 +546,7 @@ async function bootstrap(){
   }
   try{
     const existing=state.client.session();
-    const previouslySignedIn=Boolean(existing?.accessToken);
+    const previouslySignedIn=Boolean(existing?.accessToken||existing?.refreshToken);
     if(previouslySignedIn)rememberWorklinksAuthProvider(existing?.onboarding?.provider);
     const session=await validSession(state.client);
     if(!session){
@@ -498,12 +556,7 @@ async function bootstrap(){
       return;
     }
     clearAuthExpiry();
-    state.account=session.identity;state.token=session.token;state.serverReady=false;
-    publishPartnerAccess(true);
-    // Show preserved account-local data while waiting, but do not overwrite server truth.
-    applyAccount([]);
-    await reconcileServer();
-    buttons(session);
+    await activateVerifiedSession(session);
   }catch(error){
     showAuthCheckError('로그인 상태를 확인할 수 없습니다.',error);
     publishPartnerAccess(false);buttons(null);
@@ -612,8 +665,8 @@ if($('worklinks-auth-gate-retry')){
   });
 }
 if($('worklinks-auth-gate-login')){
-  $('worklinks-auth-gate-login').addEventListener('click',()=>{
-    sessionStorage.setItem('worklinks_auth_return_url',location.pathname+location.search+location.hash);
+  $('worklinks-auth-gate-login').addEventListener('click',event=>{
+    void directReLogin(event);
   });
 }
 bootstrap().catch(error=>{
