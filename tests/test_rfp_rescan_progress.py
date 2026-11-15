@@ -123,3 +123,23 @@ with tempfile.TemporaryDirectory() as temp:
     assert lanes['download']['done']==1 and lanes['download']['active']==1,lanes
     assert lanes['scan']['done']==1 and lanes['scan']['active']==1,lanes
 print('WORKLINKS_RFP_METADATA_DOWNLOAD_SCAN_LANES=PASS')
+
+# All official attachment lists may be complete while many downloads are still
+# pending. Pending downloads must NOT appear as active manifest collection.
+with tempfile.TemporaryDirectory() as temp:
+    path=Path(temp)/'cohort-queue.sqlite3'
+    ids=['R26BK00009001:000','R26BK00009002:000','R26BK00009003:000']
+    with sqlite3.connect(path) as conn:
+        conn.execute('CREATE TABLE rfp_dual_notices (notice_key TEXT PRIMARY KEY, download_status TEXT, scan_status TEXT, metadata_json TEXT, updated_at TEXT)')
+        conn.execute('CREATE TABLE rfp_bulk_manifests (notice_key TEXT PRIMARY KEY)')
+        conn.executemany('INSERT INTO rfp_dual_notices VALUES (?,?,?,?,?)', [
+            (ids[0],'ready','done','{}',''),
+            (ids[1],'pending','pending','{}',''),
+            (ids[2],'retry','pending','{}','')])
+        conn.executemany('INSERT INTO rfp_bulk_manifests VALUES (?)',
+                         [(key,) for key in ids])
+    lanes=p['rfp_cohort_lanes'](str(path),set(ids),{ids[0]})
+    assert lanes['manifest']=={'total':3,'done':3,'remaining':0,
+        'pending':0,'active':0,'failed':0},lanes
+    assert lanes['download']['failed']==1,lanes
+print('WORKLINKS_RFP_MANIFEST_DONE_DOWNLOAD_PENDING_NOT_ACTIVE=PASS')
