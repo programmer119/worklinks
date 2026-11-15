@@ -12,7 +12,9 @@
    '<span class="rfp-stage-file-fill" style="width:0%"></span>'+
    '<span class="rfp-stage-aggregate-fill" style="width:0%"></span>'+
    '<span class="rfp-stage-focus"><span class="rfp-stage-focus-name">작업 정보 확인 중</span>'+
-   '<span class="rfp-stage-focus-metric"></span></span></div></div>';
+   '<span class="rfp-stage-focus-metric"></span></span></div>'+
+   (key==='scan'?'<div class="rfp-scan-exclusion-note" data-rfp-field="scanExcluded" hidden></div>':'')+
+   '</div>';
  }
  function mount(panel){
   panel.innerHTML=
@@ -302,8 +304,6 @@
    }else if(active>0){
     name='진행 상태 확인 필요 · 세부 작업 정보 미제공';
    }
-   if(key==='scan'&&Number(lane?.blockedNoAttachments||0)>0)
-    bits.push('공식 첨부파일 없음 '+Number(lane.blockedNoAttachments)+'건');
    if(key==='scan'&&Number(lane?.notQueued||0)>0)
     bits.push('작업 큐 미편입 '+Number(lane.notQueued)+'건');
    if(selected&&choices.length>1)bits.push((choices.indexOf(selected)+1)+'/'+choices.length);
@@ -401,8 +401,6 @@
    else if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
    else if(available&&total&&processed===total)state='처리 완료';
    else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
-   else if(key==='scan'&&available&&Number(stage.blockedNoAttachments||0)>0)
-    state='원본 없음 '+number(Number(stage.blockedNoAttachments))+'건';
    else if(key==='manifest'&&available&&total&&completed<total)state='순차 확보';
    if(key==='download'&&available){
     const countNode=node.querySelector('[data-rfp-field="downloadCount"]');
@@ -444,11 +442,9 @@
     errorBar.style.left=successProgress.toFixed(2)+'%';
     errorBar.style.width=errorProgress>0?'max(4px, '+errorProgress.toFixed(2)+'%)':'0%';
    }
-   const blocked=key==='scan'&&Number(stage?.blockedNoAttachments||0)>0;
    const retry=Number(stage?.failed||0)>0;
    const status=delayed?'warning':
     (key==='download'&&errors>0)?'danger':
-    blocked?'warning':
     stageActive?'active':
     available&&total>0&&completed===total?'success':
     retry?'warning':'neutral';
@@ -458,6 +454,13 @@
   panel.querySelector('#rfpRescanUnknown').hidden=!unknownTotal;
   updateField(panel,'unknown',number(unknownTotal)+'건 · 별도 판독 '+
    number(counts.unknownDeadlineCompleted)+' / '+number(unknownTotal)+'건');
+  const exclusions=panel.querySelector('[data-rfp-field="scanExcluded"]');
+  if(exclusions){
+   const count=Math.max(0,Number(lanes?.scan?.blockedNoAttachments||0));
+   exclusions.hidden=count===0;
+   if(count>0)updateRfpText(exclusions,
+     '판독 제외 '+number(count)+'건 · 공식 첨부목록 0개 확인 (판독 실패 아님)');
+  }
   window.paintRfpLaneFocus();
   // The focus renderer updates live text, but semantic status belongs to
   // the authoritative stage counters and is applied above on every poll.
