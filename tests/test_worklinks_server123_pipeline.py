@@ -277,4 +277,18 @@ with tempfile.TemporaryDirectory() as temporary:
     except RuntimeError:pass
     else:raise AssertionError('broken run considered success')
     assert (m.SEEDS/'changcom-actionable.json').read_bytes()==old
+# Downloader supervision cannot be held hostage by long stage-3 scans.
+import threading
+watcher_calls=[]
+watcher_stop=threading.Event()
+def one_watch(current):
+    watcher_calls.append(current.get('rfpUpgradeActive'))
+    watcher_stop.set()
+with (
+    patch.object(m,'read_state',return_value={'rfpUpgradeActive':True}),
+    patch.object(m,'ensure_independent_downloader',side_effect=one_watch),
+):
+    m.supervise_independent_downloader(watcher_stop)
+assert watcher_calls==[True],watcher_calls
+
 print('WORKLINKS_SERVER123_SCHEDULER_ATOMIC_NO_NETWORK=PASS')
