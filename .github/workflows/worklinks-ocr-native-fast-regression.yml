@@ -1,0 +1,37 @@
+name: WorkLinks OCR 300DPI safe native-skip regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/deploy-worklinks-server123-pipeline.sh'
+      - 'tests/test_rfp_ocr_color_profile_20261116.py'
+      - 'tests/test_rfp_ocr_region_probe_20261116.py'
+      - 'tests/test_rfp_ocr_fast_native_skip_20261116.py'
+      - '.github/workflows/worklinks-ocr-native-fast-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install actual PDF dependencies for isolated offline regression
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr
+          python -m pip install --disable-pip-version-check --quiet pypdf pymupdf Pillow
+      - name: Verify unchanged 300 DPI, original text, native reader and sampled ROI
+        run: |
+          set -Eeuo pipefail
+          python -m py_compile scripts/refresh_worklinks_rfp.py scripts/repair_open_rfp_cached_attachments.py
+          python tests/test_rfp_ocr_color_profile_20261116.py
+          python tests/test_rfp_ocr_region_probe_20261116.py
+          python tests/test_rfp_ocr_fast_native_skip_20261116.py
+          bash -n server/deploy-worklinks-server123-pipeline.sh
+          echo WORKLINKS_OCR_SAFE_NATIVE_AND_ROI_REGRESSION_PASS
