@@ -9,7 +9,7 @@ p=runpy.run_path(str(root/'server/g2b-proxy.py'),run_name='rescan_test')
 calc=p['rfp_progress_from_rows']
 deadline=p['rfp_deadline_kst']
 KST=datetime.timezone(datetime.timedelta(hours=9))
-now=datetime.datetime(2026,11,14,12,0,tzinfo=KST)
+now=datetime.datetime(2026,11,13,12,0,tzinfo=KST)
 latest=dict(classificationVersion=23,staffingRoleScanVersion=4,staffingFactScanVersion=2,hwpxReaderVersion=3)
 def notice(bid,end):
     return (bid,'000',{'kind':'servc','bidNo':bid,'order':'000','closes':end})
@@ -65,6 +65,37 @@ assert fixed['legacy']==2 and fixed['incomplete']==1,fixed
 assert fixed['completed']+fixed['remaining']+fixed['excluded']==fixed['total'],fixed
 print('WORKLINKS_RFP_NO_FILE_BUCKET_SEPARATION=PASS',fixed)
 print('WORKLINKS_RFP_RESCAN_PROGRESS_REGRESSION=PASS',counts)
+
+# The global progress must count stale OCR files as a version-triggered rescan,
+# not lose them in the generic incomplete bucket. Only live notices with >24h
+# remain eligible, exactly like the independent OCR cached-original worker.
+ocr_latest=dict(latest,ocrReaderVersion='pdf25-blank-hwpx-embedded-image-v12-provenance-rescan')
+ocr_file=dict(name='archive.zip',readable=False,sourceTextScanComplete=False,
+    errorCategory='pdf_ocr_incomplete',
+    lastReaderAttemptVersion='pdf25-blank-hwpx-embedded-image-v11-finish-first')
+ocr_record={**good(), 'files':[ocr_file]}
+ocr_id='R26BK00000991'
+ocr_notice=notice(ocr_id,'2026-11-18 16:00')
+near_id='R26BK00000992'
+near_notice=notice(near_id,'2026-11-14 11:59')
+exact_id='R26BK00000993'
+exact_notice=notice(exact_id,'2026-11-14 12:00')
+ocr_rows=[ocr_notice,near_notice,exact_notice]
+ocr_index={ocr_id+':000':ocr_record,
+    near_id+':000':ocr_record,exact_id+':000':ocr_record}
+new_report=calc(ocr_rows,ocr_index,ocr_latest,asof=now)
+assert new_report['counts']['total']==1,new_report
+assert new_report['counts']['legacy']==1,new_report
+assert new_report['counts']['rescanRequired']==1,new_report
+assert new_report['ocrRescan']['targetNotices']==1,new_report
+assert new_report['ocrRescan']['targetFiles']==1,new_report
+upgraded={**ocr_record,'files':[{**ocr_file,
+    'lastReaderAttemptVersion':ocr_latest['ocrReaderVersion']}]}
+rechecked=calc([ocr_notice],{ocr_id+':000':upgraded},ocr_latest,asof=now)
+assert rechecked['counts']['legacy']==0,rechecked
+assert rechecked['counts']['incomplete']==1,rechecked
+assert rechecked['ocrRescan']['targetFiles']==0,rechecked
+print('RFP_OCR_READER_VERSION_RESCAN_AND_24H_COHORT=PASS')
 
 
 # One completed notice becomes visible without waiting for all eight batch tasks.
