@@ -7,6 +7,7 @@ A changed reader fingerprint resets scanning but keeps verified archived origina
 import datetime as dt
 from contextlib import contextmanager
 import json
+import hashlib
 import os
 from pathlib import Path
 import sqlite3
@@ -17,6 +18,23 @@ SCHEMA_VERSION=1
 
 def now_utc():
     return dt.datetime.now(dt.timezone.utc).isoformat()
+
+# Repeat detection uses only durable scan evidence, never a wall-clock stamp.
+# OCR repair or a newer parser can change this fingerprint and reopen work.
+def scan_evidence_signature(evidence):
+    row=evidence if isinstance(evidence,dict) else {}
+    fields=('status','manifestComplete','classificationVersion',
+            'staffingRoleScanComplete','hwpxReaderVersion')
+    file_fields=('name','sourceSha256','readable','sourceTextScanComplete',
+                 'staffingRoleScanVersion','staffingFactScanVersion',
+                 'staffingRoleScanTruncated','qualificationScanTruncated',
+                 'skippedDuplicateFormat','alternatePdfSourceSha256',
+                 'staffingScopeExcluded','errorCategory')
+    compact={'notice':{k:row.get(k) for k in fields},
+             'files':[{k:f.get(k) for k in file_fields}
+                      for f in (row.get('files') or []) if isinstance(f,dict)]}
+    return hashlib.sha256(json.dumps(compact,sort_keys=True,
+                  ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
 
 class RfpDualQueue:
     def __init__(self,path):
@@ -36,9 +54,16 @@ class RfpDualQueue:
                 download_attempts INTEGER NOT NULL DEFAULT 0,
                 download_retry_epoch REAL NOT NULL DEFAULT 0,
                 scan_retry_epoch REAL NOT NULL DEFAULT 0,
+                scan_repeat_count INTEGER NOT NULL DEFAULT 0,
+                scan_failure_signature TEXT NOT NULL DEFAULT '',
                 last_error TEXT NOT NULL DEFAULT '',
                 updated_at TEXT NOT NULL
             )''')
+            cols={row[1] for row in db.execute('PRAGMA table_info(rfp_dual_notices)')}
+            if 'scan_repeat_count' not in cols:
+                db.execute("ALTER TABLE rfp_dual_notices ADD COLUMN scan_repeat_count INTEGER NOT NULL DEFAULT 0")
+            if 'scan_failure_signature' not in cols:
+                db.execute("ALTER TABLE rfp_dual_notices ADD COLUMN scan_failure_signature TEXT NOT NULL DEFAULT ''")
             db.execute('''CREATE INDEX IF NOT EXISTS dual_queue_fetch
                 ON rfp_dual_notices(download_status,download_retry_epoch)''')
             db.execute('''CREATE TABLE IF NOT EXISTS rfp_bulk_manifests(
@@ -101,6 +126,7 @@ class RfpDualQueue:
                     elif cur[0]!=fingerprint:
                         db.execute('''UPDATE rfp_dual_notices
                             SET reader_fingerprint=?,scan_status='pending',scan_retry_epoch=0,
+                                scan_repeat_count=0,scan_failure_signature='',
                                 closes_on=?,updated_at=? WHERE notice_key=?''',
                             (fingerprint,val,now_utc(),key))
                     elif val:
@@ -198,6 +224,21 @@ class RfpDualQueue:
                               AND scan_status<> 'scanning' ''',
                             (new_download,new_scan,fingerprint,closes,
                              int(retry_reset),new_download,now_utc(),key))
+                    # A reader version change invalidates the previous retry signature.
+                    if version!=fingerprint:
+                        db.execute("""UPDATE rfp_dual_notices
+                            SET scan_repeat_count=0,scan_failure_signature=''
+                            WHERE notice_key=? AND scan_status!='scanning'""",(key,))
+                    if is_valid:
+                        # The evidence is now complete. Old generic error text
+                        # is not allowed to survive a successful reconciliation.
+                        db.execute("""UPDATE rfp_dual_notices
+                            SET last_error='',scan_retry_epoch=0,
+                                scan_repeat_count=0,scan_failure_signature=''
+                            WHERE notice_key=? AND scan_status='done'
+                            AND (last_error<>'' OR scan_retry_epoch<>0
+                                 OR scan_repeat_count<>0 OR scan_failure_signature<>'')""",
+                            (key,))
         return tally
 
     def retire_expired(self,today=None):
@@ -466,19 +507,62 @@ class RfpDualQueue:
                 claimed.append((key,closes,obj))
         return claimed
 
-    def scan_finished(self,key,success,reason=''):
+    def scan_finished(self,key,success,reason='',signature=''):
+        """Persist a real failure reason; do not endlessly rescan unchanged bytes.
+
+        First failed scan rechecks once after five minutes. A second identical
+        failure is held until the evidence signature or parser version changes.
+        A held failure stays retry/incomplete, never becomes a fake success.
+        """
         with self.connect() as db:
-            db.execute('''UPDATE rfp_dual_notices
-                SET scan_status=?,scan_retry_epoch=?,last_error=?,updated_at=?
+            db.execute('BEGIN IMMEDIATE')
+            previous=db.execute('''SELECT scan_failure_signature,scan_repeat_count
+                FROM rfp_dual_notices
+                WHERE notice_key=? AND scan_status='scanning' ''',(key,)).fetchone()
+            if previous is None:return False
+            sig=str(signature or '')[:64] if not success else ''
+            repeats=(int(previous[1] or 0)+1 if sig and sig==previous[0] else 1)
+            # Without a durable signature, never assume the failure is identical.
+            retry_epoch=(0 if success else
+                2147483647 if sig and repeats>=2 else time.time()+300)
+            db.execute('''UPDATE rfp_dual_notices SET
+                scan_status=?,scan_retry_epoch=?,last_error=?,
+                scan_repeat_count=?,scan_failure_signature=?,updated_at=?
                 WHERE notice_key=? AND scan_status='scanning' ''',
-                ('done' if success else 'retry',
-                 0 if success else time.time()+3600,
-                 '' if success else str(reason)[:140],now_utc(),key))
+                ('done' if success else 'retry',retry_epoch,
+                 '' if success else str(reason or 'scan_failure_unclassified')[:140],
+                 0 if success else repeats,sig,now_utc(),key))
+            return True
+
+    def reopen_changed_scan_evidence(self,evidence):
+        """Resume held failures only after their stored scan evidence changes."""
+        if not isinstance(evidence,dict):return 0
+        recovered=0
+        with self.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            rows=db.execute('''SELECT notice_key,scan_failure_signature
+                FROM rfp_dual_notices WHERE scan_status='retry'
+                AND download_status='ready'
+                AND scan_failure_signature<>'' AND scan_retry_epoch>?''',
+                (time.time(),)).fetchall()
+            for key,sig in rows:
+                row=evidence.get(key)
+                if not isinstance(row,dict):continue
+                if scan_evidence_signature(row)==sig:continue
+                db.execute('''UPDATE rfp_dual_notices
+                    SET scan_retry_epoch=0,scan_repeat_count=0,
+                        scan_failure_signature='',updated_at=?
+                    WHERE notice_key=? AND scan_status='retry'
+                    AND scan_failure_signature=?''',
+                    (now_utc(),key,sig))
+                recovered+=1
+        return recovered
 
     def mark_download_missing(self,key):
         with self.connect() as db:
             db.execute('''UPDATE rfp_dual_notices SET download_status='pending',
                 scan_status='pending',download_retry_epoch=0,scan_retry_epoch=0,
+                scan_repeat_count=0,scan_failure_signature='',
                 last_error='cached_original_missing',updated_at=?
                 WHERE notice_key=?''',(now_utc(),key))
 
