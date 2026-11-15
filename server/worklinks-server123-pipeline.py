@@ -319,6 +319,8 @@ def publish_verified_repair_checkpoints(keys):
                 'SELECT checked_at,evidence_json FROM rfp_notice_checkpoints WHERE notice_key=?',(key,)
             ).fetchone()
             if previous:
+                if checked<=str(previous[0] or ''):
+                    continue
                 try:prior=json.loads(previous[1])
                 except (TypeError,ValueError):prior={}
                 if rfp_prefer_evidence(row,prior,versions) is not row:
