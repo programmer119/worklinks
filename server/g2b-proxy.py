@@ -1453,7 +1453,9 @@ def rfp_cohort_lanes(path,managed,valid):
     valid=set(valid)&cohort
     present=cohort&set(entries)
     not_queued=cohort-set(entries)
-    queue_valid={key for key in present if entries[key][1] in ('done','skipped')}
+    # A verified empty original list is intentionally skipped, not a stale or
+    # failed scan. Only genuinely completed scans can become outdated.
+    queue_valid={key for key in present if entries[key][1]=='done'}
     stale_done=queue_valid-valid
     skipped_missing={key for key in cohort if entries.get(key)==('no_attachments','skipped')}
     verified_sources=valid|({key for key in cohort if key in manifests})
