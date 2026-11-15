@@ -115,7 +115,7 @@ with sync_playwright() as p:
                  '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','파일 다운로드 8개','판독 4건'):
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
-    assert '원본 다운로드' in body and '850 / 1,000건' in body,body
+    assert '원본 다운로드' in body and '정상 850 · 오류 0건 · 전체 1,000건' in body,body
     assert '사업제안요청서.pdf 외 7개' in body,body
     assert '다운로드 중 00:' in body,body
     assert '0.50MB / 2.00MB' in body,body
@@ -159,7 +159,7 @@ with sync_playwright() as p:
       timeout=12000)
     assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
-    assert '851 / 1,000건' in page.locator('#rfpRescanContent').text_content()
+    assert '정상 851 · 오류 0건 · 전체 1,000건' in page.locator('#rfpRescanContent').text_content()
     assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
     assert '사업제안요청서.pdf 외 6개' in page.locator('#rfpRescanContent').text_content()
     assert '오류 1건' in page.locator('#rfpRescanContent').text_content()
@@ -167,6 +167,23 @@ with sync_playwright() as p:
     assert page.evaluate("""() => window._rfpFileLiveRow ===
       document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track')"""), 'file row must not remount'
 
+    # Confirmed 422 uses a red clickable detail, not the transient retry counter.
+    fake['lanes']['download'].update(errors=1,processed=852,errorDetails=[
+        {'noticeKey':'R26BK01823630:000',
+         'files':[{'name':'붙임6 긴급 입찰공고 사유서.pdf',
+                   'httpStatus':422,
+                   'reason':'official_attachment_reference_missing_422'}]}])
+    page.evaluate("() => refreshRfpRescanProgress(true)")
+    page.wait_for_function(
+      "() => document.querySelector('#rfpDownloadErrorButton')?.textContent.includes('오류 1건')",
+      timeout=12000)
+    button=page.locator('#rfpDownloadErrorButton')
+    assert button.is_enabled()
+    button.click()
+    assert '붙임6 긴급 입찰공고 사유서.pdf' in page.locator('#rfpDownloadErrorDetails').inner_text()
+    assert 'R26BK01823630:000' in page.locator('#rfpDownloadErrorDetails').inner_text()
+    assert 'HTTP 422' in page.locator('#rfpDownloadErrorDetails').inner_text()
+    assert '정상 851 · 오류 1건 · 전체 1,000건' in page.locator('#rfpRescanContent').inner_text()
     assert '920 / 1,000건' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
     assert len(calls)>=2
