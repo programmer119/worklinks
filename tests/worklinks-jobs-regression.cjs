@@ -975,6 +975,41 @@ assert.ok(roleMarkup.includes('data-requirement="roles"'),'roles get separate ho
 assert.ok(roleMarkup.includes('역할별 인원')&&roleMarkup.includes('개발자 2명'));
 assert.ok(source.includes('.job-req-item[data-requirement="roles"] .job-req-tip'));
 assert.ok(source.includes('e.roles.items.map(v=>v.role)'),'detail view also separates roles');
+// Regression: these two already scanned notices must not remain "상주 확인중"
+// merely because the older /saved list entry lacks scanner version fields.
+const onsiteIds=['R26BK01810506:001','R26BK01826049:000'];
+const unversionedOnsite=Object.fromEntries(onsiteIds.map(k=>[k,{
+ seen:true,complete:true,scanComplete:true,staffingRoleScanComplete:true,
+ status:'text_extracted_requires_review',documentCount:4,
+ readableCount:3,effectiveReadableCount:4}]));
+const verifiedOnsite=Object.fromEntries(onsiteIds.map(k=>[k,{
+ ...unversionedOnsite[k],parserCurrent:true,
+ versionSource:'coverage_index',checkedAt:'2026-11-14T16:52:56Z',
+ classificationVersion:23,hwpxReaderVersion:3,
+ staffingRoleVersions:[4],staffingFactVersions:[2]}]));
+const screenshotFns=new Function('jobBidIdentity','rfpSnapshotByNotice',
+ 'jobSearchRfpState','jobListRfpState','changcomPrecheckByNotice',
+ 'rfpScanProvenanceByNotice','rfpSnapshotLoading','rfpSnapshotCheckedAt',
+ 'htmlEscape',part('function jobRequirementEvidence(x){','function jobDetailRequirementGrid(x){')+
+ 'return {jobRequirementEvidence,jobRequirementBadges};'
+)(
+ x=>({bidNo:x.noticeNumber,order:x.noticeOrder||'000'}),
+ new Map(),new Map(Object.entries(unversionedOnsite)),
+ new Map(Object.entries(verifiedOnsite)),new Map(),
+ new Map(onsiteIds.map(k=>[k,{current:false,checkedAt:'2026-11-13T16:00:00Z'}])),
+ false,'',x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')
+);
+for(const key of onsiteIds){
+ const [noticeNumber,noticeOrder]=key.split(':');
+ const bid={noticeNumber,noticeOrder};
+ const evidence=screenshotFns.jobRequirementEvidence(bid);
+ assert.equal(evidence.meta.provenance.current,true,'latest checked version must win '+key);
+ assert.equal(evidence.onsite.status.key,'offsite','complete source with no onsite clause '+key);
+ const rendered=screenshotFns.jobRequirementBadges(bid);
+ assert.ok(rendered.includes('비상주'),'complete no-onsite clause must render offsite '+key);
+ assert.ok(!rendered.includes('상주 확인중'),'old pending badge must not survive '+key);
+}
+console.log('WORKLINKS_SCREENSHOT_TWO_ONSITE_COMPLETE_NOT_CHECKING=PASS');
 console.log('Worklinks thumbnail role-count vs onsite evidence separation PASS');
 
 console.log('Worklinks job regression: deadlines, scope, qualification, bid-method metadata PASS');
