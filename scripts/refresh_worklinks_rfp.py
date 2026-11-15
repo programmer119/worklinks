@@ -753,11 +753,17 @@ def _ocr_pdf_page(raw,index):
     try:
         start=time.perf_counter()
         page=document.load_page(index)
+        # RGB is the unchanged production default. Grayscale is opt-in only
+        # after SHA-identical output is verified on actual Korean tender PDFs.
+        color_mode=(os.environ.get('WORKLINKS_RFP_OCR_COLORSPACE') or 'rgb').strip().lower()
+        if color_mode not in ('rgb','gray'):color_mode='rgb'
+        color_space=pymupdf.csGRAY if color_mode=='gray' else pymupdf.csRGB
         zoom=min(PDF_OCR_TARGET_DPI/72.0,
                  (MAX_PDF_OCR_PIXELS/max(1.0,page.rect.width*page.rect.height))**.5)
         # FitZ rounds each raster dimension. Reduce zoom on real pixel overflow.
         for _ in range(4):
-            pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
+            pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False,
+                                colorspace=color_space)
             actual_pixels=pix.width*pix.height
             if actual_pixels<=MAX_PDF_OCR_PIXELS:
                 break
@@ -765,9 +771,14 @@ def _ocr_pdf_page(raw,index):
         else:
             raise ValueError('pdf_ocr_page_too_large')
         png=pix.tobytes('png')
+        render_elapsed=time.perf_counter()-start
         if reusable:
-            context['renderSeconds']+=time.perf_counter()-start
+            context['renderSeconds']+=render_elapsed
             context['renderPixels']+=actual_pixels
+        page_profile={'page':index+1,'colorspace':color_mode,
+                      'effectiveDpi':round(zoom*72,2),
+                      'pixels':actual_pixels,'pngBytes':len(png),
+                      'renderSeconds':round(render_elapsed,4)}
         # Keep original 300-DPI ceiling and language/PSM settings until a
         # representative corpus proves a lower resolution retains text.
         ocr_started=time.perf_counter()
@@ -778,8 +789,11 @@ def _ocr_pdf_page(raw,index):
                 input=png,capture_output=True,timeout=22,check=False,
                 env=dict(os.environ,OMP_THREAD_LIMIT=str(PDF_OCR_TESSERACT_OMP_THREADS)))
         finally:
+            ocr_elapsed=time.perf_counter()-ocr_started
+            page_profile['tesseractSeconds']=round(ocr_elapsed,4)
             if reusable:
-                context['tesseractSeconds']+=time.perf_counter()-ocr_started
+                context['tesseractSeconds']+=ocr_elapsed
+                context.setdefault('pageProfiles',[]).append(page_profile)
         if result.returncode:
             raise ValueError('pdf_ocr_engine_failed')
         return result.stdout.decode('utf-8','replace')
@@ -977,6 +991,7 @@ def _extract_pdf_with_audit(raw):
               'ocrRenderedPixels':render_cache['renderPixels'],
               'ocrPdfOpenedOnce':render_cache['document'] is not None,
               'ocrTesseractThreads':PDF_OCR_TESSERACT_OMP_THREADS,
+              'ocrPageProfiles':render_cache.get('pageProfiles',[])[:MAX_PDF_OCR_PAGES],
               'sourceComplete':not missing,
               'extractionMethod':'pdf_native_ocr' if recovered or attempted else 'pdf_native'}
         if not text.strip():
