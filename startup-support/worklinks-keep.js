@@ -82,21 +82,59 @@ function render(){
 function refreshCards(){
   if(typeof window.scheduleJobsRender==='function')window.scheduleJobsRender();
 }
+let mineLoadPromise=null;
+function keepFailureReason(error){
+  const code=Number(error?.status)||0;
+  if(code===401||code===403||String(error?.message)==='auth_required')
+    return '인증 연결 오류 (HTTP '+(code||401)+')';
+  if(code===404)return '킵 조회 API 연결 오류 (HTTP 404)';
+  if(code===408||code===429||code>=500)
+    return '서버 응답 오류 (HTTP '+code+')';
+  if(error?.name==='TimeoutError'||error?.name==='AbortError')
+    return '응답 시간 초과';
+  if(error instanceof TypeError)return '네트워크 연결 오류';
+  return String(error?.message||'조회 오류').slice(0,90);
+}
 async function loadMine(){
-  if(!currentUser())return;
-  try{
-    const data=await call('/worklinks-keep');
-    if(!data?.ok||!Array.isArray(data.items))throw Error('keep_invalid_response');
+  const owner=currentUser();
+  if(!owner||document.documentElement.dataset.worklinksAuthState!=='granted')return false;
+  if(mineLoadPromise)return mineLoadPromise;
+  mineLoadPromise=(async()=>{
+    let lastError=null,data=null;
+    for(let attempt=0;attempt<3;attempt++){
+      if(owner!==currentUser()||
+         document.documentElement.dataset.worklinksAuthState!=='granted')return false;
+      try{
+        data=await call('/worklinks-keep');
+        if(!data?.ok||!Array.isArray(data.items))throw Error('keep_invalid_response');
+        break;
+      }catch(error){
+        lastError=error;
+        const code=Number(error?.status)||0;
+        const transient=[408,429,500,502,503,504].includes(code)||
+          error?.name==='TimeoutError'||error?.name==='AbortError'||
+          error instanceof TypeError;
+        if(!transient||attempt===2)break;
+        await new Promise(resolve=>setTimeout(resolve,450*(attempt+1)));
+      }
+    }
+    if(owner!==currentUser())return false;
+    if(!data){
+      status('내 킵 조회 실패 · '+keepFailureReason(lastError),true);
+      return false;
+    }
     state.mine=data.items;
     state.ownLoaded=true;
     state.shareEnabled=Boolean(data.shareEnabled);
     state.shareAlias=String(data.shareAlias||'');
+    // Do not mislabel a card rendering exception as a server fetch failure.
+    status('');
     render();refreshCards();
-  }catch(err){
-    status('내 킵 목록 조회 실패 · '+String(err.message||err).slice(0,80),true);
-    throw err;
-  }
+    return true;
+  })().finally(()=>{mineLoadPromise=null});
+  return mineLoadPromise;
 }
+
 async function loadMembers(){
   if(!currentUser())return;
   try{
