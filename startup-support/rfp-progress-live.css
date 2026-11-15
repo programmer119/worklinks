@@ -50,6 +50,8 @@
  font-variant-numeric:tabular-nums;
 }
 #rfpRescanModal .rfp-rescan-lanes .has-rfp-error .rfp-rescan-stage-track{border-color:#f2bc91;background:#fff8f1}
+#rfpRescanModal .rfp-rescan-stage-row.has-rfp-confirmed-error .rfp-rescan-stage-note{color:#b42318}
+#rfpRescanModal .rfp-rescan-lanes .has-rfp-confirmed-error .rfp-rescan-stage-track{border-color:#edaaa7;background:#fff5f5}
 #rfpRescanModal .rfp-rescan-features{margin:8px 0 0;padding:0;border:0}
 #rfpRescanModal .rfp-rescan-features>summary{
  cursor:pointer;color:#52677e;font-size:12.5px;font-weight:700;
