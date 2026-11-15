@@ -833,6 +833,46 @@ def _ocr_pdf_page(raw,index):
         if result.returncode:
             raise ValueError('pdf_ocr_engine_failed')
         baseline=result.stdout.decode('utf-8','replace')
+        # A 12-character cutoff by itself is NOT an OCR-engine failure.
+        # Real SHA-verified pages 71/91, Thales 2/2 and a drawing 1/6
+        # returned <12 alphanumerics with PSM3, but 24-89 with PSM6/11.
+        # Retry only these sparse pages from the SAME 300-DPI PNG; no second
+        # rasterization, downsample, upstream GET or loss of other page receipts.
+        if sum(c.isalnum() for c in baseline)<12:
+            best=baseline
+            best_chars=sum(c.isalnum() for c in best)
+            page_profile['sparseOcrBaselineAlnum']=best_chars
+            page_profile['sparseOcrAttempts']=[]
+            for sparse_mode in ('6','11'):
+                sparse_started=time.perf_counter()
+                try:
+                    sparse=subprocess.run(
+                        ['tesseract','stdin','stdout','-l','kor+eng',
+                         '--psm',sparse_mode,'--dpi',str(max(72,int(72*zoom)))],
+                        input=png,capture_output=True,timeout=12,check=False,
+                        env=dict(os.environ,
+                                 OMP_THREAD_LIMIT=str(PDF_OCR_TESSERACT_OMP_THREADS)))
+                    candidate=sparse.stdout.decode('utf-8','replace')
+                    alnum=sum(c.isalnum() for c in candidate) if sparse.returncode==0 else 0
+                    page_profile['sparseOcrAttempts'].append({
+                        'psm':int(sparse_mode),'alnum':alnum,
+                        'exitCode':sparse.returncode})
+                    if alnum>best_chars:
+                        best=candidate
+                        best_chars=alnum
+                        page_profile['sparseOcrSelectedPsm']=int(sparse_mode)
+                except subprocess.TimeoutExpired:
+                    page_profile['sparseOcrAttempts'].append({
+                        'psm':int(sparse_mode),'timeoutSeconds':12})
+                finally:
+                    extra=time.perf_counter()-sparse_started
+                    page_profile['tesseractSeconds']=round(
+                        float(page_profile.get('tesseractSeconds') or 0)+extra,4)
+                    if reusable:context['tesseractSeconds']+=extra
+            # No invented text: if every variant remains <12, the caller
+            # keeps the page unresolved and records a precise audit reason.
+            baseline=best
+            page_profile['sparseOcrFinalAlnum']=best_chars
         # Real-source A/B only. Production output and SHA page receipts remain
         # EXACTLY baseline; ROI is never trusted as legal qualification evidence.
         # Probe a bounded one-in-N PDFs, one page each, with its own 8s limit.
