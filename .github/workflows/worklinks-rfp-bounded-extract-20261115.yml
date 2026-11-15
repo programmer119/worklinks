@@ -1,0 +1,37 @@
+name: WorkLinks RFP no-queue-stall bounded extract regression
+on:
+  push:
+    branches:
+      - fix/rfp-scan-extraction-timeout-20261115
+      - main
+    paths:
+      - scripts/refresh_worklinks_rfp.py
+      - scripts/rfp_live_activity.py
+      - server/worklinks-server123-pipeline.py
+      - tests/test_rfp_bounded_source_extraction.py
+      - .github/workflows/worklinks-rfp-bounded-extract-20261115.yml
+  pull_request:
+    paths:
+      - scripts/refresh_worklinks_rfp.py
+      - scripts/rfp_live_activity.py
+      - server/worklinks-server123-pipeline.py
+      - tests/test_rfp_bounded_source_extraction.py
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and bounded child extraction test
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/rfp_live_activity.py server/worklinks-server123-pipeline.py
+          python3 tests/test_rfp_bounded_source_extraction.py
+      - name: Stage-2 to stage-3 original verification regression
+        run: |
+          python3 tests/test_rfp_verified_file_handoff.py
+          python3 tests/test_open_cached_rfp_repair.py
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          echo RFP_SCAN_HANG_REGRESSION=PASS
