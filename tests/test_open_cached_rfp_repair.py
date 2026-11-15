@@ -5,6 +5,7 @@ import gzip
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import sqlite3
 import sys
@@ -68,11 +69,13 @@ with tempfile.TemporaryDirectory() as tmp:
     (snap/'rfp-coverage-index.json').write_text(json.dumps({'byNotice':{
         report_key:base,'R26BK01234568:000':base}}))
     archive=CallLedger(root/'rfp-request-ledger.sqlite3')
-    q=RfpDualQueue(root/'rfp-dual-queue.sqlite3')
+    # The real scheduler stages OCR in a temporary folder: the live queue lives elsewhere.
+    q=RfpDualQueue(root/'live-downloader'/'rfp-dual-queue.sqlite3')
     receipts=[{'name':file1,'url':good_url,'sha256':'a'*64,'bytes':100},
               {'name':file2,'url':source_url,'sha256':sha,'bytes':len(bytes_)}]
     completed={**source,'downloadVerifiedFiles':receipts}
-    with patch.object(task.rfp,'OPENER',ForbiddenOpener()),\
+    with patch.dict(os.environ,{'WORKLINKS_RFP_DUAL_QUEUE_DB':str(q.path)}),\
+         patch.object(task.rfp,'OPENER',ForbiddenOpener()),\
          patch.object(task.rfp,'fetch_json',side_effect=AssertionError('stage 3 cannot call metadata API')),\
          patch.dict(sys.modules,{'pypdf':SimpleNamespace(PdfReader=PDF)}):
         # Existing snapshot and official URLs do NOT authorize third-stage work.
