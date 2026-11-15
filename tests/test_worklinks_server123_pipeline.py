@@ -79,7 +79,7 @@ with tempfile.TemporaryDirectory() as temporary:
             assert '--execute' in args and '--data-dir' in args
             assert args[args.index('--limit')+1]=='3'
             assert args[args.index('--max-files')+1]=='3'
-    assert args[args.index('--workers')+1]=='3'
+            assert args[args.index('--workers')+1]=='3'
             assert 'serviceKey=' not in env['WORKLINKS_G2B_API']
             # The staged snapshot is intentionally unchanged for this fixture.
         elif 'refresh_worklinks_rfp.py' in args[1]:
