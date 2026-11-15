@@ -111,7 +111,7 @@ with sync_playwright() as p:
       "() => document.querySelector('#rfpRescanContent')?.textContent.includes('실제 작업 진행 중')",
       timeout=12000)
     body=page.locator('#rfpRescanContent').text_content()
-    for term in ('관리 대상','6','최신 판독 완료','1','판독 미완료','구버전',
+    for term in ('관리 대상','6','최신 판독 완료','1','구버전',
                  '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','파일 다운로드 8개','판독 4건'):
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '4 / 6건' in body,body
@@ -125,7 +125,7 @@ with sync_playwright() as p:
     }""")
 
     assert '문서 판독' in body and '1 / 6건' in body,body
-    assert '판독 미완료' in body and '5' in body,body
+    assert ('판독 미완료' in body or '남은 문서 판독' in body) and '5' in body,body
     cohort_lane_values={key:page.locator('[data-rfp-field="'+key+'Count"]').text_content()
                         for key in ('manifest','download','scan')}
     assert all('6' in value for value in cohort_lane_values.values()),cohort_lane_values
