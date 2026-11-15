@@ -347,7 +347,26 @@ def process_one(key,scan,meta,ledger,file_limit=None):
                 raise VerifiedOriginalMissing('file_not_in_completed_download_receipt')
             raw,origin=fetch_verified_raw(item,ledger,str(receipt['sha256']))
             f['detectedFormat']=rfp.detected_source_format(label,raw)
+            extract_started=time.perf_counter()
             extracted,evidence,_=rfp.extract_cached_text(label,raw)
+            extract_elapsed=round(time.perf_counter()-extract_started,3)
+            # Source-linked, text-free operational profile: this distinguishes
+            # page rasterization/Tesseract from PDF parsing and cache overhead.
+            if int(evidence.get('ocrAttemptedPages') or 0)>0:
+                print('OPEN_RFP_OCR_PHASE_PROFILE',json.dumps({
+                    'notice':key,'file':label[:100],
+                    'pdfPages':evidence.get('pdfPages'),
+                    'ocrNewPages':evidence.get('ocrAttemptedPages'),
+                    'ocrRestoredPages':evidence.get('ocrRestoredPages'),
+                    'extractWallSeconds':extract_elapsed,
+                    'pdfOpenSeconds':evidence.get('ocrPdfOpenSeconds'),
+                    'nativeTextSeconds':evidence.get('ocrNativeTextSeconds'),
+                    'imageCheckSeconds':evidence.get('ocrImageCheckSeconds'),
+                    'renderSeconds':evidence.get('ocrRenderSeconds'),
+                    'tesseractSeconds':evidence.get('ocrTesseractSeconds'),
+                    'receiptWriteSeconds':evidence.get('ocrReceiptWriteSeconds'),
+                    'sourceComplete':evidence.get('sourceComplete')},
+                    ensure_ascii=False,separators=(',',':')),flush=True)
             text=rfp.normalize_extracted_text(extracted)
             if not evidence['sourceComplete']:
                 f['extractionEvidence']=evidence
