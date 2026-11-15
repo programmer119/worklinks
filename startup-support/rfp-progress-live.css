@@ -170,3 +170,9 @@
 #rfpRescanCycle.fetching>span{color:#2363ca}
 #rfpRescanCycle.error{background:#fff1f0;border-color:#edb9b5}
 #rfpRescanCycle.error>span{color:#b42318}
+
+/* A mixed outcome has VERIFIED green receipts plus red confirmed failures.
+   Do not paint green receipts as an active blue download when the transfer is over. */
+#rfpRescanModal .rfp-rescan-lanes [data-rfp-stage="download"][data-status="danger"] .rfp-stage-aggregate-fill{
+ background:var(--rfp-success);
+}
