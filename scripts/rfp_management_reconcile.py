@@ -28,6 +28,15 @@ def latest_complete(row,versions):
     if not isinstance(row,dict) or row.get('status')!='text_extracted_requires_review':
         return False
     files=[f for f in row.get('files') or [] if isinstance(f,dict)]
+    # A successfully scanned sibling does not make a failed OCR PDF complete.
+    # In particular, keep an old-reader OCR failure eligible for recovery.
+    ocr_failed={'pdf_ocr_incomplete','ocr_deferred_to_repair',
+                'pdf_unreadable_page','image_ocr_incomplete',
+                'hwpx_image_ocr_deferred_to_repair'}
+    if any(str(f.get('errorCategory') or '') in ocr_failed
+           and f.get('readable') is not True
+           and f.get('staffingScopeExcluded') is not True for f in files):
+        return False
     readable=[f for f in files if f.get('readable') is True and
               f.get('staffingScopeExcluded') is not True]
     classification=(bool(readable) and row.get('manifestComplete') is True and
@@ -110,7 +119,9 @@ def management_scope(data_dir,now=None):
         if re.search('취소|철회|폐기',str(item.get('noticeKind') or item.get('state') or '')):
             continue
         closes=deadline_kst(item.get('closes'))
-        if closes is None or closes<now:continue
+        # Same 24-hour actionable deadline as the public progress and
+        # verified-original OCR repair; expired/near-close is out of scope.
+        if closes is None or closes<=now+dt.timedelta(hours=24):continue
         managed[key]=closes.date().isoformat()
         if latest_complete(evidence.get(key),versions):valid.add(key)
     return managed,valid
