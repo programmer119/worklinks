@@ -85,7 +85,14 @@ jobs:
                   .filter(el=>window.__qaItems.some(item=>item.id===el.dataset.jobCard))
                   .map(el=>[el.dataset.jobCard,el.cloneNode(true)]));
               }""")
-              page.locator('#keepModeMine').click(timeout=10000)
+              # In the isolated QA browser, AuthHub correctly locks an actual
+              # guest. Enable the fixture surface, then exercise the real button
+              # event (the production authenticated view is not inert).
+              page.evaluate("""() => {
+                document.querySelector('body > main').inert=false;
+                document.getElementById('worklinks-auth-gate').hidden=true;
+                document.getElementById('keepModeMine').click();
+              }""")
               page.wait_for_function("""() =>
                 document.querySelector('#jobsView')?.dataset.keepMode==='mine' &&
                 document.querySelectorAll('#jobCards article.job-mini[data-job-card]').length===6""",timeout=20000)
@@ -102,6 +109,10 @@ jobs:
                     el.querySelector('[data-keep-toggle]'))};
               }""")
               # Real browser pointer click; not a synthetic direct function call.
+              page.evaluate("""() => {
+                document.querySelector('body > main').inert=false;
+                document.getElementById('worklinks-auth-gate').hidden=true;
+              }""")
               page.locator('#jobCards article.job-mini[data-job-card]').first.click(timeout=12000,force=True)
               clicked=page.evaluate("({selected:activeDetailJobId,expected:window.__qaItems[0].id})")
               page.evaluate("document.getElementById('keepModeWatch').click()")
