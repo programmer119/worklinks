@@ -136,6 +136,9 @@ MAX_FILE=100_000_000
 # OCR is local-only and bounded to prevent runaway attachment processing.
 MAX_PDF_OCR_PAGES=24
 PDF_OCR_PAGE_CACHE_VERSION=1
+# Time-budget each OCR pass so the 180s isolated extractor cannot discard
+# unfinished work without emitting the next-page checkpoint evidence.
+PDF_OCR_PASS_SECONDS=115
 MAX_PDF_OCR_PIXELS=12_000_000
 PDF_OCR_TARGET_DPI=300
 MAX_DOCUMENTS=24
@@ -830,6 +833,14 @@ def _extract_pdf_with_audit(raw):
     parts=[];missing=[];attempted=[];recovered=[];restored=[]
     deferred=[];failed=[];untouched_blanks=[]
     connection,digest,cached=_pdf_ocr_page_cache(raw)
+    # Share a single pass budget across nested PDFs in the same ZIP.
+    # A failed or stalled page can take at most 28 seconds in Tesseract;
+    # stop starting new pages with fewer than 32 seconds to spare.
+    started=getattr(_DOCUMENT_SCAN,'ocr_started_at',None)
+    if started is None:
+        started=time.monotonic()
+        _DOCUMENT_SCAN.ocr_started_at=started
+    budget=float(os.environ.get('WORKLINKS_RFP_OCR_PASS_SECONDS') or PDF_OCR_PASS_SECONDS)
     try:
         for i,page in enumerate(document.pages):
             try:
@@ -859,7 +870,8 @@ def _extract_pdf_with_audit(raw):
                 recovered.append(i+1)
                 restored.append(i+1)
                 continue
-            if len(attempted)>=MAX_PDF_OCR_PAGES:
+            if (len(attempted)>=MAX_PDF_OCR_PAGES or
+                    time.monotonic()-started>max(0.0,budget-32.0)):
                 missing.append(i+1)
                 deferred.append(i+1)
                 continue
@@ -910,8 +922,10 @@ def extract_with_source_status(name,raw):
     _DOCUMENT_SCAN.pdf=[]
     prior_hwp=getattr(_DOCUMENT_SCAN,'hwp_record_fallback',None)
     prior_hwpx_image=getattr(_DOCUMENT_SCAN,'hwpx_image_ocr',None)
+    previous_ocr_start=getattr(_DOCUMENT_SCAN,'ocr_started_at',None)
     _DOCUMENT_SCAN.hwp_record_fallback=False
     _DOCUMENT_SCAN.hwpx_image_ocr=False
+    _DOCUMENT_SCAN.ocr_started_at=time.monotonic()
     try:
         data=extract(name,raw)
         pdf_stats=list(_DOCUMENT_SCAN.pdf)
@@ -942,6 +956,10 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.hwpx_image_ocr
             except AttributeError:pass
         else:_DOCUMENT_SCAN.hwpx_image_ocr=prior_hwpx_image
+        if previous_ocr_start is None:
+            try:del _DOCUMENT_SCAN.ocr_started_at
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.ocr_started_at=previous_ocr_start
 
 
 def classify_failure(error):
