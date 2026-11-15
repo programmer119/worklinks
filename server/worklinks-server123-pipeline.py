@@ -29,7 +29,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
-RFP_DRAIN_ALGORITHM_VERSION = 'two-independent-queues-v5-20261114'
+RFP_DRAIN_ALGORITHM_VERSION = 'full-management-cohort-reconcile-v6-20261115'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
