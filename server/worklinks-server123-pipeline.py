@@ -30,7 +30,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
-RFP_DRAIN_ALGORITHM_VERSION = 'full-management-cohort-reconcile-v6-20261115'
+RFP_DRAIN_ALGORITHM_VERSION = 'full-management-cohort-reconcile-v7-ocr-durable-20261115'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
@@ -44,7 +44,7 @@ RFP_OCR_SCAN_BATCH_INTERVAL = 4
 # When download-ready work is on scan-retry cooldown, OCR repair is independent
 # of upstream file requests and must continue using saved verified originals.
 RFP_OCR_IDLE_PERIOD = 120
-RFP_OPEN_READER_VERSION='pdf25-blank-hwpx-embedded-image-v7'
+RFP_OPEN_READER_VERSION='pdf25-blank-hwpx-embedded-image-v8'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
 # Explicit short-lived recovery selection; candidates rotate out once fully scanned.
@@ -525,8 +525,10 @@ def run_once(kind, runner=None, _single=False):
             # Limit each source extractor, not just the entire eight-notice batch.
             env['WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS']='12'
         elif kind=='rfpOpenRepair':
-            # Slow full-fidelity OCR gets its own generous but finite budget.
-            env['WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS']='90'
+            # Bulk scanner defers OCR, but isolated repair MUST actually run it.
+            env.pop('WORKLINKS_RFP_DEFER_OCR',None)
+            # A few nested one-page scanned PDFs can legitimately need >90s.
+            env['WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS']='180'
         if kind in ('rfp','rfpUpgrade'):
             # OCR repair remains full-fidelity, but the bulk scanner never
             # holds every other notice behind multi-page Tesseract.
