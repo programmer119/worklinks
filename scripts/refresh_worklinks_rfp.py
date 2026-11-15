@@ -1642,7 +1642,8 @@ def ole_document_kind(name,raw):
 def detected_source_format(name,raw):
     # Some genuine G2B .hwpx downloads are HWPML XML files, not ZIP packages.
     if (str(name).lower().endswith(('.hwp','.hwpx','.hml')) and
-            raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(b'<?xml')):
+            raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(
+                (b'<?xml',b'<HWPML',b'<hwpml',b'<HML',b'<hml'))):
         return 'hwpml_xml'
     if raw.startswith(b'%PDF-'):return 'pdf'
     if raw.startswith(_OLE_HEADER):return 'xls' if ole_document_kind(name,raw)=='.xls' else 'hwp'
@@ -1810,7 +1811,8 @@ def _extract_dispatch(name,raw):
     elif raw.startswith(_OLE_HEADER):
         n=ole_document_kind(name,raw)
     elif (n.endswith(('.hwpx','.hwp')) and
-          raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(b'<?xml')):
+          raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(
+                (b'<?xml',b'<HWPML',b'<hwpml',b'<HML',b'<hml'))):
         # HWPML is a standalone XML alternative to ZIP-based HWPX. Verify
         # its root and reject unrelated/malformed XML instead of assuming
         # that a .hwpx filename guarantees a ZIP archive.
