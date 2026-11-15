@@ -234,7 +234,7 @@ with sync_playwright() as p:
       const note=row.querySelector('.rfp-rescan-stage-note');
       const c=getComputedStyle(note).color;
       return row.dataset.status==='danger' && parseFloat(agg.style.width)<100 &&
-        parseFloat(err.style.width)>0 && c==='rgb(180, 35, 24)';
+        err.style.width.startsWith('max(') && c==='rgb(180, 35, 24)';
     }"""),'confirmed errors must be red and excluded from successful blue segment'
     # Same completed condition means green in each stage, not orange/red.
     fake['lanes']['manifest']['done']=6
