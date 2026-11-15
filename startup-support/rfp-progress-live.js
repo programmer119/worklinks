@@ -12,9 +12,7 @@
    '<span class="rfp-stage-file-fill" style="width:0%"></span>'+
    '<span class="rfp-stage-aggregate-fill" style="width:0%"></span>'+
    '<span class="rfp-stage-focus"><span class="rfp-stage-focus-name">작업 정보 확인 중</span>'+
-   '<span class="rfp-stage-focus-metric"></span></span></div>'+
-   (key==='scan'?'<div class="rfp-scan-exclusion-note" data-rfp-field="scanExcluded" hidden></div>':'')+
-   '</div>';
+   '<span class="rfp-stage-focus-metric"></span></span></div></div>';
  }
  function mount(panel){
   panel.innerHTML=
@@ -277,6 +275,8 @@
    else if(!badge&&Number(lane?.done)>=Number(lane?.total)&&lane?.total>0)badge='완료';
    else if(!badge&&key==='manifest')badge='순차 확보';
    else if(!badge)badge='진행 확인 중';
+   if(key==='scan'&&Number(lane?.blockedNoAttachments||0)>0)
+    badge+=' · 판독 제외 '+Number(lane.blockedNoAttachments)+'건';
    updateRfpText(state,badge);
    node.classList.toggle('has-rfp-error',Boolean(worker?.status==='retry'||worker?.stale||problems||stale));
    let name='현재 처리 파일 없음',detail='';
@@ -454,13 +454,6 @@
   panel.querySelector('#rfpRescanUnknown').hidden=!unknownTotal;
   updateField(panel,'unknown',number(unknownTotal)+'건 · 별도 판독 '+
    number(counts.unknownDeadlineCompleted)+' / '+number(unknownTotal)+'건');
-  const exclusions=panel.querySelector('[data-rfp-field="scanExcluded"]');
-  if(exclusions){
-   const count=Math.max(0,Number(lanes?.scan?.blockedNoAttachments||0));
-   exclusions.hidden=count===0;
-   if(count>0)updateRfpText(exclusions,
-     '판독 제외 '+number(count)+'건 · 공식 첨부목록 0개 확인 (판독 실패 아님)');
-  }
   window.paintRfpLaneFocus();
   // The focus renderer updates live text, but semantic status belongs to
   // the authoritative stage counters and is applied above on every poll.
