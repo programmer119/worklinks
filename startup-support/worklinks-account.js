@@ -234,7 +234,7 @@ window.worklinksKeepRequest=async(path,options={})=>{
   if(!state.account||!state.token||!state.client||
      document.documentElement.dataset.worklinksAuthState!=='granted')
     throw Object.assign(Error('auth_required'),{status:401});
-  if(!/^\\/worklinks-keep(?:$|[-?])/.test(path))
+  if(!String(path).startsWith('/worklinks-keep'))
     throw Error('unsupported_keep_path');
   return api(path,options);
 };
