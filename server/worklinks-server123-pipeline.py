@@ -999,6 +999,8 @@ def main():
         color=(os.environ.get('WORKLINKS_RFP_OCR_COLORSPACE') or 'rgb').strip().lower()
         state['rfpOcrColorSpace']=color if color in ('rgb','gray') else 'rgb'
         state['rfpOcrTargetDpi']=300
+        state['rfpNativeTextBackend']=('mupdf_sample_verified' if
+            os.environ.get('WORKLINKS_RFP_FAST_MUPDF_NATIVE')=='1' else 'pypdf')
         # Deployed parser versions, not front-end page visits, trigger an
         # independent bounded upgrade queue with durable progress.
         current_versions=deployed_rfp_reader_versions()
