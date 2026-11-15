@@ -43,7 +43,7 @@ _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
-RFP_TEXT_CACHE_VERSION=3
+RFP_TEXT_CACHE_VERSION=4
 
 # Run potentially unbounded PDF/HWP/ZIP text extraction in a disposable child.
 # An expensive vector-drawing PDF must never hold every other stage-3 notice
@@ -731,8 +731,17 @@ def _ocr_pdf_page(raw,index):
         page=document.load_page(index)
         zoom=min(PDF_OCR_TARGET_DPI/72.0,
                  (MAX_PDF_OCR_PIXELS/max(1.0,page.rect.width*page.rect.height))**.5)
-        pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
-        if pix.width*pix.height>MAX_PDF_OCR_PIXELS:
+        # FitZ rounds each rendered dimension to whole pixels. The analytical
+        # area can be under 12M while the actual pixmap crosses the limit by
+        # a few thousand pixels (observed: 12,001,929 vs 12,000,000).
+        # Retrying a slightly smaller raster preserves OCR coverage.
+        for _ in range(4):
+            pix=page.get_pixmap(matrix=pymupdf.Matrix(zoom,zoom),alpha=False)
+            actual_pixels=pix.width*pix.height
+            if actual_pixels<=MAX_PDF_OCR_PIXELS:
+                break
+            zoom*=min(0.98,(MAX_PDF_OCR_PIXELS/actual_pixels)**.5*0.995)
+        else:
             raise ValueError('pdf_ocr_page_too_large')
         png=pix.tobytes('png')
     result=subprocess.run(
@@ -786,7 +795,17 @@ def _extract_pdf_with_audit(raw):
         if natural.strip():
             parts.append(natural)
             continue
-        has_content=page.get_contents() is not None
+        content_stream=page.get_contents()
+        # A page may have a /Contents object with zero actual bytes. It is
+        # still blank: no raster OCR can extract meaningful text from it.
+        if content_stream is None:
+            has_content=False
+        else:
+            try:
+                has_content=bool(content_stream.get_data().strip())
+            except Exception:
+                # Unknown streams fail closed and remain OCR candidates.
+                has_content=True
         try:
             has_images=bool(page.images)
         except Exception:
@@ -831,7 +850,9 @@ def extract_with_source_status(name,raw):
     previous=getattr(_DOCUMENT_SCAN,'pdf',None)
     _DOCUMENT_SCAN.pdf=[]
     prior_hwp=getattr(_DOCUMENT_SCAN,'hwp_record_fallback',None)
+    prior_hwpx_image=getattr(_DOCUMENT_SCAN,'hwpx_image_ocr',None)
     _DOCUMENT_SCAN.hwp_record_fallback=False
+    _DOCUMENT_SCAN.hwpx_image_ocr=False
     try:
         data=extract(name,raw)
         pdf_stats=list(_DOCUMENT_SCAN.pdf)
@@ -842,6 +863,7 @@ def extract_with_source_status(name,raw):
                      'ocrRecoveredPages':sum(x['ocrRecoveredPages'] for x in pdf_stats),
                      'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
                      'extractionMethod':('hwp_record_fallback' if _DOCUMENT_SCAN.hwp_record_fallback
+                         else 'hwpx_embedded_image_ocr' if _DOCUMENT_SCAN.hwpx_image_ocr
                          else 'pdf_native_ocr' if
                         any(x['ocrAttemptedPages'] for x in pdf_stats)
                         else 'native')}
@@ -854,6 +876,10 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.hwp_record_fallback
             except AttributeError:pass
         else:_DOCUMENT_SCAN.hwp_record_fallback=prior_hwp
+        if prior_hwpx_image is None:
+            try:del _DOCUMENT_SCAN.hwpx_image_ocr
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.hwpx_image_ocr=prior_hwpx_image
 
 
 def classify_failure(error):
@@ -864,7 +890,9 @@ def classify_failure(error):
     if isinstance(error,(TimeoutError,ConnectionError,urllib.error.URLError)):
         return 'file_download_connection_error'
     detail=str(error)
-    known=('legacy_xls_reader_failed','legacy_xls_reader_unavailable',
+    known=('hwpx_image_ocr_deferred_to_repair','hwpx_image_ocr_incomplete',
+           'hwpx_image_ocr_too_many_images','hwpx_image_ocr_size_limit',
+           'legacy_xls_reader_failed','legacy_xls_reader_unavailable',
            'legacy_xls_size_limit','legacy_xls_too_many_sheets',
            'invalid_legacy_xls','hml_xml_parse_failed','hml_xml_truncated',
            'hwp_record_fallback_too_large','hwp_record_fallback_invalid_text_record',
@@ -1482,7 +1510,38 @@ def extract(name,raw):
                     paragraphs=[''.join(x.text or '' for x in tree.iter()
                                 if x.tag.rsplit('}',1)[-1]=='t')]
                 data.extend(paragraphs)
-            return '\n'.join(data)
+            native_text='\n'.join(data)
+            if sum(c.isalnum() for c in native_text)<12:
+                # An HWPX can be a complete scanned form: hp:pic points to
+                # BMP images in BinData, with zero hp:t spans. The six real
+                # official examples contain one full-page BMP each. Inspect
+                # only real BinData images; never use PrvText as legal evidence.
+                images=[x for x in archive.namelist()
+                        if (x.startswith('BinData/') or
+                            x.startswith('Contents/BinData/')) and
+                            Path(x).suffix.lower() in (
+                                '.bmp','.png','.jpg','.jpeg','.tif','.tiff','.webp')]
+                if images:
+                    if len(images)>12:
+                        raise ValueError('hwpx_image_ocr_too_many_images')
+                    sizes=[archive.getinfo(x).file_size for x in images]
+                    if any(x>MAX_FILE for x in sizes) or sum(sizes)>45_000_000:
+                        raise ValueError('hwpx_image_ocr_size_limit')
+                    if os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1':
+                        raise ValueError('hwpx_image_ocr_deferred_to_repair')
+                    extracted=[]
+                    for image_name in images:
+                        image_bytes=archive.read(image_name)
+                        try:
+                            page_text=_extract_image_with_audit(image_bytes)
+                        except (ValueError,OSError,subprocess.TimeoutExpired) as error:
+                            raise ValueError('hwpx_image_ocr_incomplete') from error
+                        if sum(c.isalnum() for c in page_text)<12:
+                            raise ValueError('hwpx_image_ocr_incomplete')
+                        extracted.append('IMAGE '+image_name+'\n'+page_text)
+                    _DOCUMENT_SCAN.hwpx_image_ocr=True
+                    return '\n'.join(extracted)
+            return native_text
     if n.endswith('.pdf'):
         text,details=_extract_pdf_with_audit(raw)
         attached=getattr(_DOCUMENT_SCAN,'pdf',None)
