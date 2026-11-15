@@ -600,6 +600,12 @@ def run_once(kind, runner=None, _single=False):
                             'extractWallSeconds':timing('extractWallSeconds'),
                             'pdfTotalSeconds':timing('pdfTotalSeconds'),
                             'nativeTextSeconds':timing('nativeTextSeconds'),
+                            'nativeMuPdfAcceptedFiles':sum(int(x.get('nativeMuPdfAcceptedFiles') or 0) for x in profiles),
+                            'nativeMuPdfVerifiedPages':sum(int(x.get('nativeMuPdfVerifiedPages') or 0) for x in profiles),
+                            'nativeMuPdfValidationSeconds':timing('nativeMuPdfValidationSeconds'),
+                            'nativeMuPdfTextSeconds':timing('nativeMuPdfTextSeconds'),
+                            'nativeMuPdfTextPages':sum(int(x.get('nativeMuPdfTextPages') or 0) for x in profiles),
+                            'nativeMuPdfFallbackPages':sum(int(x.get('nativeMuPdfFallbackPages') or 0) for x in profiles),
                             'nativeFastProbeSeconds':timing('nativeFastProbeSeconds'),
                             'nativeFastProbePages':sum(int(x.get('nativeFastProbePages') or 0) for x in profiles),
                             'nativeFastSkippedPages':sum(int(x.get('nativeFastSkippedPages') or 0) for x in profiles),
@@ -635,7 +641,9 @@ def run_once(kind, runner=None, _single=False):
                         report['tesseractSeconds']-report['nativeTextSeconds']-
                         report['imageCheckSeconds']-report['pdfOpenSeconds']-
                         report['receiptWriteSeconds']-
-                        report['nativeFastProbeSeconds']),3)
+                        report['nativeFastProbeSeconds']-
+                        report['nativeMuPdfValidationSeconds']-
+                        report['nativeMuPdfTextSeconds']),3)
                     report['pageAverageSeconds']=round(
                         (report['renderSeconds']+report['tesseractSeconds'])/pages,3)
                     target=DATA/'ocr-runtime-profile.json'
