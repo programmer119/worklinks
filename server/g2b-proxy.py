@@ -2223,6 +2223,1422 @@ def worklinks_state_put(project, user_id, data):
     finally:
         db.close()
 
+# Member-owned kept jobs, explicitly shared for authenticated read-only viewing.
+# Do not mix with worklinks_preferences (which also stores private support decisions).
+KEEP_ID_RE = re.compile(r'^[a-zA-Z0-9_.:-]{1,160}
+    daemon_threads = True
+
+SNAPSHOT_ROOT = os.environ.get('WORKLINKS_SNAPSHOT_DIR', '/app/data/snapshots')
+STATIC_WORKTREE = os.environ.get('WORKLINKS_STATIC_WORKTREE','/app/data/standalone/standalone-worktree')
+SNAPSHOT_NAMES = {
+    'changcom-actionable': 'changcom-actionable.json',
+    'g2b-award-fields-open': 'g2b-award-fields-open.json',
+    'rfp-clauses': 'rfp-clauses.json',
+    'rfp-coverage-index': 'rfp-coverage-index.json',
+    'qualification-review': 'qualification-review.json',
+    'investment-opportunities': 'investment-opportunities.json',
+    'year-end-local-budget': 'year-end-local-budget.json',
+    'kimse-deep-audit': 'kimse-deep-audit.json',
+    'sme-cert-snapshot': 'sme-cert-snapshot.json',
+    'direct-production-snapshot': 'direct-production-snapshot.json',
+    'health-live-audit': 'health-live-audit.json'
+}
+
+class Handler(BaseHTTPRequestHandler):
+    def reply_changcom_200_report(self, requested_format):
+        """200-item audit is public evidence, never a bidder eligibility verdict."""
+        basename={
+            'csv':'changcom-200-official-evidence-20261111.csv',
+            'md':'changcom-200-official-evidence-20261111.md'
+        }.get(requested_format)
+        if not basename:
+            return self.reply(400,{'ok':False,'error':'invalid_audit_format'})
+        path=os.path.join(SNAPSHOT_ROOT,'audits',basename)
+        if not os.path.isfile(path):
+            return self.reply(404,{'ok':False,'error':'audit_not_generated'})
+        size=os.path.getsize(path)
+        if size<32 or size>20000000:
+            return self.reply(503,{'ok':False,'error':'audit_size_invalid'})
+        mime=('text/csv; charset=utf-8' if requested_format=='csv'
+              else 'text/markdown; charset=utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type',mime)
+        self.send_header('Content-Length',str(size))
+        self.send_header('Cache-Control','public, max-age=120')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.send_header('Content-Disposition','attachment; filename="'+basename+'"')
+        origin=self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+        self.end_headers()
+        with open(path,'rb') as file:
+            while True:
+                chunk=file.read(1024*1024)
+                if not chunk:break
+                self.wfile.write(chunk)
+
+    def reply_worklinks_site(self, route):
+        """Optional read-only server123 site mirror, no upstream or secret access."""
+        if route in ('/','/startup-support','/startup-support/'):
+            route='/startup-support/index.html'
+        raw=unquote(route)
+        if '\x00' in raw or '\\' in raw:
+            return self.reply(400,{'ok':False,'error':'invalid_site_path'})
+        rel=raw.lstrip('/')
+        if not rel.startswith('startup-support/'):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        parts=rel.split('/')
+        if any(p.startswith('.') or p in ('.','..','') for p in parts):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        ext=os.path.splitext(rel)[1].lower()
+        if ext not in ('.html','.js','.css','.json','.png','.jpg','.jpeg',
+                        '.webp','.svg','.ico','.txt','.woff','.woff2'):
+            return self.reply(404,{'ok':False,'error':'site_filetype_unavailable'})
+        stem=os.path.splitext(os.path.basename(rel))[0]
+        if ext=='.json' and stem in SNAPSHOT_NAMES:
+            return self.reply_snapshot(stem)
+        root=os.path.realpath(STATIC_WORKTREE)
+        target=os.path.realpath(os.path.join(root,rel))
+        if not target.startswith(root+os.sep):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        if not os.path.isfile(target):
+            return self.reply(404,{'ok':False,'error':'site_asset_missing'})
+        length=os.path.getsize(target)
+        if not 1<=length<=90000000:
+            return self.reply(503,{'ok':False,'error':'site_asset_invalid'})
+        mime=mimetypes.guess_type(target)[0] or 'application/octet-stream'
+        if ext in ('.html','.js','.css','.json','.svg','.txt'):
+            mime+='; charset=utf-8'
+        self.send_response(200)
+        self.send_header('Content-Type',mime)
+        self.send_header('Content-Length',str(length))
+        self.send_header('Cache-Control','public, max-age=60')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.end_headers()
+        with open(target,'rb') as source:
+            while True:
+                chunk=source.read(1024*1024)
+                if not chunk:break
+                self.wfile.write(chunk)
+
+    def reply_snapshot(self, name):
+        """Serve only published, immutable-at-read local snapshots. No G2B calls."""
+        filename = SNAPSHOT_NAMES.get(name)
+        if not filename:
+            return self.reply(400, {'ok':False,'error':'unknown_snapshot'})
+        path = os.path.join(SNAPSHOT_ROOT, filename)
+        accepts_gzip = 'gzip' in self.headers.get('Accept-Encoding','').lower()
+        compressed = path + '.gz'
+        if accepts_gzip and os.path.isfile(compressed):
+            path = compressed
+            gzipped = True
+        else:
+            gzipped = False
+        if not os.path.isfile(path):
+            return self.reply(404,{'ok':False,'error':'snapshot_not_generated'})
+        st = os.stat(path)
+        if st.st_size < 2 or st.st_size > 100000000:
+            return self.reply(503,{'ok':False,'error':'snapshot_size_invalid'})
+        tag = '"%s-%s-%s"' % (name, int(st.st_mtime), st.st_size)
+        if self.headers.get('If-None-Match','') == tag:
+            self.send_response(304)
+            self.send_header('Cache-Control','public, max-age=120')
+            self.send_header('ETag',tag)
+            self.send_header('Vary','Origin, Accept-Encoding')
+            origin = self.headers.get('Origin','')
+            if origin in ORIGINS:
+                self.send_header('Access-Control-Allow-Origin',origin)
+                self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header('Content-Type','application/json; charset=utf-8')
+        if gzipped:
+            self.send_header('Content-Encoding','gzip')
+        self.send_header('Cache-Control','public, max-age=120')
+        self.send_header('ETag',tag)
+        self.send_header('Vary','Origin, Accept-Encoding')
+        self.send_header('X-Content-Type-Options','nosniff')
+        origin = self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+            self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+        self.send_header('Content-Length',str(st.st_size))
+        self.end_headers()
+        with open(path,'rb') as handle:
+            while True:
+                chunk=handle.read(1024*1024)
+                if not chunk: break
+                self.wfile.write(chunk)
+
+    def reply(self, status, data):
+        body = json.dumps(data,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+        self.send_response(status)
+        self.send_header('Content-Type','application/json; charset=utf-8')
+        self.send_header('Cache-Control','no-store')
+        self.send_header('X-Content-Type-Options','nosniff')
+        origin = self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+            self.send_header('Access-Control-Allow-Methods','GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+            self.send_header('Vary','Origin')
+        self.send_header('Content-Length',str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        self.reply(200,{'ok':True})
+
+    def do_GET(self):
+        u = urlparse(self.path)
+        p = parse_qs(u.query)
+        def get(name, default=''): return p.get(name,[default])[0]
+        try:
+            if u.path in ('/','/startup-support','/startup-support/') or u.path.startswith('/startup-support/'):
+                return self.reply_worklinks_site(u.path)
+            if u.path == '/api/g2b/changcom-200-report':
+                return self.reply_changcom_200_report(get('format','csv'))
+            if u.path == '/api/g2b/snapshot':
+                return self.reply_snapshot(get('name'))
+            if u.path == '/api/g2b/pipeline-status':
+                state_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),'pipeline-scheduler-state.json')
+                try:
+                    with open(state_path,'r') as stream:
+                        state=json.load(stream)
+                    if not isinstance(state,dict):state={}
+                except (IOError,OSError,ValueError):
+                    state={}
+                ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
+                           for key,value in SNAPSHOT_NAMES.items()
+                           if key in ('changcom-actionable','g2b-award-fields-open',
+                                      'rfp-clauses','rfp-coverage-index'))
+                other_ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
+                                 for key,value in SNAPSHOT_NAMES.items() if key not in ready)
+                autonomous_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),
+                                             'standalone','standalone-jobs-state.json')
+                try:
+                    with open(autonomous_path,'r') as stream:
+                        autonomous=json.load(stream)
+                    if not isinstance(autonomous,dict):autonomous={}
+                except (IOError,OSError,ValueError):
+                    autonomous={}
+                return self.reply(200,{'ok':True,'scheduler':state,'autonomousJobs':autonomous,
+                                       'snapshotsReady':ready,
+                                       'autonomousSnapshotsReady':other_ready,'upstreamCalls':0})
+            if u.path in ('/health','/api/g2b/status'):
+                return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
+                    'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
+            if u.path == '/api/g2b/worklinks-auth-config':
+                project = worklinks_auth_project()
+                return self.reply(200, {'ok':True,'project':project,'enabled':bool(project),
+                    'authApi':AUTHHUB_ORIGIN,'hostedLogin':'https://authhub.suaveforge.com/login/'})
+            if u.path == '/api/g2b/worklinks-state':
+                project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
+                return self.reply(200, worklinks_state_get(project, user_id))
+            if u.path in ('/api/g2b/worklinks-keep','/api/g2b/worklinks-keep-members','/api/g2b/worklinks-keep-watch'):
+                project,user_id=worklinks_verify_identity(self.headers.get('Authorization',''))
+                if u.path=='/api/g2b/worklinks-keep':
+                    return self.reply(200,worklinks_keep_own(project,user_id))
+                if u.path=='/api/g2b/worklinks-keep-members':
+                    return self.reply(200,worklinks_keep_members(project))
+                return self.reply(200,worklinks_keep_watch(project,user_id,get('member')))
+            if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/mandatory-enrichment-batch':
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                try:
+                    page=int(get('page','1'))
+                    rows=int(get('rows','999'))
+                except ValueError:
+                    raise ApiError('invalid_mandatory_batch_pagination',400)
+                return self.reply(200,mandatory_enrichment_date_page(
+                    get('source'),get('from'),get('to'),page,rows))
+            if u.path == '/api/g2b/rfp-attachment-batch':
+                # Enforce server-local access: this expensive read must not
+                # be exposed as a public unauthenticated quota-spending API.
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                try:
+                    page=int(get('page','1'))
+                    rows=int(get('rows','999'))
+                except ValueError:
+                    raise ApiError('invalid_rfp_batch_pagination',400)
+                return self.reply(200,rfp_attachment_batch_page(
+                    get('source'),get('from'),get('to'),page,rows))
+            if u.path == '/api/g2b/rfp-attachment-exception':
+                # Only exceptional notice misses may use a targeted lookup.
+                # Never spend a fourth government call on the region API.
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if (not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no)
+                        or not re.fullmatch(r'\d{3}',order)):
+                    raise ApiError('invalid_bid_identifier',400)
+                return self.reply(200,bid_evidence_query(
+                    bid_no,order,include_region=False))
+            if u.path == '/api/g2b/upstream-rate-status':
+                return self.reply(200,upstream_rate_diagnostics())
+            if u.path == '/api/g2b/crawl-status':
+                return self.reply(200,crawler_state())
+            if u.path == '/api/g2b/award-cache':
+                try: limit,offset=int(get('limit','200')),int(get('offset','0'))
+                except ValueError:raise ApiError('invalid_award_cache_pagination',400)
+                if not (1<=limit<=200 and 0<=offset<=10000):
+                    raise ApiError('invalid_award_cache_pagination',400)
+                return self.reply(200,cached_historic_awards(limit,offset))
+            if u.path == '/api/g2b/award-cache-status':
+                return self.reply(200,award_enricher_status())
+            if u.path == '/api/g2b/standard-status':
+                return self.reply(200,standard_sync_status())
+            if u.path == '/api/g2b/standard-bid':
+                return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
+            if u.path == '/api/g2b/rfp-rescan-progress':
+                return self.reply(200,rfp_rescan_progress())
+            if u.path == '/api/g2b/rfp-card-evidence':
+                return self.reply(200,rfp_card_evidence_batch(get('keys')))
+            if u.path == '/api/g2b/saved-inventory':
+                return self.reply(200,query_saved_open_inventory())
+            if u.path == '/api/g2b/saved':
+                try: limit,offset=int(get('limit','500')),int(get('offset','0'))
+                except ValueError: raise ApiError('invalid_saved_pagination',400)
+                if not (1<=limit<=500 and 0<=offset<=100000):
+                    raise ApiError('invalid_saved_pagination',400)
+                return self.reply(200,query_saved_bids(limit,offset,get('sw','0')=='1',get('q','')))
+            if u.path == '/api/g2b/qualifications':
+                # Aggregated public counts, no keys or raw sensitive data in report.
+                try:
+                    with open(QUAL_REPORT_PATH, 'r') as f:
+                        report = json.load(f)
+                except (OSError, IOError, ValueError):
+                    raise ApiError('annual_report_not_available', 503)
+                if not isinstance(report, dict) or not isinstance(report.get('counts'), list):
+                    raise ApiError('annual_report_invalid', 503)
+                return self.reply(200, {'ok':True, 'report':report})
+            if u.path == '/api/g2b/direct-production':
+                bizno=re.sub(r'\D','',get('bizno'))
+                if len(bizno)!=10:raise ApiError('invalid_bizno',400)
+                ck=('direct-production',bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=prod_query(bizno)
+                with lock:cache[ck]=(time.time()+6*3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/company':
+                bizno = re.sub(r'[^0-9]', '', get('bizno'))
+                if len(bizno) != 10:
+                    raise ApiError('invalid_bizno', 400)
+                ck = ('company', bizno)
+                with lock: saved = cache.get(ck)
+                if saved and saved[0] > time.time():
+                    return self.reply(200, saved[1])
+                basic = request_api(COMPANY_BASE, 'getPrcrmntCorpBasicInfo02', {
+                    'pageNo':1, 'numOfRows':30, 'inqryDiv':3, 'bizno':bizno
+                })
+                industry = request_api(COMPANY_BASE, 'getPrcrmntCorpIndstrytyInfo02', {
+                    'pageNo':1, 'numOfRows':100, 'inqryDiv':1, 'bizno':bizno
+                })
+                # Complete official industry registry, not only its first page.
+                industry_rows=list(industry['items'])
+                industry_total=industry['totalCount']
+                for page in range(2,min((industry_total+99)//100,20)+1):
+                    nxt=request_api(COMPANY_BASE, 'getPrcrmntCorpIndstrytyInfo02', {
+                        'pageNo':page,'numOfRows':100,'inqryDiv':1,'bizno':bizno
+                    })
+                    industry_rows.extend(nxt['items'])
+                # Company/industry API can omit bizno in response rows even when
+                # request was filtered by bizno. Preserve explicitly mismatched rows
+                # as exclusions, but do not silently discard filtered no-bizno rows.
+                def from_requested_company(x):
+                    returned=re.sub(r'[^0-9]','',str(x.get('bizno') or x.get('bsnsRgstNo') or ''))
+                    return not returned or returned==bizno
+                matching = [x for x in basic['items'] if from_requested_company(x) and x.get('corpNm')]
+                codes = [
+                    {'code':str(x.get('indstrytyCd') or ''),
+                     'name':x.get('indstrytyNm') or '',
+                     'status':x.get('indstrytyStatsNm') or x.get('indstrytySttusNm') or x.get('statusName') or '',
+                     'registeredAt':x.get('rgstDt') or '',
+                     'expiresAt':x.get('vldPrdExprtDt') or x.get('expiryDate') or '',
+                     'representative':str(x.get('rprsntIndstrytyYn') or '')}
+                    for x in industry_rows
+                    if from_requested_company(x) and re.fullmatch(r'\d{4}',str(x.get('indstrytyCd') or ''))
+                ]
+                result = {
+                    'ok':True, 'bizno':bizno, 'found':bool(matching),
+                    'company':{'name':matching[0].get('corpNm') or '',
+                               'registeredAt':matching[0].get('rgstDt') or '',
+                               'address':_pick(matching[0],['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr']),
+                               'addressDetail':_pick(matching[0],['dtlAdrs']),
+                               'regionName':_pick(matching[0],['rgnNm']),
+                               'regionCode':_pick(matching[0],['rgnCd']),
+                               'employeeCount':_pick(matching[0],['emplyeNum']),
+                               'headOfficeKind':_pick(matching[0],['hdoffceDivNm']),
+                               'addressField':next((key for key in ['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), ''),
+                               'availableFields':sorted(matching[0].keys())
+                              } if matching else None,
+                    'industries':codes, 'industryCount':industry_total,
+                    'unattributedResponseRows':sum(1 for x in industry_rows if not x.get('bizno') and not x.get('bsnsRgstNo')),
+                    'complete':len(industry_rows) >= industry_total,
+                    'has1468':any(x['code']=='1468' for x in codes),
+                    'source':'나라장터 사용자정보서비스',
+                    'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
+                }
+                with lock: cache[ck] = (time.time()+3600, result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-capability':
+                ck=('contract-capability',)
+                with lock:
+                    saved=cache.get(ck)
+                    refresh_key=('contract-refresh-throttle',)+ck
+                    throttle=cache.get(refresh_key)
+                    # Only bypass FAILED cached responses; successful results remain
+                    # immutable until TTL. Prevent unbounded public upstream refresh.
+                    forced=(get('refresh','')=='1' and
+                            (not saved or saved[1].get('ok') is False) and
+                            (not throttle or throttle[0]<time.time()))
+                    if forced:cache[refresh_key]=(time.time()+120,None)
+                if saved and saved[0]>time.time() and not forced:
+                    return self.reply(200,saved[1])
+                try:result=contract_capability_query()
+                except ApiError as e:
+                    result={'ok':False,'authorized':None,'error':e.msg,
+                            'service':'조달청 나라장터 계약정보서비스',
+                            'applicationUrl':'https://www.data.go.kr/data/15129427/openapi.do',
+                            'companyHistoryVerified':False}
+                with lock:cache[ck]=(time.time()+3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-evidence':
+                bid_no=get('bidNo').strip()
+                bizno=re.sub(r'\\D','',get('bizno').strip())
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
+                    raise ApiError('invalid_contract_lookup',400)
+                ck=('contract-evidence',bid_no,bizno)
+                with lock:
+                    saved=cache.get(ck)
+                    refresh_key=('contract-refresh-throttle',)+ck
+                    throttle=cache.get(refresh_key)
+                    forced=(get('refresh','')=='1' and
+                            (not saved or saved[1].get('ok') is False) and
+                            (not throttle or throttle[0]<time.time()))
+                    if forced:cache[refresh_key]=(time.time()+120,None)
+                if saved and saved[0]>time.time() and not forced:
+                    return self.reply(200,saved[1])
+                try:result=contract_evidence_query(bid_no,bizno)
+                except ApiError as e:
+                    result={'ok':False,'bidNo':bid_no,'bizno':bizno,'error':e.msg,
+                            'contractPerformanceVerified':False,
+                            'officialUrl':'https://www.data.go.kr/data/15129459/openapi.do'}
+                with lock:cache[ck]=(time.time()+6*3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-notice':
+                bid_no=get('bidNo').strip()
+                bizno=re.sub(r'\D','',get('bizno').strip())
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
+                    raise ApiError('invalid_contract_lookup',400)
+                ck=('contract-notice',bid_no,bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=contract_notice_lookup(bid_no,bizno)
+                with lock:cache[ck]=(time.time()+(24*3600 if result.get('ok') else 1200),result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/bid-change-price':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('bid-change-price',bid_no,order)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=bid_change_and_price_query(bid_no,order)
+                with lock:cache[ck]=(time.time()+(12*3600 if result.get('ok') else 1200),result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/bid-extra':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                return self.reply(200,bid_extra_query(bid_no,order,collect=True))
+            if u.path == '/api/g2b/bid-evidence':
+                # Legacy automatic RFP reader must NOT multiply upstream calls
+                # by notice. Bulk manifests + bounded exceptions own the queue.
+                # Browser's explicit single-notice detail view is unaffected.
+                if self.headers.get('User-Agent','').startswith('WorkLinks-RFP-ReadOnly/'):
+                    raise ApiError('automatic_rfp_per_notice_metadata_disabled_use_batch',409)
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('bid-evidence',bid_no,order)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=bid_evidence_query(bid_no,order)
+                # Do not retain upstream failures for six hours. A transient
+                # 429 is handled by the shared cooldown above, not a false
+                # negative qualification verdict.
+                complete=(result.get('region') or {}).get('complete') and (result.get('attachments') or {}).get('complete') and (result.get('noticeDocuments') or {}).get('complete')
+                errors=[str(section.get('error') or '') for section in
+                        (result.get('region') or {},result.get('attachments') or {},
+                         result.get('noticeDocuments') or {})]
+                is_rate_error=any(('upstream_temporarily_rate_limited' in error or
+                    'upstream_http_429' in error or 'upstream_result_22' in error or
+                    'upstream_result_23' in error or
+                    'LIMITED_NUMBER_OF_SERVICE_REQUESTS' in error) for error in errors)
+                lifetime=6*3600 if complete else (0 if is_rate_error else 600)
+                # Do not cache a 3-second throttle as an unavailable document
+                # for 10 minutes. The next probe must be able to retry.
+                if lifetime:
+                    with lock:cache[ck]=(time.time()+lifetime,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/eligibility':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('eligibility',bid_no,order)
+                con=open_bid_db()
+                try:
+                    prev=con.execute('SELECT payload,checked_at FROM bid_license_cache WHERE bid_no=? AND bid_ord=?',(bid_no,order)).fetchone()
+                    if prev:
+                        try:
+                            checked=datetime.datetime.fromisoformat(prev[1].replace('Z','+00:00'))
+                            age=(datetime.datetime.now(datetime.timezone.utc)-checked).total_seconds()
+                            if age<7*86400:
+                                return self.reply(200,json.loads(prev[0]))
+                        except (ValueError,TypeError,OverflowError): pass
+                finally: con.close()
+                with lock: saved=cache.get(ck)
+                if saved and saved[0]>time.time():
+                    return self.reply(200,saved[1])
+                data=request_api(API_BASE,'getBidPblancListInfoLicenseLimit02',{
+                    'pageNo':1,'numOfRows':100,'inqryDiv':2,'bidNtceNo':bid_no,'bidNtceOrd':order
+                })
+                rows=list(data['items'])
+                total=data['totalCount']
+                for page in range(2,min((total+99)//100,10)+1):
+                    nxt=request_api(API_BASE,'getBidPblancListInfoLicenseLimit02',{
+                        'pageNo':page,'numOfRows':100,'inqryDiv':2,
+                        'bidNtceNo':bid_no,'bidNtceOrd':order})
+                    rows.extend(nxt['items'])
+                requirements=[]
+                for row in rows:
+                    if row.get('bidNtceNo') and str(row.get('bidNtceNo'))!=bid_no:
+                        continue
+                    if row.get('bidNtceOrd') and str(row.get('bidNtceOrd')).zfill(3)!=order:
+                        continue
+                    name=str(row.get('lcnsLmtNm') or '').strip()
+                    industry=str(row.get('permsnIndstrytyList') or '').strip()
+                    # Prefer official industry-code field over free-text years.
+                    raw_codes=re.findall(r'(?<!\d)\d{4}(?!\d)',industry or name)
+                    codes=[c for c in raw_codes if not re.match(r'^20\d{2}$',c)]
+                    desc=name+' '+industry
+                    if re.search(r'또는|택일|중\s*(?:하나|1종)|\bOR\b',desc,re.I):
+                        logic='OR'
+                    elif re.search(r'모두|동시\s*보유|각각\s*보유|\bAND\b',desc,re.I):
+                        logic='AND'
+                    else:
+                        logic='UNKNOWN'
+                    requirements.append({
+                        'name':name or '면허 제한 내용 확인 필요',
+                        'codes':list(dict.fromkeys(codes)),
+                        'logic':logic,
+                        'group':str(row.get('lmtGrpNo') or ''),
+                        'sequence':str(row.get('lmtSno') or ''),
+                        'permittedIndustries':industry,
+                        'fieldRestrictions':str(row.get('indstrytyMfrcFldList') or '')
+                    })
+                result={'ok':True,'bidNo':bid_no,'order':order,'requirements':requirements,
+                        'count':len(requirements),'totalCount':total,
+                        'complete':len(rows)>=total,
+                        'source':'나라장터 입찰공고정보서비스 면허제한',
+                        'limitations':'면허제한 항목만 포함. 직접생산·중소기업확인·실적·지역·원문 추가조건은 별도 확인 필요',
+                        'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'}
+                con=open_bid_db()
+                try:
+                    with con:
+                        con.execute('INSERT OR REPLACE INTO bid_license_cache(bid_no,bid_ord,payload,checked_at) VALUES(?,?,?,?)',
+                            (bid_no,order,json.dumps(result,ensure_ascii=False,separators=(',',':')),result['checkedAt']))
+                finally:con.close()
+                with lock: cache[ck]=(time.time()+3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/awards':
+                bid_no = get('bidNo').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no):
+                    raise ApiError('invalid_bid_no',400)
+                return self.reply(200,cached_awards_query(bid_no))
+            if u.path != '/api/g2b/bids': raise ApiError('not_found',404)
+            kind = get('kind','servc')
+            if kind not in BID_OPS: raise ApiError('invalid_kind',400)
+            start,end = get('from'),get('to')
+            d1,d2 = date(start),date(end)
+            if d1 > d2 or (d2-d1).days > 6: raise ApiError('date_window_must_be_1_to_7_days',400)
+            try: page,rows = int(get('page','1')),int(get('rows','50'))
+            except ValueError: raise ApiError('invalid_pagination',400)
+            if not (1 <= page <= 20 and 1 <= rows <= 100): raise ApiError('invalid_pagination',400)
+            ck = (kind,start,end,page,rows)
+            with lock: saved = cache.get(ck)
+            if saved and saved[0] > time.time():
+                out = dict(saved[1]);out['cached']=True
+                return self.reply(200,out)
+            data = request_api(API_BASE,BID_OPS[kind],{
+                'pageNo':page,'numOfRows':rows,'inqryDiv':1,
+                'inqryBgnDt':start+'0000','inqryEndDt':end+'2359'})
+            result = {'ok':True,'kind':kind,'from':start,'to':end,'page':page,
+                'rows':rows,'totalCount':data['totalCount'],
+                'items':[format_bid(x,kind) for x in data['items']],
+                'generated_at':datetime.datetime.utcnow().isoformat()+'Z','cached':False}
+            # The database write must succeed before acknowledging the fetch.
+            stats=persist_bids(result['items'])
+            result['persisted']=True
+            result['savedReceived']=stats['received']
+            result['savedTotal']=stats['storedTotal']
+            with lock:
+                if len(cache)>150:
+                    # A blanket clear would reset the official API's 429 circuit breaker.
+                    now=time.time()
+                    for key,entry in list(cache.items()):
+                        if isinstance(entry,tuple) and len(entry)==2 and entry[0]<now:
+                            del cache[key]
+                cache[ck] = (time.time()+900,result)
+            self.reply(200,result)
+        except ApiError as e:
+            self.reply(e.status,{'ok':False,'error':e.msg})
+        except Exception:
+            self.reply(502,{'ok':False,'error':'internal_upstream_error'})
+
+    def do_POST(self):
+        try:
+            operation=urlparse(self.path).path
+            if operation not in ('/api/g2b/worklinks-state','/api/g2b/worklinks-keep','/api/g2b/worklinks-keep-share'):
+                raise ApiError('not_found', 404)
+            origin = self.headers.get('Origin', '')
+            if origin and origin not in ORIGINS:
+                raise ApiError('origin_not_allowed', 403)
+            project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
+            try:
+                size = int(self.headers.get('Content-Length') or '0')
+            except ValueError:
+                raise ApiError('invalid_body', 400)
+            if not (0 < size <= 4096):
+                raise ApiError('invalid_body', 400)
+            try:
+                body = json.loads(self.rfile.read(size).decode('utf-8'))
+            except (ValueError, UnicodeError):
+                raise ApiError('invalid_json', 400)
+            if not isinstance(body, dict):
+                raise ApiError('invalid_json', 400)
+            if operation == '/api/g2b/worklinks-keep':
+                return self.reply(200,worklinks_keep_update(project,user_id,body))
+            if operation == '/api/g2b/worklinks-keep-share':
+                return self.reply(200,worklinks_keep_share(project,user_id,body))
+            return self.reply(200, worklinks_state_put(project, user_id, body))
+        except ApiError as e:
+            return self.reply(e.status, {'ok':False, 'error':e.msg})
+        except Exception:
+            return self.reply(503, {'ok':False, 'error':'state_store_unavailable'})
+
+    def log_message(self, fmt, *args):
+        # Logs client request path only; never upstream URLs or keys.
+        sys.stderr.write('[worklinks-g2b] '+fmt%args+'\n')
+
+if __name__=='__main__':
+    server = ThreadedServer((BIND_HOST,PORT),Handler)
+    if bool(TLS_CERT_FILE) != bool(TLS_KEY_FILE):
+        raise SystemExit('TLS certificate and key must both be supplied')
+    if BIND_HOST not in ('127.0.0.1','::1','localhost') and not TLS_CERT_FILE:
+        raise SystemExit('Refusing public plaintext HTTP: configure G2B_TLS_CERT_FILE and G2B_TLS_KEY_FILE')
+    if TLS_CERT_FILE:
+        # TLS 1.2 minimum; CentOS7 Python 2.7 SSLContext availability depends on security updates.
+        if not hasattr(ssl,'PROTOCOL_TLSv1_2'):
+            raise SystemExit('Python/OpenSSL with TLS 1.2 required for direct HTTPS')
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.load_cert_chain(certfile=TLS_CERT_FILE,keyfile=TLS_KEY_FILE)
+        server.socket = context.wrap_socket(server.socket,server_side=True)
+        print('G2B serving HTTPS on %s:%s' % (BIND_HOST,PORT))
+    else:
+        print('G2B serving HTTP (loopback only) on %s:%s' % (BIND_HOST,PORT))
+    server.serve_forever()
+)
+KEEP_MEMBER_RE = re.compile(r'^[a-zA-Z0-9_-]{8,128}
+    daemon_threads = True
+
+SNAPSHOT_ROOT = os.environ.get('WORKLINKS_SNAPSHOT_DIR', '/app/data/snapshots')
+STATIC_WORKTREE = os.environ.get('WORKLINKS_STATIC_WORKTREE','/app/data/standalone/standalone-worktree')
+SNAPSHOT_NAMES = {
+    'changcom-actionable': 'changcom-actionable.json',
+    'g2b-award-fields-open': 'g2b-award-fields-open.json',
+    'rfp-clauses': 'rfp-clauses.json',
+    'rfp-coverage-index': 'rfp-coverage-index.json',
+    'qualification-review': 'qualification-review.json',
+    'investment-opportunities': 'investment-opportunities.json',
+    'year-end-local-budget': 'year-end-local-budget.json',
+    'kimse-deep-audit': 'kimse-deep-audit.json',
+    'sme-cert-snapshot': 'sme-cert-snapshot.json',
+    'direct-production-snapshot': 'direct-production-snapshot.json',
+    'health-live-audit': 'health-live-audit.json'
+}
+
+class Handler(BaseHTTPRequestHandler):
+    def reply_changcom_200_report(self, requested_format):
+        """200-item audit is public evidence, never a bidder eligibility verdict."""
+        basename={
+            'csv':'changcom-200-official-evidence-20261111.csv',
+            'md':'changcom-200-official-evidence-20261111.md'
+        }.get(requested_format)
+        if not basename:
+            return self.reply(400,{'ok':False,'error':'invalid_audit_format'})
+        path=os.path.join(SNAPSHOT_ROOT,'audits',basename)
+        if not os.path.isfile(path):
+            return self.reply(404,{'ok':False,'error':'audit_not_generated'})
+        size=os.path.getsize(path)
+        if size<32 or size>20000000:
+            return self.reply(503,{'ok':False,'error':'audit_size_invalid'})
+        mime=('text/csv; charset=utf-8' if requested_format=='csv'
+              else 'text/markdown; charset=utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type',mime)
+        self.send_header('Content-Length',str(size))
+        self.send_header('Cache-Control','public, max-age=120')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.send_header('Content-Disposition','attachment; filename="'+basename+'"')
+        origin=self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+        self.end_headers()
+        with open(path,'rb') as file:
+            while True:
+                chunk=file.read(1024*1024)
+                if not chunk:break
+                self.wfile.write(chunk)
+
+    def reply_worklinks_site(self, route):
+        """Optional read-only server123 site mirror, no upstream or secret access."""
+        if route in ('/','/startup-support','/startup-support/'):
+            route='/startup-support/index.html'
+        raw=unquote(route)
+        if '\x00' in raw or '\\' in raw:
+            return self.reply(400,{'ok':False,'error':'invalid_site_path'})
+        rel=raw.lstrip('/')
+        if not rel.startswith('startup-support/'):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        parts=rel.split('/')
+        if any(p.startswith('.') or p in ('.','..','') for p in parts):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        ext=os.path.splitext(rel)[1].lower()
+        if ext not in ('.html','.js','.css','.json','.png','.jpg','.jpeg',
+                        '.webp','.svg','.ico','.txt','.woff','.woff2'):
+            return self.reply(404,{'ok':False,'error':'site_filetype_unavailable'})
+        stem=os.path.splitext(os.path.basename(rel))[0]
+        if ext=='.json' and stem in SNAPSHOT_NAMES:
+            return self.reply_snapshot(stem)
+        root=os.path.realpath(STATIC_WORKTREE)
+        target=os.path.realpath(os.path.join(root,rel))
+        if not target.startswith(root+os.sep):
+            return self.reply(404,{'ok':False,'error':'site_path_unavailable'})
+        if not os.path.isfile(target):
+            return self.reply(404,{'ok':False,'error':'site_asset_missing'})
+        length=os.path.getsize(target)
+        if not 1<=length<=90000000:
+            return self.reply(503,{'ok':False,'error':'site_asset_invalid'})
+        mime=mimetypes.guess_type(target)[0] or 'application/octet-stream'
+        if ext in ('.html','.js','.css','.json','.svg','.txt'):
+            mime+='; charset=utf-8'
+        self.send_response(200)
+        self.send_header('Content-Type',mime)
+        self.send_header('Content-Length',str(length))
+        self.send_header('Cache-Control','public, max-age=60')
+        self.send_header('X-Content-Type-Options','nosniff')
+        self.end_headers()
+        with open(target,'rb') as source:
+            while True:
+                chunk=source.read(1024*1024)
+                if not chunk:break
+                self.wfile.write(chunk)
+
+    def reply_snapshot(self, name):
+        """Serve only published, immutable-at-read local snapshots. No G2B calls."""
+        filename = SNAPSHOT_NAMES.get(name)
+        if not filename:
+            return self.reply(400, {'ok':False,'error':'unknown_snapshot'})
+        path = os.path.join(SNAPSHOT_ROOT, filename)
+        accepts_gzip = 'gzip' in self.headers.get('Accept-Encoding','').lower()
+        compressed = path + '.gz'
+        if accepts_gzip and os.path.isfile(compressed):
+            path = compressed
+            gzipped = True
+        else:
+            gzipped = False
+        if not os.path.isfile(path):
+            return self.reply(404,{'ok':False,'error':'snapshot_not_generated'})
+        st = os.stat(path)
+        if st.st_size < 2 or st.st_size > 100000000:
+            return self.reply(503,{'ok':False,'error':'snapshot_size_invalid'})
+        tag = '"%s-%s-%s"' % (name, int(st.st_mtime), st.st_size)
+        if self.headers.get('If-None-Match','') == tag:
+            self.send_response(304)
+            self.send_header('Cache-Control','public, max-age=120')
+            self.send_header('ETag',tag)
+            self.send_header('Vary','Origin, Accept-Encoding')
+            origin = self.headers.get('Origin','')
+            if origin in ORIGINS:
+                self.send_header('Access-Control-Allow-Origin',origin)
+                self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header('Content-Type','application/json; charset=utf-8')
+        if gzipped:
+            self.send_header('Content-Encoding','gzip')
+        self.send_header('Cache-Control','public, max-age=120')
+        self.send_header('ETag',tag)
+        self.send_header('Vary','Origin, Accept-Encoding')
+        self.send_header('X-Content-Type-Options','nosniff')
+        origin = self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+            self.send_header('Access-Control-Allow-Methods','GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+        self.send_header('Content-Length',str(st.st_size))
+        self.end_headers()
+        with open(path,'rb') as handle:
+            while True:
+                chunk=handle.read(1024*1024)
+                if not chunk: break
+                self.wfile.write(chunk)
+
+    def reply(self, status, data):
+        body = json.dumps(data,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+        self.send_response(status)
+        self.send_header('Content-Type','application/json; charset=utf-8')
+        self.send_header('Cache-Control','no-store')
+        self.send_header('X-Content-Type-Options','nosniff')
+        origin = self.headers.get('Origin','')
+        if origin in ORIGINS:
+            self.send_header('Access-Control-Allow-Origin',origin)
+            self.send_header('Access-Control-Allow-Methods','GET, POST, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type')
+            self.send_header('Vary','Origin')
+        self.send_header('Content-Length',str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        self.reply(200,{'ok':True})
+
+    def do_GET(self):
+        u = urlparse(self.path)
+        p = parse_qs(u.query)
+        def get(name, default=''): return p.get(name,[default])[0]
+        try:
+            if u.path in ('/','/startup-support','/startup-support/') or u.path.startswith('/startup-support/'):
+                return self.reply_worklinks_site(u.path)
+            if u.path == '/api/g2b/changcom-200-report':
+                return self.reply_changcom_200_report(get('format','csv'))
+            if u.path == '/api/g2b/snapshot':
+                return self.reply_snapshot(get('name'))
+            if u.path == '/api/g2b/pipeline-status':
+                state_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),'pipeline-scheduler-state.json')
+                try:
+                    with open(state_path,'r') as stream:
+                        state=json.load(stream)
+                    if not isinstance(state,dict):state={}
+                except (IOError,OSError,ValueError):
+                    state={}
+                ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
+                           for key,value in SNAPSHOT_NAMES.items()
+                           if key in ('changcom-actionable','g2b-award-fields-open',
+                                      'rfp-clauses','rfp-coverage-index'))
+                other_ready=dict((key,os.path.isfile(os.path.join(SNAPSHOT_ROOT,value+'.gz')))
+                                 for key,value in SNAPSHOT_NAMES.items() if key not in ready)
+                autonomous_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),
+                                             'standalone','standalone-jobs-state.json')
+                try:
+                    with open(autonomous_path,'r') as stream:
+                        autonomous=json.load(stream)
+                    if not isinstance(autonomous,dict):autonomous={}
+                except (IOError,OSError,ValueError):
+                    autonomous={}
+                return self.reply(200,{'ok':True,'scheduler':state,'autonomousJobs':autonomous,
+                                       'snapshotsReady':ready,
+                                       'autonomousSnapshotsReady':other_ready,'upstreamCalls':0})
+            if u.path in ('/health','/api/g2b/status'):
+                return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
+                    'configured':bool(get_key()),'server_time':datetime.datetime.utcnow().isoformat()+'Z'})
+            if u.path == '/api/g2b/worklinks-auth-config':
+                project = worklinks_auth_project()
+                return self.reply(200, {'ok':True,'project':project,'enabled':bool(project),
+                    'authApi':AUTHHUB_ORIGIN,'hostedLogin':'https://authhub.suaveforge.com/login/'})
+            if u.path == '/api/g2b/worklinks-state':
+                project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
+                return self.reply(200, worklinks_state_get(project, user_id))
+            if not get_key(): raise ApiError('secret_not_configured',503)
+            if u.path == '/api/g2b/mandatory-enrichment-batch':
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                try:
+                    page=int(get('page','1'))
+                    rows=int(get('rows','999'))
+                except ValueError:
+                    raise ApiError('invalid_mandatory_batch_pagination',400)
+                return self.reply(200,mandatory_enrichment_date_page(
+                    get('source'),get('from'),get('to'),page,rows))
+            if u.path == '/api/g2b/rfp-attachment-batch':
+                # Enforce server-local access: this expensive read must not
+                # be exposed as a public unauthenticated quota-spending API.
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                try:
+                    page=int(get('page','1'))
+                    rows=int(get('rows','999'))
+                except ValueError:
+                    raise ApiError('invalid_rfp_batch_pagination',400)
+                return self.reply(200,rfp_attachment_batch_page(
+                    get('source'),get('from'),get('to'),page,rows))
+            if u.path == '/api/g2b/rfp-attachment-exception':
+                # Only exceptional notice misses may use a targeted lookup.
+                # Never spend a fourth government call on the region API.
+                if (self.client_address[0] not in ('127.0.0.1','::1')
+                        or self.headers.get('Host','') not in
+                            ('127.0.0.1:18192','localhost:18192')
+                        or self.headers.get('X-Forwarded-For')
+                        or self.headers.get('X-Real-IP')):
+                    raise ApiError('local_worker_only',403)
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if (not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no)
+                        or not re.fullmatch(r'\d{3}',order)):
+                    raise ApiError('invalid_bid_identifier',400)
+                return self.reply(200,bid_evidence_query(
+                    bid_no,order,include_region=False))
+            if u.path == '/api/g2b/upstream-rate-status':
+                return self.reply(200,upstream_rate_diagnostics())
+            if u.path == '/api/g2b/crawl-status':
+                return self.reply(200,crawler_state())
+            if u.path == '/api/g2b/award-cache':
+                try: limit,offset=int(get('limit','200')),int(get('offset','0'))
+                except ValueError:raise ApiError('invalid_award_cache_pagination',400)
+                if not (1<=limit<=200 and 0<=offset<=10000):
+                    raise ApiError('invalid_award_cache_pagination',400)
+                return self.reply(200,cached_historic_awards(limit,offset))
+            if u.path == '/api/g2b/award-cache-status':
+                return self.reply(200,award_enricher_status())
+            if u.path == '/api/g2b/standard-status':
+                return self.reply(200,standard_sync_status())
+            if u.path == '/api/g2b/standard-bid':
+                return self.reply(200,standard_bid_evidence(get('bidNo').strip()))
+            if u.path == '/api/g2b/rfp-rescan-progress':
+                return self.reply(200,rfp_rescan_progress())
+            if u.path == '/api/g2b/rfp-card-evidence':
+                return self.reply(200,rfp_card_evidence_batch(get('keys')))
+            if u.path == '/api/g2b/saved-inventory':
+                return self.reply(200,query_saved_open_inventory())
+            if u.path == '/api/g2b/saved':
+                try: limit,offset=int(get('limit','500')),int(get('offset','0'))
+                except ValueError: raise ApiError('invalid_saved_pagination',400)
+                if not (1<=limit<=500 and 0<=offset<=100000):
+                    raise ApiError('invalid_saved_pagination',400)
+                return self.reply(200,query_saved_bids(limit,offset,get('sw','0')=='1',get('q','')))
+            if u.path == '/api/g2b/qualifications':
+                # Aggregated public counts, no keys or raw sensitive data in report.
+                try:
+                    with open(QUAL_REPORT_PATH, 'r') as f:
+                        report = json.load(f)
+                except (OSError, IOError, ValueError):
+                    raise ApiError('annual_report_not_available', 503)
+                if not isinstance(report, dict) or not isinstance(report.get('counts'), list):
+                    raise ApiError('annual_report_invalid', 503)
+                return self.reply(200, {'ok':True, 'report':report})
+            if u.path == '/api/g2b/direct-production':
+                bizno=re.sub(r'\D','',get('bizno'))
+                if len(bizno)!=10:raise ApiError('invalid_bizno',400)
+                ck=('direct-production',bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=prod_query(bizno)
+                with lock:cache[ck]=(time.time()+6*3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/company':
+                bizno = re.sub(r'[^0-9]', '', get('bizno'))
+                if len(bizno) != 10:
+                    raise ApiError('invalid_bizno', 400)
+                ck = ('company', bizno)
+                with lock: saved = cache.get(ck)
+                if saved and saved[0] > time.time():
+                    return self.reply(200, saved[1])
+                basic = request_api(COMPANY_BASE, 'getPrcrmntCorpBasicInfo02', {
+                    'pageNo':1, 'numOfRows':30, 'inqryDiv':3, 'bizno':bizno
+                })
+                industry = request_api(COMPANY_BASE, 'getPrcrmntCorpIndstrytyInfo02', {
+                    'pageNo':1, 'numOfRows':100, 'inqryDiv':1, 'bizno':bizno
+                })
+                # Complete official industry registry, not only its first page.
+                industry_rows=list(industry['items'])
+                industry_total=industry['totalCount']
+                for page in range(2,min((industry_total+99)//100,20)+1):
+                    nxt=request_api(COMPANY_BASE, 'getPrcrmntCorpIndstrytyInfo02', {
+                        'pageNo':page,'numOfRows':100,'inqryDiv':1,'bizno':bizno
+                    })
+                    industry_rows.extend(nxt['items'])
+                # Company/industry API can omit bizno in response rows even when
+                # request was filtered by bizno. Preserve explicitly mismatched rows
+                # as exclusions, but do not silently discard filtered no-bizno rows.
+                def from_requested_company(x):
+                    returned=re.sub(r'[^0-9]','',str(x.get('bizno') or x.get('bsnsRgstNo') or ''))
+                    return not returned or returned==bizno
+                matching = [x for x in basic['items'] if from_requested_company(x) and x.get('corpNm')]
+                codes = [
+                    {'code':str(x.get('indstrytyCd') or ''),
+                     'name':x.get('indstrytyNm') or '',
+                     'status':x.get('indstrytyStatsNm') or x.get('indstrytySttusNm') or x.get('statusName') or '',
+                     'registeredAt':x.get('rgstDt') or '',
+                     'expiresAt':x.get('vldPrdExprtDt') or x.get('expiryDate') or '',
+                     'representative':str(x.get('rprsntIndstrytyYn') or '')}
+                    for x in industry_rows
+                    if from_requested_company(x) and re.fullmatch(r'\d{4}',str(x.get('indstrytyCd') or ''))
+                ]
+                result = {
+                    'ok':True, 'bizno':bizno, 'found':bool(matching),
+                    'company':{'name':matching[0].get('corpNm') or '',
+                               'registeredAt':matching[0].get('rgstDt') or '',
+                               'address':_pick(matching[0],['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr']),
+                               'addressDetail':_pick(matching[0],['dtlAdrs']),
+                               'regionName':_pick(matching[0],['rgnNm']),
+                               'regionCode':_pick(matching[0],['rgnCd']),
+                               'employeeCount':_pick(matching[0],['emplyeNum']),
+                               'headOfficeKind':_pick(matching[0],['hdoffceDivNm']),
+                               'addressField':next((key for key in ['adrs','corpBscAddr','corpBscAdr','corpAddr','addr','address','prcrmntCorpBscAdr','prcrmntCorpBscAddr','prcrmntCorpAddr'] if matching[0].get(key)), ''),
+                               'availableFields':sorted(matching[0].keys())
+                              } if matching else None,
+                    'industries':codes, 'industryCount':industry_total,
+                    'unattributedResponseRows':sum(1 for x in industry_rows if not x.get('bizno') and not x.get('bsnsRgstNo')),
+                    'complete':len(industry_rows) >= industry_total,
+                    'has1468':any(x['code']=='1468' for x in codes),
+                    'source':'나라장터 사용자정보서비스',
+                    'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'
+                }
+                with lock: cache[ck] = (time.time()+3600, result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-capability':
+                ck=('contract-capability',)
+                with lock:
+                    saved=cache.get(ck)
+                    refresh_key=('contract-refresh-throttle',)+ck
+                    throttle=cache.get(refresh_key)
+                    # Only bypass FAILED cached responses; successful results remain
+                    # immutable until TTL. Prevent unbounded public upstream refresh.
+                    forced=(get('refresh','')=='1' and
+                            (not saved or saved[1].get('ok') is False) and
+                            (not throttle or throttle[0]<time.time()))
+                    if forced:cache[refresh_key]=(time.time()+120,None)
+                if saved and saved[0]>time.time() and not forced:
+                    return self.reply(200,saved[1])
+                try:result=contract_capability_query()
+                except ApiError as e:
+                    result={'ok':False,'authorized':None,'error':e.msg,
+                            'service':'조달청 나라장터 계약정보서비스',
+                            'applicationUrl':'https://www.data.go.kr/data/15129427/openapi.do',
+                            'companyHistoryVerified':False}
+                with lock:cache[ck]=(time.time()+3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-evidence':
+                bid_no=get('bidNo').strip()
+                bizno=re.sub(r'\\D','',get('bizno').strip())
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
+                    raise ApiError('invalid_contract_lookup',400)
+                ck=('contract-evidence',bid_no,bizno)
+                with lock:
+                    saved=cache.get(ck)
+                    refresh_key=('contract-refresh-throttle',)+ck
+                    throttle=cache.get(refresh_key)
+                    forced=(get('refresh','')=='1' and
+                            (not saved or saved[1].get('ok') is False) and
+                            (not throttle or throttle[0]<time.time()))
+                    if forced:cache[refresh_key]=(time.time()+120,None)
+                if saved and saved[0]>time.time() and not forced:
+                    return self.reply(200,saved[1])
+                try:result=contract_evidence_query(bid_no,bizno)
+                except ApiError as e:
+                    result={'ok':False,'bidNo':bid_no,'bizno':bizno,'error':e.msg,
+                            'contractPerformanceVerified':False,
+                            'officialUrl':'https://www.data.go.kr/data/15129459/openapi.do'}
+                with lock:cache[ck]=(time.time()+6*3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/contract-notice':
+                bid_no=get('bidNo').strip()
+                bizno=re.sub(r'\D','',get('bizno').strip())
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or len(bizno)!=10:
+                    raise ApiError('invalid_contract_lookup',400)
+                ck=('contract-notice',bid_no,bizno)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=contract_notice_lookup(bid_no,bizno)
+                with lock:cache[ck]=(time.time()+(24*3600 if result.get('ok') else 1200),result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/bid-change-price':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('bid-change-price',bid_no,order)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=bid_change_and_price_query(bid_no,order)
+                with lock:cache[ck]=(time.time()+(12*3600 if result.get('ok') else 1200),result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/bid-extra':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                return self.reply(200,bid_extra_query(bid_no,order,collect=True))
+            if u.path == '/api/g2b/bid-evidence':
+                # Legacy automatic RFP reader must NOT multiply upstream calls
+                # by notice. Bulk manifests + bounded exceptions own the queue.
+                # Browser's explicit single-notice detail view is unaffected.
+                if self.headers.get('User-Agent','').startswith('WorkLinks-RFP-ReadOnly/'):
+                    raise ApiError('automatic_rfp_per_notice_metadata_disabled_use_batch',409)
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('bid-evidence',bid_no,order)
+                with lock:saved=cache.get(ck)
+                if saved and saved[0]>time.time():return self.reply(200,saved[1])
+                result=bid_evidence_query(bid_no,order)
+                # Do not retain upstream failures for six hours. A transient
+                # 429 is handled by the shared cooldown above, not a false
+                # negative qualification verdict.
+                complete=(result.get('region') or {}).get('complete') and (result.get('attachments') or {}).get('complete') and (result.get('noticeDocuments') or {}).get('complete')
+                errors=[str(section.get('error') or '') for section in
+                        (result.get('region') or {},result.get('attachments') or {},
+                         result.get('noticeDocuments') or {})]
+                is_rate_error=any(('upstream_temporarily_rate_limited' in error or
+                    'upstream_http_429' in error or 'upstream_result_22' in error or
+                    'upstream_result_23' in error or
+                    'LIMITED_NUMBER_OF_SERVICE_REQUESTS' in error) for error in errors)
+                lifetime=6*3600 if complete else (0 if is_rate_error else 600)
+                # Do not cache a 3-second throttle as an unavailable document
+                # for 10 minutes. The next probe must be able to retry.
+                if lifetime:
+                    with lock:cache[ck]=(time.time()+lifetime,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/eligibility':
+                bid_no=get('bidNo').strip()
+                order=get('order','000').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no) or not re.fullmatch(r'\d{3}',order):
+                    raise ApiError('invalid_bid_identifier',400)
+                ck=('eligibility',bid_no,order)
+                con=open_bid_db()
+                try:
+                    prev=con.execute('SELECT payload,checked_at FROM bid_license_cache WHERE bid_no=? AND bid_ord=?',(bid_no,order)).fetchone()
+                    if prev:
+                        try:
+                            checked=datetime.datetime.fromisoformat(prev[1].replace('Z','+00:00'))
+                            age=(datetime.datetime.now(datetime.timezone.utc)-checked).total_seconds()
+                            if age<7*86400:
+                                return self.reply(200,json.loads(prev[0]))
+                        except (ValueError,TypeError,OverflowError): pass
+                finally: con.close()
+                with lock: saved=cache.get(ck)
+                if saved and saved[0]>time.time():
+                    return self.reply(200,saved[1])
+                data=request_api(API_BASE,'getBidPblancListInfoLicenseLimit02',{
+                    'pageNo':1,'numOfRows':100,'inqryDiv':2,'bidNtceNo':bid_no,'bidNtceOrd':order
+                })
+                rows=list(data['items'])
+                total=data['totalCount']
+                for page in range(2,min((total+99)//100,10)+1):
+                    nxt=request_api(API_BASE,'getBidPblancListInfoLicenseLimit02',{
+                        'pageNo':page,'numOfRows':100,'inqryDiv':2,
+                        'bidNtceNo':bid_no,'bidNtceOrd':order})
+                    rows.extend(nxt['items'])
+                requirements=[]
+                for row in rows:
+                    if row.get('bidNtceNo') and str(row.get('bidNtceNo'))!=bid_no:
+                        continue
+                    if row.get('bidNtceOrd') and str(row.get('bidNtceOrd')).zfill(3)!=order:
+                        continue
+                    name=str(row.get('lcnsLmtNm') or '').strip()
+                    industry=str(row.get('permsnIndstrytyList') or '').strip()
+                    # Prefer official industry-code field over free-text years.
+                    raw_codes=re.findall(r'(?<!\d)\d{4}(?!\d)',industry or name)
+                    codes=[c for c in raw_codes if not re.match(r'^20\d{2}$',c)]
+                    desc=name+' '+industry
+                    if re.search(r'또는|택일|중\s*(?:하나|1종)|\bOR\b',desc,re.I):
+                        logic='OR'
+                    elif re.search(r'모두|동시\s*보유|각각\s*보유|\bAND\b',desc,re.I):
+                        logic='AND'
+                    else:
+                        logic='UNKNOWN'
+                    requirements.append({
+                        'name':name or '면허 제한 내용 확인 필요',
+                        'codes':list(dict.fromkeys(codes)),
+                        'logic':logic,
+                        'group':str(row.get('lmtGrpNo') or ''),
+                        'sequence':str(row.get('lmtSno') or ''),
+                        'permittedIndustries':industry,
+                        'fieldRestrictions':str(row.get('indstrytyMfrcFldList') or '')
+                    })
+                result={'ok':True,'bidNo':bid_no,'order':order,'requirements':requirements,
+                        'count':len(requirements),'totalCount':total,
+                        'complete':len(rows)>=total,
+                        'source':'나라장터 입찰공고정보서비스 면허제한',
+                        'limitations':'면허제한 항목만 포함. 직접생산·중소기업확인·실적·지역·원문 추가조건은 별도 확인 필요',
+                        'checkedAt':datetime.datetime.utcnow().isoformat()+'Z'}
+                con=open_bid_db()
+                try:
+                    with con:
+                        con.execute('INSERT OR REPLACE INTO bid_license_cache(bid_no,bid_ord,payload,checked_at) VALUES(?,?,?,?)',
+                            (bid_no,order,json.dumps(result,ensure_ascii=False,separators=(',',':')),result['checkedAt']))
+                finally:con.close()
+                with lock: cache[ck]=(time.time()+3600,result)
+                return self.reply(200,result)
+            if u.path == '/api/g2b/awards':
+                bid_no = get('bidNo').strip()
+                if not re.fullmatch(r'[a-zA-Z0-9-]{8,40}',bid_no):
+                    raise ApiError('invalid_bid_no',400)
+                return self.reply(200,cached_awards_query(bid_no))
+            if u.path != '/api/g2b/bids': raise ApiError('not_found',404)
+            kind = get('kind','servc')
+            if kind not in BID_OPS: raise ApiError('invalid_kind',400)
+            start,end = get('from'),get('to')
+            d1,d2 = date(start),date(end)
+            if d1 > d2 or (d2-d1).days > 6: raise ApiError('date_window_must_be_1_to_7_days',400)
+            try: page,rows = int(get('page','1')),int(get('rows','50'))
+            except ValueError: raise ApiError('invalid_pagination',400)
+            if not (1 <= page <= 20 and 1 <= rows <= 100): raise ApiError('invalid_pagination',400)
+            ck = (kind,start,end,page,rows)
+            with lock: saved = cache.get(ck)
+            if saved and saved[0] > time.time():
+                out = dict(saved[1]);out['cached']=True
+                return self.reply(200,out)
+            data = request_api(API_BASE,BID_OPS[kind],{
+                'pageNo':page,'numOfRows':rows,'inqryDiv':1,
+                'inqryBgnDt':start+'0000','inqryEndDt':end+'2359'})
+            result = {'ok':True,'kind':kind,'from':start,'to':end,'page':page,
+                'rows':rows,'totalCount':data['totalCount'],
+                'items':[format_bid(x,kind) for x in data['items']],
+                'generated_at':datetime.datetime.utcnow().isoformat()+'Z','cached':False}
+            # The database write must succeed before acknowledging the fetch.
+            stats=persist_bids(result['items'])
+            result['persisted']=True
+            result['savedReceived']=stats['received']
+            result['savedTotal']=stats['storedTotal']
+            with lock:
+                if len(cache)>150:
+                    # A blanket clear would reset the official API's 429 circuit breaker.
+                    now=time.time()
+                    for key,entry in list(cache.items()):
+                        if isinstance(entry,tuple) and len(entry)==2 and entry[0]<now:
+                            del cache[key]
+                cache[ck] = (time.time()+900,result)
+            self.reply(200,result)
+        except ApiError as e:
+            self.reply(e.status,{'ok':False,'error':e.msg})
+        except Exception:
+            self.reply(502,{'ok':False,'error':'internal_upstream_error'})
+
+    def do_POST(self):
+        try:
+            if urlparse(self.path).path != '/api/g2b/worklinks-state':
+                raise ApiError('not_found', 404)
+            origin = self.headers.get('Origin', '')
+            if origin and origin not in ORIGINS:
+                raise ApiError('origin_not_allowed', 403)
+            project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
+            try:
+                size = int(self.headers.get('Content-Length') or '0')
+            except ValueError:
+                raise ApiError('invalid_body', 400)
+            if not (0 < size <= 4096):
+                raise ApiError('invalid_body', 400)
+            try:
+                body = json.loads(self.rfile.read(size).decode('utf-8'))
+            except (ValueError, UnicodeError):
+                raise ApiError('invalid_json', 400)
+            if not isinstance(body, dict):
+                raise ApiError('invalid_json', 400)
+            return self.reply(200, worklinks_state_put(project, user_id, body))
+        except ApiError as e:
+            return self.reply(e.status, {'ok':False, 'error':e.msg})
+        except Exception:
+            return self.reply(503, {'ok':False, 'error':'state_store_unavailable'})
+
+    def log_message(self, fmt, *args):
+        # Logs client request path only; never upstream URLs or keys.
+        sys.stderr.write('[worklinks-g2b] '+fmt%args+'\n')
+
+if __name__=='__main__':
+    server = ThreadedServer((BIND_HOST,PORT),Handler)
+    if bool(TLS_CERT_FILE) != bool(TLS_KEY_FILE):
+        raise SystemExit('TLS certificate and key must both be supplied')
+    if BIND_HOST not in ('127.0.0.1','::1','localhost') and not TLS_CERT_FILE:
+        raise SystemExit('Refusing public plaintext HTTP: configure G2B_TLS_CERT_FILE and G2B_TLS_KEY_FILE')
+    if TLS_CERT_FILE:
+        # TLS 1.2 minimum; CentOS7 Python 2.7 SSLContext availability depends on security updates.
+        if not hasattr(ssl,'PROTOCOL_TLSv1_2'):
+            raise SystemExit('Python/OpenSSL with TLS 1.2 required for direct HTTPS')
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.load_cert_chain(certfile=TLS_CERT_FILE,keyfile=TLS_KEY_FILE)
+        server.socket = context.wrap_socket(server.socket,server_side=True)
+        print('G2B serving HTTPS on %s:%s' % (BIND_HOST,PORT))
+    else:
+        print('G2B serving HTTP (loopback only) on %s:%s' % (BIND_HOST,PORT))
+    server.serve_forever()
+)
+KEEP_FIELDS = ('title','url','org','amount','deadline','entry','type','noticeNumber')
+def worklinks_keep_db():
+    db=worklinks_db()
+    db.execute('''CREATE TABLE IF NOT EXISTS worklinks_kept_jobs (
+        project TEXT NOT NULL, user_id TEXT NOT NULL, item_id TEXT NOT NULL,
+        snapshot TEXT NOT NULL, updated_at TEXT NOT NULL,
+        PRIMARY KEY(project,user_id,item_id))''')
+    db.execute('''CREATE TABLE IF NOT EXISTS worklinks_keep_shares (
+        project TEXT NOT NULL, user_id TEXT NOT NULL, alias TEXT NOT NULL DEFAULT '',
+        enabled INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL,
+        PRIMARY KEY(project,user_id))''')
+    db.execute('CREATE INDEX IF NOT EXISTS keep_jobs_member_idx ON worklinks_kept_jobs(project,user_id,updated_at DESC)')
+    db.execute('CREATE INDEX IF NOT EXISTS keep_shares_listing_idx ON worklinks_keep_shares(project,enabled)')
+    return db
+
+def worklinks_keep_public_name(user_id, alias):
+    alias=str(alias or '').strip()
+    return alias if alias else '회원 '+user_id[-6:]
+
+def worklinks_keep_items(db, project, owner):
+    rows=db.execute('''SELECT item_id,snapshot,updated_at FROM worklinks_kept_jobs
+        WHERE project=? AND user_id=? ORDER BY updated_at DESC,item_id LIMIT 1200''',
+        (project,owner)).fetchall()
+    items=[]
+    for item_id,raw,stamp in rows:
+        try:
+            obj=json.loads(raw)
+            if not isinstance(obj,dict):continue
+        except (TypeError,ValueError):continue
+        items.append(dict(obj,id=item_id,savedAt=stamp))
+    return items
+
+def worklinks_keep_own(project,user_id):
+    db=worklinks_keep_db()
+    try:
+        row=db.execute('SELECT enabled,alias FROM worklinks_keep_shares WHERE project=? AND user_id=?',
+            (project,user_id)).fetchone()
+        return {'ok':True,'items':worklinks_keep_items(db,project,user_id),
+                'shareEnabled':bool(row[0]) if row else False,
+                'shareAlias':str(row[1] or '') if row else ''}
+    finally:db.close()
+
+def worklinks_keep_update(project,user_id,data):
+    item_id=data.get('id');value=data.get('value')
+    if not isinstance(item_id,str) or not KEEP_ID_RE.fullmatch(item_id):
+        raise ApiError('invalid_keep_id',400)
+    if not isinstance(value,bool):raise ApiError('invalid_keep_value',400)
+    snapshot=data.get('snapshot') if value else {}
+    if value:
+        if not isinstance(snapshot,dict):raise ApiError('invalid_keep_snapshot',400)
+        clean={}
+        for field in KEEP_FIELDS:
+            v=snapshot.get(field,'')
+            if v is None:v=''
+            if not isinstance(v,(str,int,float)) or isinstance(v,bool):
+                raise ApiError('invalid_keep_field',400)
+            clean[field]=str(v).strip()[:(600 if field=='url' else 180)]
+        if not clean['title']:raise ApiError('keep_title_required',400)
+        if clean['url'] and not clean['url'].startswith(('https://','http://')):
+            clean['url']=''
+        clean['id']=item_id
+    db=worklinks_keep_db()
+    stamp=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    try:
+        with db:
+            if value:
+                existing=db.execute('SELECT 1 FROM worklinks_kept_jobs WHERE project=? AND user_id=? AND item_id=?',
+                    (project,user_id,item_id)).fetchone()
+                if not existing:
+                    count=db.execute('SELECT COUNT(*) FROM worklinks_kept_jobs WHERE project=? AND user_id=?',
+                        (project,user_id)).fetchone()[0]
+                    if count>=1200:raise ApiError('keep_limit_reached',409)
+                db.execute('''INSERT INTO worklinks_kept_jobs(project,user_id,item_id,snapshot,updated_at)
+                    VALUES(?,?,?,?,?) ON CONFLICT(project,user_id,item_id)
+                    DO UPDATE SET snapshot=excluded.snapshot''',
+                    (project,user_id,item_id,json.dumps(clean,ensure_ascii=False),stamp))
+            else:
+                db.execute('DELETE FROM worklinks_kept_jobs WHERE project=? AND user_id=? AND item_id=?',
+                    (project,user_id,item_id))
+        return {'ok':True,'id':item_id,'value':value}
+    finally:db.close()
+
+def worklinks_keep_share(project,user_id,data):
+    enabled=data.get('enabled')
+    alias=data.get('alias','')
+    if not isinstance(enabled,bool) or not isinstance(alias,str):
+        raise ApiError('invalid_keep_sharing',400)
+    alias=' '.join(alias.split())
+    if len(alias)>32 or any(ord(ch)<32 for ch in alias):
+        raise ApiError('invalid_keep_alias',400)
+    stamp=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    db=worklinks_keep_db()
+    try:
+        with db:
+            db.execute('''INSERT INTO worklinks_keep_shares(project,user_id,alias,enabled,updated_at)
+                VALUES(?,?,?,?,?) ON CONFLICT(project,user_id)
+                DO UPDATE SET alias=excluded.alias,enabled=excluded.enabled,updated_at=excluded.updated_at''',
+                (project,user_id,alias,int(enabled),stamp))
+        return {'ok':True,'shareEnabled':enabled,'shareAlias':alias}
+    finally:db.close()
+
+def worklinks_keep_members(project):
+    db=worklinks_keep_db()
+    try:
+        rows=db.execute('''SELECT s.user_id,s.alias,COUNT(k.item_id)
+            FROM worklinks_keep_shares s LEFT JOIN worklinks_kept_jobs k
+            ON k.project=s.project AND k.user_id=s.user_id
+            WHERE s.project=? AND s.enabled=1
+            GROUP BY s.user_id,s.alias ORDER BY s.alias COLLATE NOCASE,s.user_id LIMIT 300''',
+            (project,)).fetchall()
+        return {'ok':True,'members':[{'id':r[0],
+            'name':worklinks_keep_public_name(r[0],r[1]),'count':r[2]} for r in rows]}
+    finally:db.close()
+
+def worklinks_keep_watch(project,viewer,owner):
+    if not isinstance(owner,str) or not KEEP_MEMBER_RE.fullmatch(owner):
+        raise ApiError('invalid_keep_member',400)
+    db=worklinks_keep_db()
+    try:
+        share=db.execute('SELECT enabled,alias FROM worklinks_keep_shares WHERE project=? AND user_id=?',
+            (project,owner)).fetchone()
+        if not share or not bool(share[0]):
+            # Prevent private list enumeration and cross-account reads.
+            raise ApiError('shared_keep_not_available',404)
+        return {'ok':True,'member':{'id':owner,
+            'name':worklinks_keep_public_name(owner,share[1])},
+            'readOnly':True,'items':worklinks_keep_items(db,project,owner)}
+    finally:db.close()
+
+
 class ThreadedServer(ThreadingMixIn,HTTPServer):
     daemon_threads = True
 
