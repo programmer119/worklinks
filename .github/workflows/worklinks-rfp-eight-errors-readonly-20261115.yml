@@ -1,0 +1,56 @@
+name: WorkLinks eight RFP parse errors read only 20261115
+on:
+  push:
+    branches:
+      - diagnostics/rfp-eight-readonly-20261115
+    paths:
+      - .github/workflows/worklinks-rfp-eight-errors-readonly-20261115.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Read production document error records (GET only, no writes)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import datetime, gzip, json, urllib.request, collections
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'Accept-Encoding':'gzip','User-Agent':'WorkLinks-8-Failures-ReadOnly/1.0'})
+              with urllib.request.urlopen(req,timeout=65) as r:
+                  raw=r.read()
+                  if 'gzip' in str(r.headers.get('Content-Encoding','')): raw=gzip.decompress(raw)
+              return json.loads(raw)
+          def emit(tag,obj):
+              print(tag+' '+json.dumps(obj,ensure_ascii=False,separators=(',',':'),default=str),flush=True)
+          p=get('rfp-rescan-progress')
+          emit('LIVE_PROGRESS',{'asOf':p.get('asOf'),'counts':p.get('counts'),'lanes':p.get('lanes'),'worker':p.get('worker')})
+          emit('LIVE_ERROR_ACTIVITY',p.get('activity'))
+          d=get('snapshot?name=rfp-coverage-index')
+          rows=d.get('byNotice') or {}
+          emit('INDEX_SUMMARY',{'generatedAt':d.get('generatedAt'),'notices':len(rows)})
+          problems=[]
+          for key,v in rows.items():
+              if not isinstance(v,dict):continue
+              files=v.get('files') or []
+              failures=[{'name':f.get('name'),'readable':f.get('readable'),
+                         'errorCategory':f.get('errorCategory'),'error':f.get('error'),
+                         'sourceSha256':f.get('sourceSha256'),'sourceTextScanComplete':f.get('sourceTextScanComplete')}
+                        for f in files if isinstance(f,dict) and f.get('readable') is not True]
+              if not failures and not any(x in str(v.get('lastAttemptStatus','')).lower() for x in ('fail','error','retry')):continue
+              problems.append({'id':key,'status':v.get('status'),'reasonCode':v.get('reasonCode'),
+                    'checkedAt':v.get('checkedAt'),'lastAttemptAt':v.get('lastAttemptAt'),
+                    'lastAttemptStatus':v.get('lastAttemptStatus'),
+                    'manifestComplete':v.get('manifestComplete'),
+                    'attachmentManifestCount':v.get('attachmentManifestCount'),
+                    'readableDocumentCount':v.get('readableDocumentCount'),
+                    'unreadableDocumentCount':v.get('unreadableDocumentCount'),
+                    'files':failures})
+          problems.sort(key=lambda x:(str(x.get('lastAttemptAt') or x.get('checkedAt') or ''),x['id']),reverse=True)
+          emit('ERROR_COUNTS',{'allNoticesWithFailures':len(problems),'withUnreadableFiles':sum(bool(r['files']) for r in problems),
+                  'errorCategories':dict(collections.Counter(f.get('errorCategory') or '(none)' for r in problems for f in r['files']))})
+          for item in problems[:140]:emit('ERROR_NOTICE',item)
+          PY
