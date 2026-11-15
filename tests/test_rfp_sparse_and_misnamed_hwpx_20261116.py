@@ -37,8 +37,14 @@ with zipfile.ZipFile(z,'w') as archive:
         '<hp:p><hp:t>입찰자격 검증과 납품 기술 지원 조건</hp:t></hp:p></hp:section>')
 assert '입찰자격 검증' in rfp.extract('document.hwpx',z.getvalue())
 
+from pypdf.generic import DecodedStreamObject,NameObject
 pdf=io.BytesIO()
-writer=PdfWriter();writer.add_blank_page(width=595,height=842);writer.write(pdf)
+writer=PdfWriter()
+page=writer.add_blank_page(width=595,height=842)
+stream=DecodedStreamObject()
+stream.set_data(b'q 0 0 1 rg 10 10 90 50 re f Q')
+page[NameObject('/Contents')]=writer._add_object(stream)
+writer.write(pdf)
 pdf=pdf.getvalue()
 def make_reply(mode):
     value={
