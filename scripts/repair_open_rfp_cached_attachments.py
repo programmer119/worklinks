@@ -25,7 +25,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v8'
+READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v9-page-resume'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -133,8 +133,20 @@ def choose_repair_batch(candidates,limit,max_files):
 
 
 def reader_retry_files(scan):
-    return [f for f in failed_files(scan)
-            if f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION]
+    """Resume OCR page slices until done; do not loop over unchanging failures."""
+    selected=[]
+    for f in failed_files(scan):
+        if f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION:
+            selected.append(f)
+            continue
+        evidence=f.get('extractionEvidence') or {}
+        if (str(f.get('errorCategory') or '')=='pdf_ocr_incomplete'
+                and int(evidence.get('ocrBatchDeferredPages') or 0)>0
+                and int(evidence.get('ocrRecoveredPages') or 0)>0):
+            # The completed page receipts are durable by PDF SHA. Each next
+            # repair reads them back and scans 24 *new* pages, not page 1.
+            selected.append(f)
+    return selected
 
 
 def metadata_valid(metadata,scan):
