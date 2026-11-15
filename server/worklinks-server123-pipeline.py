@@ -918,6 +918,10 @@ def main():
         if not (SCRIPTS / 'refresh_worklinks_actionable.py').is_file():
             raise RuntimeError('pipeline_scripts_missing')
         state = read_state()
+        # Live worker's OCR mode, not merely the repository's preferred mode.
+        color=(os.environ.get('WORKLINKS_RFP_OCR_COLORSPACE') or 'rgb').strip().lower()
+        state['rfpOcrColorSpace']=color if color in ('rgb','gray') else 'rgb'
+        state['rfpOcrTargetDpi']=300
         # Deployed parser versions, not front-end page visits, trigger an
         # independent bounded upgrade queue with durable progress.
         current_versions=deployed_rfp_reader_versions()
