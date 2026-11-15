@@ -64,6 +64,7 @@ with sync_playwright() as p:
     def respond(route):
         calls.append(route.request.url)
         route.fulfill(status=200,content_type='application/json',
+                      headers={'Access-Control-Allow-Origin':'*'},
                       body=json.dumps(fake,ensure_ascii=False))
     # Match cache-busting query parameters as well as the bare URL.
     page.route('**/api/g2b/rfp-rescan-progress*',respond)
