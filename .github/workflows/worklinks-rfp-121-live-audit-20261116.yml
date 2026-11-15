@@ -50,3 +50,4 @@ jobs:
                 ensure_ascii=False,separators=(',',':')),flush=True)
           assert cause.get('upstreamCalls')==0
           PY
+# v13 postdeploy live audit after OCR fairness + XML HWPML + sparse-page fallback
