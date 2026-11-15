@@ -356,15 +356,18 @@ def process_one(key,scan,meta,ledger,file_limit=None):
                 print('OPEN_RFP_OCR_PHASE_PROFILE',json.dumps({
                     'notice':key,'file':label[:100],
                     'pdfPages':evidence.get('pdfPages'),
+                    'pdfFiles':evidence.get('pdfFiles'),
                     'ocrNewPages':evidence.get('ocrAttemptedPages'),
                     'ocrRestoredPages':evidence.get('ocrRestoredPages'),
                     'extractWallSeconds':extract_elapsed,
                     'pdfOpenSeconds':evidence.get('ocrPdfOpenSeconds'),
+                    'pdfTotalSeconds':evidence.get('ocrPdfTotalSeconds'),
                     'nativeTextSeconds':evidence.get('ocrNativeTextSeconds'),
                     'imageCheckSeconds':evidence.get('ocrImageCheckSeconds'),
                     'renderSeconds':evidence.get('ocrRenderSeconds'),
                     'tesseractSeconds':evidence.get('ocrTesseractSeconds'),
                     'receiptWriteSeconds':evidence.get('ocrReceiptWriteSeconds'),
+                    'extractOutsidePdfSeconds':round(max(0,extract_elapsed-float(evidence.get('ocrPdfTotalSeconds') or 0)),3),
                     'sourceComplete':evidence.get('sourceComplete')},
                     ensure_ascii=False,separators=(',',':')),flush=True)
             text=rfp.normalize_extracted_text(extracted)
