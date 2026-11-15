@@ -77,8 +77,9 @@ with tempfile.TemporaryDirectory() as temporary:
                   'repairAttemptedThisRun':0}),encoding='utf-8')
         elif 'repair_open_rfp_cached_attachments.py' in args[1]:
             assert '--execute' in args and '--data-dir' in args
-            assert args[args.index('--limit')+1]=='1'
-            assert args[args.index('--max-files')+1]=='1'
+            assert args[args.index('--limit')+1]=='3'
+            assert args[args.index('--max-files')+1]=='3'
+    assert args[args.index('--workers')+1]=='3'
             assert 'serviceKey=' not in env['WORKLINKS_G2B_API']
             # The staged snapshot is intentionally unchanged for this fixture.
         elif 'refresh_worklinks_rfp.py' in args[1]:
