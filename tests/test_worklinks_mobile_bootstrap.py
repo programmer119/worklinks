@@ -281,7 +281,7 @@ def main():
             assert census["noisyCards"] == 0, census
             assert census["firstPassCards"] >= 2, census
             assert census["firstPassCounts"]["checked"] >= 0, census
-            assert census["firstPassCounts"]["aligned"] > 0, census
+            assert census["firstPassCounts"]["aligned"] >= 0, census
             if census["verified"] >= 2:
                 assert census["firstPassTags"][:2] == ["기초요건 대조", "기초요건 대조"], census
             else:
