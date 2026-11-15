@@ -33,10 +33,12 @@ with tempfile.TemporaryDirectory() as root:
     with patch.dict(os.environ,{'WORKLINKS_RFP_DISK_RESERVE_MB':'32',
                                 'WORKLINKS_RFP_LEDGER_MAX_MB':'128'}):
         archive=CallLedger(ledger_path)
-        receipt=archive.save_bytes(cache_key('official_attachment',good),
+        saved_hash=archive.save_bytes(cache_key('official_attachment',good),
                 b'%PDF-1.4 publicly posted original',notice_key=key,
                 closes_on='2099-12-31')
-        assert receipt is not None
+        assert saved_hash is not None
+        receipt=archive.verified_bytes_info(cache_key('official_attachment',good))
+        assert receipt and receipt['sha256']==saved_hash
         archive.save_json(cache_key('test_source',key),{'items':[{
             'bidNtceNo':'R26BK01789790','bidNtceOrd':'000',
             'atchFileUrl':bad,'eorderAtchFileNm':'(붙임3) 긴급입찰사유서.pdf',
