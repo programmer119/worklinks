@@ -1,0 +1,34 @@
+name: WorkLinks stage-3 live deployment probe (read only)
+on:
+  push:
+    branches: [fix/rfp-repair-downloaded-only-20261115]
+    paths: [.github/workflows/worklinks-rfp-stage3-deployed-head-probe-20261115.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Read live server123 local QA head and pipeline status
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          for end in ('pipeline-status','rfp-rescan-progress'):
+              req=urllib.request.Request(base+end,headers={'Accept':'application/json','User-Agent':'WorkLinks-ReadOnly-Deploy-Probe/1.0'})
+              with urllib.request.urlopen(req,timeout=60) as response:
+                  doc=json.load(response)
+              if end=='pipeline-status':
+                  a=doc.get('autonomousJobs') or {}
+                  s=doc.get('scheduler') or {}
+                  print('LIVE_DEPLOY_QA',json.dumps({'checkedHead':a.get('checkedHead'),'lastQa':a.get('lastQa'),
+                     'schedulerTasks':{k:{'status':v.get('status'),'successEpoch':v.get('successEpoch'),'failureReason':v.get('failureReason')}
+                     for k,v in s.items() if isinstance(v,dict) and k in ('rfpUpgrade','rfpOpenRepair')}},
+                     ensure_ascii=False),flush=True)
+              else:
+                  act=doc.get('activity') or {}
+                  print('LIVE_SCANNER',json.dumps({'asOf':doc.get('asOf'),'counts':doc.get('counts'),
+                      'queue':doc.get('lanes'),'scanWorker':(act.get('workers') or {}).get('scan')},
+                      ensure_ascii=False),flush=True)
+          PY
