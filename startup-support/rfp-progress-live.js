@@ -35,6 +35,7 @@
    '<div class="rfp-rescan-section-header"><h3>작업 진행</h3>'+
     '<span>첨부목록 확보·원본 다운로드 → 별도 문서 판독</span></div>'+
    '<div class="rfp-rescan-lanes">'+laneKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
+   '<div id="rfpDownloadErrorDetails" class="rfp-download-error-details" hidden></div>'+
    '<details class="rfp-rescan-features"><summary>기능별 판독 상세</summary>'+
    '<div class="rfp-rescan-feature-list">'+stageKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div></details>'+
    '<div class="rfp-rescan-unknown" id="rfpRescanUnknown" hidden>'+
@@ -44,6 +45,27 @@
     '<button type="button" class="rfp-rescan-refresh-now" id="rfpRescanRefreshNow">↻ 지금 조회</button></div>';
   panel.dataset.ready='1';
   panel.querySelector('#rfpRescanRefreshNow').addEventListener('click',()=>void refreshRfpRescanProgress(true));
+  panel.addEventListener('click',event=>{
+   if(event.target?.id!=='rfpDownloadErrorButton')return;
+   const root=panel.querySelector('#rfpDownloadErrorDetails');
+   if(!root)return;
+   if(!root.hidden){root.hidden=true;return;}
+   const records=rfpRescanProgress?.lanes?.download?.errorDetails||[];
+   root.replaceChildren();
+   const heading=document.createElement('strong');
+   heading.textContent='원본 조회 불가 확정';
+   root.append(heading);
+   for(const entry of records){
+    for(const file of (entry.files||[])){
+     const line=document.createElement('div');
+     line.textContent=entry.noticeKey+' · '+(file.name||'파일명 미제공')+
+       ' · HTTP '+(file.httpStatus||'—')+' · '+formatRfpError(file.reason);
+     root.append(line);
+    }
+   }
+   if(!records.length)root.append('오류 상세는 서버에서 확인할 수 없습니다.');
+   root.hidden=false;
+  });
  }
  function updateField(panel,name,value){
   const el=panel.querySelector('[data-rfp-field="'+name+'"]');
@@ -64,6 +86,8 @@
 
  function formatRfpError(raw){
   const value=String(raw||'');
+  if(/official_attachment_reference_missing_422|official_missing_reference_422/.test(value))
+   return '공식 원본 참조번호 조회 불가 (422)';
   if(/not present in verified date batch|not_present_in_complete_date_batch/.test(value))
    return '검증된 날짜별 목록에 해당 공고가 없음';
   if(/quota|rate.limit|429|upstream_result_22|upstream_result_23/i.test(value))
@@ -339,9 +363,26 @@
    else if(available&&total&&processed===total)state='처리 완료';
    else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
    else if(key==='manifest'&&available&&total&&completed<total)state='순차 확보';
-   updateField(panel,key+'Count',available?
-     (key==='download'?'정상 '+number(completed)+' · 오류 '+number(errors)+' · 전체 '+number(total)+'건':
-     number(completed)+' / '+number(total)+'건'):'—');
+   if(key==='download'&&available){
+    const countNode=node.querySelector('[data-rfp-field="downloadCount"]');
+    if(countNode){
+     const caption='정상 '+number(completed)+' · ';
+     const suffix=' · 전체 '+number(total)+'건';
+     const next=caption+'오류 '+number(errors)+'건'+suffix;
+     if(countNode.dataset.value!==next){
+      countNode.dataset.value=next;
+      countNode.replaceChildren(document.createTextNode(caption));
+      const button=document.createElement('button');
+      button.id='rfpDownloadErrorButton';
+      button.type='button';
+      button.className='rfp-download-error-count';
+      button.textContent='오류 '+number(errors)+'건';
+      button.disabled=errors===0;
+      button.title=errors?'확정된 원본 오류 상세 보기':'확정 오류 없음';
+      countNode.append(button,document.createTextNode(suffix));
+     }
+    }
+   }else updateField(panel,key+'Count',available?number(completed)+' / '+number(total)+'건':'—');
    updateField(panel,key+'State',state);
    node.classList.toggle('is-active',stageActive);
    const track=node.querySelector('.rfp-rescan-stage-track');
