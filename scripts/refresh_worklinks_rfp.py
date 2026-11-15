@@ -16,6 +16,7 @@ import threading
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import time
 import urllib.parse
@@ -42,6 +43,49 @@ _LEDGER_PATH=None
 
 RFP_TEXT_CACHE_VERSION=1
 
+# Run potentially unbounded PDF/HWP/ZIP text extraction in a disposable child.
+# An expensive vector-drawing PDF must never hold every other stage-3 notice
+# hostage for minutes. The subprocess is local and makes NO file GET requests.
+_RFP_EXTRACT_CHILD_PROGRAM = """
+import json,sys
+sys.path.insert(0,sys.argv[1])
+import refresh_worklinks_rfp as reader
+try:
+    value,evidence=reader.extract_with_source_status(sys.argv[2],sys.stdin.buffer.read())
+    result={'ok':True,'text':value,'evidence':evidence}
+except Exception as error:
+    result={'ok':False,'error':type(error).__name__,'detail':str(error)[:180]}
+sys.stdout.write(json.dumps(result,ensure_ascii=False,separators=(',',':')))
+"""
+
+def bounded_source_extract(name, raw):
+    try:
+        limit=float(os.environ.get('WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS') or 0)
+    except (ValueError,TypeError):
+        limit=0
+    if limit<=0:
+        return extract_with_source_status(name,raw)
+    try:
+        result=subprocess.run(
+            [sys.executable,'-c',_RFP_EXTRACT_CHILD_PROGRAM,
+             str(Path(__file__).resolve().parent),name],
+            input=raw,capture_output=True,timeout=limit,check=False)
+    except subprocess.TimeoutExpired as error:
+        raise ValueError('source_extraction_timeout_deferred') from error
+    if result.returncode!=0:
+        raise ValueError('isolated_extraction_worker_failed')
+    if len(result.stdout)>16_000_000:
+        raise ValueError('source_extraction_output_too_large')
+    try:
+        message=json.loads(result.stdout)
+        if message.get('ok') is True and isinstance(message.get('text'),str) and isinstance(message.get('evidence'),dict):
+            return message['text'],message['evidence']
+        detail=str(message.get('detail') or message.get('error') or 'isolated_extraction_worker_failed')
+    except (ValueError,UnicodeDecodeError,AttributeError,TypeError) as error:
+        raise ValueError('isolated_extraction_worker_reply_invalid') from error
+    raise ValueError(detail[:180])
+
+
 def extract_cached_text(name, raw):
     """Verified, content-addressed extracted text. Reclassify without rereading HWP/OCR.
 
@@ -59,7 +103,7 @@ def extract_cached_text(name, raw):
                 and isinstance(cached.get('evidence'),dict)
                 and cached['evidence'].get('sourceComplete') is True):
             return cached['text'],cached['evidence'],True
-    text,evidence=extract_with_source_status(name,raw)
+    text,evidence=bounded_source_extract(name,raw)
     if ledger is not None and evidence.get('sourceComplete') is True:
         ledger.save_json(key,{'text':text,'evidence':evidence},
                          source_revision='reader-'+str(RFP_TEXT_CACHE_VERSION),
@@ -811,7 +855,9 @@ def classify_failure(error):
     if isinstance(error,(TimeoutError,ConnectionError,urllib.error.URLError)):
         return 'file_download_connection_error'
     detail=str(error)
-    known=('large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
+    known=('source_extraction_timeout_deferred','isolated_extraction_worker_failed',
+           'isolated_extraction_worker_reply_invalid','source_extraction_output_too_large',
+           'large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
            'pdf_over_100_pages','pdf_over_page_limit','pdf_unreadable_page','no_searchable_text','unsupported_format',
            'redirect_forbidden','oversize_json','egg_archive_requires_converter',
            'nested_archive_requires_review','unknown_archive_member_requires_review',
