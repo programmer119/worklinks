@@ -91,7 +91,7 @@ def repair_file_priority(f):
     # Reader v6 solves a verified pyhwp ColumnSet failure by decoding every
     # native HWP5 text record. Retry these proven new-reader fixes before OCR.
     if category=='hwp5txt_failed':
-        return -1
+        return -2 if suffix in ('.xls','.xlsx') else -1
     if f.get('readable') is True and (f.get('qualificationScanTruncated') is True
                                      or f.get('staffingRoleScanTruncated') is True):
         return -1
