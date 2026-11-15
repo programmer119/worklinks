@@ -121,6 +121,44 @@ def scan_failure_diagnosis(row, versions):
     return (gate+(':'+common if common else ''))[:140]
 
 
+def sync_scan_retry_activity(queue, key):
+    """Make file-level live retry clocks match the committed queue policy.
+
+    The extractor may have emitted its previous one-hour estimate before the
+    parent acknowledged the scan. Never show that stale timer to operators.
+    """
+    try:
+        with queue.connect() as db:
+            row=db.execute('''SELECT scan_status,scan_retry_epoch,last_error
+                FROM rfp_dual_notices WHERE notice_key=?''',(key,)).fetchone()
+            if not row:return
+            if row[0]=='done':
+                # Retire stale file-level retry events instead of claiming
+                # that an earlier unreadable file was successfully parsed.
+                db.execute('''DELETE FROM rfp_live_events WHERE lane='scan'
+                    AND notice_key=? AND file_key<>'' AND status='retry' ''',(key,))
+                db.execute('''UPDATE rfp_live_events
+                    SET status='done',phase='최신 판독 완료',error_text='',
+                        retry_epoch=0,updated_epoch=?
+                    WHERE lane='scan' AND notice_key=? AND file_key='' ''',
+                    (time.time(),key))
+            elif row[0]=='retry':
+                held=float(row[1] or 0)>=2147483647
+                actual_epoch=0 if held else float(row[1] or 0)
+                title=('동일 오류 반복 · 판독 자료 또는 판독기 변경 필요' if held
+                       else '검증 미완료 · 예약된 재판독')
+                db.execute('''UPDATE rfp_live_events
+                    SET retry_epoch=?,error_text=?,
+                        phase=CASE WHEN file_key='' THEN ? ELSE phase END,
+                        updated_epoch=?
+                    WHERE lane='scan' AND notice_key=? AND status='retry' ''',
+                    (actual_epoch,str(row[2] or '')[:180],title,time.time(),key))
+    except sqlite3.OperationalError:
+        # Deterministic queue state remains authoritative even when the
+        # optional live-activity table has not been initialized yet.
+        pass
+
+
 def deployed_rfp_reader_versions():
     """Read the version constants from the scanner actually installed on server123."""
     source=(SCRIPTS/'refresh_worklinks_rfp.py').read_text(encoding='utf-8')
@@ -414,8 +452,9 @@ def run_once(kind, runner=None, _single=False):
                             if not ok and versions is None:
                                 versions=deployed_rfp_reader_versions()
                             reason='' if ok else scan_failure_diagnosis(row,versions)
-                            queue.scan_finished(key,ok,reason,
+                            committed=queue.scan_finished(key,ok,reason,
                                                 scan_evidence_signature(row) if not ok else '')
+                            if committed:sync_scan_retry_activity(queue,key)
                             if not ok:
                                 log('RFP_SCAN_RETRY_CAUSE',key,reason)
         if kind=='rfpOpenRepair' and dual_enabled:
