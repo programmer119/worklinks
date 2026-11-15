@@ -1144,9 +1144,9 @@ def ole_document_kind(name,raw):
 def detected_source_format(name,raw):
     if raw.startswith(b'%PDF-'):return 'pdf'
     if raw.startswith(_OLE_HEADER):return 'xls' if ole_document_kind(name,raw)=='.xls' else 'hwp'
-    if raw.startswith(b'PK\\x03\\x04'):return 'zip_or_ooxml'
-    if raw.startswith(b'\\x89PNG'):return 'png'
-    if raw.startswith(b'\\xff\\xd8'):return 'jpeg'
+    if raw.startswith(b'PK\x03\x04'):return 'zip_or_ooxml'
+    if raw.startswith(b'\x89PNG'):return 'png'
+    if raw.startswith(b'\xff\xd8'):return 'jpeg'
     if raw.startswith(b'GIF8'):return 'gif'
     return str(Path(str(name)).suffix.lower()).lstrip('.') or 'unknown'
 
@@ -1172,7 +1172,7 @@ def extract_legacy_xls(raw):
                 if cells>600000:raise ValueError('legacy_xls_size_limit')
                 value=' '.join(v for v in values if v)
                 if value:lines.append(value)
-        return '\\n'.join(lines)
+        return '\n'.join(lines)
     except ValueError:
         raise
     except Exception as error:
@@ -1191,7 +1191,7 @@ def extract_markup_document(name,raw):
                if node.tag.rsplit('}',1)[-1].lower() in ('p','paragraph')]
             if not paragraphs:
                 paragraphs=[' '.join(t.strip() for t in document.itertext() if t and t.strip())]
-            return '\\n'.join(x for x in paragraphs if x)
+            return '\n'.join(x for x in paragraphs if x)
         except ET.ParseError as exc:
             raise ValueError('hml_xml_parse_failed') from exc
     for encoding in ('utf-8-sig','cp949','utf-16'):
@@ -1209,7 +1209,7 @@ def extract_markup_document(name,raw):
             self.ignore=0
         def handle_starttag(self,tag,attrs):
             if tag in ('script','style'):self.ignore+=1
-            elif not self.ignore and tag in ('p','li','br','tr','div','h1','h2','h3'):self.parts.append('\\n')
+            elif not self.ignore and tag in ('p','li','br','tr','div','h1','h2','h3'):self.parts.append('\n')
         def handle_endtag(self,tag):
             if tag in ('script','style') and self.ignore:self.ignore-=1
         def handle_data(self,data):
