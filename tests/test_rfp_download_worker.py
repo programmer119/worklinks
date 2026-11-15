@@ -3,6 +3,7 @@
 from concurrent.futures import ThreadPoolExecutor,as_completed
 import os
 from pathlib import Path
+import runpy
 import sys
 import tempfile
 import threading
@@ -135,6 +136,12 @@ with tempfile.TemporaryDirectory() as root:
     assert missing_key not in [x[0] for x in queue.claim_ready(100)]
     assert queue.stats()['download']['errors']==1
     assert queue.stats()['download']['processed']==queue.stats()['download']['done']+1
+    proxy=runpy.run_path(str(ROOT/'server/g2b-proxy.py'),run_name='download_error_test')
+    api=proxy['rfp_dual_lane_progress'](str(queue.path))
+    assert api['download']['errors']==1,api
+    assert api['download']['processed']==api['download']['done']+1,api
+    assert api['download']['errorDetails'][0]['noticeKey']==missing_key,api
+    assert api['download']['errorDetails'][0]['files'][0]['name']=='unavailable.pdf',api
     # Identical official references remain terminal across manifest refresh.
     queue.save_bulk_manifests({missing_key:partial})
     assert queue.claim_download() is None
