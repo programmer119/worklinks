@@ -62,4 +62,14 @@ else:raise AssertionError('invalid share alias allowed')
 try:watch('p47','member-11111111','../other')
 except ApiError as e:assert e.status==400
 else:raise AssertionError('invalid watch target allowed')
+# A deployed handler must expose the API routes, not just implementation functions.
+import pathlib
+source_path=pathlib.Path(os.environ.get('WORKLINKS_G2B_SOURCE','server/g2b-proxy.py'))
+source=source_path.read_text(encoding='utf-8')
+for route in ("if u.path in ('/api/g2b/worklinks-keep'",
+              "if operation == '/api/g2b/worklinks-keep':",
+              "if operation == '/api/g2b/worklinks-keep-share':",
+              "worklinks_keep_watch(project, user_id, get('member'))"):
+    assert route in source, 'keep API route missing: '+route
+print('WORKLINKS_KEEP_WATCH_ROUTES=PASS')
 print('WORKLINKS_KEEP_WATCH_ACCOUNT_ISOLATION=PASS')
