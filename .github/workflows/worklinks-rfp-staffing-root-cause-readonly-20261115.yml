@@ -1,0 +1,68 @@
+name: WorkLinks RFP 477 staffing root cause read only
+on:
+  push:
+    branches: [diagnostics/rfp-eight-readonly-20261115]
+    paths:
+      - .github/workflows/worklinks-rfp-staffing-root-cause-readonly-20261115.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Audit effective source file staffing gates without any writes
+        run: |
+          python3 - <<'PY'
+          import urllib.request,json,gzip,collections
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'Accept-Encoding':'gzip','User-Agent':'WorkLinks-Staffing-RootCause-ReadOnly'})
+              with urllib.request.urlopen(req,timeout=75) as r:
+                  raw=r.read()
+                  if 'gzip' in str(r.headers.get('Content-Encoding','')):raw=gzip.decompress(raw)
+              return json.loads(raw)
+          def out(label,val):print(label+' '+json.dumps(val,ensure_ascii=False,separators=(',',':')),flush=True)
+          info=get('rfp-rescan-progress')
+          index=(get('snapshot?name=rfp-coverage-index').get('byNotice') or {})
+          inv=get('saved-inventory').get('items') or []
+          latest=info['latest']; versions=(latest['staffingRoleScanVersion'],latest['staffingFactScanVersion'])
+          totals=collections.Counter(); issues=collections.Counter(); perFile=collections.Counter(); examples=collections.defaultdict(list)
+          sigs=collections.Counter()
+          for n in inv:
+              if not n.get('closes'):continue
+              key=str(n.get('bidNo') or '')+':'+str(n.get('order') or '000').zfill(3)
+              r=index.get(key)
+              if not isinstance(r,dict) or r.get('status')!='text_extracted_requires_review' or r.get('staffingRoleScanComplete') is True:continue
+              files=[f for f in r.get('files') or [] if isinstance(f,dict)]
+              blockers=[]
+              for f in files:
+                  if f.get('staffingScopeExcluded') is True:totals['scope_excluded']+=1;continue
+                  readable=f.get('readable') is True
+                  if readable and f.get('sourceTextScanComplete') is True and int(f.get('staffingRoleScanVersion') or 0)>=versions[0] and int(f.get('staffingFactScanVersion') or 0)>=versions[1] and f.get('staffingRoleScanTruncated') is not True:
+                      totals['complete_file']+=1;continue
+                  alt=f.get('alternatePdfEvidence'); sha=f.get('alternatePdfSourceSha256')
+                  if f.get('skippedDuplicateFormat') is True and not readable and alt and sha:
+                      pdf=next((x for x in files if x.get('name')==alt and x.get('sourceSha256')==sha and x.get('readable') is True and x.get('sourceTextScanComplete') is True and int(x.get('staffingRoleScanVersion') or 0)>=versions[0] and x.get('staffingRoleScanTruncated') is not True),None)
+                      if pdf:totals['duplicate_covered_by_pdf']+=1;continue
+                      why='duplicate_pdf_not_validated'
+                  elif not readable:why=('unreadable_'+str(f.get('errorCategory') or 'unclassified'))
+                  elif f.get('sourceTextScanComplete') is not True:why='readable_source_scan_incomplete'
+                  elif int(f.get('staffingRoleScanVersion') or 0)<versions[0]:why='role_version_behind'
+                  elif int(f.get('staffingFactScanVersion') or 0)<versions[1]:why='fact_version_behind'
+                  elif f.get('staffingRoleScanTruncated') is True:why='role_scan_truncated'
+                  else:why='other_unrecognized'
+                  perFile[why]+=1
+                  blockers.append((why,f.get('name') or ''))
+              if not blockers:issues['no_per_file_blockers_but_flag_false']+=1;continue
+              totals['incomplete_notices']+=1
+              group=set(x[0] for x in blockers)
+              for cause in group:issues[cause]+=1
+              sigs[tuple(sorted(group))]+=1
+              for cause,name in blockers:
+                  if len(examples[cause])<4:examples[cause].append({'id':key,'file':name})
+          out('LATEST',{'asOf':info.get('asOf'),'counts':info.get('counts'),'scanWorker':(info.get('activity') or {}).get('workers',{}).get('scan')})
+          out('BLOCKERS',{'noticeCauseCountsOverlapping':dict(issues),'fileCauseCounts':dict(perFile),
+                           'meta':dict(totals),'signatures':[(list(k),v) for k,v in sigs.most_common(15)]})
+          out('EXAMPLES',dict(examples))
+          PY
