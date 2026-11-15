@@ -1246,7 +1246,7 @@ def rfp_stage_checks(row,latest):
             'hwpx':hwpx}
 
 
-def rfp_progress_from_rows(rows,index,latest,asof=None):
+def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False):
     """Count *all* unique unexpired saved SW notices, never a top-500 subset."""
     if not isinstance(index,dict) or not isinstance(latest,dict):
         raise ValueError('rfp_progress_missing_verified_inputs')
@@ -1263,6 +1263,8 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
         if no not in latest_by_no or number>latest_by_no[no][0]:
             latest_by_no[no]=(number,(no,ordn,payload))
     unique=set()
+    managed_keys=set()
+    completed_keys=set()
     summary={'total':0,'completed':0,'remaining':0,'legacy':0,
              'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0,
               'unknownDeadlineCompleted':0,'unknownDeadlinePending':0}
@@ -1292,6 +1294,7 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
             continue
         if cutoff<now:continue
         summary['total']+=1
+        managed_keys.add(key)
         row=index.get(key)
         checks=rfp_stage_checks(row,latest)
         for stage,valid in checks.items():
@@ -1317,6 +1320,7 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
             cat='legacy'
         else:cat='incomplete'
         summary[cat]+=1
+        if cat=='completed':completed_keys.add(key)
     assert summary['unknownDeadlineCompleted']+summary['unknownDeadlinePending']==summary['unknownDeadline']
     summary['remaining']=summary['total']-summary['completed']
     summary['rescanRequired']=summary['legacy']
@@ -1326,11 +1330,13 @@ def rfp_progress_from_rows(rows,index,latest,asof=None):
              if summary['total'] else None)
     rescan_percent=(round(100.0*summary['rescanRequired']/summary['total'],1)
                     if summary['total'] else None)
-    return {'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
+    report={'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
             'asOf':now.isoformat(),'latest':latest,'counts':summary,
             'remainingPercent':percent,'rescanPercent':rescan_percent,'stages':stages,
             'basis':'one exact bid number and ordinal; known deadlines only',
             'noGovernmentApiCalls':True}
+    if include_scope:report['_cohortKeys']=(managed_keys,completed_keys)
+    return report
 
 
 def rfp_progress_worker_status(state_path):
@@ -1406,8 +1412,75 @@ def read_rfp_notice_checkpoints(index):
     return current,changes[:12],len(changes)
 
 
-def rfp_dual_lane_progress(path):
-    """Two factual per-notice queues; this API NEVER starts downloads/scans."""
+
+def rfp_cohort_lanes(path,managed,valid):
+    """All three rows use EXACTLY the same known-deadline SW denominator.
+
+    Prior validated scans remain valid evidence even if their queue row is
+    absent. A queue status of done/skipped never proves latest-version scan.
+    Unknown close dates are retained in the separate worker queue, not here.
+    """
+    if not os.path.isfile(path):return {'available':False}
+    try:
+        with sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=3) as db:
+            entries={key:(download,scan) for key,download,scan in db.execute(
+                'SELECT notice_key,download_status,scan_status FROM rfp_dual_notices')}
+            manifests={key for (key,) in db.execute(
+                'SELECT notice_key FROM rfp_bulk_manifests')}
+            confirmed=db.execute('''SELECT notice_key,metadata_json
+                FROM rfp_dual_notices WHERE download_status='error_confirmed'
+                ORDER BY updated_at DESC LIMIT 120''').fetchall()
+    except (sqlite3.Error,OSError):
+        return {'available':False}
+    cohort=set(managed)
+    valid=set(valid)&cohort
+    present=cohort&set(entries)
+    not_queued=cohort-set(entries)
+    queue_valid={key for key in present if entries[key][1] in ('done','skipped')}
+    stale_done=queue_valid-valid
+    skipped_missing={key for key in cohort if entries.get(key)==('no_attachments','skipped')}
+    verified_sources=valid|({key for key in cohort if key in manifests})
+    source_received=valid|({key for key in cohort if entries.get(key,('',))[0]
+                         in ('ready','no_attachments','evidence_complete')})
+    confirmed_keys={key for key in cohort if entries.get(key,('',))[0]=='error_confirmed'}
+    pending_missing=not_queued-valid
+    active_manifest=sum(1 for key in present if entries[key][0] in ('pending','retry'))
+    active_download=sum(1 for key in present if entries[key][0]=='fetching')
+    active_scan=sum(1 for key in present if entries[key][1]=='scanning')
+    retry_download=sum(1 for key in present if entries[key][0]=='retry')
+    retry_scan=sum(1 for key in present if entries[key][1]=='retry')
+    error_details=[]
+    for key,raw in confirmed:
+        if key not in cohort:continue
+        try:doc=json.loads(raw)
+        except (ValueError,TypeError):doc={}
+        error_details.append({'noticeKey':key,
+             'files':[{'name':str(f.get('name') or '')[:180],
+                       'reason':str(f.get('reason') or '')[:120],
+                       'httpStatus':f.get('httpStatus')}
+                for f in (doc.get('downloadErrorFiles') or [])
+                if isinstance(f,dict)][:24]})
+        if len(error_details)>=25:break
+    total=len(cohort)
+    return {'available':True,'scope':'unexpired_saved_sw_bid_notices',
+       'total':total,'outsideScopeQueue':len(set(entries)-cohort),
+       'missingFromQueue':len(not_queued),'missingIncomplete':len(pending_missing),
+       'manifest':{'total':total,'done':len(verified_sources),
+                   'active':active_manifest,'failed':retry_download},
+       'download':{'total':total,'done':len(source_received),
+                   'processed':len(source_received|confirmed_keys),
+                   'errors':len(confirmed_keys),'errorDetails':error_details,
+                   'skipped':len(skipped_missing),'active':active_download,
+                   'failed':retry_download},
+       'scan':{'total':total,'done':len(valid),'active':active_scan,
+               'failed':retry_scan,'blockedNoAttachments':len(skipped_missing-valid),
+               'staleQueueComplete':len(stale_done),
+               'notQueued':len(pending_missing)}}
+
+def rfp_dual_lane_progress(path,cohort=None):
+    """Read-only queue progress; optionally scoped to the same current cohort."""
+    if cohort is not None:
+        return rfp_cohort_lanes(path,*cohort)
     if not os.path.isfile(path):return {'available':False}
     try:
         with sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=2) as db:
@@ -1495,7 +1568,8 @@ def rfp_rescan_progress():
               ORDER BY b.last_seen DESC""").fetchall()
     finally:con.close()
     live_index,recent_notices,unpublished_count=read_rfp_notice_checkpoints(index)
-    report=rfp_progress_from_rows(bids,live_index,latest)
+    report=rfp_progress_from_rows(bids,live_index,latest,include_scope=True)
+    managed_keys,validated_keys=report.pop('_cohortKeys')
     report['noticeProgressMode']='per_notice_durable_checkpoint'
     report['recentNoticeUpdates']=recent_notices
     report['noticesPendingBatchArchive']=unpublished_count
@@ -1503,7 +1577,8 @@ def rfp_rescan_progress():
     report['trigger']='server123_parser_version_upgrade_and_scheduled_worker'
     report['worker']=rfp_progress_worker_status(state_path)
     report['lanes']=rfp_dual_lane_progress(
-        os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3'))
+        os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3'),
+        cohort=(managed_keys,validated_keys))
     # Read-only telemetry: no provider request, job launch, or worker side effect.
     try:
         live_db=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3')
