@@ -73,6 +73,8 @@ dk run --rm --network none -v "$ROOT:/work:ro" \
   "$IMAGE" python /work/tests/test_rfp_ocr_region_probe_20261116.py
 dk run --rm --network none -v "$ROOT:/work:ro" \
   "$IMAGE" python /work/tests/test_rfp_ocr_fast_native_skip_20261116.py
+dk run --rm --network none -v "$ROOT:/work:ro" \
+  "$IMAGE" python /work/tests/test_rfp_ocr_mupdf_native_20261116.py
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
 for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json qualification-review.json;do
@@ -176,6 +178,7 @@ start_worker(){
       -e WORKLINKS_RFP_OCR_REGION_PROBE=1 \
       -e WORKLINKS_RFP_OCR_REGION_PROBE_SAMPLE=4 \
       -e WORKLINKS_RFP_FAST_SKIP_PYPDF_NATIVE=1 \
+      -e WORKLINKS_RFP_FAST_MUPDF_NATIVE=1 \
       -e WORKLINKS_G2B_API=http://127.0.0.1:18192/api/g2b \
       -e G2B_RFP_BATCH=8 \
       -e WORKLINKS_RFP_DOWNLOAD_CONCURRENCY=8 \
