@@ -28,9 +28,9 @@ function render(){
   const active=!!currentUser(),view=byId('jobsView'),toolbar=byId('keepToolbar');
   if(!view||!toolbar)return;
   toolbar.hidden=!active;
-  if(!active){view.dataset.keepMode='all';byId('keepListPanel').hidden=true;return}
+  if(!active){view.dataset.keepMode='all';refreshCards();return}
   view.dataset.keepMode=state.mode;
-  byId('keepListPanel').hidden=state.mode==='all';
+  // Only the shared #jobCards grid is rendered in every mode.
   for(const key of ['all','mine','watch']){
     const b=byId('keepMode'+key[0].toUpperCase()+key.slice(1));
     if(!b)continue;
