@@ -38,6 +38,7 @@ jobs:
           node --check startup-support/rfp-progress-live.js
       - name: Verify real durable progress and retries without provider requests
         run: |
+          python tests/test_rfp_card_evidence_batch.py
           python tests/test_rfp_live_telemetry.py
           python tests/test_rfp_management_reconcile.py
           python tests/test_rfp_rescan_progress.py
