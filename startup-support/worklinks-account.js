@@ -15,7 +15,7 @@ const INTENT_PREFIX='worklinks_support_intents_v1:';
 const intentsFor=key=>decode(INTENT_PREFIX+key);
 const timeOf=x=>Number(x?.at)||0;
 const remoteTime=x=>Date.parse(x?.updatedAt||'')||0;
-const state = {client:null,token:'',account:'',expiredAccount:'',project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
+const state = {client:null,token:'',account:'',expiredAccount:'',explicitlyLoggedOut:false,project:'',busy:false,loading:false,serverReady:false,refreshing:null,records:[],imported:0};
 let authRetryAttempts=0;
 let manualAuthRetryInFlight=false;
 function authErrorDetail(error){
@@ -112,6 +112,7 @@ function expireSession(account, message='로그인이 만료되었습니다.'){
   // recovery. The workspace is locked and never reads account records until
   // AuthHub verifies membership and identity again.
   state.expiredAccount=account;
+  state.explicitlyLoggedOut=false;
   showAuthExpiry(message);
   guestRestore();
   buttons(null);
@@ -422,6 +423,7 @@ function buttons(session){
     root,session,
     onLogout:async()=>{
       // Lock immediately, before a potentially slow/rejected remote logout.
+      state.explicitlyLoggedOut=true;
       showAuthExpiry('로그아웃되었습니다.');
       const client=state.client;
       guestRestore();buttons(null);
@@ -475,6 +477,7 @@ async function activateVerifiedSession(session){
   state.token=session.token;
   state.serverReady=false;
   state.expiredAccount='';
+  state.explicitlyLoggedOut=false;
   clearAuthExpiry();
   publishPartnerAccess(true);
   // Local data is read only after AuthHub /v1/me validates active membership.
@@ -494,7 +497,7 @@ async function directReLogin(event){
       location.pathname+location.search+location.hash);
     const client=state.client;
     const stored=client?.session();
-    if(client&&(stored?.accessToken||stored?.refreshToken)){
+    if(!state.explicitlyLoggedOut&&client&&(stored?.accessToken||stored?.refreshToken)){
       setAuthGate('checking','자동 로그인 확인 중','기존 계정 인증을 확인하고 있습니다.');
       try{
         const verified=await validSession(client);
@@ -555,7 +558,6 @@ async function bootstrap(){
       guestRestore();buttons(null);
       return;
     }
-    clearAuthExpiry();
     await activateVerifiedSession(session);
   }catch(error){
     showAuthCheckError('로그인 상태를 확인할 수 없습니다.',error);
