@@ -22,6 +22,13 @@ value=rfp.extract('sample.hwpx',hwpml)
 assert 'Official procurement' in value and 'staffing' in value,value
 assert rfp.detected_source_format('sample.hwp',hwpml)=='hwpml_xml'
 assert 'Technical staffing' in rfp.extract('sample.hwp',hwpml)
+# A real verified HWPML from G2B has paragraphs PLUS embedded binary images.
+# Strict text extraction must omit base64, not use it as proof of complete RFP.
+embedded=b'<HWPML><BINDATA>'+b'A'*25000+b'</BINDATA><BODY><P><CHAR>Official tender actual qualifications</CHAR></P></BODY></HWPML>'
+extracted=rfp.extract('misnamed.hwpx',embedded)
+assert 'Official tender actual qualifications' in extracted,extracted
+assert 'AAAAAA' not in extracted, 'Binary was incorrectly passed as legal text'
+assert sum(c.isalnum() for c in extracted)<100
 for bad in (b'<?xml version="1.0"?><BAD><p>contents</p></BAD>',
             b'<?xml version="1.0"?><HWPML><p>truncated'):
     try:rfp.extract('sample.hwpx',bad)
@@ -85,4 +92,18 @@ with patch.object(rfp.shutil,'which',return_value='/usr/bin/tesseract'),\
     else:
         raise AssertionError('Sparse PDF must not pass full-source verification')
 assert calls==['3','6','11'],calls
+import repair_open_rfp_cached_attachments as repair
+incorrect={'name':'real.hwpx','readable':True,'sourceTextScanComplete':True,
+    'detectedFormat':'hwpml_xml',
+    'lastReaderAttemptVersion':'pdf25-blank-hwpml-psm611-v13-20261116',
+    'sourceSha256':'1'*64,'textChars':32767}
+assert repair.false_hwpml_v13_success(incorrect)
+assert repair.failed_files({'files':[incorrect]})==[incorrect]
+assert repair.reader_retry_files({'files':[incorrect]})==[incorrect]
+correct=dict(incorrect,
+    lastReaderAttemptVersion=repair.READER_ATTEMPT_VERSION,
+    textChars=1270,sourceSha256='1'*64)
+assert repair.merge_verified_repair_attempt(incorrect,correct)
+assert incorrect['textChars']==1270
+assert not repair.false_hwpml_v13_success(incorrect)
 print('RFP_SPARSE_300DPI_PSM6_PSM11_AND_HWPML_XML_FIX=PASS')
