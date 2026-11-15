@@ -15,6 +15,21 @@ source=Path(__file__).resolve().parents[1]/'server'/'worklinks-server123-pipelin
 spec=importlib.util.spec_from_file_location('worklinks_pipeline',str(source))
 m=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
+# The supervisor reports the actual saved parser/file failure, not one
+# generic reason shared by every retry.
+assert m.scan_failure_diagnosis({'status':'text_extracted_requires_review',
+    'manifestComplete':True,'staffingRoleScanComplete':False,
+    'files':[{'name':'bad.pdf','readable':False,
+              'errorCategory':'pdf_ocr_incomplete'}]},{
+    'classificationVersion':23,'staffingRoleScanVersion':4,
+    'staffingFactScanVersion':2,'hwpxReaderVersion':3
+})=='scan_staffing_incomplete:pdf_ocr_incomplete'
+assert m.scan_failure_diagnosis({'status':'text_unavailable',
+    'files':[{'name':'r.zip','readable':False,
+              'errorCategory':'invalid_hwp'}]},{
+    'classificationVersion':23,'staffingRoleScanVersion':4,
+    'staffingFactScanVersion':2,'hwpxReaderVersion':3
+})=='scan_extraction_text_unavailable:invalid_hwp'
 with tempfile.TemporaryDirectory() as temporary:
     root=Path(temporary)
     m.DATA=root
