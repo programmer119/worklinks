@@ -170,11 +170,7 @@
       badge='전송 정체 '+stalled+'개';
       infoBits.unshift('전송 정체 '+Number(group.oldestStallSeconds||0)+'초');
      }
-     if(errors.length){
-      badge=(stalled?'정체 '+stalled+'개 · ':'')+'오류 '+errors.length+'건';
-      infoBits.unshift(formatRfpError(note.reason));
-      if(due)infoBits.push(retryRfpText(due.retryEpoch,now));
-     }
+     // The progress track shows only active transfers; errors live in the header.
      description=infoBits.join(' · ');
     }else if(due||worker?.status==='retry'){
      caption='다운로드 오류 · 자동 재시도';
@@ -187,11 +183,11 @@
      caption='서버 전송 상태 갱신 끊김';
      badge='작업 상태 확인 필요';
     }else if(confirmed>0&&processed===total&&total>0){
-     caption='정상 '+normal+'건 · 오류 '+confirmed+'건 · 전체 '+total+'건';
+     caption='현재 전송 파일 없음';
      badge='처리 완료';
     }else if(confirmed>0){
-     caption='정상 '+normal+'건 · 오류 '+confirmed+'건 · 전체 '+total+'건';
-     badge='오류 확정 '+confirmed+'건';
+     caption='현재 전송 파일 없음';
+     badge='다음 다운로드 준비 중';
     }else if(failed>0&&errors.length){
      caption='파일 다운로드 오류';
      badge='재시도 '+failed+'건';
@@ -202,31 +198,41 @@
      caption='현재 전송 파일 없음';
      badge=failed>0?'재시도 대상 '+failed+'건':'다음 다운로드 준비 중';
     }
-    if(confirmed>0){
-     const errorLabels=detail.flatMap(item=>(item.files||[]).map(f=>
-       item.noticeKey+' / '+(f.name||'파일명 미제공')+
-       ' / HTTP '+(f.httpStatus||'—')+' / '+formatRfpError(f.reason)));
-     description=[description,'확정 오류 '+confirmed+'건'+
-       (errorLabels.length?' · '+errorLabels.slice(0,2).join(' ; '):'')].filter(Boolean).join(' · ');
-    }
-    if(stale&&group?.available){badge='집계 갱신 지연';description='마지막 정상 집계 · '+description;}
+    if(stale&&group?.available)badge='집계 갱신 지연';
     updateRfpText(state,badge);
-    updateRfpText(label,caption);
+    if(main){
+     // Separate count from long filename so "외 N개" cannot be ellipsized.
+     const fileName=main.name||main.noticeKey||'공식 첨부파일';
+     const more=activeCount>1?'외 '+(activeCount-1)+'개':'';
+     if(label.dataset.activeFile!==fileName||label.dataset.moreFiles!==more){
+      label.dataset.activeFile=fileName;
+      label.dataset.moreFiles=more;
+      const filename=document.createElement('span');
+      filename.className='rfp-download-current-name';
+      filename.textContent=fileName;
+      label.replaceChildren(filename);
+      if(more){
+       const extra=document.createElement('span');
+       extra.className='rfp-download-more-count';
+       extra.textContent=more;
+       label.append(extra);
+      }
+     }
+    }else{
+     delete label.dataset.activeFile;
+     delete label.dataset.moreFiles;
+     updateRfpText(label,caption);
+    }
     updateRfpText(metric,description);
     const filePct=main?.bytesTotal>0?
       Math.max(0,Math.min(100,100*Number(main.bytesDone||0)/Number(main.bytesTotal))):0;
     const width=filePct.toFixed(1)+'%';
     if(fileFill.style.width!==width)fileFill.style.width=width;
-    node.classList.toggle('has-rfp-error',hasFailure||stale||confirmed>0);
-    node.classList.toggle('has-rfp-confirmed-error',confirmed>0);
+    node.classList.toggle('has-rfp-error',(!main&&hasFailure)||stale);
+    node.classList.remove('has-rfp-confirmed-error');
     const tooltipFiles=files.map(x=>(x.name||x.noticeKey||'공식 첨부파일')+' '+fmtBytes(x.bytesDone)+
       (x.bytesTotal>0?'/'+fmtBytes(x.bytesTotal):'')).join('\n');
-    const tooltip=[caption,description,tooltipFiles,
-      ...errors.map(x=>'오류: '+formatRfpError(x.reason)+' · '+retryRfpText(x.retryEpoch,now)),
-      ...detail.flatMap(item=>(item.files||[]).map(f=>
-        '확정 오류 '+item.noticeKey+' · '+(f.name||'파일명 미제공')+' · HTTP '+
-        (f.httpStatus||'—')+' · '+formatRfpError(f.reason)))]
-      .filter(Boolean).join('\n');
+    const tooltip=[caption,description,tooltipFiles].filter(Boolean).join('\n');
     if(track.title!==tooltip)track.title=tooltip;
     continue;
    }
