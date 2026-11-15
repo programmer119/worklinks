@@ -1034,7 +1034,7 @@ def rfp_card_evidence_batch(raw_keys):
     """Return only persisted scan summaries for visible cards, with zero G2B calls."""
     keys=[x.strip() for x in str(raw_keys or '').split(',') if x.strip()]
     if (not keys or len(keys)>100 or len(set(keys))!=len(keys) or
-            any(not re.fullmatch(r'(?:R\\d{2}BK\\d{8}|\\d{11}):\\d{3}',key)
+            any(not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',key)
                 for key in keys)):
         raise ApiError('invalid_rfp_card_evidence_keys',400)
     source=read_saved_rfp_evidence_index()
