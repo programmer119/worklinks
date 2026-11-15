@@ -416,6 +416,56 @@ def update_counts(rec,now,additions):
     if additions:update_evidence(rec,additions,now)
 
 
+def reconcile_old_verified_source_status(coverage_path,ready_downloads,open_keys,now):
+    """Clear historical notice-level text_unavailable after verified OCR repair.
+
+    Does not reparse, download, set legal review complete, or trust an
+    unattested index file: each successful file's saved SHA must appear in
+    its stage-2 receipt for the same named official attachment.
+    """
+    doc=read_json(coverage_path)
+    rows=doc.get('byNotice') or {}
+    fixed=[]
+    for key in open_keys:
+        record=rows.get(key)
+        if not isinstance(record,dict) or record.get('status')!='text_unavailable':
+            continue
+        meta=ready_downloads.get(key)
+        if not meta or not metadata_valid(meta,record):
+            continue
+        hashes_by_name={}
+        receipts={x.get('url'):x.get('sha256')
+                  for x in (meta.get('downloadVerifiedFiles') or [])
+                  if isinstance(x,dict) and x.get('url') and x.get('sha256')}
+        for item in (meta.get('attachments') or {}).get('items') or []:
+            if not isinstance(item,dict):
+                continue
+            url=item.get('url')
+            if url in receipts:
+                hashes_by_name.setdefault(str(item.get('name') or ''),set()).add(receipts[url])
+        restored=any(
+            f.get('readable') is True and
+            f.get('sourceTextScanComplete') is True and
+            f.get('sourceSha256') in hashes_by_name.get(str(f.get('name') or ''),set())
+            for f in (record.get('files') or [])
+            if isinstance(f,dict))
+        if not restored:
+            continue
+        update_counts(record,now,[])
+        fixed.append(key)
+    if fixed:
+        doc['generatedAt']=now
+        raw=(json.dumps(doc,ensure_ascii=False,indent=2)+'\n').encode('utf-8')
+        write_atomic(coverage_path,raw)
+        write_atomic(Path(str(coverage_path)+'.gz'),
+                     gzip.compress(raw,compresslevel=5,mtime=0))
+        print('OPEN_RFP_STALE_REPAIRED_STATUS_RECONCILED',json.dumps({
+            'count':len(fixed),'notices':sorted(fixed)[:30],
+            'stage2ShaReceiptRequired':True,'legalReviewUnchanged':True},
+            ensure_ascii=False),flush=True)
+    return len(fixed)
+
+
 def merge_verified_repair_attempt(live,entry):
     """Publish every attempted reader result while protecting newer successful scans.
 
@@ -502,7 +552,6 @@ def run(data_dir,limit,execute=False,max_files=400):
       'noGovernmentMetadataAPICalls':True,
       'noGovernmentAttachmentGETs':True},ensure_ascii=False),flush=True)
     if not execute:return {'plan':dict(categories),'selected':len(selected)}
-    if not selected:return {'result':'no_eligible_verified_download'}
     lock=open(root/'rfp-open-repair.lock','a+')
     fcntl.flock(lock,fcntl.LOCK_EX)
     results={};tally=Counter();pending={}
@@ -544,6 +593,13 @@ def run(data_dir,limit,execute=False,max_files=400):
         pending.clear()
 
     try:
+        reconciled=reconcile_old_verified_source_status(
+            coverage_path,ready_downloads,
+            {key for key,_deadline in open_rows},
+            dt.datetime.now(dt.timezone.utc).isoformat())
+        if not selected:
+            return {'result':'no_eligible_verified_download',
+                    'reconciledOldStatus':reconciled}
         for key,deadline,meta,src,file_limit in selected:
             if deadline.astimezone(dt.timezone.utc)<=dt.datetime.now(dt.timezone.utc)+dt.timedelta(hours=24):
                 tally['skipped_deadline']+=1;continue

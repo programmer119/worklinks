@@ -4,11 +4,13 @@ on:
     branches:
       - fix/rfp-repair-accurate-error-20261115
       - fix/rfp-repair-recovered-source-status-20261115
+      - fix/rfp-reconcile-old-repaired-status-20261115
       - main
     paths:
       - scripts/repair_open_rfp_cached_attachments.py
       - tests/test_rfp_repair_error_provenance_20261115.py
       - tests/test_rfp_recovered_status_20261115.py
+      - tests/test_rfp_historical_repaired_status_20261115.py
       - .github/workflows/worklinks-rfp-verified-repair-accurate-errors-20261115.yml
   pull_request:
     paths:
@@ -27,6 +29,7 @@ jobs:
           python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py
           python3 tests/test_rfp_repair_error_provenance_20261115.py
           python3 tests/test_rfp_recovered_status_20261115.py
+          python3 tests/test_rfp_historical_repaired_status_20261115.py
           python3 tests/test_open_cached_rfp_repair.py
           python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
           python3 tests/test_rfp_verified_file_handoff.py
