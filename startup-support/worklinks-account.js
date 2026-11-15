@@ -212,7 +212,7 @@ async function api(path,options={},retryAuth=true){
     cache:'no-store',signal:AbortSignal.timeout(12000)
   });
   const data=await response.json().catch(()=>({}));
-  if([401,403].includes(response.status)&&account&&path==='/worklinks-state'){
+  if([401,403].includes(response.status)&&account&&(path==='/worklinks-state'||path.startsWith('/worklinks-keep'))){
     if(retryAuth&&state.client){
       try{await renewApiSession(account,token)}
       catch(error){
@@ -228,6 +228,17 @@ async function api(path,options={},retryAuth=true){
   if(!response.ok||!data.ok)throw Object.assign(Error(data.error||'HTTP '+response.status),{status:response.status});
   return data;
 }
+// A minimal session-verified API bridge; never expose the AuthHub access token.
+window.worklinksKeepCurrentUser=()=>state.account||'';
+window.worklinksKeepRequest=async(path,options={})=>{
+  if(!state.account||!state.token||!state.client||
+     document.documentElement.dataset.worklinksAuthState!=='granted')
+    throw Object.assign(Error('auth_required'),{status:401});
+  if(!/^\\/worklinks-keep(?:$|[-?])/.test(path))
+    throw Error('unsupported_keep_path');
+  return api(path,options);
+};
+
 async function validSession(client){
   let session=client.session();
   if(!session?.accessToken&&!session?.refreshToken)return null;
