@@ -9,6 +9,7 @@ on:
       - scripts/rfp_live_activity.py
       - server/worklinks-server123-pipeline.py
       - tests/test_rfp_bounded_source_extraction.py
+      - tests/test_rfp_nested_pdf_page_diagnostics_20261115.py
       - .github/workflows/worklinks-rfp-bounded-extract-20261115.yml
   pull_request:
     paths:
@@ -28,6 +29,8 @@ jobs:
         run: |
           python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/rfp_live_activity.py server/worklinks-server123-pipeline.py
           python3 tests/test_rfp_bounded_source_extraction.py
+          python3 -m pip install --quiet pypdf
+          python3 tests/test_rfp_nested_pdf_page_diagnostics_20261115.py
       - name: Stage-2 to stage-3 original verification regression
         run: |
           python3 tests/test_rfp_verified_file_handoff.py
