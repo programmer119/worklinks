@@ -216,6 +216,45 @@ with sync_playwright() as p:
     }"""),'외 N개 must stay fully visible beside long filename'
     assert '정상 4 · 오류 1건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
     assert '5 / 6건' in page.locator('#rfpRescanContent').text_content()
+    # All six jobs accounted for must NOT produce a success appearance
+    # when even one original is confirmed missing (actual user screenshot).
+    fake['lanes']['download'].update(done=5,errors=1,processed=6,active=0)
+    fake['activity']['downloadGroup'].update(activeCount=0,files=[])
+    page.evaluate("() => refreshRfpRescanProgress(true)")
+    page.wait_for_function("""() =>
+      document.querySelector('[data-rfp-stage="download"]')?.dataset.status==='danger'""",timeout=12000)
+    dl=page.locator('[data-rfp-stage="download"]')
+    assert '원본 오류 1건' in dl.text_content(),dl.text_content()
+    assert '처리 완료' not in dl.text_content(),dl.text_content()
+    assert '정상 5 · 오류 1건 · 전체 6건' in dl.text_content(),dl.text_content()
+    assert page.evaluate("""() => {
+      const row=document.querySelector('[data-rfp-stage="download"]');
+      const agg=row.querySelector('.rfp-stage-aggregate-fill');
+      const err=row.querySelector('.rfp-stage-error-fill');
+      const note=row.querySelector('.rfp-rescan-stage-note');
+      const c=getComputedStyle(note).color;
+      return row.dataset.status==='danger' && parseFloat(agg.style.width)<100 &&
+        parseFloat(err.style.width)>0 && c==='rgb(180, 35, 24)';
+    }"""),'confirmed errors must be red and excluded from successful blue segment'
+    # Same completed condition means green in each stage, not orange/red.
+    fake['lanes']['manifest']['done']=6
+    fake['lanes']['download'].update(done=6,errors=0,processed=6,failed=0,errorDetails=[])
+    fake['lanes']['scan'].update(active=0,blockedNoAttachments=1)
+    fake['activity']['workers']['scan'].update(status='idle',stale=False)
+    fake['worker']['upgradeActive']=False
+    page.evaluate("() => refreshRfpRescanProgress(true)")
+    page.wait_for_function("""() => 
+      document.querySelector('[data-rfp-stage="download"]')?.dataset.status==='success'""",timeout=12000)
+    assert page.locator('[data-rfp-stage="manifest"]').get_attribute('data-status')=='success'
+    assert page.locator('[data-rfp-stage="scan"]').get_attribute('data-status')=='warning'
+    assert page.evaluate("""() => {
+      const row=document.querySelector('[data-rfp-stage="download"]');
+      const note=row.querySelector('.rfp-rescan-stage-note');
+      const fill=row.querySelector('.rfp-stage-aggregate-fill');
+      const yes=getComputedStyle(note).color==='rgb(8, 119, 71)';
+      return yes && getComputedStyle(fill).backgroundColor==='rgb(8, 119, 71)';
+    }"""),'verified complete state must always use green'
+
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
