@@ -8,6 +8,7 @@ Never reread successfully extracted siblings; never claim bidder qualification.
 """
 import argparse
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import datetime as dt
 import fcntl
 import gzip
@@ -17,6 +18,7 @@ import os
 from pathlib import Path
 import sqlite3
 import tempfile
+import time
 import urllib.parse
 import zlib
 
@@ -543,7 +545,59 @@ def merge_verified_repair_attempt(live,entry):
     return complete
 
 
-def run(data_dir,limit,execute=False,max_files=400):
+def current_verified_download_metadata(queue_path,key):
+    """Read only the selected notice, not all 3,000+ downloader receipts."""
+    if not queue_path.is_file():return None
+    with sqlite3.connect('file:'+str(queue_path)+'?mode=ro',
+                         uri=True,timeout=12) as db:
+        record=db.execute('''SELECT download_total,download_done,metadata_json
+            FROM rfp_dual_notices WHERE notice_key=? AND download_status='ready' ''',
+            (key,)).fetchone()
+    if record is None:return None
+    total,done,payload=record
+    try:
+        meta=json.loads(payload)
+        receipts=meta.get('downloadVerifiedFiles') or []
+        if (not isinstance(meta,dict) or done!=total or
+                total!=len(receipts) or
+                any(not isinstance(x,dict) or len(str(x.get('sha256') or ''))!=64
+                    for x in receipts)):
+            return None
+        return meta
+    except (ValueError,TypeError,AttributeError):
+        return None
+
+
+def verified_complete_for_early_checkpoint(record,metadata):
+    """Never claim the full notice done without live SHA-verified originals."""
+    if record.get('manifestChangePending') is True or not metadata_valid(metadata,record):
+        return False
+    from rfp_management_reconcile import latest_complete
+    versions={'classificationVersion':rfp.CLASSIFICATION_VERSION,
+              'staffingRoleScanVersion':rfp.STAFFING_ROLE_SCAN_VERSION,
+              'staffingFactScanVersion':rfp.STAFFING_FACT_SCAN_VERSION,
+              'hwpxReaderVersion':rfp.HWPX_READER_VERSION}
+    if not latest_complete(rfp.compact_coverage(record),versions):
+        return False
+    receipts={x.get('url'):x.get('sha256')
+              for x in metadata.get('downloadVerifiedFiles') or []
+              if isinstance(x,dict)}
+    sources={}
+    for item in metadata['attachments']['items']:
+        sources.setdefault(str(item.get('name') or ''),[]).append(item)
+    for f in record.get('files') or []:
+        label=str(f.get('name') or '')
+        candidates=sources.get(label) or []
+        if not candidates:return False
+        original=candidates.pop(0)
+        if f.get('readable') is True:
+            sha=str(f.get('sourceSha256') or '')
+            if not sha or sha!=receipts.get(original.get('url')):
+                return False
+    return True
+
+
+def run(data_dir,limit,execute=False,max_files=400,workers=1):
     root=Path(data_dir)
     snap=root/'snapshots'
     coverage_path=snap/'rfp-coverage-index.json'
@@ -639,6 +693,7 @@ def run(data_dir,limit,execute=False,max_files=400):
         pending.clear()
 
     try:
+        clock=time.perf_counter()
         reconciled=reconcile_old_verified_source_status(
             coverage_path,ready_downloads,
             {key for key,_deadline in open_rows},
@@ -646,38 +701,106 @@ def run(data_dir,limit,execute=False,max_files=400):
         if not selected:
             return {'result':'no_eligible_verified_download',
                     'reconciledOldStatus':reconciled}
+        # The snapshot belongs to this isolated stage; concurrent threads only
+        # read it. The downloader's current SHA receipt is checked per notice.
+        latest_index=read_json(coverage_path).get('byNotice') or {}
+        tasks=[]
         for key,deadline,meta,src,file_limit in selected:
             if deadline.astimezone(dt.timezone.utc)<=dt.datetime.now(dt.timezone.utc)+dt.timedelta(hours=24):
                 tally['skipped_deadline']+=1;continue
-            # Do not use stale input to overwrite a reclassified manifest.
-            latest=read_json(coverage_path).get('byNotice',{}).get(key)
-            if not isinstance(latest,dict) or not metadata_valid(meta,latest):
+            current=latest_index.get(key)
+            if not isinstance(current,dict) or not metadata_valid(meta,current):
                 tally['changed_while_repairing']+=1;continue
-            if not reader_retry_files(latest):continue
-            fresh=verified_download_queue(queue_path).get(key)
-            if (not fresh or fresh.get('downloadVerifiedFiles')!=meta.get('downloadVerifiedFiles')):
+            if not reader_retry_files(current):continue
+            fresh=current_verified_download_metadata(queue_path,key)
+            if not fresh or fresh.get('downloadVerifiedFiles')!=meta.get('downloadVerifiedFiles'):
                 tally['download_receipt_changed']+=1;continue
-            work=json.loads(json.dumps(latest,ensure_ascii=False))
-            try:
-                additions,counters=process_one(key,work,meta,ledger,file_limit=file_limit)
-            except VerifiedOriginalMissing as exc:
-                from rfp_dual_queue import RfpDualQueue
-                RfpDualQueue(queue_path).mark_download_missing(key)
-                tally['returned_to_downloader']+=1
-                print('OPEN_RFP_RETURNED_TO_DOWNLOADER',key,str(exc)[:100],flush=True)
-                continue
-            tally.update(counters)
-            if not additions and not any(counters.get(k) for k in (
-                 'official_attachment_reference_missing_422','pdf_ocr_incomplete',
-                 'alternate_pdf_evidence','reader_attempt_recorded')):continue
-            pending[key]=(work,additions)
-            if len(pending)>=8:flush_pending()
+            tasks.append((key,meta,file_limit,current))
+        print('OPEN_RFP_PARALLEL_WORKERS',json.dumps({
+            'workers':min(max(1,int(workers)),3,len(tasks)) if tasks else 0,
+            'selectedFiles':sum(x[2] for x in tasks),
+            'noticeCount':len(tasks)},separators=(',',':')),flush=True)
+        def extract_task(item):
+            key,meta,file_limit,current=item
+            work=json.loads(json.dumps(current,ensure_ascii=False))
+            begun=time.perf_counter()
+            recovered,counters=process_one(
+                key,work,meta,ledger,file_limit=file_limit)
+            return work,recovered,counters,time.perf_counter()-begun
+
+        # OCR itself runs in up to three independent subprocesses, via separate
+        # worker threads. Python-side reader provenance is thread-local, and
+        # each SHA/page OCR SQLite connection is private to its worker.
+        # Publication, downloader state changes, and queue reconciliation
+        # stay single-writer on the parent thread.
+        worker_count=min(max(1,int(workers)),3,len(tasks)) if tasks else 1
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            futures={executor.submit(extract_task,item):item for item in tasks}
+            for future in as_completed(futures):
+                key,meta,file_limit,current=futures[future]
+                try:
+                    work,additions,counters,elapsed=future.result()
+                except VerifiedOriginalMissing as exc:
+                    from rfp_dual_queue import RfpDualQueue
+                    RfpDualQueue(queue_path).mark_download_missing(key)
+                    tally['returned_to_downloader']+=1
+                    print('OPEN_RFP_RETURNED_TO_DOWNLOADER',key,str(exc)[:100],flush=True)
+                    continue
+                except Exception as exc:
+                    tally['reader_worker_failed']+=1
+                    print('OPEN_RFP_WORKER_FAILURE',key,
+                          type(exc).__name__,str(exc)[:150],flush=True)
+                    continue
+                # Do not mark an old official original successful if a later
+                # stage-2 download replaced the selected SHA while OCR ran.
+                fresh=current_verified_download_metadata(queue_path,key)
+                if not fresh or fresh.get('downloadVerifiedFiles')!=meta.get('downloadVerifiedFiles'):
+                    tally['download_receipt_changed']+=1
+                    continue
+                tally.update(counters)
+                should_publish=(bool(additions) or any(
+                    counters.get(k) for k in (
+                      'official_attachment_reference_missing_422',
+                      'pdf_ocr_incomplete','alternate_pdf_evidence',
+                      'reader_attempt_recorded')))
+                if not should_publish:continue
+                pending[key]=(work,additions)
+                # A newly completed full notice becomes authoritative NOW,
+                # via its small per-notice SQLite checkpoint. This does not
+                # rewrite the entire RFP JSON or wait for slow sibling workers.
+                updated=json.loads(json.dumps(current,ensure_ascii=False))
+                for live,entry in zip(updated.get('files') or [],work.get('files') or []):
+                    merge_verified_repair_attempt(live,entry)
+                checked=dt.datetime.now(dt.timezone.utc).isoformat()
+                update_counts(updated,checked,additions)
+                early=False
+                if verified_complete_for_early_checkpoint(updated,fresh):
+                    fingerprint=':'.join(str(v) for v in (
+                        rfp.CLASSIFICATION_VERSION,rfp.HWPX_READER_VERSION,
+                        rfp.STAFFING_ROLE_SCAN_VERSION,rfp.STAFFING_FACT_SCAN_VERSION))
+                    try:
+                        early=bool(rfp.publish_notice_checkpoint(
+                            key,updated,fingerprint))
+                    except (sqlite3.Error,OSError,ValueError) as exc:
+                        tally['checkpoint_failed']+=1
+                        print('OPEN_RFP_CHECKPOINT_RETRY_AT_BATCH_END',
+                              key,type(exc).__name__,flush=True)
+                tally['early_verified_checkpoint']+=int(early)
+                tally['worker_completed']+=1
+                print('OPEN_RFP_PARALLEL_FILE_FINISHED',json.dumps({
+                    'notice':key,'seconds':round(elapsed,2),
+                    'filesRepaired':len(additions),'checkpointSaved':early,
+                    'parallelism':worker_count},separators=(',',':')),flush=True)
+        # Full cumulative JSON + gzip are written just ONCE per batch.
+        # The final server publisher will rebase on newer live/checkpoint
+        # evidence before atomically replacing any public snapshot.
         flush_pending()
         print('OPEN_RFP_CACHED_REPAIR_RESULT',json.dumps({
           'noticesUpdated':len(results),'counters':dict(tally),
+          'parallelism':worker_count,'seconds':round(time.perf_counter()-clock,2),
           'remainingWithoutSavedMetadata':categories['metadata_missing'],
           'noGovernmentMetadataAPICalls':True,
-      'noGovernmentAttachmentGETs':True},ensure_ascii=False),flush=True)
+          'noGovernmentAttachmentGETs':True},ensure_ascii=False),flush=True)
         return results
     finally:
         fcntl.flock(lock,fcntl.LOCK_UN)
@@ -690,6 +813,8 @@ if __name__=='__main__':
     p.add_argument('--limit',type=int,default=60)
     p.add_argument('--max-files',type=int,default=150)
     p.add_argument('--execute',action='store_true')
+    p.add_argument('--workers',type=int,default=1,
+                   help='parallel OCR workers; maximum 3 to protect server123')
     args=p.parse_args()
     run(args.data_dir,max(1,min(args.limit,300)),args.execute,
-        max(1,min(args.max_files,600)))
+        max(1,min(args.max_files,600)),max(1,min(args.workers,3)))
