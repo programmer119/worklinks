@@ -18,6 +18,11 @@ SOURCES=('ordinary','eorder','detail')
 ROWS=999
 MAX_PAGES_PER_DAY_SOURCE=500
 MAX_FETCH_PER_PASS=18
+# Keep rare per-notice recovery bounded, but let a 23-notice backlog drain
+# instead of allowing only two notices per day.
+MAX_EXCEPTIONS_PER_PASS=4
+MAX_EXCEPTIONS_PER_UTC_DAY=32
+EXCEPTION_RETRY_SECONDS=300
 # A02 is allocated 1000 daily requests. The former internal cap 180
 # stopped essential bulk attachment-list collection at 1924/2315, even while
 # the source's circuit breaker was clear. Align the cap to the service budget.
@@ -225,7 +230,11 @@ class BulkManifestPlanner:
             used=db.execute("""SELECT COUNT(*) FROM rfp_bulk_request_budget
                 WHERE started_at>=? AND source LIKE 'exception_%'""",
                 (midnight,)).fetchone()[0]
-        if used>=6:return None,0
+        if used+len(SOURCES)>MAX_EXCEPTIONS_PER_UTC_DAY*len(SOURCES):
+            tomorrow=(stamp.replace(hour=0,minute=0,second=0,microsecond=0)
+                      +dt.timedelta(days=1,seconds=2))
+            raise BulkManifestQuota('rfp_bulk_exception_daily_cap',
+                retry_after_seconds=math.ceil((tomorrow-stamp).total_seconds()))
         # Reserve the cost of ALL THREE official operations, not one proxy call.
         for src in SOURCES:self._reserve_api_call('exception_'+src,day,0)
         self.pacer.acquire()
@@ -271,10 +280,62 @@ class BulkManifestPlanner:
                                'source':'official_paginated_notice_detail'},
             'manifestOrigin':'verified_full_day_batch'}
 
+    def _recover_missing(self,keys,day):
+        """Bounded fallback for date-list misses and unknown posted dates.
+
+        Never mark a notice complete without a verified three-source result.
+        A failed notice is deferred independently; the other notices continue.
+        """
+        found={}
+        attempts=0
+        calls=0
+        retry_after=0
+        errors={}
+        for key in sorted(keys)[:MAX_EXCEPTIONS_PER_PASS]:
+            try:
+                result,spent=self._exception_one(key,day)
+            except BulkManifestQuota as exc:
+                retry_after=exc.retry_after_seconds
+                break
+            except Exception as exc:
+                # A provider outage should not make already verified date
+                # manifests disappear or spend all remaining API calls.
+                errors[key]=type(exc).__name__+': '+str(exc)[:100]
+                self.queue.defer_bulk_unmatched(
+                    [key],EXCEPTION_RETRY_SECONDS,'exception_request_failed')
+                attempts+=1
+                calls+=len(SOURCES) # reserved by _exception_one before fetch
+                retry_after=30
+                break
+            attempts+=1
+            calls+=spent
+            if result is None:
+                errors[key]='exception_sources_unverified'
+                self.queue.defer_bulk_unmatched(
+                    [key],EXCEPTION_RETRY_SECONDS,'exception_sources_unverified')
+            else:
+                found[key]=result
+        return {'manifests':found,'calls':calls,'attempted':attempts,
+                'retryAfterSeconds':retry_after,'errors':errors}
+
     def populate_one_day(self):
         """At most one day per pass; never touch the actual file-download queue."""
         mapping=self.posted_days()
-        if not mapping:return {'new':0,'missingPostedDate':len(self.queue.unprepared_notices()),'calls':0}
+        if not mapping:
+            remaining=self.queue.unprepared_notices(eligible_only=True)
+            if not remaining:
+                return {'new':0,'missingPostedDate':len(self.queue.unprepared_notices()),
+                        'calls':0}
+            # A notice with no trustworthy posted date cannot be retrieved
+            # through date-window batching. It still needs a bounded lookup.
+            result=self._recover_missing(remaining,'unknown')
+            count=self.queue.save_bulk_manifests(result['manifests'])
+            return {'new':count,'calls':result['calls'],
+                    'missingPostedDate':len(remaining)-count,
+                    'exceptionAttempted':result['attempted'],
+                    'exceptionErrors':result['errors'],
+                    'retryAfterSeconds':result['retryAfterSeconds'],
+                    'pending':len(self.queue.unprepared_notices())}
         groups={}
         for key,day in mapping.items():groups.setdefault(day,set()).add(key)
         day=sorted(groups,reverse=True)[0]
@@ -303,22 +364,25 @@ class BulkManifestPlanner:
         verified={key for key,found in present.items() if found}
         missing=sorted(keys-verified)
         manifests={key:self._notice_meta(key,sources) for key in verified}
-        exception_calls=0
-        if missing:
-            # One notice at most; never fan out a per-notice API storm.
-            try:
-                recovered,exception_calls=self._exception_one(missing[0],day)
-            except BulkManifestQuota:
-                recovered=None
-            if recovered is not None:
-                manifests[missing[0]]=recovered
-                missing=missing[1:]
+        recovery=self._recover_missing(missing,day) if missing else {
+            'manifests':{},'calls':0,'attempted':0,'errors':{},
+            'retryAfterSeconds':0}
+        manifests.update(recovery['manifests'])
         count=self.queue.save_bulk_manifests(manifests)
-        live.record('manifest',day,phase='목록 확보 완료' if not missing else '누락 공고 재확인 필요',status='done' if not missing else 'retry',files_done=len(SOURCES),files_total=len(SOURCES),error='' if not missing else str(len(missing))+' notices not present in verified date batch',retry_epoch=0 if not missing else time.time()+3600)
-        calls+=exception_calls
-        if missing:
-            # Retry on another planning window rather than hammer the same day.
-            self.queue.defer_bulk_unmatched(missing,3600,'not_present_in_complete_date_batch')
-        return {'new':count,'day':day,'calls':calls,'unmatched':len(missing),
+        unresolved=len(missing)-len(recovery['manifests'])
+        live.record('manifest',day,
+            phase='목록 확보 완료' if not unresolved else '누락 공고 재확인 필요',
+            status='done' if not unresolved else 'retry',
+            files_done=len(SOURCES),files_total=len(SOURCES),
+            error='' if not unresolved else str(unresolved)+' notices not yet verified',
+            retry_epoch=0 if not unresolved else
+                time.time()+max(30,recovery['retryAfterSeconds']))
+        calls+=recovery['calls']
+        # Untouched exceptions stay immediately eligible for the next pass.
+        # Only actually failed notices have their own bounded retry delay.
+        return {'new':count,'day':day,'calls':calls,'unmatched':unresolved,
+                'exceptionAttempted':recovery['attempted'],
+                'exceptionErrors':recovery['errors'],
+                'retryAfterSeconds':recovery['retryAfterSeconds'],
                 'sourceCounts':{src:len(items) for src,items in sources.items()},
                 'pending':len(self.queue.unprepared_notices())}
