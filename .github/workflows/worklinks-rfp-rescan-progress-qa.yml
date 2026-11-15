@@ -7,6 +7,8 @@ on:
       - 'server/worklinks-server123-pipeline.py'
       - 'scripts/refresh_worklinks_rfp.py'
       - 'startup-support/index.html'
+      - 'startup-support/rfp-progress-live.js'
+      - 'startup-support/rfp-progress-live.css'
       - 'tests/test_rfp_rescan_progress.py'
       - 'tests/test_rfp_rolling_coverage.py'
       - 'tests/test_rfp_upgrade_queue.py'
@@ -40,6 +42,7 @@ jobs:
           pathlib.Path('/tmp/worklinks-rfp-rescan-inline.js').write_text('\n'.join(scripts))
           PY
           node --check /tmp/worklinks-rfp-rescan-inline.js
+          node --check startup-support/rfp-progress-live.js
       - name: Install browser regression dependencies
         run: |
           python3 -m pip install -q playwright
