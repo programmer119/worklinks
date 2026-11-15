@@ -615,6 +615,17 @@ def run_once(kind, runner=None, _single=False):
                             row['seconds']+=float(record.get('exclusiveSeconds') or 0)
                     report['formatTimeBreakdown']={k:{'calls':v['calls'],
                         'seconds':round(v['seconds'],3)} for k,v in per_format.items()}
+                    roi_samples=[probe for source in profiles
+                        for probe in (source.get('ocrRegionProbe') or [])
+                        if isinstance(probe,dict)]
+                    report['regionProbe']={
+                        'samples':len(roi_samples),
+                        'compared':sum(x.get('status')=='compared' for x in roi_samples),
+                        'exactMatches':sum(x.get('exactMatch') is True for x in roi_samples),
+                        'timeSeconds':round(sum(float(x.get('seconds') or 0)
+                            for x in roi_samples),3),
+                        'averageAreaRatio':round(sum(float(x.get('areaRatio') or 0)
+                            for x in roi_samples)/len(roi_samples),3) if roi_samples else None}
                     report['unaccountedPdfSeconds']=round(max(0,
                         report['pdfTotalSeconds']-report['renderSeconds']-
                         report['tesseractSeconds']-report['nativeTextSeconds']-
