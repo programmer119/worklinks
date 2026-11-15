@@ -2694,6 +2694,38 @@ def publish_notice_checkpoint(notice_key, result, fingerprint):
             notice_key TEXT PRIMARY KEY,
             checked_at TEXT NOT NULL,
             evidence_json TEXT NOT NULL)''')
+        previous=db.execute(
+            'SELECT evidence_json FROM rfp_notice_checkpoints WHERE notice_key=?',
+            (notice_key,)).fetchone()
+        if previous:
+            try:prior=json.loads(previous[0])
+            except (ValueError,TypeError):prior={}
+            # A quick stage-3 pass intentionally defers slow PDF OCR. Do not
+            # let that incomplete recheck erase a previously source-verified,
+            # fully parsed OCR repair for unchanged official attachments.
+            from rfp_management_reconcile import latest_complete
+            versions={'classificationVersion':CLASSIFICATION_VERSION,
+                      'staffingRoleScanVersion':STAFFING_ROLE_SCAN_VERSION,
+                      'staffingFactScanVersion':STAFFING_FACT_SCAN_VERSION,
+                      'hwpxReaderVersion':HWPX_READER_VERSION}
+            prior_files=[f for f in prior.get('files') or [] if isinstance(f,dict)]
+            new_files=[f for f in record.get('files') or [] if isinstance(f,dict)]
+            old_signature=str(prior.get('manifestSignature') or '')
+            new_signature=str(record.get('manifestSignature') or '')
+            same_manifest=(not prior.get('manifestChangePending') and
+                           not record.get('manifestChangePending') and
+                           ((bool(old_signature and new_signature) and
+                             old_signature==new_signature) or
+                            (not old_signature and not new_signature and
+                             bool(prior_files) and len(prior_files)==len(new_files) and
+                             all(a.get('name')==b.get('name') and
+                                 (not a.get('sourceSha256') or not b.get('sourceSha256') or
+                                  a.get('sourceSha256')==b.get('sourceSha256'))
+                                 for a,b in zip(prior_files,new_files)))))
+            if (same_manifest and latest_complete(prior,versions) and
+                    not latest_complete(record,versions)):
+                print('RFP_NOTICE_CHECKPOINT_PRESERVED_FULL_OCR',notice_key,flush=True)
+                return True
         db.execute('''INSERT INTO rfp_notice_checkpoints(notice_key,checked_at,evidence_json)
             VALUES(?,?,?) ON CONFLICT(notice_key) DO UPDATE SET
             checked_at=excluded.checked_at,evidence_json=excluded.evidence_json

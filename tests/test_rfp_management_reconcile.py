@@ -75,7 +75,9 @@ with tempfile.TemporaryDirectory() as tmp:
     lanes=proxy['rfp_dual_lane_progress'](str(data/'rfp-dual-queue.sqlite3'),
                                            cohort=(set(managed),done))
     assert lanes['total']==4 and lanes['scan']['total']==4,lanes
-    assert lanes['scan']['done']==1 and lanes['scan']['blockedNoAttachments']==1,lanes
+    # Verified empty manifests are handled by the excluded-document ledger;
+    # they must not inflate the active scan lane's blocked count.
+    assert lanes['scan']['done']==1 and lanes['scan']['blockedNoAttachments']==0,lanes
     assert lanes['download']['total']==4 and lanes['download']['done']==3,lanes
     assert lanes['outsideScopeQueue']==1 and lanes['missingIncomplete']==0,lanes
     # Revalidated evidence must stop repeated work without touching originals.
