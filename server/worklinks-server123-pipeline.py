@@ -40,7 +40,7 @@ RFP_OPEN_OCR_PERIOD = max(900, int(os.environ.get('G2B_RFP_OPEN_OCR_PERIOD', 900
 # During continuous stage-3 scanning, interleave one small local-only OCR repair
 # after every four successfully published scan batches instead of starving it.
 RFP_OCR_SCAN_BATCH_INTERVAL = 4
-RFP_OPEN_READER_VERSION='pdf24-image-zip-hwpx-v3'
+RFP_OPEN_READER_VERSION='pdf24-image-zip-hwpx-xls-hml-v4'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
 # Explicit short-lived recovery selection; candidates rotate out once fully scanned.
