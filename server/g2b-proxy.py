@@ -2780,8 +2780,16 @@ class Handler(BaseHTTPRequestHandler):
                     if not isinstance(autonomous,dict):autonomous={}
                 except (IOError,OSError,ValueError):
                     autonomous={}
+                ocr_profile_path=os.path.join(os.path.dirname(SNAPSHOT_ROOT),
+                                              'ocr-runtime-profile.json')
+                try:
+                    with open(ocr_profile_path,'r') as stream:
+                        ocr_profile=json.load(stream)
+                    if not isinstance(ocr_profile,dict):ocr_profile=None
+                except (IOError,OSError,ValueError):
+                    ocr_profile=None
                 return self.reply(200,{'ok':True,'scheduler':state,'autonomousJobs':autonomous,
-                                       'snapshotsReady':ready,
+                                       'snapshotsReady':ready,'ocrRuntimeProfile':ocr_profile,
                                        'autonomousSnapshotsReady':other_ready,'upstreamCalls':0})
             if u.path in ('/health','/api/g2b/status'):
                 return self.reply(200,{'ok':True,'service':'worklinks-g2b-python',
