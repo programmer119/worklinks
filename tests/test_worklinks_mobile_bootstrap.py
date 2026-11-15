@@ -101,10 +101,10 @@ def main():
             # Reproduce a verified member in the browser. WorkLinks now
             # intentionally hides all workspace views until AuthHub permits access.
             # The test retains the real gate rather than disabling it.
-            page.add_init_script("""() => {
+            page.add_init_script("""
                 localStorage.setItem('authhub:p47:production:session',
                     JSON.stringify({accessToken:'mobile-qa-token',refreshToken:'mobile-qa-refresh'}));
-            }""")
+            """)
             def auth_route(route):
                 path=urlparse(route.request.url).path
                 if route.request.method=="OPTIONS":
