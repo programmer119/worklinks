@@ -453,7 +453,8 @@
    node.dataset.status=status;
   }
   const unknownTotal=Math.max(0,Number(counts.unknownDeadline||0));
-  panel.querySelector('#rfpRescanUnknown').hidden=!unknownTotal;
+  const unknownBox=panel.querySelector('#rfpRescanUnknown');
+  if(unknownBox)unknownBox.hidden=!unknownTotal;
   updateField(panel,'unknown',number(unknownTotal)+'건 · 별도 판독 '+
    number(counts.unknownDeadlineCompleted)+' / '+number(unknownTotal)+'건');
   window.paintRfpLaneFocus();
