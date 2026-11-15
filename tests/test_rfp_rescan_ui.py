@@ -125,6 +125,11 @@ with sync_playwright() as p:
     }""")
 
     assert '문서 판독' in body and '1 / 6건' in body,body
+    assert page.locator('[data-rfp-field="scanExcluded"]').inner_text()==(
+        '판독 제외 1건 · 공식 첨부목록 0개 확인 (판독 실패 아님)')
+    assert '공식 첨부파일 없음 1건' not in page.locator(
+        '[data-rfp-stage="scan"] .rfp-rescan-stage-track').inner_text()
+
     assert ('판독 미완료' in body or '남은 문서 판독' in body) and '5' in body,body
     cohort_lane_values={key:page.locator('[data-rfp-field="'+key+'Count"]').text_content()
                         for key in ('manifest','download','scan')}
