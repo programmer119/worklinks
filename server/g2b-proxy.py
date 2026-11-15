@@ -1148,6 +1148,14 @@ def saved_rfp_search_state(row, compact=False):
         'pdfAlternative':covered.get(i,'')[:140],
         'skippedDuplicateFormat':i in covered,
         'errorCategory':('' if i in covered else str(f.get('errorCategory') or '')[:90]),
+        'errorDetail':('' if i in covered else str(f.get('errorDetail') or '')[:180]),
+        'pdfSources':[{'sourceFile':str(doc.get('sourceFile') or '')[:200],
+            'pdfPages':int(doc.get('pdfPages') or 0),
+            'unresolvedPages':list(doc.get('unresolvedPages') or [])[:30],
+            'ocrFailureDetails':list(doc.get('ocrFailureDetails') or [])[:30],
+            'ocrBatchDeferredPages':int(doc.get('ocrBatchDeferredPages') or 0)}
+            for doc in (f.get('extractionEvidence') or {}).get('pdfSources',[])[:24]
+            if isinstance(doc,dict)],
         'textScanComplete':f.get('sourceTextScanComplete') is True,
         'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
         'unmatchedQualificationAnchorCount':int(f.get('unmatchedQualificationAnchorCount') or 0)
