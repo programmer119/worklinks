@@ -1031,20 +1031,13 @@ def read_saved_rfp_evidence_index():
             _SEARCH_RFP_SNAPSHOT.update(modified=modified,byNotice=doc['byNotice'])
         return _SEARCH_RFP_SNAPSHOT['byNotice']
 
-def rfp_card_evidence_batch(raw_keys):
-    """Return only persisted scan summaries for visible cards, with zero G2B calls."""
-    keys=[x.strip() for x in str(raw_keys or '').split(',') if x.strip()]
-    if (not keys or len(keys)>100 or len(set(keys))!=len(keys) or
-            any(not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',key)
-                for key in keys)):
-        raise ApiError('invalid_rfp_card_evidence_keys',400)
-    source=read_saved_rfp_evidence_index()
-    if source is None:
-        raise ApiError('rfp_source_index_unavailable',503)
-    # The live progress API overlays newer per-notice checkpoints. Card evidence
-    # must read those SAME persisted results, or it reports an obsolete "version
-    # unrecorded" scan after the scanner has already completed that notice.
-    # Query only requested keys (<=100); never read the full checkpoint backlog.
+def read_saved_rfp_card_states(keys,source,compact=True):
+    """One current-version scan state per notice, shared by saved list and card API.
+
+    Uses only local persisted files/checkpoints, with no procurement network
+    calls. The caller may supply up to the saved-list limit (500) keys.
+    """
+    if source is None:return {}
     rows={key:source.get(key) for key in keys}
     checkpoint_keys=set()
     progress_db=os.path.join(os.path.dirname(G2B_DB_PATH),
@@ -1082,7 +1075,7 @@ def rfp_card_evidence_batch(raw_keys):
         pass
     by_notice={}
     for key,row in rows.items():
-        state=saved_rfp_search_state(row,compact=True)
+        state=saved_rfp_search_state(row,compact=compact)
         if isinstance(row,dict):
             readable=[f for f in row.get('files') or []
                       if isinstance(f,dict) and f.get('readable') is True
@@ -1102,6 +1095,20 @@ def rfp_card_evidence_batch(raw_keys):
                     stages['classification'] and stages['roles'] and
                     stages['facts'] and stages['hwpx'] is not False)
         by_notice[key]=state
+    return by_notice
+
+
+def rfp_card_evidence_batch(raw_keys):
+    """Return current per-notice RFP scan state for visible cards, offline."""
+    keys=[x.strip() for x in str(raw_keys or '').split(',') if x.strip()]
+    if (not keys or len(keys)>100 or len(set(keys))!=len(keys) or
+            any(not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',key)
+                for key in keys)):
+        raise ApiError('invalid_rfp_card_evidence_keys',400)
+    source=read_saved_rfp_evidence_index()
+    if source is None:
+        raise ApiError('rfp_source_index_unavailable',503)
+    by_notice=read_saved_rfp_card_states(keys,source,compact=True)
     return {'ok':True,'sourceAvailable':True,'byNotice':by_notice,
             'count':len(keys),'upstreamCalls':0}
 
@@ -2265,10 +2272,15 @@ def query_saved_bids(limit,offset,only_sw=False,query=''):
         # This is a read-only lookup in an already downloaded local JSON index.
         # Always publish a compact card state; search includes file-level causes.
         source=read_saved_rfp_evidence_index()
-        for obj in items:
-            key=str(obj.get('bidNo') or '')+':'+str(obj.get('order') or '000').zfill(3)
-            obj['rfpSavedState']=(saved_rfp_search_state(source.get(key),compact=not bool(query))
-                                 if source is not None else
+        # Use the SAME latest checkpoint + deployed parser-version decision as
+        # /rfp-card-evidence. A plain card summary without version provenance
+        # incorrectly makes fully scanned tenders show "상주 확인중" forever.
+        keys=[str(obj.get('bidNo') or '')+':'+str(obj.get('order') or '000').zfill(3)
+              for obj in items]
+        current_states=(read_saved_rfp_card_states(keys,source,compact=not bool(query))
+                        if source is not None else {})
+        for obj,key in zip(items,keys):
+            obj['rfpSavedState']=(current_states.get(key) or
                                  {'sourceAvailable':False,'seen':False})
         checked=con.execute('SELECT COUNT(*) FROM bid_license_cache').fetchone()[0]
         linked=con.execute("SELECT COUNT(*) FROM bid_notices b INNER JOIN bid_license_cache q "
