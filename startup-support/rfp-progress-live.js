@@ -25,7 +25,7 @@
    '<div class="rfp-rescan-totals">'+
     '<div class="rfp-rescan-metric"><span>관리 대상</span><strong data-rfp-field="total">—</strong></div>'+
     '<div class="rfp-rescan-metric"><span>최신 판독 완료</span><strong data-rfp-field="complete">—</strong></div>'+
-    '<div class="rfp-rescan-metric"><span>재판독 필요</span><strong data-rfp-field="rescanRequired">—</strong></div></div>'+
+    '<div class="rfp-rescan-metric"><span>판독 미완료</span><strong data-rfp-field="rescanRequired">—</strong></div></div>'+
    '<div class="rfp-rescan-overview"><span>전체 판독 완료</span><strong data-rfp-field="pct">—</strong></div>'+
    '<div class="rfp-rescan-big-track" role="progressbar" aria-label="전체 최신 판독 완료" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span style="width:0%"></span></div>'+
    '<div class="rfp-rescan-breakdown"><span>최초 미판독 <b data-rfp-field="unscanned">—</b></span>'+
@@ -275,6 +275,10 @@
    }else if(active>0){
     name='진행 중 · 파일별 정보 갱신 확인 필요';
    }
+   if(key==='scan'&&Number(lane?.blockedNoAttachments||0)>0)
+    bits.push('공식 첨부파일 없음 '+Number(lane.blockedNoAttachments)+'건');
+   if(key==='scan'&&Number(lane?.notQueued||0)>0)
+    bits.push('작업 큐 미편입 '+Number(lane.notQueued)+'건');
    if(selected&&choices.length>1)bits.push((choices.indexOf(selected)+1)+'/'+choices.length);
    detail=bits.join(' · ');
    const filePct=selected?.bytesTotal>0?
@@ -324,7 +328,7 @@
   const scanActive=Math.max(0,Number(lanes?.scan?.active||0));
   const active=!delayed&&(dlNotices>0||dlFiles>0||scanActive>0||scanWorkerActive);
   for(const [name,value] of Object.entries({
-   total:number(all),complete:number(done),rescanRequired:number(counts.rescanRequired),
+   total:number(all),complete:number(done),rescanRequired:number(counts.remaining),
    unscanned:number(counts.unscanned),legacy:number(counts.legacy),
    failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
   }))updateField(panel,name,value);
@@ -362,6 +366,8 @@
    if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
    else if(available&&total&&processed===total)state='처리 완료';
    else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
+   else if(key==='scan'&&available&&Number(stage.blockedNoAttachments||0)>0)
+    state='원본 없음 '+number(Number(stage.blockedNoAttachments))+'건';
    else if(key==='manifest'&&available&&total&&completed<total)state='순차 확보';
    if(key==='download'&&available){
     const countNode=node.querySelector('[data-rfp-field="downloadCount"]');
