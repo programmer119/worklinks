@@ -16,6 +16,10 @@ huge={'name':'contract.pdf','errorCategory':'source_extraction_timeout_deferred'
 assert repair.repair_file_priority(hard)<repair.repair_file_priority(pdf)
 assert repair.repair_file_priority(ole)<repair.repair_file_priority(hard)
 assert repair.repair_file_priority(plain)<repair.repair_file_priority(huge)
+zip_images={'name':'입찰공고자료(26G056-H).zip','errorCategory':'no_searchable_text','readable':False}
+assert repair.repair_file_priority(zip_images)<repair.repair_file_priority(ole)
+deferred={'name':'영향평가.hwpx','errorCategory':'hwpx_image_ocr_deferred_to_repair','readable':False}
+assert repair.repair_file_priority(deferred)<repair.repair_file_priority(pdf)
 long_rfp={'name':'제안요청서.hwpx','readable':True,
           'qualificationScanTruncated':True,'sourceTextScanComplete':False}
 assert repair.repair_file_priority(long_rfp)<repair.repair_file_priority(pdf)
