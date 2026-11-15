@@ -172,7 +172,7 @@ with tempfile.TemporaryDirectory() as temporary:
         return mock_runner(args,**kwargs)
     deferred=m.iteration(now+5,count_repair)
     assert not repair_calls, 'expensive no-progress OCR must yield to upgrade queue'
-    assert deferred['rfpOpenRepair']['attemptEpoch']==0
+    assert deferred['rfpOpenRepair']['attemptEpoch']==now-50
     keep=m.read_state()
     keep['rfpUpgradeBatchesCompleted']=4
     m.publish_state(keep)
