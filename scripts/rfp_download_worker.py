@@ -321,7 +321,7 @@ def download_one(queue,claim,halt):
             print('RFP_DOWNLOAD_CONFIRMED_ERRORS',json.dumps({
                 'notice':key,'verifiedFiles':len(verified_files),
                 'errorFiles':error_files},ensure_ascii=False,separators=(',',':')),flush=True)
-            return True
+            return 'error_confirmed'
         meta=dict(meta,downloadVerifiedFiles=verified_files)
         queue.downloaded(key,meta,len(urls),len(urls))
         live.record('download',key,phase='다운로드 완료',status='done',files_done=len(urls),files_total=len(urls))
@@ -434,6 +434,7 @@ def run_download_forever(queue,halt):
     subprocess_started_epoch=time.time()
     started=0
     downloaded=0
+    confirmed_errors=0
     live.worker('download','running')
     with ThreadPoolExecutor(max_workers=WORKERS,
                             thread_name_prefix='rfp-original-fetch') as pool:
@@ -462,6 +463,7 @@ def run_download_forever(queue,halt):
                               type(exc).__name__,str(exc)[:140],flush=True)
                         succeeded=False
                     downloaded+=int(succeeded is True)
+                    confirmed_errors+=int(succeeded=='error_confirmed')
             else:time.sleep(POLL_SECONDS)
             # Last-resort recovery only if a claimed network stream has made
             # NO byte progress for three minutes. Typical slow-but-progressing
@@ -503,9 +505,10 @@ def run_download_forever(queue,halt):
             if time.monotonic()-last_report>=10:
                 print('RFP_DUAL_DOWNLOAD_BATCH',json.dumps({
                     'started':started,'downloaded':downloaded,
+                    'confirmedErrors':confirmed_errors,
                     'active':len(inflight),'workers':WORKERS,
                     'queue':queue.stats()},separators=(',',':')),flush=True)
-                started=downloaded=0
+                started=downloaded=confirmed_errors=0
                 last_report=time.monotonic()
 
 
