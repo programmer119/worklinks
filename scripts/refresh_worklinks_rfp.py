@@ -7,6 +7,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import nullcontext
 import datetime as dt
 import hashlib
+import html
+from html.parser import HTMLParser
 import io
 import json
 import os
@@ -142,7 +144,7 @@ MAX_HWPX_XML_MEMBER=28_000_000
 MAX_HWPX_XML_TOTAL=90_000_000
 HWPX_READER_VERSION=3
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
-TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xlsx','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp')
+TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xls','.xlsx','.xlsm','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp','.hml','.html','.htm')
 CLASSIFICATION_VERSION=23
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
@@ -855,7 +857,10 @@ def classify_failure(error):
     if isinstance(error,(TimeoutError,ConnectionError,urllib.error.URLError)):
         return 'file_download_connection_error'
     detail=str(error)
-    known=('source_extraction_timeout_deferred','isolated_extraction_worker_failed',
+    known=('legacy_xls_reader_failed','legacy_xls_reader_unavailable',
+           'legacy_xls_size_limit','legacy_xls_too_many_sheets',
+           'invalid_legacy_xls','hml_xml_parse_failed',
+           'source_extraction_timeout_deferred','isolated_extraction_worker_failed',
            'isolated_extraction_worker_reply_invalid','source_extraction_output_too_large',
            'large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
            'pdf_over_100_pages','pdf_over_page_limit','pdf_unreadable_page','no_searchable_text','unsupported_format',
@@ -1117,14 +1122,111 @@ def annotate_official_pdf_siblings(files):
     return updated
 
 
+_OLE_HEADER=bytes.fromhex('D0CF11E0A1B11AE1')
+
+
+def ole_document_kind(name,raw):
+    """Select HWP vs legacy Excel using OLE directory names, not filename alone."""
+    # OLE compound-file stream names are UTF-16LE in a plain directory sector.
+    directory=raw[:min(len(raw),2_000_000)]
+    has_hwp='FileHeader'.encode('utf-16-le') in directory and (
+        'BodyText'.encode('utf-16-le') in directory or
+        'HwpSummaryInformation'.encode('utf-16-le') in directory)
+    if has_hwp:
+        return '.hwp'
+    has_excel=('Workbook'.encode('utf-16-le') in directory or
+               'Book'.encode('utf-16-le') in directory)
+    if has_excel or str(name).lower().endswith(('.xls','.xlt')):
+        return '.xls'
+    return '.hwp'
+
+
+def detected_source_format(name,raw):
+    if raw.startswith(b'%PDF-'):return 'pdf'
+    if raw.startswith(_OLE_HEADER):return 'xls' if ole_document_kind(name,raw)=='.xls' else 'hwp'
+    if raw.startswith(b'PK\\x03\\x04'):return 'zip_or_ooxml'
+    if raw.startswith(b'\\x89PNG'):return 'png'
+    if raw.startswith(b'\\xff\\xd8'):return 'jpeg'
+    if raw.startswith(b'GIF8'):return 'gif'
+    return str(Path(str(name)).suffix.lower()).lstrip('.') or 'unknown'
+
+
+def extract_legacy_xls(raw):
+    """Parse the actual XLS workbook; do not send Excel OLE bytes to hwp5txt."""
+    try:
+        import xlrd
+    except ImportError as error:
+        raise ValueError('legacy_xls_reader_unavailable') from error
+    try:
+        book=xlrd.open_workbook(file_contents=raw,on_demand=True)
+        if book.nsheets>80:raise ValueError('legacy_xls_too_many_sheets')
+        lines=[];cells=0
+        for i in range(book.nsheets):
+            sheet=book.sheet_by_index(i)
+            if sheet.nrows>100000 or sheet.ncols>300:
+                raise ValueError('legacy_xls_size_limit')
+            lines.append('SHEET '+str(sheet.name))
+            for row in range(sheet.nrows):
+                values=[str(value).strip() for value in sheet.row_values(row)]
+                cells+=len(values)
+                if cells>600000:raise ValueError('legacy_xls_size_limit')
+                value=' '.join(v for v in values if v)
+                if value:lines.append(value)
+        return '\\n'.join(lines)
+    except ValueError:
+        raise
+    except Exception as error:
+        raise ValueError('legacy_xls_reader_failed') from error
+
+
+def extract_markup_document(name,raw):
+    """Read HML XML and published HTML notices without evaluating any markup."""
+    if len(raw)>MAX_FILE:raise ValueError('large_file')
+    suffix=Path(str(name)).suffix.lower()
+    if suffix=='.hml':
+        try:
+            document=ET.fromstring(raw)
+            paragraphs=[' '.join(t.strip() for t in node.itertext() if t and t.strip())
+               for node in document.iter()
+               if node.tag.rsplit('}',1)[-1].lower() in ('p','paragraph')]
+            if not paragraphs:
+                paragraphs=[' '.join(t.strip() for t in document.itertext() if t and t.strip())]
+            return '\\n'.join(x for x in paragraphs if x)
+        except ET.ParseError as exc:
+            raise ValueError('hml_xml_parse_failed') from exc
+    for encoding in ('utf-8-sig','cp949','utf-16'):
+        try:
+            source=raw.decode(encoding)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        source=raw.decode('utf-8','replace')
+    class NoticeHTMLText(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.parts=[]
+            self.ignore=0
+        def handle_starttag(self,tag,attrs):
+            if tag in ('script','style'):self.ignore+=1
+            elif not self.ignore and tag in ('p','li','br','tr','div','h1','h2','h3'):self.parts.append('\\n')
+        def handle_endtag(self,tag):
+            if tag in ('script','style') and self.ignore:self.ignore-=1
+        def handle_data(self,data):
+            if not self.ignore:self.parts.append(data)
+    parser=NoticeHTMLText()
+    parser.feed(source)
+    return html.unescape(''.join(parser.parts))
+
+
 def extract(name,raw):
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
     n=name.lower()
     if raw.startswith(b'%PDF-'):
         n='.pdf'
-    elif raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):
-        n='.hwp'
+    elif raw.startswith(_OLE_HEADER):
+        n=ole_document_kind(name,raw)
     elif raw.startswith(b'PK\x03\x04'):
         # Identify Office XML formats by internal paths. Otherwise this is
         # an ordinary attachment archive, regardless of its .pdf/.hwp name.
@@ -1163,7 +1265,8 @@ def extract(name,raw):
                 if inner.startswith('/') or '..' in Path(inner).parts:
                     raise ValueError('unsafe_archive_path')
                 suffix=Path(inner).suffix.lower()
-                if suffix in {'.pdf','.hwp','.hwpx','.docx','.xlsx','.pptx',
+                if suffix in {'.pdf','.hwp','.hwpx','.docx','.xls','.xlsx','.xlsm','.pptx',
+                              '.hml','.htm','.html',
                               '.png','.jpg','.jpeg','.bmp','.webp','.tif','.tiff'}:
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     value=extract(Path(inner).name,archive.read(entry))
@@ -1244,8 +1347,13 @@ def extract(name,raw):
                                       if z.tag.rsplit('}',1)[-1]=='t')
                         if value.strip():pieces.append(value.strip())
             return '\n'.join(pieces)
+    if n.endswith('.xls'):
+        if not raw.startswith(_OLE_HEADER):raise ValueError('invalid_legacy_xls')
+        return extract_legacy_xls(raw)
+    if n.endswith(('.hml','.htm','.html')):
+        return extract_markup_document(name,raw)
     if n.endswith('.hwp'):
-        if not raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):raise ValueError('invalid_hwp')
+        if not raw.startswith(_OLE_HEADER):raise ValueError('invalid_hwp')
         with tempfile.TemporaryDirectory() as directory:
             p=Path(directory)/'source.hwp'
             p.write_bytes(raw)
@@ -2056,6 +2164,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                     _NOTICE_CONTEXT.notice_key=None
                     _NOTICE_CONTEXT.closes_on=''
                     phase['downloadSeconds']+=time.perf_counter()-timer
+            record['detectedFormat']=detected_source_format(name,raw)
             if dual_scan and hashlib.sha256(raw).hexdigest()!=item.get('sourceSha256'):
                 from rfp_dual_queue import RfpDualQueue
                 RfpDualQueue(os.environ['WORKLINKS_RFP_DUAL_QUEUE_DB']).mark_download_missing(notice_key)
@@ -2285,6 +2394,8 @@ def compact_coverage(item):
             'skippedDuplicateFormat':f.get('skippedDuplicateFormat') is True,
             'extractionEvidence':f.get('extractionEvidence') or {},
             'errorCategory':str(f.get('errorCategory') or '')[:60],
+            'detectedFormat':str(f.get('detectedFormat') or '')[:32],
+            'errorDetail':str(f.get('error') or '')[:180],
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
             'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
             'staffingFactScanVersion':int(f.get('staffingFactScanVersion') or 0),
