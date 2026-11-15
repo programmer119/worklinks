@@ -263,6 +263,23 @@ with sync_playwright() as p:
       return yes && getComputedStyle(fill).backgroundColor==='rgb(8, 119, 71)';
     }"""),'verified complete state must always use green'
 
+    # The 52 officially empty notices must be a distinct exclusion, not
+    # unscanned 16 / failed 39, and not inflate remaining scan work.
+    fake['counts'].update(total=2347,eligible=2295,excluded=52,
+                          completed=2050,remaining=245,
+                          unscanned=0,failed=3,incomplete=242,legacy=0)
+    fake['lanes']['scan'].update(total=2295,done=2050,failed=3,
+                                blockedNoAttachments=52,active=0)
+    page.evaluate("() => refreshRfpRescanProgress(true)")
+    page.wait_for_function("""() => document.querySelector(
+      '[data-rfp-field="excluded"]')?.textContent==='52'""",timeout=12000)
+    assert page.locator('[data-rfp-field="unscanned"]').text_content()=='0'
+    assert page.locator('[data-rfp-field="failed"]').text_content()=='3'
+    assert page.locator('[data-rfp-field="rescanRequired"]').text_content()=='245'
+    assert page.locator('[data-rfp-field="pct"]').text_content()=='89.32%'
+    assert page.locator('[data-rfp-field="scanCount"]').text_content().startswith('2,050 / 2,295'),page.locator('[data-rfp-field="scanCount"]').text_content()
+    print('WORKLINKS_RFP_NO_FILE_52_VISIBLE_BUCKETS=PASS')
+
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
     assert len(calls)>=2
     assert all('/rfp-rescan-progress?_' in value for value in calls),calls
