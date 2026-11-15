@@ -2570,6 +2570,13 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == '/api/g2b/worklinks-state':
                 project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
                 return self.reply(200, worklinks_state_get(project, user_id))
+            if u.path in ('/api/g2b/worklinks-keep','/api/g2b/worklinks-keep-members','/api/g2b/worklinks-keep-watch'):
+                project, user_id = worklinks_verify_identity(self.headers.get('Authorization', ''))
+                if u.path == '/api/g2b/worklinks-keep':
+                    return self.reply(200, worklinks_keep_own(project, user_id))
+                if u.path == '/api/g2b/worklinks-keep-members':
+                    return self.reply(200, worklinks_keep_members(project))
+                return self.reply(200, worklinks_keep_watch(project, user_id, get('member')))
             if not get_key(): raise ApiError('secret_not_configured',503)
             if u.path == '/api/g2b/mandatory-enrichment-batch':
                 if (self.client_address[0] not in ('127.0.0.1','::1')
@@ -2947,7 +2954,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            if urlparse(self.path).path != '/api/g2b/worklinks-state':
+            operation = urlparse(self.path).path
+            if operation not in ('/api/g2b/worklinks-state','/api/g2b/worklinks-keep','/api/g2b/worklinks-keep-share'):
                 raise ApiError('not_found', 404)
             origin = self.headers.get('Origin', '')
             if origin and origin not in ORIGINS:
@@ -2965,6 +2973,10 @@ class Handler(BaseHTTPRequestHandler):
                 raise ApiError('invalid_json', 400)
             if not isinstance(body, dict):
                 raise ApiError('invalid_json', 400)
+            if operation == '/api/g2b/worklinks-keep':
+                return self.reply(200, worklinks_keep_update(project, user_id, body))
+            if operation == '/api/g2b/worklinks-keep-share':
+                return self.reply(200, worklinks_keep_share(project, user_id, body))
             return self.reply(200, worklinks_state_put(project, user_id, body))
         except ApiError as e:
             return self.reply(e.status, {'ok':False, 'error':e.msg})
