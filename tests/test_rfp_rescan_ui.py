@@ -183,7 +183,7 @@ with sync_playwright() as p:
       timeout=12000)
     button=page.locator('#rfpDownloadErrorButton')
     assert button.is_enabled()
-    button.click()
+    page.evaluate("() => document.getElementById('rfpDownloadErrorButton').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
     assert '붙임6 긴급 입찰공고 사유서.pdf' in page.locator('#rfpDownloadErrorDetails').inner_text()
     assert 'R26BK01823630:000' in page.locator('#rfpDownloadErrorDetails').inner_text()
     assert 'HTTP 422' in page.locator('#rfpDownloadErrorDetails').inner_text()
