@@ -577,6 +577,37 @@ def run_once(kind, runner=None, _single=False):
                            capture_output=True, text=True, timeout=TIMEOUT[kind])
         for line in (completed.stdout or '').splitlines()[-15:]:
             log('PIPELINE_LOG', kind, line[:400])
+        # Capture aggregate on-server OCR phase timings without source text,
+        # bidder identities, raw documents or external telemetry.
+        if kind=='rfpOpenRepair':
+            profiles=[]
+            for line in (completed.stdout or '').splitlines():
+                if not line.startswith('OPEN_RFP_OCR_PHASE_PROFILE '):continue
+                try:
+                    item=json.loads(line.split(' ',1)[1])
+                    if isinstance(item,dict) and int(item.get('ocrNewPages') or 0)>0:
+                        profiles.append(item)
+                except (ValueError,TypeError):continue
+            if profiles:
+                try:
+                    pages=sum(int(x.get('ocrNewPages') or 0) for x in profiles)
+                    timing=lambda key:round(sum(float(x.get(key) or 0) for x in profiles),3)
+                    report={'observedAt':dt.datetime.now(dt.timezone.utc).isoformat(),
+                            'colorSpace':env.get('WORKLINKS_RFP_OCR_COLORSPACE','rgb'),
+                            'targetDpi':300,'documents':len(profiles),'ocrPages':pages,
+                            'renderSeconds':timing('renderSeconds'),
+                            'tesseractSeconds':timing('tesseractSeconds'),
+                            'extractWallSeconds':timing('extractWallSeconds')}
+                    report['pageAverageSeconds']=round(
+                        (report['renderSeconds']+report['tesseractSeconds'])/pages,3)
+                    target=DATA/'ocr-runtime-profile.json'
+                    staged=DATA/('ocr-runtime-profile.'+str(os.getpid())+'.tmp')
+                    staged.write_text(json.dumps(report,separators=(',',':'))+'\n',
+                                      encoding='utf-8')
+                    os.replace(staged,target)
+                    log('PIPELINE_OCR_ACTUAL_PAGE_PROFILE',json.dumps(report))
+                except (OSError,TypeError,ValueError,ZeroDivisionError) as exc:
+                    log('PIPELINE_OCR_PROFILE_UNAVAILABLE',type(exc).__name__)
         if completed.returncode != 0:
             log('PIPELINE_FAILED', kind, 'exit', completed.returncode,
                 'tail', (completed.stderr or '')[-300:].replace('\n', ' '))
