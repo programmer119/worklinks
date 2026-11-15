@@ -84,6 +84,11 @@ ocr_rows=[ocr_notice,near_notice,exact_notice]
 ocr_index={ocr_id+':000':ocr_record,
     near_id+':000':ocr_record,exact_id+':000':ocr_record}
 new_report=calc(ocr_rows,ocr_index,ocr_latest,asof=now)
+# Server can change eligibility semantics without breaking already-open
+# dashboards which validate the stable schema v1 scope token.
+assert new_report['scope']=='unexpired_saved_sw_bid_notices',new_report
+assert new_report['managementScope']=='actionable_saved_sw_bid_notices_24h',new_report
+assert new_report['minimumHoursToDeadline']==24,new_report
 assert new_report['counts']['total']==1,new_report
 assert new_report['counts']['legacy']==1,new_report
 assert new_report['counts']['rescanRequired']==1,new_report
