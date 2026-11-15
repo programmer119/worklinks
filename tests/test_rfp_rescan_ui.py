@@ -17,9 +17,9 @@ fake={
               'roles':{'total':6,'done':2,'remaining':4},
               'facts':{'total':6,'done':2,'remaining':4},
               'hwpx':{'total':2,'done':1,'remaining':1}},
-    'lanes':{'available':True,'manifest':{'total':1000,'done':900},
-             'download':{'total':1000,'done':850,'active':8,'failed':2},
-             'scan':{'total':1000,'done':375,'active':4,'failed':0}},
+    'lanes':{'available':True,'scope':'unexpired_saved_sw_bid_notices','manifest':{'total':6,'done':4},
+             'download':{'total':6,'done':3,'processed':3,'errors':0,'active':2,'failed':2},
+             'scan':{'total':6,'done':1,'active':4,'failed':0,'blockedNoAttachments':1,'notQueued':0}},
     'activity':{'available':True,
         'workers':{'manifest':{'status':'retry','error':'provider quota',
                               'retryEpoch':1794672000,'updatedEpoch':1794630000,'stale':False},
@@ -111,11 +111,11 @@ with sync_playwright() as p:
       "() => document.querySelector('#rfpRescanContent')?.textContent.includes('실제 작업 진행 중')",
       timeout=12000)
     body=page.locator('#rfpRescanContent').text_content()
-    for term in ('관리 대상','6','최신 판독 완료','1','재판독 필요','구버전',
+    for term in ('관리 대상','6','최신 판독 완료','1','판독 미완료','구버전',
                  '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','파일 다운로드 8개','판독 4건'):
         assert term in body,(term,body)
-    assert '첨부목록 확보' in body and '900 / 1,000건' in body,body
-    assert '원본 다운로드' in body and '정상 850 · 오류 0건 · 전체 1,000건' in body,body
+    assert '첨부목록 확보' in body and '4 / 6건' in body,body
+    assert '원본 다운로드' in body and '정상 3 · 오류 0건 · 전체 6건' in body,body
     assert '사업제안요청서.pdf 외 7개' in body,body
     assert '다운로드 중 00:' in body,body
     assert '0.50MB / 2.00MB' in body,body
@@ -124,7 +124,9 @@ with sync_playwright() as p:
       window._rfpFileLiveRow=document.querySelector('[data-rfp-stage="download"] .rfp-rescan-stage-track');
     }""")
 
-    assert '문서 판독' in body and '375 / 1,000건' in body,body
+    assert '문서 판독' in body and '1 / 6건' in body,body
+    assert '판독 미완료' in body and '5' in body,body
+    assert all(str(6) in page.locator('[data-rfp-field="'+key+'Count"]').inner_text() for key in ('manifest','download','scan')), 'all lanes share management cohort denominator'
     assert page.locator('#rfpLiveDetails').count()==0, 'duplicate detail cards must be removed'
     assert page.locator('#rfpRescanContent .rfp-rescan-lanes .rfp-rescan-stage-row').count()==3
     assert page.locator('#rfpRescanContent .rfp-rescan-features:not([open])').count()==1
@@ -144,14 +146,16 @@ with sync_playwright() as p:
 
     # A new server result must actually update both completed numerator and percentage.
     fake['counts'].update(completed=2,remaining=4,unscanned=0)
-    fake['lanes']['download']['done']=851
+    fake['lanes']['download']['done']=4
+    fake['lanes']['download']['processed']=4
+    fake['lanes']['scan']['done']=2
     fake['activity']['items'][0]['bytesDone']=1048576
     fake['activity']['downloadGroup']['activeCount']=7
     fake['activity']['downloadGroup']['files']=fake['activity']['downloadGroup']['files'][:7]
     fake['activity']['downloadGroup']['files'][0]['bytesDone']=1048576
     fake['activity']['downloadGroup']['recentErrors']=[{'name':'첨부파일8.pdf',
         'reason':'upstream_http_429','retryEpoch':time.time()+300,'updatedEpoch':time.time()}]
-    fake['lanes']['manifest']['done']=920
+    fake['lanes']['manifest']['done']=5
     fake['asOf']='2026-11-14T12:01:00+09:00'
     page.evaluate("() => refreshRfpRescanProgress(true)")
     page.wait_for_function(
@@ -159,7 +163,7 @@ with sync_playwright() as p:
       timeout=12000)
     assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
-    assert '정상 851 · 오류 0건 · 전체 1,000건' in page.locator('#rfpRescanContent').text_content()
+    assert '정상 4 · 오류 0건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
     assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
     assert '사업제안요청서.pdf 외 6개' in page.locator('#rfpRescanContent').text_content()
     assert '오류 1건' in page.locator('#rfpRescanContent').text_content()
