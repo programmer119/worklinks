@@ -65,6 +65,10 @@ if ! dk image inspect "$IMAGE" >/dev/null 2>&1;then
       -t "$IMAGE" "$ROOT/server"
 fi
 dk run --rm "$IMAGE" sh -c 'command -v hwp5txt >/dev/null && command -v tesseract >/dev/null && tesseract --list-langs 2>&1 | grep -q kor && python -c "import pypdf, pymupdf, six, hwp5.hwp5txt; print(\"PIPELINE_PDF_HWP_KOREAN_OCR_READY=PASS\")"'
+# Production mode must be validated with the pipeline's exact Python/OCR image.
+# This test validates both RGB fallback and opt-in 300-DPI grayscale rendering.
+dk run --rm --network none -v "$ROOT:/work:ro" \
+  "$IMAGE" python /work/tests/test_rfp_ocr_color_profile_20261116.py
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
 for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json qualification-review.json;do
@@ -164,6 +168,7 @@ start_worker(){
   dk run -d --name "$WORKER" --restart unless-stopped --network host \
       -e G2B_PIPELINE_DATA=/app/data \
       -e G2B_PIPELINE_SCRIPTS=/app/scripts \
+      -e WORKLINKS_RFP_OCR_COLORSPACE=gray \
       -e WORKLINKS_G2B_API=http://127.0.0.1:18192/api/g2b \
       -e G2B_RFP_BATCH=8 \
       -e WORKLINKS_RFP_DOWNLOAD_CONCURRENCY=8 \
