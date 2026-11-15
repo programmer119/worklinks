@@ -289,6 +289,12 @@ def run_once(kind, runner=None, _single=False):
             env['WORKLINKS_RFP_DUAL_QUEUE_DB']=str(DATA/'rfp-dual-queue.sqlite3')
         if kind=='rfpUpgrade' and dual_enabled:
             env['WORKLINKS_RFP_DUAL_SCAN_ONLY']='1'
+        if kind=='rfpUpgrade' and dual_enabled:
+            # Limit each source extractor, not just the entire eight-notice batch.
+            env['WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS']='12'
+        elif kind=='rfpOpenRepair':
+            # Slow full-fidelity OCR gets its own generous but finite budget.
+            env['WORKLINKS_RFP_EXTRACT_TIMEOUT_SECONDS']='90'
         if kind in ('rfp','rfpUpgrade'):
             # OCR repair remains full-fidelity, but the bulk scanner never
             # holds every other notice behind multi-page Tesseract.
