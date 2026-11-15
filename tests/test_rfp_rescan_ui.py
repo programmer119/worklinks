@@ -59,7 +59,7 @@ with sync_playwright() as p:
     browser=p.chromium.launch(headless=True)
     page=browser.new_page(viewport={'width':1310,'height':820})
     errors=[]
-    page.on('pageerror',lambda err:errors.append(str(err)))
+    page.on('pageerror',lambda err:errors.append(str(err)+' | stack='+str(getattr(err,'stack',''))))
     calls=[]
     def respond(route):
         calls.append(route.request.url)
