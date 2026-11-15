@@ -72,4 +72,47 @@ for route in ("if u.path in ('/api/g2b/worklinks-keep'",
               "worklinks_keep_watch(project, user_id, get('member'))"):
     assert route in source, 'keep API route missing: '+route
 print('WORKLINKS_KEEP_WATCH_ROUTES=PASS')
+# Exercise actual HTTP handlers, not only Python DB functions. Fake auth
+# confirms isolation without reading real users or using production credentials.
+import threading
+from urllib.request import Request,urlopen
+from urllib.error import HTTPError
+assert put('p47','member-11111111',record)['ok']
+assert share('p47','member-11111111',{'enabled':True,'alias':'개발 1팀'})['ok']
+def fixture_identity(header):
+    if header=='Bearer owner-fixture':return ('p47','member-11111111')
+    if header=='Bearer viewer-fixture':return ('p47','member-22222222')
+    raise ApiError('auth_required',401)
+handler=p['Handler']
+httpd=p['ThreadedServer'](('127.0.0.1',0),handler)
+port=httpd.server_address[1]
+thread=threading.Thread(target=httpd.serve_forever,daemon=True)
+with mock.patch.dict(handler.do_GET.__globals__,{'worklinks_verify_identity':fixture_identity}):
+    thread.start()
+    try:
+        def GET(path,auth):
+            req=Request('http://127.0.0.1:'+str(port)+'/api/g2b/'+path,
+                        headers={'Authorization':'Bearer '+auth})
+            with urlopen(req,timeout=4) as resp:
+                return json.load(resp)
+        owned=GET('worklinks-keep','owner-fixture')
+        assert owned['ok'] and len(owned['items'])==1
+        viewed_own=GET('worklinks-keep','viewer-fixture')
+        assert viewed_own['ok'] and viewed_own['items']==[]
+        visible=GET('worklinks-keep-members','viewer-fixture')
+        assert len(visible['members'])==1
+        watched=GET('worklinks-keep-watch?member=member-11111111','viewer-fixture')
+        assert watched['readOnly'] and watched['items']==owned['items']
+        try:GET('worklinks-keep','invalid')
+        except HTTPError as error:assert error.code==401
+        else:raise AssertionError('unauthenticated keep query was allowed')
+        assert share('p47','member-11111111',{'enabled':False,'alias':'개발 1팀'})['ok']
+        try:GET('worklinks-keep-watch?member=member-11111111','viewer-fixture')
+        except HTTPError as error:assert error.code==404
+        else:raise AssertionError('revoked spectator access still succeeded')
+    finally:
+        httpd.shutdown()
+        thread.join(timeout=4)
+        httpd.server_close()
+print('WORKLINKS_KEEP_AUTHENTICATED_HTTP_INTEGRATION=PASS')
 print('WORKLINKS_KEEP_WATCH_ACCOUNT_ISOLATION=PASS')
