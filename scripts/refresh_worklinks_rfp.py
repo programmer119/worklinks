@@ -43,7 +43,7 @@ _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
-RFP_TEXT_CACHE_VERSION=4
+RFP_TEXT_CACHE_VERSION=5
 
 # Run potentially unbounded PDF/HWP/ZIP text extraction in a disposable child.
 # An expensive vector-drawing PDF must never hold every other stage-3 notice
@@ -1947,7 +1947,13 @@ def _extract_dispatch(name,raw):
         if not raw.startswith(_OLE_HEADER):raise ValueError('invalid_legacy_xls')
         return extract_legacy_xls(raw)
     if n.endswith(('.hml','.htm','.html')):
-        return extract_markup_document(name,raw)
+        # A misnamed HWPX/HWP can actually be standalone HWPML. Preserve
+        # the detected XML MIME while choosing the strict HML paragraph
+        # reader, not the permissive HTML parser. The HTML path would
+        # accidentally ingest embedded <BINDATA> base64 as source text.
+        markup_name=(name if Path(str(name)).suffix.lower() in ('.hml','.htm','.html')
+                     else 'official-source.hml')
+        return extract_markup_document(markup_name,raw)
     if n.endswith('.hwp'):
         if not raw.startswith(_OLE_HEADER):raise ValueError('invalid_hwp')
         with tempfile.TemporaryDirectory() as directory:
