@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Server-side kept-job ownership and opt-in spectator regressions (no network)."""
-import os,runpy,tempfile
+import os,runpy,tempfile,json
 os.environ['WORKLINKS_STATE_DB']=os.path.join(tempfile.mkdtemp(prefix='keep-watch-'),'members.sqlite3')
 p=runpy.run_path(os.environ.get('WORKLINKS_G2B_SOURCE','server/g2b-proxy.py'),run_name='keep_watch_test')
 ApiError=p['ApiError']
