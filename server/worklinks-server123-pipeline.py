@@ -44,7 +44,7 @@ RFP_OCR_SCAN_BATCH_INTERVAL = 4
 # When download-ready work is on scan-retry cooldown, OCR repair is independent
 # of upstream file requests and must continue using saved verified originals.
 RFP_OCR_IDLE_PERIOD = 120
-RFP_OPEN_READER_VERSION='pdf25-blank-hwpx-embedded-image-v11-finish-first'
+RFP_OPEN_READER_VERSION='pdf25-blank-hwpx-embedded-image-v12-provenance-rescan'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
 # Explicit short-lived recovery selection; candidates rotate out once fully scanned.
@@ -914,19 +914,30 @@ def main():
         # independent bounded upgrade queue with durable progress.
         current_versions=deployed_rfp_reader_versions()
         previous_versions=state.get('rfpDeployedReaderVersions')
-        manifest={'ok':True,'schemaVersion':1,'latest':current_versions,
+        # OCR source repair has an independently versioned reader. Publish it
+        # in the same authoritative manifest as all other parser revisions;
+        # otherwise old OCR failures never enter the global rescan progress.
+        manifest_versions=dict(current_versions,ocrReaderVersion=RFP_OPEN_READER_VERSION)
+        manifest={'ok':True,'schemaVersion':1,'latest':manifest_versions,
                   'generatedAt':dt.datetime.now(dt.timezone.utc).isoformat()}
         manifest_path=SEEDS/'rfp-scanner-versions.json'
-        if previous_versions!=current_versions or not manifest_path.is_file():
+        previous_manifest=read_json(manifest_path)
+        parser_changed=(previous_versions!=current_versions or not manifest_path.is_file())
+        ocr_changed=str((previous_manifest.get('latest') or {}).get('ocrReaderVersion') or '')!=RFP_OPEN_READER_VERSION
+        if parser_changed or ocr_changed:
             with tempfile.TemporaryDirectory(prefix='rfp-reader-versions-',dir=str(DATA)) as temp:
                 staged=Path(temp)/'rfp-scanner-versions.json'
                 staged.write_text(json.dumps(manifest,ensure_ascii=False)+'\n',encoding='utf-8')
                 publish_atomic(staged,manifest_path)
             state['rfpDeployedReaderVersions']=current_versions
-            state['rfpUpgradeActive']=True
-            state['rfpUpgrade']={'status':'parser_versions_upgraded','attemptEpoch':0}
-            state['rfp']={'status':'parser_versions_upgraded','attemptEpoch':0}
-            log('PIPELINE_PARSER_UPGRADE_QUEUE_CREATED',current_versions)
+            if parser_changed:
+                state['rfpUpgradeActive']=True
+                state['rfpUpgrade']={'status':'parser_versions_upgraded','attemptEpoch':0}
+                state['rfp']={'status':'parser_versions_upgraded','attemptEpoch':0}
+                log('PIPELINE_PARSER_UPGRADE_QUEUE_CREATED',current_versions)
+            if ocr_changed:
+                state['rfpOpenRepair']={'status':'reader_version_changed_run_now','attemptEpoch':0}
+                log('PIPELINE_OCR_READER_RESCAN_QUEUE_CREATED',RFP_OPEN_READER_VERSION)
         # A source-only queue change does not alter parser field versions.
         # Discard an old "no eligible" cooldown on this deploy so the
         # newly supported first-time SW backlog starts draining immediately.
