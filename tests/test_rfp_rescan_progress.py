@@ -143,3 +143,23 @@ with tempfile.TemporaryDirectory() as temp:
         'pending':0,'active':0,'failed':0},lanes
     assert lanes['download']['failed']==1,lanes
 print('WORKLINKS_RFP_MANIFEST_DONE_DOWNLOAD_PENDING_NOT_ACTIVE=PASS')
+
+# A verified empty official attachment list is a terminal scan exclusion.
+# It is NOT a scanner failure and NOT a stale previously-completed scan.
+with tempfile.TemporaryDirectory() as temp:
+    path=Path(temp)/'empty-cohort.sqlite3'
+    ids=['R26BK00009101:000','R26BK00009102:000']
+    with sqlite3.connect(path) as conn:
+        conn.execute('CREATE TABLE rfp_dual_notices (notice_key TEXT PRIMARY KEY, download_status TEXT, scan_status TEXT, metadata_json TEXT, updated_at TEXT)')
+        conn.execute('CREATE TABLE rfp_bulk_manifests (notice_key TEXT PRIMARY KEY)')
+        conn.executemany('INSERT INTO rfp_dual_notices VALUES (?,?,?,?,?)',[
+            (ids[0],'ready','done','{}',''),
+            (ids[1],'no_attachments','skipped','{}','')])
+        conn.executemany('INSERT INTO rfp_bulk_manifests VALUES (?)',
+                         [(key,) for key in ids])
+    stage=p['rfp_cohort_lanes'](str(path),set(ids),set())
+    assert stage['scan']['blockedNoAttachments']==1,stage
+    assert stage['scan']['failed']==0,stage
+    assert stage['scan']['staleQueueComplete']==1,stage
+    assert stage['scan']['active']==0,stage
+print('RFP_NO_FILE_SKIPPED_NOT_FAILED_OR_STALE=PASS')
