@@ -84,6 +84,40 @@ def failed_files(scan):
             or int(f.get('unmatchedQualificationAnchorCount') or 0)>0)]
 
 
+def repair_file_priority(f):
+    """Prioritize reader-fixable, already downloaded files over repeated HWP failures."""
+    category=str(f.get('errorCategory') or '')
+    suffix=Path(str(f.get('name') or '')).suffix.lower()
+    if category in ('pdf_ocr_incomplete','ocr_deferred_to_repair',
+                    'image_ocr_incomplete','pdf_unreadable_page'):
+        return 0
+    if suffix in ('.xls','.hml','.html','.htm'):
+        return 1
+    if category=='no_searchable_text':
+        return 2
+    if category in ('hwp5txt_failed','invalid_hwp',
+                    'source_extraction_timeout_deferred','pdf_over_page_limit'):
+        return 5
+    if f.get('readable') is True and (f.get('sourceTextScanComplete') is not True
+                                     or f.get('qualificationScanTruncated') is True):
+        return 4
+    return 3
+
+
+def choose_repair_batch(candidates,limit,max_files):
+    """Bound the repairer by FILES, not whole notices, so 9+ file RFPs are eligible."""
+    chosen=[]
+    used=0
+    for priority,deadline,key,metadata,source,nfiles in sorted(
+            candidates,key=lambda r:(r[0],r[1],r[2])):
+        if len(chosen)>=limit or used>=max_files:break
+        allowance=min(3,nfiles,max_files-used)
+        if allowance<=0:continue
+        chosen.append((key,deadline,metadata,source,allowance))
+        used+=allowance
+    return chosen,used
+
+
 def reader_retry_files(scan):
     return [f for f in failed_files(scan)
             if f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION]
@@ -212,7 +246,7 @@ def fetch_verified_raw(source,ledgerpath,expected_sha):
     return raw,'verified_cache'
 
 
-def process_one(key,scan,meta,ledger):
+def process_one(key,scan,meta,ledger,file_limit=None):
     """No successful file is downloaded, parsed, or overwritten."""
     manifest=meta['attachments']['items']
     byname={}
@@ -226,7 +260,9 @@ def process_one(key,scan,meta,ledger):
     counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
     # Examine all notice siblings together. The single-file wrapper here
     # previously lost the verified PDF companion and retried covered HWP.
-    pending=reader_retry_files(scan)
+    pending=sorted(reader_retry_files(scan),key=repair_file_priority)
+    if file_limit is not None:
+        pending=pending[:max(0,int(file_limit))]
     receipts={f['url']:f for f in meta.get('downloadVerifiedFiles') or []
               if isinstance(f,dict) and f.get('url') and f.get('sha256')}
     for f in scan['files']:
@@ -371,7 +407,7 @@ def run(data_dir,limit,execute=False,max_files=400):
     entries=read_json(coverage_path).get('byNotice') or {}
     now=dt.datetime.now(dt.timezone.utc)
     open_rows=open_candidates(root,now)
-    selected=[];categories=Counter();selected_file_count=0
+    candidates=[];categories=Counter();selected_file_count=0
     for key,ends in open_rows:
         scan=entries.get(key)
         if not isinstance(scan,dict):
@@ -394,9 +430,9 @@ def run(data_dir,limit,execute=False,max_files=400):
             categories['download_manifest_mismatch']+=1;continue
         src='verified_download_queue'
         categories['ready']+=1
-        if len(selected)<limit and selected_file_count+len(broken)<=max_files:
-            selected.append((key,ends,meta,src))
-            selected_file_count+=len(broken)
+        candidates.append((min(repair_file_priority(f) for f in broken),
+                           ends,key,meta,src,len(broken)))
+    selected,selected_file_count=choose_repair_batch(candidates,limit,max_files)
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
@@ -468,7 +504,7 @@ def run(data_dir,limit,execute=False,max_files=400):
         pending.clear()
 
     try:
-        for key,deadline,meta,src in selected:
+        for key,deadline,meta,src,file_limit in selected:
             if deadline.astimezone(dt.timezone.utc)<=dt.datetime.now(dt.timezone.utc)+dt.timedelta(hours=24):
                 tally['skipped_deadline']+=1;continue
             # Do not use stale input to overwrite a reclassified manifest.
@@ -481,7 +517,7 @@ def run(data_dir,limit,execute=False,max_files=400):
                 tally['download_receipt_changed']+=1;continue
             work=json.loads(json.dumps(latest,ensure_ascii=False))
             try:
-                additions,counters=process_one(key,work,meta,ledger)
+                additions,counters=process_one(key,work,meta,ledger,file_limit=file_limit)
             except VerifiedOriginalMissing as exc:
                 from rfp_dual_queue import RfpDualQueue
                 RfpDualQueue(queue_path).mark_download_missing(key)
