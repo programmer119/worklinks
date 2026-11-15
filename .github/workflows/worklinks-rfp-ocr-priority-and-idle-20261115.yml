@@ -27,3 +27,5 @@ jobs:
           python3 tests/test_rfp_verified_file_handoff.py
           python3 tests/test_rfp_dual_queue.py
           echo WORKLINKS_RFP_OCR_REPAIR_CONTINUOUS_PRIORITY_PASS
+
+# v14 strict HWPML dispatch retains truncated HML classification and scanner fairness.
