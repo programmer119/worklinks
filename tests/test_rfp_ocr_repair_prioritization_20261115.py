@@ -28,10 +28,10 @@ candidates=[
 ]
 chosen,used=repair.choose_repair_batch(candidates,limit=3,max_files=8)
 assert [x[0] for x in chosen]==[
-    'R26BK00000001:000','R26BK00000002:000','R26BK00000003:000'
+    'R26BK00000003:000','R26BK00000001:000','R26BK00000002:000'
 ],chosen
 assert used==7,used  # 3 HWP + 1 OCR + 3 XLS; large manifests remain eligible
-assert [x[-1] for x in chosen]==[3,1,3],chosen
+assert [x[-1] for x in chosen]==[3,3,1],chosen
 assert repair.choose_repair_batch(candidates,limit=2,max_files=3)[1]==3
 assert repair.choose_repair_batch(candidates,limit=3,max_files=1)[1]==1
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
