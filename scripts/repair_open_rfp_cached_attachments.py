@@ -88,6 +88,13 @@ def repair_file_priority(f):
     """Prioritize reader-fixable, already downloaded files over repeated HWP failures."""
     category=str(f.get('errorCategory') or '')
     suffix=Path(str(f.get('name') or '')).suffix.lower()
+    # Reader v6 solves a verified pyhwp ColumnSet failure by decoding every
+    # native HWP5 text record. Retry these proven new-reader fixes before OCR.
+    if category=='hwp5txt_failed':
+        return -2 if suffix in ('.xls','.xlsx') else -1
+    if f.get('readable') is True and (f.get('qualificationScanTruncated') is True
+                                     or f.get('staffingRoleScanTruncated') is True):
+        return -1
     if category in ('pdf_ocr_incomplete','ocr_deferred_to_repair',
                     'image_ocr_incomplete','pdf_unreadable_page'):
         return 0

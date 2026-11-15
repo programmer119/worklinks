@@ -1,7 +1,7 @@
 name: WorkLinks OCR priority and retry-idle drain
 on:
   push:
-    branches: [fix/rfp-ocr-repair-priority-and-idle-drain-20261115, main]
+    branches: [fix/rfp-hwp-repair-priority-20261115, fix/rfp-ocr-repair-priority-and-idle-drain-20261115, main]
     paths:
       - server/worklinks-server123-pipeline.py
       - scripts/repair_open_rfp_cached_attachments.py
@@ -20,6 +20,8 @@ jobs:
         run: |
           python3 -m py_compile server/worklinks-server123-pipeline.py scripts/repair_open_rfp_cached_attachments.py
           python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
+          python3 tests/test_rfp_hwp_records_fallback_20261115.py
+          python3 tests/test_rfp_long_document_coverage_20261115.py
           python3 tests/test_worklinks_server123_pipeline.py
           python3 tests/test_open_cached_rfp_repair.py
           python3 tests/test_rfp_verified_file_handoff.py
