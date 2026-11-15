@@ -252,7 +252,9 @@ with sync_playwright() as p:
     page.wait_for_function("""() => 
       document.querySelector('[data-rfp-stage="download"]')?.dataset.status==='success'""",timeout=12000)
     assert page.locator('[data-rfp-stage="manifest"]').get_attribute('data-status')=='success'
-    assert page.locator('[data-rfp-stage="scan"]').get_attribute('data-status')=='warning'
+    # Officially verified empty attachments are excluded, not scan errors.
+    assert page.locator('[data-rfp-stage="scan"]').get_attribute('data-status')=='neutral'
+    assert '판독 제외 1건' in page.locator('[data-rfp-field="scanState"]').text_content()
     assert page.evaluate("""() => {
       const row=document.querySelector('[data-rfp-stage="download"]');
       const note=row.querySelector('.rfp-rescan-stage-note');
