@@ -60,7 +60,7 @@ jobs:
                   '<button type="button" class="job-keep-button" data-keep-toggle="'+id+'">★ 킵</button>');
                 window.worklinksKeeps={getMode:()=>window.__qaMode,
                   activeItems:()=>window.__qaItems,keepButton,has:id=>ids.includes(id)};
-                const canonical=html=>html.replace(/<button[^>]*data-keep-toggle="[^"]*"[^>]*>[^<]*<\\/button>/g,'');
+                const canonical=html=>html.replace(/<button[^>]*data-keep-toggle="[^"]*"[^>]*>[^<]*<[/]button>/g,'');
                 renderJobs();
                 const normal=new Map([...document.querySelectorAll('#jobCards .job-mini')]
                   .filter(el=>ids.includes(el.dataset.jobCard))
