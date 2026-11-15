@@ -8,6 +8,9 @@ on:
       - 'startup-support/worklinks-header-auth.js'
       - 'startup-support/worklinks-header-auth.css'
       - 'startup-support/worklinks-auth-version.txt'
+      - 'tests/test_worklinks_direct_relogin.mjs'
+      - 'startup-support/index.html'
+      - 'startup-support/auth-callback.html'
       - 'startup-support/tests/auth_gate_live_qa.py'
 permissions:
   contents: read
@@ -23,6 +26,7 @@ jobs:
           set -Eeuo pipefail
           node --input-type=module --check < startup-support/worklinks-account.js
           node --input-type=module --check < startup-support/worklinks-header-auth.js
+          node tests/test_worklinks_direct_relogin.mjs
           python3 - <<'PY'
           from pathlib import Path
           html=Path('startup-support/index.html').read_text()
