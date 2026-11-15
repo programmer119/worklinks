@@ -143,3 +143,50 @@ with tempfile.TemporaryDirectory() as tmp:
     assert q.claim_download()[0]==legacy_file
 
 print('RFP_DUAL_QUEUE_1000_FULL_DOWNLOAD_INDEPENDENT_SCAN=PASS')
+
+# 3/4/5: distinguish actual failure causes, stop identical blind retries,
+# reopen changed evidence, and never preserve a stale error after success.
+with tempfile.TemporaryDirectory() as tmp:
+    from rfp_dual_queue import scan_evidence_signature
+    q=RfpDualQueue(Path(tmp)/'scan-policy.sqlite3')
+    key='R26BK99990003:000'
+    q.enqueue([('R26BK99990003','000','2099-12-31')],'reader-v1')
+    meta={'attachments':{'ok':True,'complete':True,
+           'items':[{'name':'bad.pdf','url':'https://www.g2b.go.kr/UntyAtchFile/bad.pdf'}]},
+          'noticeDocuments':{'ok':True,'complete':True},
+          'downloadVerifiedFiles':[{'name':'bad.pdf',
+             'url':'https://www.g2b.go.kr/UntyAtchFile/bad.pdf','sha256':'b'*64}]}
+    claim=q.claim_download()
+    assert claim and claim[0]==key,claim
+    q.downloaded(key,meta,1,1)
+    row={'status':'text_extracted_requires_review','manifestComplete':True,
+         'staffingRoleScanComplete':False,
+         'files':[{'name':'bad.pdf','sourceSha256':'b'*64,
+                   'readable':False,'errorCategory':'pdf_ocr_incomplete'}]}
+    sig=scan_evidence_signature(row)
+    assert q.claim_ready(1)[0][0]==key
+    assert q.scan_finished(key,False,'scan_staffing_incomplete:pdf_ocr_incomplete',sig)
+    with q.connect() as db:
+        before=db.execute('SELECT last_error,scan_repeat_count,scan_failure_signature,scan_retry_epoch FROM rfp_dual_notices WHERE notice_key=?',(key,)).fetchone()
+        assert before[0]=='scan_staffing_incomplete:pdf_ocr_incomplete'
+        assert before[1]==1 and before[2]==sig and time.time()<before[3]<time.time()+310,before
+        db.execute('UPDATE rfp_dual_notices SET scan_retry_epoch=0 WHERE notice_key=?',(key,))
+    assert q.claim_ready(1)[0][0]==key
+    q.scan_finished(key,False,'scan_staffing_incomplete:pdf_ocr_incomplete',sig)
+    with q.connect() as db:
+        held=db.execute('SELECT scan_status,scan_retry_epoch,scan_repeat_count FROM rfp_dual_notices WHERE notice_key=?',(key,)).fetchone()
+        assert held==('retry',2147483647.0,2),held
+    assert q.claim_ready(1)==[], 'unchanged failure must never endlessly reparse'
+    assert q.reopen_changed_scan_evidence({key:row})==0
+    changed=dict(row,files=[dict(row['files'][0],errorCategory='file_extract_failure')])
+    assert q.reopen_changed_scan_evidence({key:changed})==1
+    assert q.claim_ready(1)[0][0]==key
+    q.scan_finished(key,True)
+    with q.connect() as db:
+        final=db.execute('SELECT scan_status,scan_retry_epoch,last_error,scan_repeat_count,scan_failure_signature FROM rfp_dual_notices WHERE notice_key=?',(key,)).fetchone()
+        assert final==('done',0.0,'',0,''),final
+        db.execute("UPDATE rfp_dual_notices SET last_error='scan_unverified_or_incomplete' WHERE notice_key=?",(key,))
+    reconciliation=q.reconcile_management({key:'2099-12-31'},{key},'reader-v1')
+    with q.connect() as db:
+        assert db.execute('SELECT last_error FROM rfp_dual_notices WHERE notice_key=?',(key,)).fetchone()==('',)
+print('RFP_SCAN_RETRY_REASON_DEDUP_AND_STATE_RECONCILIATION=PASS')
