@@ -25,7 +25,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v9-page-resume'
+READER_ATTEMPT_VERSION='pdf25-blank-hwpx-embedded-image-v10-fair-resume'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -119,17 +119,46 @@ def repair_file_priority(f):
 
 
 def choose_repair_batch(candidates,limit,max_files):
-    """Bound the repairer by FILES, not whole notices, so 9+ file RFPs are eligible."""
+    """Complete easily recoverable notices first, then longer OCR documents.
+
+    Keep reader-category priority, while avoiding a 91-page incomplete PDF
+    occupying one of only four slots ahead of a nearly finished 26-page PDF.
+    Legacy six-column input is retained for no-network compatibility tests.
+    """
     chosen=[]
     used=0
-    for priority,deadline,key,metadata,source,nfiles in sorted(
-            candidates,key=lambda r:(r[0],r[1],r[2])):
+    def priority(item):
+        # item[6]: (additional non-retryable broken files, unfinished files,
+        #             estimated OCR pages). The lowest unfinished work first.
+        score=item[6] if len(item)>6 else (0,1,0)
+        return (item[0],score[0],score[1],score[2],item[1],item[2])
+    for item in sorted(candidates,key=priority):
+        _priority,deadline,key,metadata,source,nfiles=item[:6]
         if len(chosen)>=limit or used>=max_files:break
         allowance=min(3,nfiles,max_files-used)
         if allowance<=0:continue
         chosen.append((key,deadline,metadata,source,allowance))
         used+=allowance
     return chosen,used
+
+
+def repair_completion_score(scan,pending):
+    """Prioritize bids whose remaining verified files can actually finish."""
+    incomplete=failed_files(scan)
+    unrepairable=max(0,len(incomplete)-len(pending))
+    pages=0
+    for item in pending:
+        info=item.get('extractionEvidence') or {}
+        deferred=info.get('ocrBatchDeferredPages')
+        failed=info.get('ocrFailedPages')
+        if deferred is not None or failed is not None:
+            pages+=max(1,int(deferred or 0)+int(failed or 0))
+        elif info.get('pdfPages') is not None:
+            pages+=max(1,int(info.get('pdfPages') or 0)-
+                int(info.get('ocrRecoveredPages') or 0))
+        else:
+            pages+=8
+    return (unrepairable,len(incomplete),pages)
 
 
 def reader_retry_files(scan):
@@ -555,7 +584,8 @@ def run(data_dir,limit,execute=False,max_files=400):
         src='verified_download_queue'
         categories['ready']+=1
         candidates.append((min(repair_file_priority(f) for f in broken),
-                           ends,key,meta,src,len(broken)))
+                           ends,key,meta,src,len(broken),
+                           repair_completion_score(scan,broken)))
     selected,selected_file_count=choose_repair_batch(candidates,limit,max_files)
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
