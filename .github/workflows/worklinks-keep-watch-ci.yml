@@ -46,6 +46,15 @@ jobs:
                       'window.worklinksKeepSnapshotFor','data-keep-toggle',
                       'worklinks-keep.js?v='):
               assert key in html,key
+          keep=pathlib.Path('startup-support/worklinks-keep.js').read_text(encoding='utf-8')
+          assert 'function keptMarkup' not in keep
+          assert 'keepListPanel' not in keep and 'keepListCards' not in keep
+          assert 'window.worklinksKeeps=' in keep and 'activeItems:()=>' in keep
+          assert "const keepMode=window.worklinksKeeps?.getMode?.()||'all'" in html
+          assert "if(worklinksKeptFullRows.has(id))return worklinksKeptFullRows.get(id)" in html
+          assert "data-job-card" in html and "data-job-detail" in html
+          assert '#jobsView[data-keep-mode=mine] #jobCards' not in html
+          print('WORKLINKS_KEPT_VIEW_REUSES_ORIGINAL_CLICKABLE_CARDS=PASS')
           print('WORKLINKS_KEEP_UI_PRESENT=PASS')
           PY
           node --check /tmp/worklinks-keep-page.js
