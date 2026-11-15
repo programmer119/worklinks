@@ -189,6 +189,28 @@ with sync_playwright() as p:
     assert '붙임6 긴급 입찰공고 사유서.pdf' in page.locator('#rfpDownloadErrorDetails').text_content()
     assert 'R26BK01823630:000' in page.locator('#rfpDownloadErrorDetails').text_content()
     assert 'HTTP 422' in page.locator('#rfpDownloadErrorDetails').text_content()
+    # The transfer strip must never repeat the confirmed error list or hide
+    # the current file count, even when the filename is very long.
+    fake['activity']['downloadGroup']['files'][0]['name']=(
+        'KOICA 입찰 관련 규정 및 지침(2026년 개정판) 원본 '
+        '세부 운영사항 및 첨부파일 버전 최종 검토용.pdf')
+    page.evaluate("() => refreshRfpRescanProgress(true)")
+    page.wait_for_function(
+      "() => document.querySelector('[data-rfp-stage=\"download\"] .rfp-download-current-name')?.textContent.startsWith('KOICA')",
+      timeout=12000)
+    track_text=page.locator('[data-rfp-stage="download"] .rfp-rescan-stage-track').inner_text()
+    assert '외 6개' in track_text,track_text
+    assert '오류' not in track_text and 'R26BK01823630' not in track_text,track_text
+    assert '1.00MB / 2.00MB' in track_text,track_text
+    assert page.evaluate("""() => {
+      const track=document.querySelector('[data-rfp-stage="download"]');
+      const name=track.querySelector('.rfp-download-current-name');
+      const extra=track.querySelector('.rfp-download-more-count');
+      const slot=track.querySelector('.rfp-stage-focus-name');
+      if(!name||!extra||!slot)return false;
+      const r=extra.getBoundingClientRect(), b=slot.getBoundingClientRect();
+      return r.width>24 && r.left>=b.left && r.right<=b.right+1;
+    }"""),'외 N개 must stay fully visible beside long filename'
     assert '정상 4 · 오류 1건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
     assert '5 / 6건' in page.locator('#rfpRescanContent').text_content()
     assert page.evaluate('() => window._rfpOriginalDownloadTrack===document.querySelector(\'[data-rfp-stage="download"] .rfp-rescan-stage-track\')'), 'progress DOM must not be replaced every 10s'
