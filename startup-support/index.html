@@ -2193,7 +2193,7 @@ async function refreshRfpRescanProgress(force=false){
    if(!res.ok)throw Error('운영 집계 HTTP '+res.status);
    const report=await res.json();
    if(report?.ok!==true||report?.schemaVersion!==1||
-      report?.scope!=='unexpired_saved_sw_bid_notices'||
+      !['unexpired_saved_sw_bid_notices','actionable_saved_sw_bid_notices_24h'].includes(report?.scope)||
       !rfpProgressTotalsConsistent(report?.counts))
     throw Error('집계 데이터 형식 오류');
    const previous=rfpRescanProgress;
