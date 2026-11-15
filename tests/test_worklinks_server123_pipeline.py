@@ -207,6 +207,26 @@ with tempfile.TemporaryDirectory() as temporary:
     assert not repair_blockers, 'OCR must not block each following scan batch'
     print('WORKLINKS_CONTINUOUS_SCAN_FAIR_LOCAL_OCR_REPAIR=PASS')
 
+    # The scanner may have processed every currently eligible original and
+    # be waiting on 1-hour retry cooldown; OCR still needs to drain its
+    # already-verified local backlog without a new scan batch.
+    idle=m.read_state()
+    idle['rfpUpgradeActive']=True
+    idle['rfpUpgrade']={'status':'waiting_for_download','attemptEpoch':now+9,
+                        'retryAfterEpoch':now+3600}
+    idle['rfpOpenRepair']={'status':'ok','attemptEpoch':now-150}
+    idle['rfpOpenRepairUpgradeBatch']=int(idle.get('rfpUpgradeBatchesCompleted') or 0)
+    m.publish_state(idle)
+    idle_calls=[]
+    def idle_reader(args,**kwargs):
+        if 'repair_open_rfp_cached_attachments.py' in args[1]:
+            idle_calls.append('ocr')
+        return mock_runner(args,**kwargs)
+    drained=m.iteration(now+10,idle_reader)
+    assert idle_calls==['ocr'],idle_calls
+    assert drained['rfpOpenRepair']['status']=='ok'
+    print('WORKLINKS_OCR_REPAIR_DRAINS_DURING_SCAN_RETRY_COOLDOWN=PASS')
+
     print('WORKLINKS_RFP_UPGRADE_4_BATCH_OCR_FAIRNESS=PASS')
 
     # After durable snapshot publication, the scanner parent acknowledges its
