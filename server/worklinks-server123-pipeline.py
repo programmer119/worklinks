@@ -554,8 +554,8 @@ def run_once(kind, runner=None, _single=False):
                        '--summary-only', '--rule-based', '--limit', str(QUALIFICATION_BATCH)]
         elif kind == 'rfpOpenRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
-                       '--data-dir', str(root), '--limit', '1',
-                       '--max-files', '1', '--execute']
+                       '--data-dir', str(root), '--limit', '3',
+                       '--max-files', '3', '--workers', '3', '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
                        '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
