@@ -1,0 +1,30 @@
+name: WorkLinks verified original OCR repair cause integrity
+on:
+  push:
+    branches:
+      - fix/rfp-repair-accurate-error-20261115
+      - main
+    paths:
+      - scripts/repair_open_rfp_cached_attachments.py
+      - tests/test_rfp_repair_error_provenance_20261115.py
+      - .github/workflows/worklinks-rfp-verified-repair-accurate-errors-20261115.yml
+  pull_request:
+    paths:
+      - scripts/repair_open_rfp_cached_attachments.py
+      - tests/test_rfp_repair_error_provenance_20261115.py
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test file-level error provenance and downloaded originals
+        run: |
+          python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py
+          python3 tests/test_rfp_repair_error_provenance_20261115.py
+          python3 tests/test_open_cached_rfp_repair.py
+          python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
+          python3 tests/test_rfp_verified_file_handoff.py
+          echo RFP_VERIFIED_REPAIR_ERROR_CAUSE_PERSISTENCE=PASS
