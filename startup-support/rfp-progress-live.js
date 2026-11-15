@@ -477,7 +477,8 @@
   if(mini)mini.dataset.status=completeNotice?'success':'active';
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
-  count.textContent='완료 '+number(done)+' / '+number(all)+'건';
+  count.textContent='완료 '+number(done)+' / '+number(eligible)+'건';
+   count.title='관리 대상 '+number(all)+'건 · 판독 제외 '+number(excluded)+'건';
   label.textContent=pct.toFixed(2)+'%'+(delayed?' · 갱신 지연':'');
   fill.style.width=pct.toFixed(2)+'%';
   const next=document.getElementById('rfpRescanNext');
