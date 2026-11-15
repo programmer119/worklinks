@@ -61,7 +61,7 @@ def open_session(browser, revoked):
         if (location.hostname === 'worklinks.suaveforge.com') {
           localStorage.setItem(
             'authhub:p47:production:session',
-            JSON.stringify({accessToken: 'qa-token', refreshToken: 'qa-refresh'})
+            JSON.stringify({accessToken: 'qa-token', refreshToken: 'qa-refresh', onboarding: {provider: 'google'}})
           );
         }
     """)
@@ -107,7 +107,10 @@ with sync_playwright() as pw:
     revoked["value"] = True
     page.evaluate("window.dispatchEvent(new Event('focus'))")
     assert_locked(page, "로그인이 만료되었습니다.")
-    print("REVOKED_SESSION_GATE=PASS", flush=True)
+    direct=page.locator("#worklinks-auth-gate-login").get_attribute("href")
+    assert direct.startswith("https://api-authhub.suaveforge.com/v1/oauth/p47/google/start?"), direct
+    assert "redirect_uri=" in direct and "environment=production" in direct, direct
+    print("REVOKED_SESSION_DIRECT_PROVIDER_URL=PASS", flush=True)
     context.close()
 
     # No tab switch and no user click: the 45s session heartbeat must still lock it.
@@ -127,7 +130,7 @@ with sync_playwright() as pw:
         if (location.hostname === 'worklinks.suaveforge.com') {
           localStorage.setItem(
             'authhub:p47:production:session',
-            JSON.stringify({accessToken: 'qa-token', refreshToken: 'qa-refresh'})
+            JSON.stringify({accessToken: 'qa-token', refreshToken: 'qa-refresh', onboarding: {provider: 'google'}})
           );
         }
     """)
