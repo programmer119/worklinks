@@ -24,8 +24,8 @@ scanned_pdf=buf.getvalue()
 env={'WORKLINKS_RFP_FAST_SKIP_PYPDF_NATIVE':'1',
      'WORKLINKS_RFP_OCR_REGION_PROBE':'0',
      'WORKLINKS_RFP_DEFER_OCR':'0'}
-with patch.dict(os.environ,env),\\
-     patch.object(PageObject,'extract_text',return_value='should-not-use') as native,\\
+with patch.dict(os.environ,env),\
+     patch.object(PageObject,'extract_text',return_value='should-not-use') as native,\
      patch.object(reader,'_ocr_pdf_page',return_value='한국어 입찰 참가자격 원본 OCR 확인입니다') as ocr:
     text,stats=reader.extract_with_source_status('scanned.pdf',scanned_pdf)
     assert native.call_count==0,'slow pypdf scan-page parse must be bypassed'
@@ -42,7 +42,7 @@ native_page=doc.new_page(width=595,height=842)
 native_page.insert_text((70,120),'Tender qualification native text evidence')
 native_pdf=doc.tobytes()
 doc.close()
-with patch.dict(os.environ,env),\\
+with patch.dict(os.environ,env),\
      patch.object(reader,'_ocr_pdf_page',side_effect=AssertionError('native page must not OCR')) as ocr:
     text,stats=reader.extract_with_source_status('native.pdf',native_pdf)
     assert 'Tender qualification native text' in text,text
