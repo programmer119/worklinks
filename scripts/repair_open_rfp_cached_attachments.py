@@ -368,6 +368,7 @@ def process_one(key,scan,meta,ledger,file_limit=None):
                     'tesseractSeconds':evidence.get('ocrTesseractSeconds'),
                     'receiptWriteSeconds':evidence.get('ocrReceiptWriteSeconds'),
                     'extractOutsidePdfSeconds':round(max(0,extract_elapsed-float(evidence.get('ocrPdfTotalSeconds') or 0)),3),
+                    'extractFormatTimes':evidence.get('extractFormatTimes') or {},
                     'sourceComplete':evidence.get('sourceComplete')},
                     ensure_ascii=False,separators=(',',':')),flush=True)
             text=rfp.normalize_extracted_text(extracted)
