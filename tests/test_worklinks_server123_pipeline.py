@@ -154,8 +154,9 @@ with tempfile.TemporaryDirectory() as temporary:
     assert empty['rfpUpgradeActive'] is True
     assert empty['rfpUpgrade']['retryAfterEpoch']>time.time()+250
 
-    # An OCR batch may take minutes and repair zero files. During an active
-    # RFP reader upgrade it must not run between every eight-notice batch.
+    # OCR repair is limited to one verified-source pass per four completed
+    # scan batches. It must neither starve behind an always-active scanner
+    # nor take over each individual scan batch.
     keep=m.read_state()
     keep['rfpUpgradeActive']=True
     keep['rfpUpgrade']={'status':'failed','attemptEpoch':now+4,
@@ -173,15 +174,15 @@ with tempfile.TemporaryDirectory() as temporary:
     assert not repair_calls, 'expensive no-progress OCR must yield to upgrade queue'
     assert deferred['rfpOpenRepair']['attemptEpoch']==0
     keep=m.read_state()
-    keep['rfpUpgradeBatchesCompleted']=12
+    keep['rfpUpgradeBatchesCompleted']=4
     m.publish_state(keep)
     fair=m.iteration(now+6,count_repair)
     assert repair_calls==['ocr'],repair_calls
-    assert fair['rfpOpenRepairUpgradeBatch']==12
+    assert fair['rfpOpenRepairUpgradeBatch']==4
     again=m.iteration(now+7,count_repair)
     assert repair_calls==['ocr'],repair_calls
-    # A successful continuous first-time scan must not be blocked by a
-    # scheduled OCR or top-500 repair job, regardless of batch count.
+    # A continuously successful first-time scan MUST periodically give one
+    # turn to local OCR repair, while legacy top500 repair remains excluded.
     keep=m.read_state()
     keep['rfpUpgradeActive']=True
     keep['rfpUpgrade']={'status':'ok','attemptEpoch':now+7}
@@ -198,10 +199,15 @@ with tempfile.TemporaryDirectory() as temporary:
         return mock_runner(args,**kwargs)
     active_next=m.iteration(now+8,nonblocking_runner)
     assert active_next['rfpUpgrade']['status']=='ok'
-    assert not repair_blockers,repair_blockers
-    print('WORKLINKS_CONTINUOUS_SCAN_NOT_BLOCKED_BY_REPAIRS=PASS')
+    assert repair_blockers==[str(next(p for p in repair_blockers if p.endswith(
+        'repair_open_rfp_cached_attachments.py')))],repair_blockers
+    assert active_next['rfpOpenRepairUpgradeBatch']>=101
+    repair_blockers.clear()
+    m.iteration(now+9,nonblocking_runner)
+    assert not repair_blockers, 'OCR must not block each following scan batch'
+    print('WORKLINKS_CONTINUOUS_SCAN_FAIR_LOCAL_OCR_REPAIR=PASS')
 
-    print('WORKLINKS_RFP_UPGRADE_12_BATCH_OCR_FAIRNESS=PASS')
+    print('WORKLINKS_RFP_UPGRADE_4_BATCH_OCR_FAIRNESS=PASS')
 
     # After durable snapshot publication, the scanner parent acknowledges its
     # independent scan lane. A failed batch must not silently complete notice.
