@@ -43,7 +43,7 @@ _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
-RFP_TEXT_CACHE_VERSION=2
+RFP_TEXT_CACHE_VERSION=3
 
 # Run potentially unbounded PDF/HWP/ZIP text extraction in a disposable child.
 # An expensive vector-drawing PDF must never hold every other stage-3 notice
@@ -830,6 +830,8 @@ def extract_with_source_status(name,raw):
     """Record mixed PDF/OCR provenance including PDFs nested in a ZIP."""
     previous=getattr(_DOCUMENT_SCAN,'pdf',None)
     _DOCUMENT_SCAN.pdf=[]
+    prior_hwp=getattr(_DOCUMENT_SCAN,'hwp_record_fallback',None)
+    _DOCUMENT_SCAN.hwp_record_fallback=False
     try:
         data=extract(name,raw)
         pdf_stats=list(_DOCUMENT_SCAN.pdf)
@@ -839,14 +841,19 @@ def extract_with_source_status(name,raw):
                      'ocrAttemptedPages':sum(x['ocrAttemptedPages'] for x in pdf_stats),
                      'ocrRecoveredPages':sum(x['ocrRecoveredPages'] for x in pdf_stats),
                      'unresolvedPages':sum(len(x['unresolvedPages']) for x in pdf_stats),
-                     'extractionMethod':'pdf_native_ocr' if
+                     'extractionMethod':('hwp_record_fallback' if _DOCUMENT_SCAN.hwp_record_fallback
+                         else 'pdf_native_ocr' if
                         any(x['ocrAttemptedPages'] for x in pdf_stats)
-                        else 'native'}
+                        else 'native')}
     finally:
         if previous is None:
             try:del _DOCUMENT_SCAN.pdf
             except AttributeError:pass
         else:_DOCUMENT_SCAN.pdf=previous
+        if prior_hwp is None:
+            try:del _DOCUMENT_SCAN.hwp_record_fallback
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.hwp_record_fallback=prior_hwp
 
 
 def classify_failure(error):
@@ -859,7 +866,12 @@ def classify_failure(error):
     detail=str(error)
     known=('legacy_xls_reader_failed','legacy_xls_reader_unavailable',
            'legacy_xls_size_limit','legacy_xls_too_many_sheets',
-           'invalid_legacy_xls','hml_xml_parse_failed',
+           'invalid_legacy_xls','hml_xml_parse_failed','hml_xml_truncated',
+           'hwp_record_fallback_too_large','hwp_record_fallback_invalid_text_record',
+           'hwp_record_fallback_invalid_ole','hwp_record_fallback_missing_sections',
+           'hwp_record_fallback_timeout','hwp_record_fallback_failed',
+           'hwp_record_fallback_invalid_record_list','hwp_record_fallback_invalid_record',
+           'hwp_record_fallback_no_text',
            'source_extraction_timeout_deferred','isolated_extraction_worker_failed',
            'isolated_extraction_worker_reply_invalid','source_extraction_output_too_large',
            'large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
@@ -1151,6 +1163,81 @@ def detected_source_format(name,raw):
     return str(Path(str(name)).suffix.lower()).lstrip('.') or 'unknown'
 
 
+def decode_hwp_paragraph_bytes(payload):
+    """Decode trusted HWP5 PARA_TEXT UTF-16LE while excluding inline controls.
+
+    HWP5 variable inline controls occupy eight UTF-16 code units with the
+    control code repeated at both ends. The intervening binary is NOT text.
+    """
+    if len(payload)%2:
+        raise ValueError('hwp_record_fallback_invalid_text_record')
+    chars=payload.decode('utf-16-le','replace')
+    pieces=[];i=0
+    while i<len(chars):
+        c=ord(chars[i])
+        if 1<=c<=31 and i+7<len(chars) and ord(chars[i+7])==c:
+            i+=8
+            continue
+        if c in (9,10,13):
+            pieces.append(' ')
+        elif c>=32:
+            pieces.append(chars[i])
+        i+=1
+    return ''.join(pieces).strip()
+
+
+def extract_hwp_record_paragraphs(raw):
+    """Fall back to all actual HWP5 text records if pyhwp XML model fails.
+
+    The alternative uses pyhwp's own record decoder without its broken
+    ColumnSet XML model. It never scans HWP preview text or arbitrary raw
+    byte strings as proof of comprehensive qualification coverage.
+    """
+    if len(raw)>20_000_000:
+        raise ValueError('hwp_record_fallback_too_large')
+    import olefile
+    try:
+        with olefile.OleFileIO(io.BytesIO(raw)) as src:
+            sections=sorted(
+                ('/'.join(item) for item in src.listdir()
+                 if len(item)==2 and item[0]=='BodyText'
+                    and re.fullmatch(r'Section\d+',item[1])),
+                key=lambda path:int(path.rsplit('Section',1)[1]))
+    except Exception as exc:
+        raise ValueError('hwp_record_fallback_invalid_ole') from exc
+    if not sections or len(sections)>80:
+        raise ValueError('hwp_record_fallback_missing_sections')
+    paragraphs=[];text_records=0
+    with tempfile.TemporaryDirectory() as directory:
+        source=Path(directory)/'original.hwp'
+        source.write_bytes(raw)
+        for section in sections:
+            try:
+                run=subprocess.run(
+                    ['hwp5proc','records','--json',str(source),section],
+                    capture_output=True,timeout=15,check=False)
+            except subprocess.TimeoutExpired as exc:
+                raise ValueError('hwp_record_fallback_timeout') from exc
+            if run.returncode!=0 or len(run.stdout)>45_000_000:
+                raise ValueError('hwp_record_fallback_failed')
+            try:
+                record_list=json.loads(run.stdout)
+                if not isinstance(record_list,list):
+                    raise ValueError('hwp_record_fallback_invalid_record_list')
+                for record in record_list:
+                    if record.get('tagid')!=67:
+                        continue
+                    text_records+=1
+                    payload=bytes.fromhex(' '.join(record.get('payload') or []))
+                    fragment=decode_hwp_paragraph_bytes(payload)
+                    if fragment:paragraphs.append(fragment)
+            except (TypeError,ValueError,KeyError) as exc:
+                raise ValueError('hwp_record_fallback_invalid_record') from exc
+    if not text_records or sum(ch.isalnum() for line in paragraphs for ch in line)<12:
+        raise ValueError('hwp_record_fallback_no_text')
+    return '\n'.join(paragraphs)
+
+
 def extract_legacy_xls(raw):
     """Parse the actual XLS workbook; do not send Excel OLE bytes to hwp5txt."""
     try:
@@ -1193,6 +1280,11 @@ def extract_markup_document(name,raw):
                 paragraphs=[' '.join(t.strip() for t in document.itertext() if t and t.strip())]
             return '\n'.join(x for x in paragraphs if x)
         except ET.ParseError as exc:
+            # Some official HML originals literally end in an unfinished
+            # XML tag. A SHA-verified download is still an invalid source;
+            # never silently treat it as a fully readable document.
+            if not raw.rstrip().endswith(b'>'):
+                raise ValueError('hml_xml_truncated') from exc
             raise ValueError('hml_xml_parse_failed') from exc
     for encoding in ('utf-8-sig','cp949','utf-16'):
         try:
@@ -1358,8 +1450,14 @@ def extract(name,raw):
             p=Path(directory)/'source.hwp'
             p.write_bytes(raw)
             r=subprocess.run(['hwp5txt',str(p)],capture_output=True,timeout=38)
-            if r.returncode:raise ValueError('hwp5txt_failed')
-            return r.stdout.decode('utf-8','replace')
+            if r.returncode==0 and sum(ch.isalnum() for ch in r.stdout.decode('utf-8','replace'))>=12:
+                return r.stdout.decode('utf-8','replace')
+            # Valid HWP5 OLE files can trigger pyhwp ColumnSet AssertionError.
+            # Decode every BodyText record with the same library's record
+            # backend instead; fail closed if any section cannot be read.
+            recovered=extract_hwp_record_paragraphs(raw)
+            _DOCUMENT_SCAN.hwp_record_fallback=True
+            return recovered
     if n.endswith('.hwpx'):
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             data=[]
