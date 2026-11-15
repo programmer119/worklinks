@@ -554,8 +554,8 @@ def run_once(kind, runner=None, _single=False):
                        '--summary-only', '--rule-based', '--limit', str(QUALIFICATION_BATCH)]
         elif kind == 'rfpOpenRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
-                       '--data-dir', str(root), '--limit', str(min(4,RFP_OPEN_OCR_LIMIT)),
-                       '--max-files', str(min(8,RFP_OPEN_OCR_LIMIT * 2)), '--execute']
+                       '--data-dir', str(root), '--limit', '1',
+                       '--max-files', '1', '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
                        '--data-dir', str(root), '--limit', str(RFP_REPAIR_LIMIT), '--execute']
@@ -703,8 +703,13 @@ def iteration(current=None, runner=None):
             previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
             ocr_due_to_batches=(completed-previous_repair>=RFP_OCR_SCAN_BATCH_INTERVAL)
             last_attempt=float(prior.get('attemptEpoch') or 0)
+            # One verified notice/file is published per pass. When work is
+            # known to remain, resume quickly instead of pausing two minutes
+            # between every saved source. An empty plan uses normal backoff.
+            idle_period=(15 if state.get('rfpOpenRepairHasMore') is True
+                         else RFP_OCR_IDLE_PERIOD)
             ocr_due_idle=(drain_status in ('waiting_for_download','no_eligible_now','failed')
-                          and now-last_attempt>=RFP_OCR_IDLE_PERIOD)
+                          and now-last_attempt>=idle_period)
             # One local-only repair slice between scan batches, or every two
             # minutes while the main scan is blocked on retry/eligibility.
             if not (ocr_due_to_batches or ocr_due_idle):
@@ -755,6 +760,12 @@ def iteration(current=None, runner=None):
                 entry.update(failureStreak=streak,retryAfterEpoch=time.time()+delay)
                 log('PIPELINE_RFP_DRAIN_BACKOFF',delay,'seconds',message)
             log('PIPELINE_JOB_RETRY_NEXT_CYCLE', kind, entry['error'])
+        if kind=='rfpOpenRepair':
+            # Production run_once() only returns True if the cached-original
+            # repair plan selected at least one actual notice. Test runners
+            # have no real plan and must not create a synthetic busy loop.
+            state['rfpOpenRepairHasMore']=(more is True and runner is None
+                and entry.get('status')=='ok')
         if kind=='rfpOpenRepair' and state.get('rfpUpgradeActive') is True:
             state['rfpOpenRepairUpgradeBatch']=int(state.get('rfpUpgradeBatchesCompleted') or 0)
         state[kind] = entry
