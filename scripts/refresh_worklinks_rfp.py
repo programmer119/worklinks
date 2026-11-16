@@ -1366,6 +1366,8 @@ def classify_failure(error):
            'nested_archive_requires_review','unknown_archive_member_requires_review',
            'archive_no_searchable_documents','unsafe_archive_path','large_xml_section',
            'archive_expanded_size_safety_limit','hancom_cell_converter_required','text_encoding_unrecognized',
+           'source_text_scan_limit','shared_strings_safety_limit','office_document_text_parts_missing',
+           'office_shared_string_index_invalid',
             'image_ocr_incomplete','image_ocr_page_too_large','image_ocr_engine_failed',
             'pdf_ocr_incomplete','pdf_ocr_engine_unavailable','pdf_ocr_renderer_unavailable')
     return next((v for v in known if v in detail),'file_extract_failure')
@@ -1806,6 +1808,93 @@ def extract_markup_document(name,raw):
     return html.unescape(''.join(parser.parts))
 
 
+
+def extract_office_xml_stream(raw,format_name):
+    """Stream genuine OOXML members instead of failing at a 6MB sheet or 1000 ZIP entries.
+
+    Both the expanded size and the *resulting* full-source evidence remain bounded.
+    If extracted text exceeds what the qualification engine will review, fail
+    closed instead of claiming to have seen all rows.
+    """
+    max_members=3000
+    max_expanded=250_000_000
+    max_single_xml=180_000_000
+    max_text=1_000_000
+    text_chunks=[]
+    text_size=0
+    def append(value):
+        nonlocal text_size
+        if not value or not value.strip():return
+        text_size+=len(value)+1
+        if text_size>max_text:
+            raise ValueError('source_text_scan_limit')
+        text_chunks.append(value.strip())
+    def local(elem):
+        return elem.tag.rsplit('}',1)[-1]
+    def stream_elements(archive,member,wanted,callback):
+        with archive.open(member) as source:
+            stack=[]
+            for event,elem in ET.iterparse(source,events=('start','end')):
+                if event=='start':
+                    stack.append(elem)
+                    continue
+                if local(elem)==wanted:
+                    callback(elem)
+                    elem.clear()
+                    if len(stack)>1:stack[-2].clear()
+                stack.pop()
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        info=archive.infolist()
+        if len(info)>max_members:raise ValueError('archive_many_xml_files')
+        if sum(part.file_size for part in info)>max_expanded:
+            raise ValueError('archive_expanded_size_safety_limit')
+        members={part.filename:part for part in info}
+        fmt=format_name.lower()
+        strings=[]
+        if fmt=='.xlsx' and 'xl/sharedStrings.xml' in members:
+            shared=members['xl/sharedStrings.xml']
+            if shared.file_size>max_single_xml:raise ValueError('large_xml_section')
+            def add_shared(si):
+                if len(strings)>=500_000:raise ValueError('shared_strings_safety_limit')
+                strings.append(''.join((z.text or '') for z in si.iter() if local(z)=='t'))
+            stream_elements(archive,shared.filename,'si',add_shared)
+        if fmt=='.docx':
+            chosen=[part for name,part in members.items()
+                if name=='word/document.xml' or
+                re.fullmatch(r'word/(?:header|footer)\d+\.xml',name)]
+        elif fmt=='.xlsx':
+            chosen=[part for name,part in members.items()
+                if re.fullmatch(r'xl/worksheets/sheet\d+\.xml',name)]
+        else:
+            chosen=[part for name,part in members.items()
+                if re.fullmatch(r'ppt/slides/slide\d+\.xml',name)]
+        if len(chosen)>1000:raise ValueError('archive_many_xml_files')
+        if not chosen:raise ValueError('office_document_text_parts_missing')
+        for part in chosen:
+            if part.file_size>max_single_xml:
+                raise ValueError('large_xml_section')
+            if fmt=='.xlsx':
+                def row_text(row):
+                    cells=[]
+                    for cell in row.iter():
+                        if local(cell)!='c':continue
+                        value=next((z.text or '' for z in cell.iter() if local(z)=='v'),'')
+                        if cell.get('t')=='s':
+                            if not value.isdigit() or int(value)>=len(strings):
+                                raise ValueError('office_shared_string_index_invalid')
+                            value=strings[int(value)]
+                        elif cell.get('t')=='inlineStr':
+                            value=''.join(z.text or '' for z in cell.iter() if local(z)=='t')
+                        if value.strip():cells.append(value.strip())
+                    append(' '.join(cells))
+                stream_elements(archive,part.filename,'row',row_text)
+            else:
+                def paragraph_text(paragraph):
+                    append(''.join(z.text or '' for z in paragraph.iter() if local(z)=='t'))
+                stream_elements(archive,part.filename,'p',paragraph_text)
+    return '\n'.join(text_chunks)
+
+
 def _extract_dispatch(name,raw):
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
@@ -1914,57 +2003,7 @@ def _extract_dispatch(name,raw):
         if not parts:raise ValueError('archive_no_searchable_documents')
         return '\n'.join(parts)
     if n.endswith(('.docx','.xlsx','.pptx')):
-        # OOXML text is accessible without external dependencies. Only bounded
-        # declared members are read, so decompression bombs cannot exhaust CI.
-        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-            names=archive.namelist()
-            if len(names)>1000:raise ValueError('archive_many_xml_files')
-            total=sum(archive.getinfo(m).file_size for m in names)
-            if total>45_000_000:raise ValueError('large_xml_section')
-            pieces=[]
-            shared=[]
-            if n.endswith('.xlsx') and 'xl/sharedStrings.xml' in names:
-                info=archive.getinfo('xl/sharedStrings.xml')
-                if info.file_size>10_000_000:raise ValueError('large_xml_section')
-                tree=ET.fromstring(archive.read('xl/sharedStrings.xml'))
-                for si in tree.iter():
-                    if si.tag.rsplit('}',1)[-1]=='si':
-                        shared.append(''.join((z.text or '') for z in si.iter()
-                                              if z.tag.rsplit('}',1)[-1]=='t'))
-            if n.endswith('.docx'):
-                chosen=[m for m in names if m=='word/document.xml' or
-                        re.fullmatch(r'word/(?:header|footer)\d+\.xml',m)]
-            elif n.endswith('.xlsx'):
-                chosen=[m for m in names if re.fullmatch(r'xl/worksheets/sheet\d+\.xml',m)]
-            else:
-                chosen=[m for m in names if re.fullmatch(r'ppt/slides/slide\d+\.xml',m)]
-            if len(chosen)>150:raise ValueError('archive_many_xml_files')
-            for member in chosen:
-                info=archive.getinfo(member)
-                if info.file_size>6_000_000:raise ValueError('large_xml_section')
-                tree=ET.fromstring(archive.read(member))
-                if n.endswith('.xlsx'):
-                    for row in tree.iter():
-                        if row.tag.rsplit('}',1)[-1]!='row':continue
-                        cells=[]
-                        for cell in row:
-                            if cell.tag.rsplit('}',1)[-1]!='c':continue
-                            v=next((z.text or '' for z in cell.iter()
-                                    if z.tag.rsplit('}',1)[-1]=='v'),'')
-                            if cell.get('t')=='s' and v.isdigit() and int(v)<len(shared):
-                                v=shared[int(v)]
-                            elif cell.get('t')=='inlineStr':
-                                v=''.join(z.text or '' for z in cell.iter()
-                                          if z.tag.rsplit('}',1)[-1]=='t')
-                            if v.strip():cells.append(v.strip())
-                        if cells:pieces.append(' '.join(cells))
-                else:
-                    for paragraph in tree.iter():
-                        if paragraph.tag.rsplit('}',1)[-1]!='p':continue
-                        value=''.join(z.text or '' for z in paragraph.iter()
-                                      if z.tag.rsplit('}',1)[-1]=='t')
-                        if value.strip():pieces.append(value.strip())
-            return '\n'.join(pieces)
+        return extract_office_xml_stream(raw,n)
     if n.endswith('.cell'):
         # Hancom .cell requires a dedicated converter unless its *actual*
         # bytes are an already-supported OOXML/OLE/HWPML container. Never
