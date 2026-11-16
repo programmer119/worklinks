@@ -1369,6 +1369,7 @@ def classify_failure(error):
            'hwpx_image_ocr_too_many_images','hwpx_image_ocr_size_limit',
            'legacy_xls_reader_failed','legacy_xls_reader_unavailable',
            'legacy_xls_size_limit','legacy_xls_too_many_sheets',
+           'drm_protected_original_requires_authorized_decryption',
            'invalid_legacy_xls','hml_xml_parse_failed','hml_xml_truncated',
            'unrecognized_hwpml_root',
            'hwp_record_fallback_too_large','hwp_record_fallback_invalid_text_record',
@@ -1661,6 +1662,9 @@ def ole_document_kind(name,raw):
 
 
 def detected_source_format(name,raw):
+    # Verified originals may be wrapped in proprietary DRM rather than Office bytes.
+    if raw.startswith(bytes.fromhex('9b2044524d4f4e45')):
+        return 'drm_protected'
     # Some genuine G2B .hwpx downloads are HWPML XML files, not ZIP packages.
     stripped=raw.lstrip(b'\xef\xbb\xbf \r\n\t')
     if stripped[:80].lower().startswith((b'<html',b'<!doctype html')):
@@ -1915,6 +1919,10 @@ def extract_office_xml_stream(raw,format_name):
 
 
 def _extract_dispatch(name,raw):
+    # Never feed a SHA-verified DRMONE wrapper to a ZIP/Office parser.
+    # It requires authorized source decryption, not repeated OCR attempts.
+    if raw.startswith(bytes.fromhex('9b2044524d4f4e45')):
+        raise ValueError('drm_protected_original_requires_authorized_decryption')
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
     n=name.lower()
