@@ -742,7 +742,7 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
         per_notice_cap=per_notice_cap,minimum_old_ocr=minimum_old_ocr,
         minimum_format_fixes=minimum_format_fixes)
     legacy_pdf_keys={item[2] for item in candidates if item[7] is True}
-    legacy_format_keys={item[2] for item in candidates if item[8] is True}
+    legacy_format_keys={item[2] for item in candidates if item[8] is True and item[7] is not True}
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
