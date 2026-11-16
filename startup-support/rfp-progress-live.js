@@ -462,15 +462,17 @@
    if(key==='download'&&available){
     const countNode=node.querySelector('[data-rfp-field="downloadCount"]');
     if(countNode){
-     const caption='정상 '+number(completed)+' · ';
+     const withoutFiles=Math.max(0,Math.min(completed,Number(stage.skipped||0)));
+     const withOriginals=Math.max(0,completed-withoutFiles);
+     const caption='확보 '+number(withOriginals)+' · 첨부없음 '+number(withoutFiles)+' · ';
      const suffix=' · 전체 '+number(total)+'건';
      const next=caption+'오류 '+number(errors)+'건'+suffix;
      if(countNode.dataset.value!==next){
       countNode.dataset.value=next;
       const success=document.createElement('span');
       success.className='rfp-download-success-count';
-      success.textContent='정상 '+number(completed);
-      countNode.replaceChildren(success,document.createTextNode(' · '));
+      success.textContent='확보 '+number(withOriginals);
+      countNode.replaceChildren(success,document.createTextNode(' · 첨부없음 '+number(withoutFiles)+' · '));
       const button=document.createElement('button');
       button.id='rfpDownloadErrorButton';
       button.type='button';
