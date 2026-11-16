@@ -43,7 +43,7 @@ _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
-RFP_TEXT_CACHE_VERSION=5
+RFP_TEXT_CACHE_VERSION=6
 
 # Run potentially unbounded PDF/HWP/ZIP text extraction in a disposable child.
 # An expensive vector-drawing PDF must never hold every other stage-3 notice
@@ -150,9 +150,9 @@ MAX_DOCUMENTS=24
 # 3MB per member was rejecting real official documents before text extraction.
 MAX_HWPX_XML_MEMBER=28_000_000
 MAX_HWPX_XML_TOTAL=90_000_000
-HWPX_READER_VERSION=3
+HWPX_READER_VERSION=4
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
-TEXT_FORMATS=('.hwp','.hwpx','.pdf','.docx','.xls','.xlsx','.xlsm','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp','.hml','.html','.htm')
+TEXT_FORMATS=('.hwp','.hwpx','.hwtx','.pdf','.docx','.xls','.xlsx','.xlsm','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp','.hml','.html','.htm','.cell','.txt','.csv')
 CLASSIFICATION_VERSION=23
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
@@ -1365,6 +1365,7 @@ def classify_failure(error):
            'redirect_forbidden','oversize_json','egg_archive_requires_converter',
            'nested_archive_requires_review','unknown_archive_member_requires_review',
            'archive_no_searchable_documents','unsafe_archive_path','large_xml_section',
+           'archive_expanded_size_safety_limit','hancom_cell_converter_required','text_encoding_unrecognized',
             'image_ocr_incomplete','image_ocr_page_too_large','image_ocr_engine_failed',
             'pdf_ocr_incomplete','pdf_ocr_engine_unavailable','pdf_ocr_renderer_unavailable')
     return next((v for v in known if v in detail),'file_extract_failure')
@@ -1810,7 +1811,7 @@ def _extract_dispatch(name,raw):
         n='.pdf'
     elif raw.startswith(_OLE_HEADER):
         n=ole_document_kind(name,raw)
-    elif (n.endswith(('.hwpx','.hwp')) and
+    elif (n.endswith(('.hwpx','.hwtx','.hwp','.cell')) and
           raw.lstrip(b'\xef\xbb\xbf \r\n\t').startswith(
                 (b'<?xml',b'<HWPML',b'<hwpml',b'<HML',b'<hml'))):
         # HWPML is a standalone XML alternative to ZIP-based HWPX. Verify
@@ -1855,16 +1856,19 @@ def _extract_dispatch(name,raw):
         parts=[]
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             members=archive.infolist()
-            if len(members)>250 or sum(m.file_size for m in members)>45_000_000:
-                raise ValueError('archive_many_xml_files')
+            # These are extraction safety bounds, not arbitrary 250-member
+            # ceilings that misclassify perfectly valid G2B bid bundles.
+            # Per-entry input is still bounded before loading its bytes.
+            if len(members)>3000 or sum(m.file_size for m in members)>250_000_000:
+                raise ValueError('archive_expanded_size_safety_limit')
             for entry in members:
                 if entry.is_dir():continue
                 inner=entry.filename
                 if inner.startswith('/') or '..' in Path(inner).parts:
                     raise ValueError('unsafe_archive_path')
                 suffix=Path(inner).suffix.lower()
-                if suffix in {'.pdf','.hwp','.hwpx','.docx','.xls','.xlsx','.xlsm','.pptx',
-                              '.hml','.htm','.html',
+                if suffix in {'.pdf','.hwp','.hwpx','.hwtx','.docx','.xls','.xlsx','.xlsm','.pptx',
+                              '.hml','.htm','.html','.cell',
                               '.png','.jpg','.jpeg','.bmp','.webp','.tif','.tiff'}:
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     value=extract(inner,archive.read(entry))
@@ -1888,9 +1892,14 @@ def _extract_dispatch(name,raw):
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     data=archive.read(entry)
                     parts.append('FILE '+inner+'\n'+data.decode('utf-8','replace'))
+                elif suffix in {'.ini','.ds_store'} or Path(inner).name.lower() in (
+                        'thumbs.db','desktop.ini','__macosx'):
+                    # OS-generated non-document metadata cannot invalidate
+                    # an otherwise readable, verified bid bundle.
+                    continue
                 elif suffix not in {'.png','.jpg','.jpeg','.gif','.bmp','.webp','.xml',
-                                     '.rels','.DS_Store','.md'}:
-                    raise ValueError('unknown_archive_member_requires_review')
+                                     '.rels','.md'}:
+                    raise ValueError('unknown_archive_member_requires_review:'+inner[:100])
         if not parts:raise ValueError('archive_no_searchable_documents')
         return '\n'.join(parts)
     if n.endswith(('.docx','.xlsx','.pptx')):
@@ -1945,6 +1954,16 @@ def _extract_dispatch(name,raw):
                                       if z.tag.rsplit('}',1)[-1]=='t')
                         if value.strip():pieces.append(value.strip())
             return '\n'.join(pieces)
+    if n.endswith('.cell'):
+        # Hancom .cell requires a dedicated converter unless its *actual*
+        # bytes are an already-supported OOXML/OLE/HWPML container. Never
+        # pretend an unsupported source was successfully scanned.
+        raise ValueError('hancom_cell_converter_required')
+    if n.endswith(('.txt','.csv')):
+        for encoding in ('utf-8-sig','cp949','utf-16'):
+            try:return raw.decode(encoding)
+            except UnicodeDecodeError:pass
+        raise ValueError('text_encoding_unrecognized')
     if n.endswith('.xls'):
         if not raw.startswith(_OLE_HEADER):raise ValueError('invalid_legacy_xls')
         return extract_legacy_xls(raw)
