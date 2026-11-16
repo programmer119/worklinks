@@ -425,4 +425,44 @@ with tempfile.TemporaryDirectory() as root:
     assert q.unprepared_notices()==[]
     print('RFP_UNKNOWN_POSTED_DATE_EXCEPTION_RECOVERY=PASS',flush=True)
 
+# Production 2026-11-16: 128 successful exception lookups consumed just
+# 384 of 1000 daily source calls but the arbitrary 128/day gate stopped
+# 148 remaining notices until midnight. Shared quota is authoritative.
+with tempfile.TemporaryDirectory() as root:
+    root=Path(root)
+    q=RfpDualQueue(root/'queue.sqlite3')
+    now=dt.datetime.now(dt.timezone.utc).isoformat()
+    responses=[]
+    def exception_response(url):
+        responses.append(url)
+        return {'ok':True,
+                'attachments':{'ok':True,'complete':True,'items':[]},
+                'noticeDocuments':{'ok':True,'complete':True,'items':[]}}
+    planner=bulk.BulkManifestPlanner(q,root/'bids.sqlite3',
+                                      exception_response,NoDelay())
+    with q.connect() as db:
+        db.executemany('''INSERT INTO rfp_bulk_request_budget
+            (started_at,source,day,page) VALUES (?,?,?,?)''',
+            [(now,'exception_'+bulk.SOURCES[i%3],new_day,0)
+             for i in range(384)])
+    result,cost=planner._exception_one('R26BK00020001:000',new_day)
+    assert cost==3 and result['manifestOrigin']=='verified_missing_date_batch_exception'
+    assert len(responses)==1
+    with q.connect() as db:
+        assert db.execute('SELECT count(*) FROM rfp_bulk_request_budget').fetchone()[0]==387
+        db.execute('DELETE FROM rfp_bulk_request_budget')
+        db.executemany('''INSERT INTO rfp_bulk_request_budget
+            (started_at,source,day,page) VALUES (?,?,?,?)''',
+            [(now,'already_used',new_day,0) for i in range(998)])
+    try:
+        planner._exception_one('R26BK00020002:000',new_day)
+    except bulk.BulkManifestQuota:
+        pass
+    else:
+        raise AssertionError('shared official daily 1000 budget must enforce all 3 operations')
+    with q.connect() as db:
+        assert db.execute('SELECT count(*) FROM rfp_bulk_request_budget').fetchone()[0]==998
+    assert len(responses)==1, 'no network call when insufficient quota'
+    print('RFP_EXCEPTION_128_CAP_REMOVED_SHARED_1000_ATOMIC=PASS',flush=True)
+
 print('RFP_BULK_OFFICIAL_DATE_RANGE_ADAPTER=PASS',flush=True)
