@@ -27,7 +27,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='pdf25-blank-hwpml-strict-v14-20261116'
+READER_ATTEMPT_VERSION='real-byte-recursive-office-v15-20261116'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -130,7 +130,7 @@ def repair_file_priority(f):
     return 3
 
 
-def choose_repair_batch(candidates,limit,max_files,per_notice_cap=3,minimum_old_ocr=0):
+def choose_repair_batch(candidates,limit,max_files,per_notice_cap=3,minimum_old_ocr=0,minimum_format_fixes=0):
     """Complete easily recoverable notices first, then longer OCR documents.
 
     Keep reader-category priority, while avoiding a 91-page incomplete PDF
@@ -155,6 +155,13 @@ def choose_repair_batch(candidates,limit,max_files,per_notice_cap=3,minimum_old_
     old=[item for item in ordered if len(item)>7 and item[7] is True]
     reserved=old[:max(0,int(minimum_old_ocr))]
     reserved_ids={id(item) for item in reserved}
+    # Legacy HWP, XML, HTML-XLS and ZIP format mismatches must not be
+    # starved behind OCR. Reserve a real third file slot for those originals.
+    formats=[item for item in ordered if len(item)>8 and item[8] is True
+             and id(item) not in reserved_ids]
+    for item in formats[:max(0,int(minimum_format_fixes))]:
+        reserved.append(item)
+        reserved_ids.add(id(item))
     ordered=reserved+[item for item in ordered if id(item) not in reserved_ids]
     for item in ordered:
         _priority,deadline,key,metadata,source,nfiles=item[:6]
@@ -208,9 +215,23 @@ def legacy_pdf_ocr_failure(file):
             and str(file.get('lastReaderAttemptVersion') or '')!=READER_ATTEMPT_VERSION)
 
 
-def ordered_retry_files(scan,prioritize_legacy_pdf_ocr=False):
-    """Reserved PDF OCR slots must select the PDF OCR file, not a ZIP/HWP sibling."""
+FORMAT_REPAIR_ERRORS=frozenset((
+    'invalid_hwp','file_extract_failure','invalid_legacy_xls',
+    'unknown_archive_member_requires_review','large_xml_section',
+    'archive_many_xml_files','hancom_cell_converter_required'))
+
+
+def legacy_format_failure(file):
+    return (str(file.get('errorCategory') or '') in FORMAT_REPAIR_ERRORS
+            and str(file.get('lastReaderAttemptVersion') or '')!=READER_ATTEMPT_VERSION)
+
+
+def ordered_retry_files(scan,prioritize_legacy_pdf_ocr=False,prioritize_format=False):
+    """Reserve an actual file within the notice, not merely its notice ID."""
     pending=reader_retry_files(scan)
+    if prioritize_format:
+        return sorted(pending,key=lambda f:(
+            0 if legacy_format_failure(f) else 1,repair_file_priority(f)))
     if prioritize_legacy_pdf_ocr:
         return sorted(pending,key=lambda f:(
             0 if legacy_pdf_ocr_failure(f) else 1,repair_file_priority(f)))
@@ -340,7 +361,7 @@ def fetch_verified_raw(source,ledgerpath,expected_sha):
     return raw,'verified_cache'
 
 
-def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=False):
+def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=False,prioritize_format=False):
     """No successful file is downloaded, parsed, or overwritten."""
     manifest=meta['attachments']['items']
     byname={}
@@ -354,7 +375,7 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
     counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
     # Examine all notice siblings together. The single-file wrapper here
     # previously lost the verified PDF companion and retried covered HWP.
-    pending=ordered_retry_files(scan,prioritize_legacy_pdf_ocr)
+    pending=ordered_retry_files(scan,prioritize_legacy_pdf_ocr,prioritize_format)
     if file_limit is not None:
         pending=pending[:max(0,int(file_limit))]
     receipts={f['url']:f for f in meta.get('downloadVerifiedFiles') or []
@@ -668,7 +689,7 @@ def verified_complete_for_early_checkpoint(record,metadata):
 
 
 def run(data_dir,limit,execute=False,max_files=400,workers=1,
-        per_notice_cap=3,minimum_old_ocr=0):
+        per_notice_cap=3,minimum_old_ocr=0,minimum_format_fixes=0):
     root=Path(data_dir)
     snap=root/'snapshots'
     coverage_path=snap/'rfp-coverage-index.json'
@@ -713,19 +734,24 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
         src='verified_download_queue'
         categories['ready']+=1
         old_ocr=any(legacy_pdf_ocr_failure(f) for f in broken)
+        old_format=any(legacy_format_failure(f) for f in broken)
         candidates.append((min(repair_file_priority(f) for f in broken),
                            ends,key,meta,src,len(broken),
-                           repair_completion_score(scan,broken),old_ocr))
+                           repair_completion_score(scan,broken),old_ocr,old_format))
     selected,selected_file_count=choose_repair_batch(candidates,limit,max_files,
-        per_notice_cap=per_notice_cap,minimum_old_ocr=minimum_old_ocr)
+        per_notice_cap=per_notice_cap,minimum_old_ocr=minimum_old_ocr,
+        minimum_format_fixes=minimum_format_fixes)
     legacy_pdf_keys={item[2] for item in candidates if item[7] is True}
+    legacy_format_keys={item[2] for item in candidates if item[8] is True}
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
       'selectedProblemFiles':selected_file_count,
       'legacyReadyCandidates':sum(item[7] is True for item in candidates),
+      'legacyFormatReadyCandidates':sum(item[8] is True for item in candidates),
       'legacySelectedNotices':sum(any(item[2]==chosen[0] and item[7] is True
                                  for item in candidates) for chosen in selected),
+      'legacyFormatSelectedNotices':sum(chosen[0] in legacy_format_keys for chosen in selected),
       'selectedIds':[chosen[0] for chosen in selected],
       'filesPerNoticeCap':max(1,int(per_notice_cap)),
       'noGovernmentMetadataAPICalls':True,
@@ -794,18 +820,18 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
             fresh=current_verified_download_metadata(queue_path,key)
             if not fresh or fresh.get('downloadVerifiedFiles')!=meta.get('downloadVerifiedFiles'):
                 tally['download_receipt_changed']+=1;continue
-            tasks.append((key,meta,file_limit,current,key in legacy_pdf_keys))
+            tasks.append((key,meta,file_limit,current,key in legacy_pdf_keys,key in legacy_format_keys))
         print('OPEN_RFP_PARALLEL_WORKERS',json.dumps({
             'workers':min(max(1,int(workers)),3,len(tasks)) if tasks else 0,
             'selectedFiles':sum(x[2] for x in tasks),
             'noticeCount':len(tasks)},separators=(',',':')),flush=True)
         def extract_task(item):
-            key,meta,file_limit,current,prefer_pdf=item
+            key,meta,file_limit,current,prefer_pdf,prefer_format=item
             work=json.loads(json.dumps(current,ensure_ascii=False))
             begun=time.perf_counter()
             recovered,counters=process_one(
                 key,work,meta,ledger,file_limit=file_limit,
-                prioritize_legacy_pdf_ocr=prefer_pdf)
+                prioritize_legacy_pdf_ocr=prefer_pdf,prioritize_format=prefer_format)
             return work,recovered,counters,time.perf_counter()-begun
 
         # OCR itself runs in up to three independent subprocesses, via separate
@@ -817,7 +843,7 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             futures={executor.submit(extract_task,item):item for item in tasks}
             for future in as_completed(futures):
-                key,meta,file_limit,current,prefer_pdf=futures[future]
+                key,meta,file_limit,current,prefer_pdf,prefer_format=futures[future]
                 try:
                     work,additions,counters,elapsed=future.result()
                 except VerifiedOriginalMissing as exc:
@@ -897,8 +923,10 @@ if __name__=='__main__':
                    help='parallel OCR workers; maximum 3 to protect server123')
     p.add_argument('--per-notice-file-cap',type=int,default=3)
     p.add_argument('--minimum-old-ocr',type=int,default=0)
+    p.add_argument('--minimum-format-fixes',type=int,default=0)
     args=p.parse_args()
     run(args.data_dir,max(1,min(args.limit,300)),args.execute,
         max(1,min(args.max_files,600)),max(1,min(args.workers,3)),
         per_notice_cap=max(1,min(args.per_notice_file_cap,3)),
-        minimum_old_ocr=max(0,min(args.minimum_old_ocr,3)))
+        minimum_old_ocr=max(0,min(args.minimum_old_ocr,3)),
+        minimum_format_fixes=max(0,min(args.minimum_format_fixes,3)))
