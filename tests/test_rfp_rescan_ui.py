@@ -168,7 +168,7 @@ with sync_playwright() as p:
     }""")
     # Restore the live attempt fixture before the remaining active-lane checks.
     page.evaluate("() => {rfpRescanLastChangeAt=Date.now();paintRfpRescanProgress();}")
-    assert '원본 다운로드' in body and '정상 3 · 오류 0건 · 전체 6건' in body,body
+    assert '원본 다운로드' in body and '확보 3 · 첨부없음 0 · 오류 0건 · 전체 6건' in body,body
     assert '사업제안요청서.pdf' in body and '외 7개' in body,body
     assert '다운로드 중 00:' in body,body
     assert '0.50MB / 2.00MB' in body,body
@@ -224,7 +224,7 @@ with sync_playwright() as p:
       timeout=12000)
     assert '33.33%' in page.locator('#rfpRescanLabel').text_content()
     assert '최근 판독 +1건' in page.locator('#rfpRescanContent').text_content()
-    assert '정상 4 · 오류 0건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
+    assert '확보 4 · 첨부없음 0 · 오류 0건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
     assert '1.00MB / 2.00MB' in page.locator('#rfpRescanContent').text_content()
     assert '사업제안요청서.pdf' in page.locator('#rfpRescanContent').text_content()
     assert '외 6개' in page.locator('#rfpRescanContent').text_content()
@@ -273,7 +273,7 @@ with sync_playwright() as p:
       if(!b.width||!r.width)return css.flexShrink==='0' && css.whiteSpace==='nowrap';
       return css.flexShrink==='0' && r.width>24 && r.left>=b.left && r.right<=b.right+1;
     }"""),'외 N개 must stay fully visible beside long filename'
-    assert '정상 4 · 오류 1건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
+    assert '확보 4 · 첨부없음 0 · 오류 1건 · 전체 6건' in page.locator('#rfpRescanContent').text_content()
     assert '5 / 6건' in page.locator('#rfpRescanContent').text_content()
     # All six jobs accounted for must NOT produce a success appearance
     # when even one original is confirmed missing (actual user screenshot).
@@ -285,7 +285,7 @@ with sync_playwright() as p:
     dl=page.locator('[data-rfp-stage="download"]')
     assert '원본 오류 1건' in dl.text_content(),dl.text_content()
     assert '처리 완료' not in dl.text_content(),dl.text_content()
-    assert '정상 5 · 오류 1건 · 전체 6건' in dl.text_content(),dl.text_content()
+    assert '확보 5 · 첨부없음 0 · 오류 1건 · 전체 6건' in dl.text_content(),dl.text_content()
     assert page.evaluate("""() => {
       const row=document.querySelector('[data-rfp-stage="download"]');
       const agg=row.querySelector('.rfp-stage-aggregate-fill');
