@@ -12,6 +12,9 @@ import tempfile
 import time
 from types import SimpleNamespace
 
+# Runtime adds the project scripts directory to import paths; reproduce that
+# contract in CI instead of depending on an ambient PYTHONPATH.
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 source=Path(__file__).resolve().parents[1]/'server'/'worklinks-server123-pipeline.py'
 spec=importlib.util.spec_from_file_location('worklinks_pipeline',str(source))
 m=importlib.util.module_from_spec(spec)
