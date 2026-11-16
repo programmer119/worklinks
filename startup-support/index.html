@@ -4533,16 +4533,17 @@ function savedResearchMarkup(x){
 
 /* Absence of a requirement is conclusive only after every official attachment is read and scanned completely. */
 function jobRequirementEvidence(x){
+ const priorOverride=arguments.length>1?arguments[1]:null;
  const id=jobBidIdentity(x);if(!id)return null;
  const key=id.bidNo+':'+id.order;
- const full=rfpSnapshotByNotice.get(key)||null;
+ const full=priorOverride?null:rfpSnapshotByNotice.get(key)||null;
  // Keep this comparison self-contained: the evidence renderer is also
  // executed independently by offline regression tests and detail panes.
- const saved=[jobSearchRfpState.get(key),jobListRfpState.get(key)]
+ const saved=(priorOverride||[jobSearchRfpState.get(key),jobListRfpState.get(key)]
   .filter(Boolean).sort((a,b)=>
    Number(b?.seen===true&&typeof b.parserCurrent==='boolean'&&!!b.versionSource)-
    Number(a?.seen===true&&typeof a.parserCurrent==='boolean'&&!!a.versionSource)||
-   (Date.parse(b.checkedAt||'')||0)-(Date.parse(a.checkedAt||'')||0))[0]||null;
+   (Date.parse(b.checkedAt||'')||0)-(Date.parse(a.checkedAt||'')||0))[0]||null);
  const publishedProvenance=typeof rfpScanProvenanceByNotice==='undefined'?null:
    rfpScanProvenanceByNotice.get(key)||null;
  const cardScan=saved;
@@ -4565,7 +4566,7 @@ function jobRequirementEvidence(x){
     versionSource:cardScan.versionSource
    }:publishedProvenance;
  const partnerEvidence=changcomPrecheckByNotice.get(key)||null;
- const staff=partnerEvidence?.staffingClassification||null;
+ const staff=priorOverride?null:partnerEvidence?.staffingClassification||null;
  const clauses=[];
  if(Array.isArray(full?.files)){
   for(const f of full.files)for(const c of f.clauseCandidates||[]){
@@ -4954,7 +4955,7 @@ function jobRequirementEvidence(x){
   siteLines.push('출처: '+(srcOnsite.file||'파일명 미확인'));
  }
  if(coverage){siteLines.unshift(coverage);roleLines.unshift(coverage);}
- return {
+ const result={
   insurance:{status:four,source:srcInsurance,lines:insLines},
   onsite:{status:site,source:srcOnsite,lines:siteLines,
    recommendation:rec,workloads:onsiteAllocations,singleRole:singleOnsiteRole,
@@ -4966,6 +4967,33 @@ function jobRequirementEvidence(x){
    sourceFiles:[...new Set(effortRows.map(f=>String(f.sourceFile||'')).filter(Boolean))]},
   meta:{full,saved,staff,provenance,clauses,tried,scanFailed,fullyReviewed}
  };
+ const previous=priorOverride?null:saved?.lastSuccessfulState;
+ const newestSucceeded=saved?.parserCurrent===true&&
+   saved?.scanComplete===true&&saved?.staffingRoleScanComplete===true;
+ if(previous?.scanComplete===true&&
+    previous?.staffingRoleScanComplete===true&&!newestSucceeded){
+  // Historical source was verified independently and identity-matched by
+  // the API. A failed, pending or old-version recheck must NOT degrade
+  // an existing successful badge to checking/unknown/failed.
+  const priorView=jobRequirementEvidence(x,previous);
+  const valid={
+   insurance:new Set(['required','required_at_bid','employment_proof','not_required']),
+   onsite:new Set(['onsite','onsite_recommended','onsite_negotiable','offsite']),
+   roles:new Set(['role_found','role_workload','role_recommended','role_requirements',
+                  'role_count_unspecified','role_unspecified'])
+  };
+  const stamp='이전 판독 결과 · 재검증 중';
+  for(const field of ['insurance','onsite','roles']){
+   const oldStatus=priorView?.[field]?.status;
+   if(!oldStatus||!valid[field].has(oldStatus.key))continue;
+   result[field]={...priorView[field],
+     status:{...oldStatus,reason:stamp+' · '+(oldStatus.reason||'')},
+     lines:[stamp,...(priorView[field].lines||[])]};
+   result.meta.lastSuccessfulFields=result.meta.lastSuccessfulFields||[];
+   result.meta.lastSuccessfulFields.push(field);
+  }
+ }
+ return result;
 }
 function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
