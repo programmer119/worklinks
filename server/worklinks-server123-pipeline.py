@@ -744,7 +744,13 @@ def run_once(kind, runner=None, _single=False):
             # writing any SQLite checkpoint, so a busy database cannot lose
             # the repair acknowledgement on process restart.
             if repaired_keys:
-                latest={'keys':repaired_keys,
+                # Never overwrite a previous batch's busy checkpoint marker.
+                # A later completed batch must preserve both pending sets.
+                previous_keys=[]
+                if OCR_RECONCILE_PENDING.is_file():
+                    prior=json.loads(OCR_RECONCILE_PENDING.read_text(encoding='utf-8'))
+                    previous_keys=prior.get('keys') or []
+                latest={'keys':sorted(set(previous_keys+repaired_keys)),
                         'publishedAt':dt.datetime.now(dt.timezone.utc).isoformat()}
                 temp=OCR_RECONCILE_PENDING.with_suffix('.new')
                 temp.write_text(json.dumps(latest,separators=(',',':'))+'\n',
