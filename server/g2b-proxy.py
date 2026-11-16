@@ -1031,6 +1031,29 @@ def read_saved_rfp_evidence_index():
             _SEARCH_RFP_SNAPSHOT.update(modified=modified,byNotice=doc['byNotice'])
         return _SEARCH_RFP_SNAPSHOT['byNotice']
 
+def rfp_same_thumbnail_source(now,prior):
+    """No prior verdict across changed notice/attachment identities."""
+    if not isinstance(now,dict) or not isinstance(prior,dict) or (
+            now.get('manifestChangePending') or prior.get('manifestChangePending')):
+        return False
+    a=[f for f in now.get('files') or [] if isinstance(f,dict)]
+    b=[f for f in prior.get('files') or [] if isinstance(f,dict)]
+    if not a or len(a)!=len(b) or [f.get('name') for f in a]!=[
+            f.get('name') for f in b]:
+        return False
+    sx=str(now.get('manifestSignature') or '')
+    sy=str(prior.get('manifestSignature') or '')
+    if sx or sy:
+        if not sx or sx!=sy:return False
+    else:
+        for x,y in zip(a,b):
+            hx=str(x.get('sourceSha256') or x.get('alternatePdfSourceSha256') or '')
+            hy=str(y.get('sourceSha256') or y.get('alternatePdfSourceSha256') or '')
+            if len(hx)!=64 or hx!=hy:return False
+    return all(not x.get('sourceSha256') or not y.get('sourceSha256') or
+               x['sourceSha256']==y['sourceSha256'] for x,y in zip(a,b))
+
+
 def read_saved_rfp_card_states(keys,source,compact=True):
     """One current-version scan state per notice, shared by saved list and card API.
 
@@ -1039,6 +1062,7 @@ def read_saved_rfp_card_states(keys,source,compact=True):
     """
     if source is None:return {}
     rows={key:source.get(key) for key in keys}
+    original_rows=dict(rows)
     checkpoint_keys=set()
     progress_db=os.path.join(os.path.dirname(G2B_DB_PATH),
                              'rfp-notice-progress.sqlite3')
@@ -1094,6 +1118,34 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                 state['parserCurrent']=bool(
                     stages['classification'] and stages['roles'] and
                     stages['facts'] and stages['hwpx'] is not False)
+            # The live scan state remains independent of the last successful
+            # badges. A pending/failed/new-version scan cannot erase an older
+            # complete result for this exact, unchanged source.
+            if (state.get('parserCurrent') is not True or
+                    state.get('scanComplete') is not True or
+                    state.get('staffingRoleScanComplete') is not True):
+                old=(row.get('lastSuccessfulThumbnail') if
+                     isinstance(row.get('lastSuccessfulThumbnail'),dict)
+                     else None)
+                source_prior=original_rows.get(key)
+                # Checkpoints may be newer than the published snapshot.
+                # Recover source-backed prior evidence without rewriting disk.
+                if (not old and source_prior is not row and
+                        isinstance(source_prior,dict)):
+                    old=(source_prior.get('lastSuccessfulThumbnail') if
+                         isinstance(source_prior.get('lastSuccessfulThumbnail'),dict)
+                         else source_prior)
+                if old is None and state.get('scanComplete') is True and (
+                        state.get('staffingRoleScanComplete') is True):
+                    old=row  # old-reader complete data; current parser only stale
+                if old is not None and rfp_same_thumbnail_source(row,old):
+                    old_state=saved_rfp_search_state(old,compact=compact)
+                    if (old_state.get('scanComplete') is True and
+                            old_state.get('staffingRoleScanComplete') is True):
+                        old_state['checkedAt']=str(old.get('checkedAt') or '')
+                        old_state['parserCurrent']=True  # historical verdict only
+                        old_state['versionSource']='last_success'
+                        state['lastSuccessfulState']=old_state
         by_notice[key]=state
     return by_notice
 
