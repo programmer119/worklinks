@@ -1065,7 +1065,7 @@ def _extract_pdf_with_audit(raw):
     """
     from pypdf import PdfReader
     document=PdfReader(io.BytesIO(raw))
-    if len(document.pages)>450:raise ValueError('pdf_over_page_limit')
+    if len(document.pages)>750:raise ValueError('pdf_over_page_limit')
     parts=[];missing=[];attempted=[];recovered=[];restored=[]
     deferred=[];failed=[];failure_details=[];untouched_blanks=[]
     connection,digest,cached=_pdf_ocr_page_cache(raw)
