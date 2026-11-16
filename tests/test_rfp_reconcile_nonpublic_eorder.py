@@ -48,6 +48,9 @@ with tempfile.TemporaryDirectory() as root:
         [{'name':'(붙임3) 긴급입찰사유서.pdf','url':bad,'httpStatus':422,
           'reason':'official_attachment_reference_missing_422'}])
     assert q.stats()['download']['errors']==1
+    with sqlite3.connect(q.path) as db:
+        original_row=db.execute('SELECT metadata_json FROM rfp_dual_notices WHERE notice_key=?',(key,)).fetchone()[0]
+        original_bulk=db.execute('SELECT metadata_json FROM rfp_bulk_manifests WHERE notice_key=?',(key,)).fetchone()[0]
     assert reconcile(str(q.path),str(ledger_path),apply=False,targets=(key,))==1
     assert q.stats()['download']['errors']==1,'dry run changed production-like DB'
     assert reconcile(str(q.path),str(ledger_path),apply=True,targets=(key,))==1
@@ -63,6 +66,30 @@ with tempfile.TemporaryDirectory() as root:
     assert q.bulk_manifest(key)['attachments']['count']==1
     assert reconcile(str(q.path),str(ledger_path),apply=True,targets=(key,))==0
     q.scan_release([key])
+    # Live case R26BK01808323:000 already has a successful historical scan,
+    # and ONLY its verified nonpublic e-order download must be reconciled.
+    with sqlite3.connect(q.path) as db:
+        db.execute("""UPDATE rfp_dual_notices
+           SET download_status='error_confirmed',scan_status='done',
+               metadata_json=? WHERE notice_key=?""",(original_row,key))
+        db.execute('UPDATE rfp_bulk_manifests SET metadata_json=? WHERE notice_key=?',
+                   (original_bulk,key))
+    assert reconcile(str(q.path),str(ledger_path),apply=False,targets=(key,))==1
+    with sqlite3.connect(q.path) as db:
+        assert db.execute('SELECT download_status,scan_status FROM rfp_dual_notices WHERE notice_key=?',
+                    (key,)).fetchone()==('error_confirmed','done')
+    assert reconcile(str(q.path),str(ledger_path),apply=True,targets=(key,))==1
+    with sqlite3.connect(q.path) as db:
+        status,scan,raw=db.execute('SELECT download_status,scan_status,metadata_json FROM rfp_dual_notices WHERE notice_key=?',
+                       (key,)).fetchone()
+        assert (status,scan)==('ready','done'),(status,scan)
+        updated=json.loads(raw)
+        assert len(updated['downloadVerifiedFiles'])==1
+        assert len(updated['attachments']['items'])==1
+        assert len(updated['attachments']['excludedNonPublicDocuments'])==1
+        assert not updated.get('downloadErrorFiles')
+        assert reconcile(str(q.path),str(ledger_path),apply=True,targets=(key,))==0
+    print('RFP_NONPUBLIC_422_PRESERVES_PREVIOUS_SCAN_DONE=PASS')
 
 # A failed public RFP is never silently dropped without explicit official
 # source-category evidence, even if it also returns HTTP 422.
