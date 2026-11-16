@@ -658,8 +658,12 @@ def run_once(kind, runner=None, _single=False):
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
                        '--data-dir', str(root), '--limit', '3',
                        '--max-files', '3', '--workers', '3',
-                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '2',
-                       '--minimum-format-fixes','1',
+                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '1',
+                       # Keep one legacy OCR lane but leave two source-file
+                       # slots for proven fast v17 protocol repairs. The old
+                       # 2 OCR + 1 format reservation starved all 18
+                       # reply-invalid PDFs despite a working fix.
+                       '--minimum-format-fixes','0',
                        '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
