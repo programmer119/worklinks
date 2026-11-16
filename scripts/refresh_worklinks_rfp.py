@@ -1160,6 +1160,62 @@ def _pdf_verified_completely_white_page(raw,index,cache):
         return False
 
 
+def _pdf_verified_perimeter_only_frame(raw,index,cache):
+    """A page consisting ONLY of four thin vector frame lines has no text.
+
+    Verified 2026 government purchase PDF p8 had four perimeter strokes and
+    zero fonts/images. This detector rejects any filled, textual, inner, or
+    additional path. A drawing-rich page cannot be silently excluded.
+    """
+    try:
+        import pymupdf
+        doc=cache.get('document')
+        if doc is None:
+            start=time.perf_counter()
+            doc=pymupdf.open(stream=raw,filetype='pdf')
+            cache['document']=doc
+            cache['pdfOpenSeconds']+=time.perf_counter()-start
+        page=doc.load_page(index)
+        w,h=page.rect.width,page.rect.height
+        if w<=0 or h<=0 or page.get_text('text').strip() or page.get_images(full=True):
+            return False
+        bb=page.get_bboxlog()
+        if len(bb)!=4 or any(row[0]!='stroke-path' for row in bb):
+            return False
+        directions={'left':False,'right':False,'top':False,'bottom':False}
+        for shape in page.get_drawings():
+            if shape.get('fill') is not None or shape.get('type')!='s':
+                return False
+            if not (0<float(shape.get('width') or 0)<=0.6):
+                return False
+            segments=shape.get('items') or []
+            if len(segments)!=1 or segments[0][0]!='l':
+                return False
+            p,q=segments[0][1],segments[0][2]
+            if abs(p.x-q.x)<.8 and abs(p.y-q.y)>=.75*h:
+                x=(p.x+q.x)/2
+                if 0.04*w<=x<=.16*w:
+                    if directions['left']:return False
+                    directions['left']=True
+                elif .84*w<=x<=.98*w:
+                    if directions['right']:return False
+                    directions['right']=True
+                else:return False
+            elif abs(p.y-q.y)<.8 and abs(p.x-q.x)>=.75*w:
+                y=(p.y+q.y)/2
+                if .01*h<=y<=.12*h:
+                    if directions['top']:return False
+                    directions['top']=True
+                elif .85*h<=y<=.99*h:
+                    if directions['bottom']:return False
+                    directions['bottom']=True
+                else:return False
+            else:return False
+        return all(directions.values())
+    except (ValueError,TypeError,AttributeError,ImportError):
+        return False
+
+
 def _extract_pdf_with_audit(raw,name=''):
     """OCR at most 24 NEW pages per pass; resume from SHA-verified page cache.
 
@@ -1341,6 +1397,11 @@ def _extract_pdf_with_audit(raw,name=''):
                     has_images=True
             image_check_seconds+=time.perf_counter()-phase
             if not has_content and not has_images:
+                untouched_blanks.append(i+1)
+                continue
+            if _pdf_verified_perimeter_only_frame(raw,i,render_cache):
+                # This is a fully source-verified empty TEMPLATE FRAME,
+                # not OCR text. Never infer any qualifications from it.
                 untouched_blanks.append(i+1)
                 continue
             if (len(attempted)>=MAX_PDF_OCR_PAGES or
