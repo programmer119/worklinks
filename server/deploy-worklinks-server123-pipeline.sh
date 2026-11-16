@@ -75,6 +75,8 @@ dk run --rm --network none -v "$ROOT:/work:ro" \
   "$IMAGE" python /work/tests/test_rfp_ocr_fast_native_skip_20261116.py
 dk run --rm --network none -v "$ROOT:/work:ro" \
   "$IMAGE" python /work/tests/test_rfp_ocr_mupdf_native_20261116.py
+dk run --rm --network none -v "$ROOT:/work:ro" \
+  "$IMAGE" python /work/tests/test_rfp_ocr_repair_prioritization_20261115.py
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
 for name in changcom-actionable.json g2b-award-fields-open.json rfp-clauses.json rfp-coverage-index.json qualification-review.json;do
