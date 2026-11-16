@@ -486,6 +486,60 @@ def repair_preflight():
                     failureReason=type(exc).__name__ + ': ' + str(exc)[:180])
 
 
+# A completed OCR batch publishes its source-backed JSON first. A separate
+# SQLite checkpoint or scan queue may temporarily be write-locked by the
+# independent downloader. A transient lock must not erase a successful repair
+# or force the expensive OCR to be repeated.
+OCR_RECONCILE_PENDING=DATA/'rfp-ocr-postpublish-reconcile.json'
+
+
+def reconcile_published_ocr_batch(keys, *, dual_enabled=True):
+    """Retry post-publish bookkeeping; never touches/downloads original files."""
+    if keys:
+        publish_verified_repair_checkpoints(keys)
+    if dual_enabled:
+        from rfp_dual_queue import RfpDualQueue
+        from rfp_management_reconcile import read_evidence,management_scope
+        queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
+        versions,evidence=read_evidence(DATA)
+        reopened=queue.reopen_changed_scan_evidence(evidence)
+        managed,valid=management_scope(DATA)
+        fingerprint=':'.join(str(versions[k]) for k in
+            ('classificationVersion','hwpxReaderVersion',
+             'staffingRoleScanVersion','staffingFactScanVersion'))
+        tally=queue.reconcile_management(managed,valid,fingerprint)
+        log('RFP_SCAN_POST_REPAIR_RECONCILED',json.dumps({
+            'newEvidenceReopened':reopened,
+            'validCompleted':tally['completedEvidenceReconciled']},
+            separators=(',',':')))
+
+
+def retry_published_ocr_reconcile(attempts=3):
+    """Durably resume a partial post-publish operation; on lock, leave marker."""
+    if not OCR_RECONCILE_PENDING.is_file():
+        return False
+    record=json.loads(OCR_RECONCILE_PENDING.read_text(encoding='utf-8'))
+    keys=record.get('keys') or []
+    if not isinstance(keys,list) or any(not isinstance(k,str) for k in keys):
+        raise ValueError('invalid_postpublished_ocr_keys')
+    for attempt in range(max(1,attempts)):
+        try:
+            reconcile_published_ocr_batch(keys,
+                dual_enabled=os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1')
+            OCR_RECONCILE_PENDING.unlink(missing_ok=True)
+            log('RFP_OCR_POSTPUBLISH_RECONCILE_COMPLETE',len(keys))
+            return True
+        except sqlite3.OperationalError as error:
+            if not ('locked' in str(error).lower() or
+                    'busy' in str(error).lower()):
+                raise
+            log('RFP_OCR_POSTPUBLISH_DB_BUSY',attempt+1,
+                str(error)[:80],'checkpointAndQueueRetryDeferred')
+            if attempt+1<attempts:
+                time.sleep(min(0.3*(2**attempt),1.2))
+    return False
+
+
 def run_once(kind, runner=None, _single=False):
     """Run one job in an isolated writable workspace, atomic publish on success."""
     dual_enabled=(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1')
@@ -685,8 +739,21 @@ def run_once(kind, runner=None, _single=False):
         quality_guard(kind, outputs)
         for result in outputs:
             publish_atomic(result, SEEDS / result.name)
-        if kind=='rfpOpenRepair' and repaired_keys:
-            publish_verified_repair_checkpoints(repaired_keys)
+        if kind=='rfpOpenRepair':
+            # Publishing succeeded. Persist the exact repair keys BEFORE
+            # writing any SQLite checkpoint, so a busy database cannot lose
+            # the repair acknowledgement on process restart.
+            if repaired_keys:
+                latest={'keys':repaired_keys,
+                        'publishedAt':dt.datetime.now(dt.timezone.utc).isoformat()}
+                temp=OCR_RECONCILE_PENDING.with_suffix('.new')
+                temp.write_text(json.dumps(latest,separators=(',',':'))+'\n',
+                                encoding='utf-8')
+                os.replace(temp,OCR_RECONCILE_PENDING)
+            if OCR_RECONCILE_PENDING.is_file():
+                if not retry_published_ocr_reconcile(attempts=3):
+                    log('RFP_OCR_POSTPUBLISH_PENDING_DB_UNLOCK',
+                        len(repaired_keys),'publishedOriginalEvidencePreserved')
         if kind=='rfpUpgrade' and dual_enabled:
             # Mark scans finished ONLY after both validated archives are
             # durably published. An interrupted publish is always retryable.
@@ -726,23 +793,6 @@ def run_once(kind, runner=None, _single=False):
                             if committed:sync_scan_retry_activity(queue,key)
                             if not ok:
                                 log('RFP_SCAN_RETRY_CAUSE',key,reason)
-        if kind=='rfpOpenRepair' and dual_enabled:
-            # A published OCR repair may complete a previously failed notice.
-            # Reconcile now, not only on the independent 10-minute discovery.
-            from rfp_dual_queue import RfpDualQueue
-            from rfp_management_reconcile import read_evidence, management_scope
-            queue=RfpDualQueue(DATA/'rfp-dual-queue.sqlite3')
-            versions,evidence=read_evidence(DATA)
-            reopened=queue.reopen_changed_scan_evidence(evidence)
-            managed,valid=management_scope(DATA)
-            fingerprint=':'.join(str(versions[k]) for k in
-                ('classificationVersion','hwpxReaderVersion',
-                 'staffingRoleScanVersion','staffingFactScanVersion'))
-            tally=queue.reconcile_management(managed,valid,fingerprint)
-            log('RFP_SCAN_POST_REPAIR_RECONCILED',
-                json.dumps({'newEvidenceReopened':reopened,
-                   'validCompleted':tally['completedEvidenceReconciled']},
-                   separators=(',',':')))
         log('PIPELINE_PUBLISHED', kind,
             'outputs', ','.join(result.name for result in outputs))
         if kind=='rfpOpenRepair' and _single:
@@ -761,6 +811,15 @@ def run_once(kind, runner=None, _single=False):
 def iteration(current=None, runner=None):
     now = float(time.time() if current is None else current)
     state = read_state()
+    # A prior OCR batch can have committed complete evidence while the
+    # post-publish scan-queue database was busy. Reconcile independently,
+    # without OCR rerun, on every scheduler iteration until acknowledged.
+    if OCR_RECONCILE_PENDING.is_file():
+        try:
+            retry_published_ocr_reconcile(attempts=1)
+        except (OSError,sqlite3.Error,ValueError,KeyError) as error:
+            log('RFP_OCR_POSTPUBLISH_RECONCILE_RETRY',
+                type(error).__name__,str(error)[:90])
     # Periodic tasks remain scheduled. Triggered RFP drain continues as soon
     # as the previous successful batch atomically publishes its checkpoint.
     jobs = (('rfp', RFP_PERIOD), ('rfpUpgrade', RFP_UPGRADE_PERIOD), ('actionable', SHORTLIST_PERIOD),
