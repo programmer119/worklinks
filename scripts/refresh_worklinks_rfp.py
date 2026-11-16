@@ -3171,6 +3171,27 @@ def compact_coverage(item):
     }
     compact['staffingRoles']=staffing_summary(item)
     compact['staffingFacts']=staffing_fact_summary(item)
+    # Keep bounded source quotes for previous successful badge decisions when
+    # a future recheck is deferred. The rolling full detail may be evicted.
+    thumbnail_clauses=[]
+    for f in item.get('files') or []:
+        if not isinstance(f,dict) or f.get('readable') is not True:
+            continue
+        for clause in (f.get('clauseCandidates') or []):
+            if not isinstance(clause,dict):
+                continue
+            quote=str(clause.get('sourceText') or '').strip()
+            if not quote or not re.search(
+                    r'4\s*대\s*보험|사대\s*보험|건강\s*보험|고용\s*보험|상주|'
+                    r'현장\s*(?:근무|배치)|인력|인원|투입|재직',quote,re.I):
+                continue
+            thumbnail_clauses.append({'type':str(clause.get('type') or '')[:40],
+                'text':quote[:330],'sourceFile':str(f.get('name') or '')[:140]})
+            if len(thumbnail_clauses)>=14:
+                break
+        if len(thumbnail_clauses)>=14:
+            break
+    compact['thumbnailClauses']=thumbnail_clauses
     compact['staffingRoleScanComplete']=bool(
         item.get('manifestComplete') is True and compact['files'] and
         all(staffing_effective_file_complete(f,item.get('files') or [])
@@ -3275,6 +3296,7 @@ def publish_notice_checkpoint(notice_key, result, fingerprint):
     if not re.fullmatch(r'(?:R\d{2}BK\d{8}|\d{11}):\d{3}',notice_key):
         raise ValueError('invalid_checkpoint_notice_key')
     record=compact_coverage(result)
+    from rfp_management_reconcile import preserve_last_success_thumbnail
     checked=str(result.get('checkedAt') or '')
     if not checked or not record.get('status'):
         raise ValueError('invalid_checkpoint_source_provenance')
@@ -3293,6 +3315,8 @@ def publish_notice_checkpoint(notice_key, result, fingerprint):
         if previous:
             try:prior=json.loads(previous[0])
             except (ValueError,TypeError):prior={}
+            record=preserve_last_success_thumbnail(record,prior)
+            value=json.dumps(record,ensure_ascii=False,separators=(',',':'))
             # A quick stage-3 pass intentionally defers slow PDF OCR. Do not
             # let that incomplete recheck erase a previously source-verified,
             # fully parsed OCR repair for unchanged official attachments.
