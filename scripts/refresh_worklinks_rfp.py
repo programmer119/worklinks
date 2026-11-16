@@ -161,6 +161,8 @@ MAX_FILE=100_000_000
 MAX_PDF_OCR_PAGES=24
 PDF_OCR_PAGE_CACHE_VERSION=1
 SPARSE_OCR_PAGE_CACHE_VERSION=1001  # consensus + sparse render guard
+PDF_OCR_FAILED_PAGE_VERSION=1
+PDF_OCR_FAILED_PAGE_COOLDOWN_SECONDS=3600  # retry unreadable pages after fresh pages have advanced
 # Time-budget each OCR pass so the 180s isolated extractor cannot discard
 # unfinished work without emitting the next-page checkpoint evidence.
 PDF_OCR_PASS_SECONDS=115
@@ -1049,6 +1051,39 @@ def _pdf_ocr_page_cache(raw):
         raise
 
 
+def _pdf_ocr_failed_page_cooldowns(connection,digest):
+    """Durably defer repeated unreadable OCR pages without declaring them readable.
+
+    A page failure is never a successful receipt. The cooldown only shifts
+    work to later pages so a six-page group cannot block a 153-page document.
+    """
+    if connection is None:return {}
+    connection.execute('''CREATE TABLE IF NOT EXISTS rfp_pdf_ocr_page_failures (
+      pdf_sha256 TEXT NOT NULL, page_index INTEGER NOT NULL,
+      failure_version INTEGER NOT NULL, reason TEXT NOT NULL,
+      attempts INTEGER NOT NULL, next_retry_epoch REAL NOT NULL,
+      PRIMARY KEY(pdf_sha256,page_index,failure_version))''')
+    rows=connection.execute('''SELECT page_index,reason FROM
+      rfp_pdf_ocr_page_failures WHERE pdf_sha256=? AND failure_version=?
+      AND next_retry_epoch>?''',
+      (digest,PDF_OCR_FAILED_PAGE_VERSION,time.time())).fetchall()
+    return {index:reason for index,reason in rows}
+
+
+def _pdf_ocr_save_failed_page(connection,digest,index,reason):
+    if connection is None:return
+    connection.execute('''INSERT INTO rfp_pdf_ocr_page_failures(
+      pdf_sha256,page_index,failure_version,reason,attempts,next_retry_epoch)
+      VALUES(?,?,?,?,1,?) ON CONFLICT(pdf_sha256,page_index,failure_version)
+      DO UPDATE SET reason=excluded.reason, attempts=attempts+1,
+        next_retry_epoch=excluded.next_retry_epoch''',
+      (digest,index,PDF_OCR_FAILED_PAGE_VERSION,reason,
+       time.time()+PDF_OCR_FAILED_PAGE_COOLDOWN_SECONDS))
+    # Commit each failed page as well as each successful page. An isolated
+    # extractor can be terminated after a long pass; the schedule must survive.
+    connection.commit()
+
+
 def _pdf_native_text_objects_present(raw,index,cache):
     """Fast MuPDF display-list test; fail closed to pypdf on any uncertainty.
 
@@ -1111,6 +1146,8 @@ def _extract_pdf_with_audit(raw):
     parts=[];missing=[];attempted=[];recovered=[];restored=[]
     deferred=[];failed=[];failure_details=[];untouched_blanks=[]
     connection,digest,cached=_pdf_ocr_page_cache(raw)
+    cached_failures=_pdf_ocr_failed_page_cooldowns(connection,digest)
+    cached_failed=[]
     # The reusable PDF handle is lazy: a native-text-only PDF never opens
     # PyMuPDF. One image-only PDF uses ONE handle across all OCR pages.
     previous_render_cache=getattr(_DOCUMENT_SCAN,'ocr_render_cache',None)
@@ -1191,6 +1228,16 @@ def _extract_pdf_with_audit(raw):
                 parts.append(cached[i])
                 recovered.append(i+1)
                 restored.append(i+1)
+                continue
+            # Do not run the same known-failing Tesseract pages again and
+            # exhaust this bounded pass before reaching deferred pages.
+            # They stay unresolved (never enter the successful OCR cache).
+            if i in cached_failures:
+                missing.append(i+1)
+                failed.append(i+1)
+                cached_failed.append(i+1)
+                failure_details.append({'page':i+1,'reason':cached_failures[i],
+                                        'cachedFailureCooldown':True})
                 continue
             # On long verified PDFs, native MuPDF text is much cheaper than
             # running a complete pypdf text decoder on every page. The sample
@@ -1284,9 +1331,10 @@ def _extract_pdf_with_audit(raw):
             except (ValueError,subprocess.TimeoutExpired) as error:
                 missing.append(i+1)
                 failed.append(i+1)
-                failure_details.append({'page':i+1,
-                    'reason':'ocr_timeout_22s' if isinstance(error,subprocess.TimeoutExpired)
-                    else str(error)[:120]})
+                reason=('ocr_timeout_22s' if isinstance(error,subprocess.TimeoutExpired)
+                        else str(error)[:120])
+                failure_details.append({'page':i+1,'reason':reason})
+                _pdf_ocr_save_failed_page(connection,digest,i,reason)
                 continue
             sparse_verified=any(
                 item.get('page')==i+1 and item.get('sparseOcrConsensusVerified')
@@ -1300,7 +1348,9 @@ def _extract_pdf_with_audit(raw):
                     continue
                 missing.append(i+1)
                 failed.append(i+1)
-                failure_details.append({'page':i+1,'reason':'ocr_text_below_12_alphanumeric'})
+                reason='ocr_text_below_12_alphanumeric'
+                failure_details.append({'page':i+1,'reason':reason})
+                _pdf_ocr_save_failed_page(connection,digest,i,reason)
                 continue
             parts.append(value)
             recovered.append(i+1)
@@ -1320,6 +1370,7 @@ def _extract_pdf_with_audit(raw):
         info={'pdfPages':len(document.pages),'ocrAttemptedPages':len(attempted),
               'ocrRecoveredPages':len(recovered),'ocrRestoredPages':len(restored),
               'ocrBatchDeferredPages':len(deferred),'ocrFailedPages':len(failed),
+              'ocrCachedFailedPages':len(cached_failed),
               'ocrFailureDetails':failure_details[:30],
               'unresolvedPages':missing[:30],
               'genuinelyBlankPages':len(untouched_blanks),
