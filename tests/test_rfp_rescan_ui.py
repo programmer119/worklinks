@@ -142,6 +142,16 @@ with sync_playwright() as p:
     assert '원본 다운로드 완료 대기' in scan_card.text_content(),scan_card.text_content()
     assert '서버 작업 기록 갱신 끊김' not in scan_card.text_content()
     assert '원본 다운로드 대기' in scan_card.text_content()
+    # A serial OCR repair may still be running while the scan lane has no
+    # fresh per-file heartbeat. That is not a disconnected server either.
+    page.evaluate("""() => {
+      rfpRescanProgress.worker.tasks.rfpUpgrade.status='ok';
+      rfpRescanProgress.worker.tasks.rfpOpenRepair={status:'started',
+        attemptEpoch:Date.now()/1000-35};
+      paintRfpRescanProgress();
+    }""")
+    assert '저장 원본 OCR 복구 실행 중' in scan_card.text_content(),scan_card.text_content()
+    assert '서버 작업 기록 갱신 끊김' not in scan_card.text_content()
     # A real scanner job is not the same state as download waiting.
     page.evaluate("""() => {
       rfpRescanProgress.worker.tasks.rfpUpgrade.status='started';
