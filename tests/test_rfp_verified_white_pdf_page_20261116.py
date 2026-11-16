@@ -34,7 +34,7 @@ blank_pdf=make_pdf(b'q\nQ\n')
 with patch.dict(os.environ,env),patch.object(reader,'_ocr_pdf_page',return_value='') as ocr:
     text,stats=reader.extract_with_source_status('contract.pdf',blank_pdf)
     assert stats['sourceComplete'] is True,stats
-    assert stats['genuinelyBlankPages']==1,stats
+    assert stats['pdfSources'][0]['genuinelyBlankPages']==1,stats
     assert stats['ocrFailedPages']==0,stats
     assert 'Public procurement' in text,text
     assert ocr.call_count==1,ocr.call_count
@@ -44,7 +44,7 @@ diagram_pdf=make_pdf(b'q 0 0 0 rg 120 140 300 400 re f Q')
 with patch.dict(os.environ,env),patch.object(reader,'_ocr_pdf_page',return_value='') as ocr:
     text,stats=reader.extract_with_source_status('diagram.pdf',diagram_pdf)
     assert stats['sourceComplete'] is False,stats
-    assert stats['genuinelyBlankPages']==0,stats
+    assert stats['pdfSources'][0]['genuinelyBlankPages']==0,stats
     assert stats['ocrFailedPages']==1,stats
     assert ocr.call_count==1,ocr.call_count
 print('RFP_TRUE_WHITE_PAGE_SKIP_AND_NONWHITE_FAIL_CLOSED=PASS')
