@@ -32,6 +32,29 @@ assert m.scan_failure_diagnosis({'status':'text_unavailable',
     'classificationVersion':23,'staffingRoleScanVersion':4,
     'staffingFactScanVersion':2,'hwpxReaderVersion':3
 })=='scan_extraction_text_unavailable:invalid_hwp'
+# OCR child execution may exceed the 90s dashboard stale threshold.
+# A dedicated 15s pulse must continue while the child is alive and stop after it exits.
+heartbeat_times=[]
+def simulated_long_ocr(args,**kwargs):
+    time.sleep(0.11)
+    return SimpleNamespace(returncode=0,stdout='ok',stderr='')
+result=m.run_child_with_heartbeat(simulated_long_ocr,['python','ocr'],
+    cwd='/tmp',env={},timeout=10,pulse=lambda:heartbeat_times.append(time.monotonic()),
+    interval=0.02)
+assert result.returncode==0 and len(heartbeat_times)>=4,heartbeat_times
+observed=len(heartbeat_times)
+time.sleep(0.05)
+assert len(heartbeat_times)==observed,'heartbeat continued after OCR finished'
+try:
+    m.run_child_with_heartbeat(lambda *_a,**_k: (_ for _ in ()).throw(ValueError('test_child_fail')),
+        ['python','ocr'],cwd='/tmp',env={},timeout=10,
+        pulse=lambda:heartbeat_times.append(time.monotonic()),interval=0.02)
+except ValueError as exc:
+    assert str(exc)=='test_child_fail'
+else:
+    raise AssertionError('OCR child failure must propagate')
+print('RFP_LONG_OCR_RUNNING_HEARTBEAT_AND_CLEAN_STOP=PASS')
+
 with tempfile.TemporaryDirectory() as temporary:
     root=Path(temporary)
     m.DATA=root
