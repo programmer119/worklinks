@@ -158,7 +158,7 @@ def choose_repair_batch(candidates,limit,max_files,per_notice_cap=3,minimum_old_
     # Legacy HWP, XML, HTML-XLS and ZIP format mismatches must not be
     # starved behind OCR. Reserve a real third file slot for those originals.
     formats=[item for item in ordered if len(item)>8 and item[8] is True
-             and id(item) not in reserved_ids]
+             and item[7] is not True and id(item) not in reserved_ids]
     for item in formats[:max(0,int(minimum_format_fixes))]:
         reserved.append(item)
         reserved_ids.add(id(item))
