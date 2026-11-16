@@ -58,10 +58,16 @@ sys.path.insert(0,sys.argv[1])
 import refresh_worklinks_rfp as reader
 try:
     value,evidence=reader.extract_with_source_status(sys.argv[2],sys.stdin.buffer.read())
+    # Native MuPDF can return isolated UTF-16 surrogate codepoints for rare
+    # Korean PDF fonts. Preserve their escaped identity as printable ASCII
+    # instead of crashing the entire ZIP extraction child.
+    if any(0xd800<=ord(ch)<=0xdfff for ch in value):
+        value=value.encode('utf-8','backslashreplace').decode('utf-8')
+        evidence['unmappedUnicodeSurrogateEscapes']=True
     result={'ok':True,'text':value,'evidence':evidence}
 except Exception as error:
     result={'ok':False,'error':type(error).__name__,'detail':str(error)[:180]}
-sys.stdout.write(chr(10)+'__WORKLINKS_EXTRACT_RESULT_V2__'+json.dumps(result,ensure_ascii=False,separators=(',',':')))
+sys.stdout.write(chr(10)+'__WORKLINKS_EXTRACT_RESULT_V2__'+json.dumps(result,ensure_ascii=True,separators=(',',':')))
 """
 
 def decode_extraction_child_result(stdout):
