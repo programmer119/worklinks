@@ -186,7 +186,8 @@ with tempfile.TemporaryDirectory() as temporary:
     repair_calls=[]
     def count_repair(args,**kwargs):
         if 'repair_open_rfp_cached_attachments.py' in args[1]:
-            assert args[args.index('--minimum-old-ocr')+1]=='3',args
+            assert args[args.index('--minimum-old-ocr')+1]=='2',args
+            assert args[args.index('--minimum-format-fixes')+1]=='1',args
             repair_calls.append('ocr')
         return mock_runner(args,**kwargs)
     deferred=m.iteration(now+5,count_repair)
