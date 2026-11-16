@@ -161,7 +161,7 @@ MAX_FILE=100_000_000
 MAX_PDF_OCR_PAGES=24
 PDF_OCR_PAGE_CACHE_VERSION=1
 SPARSE_OCR_PAGE_CACHE_VERSION=1001  # consensus + sparse render guard
-PDF_OCR_FAILED_PAGE_VERSION=1
+PDF_OCR_FAILED_PAGE_VERSION=2  # new evidence-gated vector PSM11 path retries prior timed-out pages
 PDF_OCR_FAILED_PAGE_COOLDOWN_SECONDS=3600  # retry unreadable pages after fresh pages have advanced
 # Time-budget each OCR pass so the 180s isolated extractor cannot discard
 # unfinished work without emitting the next-page checkpoint evidence.
@@ -849,6 +849,64 @@ def _ocr_pdf_page(raw,index,name=''):
     try:
         start=time.perf_counter()
         page=document.load_page(index)
+        # Opt-in only for a long, verified engineering drawing consisting
+        # almost entirely of vector geometry, with no native text operators.
+        # Actual 153-page G2B drawing page 37 timed out at default 300 DPI,
+        # but 130-DPI grayscale PSM11 yielded 1618 alphanumerics in 9.71 s.
+        # Fail closed on ambiguous OCR; a failed fast attempt is NEVER a
+        # source-complete page. Enable only for a scoped verified-source repair.
+        if (os.environ.get('WORKLINKS_RFP_LONG_VECTOR_FAST_OCR')=='1'
+                and document.page_count>=120):
+            try:
+                display=page.get_bboxlog()
+                kinds=[str(v[0]) for v in display]
+            except Exception:
+                kinds=[]
+            vector=sum(v in ('stroke-path','fill-path') for v in kinds)
+            if (len(kinds)>=10 and vector>=len(kinds)*0.90
+                    and not any(v.endswith('text') for v in kinds)):
+                quick_start=time.perf_counter()
+                quick_zoom=min(130/72.0,(MAX_PDF_OCR_PIXELS/
+                    max(1.0,page.rect.width*page.rect.height))**.5)
+                quick_pix=page.get_pixmap(
+                    matrix=pymupdf.Matrix(quick_zoom,quick_zoom),
+                    colorspace=pymupdf.csGRAY,alpha=False)
+                quick_png=quick_pix.tobytes('png')
+                render_seconds=time.perf_counter()-quick_start
+                if reusable:
+                    context['renderSeconds']+=render_seconds
+                    context['renderPixels']+=quick_pix.width*quick_pix.height
+                ocr_start=time.perf_counter()
+                try:
+                    quick=subprocess.run(
+                        ['tesseract','stdin','stdout','-l','kor+eng','--psm','11',
+                         '--dpi',str(int(quick_zoom*72))],
+                        input=quick_png,capture_output=True,timeout=16,
+                        check=False,env=dict(os.environ,OMP_THREAD_LIMIT='1'))
+                    candidate=quick.stdout.decode('utf-8','replace')
+                    alnum=sum(c.isalnum() for c in candidate) if quick.returncode==0 else 0
+                    hangul=sum('가'<=c<='힣' for c in candidate)
+                    verified=quick.returncode==0 and alnum>=60 and hangul>=10
+                    reason='accepted' if verified else 'insufficient_verifiable_text'
+                except subprocess.TimeoutExpired:
+                    candidate=''
+                    alnum=0
+                    hangul=0
+                    verified=False
+                    reason='fast_psm11_timeout_16s'
+                ocr_seconds=time.perf_counter()-ocr_start
+                if reusable:
+                    context['tesseractSeconds']+=ocr_seconds
+                    context.setdefault('pageProfiles',[]).append({
+                        'page':index+1,'strategy':'verified_long_vector_psm11_130dpi',
+                        'effectiveDpi':round(quick_zoom*72,2),
+                        'renderSeconds':round(render_seconds,3),
+                        'tesseractSeconds':round(ocr_seconds,3),
+                        'alnum':alnum,'hangul':hangul,
+                        'verified':verified,'reason':reason})
+                if verified:return candidate
+                if os.environ.get('WORKLINKS_RFP_LONG_VECTOR_FAST_ONLY')=='1':
+                    raise ValueError('pdf_ocr_long_vector_fast_unreadable')
         # RGB is the unchanged production default. Grayscale is opt-in only
         # after SHA-identical output is verified on actual Korean tender PDFs.
         color_mode=(os.environ.get('WORKLINKS_RFP_OCR_COLORSPACE') or 'rgb').strip().lower()
