@@ -277,6 +277,10 @@
      upstreamScan==='waiting_for_download';
    const waitingForEligibility=key==='scan'&&info?.worker?.upgradeActive===true&&
      upstreamScan==='no_eligible_now';
+   const waitingForRepair=key==='scan'&&info?.worker?.upgradeActive===true&&
+     upstreamScan==='waiting_for_source_repair';
+   const waitingForSource=key==='scan'&&info?.worker?.upgradeActive===true&&
+     upstreamScan==='waiting_for_source';
    const ocrTask=info?.worker?.tasks?.rfpOpenRepair;
    const recentOcrRepair=key==='scan'&&info?.worker?.upgradeActive===true&&
      ocrTask?.status==='started'&&Number(ocrTask.attemptEpoch)>0&&
@@ -284,7 +288,9 @@
    let badge=active?(key==='scan'?'판독 시도 '+active+'건':'진행 '+active+'건'):
       problems?'재시도 '+problems+'건':'';
    if(active&&problems)badge+=' · 오류 '+problems+'건';
-   if(waitingForOriginal)badge=recentOcrRepair?'원본 대기 · OCR 복구 중':'원본 다운로드 대기';
+   if(waitingForRepair)badge=recentOcrRepair?'원본 문서 복구 실행 중':'원본 추출 오류 · 복구 필요';
+   else if(waitingForSource)badge='공식 원본 미확보 · 확인 필요';
+   else if(waitingForOriginal)badge=recentOcrRepair?'원본 대기 · OCR 복구 중':'원본 다운로드 대기';
    else if(waitingForEligibility)badge='판독 가능한 원본 확인 중';
    else if(recentOcrRepair)badge='OCR 복구 시도 중';
    else if(worker?.status==='retry'&&Number(worker.retryEpoch)>now)
@@ -298,11 +304,19 @@
     badge+=' · 판독 제외 '+Number(lane.blockedNoAttachments)+'건';
    updateRfpText(state,badge);
    node.classList.toggle('has-rfp-error',Boolean(
-     (worker?.status==='retry'&&!waitingForOriginal&&!waitingForEligibility&&!recentOcrRepair)||
-     (worker?.stale&&!waitingForOriginal&&!waitingForEligibility&&!recentOcrRepair)||problems||stale));
+     (worker?.status==='retry'&&!waitingForOriginal&&!waitingForEligibility&&!waitingForRepair&&!waitingForSource&&!recentOcrRepair)||
+     (worker?.stale&&!waitingForOriginal&&!waitingForEligibility&&!waitingForRepair&&!waitingForSource&&!recentOcrRepair)||problems||stale));
    let name='현재 처리 파일 없음',detail='';
    const bits=[];
-   if(waitingForOriginal){
+   if(waitingForRepair){
+    name=recentOcrRepair?'실제 저장 원본 OCR·추출 복구 실행 중':'원본 판독 오류 · 복구 대상 확인 필요';
+    if(failed>0)bits.push('미완료 판독 '+number(failed)+'건');
+    // A held scan is never a completed action or a fake current file.
+   }else if(waitingForSource){
+    name='공식 원본이 확인되지 않아 판독할 수 없음';
+    if(Number(lane?.blockedNoAttachments||0)>0)
+     bits.push('원본 미확보 '+number(Number(lane.blockedNoAttachments))+'건');
+   }else if(waitingForOriginal){
     name=recentOcrRepair?'원본 대기 · OCR 복구 실행 중':'원본 다운로드 완료 대기';
     const dl=info?.lanes?.download;
     if(dl?.total>0)bits.push('미확보 '+number(Math.max(0,Number(dl.total)-Number(dl.done||0)))+'건');
