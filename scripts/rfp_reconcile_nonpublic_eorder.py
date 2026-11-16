@@ -176,8 +176,8 @@ def reconcile(queue_path,ledger_path,apply=False,targets=TARGETS):
                         last_error='',updated_at=?
                     WHERE notice_key=? AND download_status='error_confirmed'
                       AND metadata_json=? AND scan_status=?""",(
-                    json.dumps(meta,ensure_ascii=False,separators=(',',':')),
                     'done' if scan=='done' else 'pending',
+                    json.dumps(meta,ensure_ascii=False,separators=(',',':')),
                     files,files,now,key,old,scan))
                 if result.rowcount!=1:
                     raise ValueError(key+':queue_changed_during_reconciliation')
