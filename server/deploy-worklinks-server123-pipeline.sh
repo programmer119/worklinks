@@ -76,6 +76,8 @@ dk run --rm --network none -v "$ROOT:/work:ro" \
 dk run --rm --network none -v "$ROOT:/work:ro" \
   "$IMAGE" python /work/tests/test_rfp_ocr_mupdf_native_20261116.py
 dk run --rm --network none -v "$ROOT:/work:ro" \
+  "$IMAGE" python /work/tests/test_rfp_ocr_postpublish_busy_20261116.py
+dk run --rm --network none -v "$ROOT:/work:ro" \
   "$IMAGE" python /work/tests/test_rfp_ocr_repair_prioritization_20261115.py
 mkdir -p "$SCRIPTS" "$SNAPSHOTS" "$SNAPSHOTS/audits"
 # Pipeline-owned outputs are initial seed ONLY; never overwrite live 123 results.
