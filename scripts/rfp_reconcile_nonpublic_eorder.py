@@ -8,6 +8,7 @@ download must still have a fully SHA-256-verified binary in the ledger.
 import argparse
 import datetime as dt
 import json
+import re
 import sqlite3
 import urllib.parse
 import zlib
@@ -114,15 +115,15 @@ def reconcile(queue_path,ledger_path,apply=False,targets=TARGETS):
             if status=='ready' and scan in ('pending','retry','scanning','done'):
                 print('NONPUBLIC_REFERENCE_ALREADY_RECONCILED',key,flush=True)
                 continue
-            if status!='error_confirmed' or scan not in ('pending','retry'):
+            if status!='error_confirmed' or scan not in ('pending','retry','done'):
                 raise ValueError(key+':unexpected_queue_status:'+str((status,scan)))
             meta=_loads(raw)
             errors=meta.get('downloadErrorFiles') or []
             needed[key]={str(x.get('url') or '') for x in errors if isinstance(x,dict)}
-            entries[key]=(raw,meta)
+            entries[key]=(raw,meta,scan)
         labels=_official_sources(archive,needed)
         prepared={}
-        for key,(raw,meta) in entries.items():
+        for key,(raw,meta,scan) in entries.items():
             updated,excluded,receipts=_source_eligible(key,meta,labels)
             # Re-read each compressed original and verify SHA against its receipt.
             for receipt in receipts:
@@ -156,7 +157,7 @@ def reconcile(queue_path,ledger_path,apply=False,targets=TARGETS):
                         *updated['downloadExcludedNonPublicReferences']]})
                 bulkchange=(bulk[0],json.dumps(newbulk,ensure_ascii=False,separators=(',',':')))
             else:bulkchange=None
-            prepared[key]=(raw,updated,len(receipts),len(excluded),bulkchange)
+            prepared[key]=(raw,updated,len(receipts),len(excluded),bulkchange,scan)
             print('NONPUBLIC_REFERENCE_VERIFIED',json.dumps({
                 'noticeKey':key,'publicVerifiedFiles':len(receipts),
                 'excludedInternal422':len(excluded),
@@ -167,16 +168,17 @@ def reconcile(queue_path,ledger_path,apply=False,targets=TARGETS):
         if apply:
             queue.execute('BEGIN IMMEDIATE')
             now=dt.datetime.now(dt.timezone.utc).isoformat()
-            for key,(old,meta,files,nexcluded,bulkchange) in prepared.items():
+            for key,(old,meta,files,nexcluded,bulkchange,scan) in prepared.items():
                 result=queue.execute("""UPDATE rfp_dual_notices
-                    SET download_status='ready',scan_status='pending',
+                    SET download_status='ready',scan_status=?, 
                         metadata_json=?,download_done=?,download_total=?,
                         download_retry_epoch=0,scan_retry_epoch=0,
                         last_error='',updated_at=?
                     WHERE notice_key=? AND download_status='error_confirmed'
-                      AND metadata_json=?""",(
+                      AND metadata_json=? AND scan_status=?""",(
                     json.dumps(meta,ensure_ascii=False,separators=(',',':')),
-                    files,files,now,key,old))
+                    'done' if scan=='done' else 'pending',
+                    files,files,now,key,old,scan))
                 if result.rowcount!=1:
                     raise ValueError(key+':queue_changed_during_reconciliation')
                 if bulkchange:
@@ -203,5 +205,9 @@ if __name__=='__main__':
     parser.add_argument('--queue',default='/app/data/rfp-dual-queue.sqlite3')
     parser.add_argument('--ledger',default='/app/data/rfp-request-ledger.sqlite3')
     parser.add_argument('--apply',action='store_true')
+    parser.add_argument('--notice-key',help='One exact official bid number and revision; avoids changing unrelated queue rows')
     args=parser.parse_args()
-    reconcile(args.queue,args.ledger,args.apply)
+    if args.notice_key and not re.fullmatch(r'R[0-9]{2}BK[0-9]{8}:[0-9]{3}',args.notice_key):
+        parser.error('--notice-key must use R00BK00000000:000 format')
+    reconcile(args.queue,args.ledger,args.apply,
+              targets=(args.notice_key,) if args.notice_key else TARGETS)
