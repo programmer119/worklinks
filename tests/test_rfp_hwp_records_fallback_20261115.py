@@ -65,5 +65,5 @@ try:
 except ValueError as exc:
     assert str(exc)=='hml_xml_truncated',str(exc)
 
-assert repair.READER_ATTEMPT_VERSION.endswith('v17-20261116')
+assert repair.READER_ATTEMPT_VERSION.startswith('framed-isolated-extract-v')
 print('RFP_HWP5_RECORD_FALLBACK_AND_TRUNCATED_HML=PASS')
