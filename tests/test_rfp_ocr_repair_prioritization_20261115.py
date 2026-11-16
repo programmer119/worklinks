@@ -53,4 +53,23 @@ fair2,slots=repair.choose_repair_batch([legacy_a,normal],2,3,
     per_notice_cap=1,minimum_old_ocr=2)
 assert [r[0] for r in fair2]==['legacy-A','completed-soon']
 assert slots==2
+# Reserved legacy-PDF OCR capacity must actually process the PDF OCR file
+# rather than a higher-ranked failing ZIP or HWP attached to the same notice.
+mixed={'files':[
+    {'name':'standard-terms.zip','errorCategory':'no_searchable_text',
+     'readable':False},
+    {'name':'scanned-contract.pdf','errorCategory':'pdf_ocr_incomplete',
+     'lastReaderAttemptVersion':'','readable':False},
+    {'name':'unreadable-record.hwp','errorCategory':'invalid_hwp',
+     'readable':False}
+]}
+default=repair.ordered_retry_files(mixed)
+prioritized=repair.ordered_retry_files(mixed,prioritize_legacy_pdf_ocr=True)
+assert default[0]['name']=='standard-terms.zip',default
+assert prioritized[0]['name']=='scanned-contract.pdf',prioritized
+assert repair.legacy_pdf_ocr_failure(prioritized[0])
+assert not repair.legacy_pdf_ocr_failure({
+    **prioritized[0],'lastReaderAttemptVersion':repair.READER_ATTEMPT_VERSION})
+print('RFP_RESERVED_PDF_OCR_SLOT_SELECTS_ACTUAL_PDF_ERROR=PASS')
+
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
