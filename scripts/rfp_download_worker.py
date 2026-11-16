@@ -10,6 +10,7 @@ import datetime as dt
 import hashlib
 import io
 import json
+import re
 import os
 import zipfile
 import tempfile
@@ -54,6 +55,33 @@ META_PACE=Pace(0.8)
 FILE_PACE=Pace(0.125)  # 8 file starts/sec for 8 independent download workers
 
 
+def _hwp_ole_bodytext_issue(ole):
+    """Check HWP5 body stream sector chains, not just the OLE directory.
+
+    A truncated official HWP may have a readable CFB directory but a Section0
+    start-sector beyond its FAT. Merely listing the directory would previously
+    let that corrupt attachment be SHA-verified and reused indefinitely.
+    """
+    if not ole.exists('FileHeader'):
+        return ''
+    sections=[path for path in ole.listdir(streams=True,storages=False)
+              if len(path)==2 and path[0]=='BodyText'
+              and re.fullmatch(r'Section[0-9]+',path[1])]
+    if not sections:
+        return 'hwp_bodytext_missing'
+    for path in sections:
+        expected=ole.get_size(path)
+        stream=ole.openstream(path)
+        actual=0
+        while actual<expected:
+            chunk=stream.read(min(262144,expected-actual))
+            if not chunk:break
+            actual+=len(chunk)
+        if actual!=expected:
+            return 'hwp_bodytext_ole_sector_chain_truncated'
+    return ''
+
+
 def _original_structure_issue_bytes(raw):
     """Confirm intrinsic content integrity, not the misleading file extension.
 
@@ -69,6 +97,7 @@ def _original_structure_issue_bytes(raw):
             import olefile
             with olefile.OleFileIO(io.BytesIO(raw)) as ole:
                 ole.listdir()
+                return _hwp_ole_bodytext_issue(ole)
         except ImportError:
             return ''  # The production image includes olefile; no filename guess.
         except Exception:
@@ -96,6 +125,7 @@ def _original_structure_issue_file(path):
             import olefile
             with olefile.OleFileIO(str(path)) as ole:
                 ole.listdir()
+                return _hwp_ole_bodytext_issue(ole)
         except ImportError:
             return ''
         except Exception:
