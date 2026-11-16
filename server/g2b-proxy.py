@@ -1136,8 +1136,11 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                          isinstance(source_prior.get('lastSuccessfulThumbnail'),dict)
                          else source_prior)
                 if old is None and state.get('scanComplete') is True and (
-                        state.get('staffingRoleScanComplete') is True):
-                    old=row  # old-reader complete data; current parser only stale
+                        row.get('staffingRoleScanComplete') is True):
+                    # Latest-version presentation can say incomplete even
+                    # though the *previous* role reader succeeded. Evaluate
+                    # that original at its own stored reader version below.
+                    old=row
                 if old is not None and rfp_same_thumbnail_source(row,old):
                     old_state=saved_rfp_search_state(old,compact=compact,historical=True)
                     if (old_state.get('scanComplete') is True and
