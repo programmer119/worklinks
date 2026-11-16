@@ -30,7 +30,7 @@ REPAIR_VERSION='signature-reader-20261112'
 READER_ATTEMPT_VERSION='framed-isolated-extract-v19-hwp-record-unicode-pdf750-20261117'
 NESTED_ZIP_READER_VERSION='two-nested-levels-cumulative-250mb-v1'
 PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
-SPARSE_COVER_READER_VERSION='sha-psm6-11-minimal-ink-20261117'
+SPARSE_COVER_READER_VERSION='sha-psm6-11-and-source-title-20261117'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
