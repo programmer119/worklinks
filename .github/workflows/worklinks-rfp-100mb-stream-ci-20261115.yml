@@ -13,6 +13,7 @@ on:
       - 'scripts/refresh_worklinks_rfp.py'
       - 'tests/test_rfp_streamed_100mb.py'
       - 'tests/test_rfp_download_worker.py'
+      - 'tests/test_rfp_hwp_ole_sector_integrity_20261117.py'
       - 'tests/test_rfp_independent_workers_and_scan.py'
       - '.github/workflows/worklinks-rfp-100mb-stream-ci-20261115.yml'
   workflow_dispatch:
@@ -35,6 +36,7 @@ jobs:
           python3 tests/test_rfp_streamed_100mb.py
           python3 tests/test_rfp_call_ledger.py
           python3 tests/test_rfp_download_worker.py
+          python3 tests/test_rfp_hwp_ole_sector_integrity_20261117.py
           python3 tests/test_rfp_independent_workers_and_scan.py
           python3 tests/test_rfp_dual_queue.py
           echo RFP_100MB_STREAMED_ORIGINAL_TESTS_PASS
