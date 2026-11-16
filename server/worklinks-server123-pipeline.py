@@ -44,7 +44,7 @@ RFP_OCR_SCAN_BATCH_INTERVAL = 4
 # When download-ready work is on scan-retry cooldown, OCR repair is independent
 # of upstream file requests and must continue using saved verified originals.
 RFP_OCR_IDLE_PERIOD = 120
-RFP_OPEN_READER_VERSION='pdf25-blank-hwpml-strict-v14-20261116'
+RFP_OPEN_READER_VERSION='real-byte-recursive-office-v15-20261116'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
 # Explicit short-lived recovery selection; candidates rotate out once fully scanned.
@@ -564,7 +564,8 @@ def run_once(kind, runner=None, _single=False):
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
                        '--data-dir', str(root), '--limit', '3',
                        '--max-files', '3', '--workers', '3',
-                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '3',
+                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '2',
+                       '--minimum-format-fixes','1',
                        '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
