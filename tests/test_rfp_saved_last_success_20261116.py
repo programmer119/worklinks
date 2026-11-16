@@ -65,4 +65,24 @@ with tempfile.TemporaryDirectory() as d:
     mutated={**new,'files':[dict(new['files'][0],sourceSha256='b'*64)]}
     bad2=fn([key],{key:mutated},compact=True)[key]
     assert 'lastSuccessfulState' not in bad2,bad2
+# A cited staffing/onsite/insurance success from an otherwise incomplete
+# old notice must remain available; incomplete ABSENCE is never verified.
+partial={**prior,'manifestComplete':False,'staffingRoleScanComplete':False,
+         'checkedAt':'2026-11-14T12:00:00Z'}
+partial_failed={**new,'lastSuccessfulThumbnail':partial}
+with tempfile.TemporaryDirectory() as d:
+ root=Path(d)
+ (root/'rfp-scanner-versions.json').write_text(
+   json.dumps({'ok':True,'schemaVersion':1,'latest':{
+     'classificationVersion':23,'staffingRoleScanVersion':4,
+     'staffingFactScanVersion':2,'hwpxReaderVersion':3}}))
+ with patch.dict(fn.__globals__,{'SNAPSHOT_ROOT':d,
+                   'G2B_DB_PATH':str(root/'bids.sqlite3')}):
+    response=fn([key],{key:partial_failed},compact=True)[key]
+    historical=response.get('lastSuccessfulState')
+    assert historical,historical
+    assert historical['staffingRoles'][0]['count']==2,historical
+    assert historical['scanComplete'] is False,historical
+    assert historical['excerpts'][0]['text'].startswith('입찰 참가 시'),historical
+print('RFP_API_INDIVIDUAL_HISTORICAL_POSITIVE_WITH_PARTIAL_SCAN=PASS')
 print('RFP_SAVED_API_PREVIOUS_RESULT_ONLY_IF_SAME_OFFICIAL_ORIGINAL=PASS')
