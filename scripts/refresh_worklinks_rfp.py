@@ -1323,8 +1323,12 @@ def extract_with_source_status(name,raw):
     previous_ocr_start=getattr(_DOCUMENT_SCAN,'ocr_started_at',None)
     previous_format_times=getattr(_DOCUMENT_SCAN,'format_times',None)
     previous_extract_stack=getattr(_DOCUMENT_SCAN,'extract_stack',None)
+    previous_zip_depth=getattr(_DOCUMENT_SCAN,'zip_depth',None)
+    previous_zip_expanded=getattr(_DOCUMENT_SCAN,'zip_expanded_bytes',None)
     _DOCUMENT_SCAN.format_times={}
     _DOCUMENT_SCAN.extract_stack=[]
+    _DOCUMENT_SCAN.zip_depth=0
+    _DOCUMENT_SCAN.zip_expanded_bytes=0
     _DOCUMENT_SCAN.hwp_record_fallback=False
     _DOCUMENT_SCAN.hwpx_image_ocr=False
     _DOCUMENT_SCAN.ocr_started_at=time.monotonic()
@@ -1391,6 +1395,14 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.extract_stack
             except AttributeError:pass
         else:_DOCUMENT_SCAN.extract_stack=previous_extract_stack
+        if previous_zip_depth is None:
+            try:del _DOCUMENT_SCAN.zip_depth
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.zip_depth=previous_zip_depth
+        if previous_zip_expanded is None:
+            try:del _DOCUMENT_SCAN.zip_expanded_bytes
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.zip_expanded_bytes=previous_zip_expanded
 
 
 def classify_failure(error):
@@ -2022,8 +2034,13 @@ def _extract_dispatch(name,raw):
             # These are extraction safety bounds, not arbitrary 250-member
             # ceilings that misclassify perfectly valid G2B bid bundles.
             # Per-entry input is still bounded before loading its bytes.
-            if len(members)>3000 or sum(m.file_size for m in members)>250_000_000:
+            # Every nested archive contributes to ONE entire source budget.
+            # This avoids multiplying 250MB across nested ZIP containers.
+            expanded=sum(m.file_size for m in members)
+            total=getattr(_DOCUMENT_SCAN,'zip_expanded_bytes',0)
+            if len(members)>3000 or expanded>250_000_000 or total+expanded>250_000_000:
                 raise ValueError('archive_expanded_size_safety_limit')
+            _DOCUMENT_SCAN.zip_expanded_bytes=total+expanded
             for entry in members:
                 if entry.is_dir():continue
                 inner=entry.filename
@@ -2038,10 +2055,13 @@ def _extract_dispatch(name,raw):
                     if not value.strip():raise ValueError('no_searchable_text')
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix=='.zip':
-                    # One additional nested ZIP level only; each archive
-                    # still has strict member, expanded-size and path limits.
+                    # Verified KOICA archives contain an additional nested
+                    # ZIP inside a ZIP, with PDFs at level 2. Permit that
+                    # verified structure, but not unbounded recursive ZIPs.
+                    # Cumulative expanded bytes and path checks apply across
+                    # the complete source tree.
                     depth=getattr(_DOCUMENT_SCAN,'zip_depth',0)
-                    if depth>=1:raise ValueError('nested_archive_requires_review')
+                    if depth>=2:raise ValueError('nested_archive_requires_review')
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     _DOCUMENT_SCAN.zip_depth=depth+1
                     try:
