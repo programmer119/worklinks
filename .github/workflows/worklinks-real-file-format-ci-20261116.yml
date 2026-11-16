@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install extraction dependencies
-        run: python3 -m pip install -q 'pypdf<7' pymupdf pillow olefile xlrd
+        run: python3 -m pip install -q 'pypdf<7' pymupdf pillow olefile xlrd xlwt
       - name: Verify real signatures and zipped member handling
         run: |
           python3 -m py_compile scripts/refresh_worklinks_rfp.py
