@@ -1,0 +1,3796 @@
+{
+  "checkedAt": "2026-11-16T01:29:53.118718+00:00",
+  "mode": "read_only",
+  "upstreamCalls": 0,
+  "progress": {
+    "asOf": "2026-11-16T10:29:45.646987+09:00",
+    "counts": {
+      "total": 1935,
+      "eligible": 1900,
+      "excluded": 35,
+      "completed": 1809,
+      "remaining": 91,
+      "legacy": 30,
+      "unscanned": 0,
+      "failed": 1,
+      "incomplete": 60,
+      "unknownDeadline": 743,
+      "unknownDeadlineCompleted": 555,
+      "unknownDeadlinePending": 188,
+      "rescanRequired": 30
+    },
+    "worker": {
+      "available": true,
+      "upgradeActive": true,
+      "continuousDrain": false,
+      "upgradePeriodSeconds": 600,
+      "nextUpgradeEpoch": 1794792583.3348072,
+      "upgradeBatchesCompleted": 7588,
+      "tasks": {
+        "rfp": {
+          "status": "failed",
+          "attemptEpoch": 1794656212.7982223,
+          "successEpoch": 0,
+          "retryAfterEpoch": 0,
+          "failureStreak": 0
+        },
+        "rfpUpgrade": {
+          "status": "waiting_for_download",
+          "attemptEpoch": 1794792578.3237252,
+          "successEpoch": 1794792578.3348072,
+          "retryAfterEpoch": 1794792583.3348072,
+          "failureStreak": 0
+        },
+        "rfpRepair": {
+          "status": "ok",
+          "attemptEpoch": 1794665585.7837763,
+          "successEpoch": 1794665608.770534,
+          "retryAfterEpoch": 0,
+          "failureStreak": 0
+        },
+        "rfpOpenRepair": {
+          "status": "started",
+          "attemptEpoch": 1794792578.3237252,
+          "successEpoch": 0,
+          "retryAfterEpoch": 0,
+          "failureStreak": 0
+        }
+      }
+    },
+    "lanes": {
+      "available": true,
+      "scope": "unexpired_saved_sw_bid_notices",
+      "total": 1935,
+      "outsideScopeQueue": 1158,
+      "missingFromQueue": 0,
+      "missingIncomplete": 0,
+      "manifest": {
+        "total": 1935,
+        "done": 1935,
+        "remaining": 0,
+        "pending": 0,
+        "active": 0,
+        "failed": 0
+      },
+      "download": {
+        "total": 1935,
+        "done": 1935,
+        "processed": 1935,
+        "errors": 0,
+        "errorDetails": [],
+        "skipped": 35,
+        "active": 0,
+        "failed": 0
+      },
+      "scan": {
+        "total": 1900,
+        "done": 1809,
+        "active": 0,
+        "failed": 91,
+        "blockedNoAttachments": 35,
+        "staleQueueComplete": 0,
+        "notQueued": 0
+      }
+    },
+    "activity": {
+      "available": true,
+      "items": [
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "제안요청서.hwp",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792562.1256957
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "2. 제안요청서.hwp",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792562.0839543
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "1. 입찰공고문.hwp",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792562.0339594
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "상생결제 안내자료.zip",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792561.9921615
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "표준계약조건(260630).zip",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792561.958852
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "6. 계약서(안).hwp",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792559.033535
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "3. 세부사양서.hwp",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792553.281013
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "2. 제안요청서.pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792553.24765
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "3. 세부사양서.pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792553.1564074
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "물품공급 및 기술지원 확약서.tif",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792553.0891197
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792553.0557961
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "최종_제안요청서(파주시 사이버침해대응시스템 통합 운영관리).hwpx",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.9640977
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "입찰공고서(긴급)-1468(유지관리+지방+온서+공가+기술지원).hwpx",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.8388486
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01824367:000",
+          "fileName": "[붙임3] 공내역서.xlsx",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.8055735
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01824367:000",
+          "fileName": "[붙임1] 입찰공고문.hwp",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.7722428
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01824367:000",
+          "fileName": "[붙임2] 시방서.pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.7389343
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01824367:000",
+          "fileName": "[붙임1] 입찰공고문.pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.7055151
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "1. 입찰공고문.pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.6555011
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01767174:000",
+          "fileName": "4. 참고자료.pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.622199
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "물품공급 및 기술지원 확약서.tif",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.5639937
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "최종_제안요청서(파주시 사이버침해대응시스템 통합 운영관리)V2.hwpx",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.530607
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823859:000",
+          "fileName": "입찰공고서(긴급)-1468(유지관리+지방+온서+공가+기술지원).pdf",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794792552.4973965
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823840:000",
+          "fileName": "2026년 통합자동제어설비 유지관리용역 제안요청서(조달협의수용).hwpx",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794762062.9538324
+        },
+        {
+          "lane": "scan",
+          "noticeKey": "R26BK01823840:000",
+          "fileName": "일반용역입찰재공고서_R26BK01785050_000.hwpx",
+          "phase": "텍스트 추출 준비",
+          "status": "working",
+          "bytesDone": 0,
+          "bytesTotal": 0,
+          "filesDone": 0,
+          "filesTotal": 0,
+          "retryEpoch": 0.0,
+          "error": "",
+          "updatedEpoch": 1794762062.6195393
+        }
+      ],
+      "workers": {
+        "download": {
+          "status": "running",
+          "error": "",
+          "retryEpoch": 0.0,
+          "updatedEpoch": 1794792585.6468534,
+          "stale": false
+        },
+        "manifest": {
+          "status": "running",
+          "error": "",
+          "retryEpoch": 0.0,
+          "updatedEpoch": 1794792574.0301552,
+          "stale": false
+        },
+        "scan": {
+          "status": "running",
+          "error": "",
+          "retryEpoch": 0.0,
+          "updatedEpoch": 1794792577.2715394,
+          "stale": false
+        }
+      },
+      "downloadGroup": {
+        "available": true,
+        "activeCount": 0,
+        "startedEpoch": 0,
+        "files": [],
+        "stalledCount": 0,
+        "oldestStallSeconds": 0,
+        "recentErrors": []
+      }
+    },
+    "stages": {
+      "classification": {
+        "total": 1900,
+        "done": 1866,
+        "remaining": 34
+      },
+      "roles": {
+        "total": 1900,
+        "done": 1809,
+        "remaining": 91
+      },
+      "facts": {
+        "total": 1900,
+        "done": 1809,
+        "remaining": 91
+      },
+      "hwpx": {
+        "total": 1168,
+        "done": 1168,
+        "remaining": 0
+      }
+    }
+  },
+  "causes": {
+    "asOf": "2026-11-16T10:29:54.449431+09:00",
+    "counts": {
+      "total": 1935,
+      "eligible": 1900,
+      "excluded": 35,
+      "completed": 1809,
+      "remaining": 91,
+      "legacy": 30,
+      "unscanned": 0,
+      "failed": 1,
+      "incomplete": 60,
+      "unknownDeadline": 743,
+      "unknownDeadlineCompleted": 555,
+      "unknownDeadlinePending": 188,
+      "rescanRequired": 30
+    },
+    "actualIssueNoticeCount": 91,
+    "primaryCauseCounts": {
+      "other_file_extraction_failure": 59,
+      "ocr_reader_not_retried": 30,
+      "scan_coverage_incomplete": 2
+    },
+    "categoryCounts": {
+      "incomplete": 60,
+      "legacy": 30,
+      "failed": 1
+    },
+    "overlappingIssueNoticeCounts": {
+      "source_error:invalid_hwp": 19,
+      "role_scan_flag_incomplete": 91,
+      "source_error:file_extract_failure": 18,
+      "source_error:source_extraction_timeout_deferred": 11,
+      "ocr_old_reader_version": 30,
+      "source_text_incomplete": 4,
+      "source_error:pdf_over_page_limit": 1,
+      "ocr_v12_attempt_still_incomplete": 1,
+      "source_error:hwp_record_fallback_invalid_ole": 4,
+      "source_error:large_xml_section": 6,
+      "source_error:archive_many_xml_files": 2,
+      "source_error:unknown_archive_member_requires_review": 3,
+      "source_error:invalid_legacy_xls": 1,
+      "source_error:isolated_extraction_worker_failed": 1,
+      "source_error:hml_xml_truncated": 1,
+      "source_error:hwp_record_fallback_invalid_record": 1
+    },
+    "problemFileErrorCounts": {
+      "invalid_hwp": 26,
+      "file_extract_failure": 18,
+      "source_extraction_timeout_deferred": 15,
+      "source_text_incomplete": 5,
+      "pdf_ocr_incomplete": 60,
+      "pdf_over_page_limit": 1,
+      "hwp_record_fallback_invalid_ole": 4,
+      "ocr_deferred_to_repair": 3,
+      "large_xml_section": 6,
+      "archive_many_xml_files": 2,
+      "unknown_archive_member_requires_review": 4,
+      "invalid_legacy_xls": 1,
+      "isolated_extraction_worker_failed": 1,
+      "hml_xml_truncated": 1,
+      "hwp_record_fallback_invalid_record": 1
+    },
+    "upstreamCalls": 0
+  },
+  "problemNotices": [
+    {
+      "noticeKey": "R26BK01767174:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "5. 투찰내역서.xlsm",
+          "errorCategory": "",
+          "reason": "source_text_incomplete",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "KOICA 입찰 관련 규정 및 지침(260922).zip",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01778884:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_v12_attempt_still_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 14,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "2027년 위기청소년통합지원정보시스템 운영 및 유지보수 관련 기술지원협약서(27종).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01787906:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "10. 소프트웨어사업 영향평가 검토결과서(RDBMS(ORACLE) 상용SW 유지보수).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "과업심의결과서.png",
+          "errorCategory": "ocr_deferred_to_repair",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01789790:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "물품공급 기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01795767:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "3. (엔진) 국문규격서.hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "4. 하이브리드 추진시스템용 수소혼소엔진 및 전기추진 통합 모듈 견적서_260907.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "5. (엔진)긴급입찰사유서-직인날인본.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01799247:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급입찰사유서.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v8",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "물품공급  및 기술지원 협약서(합본)_2027년 생활안전용 CCTV시스템 통합 유지관리 용역.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v8",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "과업지시서(2027년 생활안전용 CCTV시스템 통합 유지관리).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v8",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01801110:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "물품공급 및 기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01802775:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(과업지시서)2027년 부안군 CCTV 및 통합관제센터 유지관리용역_261105.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "(물품공급기술지원협약서)2027년 부안군 CCTV 및 통합관제센터 유지관리용역_261105.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01804199:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(사업계획서)2027년 e-푸른바다 및 홈페이지 유지관리 사업 계획(안).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "(용역발주의뢰서)2027년 e-푸른바다 및 홈페이지 유지관리.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01812910:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급입찰사유서(2027년 농림축산검역 정보자원 통합유지관리 사업).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "국제입찰(제외) 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01813949:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "기술지원협약서(디지털홍보영상시스템).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "긴급입찰 사유서(2027년_2028년 정부세종청사 인터넷전화 및 방송통신시설 유지관리 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01815325:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "기술지원협약서_(주)마크애니.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "기술지원협약서_뉴인테크(주).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816121:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "물품공급 및 기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "지역제한 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816419:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "별첨3_소프트웨어사업영향평가별과서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "별첨1_기술지원협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01817330:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "기술지원협약서 목록(2027년 스마트도시 시스템 통합유지관리 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "기술지원협약서(2027년 스마트도시 시스템 통합유지관리용역).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819419:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "제안요청서 및 기술원협약서.Zip",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01821423:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "2. [본문]2027년 재난상황실 및 재난 예경보시스템 통합 유지보수 용역.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "11. 물품공급·기술지원 협약서(2027년 재난상황실 및 재난 예경보시스템 통합 유지보수 용역).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01821858:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "긴급입찰 사유서(2027년 통합관제시스템 및 현장CCTV 유지보수 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01822388:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "[긴급입찰 사유서] 2027년도 도로기상정보시스템 유지관리 및 기능개선 사업.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "통합발주 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01823198:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(붙임) 3. 유지보수등급측정표(2027년 행정정보시스템 통합유지관리 용역).xlsx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 12,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "(붙임) 4. 기술지원협약서 목록(2027년 행정정보시스템 통합 유지관리 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01823859:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "물품공급 및 기술지원 확약서.tif",
+          "errorCategory": "ocr_deferred_to_repair",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "물품공급 및 기술지원 확약서.tif",
+          "errorCategory": "ocr_deferred_to_repair",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824444:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "물품공급·기술지원 협약서(관인날인).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "긴급입찰 사유서(통합관제센터 및 현장 CCTV 유지관리용역) (1).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824549:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "기술지원협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "일반용역계약_특수조건(1301공소청콜센터_시스템_유지관리).hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "개인정보_취급위탁계약_특수조건(1301공소청콜센터_시스템_유지관리).hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "긴급입찰_사유서(1301공소청콜센터_시스템_유지관리).hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01825843:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급발주 사유서(공간정보시스템).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "기술지원협약서(아이앤씨솔루션).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "기술지원협약서(지오투정보기술).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01826833:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1. 제안요청서_방글라데시 AI 혁신기술 전문인력 양성사업_최종.hwp",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "3. 투찰내역서_방글라데시 AI 혁신기술 전문인력 양성사업.xlsm",
+          "errorCategory": "large_xml_section",
+          "reason": "source_error:large_xml_section",
+          "errorDetail": "ValueError: large_xml_section",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "4. 사업참고자료.zip",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "7. KOICA 입찰 관련 규정 및 지침(260811).zip",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "1. 제안요청서_방글라데시 AI 혁신기술 전문인력 양성사업_최종.hwp",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01828697:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(붙임)과업내용서[2027년 정보통신시스템 통합유지관리].hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "(붙임)물품공급 및 기술지원 협약서[2027년 정보통신시스템 통합유지관리].pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01828947:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "[붙임6]긴급입찰공고사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "물품공급기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01829292:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(기술지원협약서)오산시 도서관 정보화시스템 통합유지보수.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "(긴급입찰 사유서)오산시 도서관 정보화시스템 통합유지보수.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01829449:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "단일 규격 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "긴급 구매 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01830982:000",
+      "rootCause": "ocr_reader_not_retried",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "제안요청서[2027년도 공간정보시스템 통합유지보수 용역].pdf",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "기술지원협약서[2027년도 공간정보시스템 통합유지보수 용역].pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "reason": "ocr_old_reader_version",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01759044:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "통합의료정보시스템 고도화 사업 입찰서류.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01763165:001",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "(제안요청서)_'27~'28년 취업 후 학자금 상환 전산시스템 운영 및 유지관리_수정.hwpx",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01764148:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01772242:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "3. 일반조건.hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01774133:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "3. 공사도면_안산송산 집단에너지 열네트워크 구축사업 열수송관 공사.pdf",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "4. 입찰안내서_안산송산 집단에너지 열네트워크 구축사업 열수송관 공사.pdf",
+          "errorCategory": "pdf_over_page_limit",
+          "reason": "source_error:pdf_over_page_limit",
+          "errorDetail": "ValueError: pdf_over_page_limit",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01785734:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "2. 공고용_제안요청서_무인기 플랫폼 제작 및 시험지원.hwp",
+          "errorCategory": "hwp_record_fallback_invalid_ole",
+          "reason": "source_error:hwp_record_fallback_invalid_ole",
+          "errorDetail": "ValueError: hwp_record_fallback_invalid_ole",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01788116:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "4. 전자입찰특별유의서.hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01789856:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1_(내역서) 1공구 설계내역서(전차선)_공내역.xlsx",
+          "errorCategory": "large_xml_section",
+          "reason": "source_error:large_xml_section",
+          "errorDetail": "ValueError: large_xml_section",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "3_2_[시방서] 자재시방서.hwp",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01790085:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고문_전차선(2공구)v.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "3_2_[시방서] 자재시방서.hwp",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01790119:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "3_2_[시방서] 자재시방서.hwp",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01791320:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "공고문_ERP시스템 유지관리 용역.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01793416:003",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "2. (설계내역서) 정보통신공사 내역서(1공구)_공내역v.xlsm",
+          "errorCategory": "large_xml_section",
+          "reason": "source_error:large_xml_section",
+          "errorDetail": "ValueError: large_xml_section",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01794289:001",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(설계내역서) 정보통신공사 내역서 (2공구)_공내역.xlsx",
+          "errorCategory": "large_xml_section",
+          "reason": "source_error:large_xml_section",
+          "errorDetail": "ValueError: large_xml_section",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01797861:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "공내역서.xlsx",
+          "errorCategory": "archive_many_xml_files",
+          "reason": "source_error:archive_many_xml_files",
+          "errorDetail": "ValueError: archive_many_xml_files",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01798829:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "R26BK01798829-000 [붙임] 제안요청서 등.zip",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01804092:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "서울특별시 용역계약 특수조건(서울특별시예규)(제746호)(20261001) (1).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01805597:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "계약예규 및 참고서식(공고시 붙임서류).zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01806666:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1. 입찰공고문.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01806913:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "붙임. 과업내용서.hwp",
+          "errorCategory": "hwp_record_fallback_invalid_ole",
+          "reason": "source_error:hwp_record_fallback_invalid_ole",
+          "errorDetail": "ValueError: hwp_record_fallback_invalid_ole",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "붙임. 제안요청서.hwp",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01807866:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "참조_27년 통합유지보수 대상장비 목록(공고용).xlsx",
+          "errorCategory": "large_xml_section",
+          "reason": "source_error:large_xml_section",
+          "errorDetail": "ValueError: large_xml_section",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01808384:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "제안요청서_한국자동차연구원.hwpx",
+          "errorCategory": "hwp_record_fallback_invalid_ole",
+          "reason": "source_error:hwp_record_fallback_invalid_ole",
+          "errorDetail": "ValueError: hwp_record_fallback_invalid_ole",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01808816:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "5. 입찰유의서,계약일반조건 등.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01808941:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "5. (재) KOICA 입찰 관련 규정, 표준계약서 등(260725)(변경없음).zip",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01811210:001",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "계약조건(경쟁).zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01811890:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "[입찰공고]AAU LMS 용 AI챗봇 도입 사업_재공고.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01812217:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1. 용역계약일반조건.hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "2. 용역입찰유의서.hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "3.국가종합전자조달시스템 전자입찰특별유의서(조달청고시)(제2024-23호)(20250106).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01812274:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1. 용역계약일반조건.hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "2. 용역입찰유의서.hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "3.국가종합전자조달시스템 전자입찰특별유의서(조달청고시)(제2024-23호)(20250106).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01813495:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "붙임5. 제안요청서_DHCP시스템외 1종 유지보수_2027년.hwp",
+          "errorCategory": "hwp_record_fallback_invalid_ole",
+          "reason": "source_error:hwp_record_fallback_invalid_ole",
+          "errorDetail": "ValueError: hwp_record_fallback_invalid_ole",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01814778:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "[붙임] 입찰서류 일체.zip",
+          "errorCategory": "archive_many_xml_files",
+          "reason": "source_error:archive_many_xml_files",
+          "errorDetail": "ValueError: archive_many_xml_files",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01814802:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "제안요청서 등.zip",
+          "errorCategory": "unknown_archive_member_requires_review",
+          "reason": "source_error:unknown_archive_member_requires_review",
+          "errorDetail": "ValueError: unknown_archive_member_requires_review",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01815758:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "청렴계약이행서약서.xls",
+          "errorCategory": "invalid_legacy_xls",
+          "reason": "source_error:invalid_legacy_xls",
+          "errorDetail": "ValueError: invalid_legacy_xls",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816075:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "긴급발주사유서.hwp",
+          "errorCategory": "isolated_extraction_worker_failed",
+          "reason": "source_error:isolated_extraction_worker_failed",
+          "errorDetail": "ValueError: isolated_extraction_worker_failed",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816168:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "3. 참고서류.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816525:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "전자입찰참가 서식.zip",
+          "errorCategory": "unknown_archive_member_requires_review",
+          "reason": "source_error:unknown_archive_member_requires_review",
+          "errorDetail": "ValueError: unknown_archive_member_requires_review",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816714:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1. 물품 구매 입찰 공고문_3차원 형상 측정시스템.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01818024:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_unavailable",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고문 등(KREI 정보보호시스템 통합유지관리).zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01818426:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "공고문_2026년 서울특별시 의료장비 통합구매 2차 재공고(서울특별시 보라매병원, 신경내시경시스템).pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01818624:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "4. 긴급입찰요청서(2027년 광주시 방범용 CCTV 시스템 통합유지보수 용역).hwpx",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01818863:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고문(2027년 선박 전자증서 발급시스템 유지보수 및 운영).pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01818912:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(긴급)물품구매(제조)입찰공고_통합모니터링 등 설치.pdf",
+          "errorCategory": "",
+          "reason": "source_text_incomplete",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "첨부파일.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01818936:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고문(2027년 수입 공 컨테이너 종합정보관리시스템 위탁운영).hml",
+          "errorCategory": "hml_xml_truncated",
+          "reason": "source_error:hml_xml_truncated",
+          "errorDetail": "ValueError: hml_xml_truncated",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819031:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "[붙임5] 2026 성과공유제 제도 안내문(입찰공고용).hwp",
+          "errorCategory": "hwp_record_fallback_invalid_record",
+          "reason": "source_error:hwp_record_fallback_invalid_record",
+          "errorDetail": "ValueError: hwp_record_fallback_invalid_record",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819272:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "용역붙임자료(2026).zip",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819500:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고서(재공고) 1부.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819599:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "규격서 등.zip",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819901:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1.2026-058입찰공고(액체수소 공급시스템용 극저온 밸브 제작).pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819974:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(입찰)제안요청서_2026년 글로벌 OTT 플랫폼 연계형 제작지원(RAkuten Viki)_조련의 여왕_디지털 색보정(DI) 용역 제안요청서.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01820680:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고문 - 2027년 업무정책시스템 통합 유지관리 용역.pdf",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: Stream has ended unexpectedly",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01820986:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "관련규정_국가계약법_수의(우수)_시운전_국가.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01821884:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "협상에 의한 계약 추진 사유.hwp",
+          "errorCategory": "unknown_archive_member_requires_review",
+          "reason": "source_error:unknown_archive_member_requires_review",
+          "errorDetail": "ValueError: unknown_archive_member_requires_review",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "제안요청서.hwpx",
+          "errorCategory": "unknown_archive_member_requires_review",
+          "reason": "source_error:unknown_archive_member_requires_review",
+          "errorDetail": "ValueError: unknown_archive_member_requires_review",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01822551:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "(공고)규격서 1식_국립청주박물관 디지털문화관.zip",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824406:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "3. 용역 계약 시 나라장터 필첨 서류.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824627:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "설계서(경북선 상주1 건널목 등 5개소 지능형 CCTV 개량공사).xlsx",
+          "errorCategory": "large_xml_section",
+          "reason": "source_error:large_xml_section",
+          "errorDetail": "ValueError: large_xml_section",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01825441:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "설계내역서(2027년도 상수도시설물 중앙감시시스템 모니터링 용역).xlsx",
+          "errorCategory": "file_extract_failure",
+          "reason": "source_error:file_extract_failure",
+          "errorDetail": "ValueError: File is not a zip file",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01825567:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "5. 입찰_공동계약.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "계약조건(경쟁).zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01826370:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "관련규정_지방계약법_수의(우수)_시운전_지방.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01827125:001",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰 참여 유의사항.zip",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01827991:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "1.(계약예규) 용역계약일반조건(재정경제부계약예규)(제149호)(20260430).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "2.(계약예규) 용역입찰유의서(기획재정부계약예규)(제820호)(20251231).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "3.국가종합전자조달시스템 전자입찰특별유의서(조달청고시)(제2024-23호)(20250106).hwp",
+          "errorCategory": "invalid_hwp",
+          "reason": "source_error:invalid_hwp",
+          "errorDetail": "ValueError: invalid_hwp",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01830523:000",
+      "rootCause": "other_file_extraction_failure",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "용역계약조건등(20261106).zip",
+          "errorCategory": "source_extraction_timeout_deferred",
+          "reason": "source_error:source_extraction_timeout_deferred",
+          "errorDetail": "ValueError: source_extraction_timeout_deferred",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01786079:000",
+      "rootCause": "scan_coverage_incomplete",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "입찰공고문_홈쇼핑 모니터링 시스템.pdf",
+          "errorCategory": "",
+          "reason": "source_text_incomplete",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        },
+        {
+          "name": "상생결제제도 안내 자료.zip",
+          "errorCategory": "",
+          "reason": "source_text_incomplete",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824367:000",
+      "rootCause": "scan_coverage_incomplete",
+      "scanStatus": "text_extracted_requires_review",
+      "reason": null,
+      "files": [
+        {
+          "name": "[붙임2] 시방서.pdf",
+          "errorCategory": "",
+          "reason": "source_text_incomplete",
+          "errorDetail": "",
+          "lastReaderAttemptVersion": "",
+          "detectedFormat": null,
+          "ocrBatchDeferredPages": 1,
+          "ocrFailedPages": 0
+        }
+      ]
+    }
+  ],
+  "attribution": {
+    "ok": true,
+    "scope": "actionable_saved_sw_bid_notices_24h",
+    "readerVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+    "eligibleNotices": 1935,
+    "noticesWithV12Success": 13,
+    "filesRecoveredByV12": 13,
+    "ocrPdfOrArchiveFilesRecovered": 2,
+    "ocrPageRecoveredFiles": 2,
+    "completedNoticesWithV12RecoveredFiles": 13,
+    "completedNoticesWithV12OcrPdfOrArchiveFiles": 2,
+    "attemptedFilesStillIncomplete": 31,
+    "attemptedNoticesStillIncomplete": 31,
+    "sampleVerifiedRecoveries": [
+      {
+        "noticeKey": "R26BK01804320:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:35:46.346789+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01822238:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:44:00.693480+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01802945:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:34:42.784156+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01828163:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:40:56.531918+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01818805:000",
+        "file": "04 기술지원협약서(브이앤지).pdf",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": true,
+        "recordedAttemptAt": "2026-11-15T16:56:48.994968+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01792436:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:30:22.120366+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01786362:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:24:05.603187+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01823840:000",
+        "file": "물품공급 기술지원 협약서.pdf",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": true,
+        "recordedAttemptAt": "2026-11-15T17:01:34.533961+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01805360:000",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:39:57.009697+00:00",
+        "noticeComplete": true
+      },
+      {
+        "noticeKey": "R26BK01766737:001",
+        "file": "네트워크 장비 구축·운영사업 추가특수조건(조달청지침)(제8258호)(20210615).hwpx",
+        "sourceShaVerified": true,
+        "pdfOrArchiveSource": false,
+        "recordedAttemptAt": "2026-11-15T17:33:36.934667+00:00",
+        "noticeComplete": true
+      }
+    ],
+    "upstreamCalls": 0,
+    "caveat": "Counts are persisted v12 file-level successes, not all increases in overall completion."
+  },
+  "pdfOcrFiles": [
+    {
+      "noticeKey": "R26BK01767174:000",
+      "deadline": "2026-11-25 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "KOICA 입찰 관련 규정 및 지침(260922).zip",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01778884:000",
+      "deadline": "2026-11-25 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpml-strict-v14-20261116",
+          "lastReaderAttemptAt": "2026-11-15T16:58:03.498531+00:00",
+          "ocrBatchDeferredPages": 14,
+          "ocrFailedPages": 0,
+          "pdfSources": [
+            {
+              "sourceFile": "긴급입찰사유서.pdf",
+              "pdfPages": 1,
+              "unresolvedPages": [],
+              "ocrFailureDetails": []
+            },
+            {
+              "sourceFile": "2027년 위기청소년통합지원정보시스템 운영 및 유지보수 관련 기술지원협약서(27종).pdf",
+              "pdfPages": 27,
+              "unresolvedPages": [
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27
+              ],
+              "ocrFailureDetails": []
+            }
+          ],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "2027년 위기청소년통합지원정보시스템 운영 및 유지보수 관련 기술지원협약서(27종).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01787906:000",
+      "deadline": "2026-12-03 11:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "10. 소프트웨어사업 영향평가 검토결과서(RDBMS(ORACLE) 상용SW 유지보수).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01789790:000",
+      "deadline": "2026-11-26 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "물품공급 기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "소프트웨어사업 영향평가 검토결과서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01795767:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "3. (엔진) 국문규격서.hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "4. 하이브리드 추진시스템용 수소혼소엔진 및 전기추진 통합 모듈 견적서_260907.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "5. (엔진)긴급입찰사유서-직인날인본.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01799247:000",
+      "deadline": "2026-11-20 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급입찰사유서.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v8",
+          "lastReaderAttemptAt": "2026-11-15T11:07:29.165862+00:00",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "물품공급  및 기술지원 협약서(합본)_2027년 생활안전용 CCTV시스템 통합 유지관리 용역.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v8",
+          "lastReaderAttemptAt": "2026-11-15T11:09:55.937383+00:00",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "과업지시서(2027년 생활안전용 CCTV시스템 통합 유지관리).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v8",
+          "lastReaderAttemptAt": "2026-11-15T11:12:24.907034+00:00",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01801110:000",
+      "deadline": "2026-11-26 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "물품공급 및 기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01802775:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "(과업지시서)2027년 부안군 CCTV 및 통합관제센터 유지관리용역_261105.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "(물품공급기술지원협약서)2027년 부안군 CCTV 및 통합관제센터 유지관리용역_261105.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01804199:000",
+      "deadline": "2026-12-04 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "(사업계획서)2027년 e-푸른바다 및 홈페이지 유지관리 사업 계획(안).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "(용역발주의뢰서)2027년 e-푸른바다 및 홈페이지 유지관리.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01812910:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급입찰사유서(2027년 농림축산검역 정보자원 통합유지관리 사업).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "국제입찰(제외) 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01813949:000",
+      "deadline": "2026-12-15 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "기술지원협약서(디지털홍보영상시스템).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "긴급입찰 사유서(2027년_2028년 정부세종청사 인터넷전화 및 방송통신시설 유지관리 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01815325:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급입찰사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "기술지원협약서_(주)마크애니.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "기술지원협약서_뉴인테크(주).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816121:000",
+      "deadline": "2026-12-01 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "물품공급 및 기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "지역제한 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01816419:000",
+      "deadline": "2026-12-03 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "별첨3_소프트웨어사업영향평가별과서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "별첨1_기술지원협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01817330:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "기술지원협약서 목록(2027년 스마트도시 시스템 통합유지관리 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "기술지원협약서(2027년 스마트도시 시스템 통합유지관리용역).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01819419:000",
+      "deadline": "2026-12-02 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "제안요청서 및 기술원협약서.Zip",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01821423:000",
+      "deadline": "2026-12-03 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "2. [본문]2027년 재난상황실 및 재난 예경보시스템 통합 유지보수 용역.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "11. 물품공급·기술지원 협약서(2027년 재난상황실 및 재난 예경보시스템 통합 유지보수 용역).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01821858:000",
+      "deadline": "2026-12-02 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "긴급입찰 사유서(2027년 통합관제시스템 및 현장CCTV 유지보수 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01822388:000",
+      "deadline": "2026-12-09 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "[긴급입찰 사유서] 2027년도 도로기상정보시스템 유지관리 및 기능개선 사업.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "통합발주 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01823198:000",
+      "deadline": "2026-11-24 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "(붙임) 3. 유지보수등급측정표(2027년 행정정보시스템 통합유지관리 용역).xlsx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "pdf25-blank-hwpx-embedded-image-v12-provenance-rescan",
+          "lastReaderAttemptAt": "2026-11-15T16:45:00.327773+00:00",
+          "ocrBatchDeferredPages": 12,
+          "ocrFailedPages": 0,
+          "pdfSources": [
+            {
+              "sourceFile": "(붙임) 5. 물품공급 기술지원 협약서(2027년 행정정보시스템 통합 유지관리 용역).pdf",
+              "pdfPages": 20,
+              "unresolvedPages": [
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+              ],
+              "ocrFailureDetails": []
+            },
+            {
+              "sourceFile": "(붙임) 6. 용역 사전점검표(2027년 행정정보시스템 통합 유지관리 용역).pdf",
+              "pdfPages": 3,
+              "unresolvedPages": [],
+              "ocrFailureDetails": []
+            },
+            {
+              "sourceFile": "(붙임) 7. 협상에 의한 계약 대상사업 검토서(2027년 행정정보시스텝 통합 유지관리 용역).pdf",
+              "pdfPages": 3,
+              "unresolvedPages": [
+                1,
+                2
+              ],
+              "ocrFailureDetails": []
+            },
+            {
+              "sourceFile": "(붙임) 8. 일상감사결과 의견 및 조치결과[2027년 행정정보시스템 통합 유지관리 용역].pdf",
+              "pdfPages": 4,
+              "unresolvedPages": [
+                1,
+                3
+              ],
+              "ocrFailureDetails": []
+            }
+          ],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "(붙임) 4. 기술지원협약서 목록(2027년 행정정보시스템 통합 유지관리 용역).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824444:000",
+      "deadline": "2026-12-03 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "물품공급·기술지원 협약서(관인날인).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "긴급입찰 사유서(통합관제센터 및 현장 CCTV 유지관리용역) (1).hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01824549:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "기술지원협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "일반용역계약_특수조건(1301공소청콜센터_시스템_유지관리).hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "개인정보_취급위탁계약_특수조건(1301공소청콜센터_시스템_유지관리).hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "긴급입찰_사유서(1301공소청콜센터_시스템_유지관리).hwp",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01825843:000",
+      "deadline": "2026-11-25 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "긴급발주 사유서(공간정보시스템).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "기술지원협약서(아이앤씨솔루션).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "기술지원협약서(지오투정보기술).pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01826833:000",
+      "deadline": "2026-11-26 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "7. KOICA 입찰 관련 규정 및 지침(260811).zip",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01828697:000",
+      "deadline": "2026-11-26 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "(붙임)과업내용서[2027년 정보통신시스템 통합유지관리].hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "(붙임)물품공급 및 기술지원 협약서[2027년 정보통신시스템 통합유지관리].pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01828947:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "[붙임6]긴급입찰공고사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "물품공급기술지원 협약서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01829292:000",
+      "deadline": "2026-11-27 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "(기술지원협약서)오산시 도서관 정보화시스템 통합유지보수.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "(긴급입찰 사유서)오산시 도서관 정보화시스템 통합유지보수.hwpx",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01829449:000",
+      "deadline": "2026-11-25 10:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "단일 규격 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        },
+        {
+          "name": "긴급 구매 사유서.pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    },
+    {
+      "noticeKey": "R26BK01830982:000",
+      "deadline": "2026-12-07 17:00:00",
+      "rootCause": "ocr_reader_not_retried",
+      "files": [
+        {
+          "name": "기술지원협약서[2027년도 공간정보시스템 통합유지보수 용역].pdf",
+          "errorCategory": "pdf_ocr_incomplete",
+          "errorDetail": "ValueError: pdf_ocr_incomplete",
+          "lastReaderAttemptVersion": "",
+          "lastReaderAttemptAt": "",
+          "ocrBatchDeferredPages": 0,
+          "ocrFailedPages": 0,
+          "pdfSources": [],
+          "extractionEvidence": {}
+        }
+      ]
+    }
+  ]
+}
