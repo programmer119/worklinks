@@ -1,0 +1,19 @@
+name: WorkLinks malformed cached originals download priority regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/rfp_dual_queue.py
+      - tests/test_rfp_priority_corrupt_refetch_20261116.py
+      - .github/workflows/worklinks-corrupt-refetch-priority-ci.yml
+permissions:
+  contents: read
+jobs:
+  priority:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prioritize invalid official bytes ahead of backlog
+        run: |
+          python3 tests/test_rfp_priority_corrupt_refetch_20261116.py
