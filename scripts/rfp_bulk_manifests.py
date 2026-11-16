@@ -21,12 +21,10 @@ MAX_FETCH_PER_PASS=18
 # Keep rare per-notice recovery bounded, but let a 23-notice backlog drain
 # instead of allowing only two notices per day.
 MAX_EXCEPTIONS_PER_PASS=4
-# Each exceptional notice consumes three official source calls. A separate
-# 32-notice cap exhausted after only 96 calls and blocked the remaining live
-# notices until UTC midnight, despite the shared 1000-call official budget.
-# Keep a bounded per-notice exception guard; the durable shared daily budget
-# below still prevents any call beyond the provider's official allocation.
-MAX_EXCEPTIONS_PER_UTC_DAY=128
+# Exception lookups remain bounded to four notices per pass; ALL calls count
+# toward the same 1000-call ledger. Do not impose a second arbitrary per-day
+# exception cap: 128 successful notices exhausted the old cap at 384 calls,
+# blocking the remaining 148 without exhausting the official budget.
 EXCEPTION_RETRY_SECONDS=300
 # A02 is allocated 1000 daily requests. The former internal cap 180
 # stopped essential bulk attachment-list collection at 1924/2315, even while
@@ -114,6 +112,11 @@ class BulkManifestPlanner:
         return rows
 
     def _reserve_api_call(self,source,day,page):
+        self._reserve_api_calls([(source,day,page)])
+
+    def _reserve_api_calls(self,calls):
+        """Reserve all operations for one request atomically, not partially."""
+        if not calls:return
         stamp=dt.datetime.now(dt.timezone.utc)
         hourly=(stamp-dt.timedelta(hours=1)).isoformat()
         midnight=stamp.replace(hour=0,minute=0,second=0,microsecond=0).isoformat()
@@ -123,26 +126,27 @@ class BulkManifestPlanner:
                             (hourly,)).fetchone()[0]
             daily=db.execute("SELECT COUNT(*) FROM rfp_bulk_request_budget WHERE started_at>=?",
                              (midnight,)).fetchone()[0]
-            if hour>=HOURLY_LIMIT or daily>=DAILY_LIMIT:
+            if hour+len(calls)>HOURLY_LIMIT or daily+len(calls)>DAILY_LIMIT:
                 # Resume exactly as the saved rolling-hour / UTC-day budgets
                 # release requests, rather than blindly sleeping another hour.
                 retry_at=stamp
-                if hour>=HOURLY_LIMIT:
+                if hour+len(calls)>HOURLY_LIMIT:
                     oldest=db.execute('''SELECT MIN(started_at)
                         FROM rfp_bulk_request_budget WHERE started_at>=?''',
                         (hourly,)).fetchone()[0]
                     if oldest:
                         retry_at=max(retry_at,
                             dt.datetime.fromisoformat(oldest)+dt.timedelta(hours=1,seconds=2))
-                if daily>=DAILY_LIMIT:
+                if daily+len(calls)>DAILY_LIMIT:
                     retry_at=max(retry_at,
                         stamp.replace(hour=0,minute=0,second=0,microsecond=0)+
                         dt.timedelta(days=1,seconds=2))
                 wait=math.ceil((retry_at-stamp).total_seconds())
                 raise BulkManifestQuota('rfp_bulk_budget_hourly_or_daily',
                                          retry_after_seconds=wait)
-            db.execute('''INSERT INTO rfp_bulk_request_budget(started_at,source,day,page)
-                VALUES(?,?,?,?)''',(stamp.isoformat(),source,day,page))
+            db.executemany('''INSERT INTO rfp_bulk_request_budget(started_at,source,day,page)
+                VALUES(?,?,?,?)''',[(stamp.isoformat(),source,day,page)
+                                    for source,day,page in calls])
             # 3-day bounded history; avoid a forever-growing request ledger.
             db.execute("DELETE FROM rfp_bulk_request_budget WHERE started_at<?",
                        ((stamp-dt.timedelta(days=3)).isoformat(),))
@@ -223,25 +227,17 @@ class BulkManifestPlanner:
         return self._cached_pages(day,source),fetched
 
     def _exception_one(self,key,day):
-        """Maximum one exceptional notice per pass, maximum two per UTC day.
+        """A 3-operation exception is allowed while shared quota remains.
 
-        Normal traffic remains three shared date listings. A three-operation
-        exception is used only after a complete batch misses the notice.
+        The date listing is preferred. Each exceptional notice is only
+        attempted after its complete day listing misses the notice, with
+        at most four exceptional notices per pass.
         """
         if not self.allow_exceptions:return None,0
-        stamp=dt.datetime.now(dt.timezone.utc)
-        midnight=stamp.replace(hour=0,minute=0,second=0,microsecond=0).isoformat()
-        with self.queue.connect() as db:
-            used=db.execute("""SELECT COUNT(*) FROM rfp_bulk_request_budget
-                WHERE started_at>=? AND source LIKE 'exception_%'""",
-                (midnight,)).fetchone()[0]
-        if used+len(SOURCES)>MAX_EXCEPTIONS_PER_UTC_DAY*len(SOURCES):
-            tomorrow=(stamp.replace(hour=0,minute=0,second=0,microsecond=0)
-                      +dt.timedelta(days=1,seconds=2))
-            raise BulkManifestQuota('rfp_bulk_exception_daily_cap',
-                retry_after_seconds=math.ceil((tomorrow-stamp).total_seconds()))
-        # Reserve the cost of ALL THREE official operations, not one proxy call.
-        for src in SOURCES:self._reserve_api_call('exception_'+src,day,0)
+        # The official endpoint consumes exactly three source operations.
+        # Reserve all three together before any HTTP call, so an almost-full
+        # ledger cannot silently consume the last 1-2 slots without a request.
+        self._reserve_api_calls([('exception_'+src,day,0) for src in SOURCES])
         self.pacer.acquire()
         bid,order=key.split(':',1)
         params=urllib.parse.urlencode({'bidNo':bid,'order':order})
