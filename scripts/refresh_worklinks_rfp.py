@@ -150,7 +150,7 @@ MAX_DOCUMENTS=24
 # 3MB per member was rejecting real official documents before text extraction.
 MAX_HWPX_XML_MEMBER=28_000_000
 MAX_HWPX_XML_TOTAL=90_000_000
-HWPX_READER_VERSION=4
+HWPX_READER_VERSION=3
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.hwtx','.pdf','.docx','.xls','.xlsx','.xlsm','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp','.hml','.html','.htm','.cell','.txt','.csv')
 CLASSIFICATION_VERSION=23
