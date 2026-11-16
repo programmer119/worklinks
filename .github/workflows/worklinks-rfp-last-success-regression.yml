@@ -1,0 +1,38 @@
+name: WorkLinks verified insurance staffing onsite last-success regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/rfp_management_reconcile.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_last_success_20261116.py'
+      - 'tests/test_rfp_last_success_badges_20261116.cjs'
+      - 'tests/test_rfp_saved_last_success_20261116.py'
+      - '.github/workflows/worklinks-rfp-last-success-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile scan, merging and public saved API
+        run: |
+          python -m py_compile scripts/rfp_management_reconcile.py scripts/refresh_worklinks_rfp.py server/worklinks-server123-pipeline.py server/g2b-proxy.py
+      - name: Validate last-success source identity and persistence
+        run: |
+          python tests/test_rfp_last_success_20261116.py
+          python tests/test_rfp_saved_last_success_20261116.py
+          python tests/test_rfp_saved_list_version_20261116.py
+      - name: Verify thumbnails preserve last results but replace on new success
+        run: |
+          node tests/test_rfp_last_success_badges_20261116.cjs
+          node tests/worklinks-jobs-regression.cjs
