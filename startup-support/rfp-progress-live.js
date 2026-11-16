@@ -269,11 +269,20 @@
    const active=Math.max(0,Number(lane?.active||0));
    const failed=Math.max(0,Number(lane?.failed||0));
    const problems=Math.max(failed,broken.length);
+   // The source queue may be temporarily empty while the pipeline is alive.
+   // A silent file heartbeat in this state is NOT a disconnected server.
+   const upstreamScan=String(info?.worker?.tasks?.rfpUpgrade?.status||'');
+   const waitingForOriginal=key==='scan'&&info?.worker?.upgradeActive===true&&
+     upstreamScan==='waiting_for_download';
+   const waitingForEligibility=key==='scan'&&info?.worker?.upgradeActive===true&&
+     upstreamScan==='no_eligible_now';
    let badge=active?(key==='scan'?'판독 시도 '+active+'건':'진행 '+active+'건'):
       problems?'재시도 '+problems+'건':'';
    if(active&&problems)badge+=' · 오류 '+problems+'건';
    if(worker?.status==='retry'&&Number(worker.retryEpoch)>now)
     badge=retryRfpText(worker.retryEpoch,now);
+   else if(waitingForOriginal)badge='원본 다운로드 대기';
+   else if(waitingForEligibility)badge='판독 가능한 원본 확인 중';
    else if(worker?.stale&&active===0)badge='상태 갱신 끊김';
    else if(stale)badge='집계 갱신 지연';
    else if(!badge&&Number(lane?.done)>=Number(lane?.total)&&lane?.total>0)badge='완료';
@@ -282,10 +291,19 @@
    if(key==='scan'&&Number(lane?.blockedNoAttachments||0)>0)
     badge+=' · 판독 제외 '+Number(lane.blockedNoAttachments)+'건';
    updateRfpText(state,badge);
-   node.classList.toggle('has-rfp-error',Boolean(worker?.status==='retry'||worker?.stale||problems||stale));
+   node.classList.toggle('has-rfp-error',Boolean(worker?.status==='retry'||
+     (worker?.stale&&!waitingForOriginal&&!waitingForEligibility)||problems||stale));
    let name='현재 처리 파일 없음',detail='';
    const bits=[];
-   if(selected){
+   if(waitingForOriginal){
+    name='원본 다운로드 완료 대기';
+    const dl=info?.lanes?.download;
+    if(dl?.total>0)bits.push('미확보 '+number(Math.max(0,Number(dl.total)-Number(dl.done||0)))+'건');
+    if(failed>0)bits.push('재판독 오류 '+number(failed)+'건');
+   }else if(waitingForEligibility){
+    name='현재 바로 판독 가능한 공고 없음';
+    if(failed>0)bits.push('재판독 오류 '+number(failed)+'건');
+   }else if(selected){
     name=selected.fileName||selected.noticeKey||'공고';
     if(selected.phase)bits.push(selected.phase);
     if(selected.filesTotal>0&&key!=='manifest')bits.push('파일 '+selected.filesDone+'/'+selected.filesTotal);
