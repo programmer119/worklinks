@@ -1692,9 +1692,12 @@ def rfp_cohort_lanes(path,managed,valid):
                      entries.get(key)==('no_attachments','skipped') and
                      key in manifests}
     verified_sources=valid|({key for key in cohort if key in manifests})
-    source_received=valid|({key for key in cohort if entries.get(key,('',))[0]
-                         in ('ready','no_attachments','evidence_complete')})
     confirmed_keys={key for key in cohort if entries.get(key,('',))[0]=='error_confirmed'}
+    # A previously valid scan is not proof that EVERY original was downloaded.
+    # If the current downloader confirmed a missing official source (e.g. 422),
+    # do not also count that same notice as a successful original download.
+    source_received=(valid|({key for key in cohort if entries.get(key,('',))[0]
+                         in ('ready','no_attachments','evidence_complete')})) - confirmed_keys
     pending_missing=not_queued-valid
     # A pending/retry download is NOT an active attachment-list collection.
     # The manifest is already complete for such notices once present in
