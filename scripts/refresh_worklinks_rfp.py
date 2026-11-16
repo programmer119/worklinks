@@ -1819,7 +1819,8 @@ def extract_office_xml_stream(raw,format_name):
     max_members=3000
     max_expanded=250_000_000
     max_single_xml=180_000_000
-    max_text=1_000_000
+    # Match the full qualification/staffing scan ceiling. Fail closed above it.
+    max_text=RFP_QUALIFICATION_TEXT_LIMIT
     text_chunks=[]
     text_size=0
     def append(value):
@@ -2141,9 +2142,10 @@ def extract(name,raw):
         item['exclusiveSeconds']+=max(0.0,total-frame['child'])
 
 
-# Full-document evidence is retained up to 1M characters; beyond that it
-# remains incomplete instead of silently declaring a truncated scan valid.
-RFP_QUALIFICATION_TEXT_LIMIT=1_000_000
+# Scan up to 4M actual source characters, including long verified OOXML
+# spreadsheets. This is a full-text ceiling, not a license to mark truncated
+# documents complete; sources above it still fail closed.
+RFP_QUALIFICATION_TEXT_LIMIT=4_000_000
 
 def parse_clauses(text):
     text=re.sub(r'[\u200b\ufeff\x00]','',text)
@@ -2827,7 +2829,9 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
     live_trace=None
     if os.environ.get('WORKLINKS_RFP_DUAL_SCAN_ONLY')=='1':
         import rfp_live_activity as live_trace
-    if live_trace:live_trace.record('scan',notice_key,phase='문서 판독 준비',status='working',files_total=len(primary_manifest))
+    if live_trace:
+        live_trace.begin_scan_notice(notice_key)
+        live_trace.record('scan',notice_key,phase='문서 판독 준비',status='working',files_total=len(primary_manifest))
     close_date=_NOTICE_DEADLINES.get(notice_key,'')
     def refill():
         if prefetch is None:return
@@ -2847,8 +2851,6 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                           'errorCategory':invalid_file_reason(item)}
             continue
         name,url=public
-        if live_trace:
-            live_trace.record('scan',notice_key,file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],file_name=name,phase='텍스트 추출 준비',status='working')
         # Same filename stem + verified PDF in this notice: use PDF only.
         # Do not download the duplicate HWP and never mark it readable.
         companion=verified_pdf_companion({'name':name},list(saved_slots.values()))
@@ -2883,6 +2885,13 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             phase['deferredImageFiles']+=1
             saved_slots[position]=record
             continue
+        # Only report 'working' after all no-work branches have been passed.
+        # A same-stem PDF skip, saved SHA reuse, or deferred OCR is not an
+        # actively running extractor and must never be displayed as one.
+        if live_trace:
+            live_trace.record('scan',notice_key,
+                file_key=hashlib.sha256(url.encode('utf-8')).hexdigest()[:24],
+                file_name=name,phase='텍스트 추출 준비',status='working')
         try:
             # Measure file work separately from page retrieval, metadata and
             # whole-index JSON publication; worker threads may overlap.
@@ -2974,6 +2983,9 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
         saved.append({'name':str(item.get('name') or '')[:160], 'readable':False,
                       'errorCategory':'manifest_documents_over_limit'})
     readable=any(x.get('readable') for x in saved)
+    # A completed notice attempt may have skipped/reused some files. Never
+    # leave those or an interrupted partial file event marked 'working'.
+    if live_trace:live_trace.finish_scan_notice(notice_key)
     notice=data.get('noticeDocuments') or {}
     return {'status':'download_not_verified' if original_missing else
                      'text_extracted_requires_review' if readable else 'text_unavailable',
@@ -3554,6 +3566,7 @@ def main():
                 scan_validity[key]=False
                 if dual_scan:
                     import rfp_live_activity as live_trace
+                    live_trace.finish_scan_notice(key)
                     live_trace.record('scan',key,phase='판독 오류',status='retry',retry_epoch=time.time()+3600,error=str(e))
                 reason=('metadata_http_'+str(e.code) if isinstance(e,urllib.error.HTTPError)
                         else classify_failure(e))
