@@ -61,7 +61,7 @@ try:
     result={'ok':True,'text':value,'evidence':evidence}
 except Exception as error:
     result={'ok':False,'error':type(error).__name__,'detail':str(error)[:180]}
-sys.stdout.write('\n__WORKLINKS_EXTRACT_RESULT_V2__'+json.dumps(result,ensure_ascii=False,separators=(',',':')))
+sys.stdout.write(chr(10)+'__WORKLINKS_EXTRACT_RESULT_V2__'+json.dumps(result,ensure_ascii=False,separators=(',',':')))
 """
 
 def decode_extraction_child_result(stdout):
