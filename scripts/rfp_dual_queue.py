@@ -450,7 +450,10 @@ class RfpDualQueue:
         with self.connect() as db:
             db.execute('''UPDATE rfp_dual_notices
                 SET download_status='ready',metadata_json=?,download_done=?,download_total=?,
-                    download_retry_epoch=0,last_error='',updated_at=?
+                    download_retry_epoch=0,
+                    last_error=CASE WHEN last_error='cached_original_missing'
+                      THEN 'source_integrity_recovered_pending_scan' ELSE '' END,
+                    updated_at=?
                 WHERE notice_key=? AND download_status='fetching' ''',
                 (payload,int(done),int(total),now_utc(),key))
 
@@ -497,7 +500,8 @@ class RfpDualQueue:
             rows=db.execute('''SELECT notice_key,closes_on,metadata_json
                 FROM rfp_dual_notices WHERE download_status='ready'
                 AND scan_status IN ('pending','retry') AND scan_retry_epoch<=?
-                ORDER BY updated_at,notice_key LIMIT ?''',
+                ORDER BY CASE WHEN last_error='source_integrity_recovered_pending_scan'
+                   THEN 0 ELSE 1 END,updated_at,notice_key LIMIT ?''',
                 (time.time(),int(limit))).fetchall()
             for key,closes,metadata in rows:
                 try:obj=json.loads(metadata)
