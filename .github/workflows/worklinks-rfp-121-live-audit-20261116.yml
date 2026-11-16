@@ -64,10 +64,17 @@ jobs:
       - name: Verify PDF OCR repair priority and scheduler without network
         shell: bash
         run: |
-          python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py server/worklinks-server123-pipeline.py
-          python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
-          python3 tests/test_worklinks_server123_pipeline.py
-          echo OCR_PDF_PRIORITY_AND_SCHEDULER_REGRESSION_PASS
+          mkdir -p diagnostics
+          python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py server/worklinks-server123-pipeline.py > diagnostics/rfp-pdf-ocr-regression.log 2>&1 \
+            && echo PY_COMPILE_PASS >> diagnostics/rfp-pdf-ocr-regression.log \
+            || echo PY_COMPILE_FAIL >> diagnostics/rfp-pdf-ocr-regression.log
+          python3 tests/test_rfp_ocr_repair_prioritization_20261115.py >> diagnostics/rfp-pdf-ocr-regression.log 2>&1 \
+            && echo PDF_PRIORITY_TEST_PASS >> diagnostics/rfp-pdf-ocr-regression.log \
+            || echo PDF_PRIORITY_TEST_FAIL >> diagnostics/rfp-pdf-ocr-regression.log
+          python3 tests/test_worklinks_server123_pipeline.py >> diagnostics/rfp-pdf-ocr-regression.log 2>&1 \
+            && echo SCHEDULER_TEST_PASS >> diagnostics/rfp-pdf-ocr-regression.log \
+            || echo SCHEDULER_TEST_FAIL >> diagnostics/rfp-pdf-ocr-regression.log
+          tail -n 35 diagnostics/rfp-pdf-ocr-regression.log
       - name: Read server123 RFP live diagnosis and publish compact results to audit branch
         shell: bash
         run: |
@@ -140,7 +147,7 @@ jobs:
                     if k in ('pdfPages','ocrAttemptedPages','ocrRecoveredPages','ocrRestoredPages',
                        'ocrBatchDeferredPages','ocrFailedPages','unresolvedPages','ocrFailureDetails')}
                 } for f in files]})
-          target=Path('diagnostics/rfp-pdf-ocr-verified-20261116.json')
+          target=Path('diagnostics/rfp-pdf-ocr-regression-state-20261116.json')
           target.parent.mkdir(exist_ok=True)
           target.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print('AUDIT_COUNTS',json.dumps(report.get('progress',{}).get('counts'),ensure_ascii=False),flush=True)
@@ -149,6 +156,6 @@ jobs:
           PY
           git config user.name "worklinks-audit-bot"
           git config user.email "worklinks-audit-bot@users.noreply.github.com"
-          git add diagnostics/rfp-pdf-ocr-verified-20261116.json
+          git add diagnostics/rfp-pdf-ocr-regression-state-20261116.json diagnostics/rfp-pdf-ocr-regression.log
           git commit -m "audit: save read-only production RFP diagnosis"
-          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-verified-20261116
+          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-regression-state-20261116
