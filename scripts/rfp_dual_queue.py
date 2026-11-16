@@ -19,20 +19,33 @@ SCHEMA_VERSION=1
 def now_utc():
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
-# Repeat detection uses only durable scan evidence, never a wall-clock stamp.
-# OCR repair or a newer parser can change this fingerprint and reopen work.
+# A repeated failure may be reopened only by POSITIVE source evidence:
+# verified full text, a new fully parsed attachment, confirmed PDF sibling,
+# manifest completion, or parser version. Merely swapping one failure label
+# for another ('pdf_ocr_incomplete' -> 'invalid_hwp' etc.) is NOT progress.
+# Do not include timestamps, partial error strings, retry attempt versions,
+# or other fields updated on every unsuccessful OCR pass.
 def scan_evidence_signature(evidence):
     row=evidence if isinstance(evidence,dict) else {}
-    fields=('status','manifestComplete','classificationVersion',
+    fields=('manifestComplete','classificationVersion',
             'staffingRoleScanComplete','hwpxReaderVersion')
-    file_fields=('name','sourceSha256','readable','sourceTextScanComplete',
-                 'staffingRoleScanVersion','staffingFactScanVersion',
-                 'staffingRoleScanTruncated','qualificationScanTruncated',
-                 'skippedDuplicateFormat','alternatePdfSourceSha256',
-                 'staffingScopeExcluded','errorCategory')
-    compact={'notice':{k:row.get(k) for k in fields},
-             'files':[{k:f.get(k) for k in file_fields}
-                      for f in (row.get('files') or []) if isinstance(f,dict)]}
+    files=[]
+    for f in row.get('files') or []:
+        if not isinstance(f,dict):continue
+        complete=(f.get('readable') is True and
+                  f.get('sourceTextScanComplete') is True and
+                  bool(f.get('sourceSha256')))
+        files.append({'name':f.get('name'),
+                      'verifiedFullText':bool(complete),
+                      'sourceSha256':f.get('sourceSha256') if complete else None,
+                      'staffingRoleScanVersion':f.get('staffingRoleScanVersion') if complete else None,
+                      'staffingFactScanVersion':f.get('staffingFactScanVersion') if complete else None,
+                      'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') if complete else None,
+                      'qualificationScanTruncated':f.get('qualificationScanTruncated') if complete else None,
+                      'skippedDuplicateFormat':f.get('skippedDuplicateFormat') is True,
+                      'alternatePdfSourceSha256':f.get('alternatePdfSourceSha256') or None,
+                      'staffingScopeExcluded':f.get('staffingScopeExcluded') is True})
+    compact={'notice':{k:row.get(k) for k in fields},'files':files}
     return hashlib.sha256(json.dumps(compact,sort_keys=True,
                   ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
 
