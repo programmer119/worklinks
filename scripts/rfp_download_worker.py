@@ -8,8 +8,10 @@ The independent scan process only consumes already-downloaded originals.
 from concurrent.futures import ThreadPoolExecutor,wait,FIRST_COMPLETED
 import datetime as dt
 import hashlib
+import io
 import json
 import os
+import zipfile
 import tempfile
 from pathlib import Path
 import threading
@@ -52,6 +54,60 @@ META_PACE=Pace(0.8)
 FILE_PACE=Pace(0.125)  # 8 file starts/sec for 8 independent download workers
 
 
+def _original_structure_issue_bytes(raw):
+    """Confirm intrinsic content integrity, not the misleading file extension.
+
+    The downloader's SHA receipt only proves persistence of received bytes.
+    A real 247645-byte government PDF was stored without EOF even though
+    the same official URL now returns a complete 260331-byte PDF. Likewise
+    a 255143-byte HWP failed OLE sectors where fresh bytes read normally.
+    """
+    if raw.startswith(b'%PDF-'):
+        return '' if b'%%EOF' in raw[-8192:] else 'pdf_missing_eof'
+    if raw.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):
+        try:
+            import olefile
+            with olefile.OleFileIO(io.BytesIO(raw)) as ole:
+                ole.listdir()
+        except ImportError:
+            return ''  # The production image includes olefile; no filename guess.
+        except Exception:
+            return 'ole_directory_unreadable'
+    if raw.startswith(b'PK\x03\x04'):
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw)) as z:z.infolist()
+        except (zipfile.BadZipFile,OSError,EOFError):
+            return 'zip_central_directory_missing'
+    return ''
+
+
+def _original_structure_issue_file(path):
+    """Check a downloaded file on disk before accepting its SHA as complete."""
+    path=Path(path)
+    with path.open('rb') as file:
+        header=file.read(8)
+        size=path.stat().st_size
+        file.seek(max(0,size-8192))
+        tail=file.read()
+    if header.startswith(b'%PDF-'):
+        return '' if b'%%EOF' in tail else 'pdf_missing_eof'
+    if header.startswith(bytes.fromhex('D0CF11E0A1B11AE1')):
+        try:
+            import olefile
+            with olefile.OleFileIO(str(path)) as ole:
+                ole.listdir()
+        except ImportError:
+            return ''
+        except Exception:
+            return 'ole_directory_unreadable'
+    if header.startswith(b'PK\x03\x04'):
+        try:
+            with zipfile.ZipFile(path) as z:z.infolist()
+        except (zipfile.BadZipFile,OSError,EOFError):
+            return 'zip_central_directory_missing'
+    return ''
+
+
 def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
                                        rate_gate=None,progress=None,on_retry=None):
     """Bounded-memory official GET -> temporary file -> verified compressed SQLite BLOB.
@@ -61,6 +117,19 @@ def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
     """
     reqkey=cache_key('official_attachment',url)
     reusable=ledger.verified_bytes_info(reqkey)
+    # The SHA-verified cache can preserve a *truncated* official response.
+    # Before reuse, inspect the real signature/EOF/OLE/ZIP structure. If the
+    # old original is incomplete, bypass the cache and GET again. Do not
+    # delete the old cache unless a fresh, valid original has been saved.
+    if reusable is not None and reusable.get('bytes',0)<=10_000_000 and hasattr(ledger,'get_bytes'):
+        cached=ledger.get_bytes(reqkey)
+        problem=(_original_structure_issue_bytes(cached)
+                 if isinstance(cached,bytes) else 'cached_bytes_missing')
+        if problem:
+            ledger.record('attachment_reuse',reqkey,'incomplete_original_refetch',
+                          notice_key=notice_key,response_sha256=reusable.get('sha256'),
+                          detail=problem)
+            reusable=None
     if reusable is not None:
         ledger.link_attachment(reqkey,notice_key,closes_on)
         ledger.record('attachment_reuse',reqkey,'verified_bytes_reused',
@@ -102,6 +171,9 @@ def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
                 if raw_length and bytes_received!=raw_length:
                     raise ValueError('download_length_mismatch: received='+str(bytes_received)+
                                      ' expected='+str(raw_length))
+            integrity=_original_structure_issue_file(raw_path)
+            if integrity:
+                raise ValueError('source_structure_invalid:'+integrity)
             ledger.record('attachment_http',reqkey,'http_ok',
                           http_status=status,notice_key=notice_key,
                           response_sha256=digest.hexdigest(),
@@ -127,7 +199,8 @@ def stream_original_to_verified_ledger(url,ledger,notice_key,closes_on,
             else:
                 retry=(isinstance(exc,(TimeoutError,ConnectionError,urllib.error.URLError)) or
                        (isinstance(exc,ValueError) and
-                        str(exc).startswith('download_length_mismatch:')))
+                        (str(exc).startswith('download_length_mismatch:') or
+                         str(exc).startswith('source_structure_invalid:'))))
             if not retry or attempt==2:raise
             if on_retry:on_retry(exc,1.5*(attempt+1))
             time.sleep(1.5*(attempt+1))
