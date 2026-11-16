@@ -96,6 +96,34 @@ def worker(lane,status,error='',retry_epoch=0):
           (lane,str(status)[:32],str(error)[:180],float(retry_epoch or 0),time.time()))
 
 
+def begin_scan_notice(notice_key):
+    """Retire file events from the preceding attempt before this one starts.
+
+    A source-reuse or same-stem PDF skip must never leave a previous file's
+    'text extraction ready' row looking like a running extractor.
+    """
+    now=time.time()
+    with connect() as db:
+        return db.execute("""UPDATE rfp_live_events
+            SET status='skipped',phase='이전 판독 기록 종료',
+                retry_epoch=0,error_text='superseded_by_new_scan',
+                updated_epoch=?
+            WHERE lane='scan' AND notice_key=? AND status='working'""",
+            (now,str(notice_key)[:100])).rowcount
+
+
+def finish_scan_notice(notice_key):
+    """Retire only unfinished progress events; preserve actual file errors."""
+    now=time.time()
+    with connect() as db:
+        return db.execute("""UPDATE rfp_live_events
+            SET status='skipped',phase='판독 시도 종료',
+                retry_epoch=0,error_text='scan_attempt_finished',
+                updated_epoch=?
+            WHERE lane='scan' AND notice_key=? AND status='working'""",
+            (now,str(notice_key)[:100])).rowcount
+
+
 def recover_interrupted_downloads():
     """Release orphaned file activity on downloader subprocess restart.
 
@@ -147,12 +175,22 @@ def snapshot(path=None,limit=12):
             # Older live DBs are valid but have no activity tables.
             tables={row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             if 'rfp_live_events' not in tables:return {'available':False}
+            # A crashed/retried scan can leave 'working' rows forever. The
+            # authoritative queue, not an old file heartbeat, determines
+            # whether any scan is actually running.
+            only_current_scan=(
+                " AND (lane<>'scan' OR status<>'working' OR "
+                "EXISTS (SELECT 1 FROM rfp_dual_notices q "
+                "WHERE q.notice_key=rfp_live_events.notice_key "
+                "AND q.scan_status='scanning'))"
+                if 'rfp_dual_notices' in tables else '')
             entries=db.execute('''SELECT lane,notice_key,file_key,file_name,phase,status,
                 bytes_done,bytes_total,files_done,files_total,retry_epoch,error_text,updated_epoch,
                 started_epoch,byte_progress_epoch FROM rfp_live_events
-                WHERE (status NOT IN ('done','skipped') OR updated_epoch>?)
-                ORDER BY CASE WHEN status='working' THEN 0 WHEN status='retry' THEN 1 ELSE 2 END,
-                    updated_epoch DESC LIMIT ?''',(now-120,int(limit))).fetchall()
+                WHERE (status NOT IN ('done','skipped') OR updated_epoch>?)'''
+                +only_current_scan+''' ORDER BY
+                CASE WHEN status='working' THEN 0 WHEN status='retry' THEN 1 ELSE 2 END,
+                updated_epoch DESC LIMIT ?''',(now-120,int(limit))).fetchall()
             workers=db.execute('''SELECT lane,status,error_text,retry_epoch,updated_epoch
                 FROM rfp_live_workers''').fetchall() if 'rfp_live_workers' in tables else []
             columns=('lane','noticeKey','fileKey','fileName','phase','status','bytesDone',
@@ -177,4 +215,6 @@ def _nonfatal(fn):
 record=_nonfatal(record)
 worker=_nonfatal(worker)
 
+begin_scan_notice=_nonfatal(begin_scan_notice)
+finish_scan_notice=_nonfatal(finish_scan_notice)
 recover_interrupted_downloads=_nonfatal(recover_interrupted_downloads)
