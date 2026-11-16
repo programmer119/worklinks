@@ -277,13 +277,18 @@
      upstreamScan==='waiting_for_download';
    const waitingForEligibility=key==='scan'&&info?.worker?.upgradeActive===true&&
      upstreamScan==='no_eligible_now';
+   const ocrTask=info?.worker?.tasks?.rfpOpenRepair;
+   const recentOcrRepair=key==='scan'&&info?.worker?.upgradeActive===true&&
+     ocrTask?.status==='started'&&Number(ocrTask.attemptEpoch)>0&&
+     now-Number(ocrTask.attemptEpoch)<600;
    let badge=active?(key==='scan'?'판독 시도 '+active+'건':'진행 '+active+'건'):
       problems?'재시도 '+problems+'건':'';
    if(active&&problems)badge+=' · 오류 '+problems+'건';
    if(worker?.status==='retry'&&Number(worker.retryEpoch)>now)
     badge=retryRfpText(worker.retryEpoch,now);
-   else if(waitingForOriginal)badge='원본 다운로드 대기';
+   else if(waitingForOriginal)badge=recentOcrRepair?'원본 대기 · OCR 복구 중':'원본 다운로드 대기';
    else if(waitingForEligibility)badge='판독 가능한 원본 확인 중';
+   else if(recentOcrRepair)badge='OCR 복구 시도 중';
    else if(worker?.stale&&active===0)badge='상태 갱신 끊김';
    else if(stale)badge='집계 갱신 지연';
    else if(!badge&&Number(lane?.done)>=Number(lane?.total)&&lane?.total>0)badge='완료';
@@ -293,16 +298,19 @@
     badge+=' · 판독 제외 '+Number(lane.blockedNoAttachments)+'건';
    updateRfpText(state,badge);
    node.classList.toggle('has-rfp-error',Boolean(worker?.status==='retry'||
-     (worker?.stale&&!waitingForOriginal&&!waitingForEligibility)||problems||stale));
+     (worker?.stale&&!waitingForOriginal&&!waitingForEligibility&&!recentOcrRepair)||problems||stale));
    let name='현재 처리 파일 없음',detail='';
    const bits=[];
    if(waitingForOriginal){
-    name='원본 다운로드 완료 대기';
+    name=recentOcrRepair?'원본 대기 · OCR 복구 실행 중':'원본 다운로드 완료 대기';
     const dl=info?.lanes?.download;
     if(dl?.total>0)bits.push('미확보 '+number(Math.max(0,Number(dl.total)-Number(dl.done||0)))+'건');
     if(failed>0)bits.push('재판독 오류 '+number(failed)+'건');
    }else if(waitingForEligibility){
     name='현재 바로 판독 가능한 공고 없음';
+    if(failed>0)bits.push('재판독 오류 '+number(failed)+'건');
+   }else if(recentOcrRepair){
+    name='저장 원본 OCR 복구 실행 중';
     if(failed>0)bits.push('재판독 오류 '+number(failed)+'건');
    }else if(selected){
     name=selected.fileName||selected.noticeKey||'공고';
