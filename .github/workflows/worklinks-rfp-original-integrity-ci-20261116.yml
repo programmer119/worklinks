@@ -1,0 +1,24 @@
+name: WorkLinks official attachment integrity and refetch regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/rfp_download_worker.py
+      - tests/test_rfp_incomplete_original_redownload_20261116.py
+      - .github/workflows/worklinks-rfp-original-integrity-ci-20261116.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  downloaded-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OLE structural validator
+        run: python3 -m pip install -q olefile
+      - name: Test PDF/OLE/ZIP structural completeness and actual cache bypass
+        run: |
+          python3 -m py_compile scripts/rfp_download_worker.py
+          python3 tests/test_rfp_incomplete_original_redownload_20261116.py
+          python3 tests/test_rfp_download_worker.py
