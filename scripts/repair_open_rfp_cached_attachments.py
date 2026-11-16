@@ -29,6 +29,7 @@ KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
 READER_ATTEMPT_VERSION='framed-isolated-extract-v19-hwp-record-unicode-pdf750-20261117'
 NESTED_ZIP_READER_VERSION='two-nested-levels-cumulative-250mb-v1'
+PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -209,6 +210,10 @@ def reader_retry_files(scan):
                'source_extraction_timeout_deferred',
                'file_extract_failure'}
     for f in failed_files(scan):
+        if (f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption'
+                and f.get('lastPartialDrmZipAttemptVersion')!=PARTIAL_DRM_ZIP_READER_VERSION):
+            selected.append(f)
+            continue
         if (f.get('errorCategory')=='nested_archive_requires_review' and
                 f.get('lastNestedZipAttemptVersion')!=NESTED_ZIP_READER_VERSION):
             selected.append(f)
@@ -416,6 +421,8 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
         previous_version=str(f.get('lastReaderAttemptVersion') or '')
         if f.get('errorCategory')=='nested_archive_requires_review':
             f['lastNestedZipAttemptVersion']=NESTED_ZIP_READER_VERSION
+        if f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption':
+            f['lastPartialDrmZipAttemptVersion']=PARTIAL_DRM_ZIP_READER_VERSION
         if previous_version==READER_ATTEMPT_VERSION:
             f['lastReaderTransientRetryCount']=int(f.get('lastReaderTransientRetryCount') or 0)+1
         else:
@@ -479,9 +486,14 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
             if not evidence['sourceComplete']:
                 f['extractionEvidence']=evidence
                 f['partialTextChars']=len(text)
-                f['errorCategory']='pdf_ocr_incomplete'
-                f['error']='pdf_ocr_incomplete: unresolved PDF pages in source'
-                counts['pdf_ocr_incomplete']+=1
+                if int(evidence.get('protectedMemberCount') or 0)>0:
+                    f['errorCategory']='drm_protected_original_requires_authorized_decryption'
+                    f['error']='protected member(s) remain in verified archive; readable siblings extracted separately'
+                    counts['partial_drm_archive']+=1
+                else:
+                    f['errorCategory']='pdf_ocr_incomplete'
+                    f['error']='pdf_ocr_incomplete: unresolved PDF pages in source'
+                    counts['pdf_ocr_incomplete']+=1
                 continue
             if sum(ch.isalnum() for ch in text)<12:
                 raise ValueError('no_searchable_text')
@@ -665,7 +677,7 @@ def merge_verified_repair_attempt(live,entry):
         for field in ('errorCategory','error','lastHttpStatus','extractionEvidence',
                       'partialTextChars','detectedFormat','textChars',
                       'lastReaderAttemptVersion','lastReaderAttemptAt',
-                      'lastNestedZipAttemptVersion'):
+                      'lastNestedZipAttemptVersion','lastPartialDrmZipAttemptVersion'):
             if field in entry:live[field]=entry[field]
         if entry.get('errorCategory')!='official_attachment_reference_missing_422':
             live.pop('lastHttpStatus',None)
