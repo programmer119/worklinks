@@ -35,6 +35,7 @@ f={'name':'verified-cover.pdf','readable':False,
 scan={'files':[f]}
 assert len(R.reader_retry_files(scan))==1
 f['lastSparseCoverAttemptVersion']=R.SPARSE_COVER_READER_VERSION
+f['lastPerimeterAttemptVersion']=R.EMPTY_PERIMETER_READER_VERSION
 assert not R.reader_retry_files(scan)
 f.pop('lastSparseCoverAttemptVersion')
 f['extractionEvidence']['ocrBatchDeferredPages']=4
