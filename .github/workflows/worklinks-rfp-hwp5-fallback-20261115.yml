@@ -7,6 +7,7 @@ on:
       - scripts/repair_open_rfp_cached_attachments.py
       - server/worklinks-server123-pipeline.py
       - tests/test_rfp_hwp_records_fallback_20261115.py
+      - tests/test_rfp_long_document_coverage_20261115.py
       - .github/workflows/worklinks-rfp-hwp5-fallback-20261115.yml
 permissions:
   contents: read
