@@ -1696,7 +1696,8 @@ def _eligible_prefetch_positions(manifest,processing_order,reusable):
         if (retained and
                 int(retained.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
                 int(retained.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
-                retained.get('staffingRoleScanTruncated') is not True):
+                retained.get('staffingRoleScanTruncated') is not True and
+                int(retained.get('submissionScanVersion') or 0)>=SUBMISSION_SCAN_VERSION):
             continue
         if (os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1' and
                 name.lower().endswith(('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp'))):
@@ -3420,7 +3421,8 @@ def backfill_cached_staffing(records, max_files=24):
         for f in notice.get('files') or []:
             if not isinstance(f,dict) or f.get('readable') is not True:continue
             if (int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
-                    int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION):
+                    int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
+                    int(f.get('submissionScanVersion') or 0)>=SUBMISSION_SCAN_VERSION):
                 continue
             name=str(f.get('name') or '')
             url=str(f.get('sourceUrl') or '')
@@ -3440,6 +3442,9 @@ def backfill_cached_staffing(records, max_files=24):
                         raise ValueError('cached_source_scan_incomplete')
                     f['staffingRoles']=extract_staffing_roles(content,name,url)
                     f['staffingFacts']=extract_staffing_facts(content,name,url)
+                    f['submissionItems'],submission_complete=extract_submission_items(content,name)
+                    f['submissionScanVersion']=SUBMISSION_SCAN_VERSION
+                    f['submissionScanComplete']=submission_complete and bool(evidence.get('sourceComplete'))
                     f['staffingRoleScanVersion']=STAFFING_ROLE_SCAN_VERSION
                     f['staffingFactScanVersion']=STAFFING_FACT_SCAN_VERSION
                     f['staffingRoleScanTruncated']=len(content)>STAFFING_ROLE_TEXT_LIMIT
