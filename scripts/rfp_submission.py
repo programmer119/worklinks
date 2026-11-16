@@ -13,29 +13,29 @@ MAX_NOTICE_ITEMS = 24
 STAGES = {'bid', 'presentation', 'post_award', 'unknown'}
 
 DOCS = (
-    ('정성 PDF', r'정성(?:적)?\\s*(?:평가\\s*)?(?:제안서|PDF)|제안서\\s*[(\\[]\\s*정성'),
-    ('정량 PDF', r'정량(?:적)?\\s*(?:평가\\s*)?(?:제안서|PDF)|제안서\\s*[(\\[]\\s*정량'),
-    ('발표자료', r'발표\\s*자료|제안\\s*발표\\s*(?:자료|PPT)|프레젠테이션\\s*자료'),
-    ('제안서', r'(?<!요청)제안\\s*서(?!\\s*(?:요청|서식\\s*작성))'),
-    ('입찰신청서', r'입찰\\s*(?:참가\\s*)?신청서'),
-    ('가격제안서', r'가격\\s*제안서|가격\\s*입찰서'),
-    ('견적서', r'견적\\s*서'),
-    ('서약서', r'서약\\s*서'),
-    ('확약서', r'확약\\s*서'),
-    ('실적증명서', r'(?:수행\\s*)?실적\\s*증명서'),
-    ('재직증명서', r'재직\\s*증명서'),
-    ('사업자등록증', r'사업자\\s*등록증'),
-    ('인감증명서', r'인감\\s*증명서'),
+    ('정성 PDF', r'정성(?:적)?\s*(?:평가\s*)?(?:제안서|PDF)|제안서\s*[(\[]\s*정성'),
+    ('정량 PDF', r'정량(?:적)?\s*(?:평가\s*)?(?:제안서|PDF)|제안서\s*[(\[]\s*정량'),
+    ('발표자료', r'발표\s*자료|제안\s*발표\s*(?:자료|PPT)|프레젠테이션\s*자료'),
+    ('제안서', r'(?<!요청)제안\s*서(?!\s*(?:요청|서식\s*작성))'),
+    ('입찰신청서', r'입찰\s*(?:참가\s*)?신청서'),
+    ('가격제안서', r'가격\s*제안서|가격\s*입찰서'),
+    ('견적서', r'견적\s*서'),
+    ('서약서', r'서약\s*서'),
+    ('확약서', r'확약\s*서'),
+    ('실적증명서', r'(?:수행\s*)?실적\s*증명서'),
+    ('재직증명서', r'재직\s*증명서'),
+    ('사업자등록증', r'사업자\s*등록증'),
+    ('인감증명서', r'인감\s*증명서'),
 )
-SUBMISSION_CONTEXT = re.compile(r'제출|구비\\s*서류|첨부\\s*(?:하|서류)|접수\\s*서류|송부|준비\\s*서류')
-HEADING = re.compile(r'제출\\s*(?:서류|자료|문서|물|목록)|입찰\\s*참가\\s*(?:신청|등록)\\s*서류|구비\\s*서류')
-NEW_SECTION = re.compile(r'^\\s*(?:[0-9IVXivx]+[.)]\\s*)?(?:사업\\s*개요|과업\\s*(?:내용|범위)|평가\\s*(?:항목|기준|방법)|선정\\s*방법|참가\\s*자격|계약\\s*(?:조건|체결))\\s*[:：]?$')
-NEGATIVE = re.compile(r'제출\\s*(?:불필요|면제|하지\\s*않|할\\s*필요\\s*없)|(?:제출|구비)\\s*대상\\s*아님|제출\\s*하지\\s*말')
-OPTIONAL = re.compile(r'선택\\s*사항|해당\\s*(?:시|하는\\s*경우)|필요\\s*시|별도\\s*(?:요청|안내)|제출\\s*가능')
-POST_AWARD = re.compile(r'낙찰\\s*(?:자|후)|계약\\s*(?:체결\\s*)?(?:후|시)|계약\\s*상대자|우선\\s*협상\\s*대상자|선정\\s*(?:후|업체)')
-PRESENTATION = re.compile(r'발표\\s*(?:평가|심사|당일)\\s*(?:시|당일|까지)?|발표\\s*당일|PT\\s*평가\\s*시')
-BID = re.compile(r'입찰\\s*(?:시|전|마감|접수|참가|등록)|제안서\\s*제출|입찰서\\s*제출|접수\\s*(?:마감|시)|마감\\s*(?:시|전|까지)')
-COPY_COUNT = re.compile(r'(?:원본|사본)?\\s*([0-9]{1,3})\\s*부')
+SUBMISSION_CONTEXT = re.compile(r'제출|구비\s*서류|첨부\s*(?:하|서류)|접수\s*서류|송부|준비\s*서류')
+HEADING = re.compile(r'제출\s*(?:서류|자료|문서|물|목록)|입찰\s*참가\s*(?:신청|등록)\s*서류|구비\s*서류')
+NEW_SECTION = re.compile(r'^\s*(?:[0-9IVXivx]+[.)]\s*)?(?:사업\s*개요|과업\s*(?:내용|범위)|평가\s*(?:항목|기준|방법)|선정\s*방법|참가\s*자격|계약\s*(?:조건|체결))\s*[:：]?$')
+NEGATIVE = re.compile(r'제출\s*(?:불필요|면제|하지\s*않|할\s*필요\s*없)|(?:제출|구비)\s*대상\s*아님|제출\s*하지\s*말')
+OPTIONAL = re.compile(r'선택\s*사항|해당\s*(?:시|하는\s*경우)|필요\s*시|별도\s*(?:요청|안내)|제출\s*가능')
+POST_AWARD = re.compile(r'낙찰\s*(?:자|후)|계약\s*(?:체결\s*)?(?:후|시)|계약\s*상대자|우선\s*협상\s*대상자|선정\s*(?:후|업체)')
+PRESENTATION = re.compile(r'발표\s*(?:평가|심사|당일)\s*(?:시|당일|까지)?|발표\s*당일|PT\s*평가\s*시')
+BID = re.compile(r'입찰\s*(?:시|전|마감|접수|참가|등록)|제안서\s*제출|입찰서\s*제출|접수\s*(?:마감|시)|마감\s*(?:시|전|까지)')
+COPY_COUNT = re.compile(r'(?:원본|사본)?\s*([0-9]{1,3})\s*부')
 
 def _stage(text, inherited='unknown'):
     if POST_AWARD.search(text):
@@ -79,7 +79,7 @@ def extract_submission_items(text, source_file):
             for m in re.finditer(rx, line, re.I):
                 matches.append((m.start(), label, m.end()))
                 break
-        annex = re.search(r'별지\\s*(?:제?\\s*)?([0-9]{1,2})(?:\\s*[~～-]\\s*(?:제?\\s*)?([0-9]{1,2}))?', line)
+        annex = re.search(r'별지\s*(?:제?\s*)?([0-9]{1,2})(?:\s*[~～-]\s*(?:제?\s*)?([0-9]{1,2}))?', line)
         if annex:
             last = annex.group(2)
             matches.append((annex.start(),
@@ -104,7 +104,7 @@ def extract_submission_items(text, source_file):
             prev = found.get(key)
             if prev is None or (item['confidence'] == 'source' and
                                 prev['confidence'] != 'source') or (
-                                quantity and not re.search(r'\\d+부$', prev['label'])):
+                                quantity and not re.search(r'\d+부$', prev['label'])):
                 found[key] = item
             if len(found) >= MAX_FILE_ITEMS:
                 return list(found.values()), False
@@ -124,7 +124,7 @@ def submission_summary(notice):
             stage = item.get('stage')
             if not label or stage not in STAGES:
                 continue
-            key = (re.sub(r'\\s+\\d+부$', '', label), stage)
+            key = (re.sub(r'\s+\d+부$', '', label), stage)
             current = selected.get(key)
             if current is None or (item.get('confidence') == 'source'
                                    and current.get('confidence') != 'source'):
