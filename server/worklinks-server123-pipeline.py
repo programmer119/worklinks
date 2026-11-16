@@ -251,8 +251,13 @@ def rfp_prefer_evidence(candidate,previous,versions):
             return previous
         if candidate_ok and not previous_ok:
             return candidate
-    return (candidate if str(candidate.get('checkedAt') or '')>=
+    picked=(candidate if str(candidate.get('checkedAt') or '')>=
             str(previous.get('checkedAt') or '') else previous)
+    earlier=(previous if picked is candidate else candidate)
+    # The progress queue may demand the NEW version, but the three card badges
+    # retain the last verified finding until it is genuinely superseded.
+    from rfp_management_reconcile import preserve_last_success_thumbnail
+    return preserve_last_success_thumbnail(picked,earlier)
 
 
 def merge_rfp_coverage_before_publish(stage):
