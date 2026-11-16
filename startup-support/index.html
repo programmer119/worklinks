@@ -4970,8 +4970,9 @@ function jobRequirementEvidence(x){
  const previous=priorOverride?null:saved?.lastSuccessfulState;
  const newestSucceeded=saved?.parserCurrent===true&&
    saved?.scanComplete===true&&saved?.staffingRoleScanComplete===true;
- if(previous?.scanComplete===true&&
-    previous?.staffingRoleScanComplete===true&&!newestSucceeded){
+ if(previous?.seen===true&&!newestSucceeded){
+  const priorComplete=previous.scanComplete===true&&
+    previous.staffingRoleScanComplete===true;
   // Historical source was verified independently and identity-matched by
   // the API. A failed, pending or old-version recheck must NOT degrade
   // an existing successful badge to checking/unknown/failed.
@@ -4986,6 +4987,10 @@ function jobRequirementEvidence(x){
   for(const field of ['insurance','onsite','roles']){
    const oldStatus=priorView?.[field]?.status;
    if(!oldStatus||!valid[field].has(oldStatus.key))continue;
+   // A partially scanned historical RFP may confirm explicit POSITIVES,
+   // never infer "not required", "offsite" or free staffing from omissions.
+   if(!priorComplete&&(['not_required','offsite','role_unspecified',
+                         'role_count_unspecified'].includes(oldStatus.key)))continue;
    result[field]={...priorView[field],
      status:{...oldStatus,reason:stamp+' · '+(oldStatus.reason||'')},
      lines:[stamp,...(priorView[field].lines||[])]};
