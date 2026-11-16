@@ -72,7 +72,8 @@ jobs:
           for key,url in [
             ('progress','rfp-rescan-progress'),
             ('causes','rfp-rescan-causes?limit=150&offset=0'),
-            ('attribution','rfp-ocr-repair-attribution')]:
+            ('attribution','rfp-ocr-repair-attribution'),
+            ('pipeline','pipeline-status')]:
               try:
                 req=urllib.request.Request(base+url,headers={'Accept-Encoding':'gzip',
                   'User-Agent':'WorkLinks-Live-RFP-Cause-Audit/1.0','Cache-Control':'no-cache'})
@@ -97,6 +98,13 @@ jobs:
                        'ocrFailedPages':file.get('ocrFailedPages')}
                        for file in (row.get('files') or [])]}
                     for row in (data.get('records') or [])]
+                elif key=='pipeline':
+                  state=data.get('scheduler') or {}
+                  report[key]={'scheduler':{k:state.get(k) for k in (
+                    'rfpOpenReaderVersion','rfpOpenRepairHasMore','rfpOpenRepair',
+                    'rfpUpgrade','rfpUpgradeBatchesCompleted','rfpOpenRepairUpgradeBatch',
+                    'rfpDrainAlgorithmVersion')},
+                    'ocrRuntimeProfile':data.get('ocrRuntimeProfile')}
                 else:
                   report[key]=data
               except Exception as e:
@@ -124,7 +132,7 @@ jobs:
                     if k in ('pdfPages','ocrAttemptedPages','ocrRecoveredPages','ocrRestoredPages',
                        'ocrBatchDeferredPages','ocrFailedPages','unresolvedPages','ocrFailureDetails')}
                 } for f in files]})
-          target=Path('diagnostics/rfp-pdf-ocr-details-20261116.json')
+          target=Path('diagnostics/rfp-pdf-ocr-runtime-20261116.json')
           target.parent.mkdir(exist_ok=True)
           target.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print('AUDIT_COUNTS',json.dumps(report.get('progress',{}).get('counts'),ensure_ascii=False),flush=True)
@@ -133,6 +141,6 @@ jobs:
           PY
           git config user.name "worklinks-audit-bot"
           git config user.email "worklinks-audit-bot@users.noreply.github.com"
-          git add diagnostics/rfp-pdf-ocr-details-20261116.json
+          git add diagnostics/rfp-pdf-ocr-runtime-20261116.json
           git commit -m "audit: save read-only production RFP diagnosis"
-          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-details-20261116
+          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-runtime-20261116
