@@ -312,7 +312,8 @@ class RfpDualQueue:
                 AND download_retry_epoch<=?
                 AND (?=0 OR EXISTS(SELECT 1 FROM rfp_bulk_manifests
                     WHERE rfp_bulk_manifests.notice_key=rfp_dual_notices.notice_key))
-                ORDER BY download_retry_epoch,updated_at,notice_key LIMIT 1''',
+                ORDER BY CASE WHEN last_error='cached_original_missing' THEN 0 ELSE 1 END,
+                         download_retry_epoch,updated_at,notice_key LIMIT 1''',
                 (time.time(),int(ready_manifest))).fetchone()
             if row:
                 db.execute('''UPDATE rfp_dual_notices SET download_status='fetching',
