@@ -19,35 +19,44 @@ SCHEMA_VERSION=1
 def now_utc():
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
-# A repeated failure may be reopened only by POSITIVE source evidence:
-# verified full text, a new fully parsed attachment, confirmed PDF sibling,
-# manifest completion, or parser version. Merely swapping one failure label
-# for another ('pdf_ocr_incomplete' -> 'invalid_hwp' etc.) is NOT progress.
-# Do not include timestamps, partial error strings, retry attempt versions,
-# or other fields updated on every unsuccessful OCR pass.
+# A parser revision is handled by the durable reader_fingerprint.
+# OCR errors, partial validation flags and scan attempt versions are NOT source
+# improvements. Only verified complete source receipts may reopen a failed scan.
 def scan_evidence_signature(evidence):
     row=evidence if isinstance(evidence,dict) else {}
-    fields=('manifestComplete','classificationVersion',
-            'staffingRoleScanComplete','hwpxReaderVersion')
-    files=[]
+    receipts=[]
     for f in row.get('files') or []:
         if not isinstance(f,dict):continue
-        complete=(f.get('readable') is True and
-                  f.get('sourceTextScanComplete') is True and
-                  bool(f.get('sourceSha256')))
-        files.append({'name':f.get('name'),
-                      'verifiedFullText':bool(complete),
-                      'sourceSha256':f.get('sourceSha256') if complete else None,
-                      'staffingRoleScanVersion':f.get('staffingRoleScanVersion') if complete else None,
-                      'staffingFactScanVersion':f.get('staffingFactScanVersion') if complete else None,
-                      'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') if complete else None,
-                      'qualificationScanTruncated':f.get('qualificationScanTruncated') if complete else None,
-                      'skippedDuplicateFormat':f.get('skippedDuplicateFormat') is True,
-                      'alternatePdfSourceSha256':f.get('alternatePdfSourceSha256') or None,
-                      'staffingScopeExcluded':f.get('staffingScopeExcluded') is True})
-    compact={'notice':{k:row.get(k) for k in fields},'files':files}
+        sha=str(f.get('sourceSha256') or '')
+        if (f.get('readable') is True and
+                f.get('sourceTextScanComplete') is True and
+                len(sha)==64):
+            receipts.append((str(f.get('name') or ''),sha))
+    compact={'manifestComplete':row.get('manifestComplete') is True,
+             'verifiedFullSourceReceipts':sorted(receipts)}
     return hashlib.sha256(json.dumps(compact,sort_keys=True,
                   ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
+
+
+def scan_reopen_source_ready(evidence):
+    """Do not spend another eight-slot scan on a still-unreadable attachment.
+
+    Cached-original OCR repair runs independently and keeps partial successes.
+    Re-run final RFP extraction only when every required attachment has full
+    readable evidence (or is positively excluded/verified duplicate).
+    """
+    if not isinstance(evidence,dict) or evidence.get('manifestComplete') is not True:
+        return False
+    files=[f for f in (evidence.get('files') or []) if isinstance(f,dict)]
+    if not files:return False
+    for f in files:
+        if f.get('staffingScopeExcluded') is True or f.get('skippedDuplicateFormat') is True:
+            continue
+        if (f.get('readable') is not True or
+                f.get('sourceTextScanComplete') is not True or
+                len(str(f.get('sourceSha256') or ''))!=64):
+            return False
+    return True
 
 class RfpDualQueue:
     def __init__(self,path):
@@ -566,6 +575,10 @@ class RfpDualQueue:
             for key,sig in rows:
                 row=evidence.get(key)
                 if not isinstance(row,dict):continue
+                # A changed error label, parser-produced validation flag,
+                # or one newly repaired file among still-broken attachments
+                # does not justify another expensive, doomed scan.
+                if not scan_reopen_source_ready(row):continue
                 if scan_evidence_signature(row)==sig:continue
                 db.execute('''UPDATE rfp_dual_notices
                     SET scan_retry_epoch=0,scan_repeat_count=0,
