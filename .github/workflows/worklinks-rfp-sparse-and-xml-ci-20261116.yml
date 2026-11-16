@@ -5,6 +5,7 @@ on:
     paths:
       - scripts/refresh_worklinks_rfp.py
       - tests/test_rfp_sparse_and_misnamed_hwpx_20261116.py
+      - tests/test_rfp_verified_white_pdf_page_20261116.py
       - .github/workflows/worklinks-rfp-sparse-and-xml-ci-20261116.yml
 permissions:
   contents: read
@@ -20,3 +21,4 @@ jobs:
         run: |
           python3 -m py_compile scripts/refresh_worklinks_rfp.py
           python3 tests/test_rfp_sparse_and_misnamed_hwpx_20261116.py
+          python3 tests/test_rfp_verified_white_pdf_page_20261116.py
