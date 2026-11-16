@@ -202,6 +202,21 @@ def reader_retry_files(scan):
     return selected
 
 
+def legacy_pdf_ocr_failure(file):
+    """A PDF OCR source that has not run under the current repair reader."""
+    return (str(file.get('errorCategory') or '')=='pdf_ocr_incomplete'
+            and str(file.get('lastReaderAttemptVersion') or '')!=READER_ATTEMPT_VERSION)
+
+
+def ordered_retry_files(scan,prioritize_legacy_pdf_ocr=False):
+    """Reserved PDF OCR slots must select the PDF OCR file, not a ZIP/HWP sibling."""
+    pending=reader_retry_files(scan)
+    if prioritize_legacy_pdf_ocr:
+        return sorted(pending,key=lambda f:(
+            0 if legacy_pdf_ocr_failure(f) else 1,repair_file_priority(f)))
+    return sorted(pending,key=repair_file_priority)
+
+
 def metadata_valid(metadata,scan):
     if not isinstance(metadata,dict):return False
     doc=metadata.get('attachments') or {}
@@ -325,7 +340,7 @@ def fetch_verified_raw(source,ledgerpath,expected_sha):
     return raw,'verified_cache'
 
 
-def process_one(key,scan,meta,ledger,file_limit=None):
+def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=False):
     """No successful file is downloaded, parsed, or overwritten."""
     manifest=meta['attachments']['items']
     byname={}
@@ -339,7 +354,7 @@ def process_one(key,scan,meta,ledger,file_limit=None):
     counts['alternate_pdf_evidence']+=rfp.annotate_official_pdf_siblings(scan['files'])
     # Examine all notice siblings together. The single-file wrapper here
     # previously lost the verified PDF companion and retried covered HWP.
-    pending=sorted(reader_retry_files(scan),key=repair_file_priority)
+    pending=ordered_retry_files(scan,prioritize_legacy_pdf_ocr)
     if file_limit is not None:
         pending=pending[:max(0,int(file_limit))]
     receipts={f['url']:f for f in meta.get('downloadVerifiedFiles') or []
@@ -697,18 +712,13 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
             categories['download_manifest_mismatch']+=1;continue
         src='verified_download_queue'
         categories['ready']+=1
-        old_ocr=any(
-            str(f.get('errorCategory') or '') in (
-                'pdf_ocr_incomplete','ocr_deferred_to_repair',
-                'pdf_unreadable_page','image_ocr_incomplete',
-                'hwpx_image_ocr_deferred_to_repair')
-            and f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION
-            for f in broken)
+        old_ocr=any(legacy_pdf_ocr_failure(f) for f in broken)
         candidates.append((min(repair_file_priority(f) for f in broken),
                            ends,key,meta,src,len(broken),
                            repair_completion_score(scan,broken),old_ocr))
     selected,selected_file_count=choose_repair_batch(candidates,limit,max_files,
         per_notice_cap=per_notice_cap,minimum_old_ocr=minimum_old_ocr)
+    legacy_pdf_keys={item[2] for item in candidates if item[7] is True}
     print('OPEN_RFP_CACHED_REPAIR_PLAN',json.dumps({
       'cutoffUTC':(now+dt.timedelta(hours=24)).isoformat(),
       'counts':dict(categories),'selectedNotices':len(selected),
@@ -784,17 +794,18 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
             fresh=current_verified_download_metadata(queue_path,key)
             if not fresh or fresh.get('downloadVerifiedFiles')!=meta.get('downloadVerifiedFiles'):
                 tally['download_receipt_changed']+=1;continue
-            tasks.append((key,meta,file_limit,current))
+            tasks.append((key,meta,file_limit,current,key in legacy_pdf_keys))
         print('OPEN_RFP_PARALLEL_WORKERS',json.dumps({
             'workers':min(max(1,int(workers)),3,len(tasks)) if tasks else 0,
             'selectedFiles':sum(x[2] for x in tasks),
             'noticeCount':len(tasks)},separators=(',',':')),flush=True)
         def extract_task(item):
-            key,meta,file_limit,current=item
+            key,meta,file_limit,current,prefer_pdf=item
             work=json.loads(json.dumps(current,ensure_ascii=False))
             begun=time.perf_counter()
             recovered,counters=process_one(
-                key,work,meta,ledger,file_limit=file_limit)
+                key,work,meta,ledger,file_limit=file_limit,
+                prioritize_legacy_pdf_ocr=prefer_pdf)
             return work,recovered,counters,time.perf_counter()-begun
 
         # OCR itself runs in up to three independent subprocesses, via separate
@@ -806,7 +817,7 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             futures={executor.submit(extract_task,item):item for item in tasks}
             for future in as_completed(futures):
-                key,meta,file_limit,current=futures[future]
+                key,meta,file_limit,current,prefer_pdf=futures[future]
                 try:
                     work,additions,counters,elapsed=future.result()
                 except VerifiedOriginalMissing as exc:
