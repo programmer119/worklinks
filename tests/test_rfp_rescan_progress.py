@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Read-only notice progress: immutable test clock, no public API calls."""
 import datetime
+import json
 from pathlib import Path
 import runpy
 
