@@ -28,14 +28,14 @@ def office_xml(chars):
 
 
 def test_full_source_ceiling():
-    assert rfp.RFP_QUALIFICATION_TEXT_LIMIT == 4_000_000
-    verified=rfp.extract_office_xml_stream(office_xml(1_050_000),'.xlsx')
-    assert len(verified)>1_000_000
+    assert rfp.RFP_QUALIFICATION_TEXT_LIMIT == 6_000_000
+    verified=rfp.extract_office_xml_stream(office_xml(5_100_000),'.xlsx')
+    assert len(verified)>5_000_000
     assert len(verified)<=rfp.RFP_QUALIFICATION_TEXT_LIMIT
     assert verified[-8:] == 'A'*8
     # Do not silently skip unprocessed XML rows or claim partial scan success.
     try:
-        rfp.extract_office_xml_stream(office_xml(4_100_000),'.xlsx')
+        rfp.extract_office_xml_stream(office_xml(6_100_000),'.xlsx')
     except ValueError as error:
         assert str(error)=='source_text_scan_limit',error
     else:
