@@ -742,7 +742,8 @@ def source_verified_current_repair_rows(root,snapshot_rows):
 
 
 def run(data_dir,limit,execute=False,max_files=400,workers=1,
-        per_notice_cap=3,minimum_old_ocr=0,minimum_format_fixes=0):
+        per_notice_cap=3,minimum_old_ocr=0,minimum_format_fixes=0,
+        only_notices=None):
     root=Path(data_dir)
     snap=root/'snapshots'
     coverage_path=snap/'rfp-coverage-index.json'
@@ -764,6 +765,9 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
         root,read_json(coverage_path).get('byNotice') or {})
     now=dt.datetime.now(dt.timezone.utc)
     open_rows=open_candidates(root,now)
+    if only_notices is not None:
+        allowed=set(only_notices)
+        open_rows=[item for item in open_rows if item[0] in allowed]
     candidates=[];categories=Counter();selected_file_count=0
     for key,ends in open_rows:
         scan=entries.get(key)
@@ -978,6 +982,8 @@ if __name__=='__main__':
     p.add_argument('--limit',type=int,default=60)
     p.add_argument('--max-files',type=int,default=150)
     p.add_argument('--execute',action='store_true')
+    p.add_argument('--only-notice',action='append',dest='only_notices',
+                   help='Repair only specified official notice key; may repeat')
     p.add_argument('--workers',type=int,default=1,
                    help='parallel OCR workers; maximum 3 to protect server123')
     p.add_argument('--per-notice-file-cap',type=int,default=3)
@@ -988,4 +994,5 @@ if __name__=='__main__':
         max(1,min(args.max_files,600)),max(1,min(args.workers,3)),
         per_notice_cap=max(1,min(args.per_notice_file_cap,3)),
         minimum_old_ocr=max(0,min(args.minimum_old_ocr,3)),
-        minimum_format_fixes=max(0,min(args.minimum_format_fixes,3)))
+        minimum_format_fixes=max(0,min(args.minimum_format_fixes,3)),
+        only_notices=set(args.only_notices) if args.only_notices else None)
