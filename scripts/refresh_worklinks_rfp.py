@@ -2142,10 +2142,10 @@ def extract(name,raw):
         item['exclusiveSeconds']+=max(0.0,total-frame['child'])
 
 
-# Scan up to 4M actual source characters, including long verified OOXML
-# spreadsheets. This is a full-text ceiling, not a license to mark truncated
-# documents complete; sources above it still fail closed.
-RFP_QUALIFICATION_TEXT_LIMIT=4_000_000
+# Scan up to 6M source characters including SHA-verified large OOXML
+# spreadsheets (a real 5,076,036-character XLSM was failing under 4M).
+# This remains a complete-source bound: larger files still fail closed.
+RFP_QUALIFICATION_TEXT_LIMIT=6_000_000
 
 def parse_clauses(text):
     text=re.sub(r'[\u200b\ufeff\x00]','',text)
