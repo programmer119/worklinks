@@ -1143,8 +1143,22 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                     old=row
                 if old is not None and rfp_same_thumbnail_source(row,old):
                     old_state=saved_rfp_search_state(old,compact=compact,historical=True)
-                    if (old_state.get('scanComplete') is True and
-                            old_state.get('staffingRoleScanComplete') is True):
+                    readable_names={str(f.get('name') or '') for f in old.get('files') or []
+                        if isinstance(f,dict) and f.get('readable') is True and
+                        f.get('sourceTextScanComplete') is True and
+                        len(str(f.get('sourceSha256') or ''))==64}
+                    # Incomplete prior documents may still contain confirmed
+                    # POSITIVE requirements. A negative remains valid only
+                    # after a fully verified historical source scan.
+                    cited_positive=any(isinstance(item,dict) and
+                        str(item.get('sourceFile') or '') in readable_names and
+                        str(item.get('sourceText') or item.get('text') or '').strip()
+                        for item in (old.get('staffingRoles') or [])+
+                                    (old.get('staffingFacts') or [])+
+                                    (old.get('thumbnailClauses') or []))
+                    if ((old_state.get('scanComplete') is True and
+                            old_state.get('staffingRoleScanComplete') is True)
+                            or cited_positive):
                         old_state['checkedAt']=str(old.get('checkedAt') or '')
                         old_state['classificationVersion']=int(old.get('classificationVersion') or 0)
                         old_state['hwpxReaderVersion']=int(old.get('hwpxReaderVersion') or 0)
