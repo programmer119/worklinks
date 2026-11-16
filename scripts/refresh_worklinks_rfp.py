@@ -44,6 +44,10 @@ _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
 RFP_TEXT_CACHE_VERSION=6
+# A child reader or a native library may print to stdout during PDF/HWP/ZIP
+# parsing. Its diagnostic text must not corrupt the structured extraction
+# result; the final sentinel is emitted AFTER all parsing has completed.
+_RFP_EXTRACT_CHILD_MARKER=b'\n__WORKLINKS_EXTRACT_RESULT_V2__'
 
 # Run potentially unbounded PDF/HWP/ZIP text extraction in a disposable child.
 # An expensive vector-drawing PDF must never hold every other stage-3 notice
@@ -57,8 +61,29 @@ try:
     result={'ok':True,'text':value,'evidence':evidence}
 except Exception as error:
     result={'ok':False,'error':type(error).__name__,'detail':str(error)[:180]}
-sys.stdout.write(json.dumps(result,ensure_ascii=False,separators=(',',':')))
+sys.stdout.write('\n__WORKLINKS_EXTRACT_RESULT_V2__'+json.dumps(result,ensure_ascii=False,separators=(',',':')))
 """
+
+def decode_extraction_child_result(stdout):
+    """Read the final framed child reply; ignore noisy native parser stdout."""
+    if not isinstance(stdout,bytes) or len(stdout)>16_000_000:
+        raise ValueError('source_extraction_output_too_large')
+    start=stdout.rfind(_RFP_EXTRACT_CHILD_MARKER)
+    if start<0:
+        raise ValueError('isolated_extraction_worker_reply_invalid')
+    try:
+        data=json.loads(stdout[start+len(_RFP_EXTRACT_CHILD_MARKER):])
+        if not isinstance(data,dict) or not isinstance(data.get('ok'),bool):
+            raise ValueError('invalid_result_shape')
+    except (ValueError,UnicodeDecodeError,TypeError) as error:
+        raise ValueError('isolated_extraction_worker_reply_invalid') from error
+    if data['ok'] is not True:
+        raise ValueError(str(data.get('detail') or data.get('error') or
+                         'isolated_extraction_worker_failed')[:180])
+    if not isinstance(data.get('text'),str) or not isinstance(data.get('evidence'),dict):
+        raise ValueError('isolated_extraction_worker_reply_invalid')
+    return data['text'],data['evidence']
+
 
 def bounded_source_extract(name, raw):
     try:
@@ -78,14 +103,7 @@ def bounded_source_extract(name, raw):
         raise ValueError('isolated_extraction_worker_failed')
     if len(result.stdout)>16_000_000:
         raise ValueError('source_extraction_output_too_large')
-    try:
-        message=json.loads(result.stdout)
-        if message.get('ok') is True and isinstance(message.get('text'),str) and isinstance(message.get('evidence'),dict):
-            return message['text'],message['evidence']
-        detail=str(message.get('detail') or message.get('error') or 'isolated_extraction_worker_failed')
-    except (ValueError,UnicodeDecodeError,AttributeError,TypeError) as error:
-        raise ValueError('isolated_extraction_worker_reply_invalid') from error
-    raise ValueError(detail[:180])
+    return decode_extraction_child_result(result.stdout)
 
 
 def extract_cached_text(name, raw):
