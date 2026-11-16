@@ -36,6 +36,7 @@ except ModuleNotFoundError as exc:
     import sys
     sys.path.insert(0,str(Path(__file__).resolve().parent))
     from rfp_call_ledger import CallLedger, cache_key
+    from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
