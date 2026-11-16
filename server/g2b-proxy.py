@@ -1139,7 +1139,7 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                         state.get('staffingRoleScanComplete') is True):
                     old=row  # old-reader complete data; current parser only stale
                 if old is not None and rfp_same_thumbnail_source(row,old):
-                    old_state=saved_rfp_search_state(old,compact=compact)
+                    old_state=saved_rfp_search_state(old,compact=compact,historical=True)
                     if (old_state.get('scanComplete') is True and
                             old_state.get('staffingRoleScanComplete') is True):
                         old_state['checkedAt']=str(old.get('checkedAt') or '')
@@ -1174,7 +1174,7 @@ def rfp_card_evidence_batch(raw_keys):
             'count':len(keys),'upstreamCalls':0}
 
 
-def saved_rfp_search_state(row, compact=False):
+def saved_rfp_search_state(row, compact=False, historical=False):
     """Expose persisted RFP scan provenance; never call official API on page load."""
     if not isinstance(row,dict):
         return {'sourceAvailable':True,'seen':False,
@@ -1307,7 +1307,7 @@ def saved_rfp_search_state(row, compact=False):
              bool(f.get('alternatePdfSourceSha256'))) or
             (f.get('readable') is True and
              f.get('sourceTextScanComplete') is True and
-             int(f.get('staffingRoleScanVersion') or 0)>=4 and
+             int(f.get('staffingRoleScanVersion') or 0)>=(1 if historical else 4) and
              f.get('staffingRoleScanTruncated') is not True)
             for i,f in enumerate(files)))
     # The ordinary list needs only a tiny, deterministic hint per row, not
