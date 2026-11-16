@@ -30,7 +30,7 @@ RFP_PERIOD = max(3600, int(os.environ.get('G2B_RFP_PERIOD', 3600)))
 # Recheck/failed-job cooldown only. Successful triggered batches continue immediately.
 RFP_UPGRADE_PERIOD = max(300, int(os.environ.get('G2B_RFP_UPGRADE_PERIOD', 600)))
 RFP_UPGRADE_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_UPGRADE_BATCH', 8))))
-RFP_DRAIN_ALGORITHM_VERSION = 'full-management-cohort-reconcile-v7-ocr-durable-20261115'
+RFP_DRAIN_ALGORITHM_VERSION = 'full-management-cohort-reconcile-v8-source-repair-status-20261116'
 SHORTLIST_PERIOD = max(10800, int(os.environ.get('G2B_SHORTLIST_PERIOD', 10800)))
 AWARD_FALLBACK_PERIOD = max(14400, int(os.environ.get('G2B_OPEN_AWARD_PERIOD', 14400)))
 RFP_LIMIT = max(1, min(8, int(os.environ.get('G2B_RFP_BATCH', 8))))
@@ -44,7 +44,7 @@ RFP_OCR_SCAN_BATCH_INTERVAL = 4
 # When download-ready work is on scan-retry cooldown, OCR repair is independent
 # of upstream file requests and must continue using saved verified originals.
 RFP_OCR_IDLE_PERIOD = 120
-RFP_OPEN_READER_VERSION='real-byte-recursive-office-v16-20261116'
+RFP_OPEN_READER_VERSION='framed-isolated-extract-v17-20261116'
 # Enqueue one bounded official RFP pass after staffing-role parser upgrades.
 RFP_STAFFING_READER_VERSION='v7-form-scope-and-two-live-notice-rescan-20261113'
 # Explicit short-lived recovery selection; candidates rotate out once fully scanned.
@@ -598,10 +598,11 @@ def run_once(kind, runner=None, _single=False):
             counters=q.stats()
             if counters['total'] and counters['scan']['done']==counters['total']:
                 return False
-            log('RFP_DUAL_WAIT_ORIGINALS',
+            wait_reason=q.scan_wait_reason()
+            log('RFP_DUAL_WAIT_REASON',wait_reason,
                 counters['download']['done'],counters['download']['total'],
                 counters['scan']['done'],counters['scan']['total'])
-            return 'download_wait'
+            return wait_reason if wait_reason!='no_eligible_now' else False
     if kind not in PUBLISHED:
         raise ValueError('unknown_pipeline_kind')
     if kind == 'rfpOpenRepair' and runner is None and not _single:
@@ -760,7 +761,8 @@ def run_once(kind, runner=None, _single=False):
             reason = details[-1][:130] if details else 'missing_child_diagnostics'
             raise RuntimeError('pipeline_' + kind + '_failed: ' + reason)
         if kind=='rfpUpgrade' and dual_enabled and 'RFP_DUAL_SCAN_NO_READY' in (completed.stdout or ''):
-            return 'download_wait'
+            from rfp_dual_queue import RfpDualQueue
+            return RfpDualQueue(DATA/'rfp-dual-queue.sqlite3').scan_wait_reason()
         if kind=='rfpUpgrade' and 'RFP_UPGRADE_SELECT_COUNT 0' in (completed.stdout or ''):
             if ('SAVED_NOTICE_DISCOVERY_UNAVAILABLE' in (completed.stdout or '') or
                     'RFP_DISCOVER_SERVER_ERROR' in (completed.stdout or '')):
@@ -905,7 +907,8 @@ def iteration(current=None, runner=None):
             # between every saved source. An empty plan uses normal backoff.
             idle_period=(15 if state.get('rfpOpenRepairHasMore') is True
                          else RFP_OCR_IDLE_PERIOD)
-            ocr_due_idle=(drain_status in ('waiting_for_download','no_eligible_now','failed')
+            ocr_due_idle=(drain_status in ('waiting_for_download','waiting_for_source_repair',
+                                       'waiting_for_source','no_eligible_now','failed')
                           and now-last_attempt>=idle_period)
             # One local-only repair slice between scan batches, or every two
             # minutes while the main scan is blocked on retry/eligibility.
@@ -932,6 +935,13 @@ def iteration(current=None, runner=None):
                     entry.update(status='waiting_for_download',successEpoch=finished,
                                  retryAfterEpoch=finished+5)
                     log('PIPELINE_RFP_WAIT_DOWNLOADER',5,'seconds')
+                elif more in ('source_repair_wait','source_missing_wait'):
+                    entry.update(status=('waiting_for_source_repair'
+                                          if more=='source_repair_wait'
+                                          else 'waiting_for_source'),
+                                 successEpoch=finished,
+                                 retryAfterEpoch=finished+15)
+                    log('PIPELINE_RFP_SOURCE_REPAIR_REQUIRED',more)
                 elif more is False:
                     # No eligible item *now* does not mean the 2k+ remaining
                     # notices are complete: some may need official-file retry.
@@ -1253,7 +1263,8 @@ def main():
             # jobs fair (one bounded RFP batch per loop) and never spin while
             # the upstream service is rate-limited or no items are eligible.
             time.sleep(1 if (state.get('rfpUpgradeActive') is True and
-                              drain.get('status') in ('ok','waiting_for_download')) else
+                              drain.get('status') in ('ok','waiting_for_download',
+                                  'waiting_for_source_repair','waiting_for_source')) else
                        15 if state.get('rfpUpgradeActive') is True else 90)
 
 
