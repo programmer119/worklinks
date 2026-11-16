@@ -201,4 +201,27 @@ with tempfile.TemporaryDirectory() as tmp:
     reconciliation=q.reconcile_management({key:'2099-12-31'},{key},'reader-v1')
     with q.connect() as db:
         assert db.execute('SELECT last_error FROM rfp_dual_notices WHERE notice_key=?',(key,)).fetchone()==('',)
+# A one-file OCR repair must NOT reopen a notice whose other attachment is
+# still unreadable; otherwise the same failing notice loops for hours.
+from rfp_dual_queue import scan_reopen_source_ready
+valid_full={'name':'a.pdf','sourceSha256':'a'*64,'readable':True,'sourceTextScanComplete':True}
+broken={'name':'b.pdf','sourceSha256':'b'*64,'readable':False,
+        'sourceTextScanComplete':False,'errorCategory':'pdf_ocr_incomplete'}
+partial={'manifestComplete':True,'files':[valid_full,broken]}
+assert not scan_reopen_source_ready(partial)
+assert not scan_reopen_source_ready(dict(partial,manifestComplete=False))
+assert not scan_reopen_source_ready({'manifestComplete':True,'files':[]})
+moved_error={'manifestComplete':True,'files':[valid_full,dict(broken,errorCategory='file_extract_failure')]}
+assert scan_evidence_signature(partial)==scan_evidence_signature(moved_error)
+changed_validation=dict(partial,staffingRoleScanComplete=True,classificationVersion=999,
+                        status='temporary_error')
+assert scan_evidence_signature(partial)==scan_evidence_signature(changed_validation)
+finished={'manifestComplete':True,'files':[valid_full,
+          dict(broken,sourceSha256='c'*64,readable=True,sourceTextScanComplete=True,errorCategory='')]}
+assert scan_reopen_source_ready(finished)
+assert scan_evidence_signature(finished)!=scan_evidence_signature(partial)
+duplicate={'manifestComplete':True,'files':[valid_full,dict(broken,skippedDuplicateFormat=True)]}
+assert scan_reopen_source_ready(duplicate)
+print('RFP_RESCAN_ONLY_AFTER_FULL_VERIFIED_REQUIRED_FILES=PASS')
+
 print('RFP_SCAN_RETRY_REASON_DEDUP_AND_STATE_RECONCILIATION=PASS')
