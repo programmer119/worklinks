@@ -53,4 +53,23 @@ with patch.dict(os.environ,{},clear=False):
 with patch.dict(os.environ,{'WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR':'1'}):
     assert repair.reader_retry_files(scan)==[file]
     assert not repair.reader_retry_files({'files':[dict(file,name='unsafe.docx')]}), 'PDF only'
+# Old-version failure cooldown must not block a NEW, verified and explicitly
+# scoped OCR strategy. Normal, unscoped runs still honor the cooldown.
+pdf_reader=reader.PdfReader if hasattr(reader,'PdfReader') else None
+with patch.object(reader,'_pdf_ocr_page_cache',return_value=(None,'sha',{})),\
+     patch.object(reader,'_pdf_ocr_failed_page_cooldowns',return_value={0:'old_22s_timeout'}),\
+     patch.object(reader,'_ocr_pdf_page',return_value=valid.decode()):
+    with patch.dict(os.environ,{'WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR':'1',
+                                'WORKLINKS_RFP_DENSE_IMAGE_FAST_ONLY':'1'}):
+        extracted,evidence=reader.extract_with_source_status('drawing.pdf',raw)
+        assert evidence['sourceComplete'] is True,evidence
+        assert '계약서 정부 사업' in extracted
+    with patch.dict(os.environ,{'WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR':'0',
+                                'WORKLINKS_RFP_DENSE_IMAGE_FAST_ONLY':'0'}):
+        try:
+            _,evidence=reader.extract_with_source_status('drawing.pdf',raw)
+            assert evidence['sourceComplete'] is False,evidence
+        except ValueError as error:
+            assert str(error)=='pdf_ocr_incomplete'
+
 print('WORKLINKS_DENSE_IMAGE_PSM11_OPTIN_CONFIDENCE_AND_SOURCE_SCOPE=PASS')
