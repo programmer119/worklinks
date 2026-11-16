@@ -160,6 +160,7 @@ MAX_FILE=100_000_000
 # OCR is local-only and bounded to prevent runaway attachment processing.
 MAX_PDF_OCR_PAGES=24
 PDF_OCR_PAGE_CACHE_VERSION=1
+SPARSE_OCR_PAGE_CACHE_VERSION=1001  # consensus + sparse render guard
 # Time-budget each OCR pass so the 180s isolated extractor cannot discard
 # unfinished work without emitting the next-page checkpoint evidence.
 PDF_OCR_PASS_SECONDS=115
@@ -787,6 +788,23 @@ def _ocr_pdf_region_candidate(page,pymupdf):
     return clip,ratio
 
 
+def verified_sparse_ocr_text(psm6,psm11,nonwhite_ratio,display_objects):
+    """Accept short OCR ONLY when two page-segmentation modes agree and
+    the verified original page contains very little visible ink.
+
+    Scans of legal prose, diagrams, or unmatched OCR guesses remain FAILED.
+    This resolves real official title/logo pages without a blanket <12 waiver.
+    """
+    a=''.join(c for c in str(psm6 or '') if c.isalnum())
+    b=''.join(c for c in str(psm11 or '') if c.isalnum())
+    korean=sum('\uac00'<=c<='\ud7a3' for c in a)
+    if not (4<=len(a)<12 and a==b and korean>=3
+            and 0<=nonwhite_ratio<=0.012
+            and 0<=display_objects<=7):
+        return ''
+    return str(psm6)
+
+
 def _ocr_pdf_page(raw,index):
     """OCR a page with one reusable PyMuPDF handle per verified PDF source.
 
@@ -867,6 +885,7 @@ def _ocr_pdf_page(raw,index):
             best_chars=sum(c.isalnum() for c in best)
             page_profile['sparseOcrBaselineAlnum']=best_chars
             page_profile['sparseOcrAttempts']=[]
+            sparse_candidates={}
             for sparse_mode in ('6','11'):
                 sparse_started=time.perf_counter()
                 try:
@@ -878,6 +897,7 @@ def _ocr_pdf_page(raw,index):
                                  OMP_THREAD_LIMIT=str(PDF_OCR_TESSERACT_OMP_THREADS)))
                     candidate=sparse.stdout.decode('utf-8','replace')
                     alnum=sum(c.isalnum() for c in candidate) if sparse.returncode==0 else 0
+                    if sparse.returncode==0:sparse_candidates[sparse_mode]=candidate
                     page_profile['sparseOcrAttempts'].append({
                         'psm':int(sparse_mode),'alnum':alnum,
                         'exitCode':sparse.returncode})
@@ -893,8 +913,28 @@ def _ocr_pdf_page(raw,index):
                     page_profile['tesseractSeconds']=round(
                         float(page_profile.get('tesseractSeconds') or 0)+extra,4)
                     if reusable:context['tesseractSeconds']+=extra
-            # No invented text: if every variant remains <12, the caller
-            # keeps the page unresolved and records a precise audit reason.
+            # A real sparse cover may contain 4-11 Korean alphanumerics.
+            # Require independent PSM6 and PSM11 consensus, <=1.2% dark ink,
+            # and <=7 drawing objects on the ACTUAL SHA-verified PDF page.
+            if sparse_candidates.get('6') and sparse_candidates.get('11'):
+                pixels=pix.samples
+                channel=max(1,pix.n)
+                step=max(channel,(max(1,len(pixels)//150000//channel))*channel)
+                sample=pixels[::step]
+                ratio=sum(byte<225 for byte in sample)/max(1,len(sample))
+                try:display_count=len(page.get_bboxlog())
+                except Exception:display_count=999
+                agreed=verified_sparse_ocr_text(
+                    sparse_candidates['6'],sparse_candidates['11'],
+                    ratio,display_count)
+                if agreed:
+                    best=agreed
+                    best_chars=sum(ch.isalnum() for ch in agreed)
+                    page_profile['sparseOcrConsensusVerified']=True
+                    page_profile['sparseOcrVisualInkRatio']=round(ratio,6)
+                    page_profile['sparseOcrDisplayObjects']=display_count
+                    page_profile['sparseOcrSelectedPsm']=6
+            # Without verified consensus, a sparse page remains incomplete.
             baseline=best
             page_profile['sparseOcrFinalAlnum']=best_chars
         # Real-source A/B only. Production output and SHA page receipts remain
@@ -995,12 +1035,14 @@ def _pdf_ocr_page_cache(raw):
             PRIMARY KEY(pdf_sha256,page_index,reader_version))''')
         digest=hashlib.sha256(raw).hexdigest()
         previous=connection.execute(
-            'SELECT page_index,text,text_sha256 FROM rfp_pdf_ocr_page_receipts '
-            'WHERE pdf_sha256=? AND reader_version=?',
-            (digest,PDF_OCR_PAGE_CACHE_VERSION)).fetchall()
-        cached={index:value for index,value,signature in previous
+            'SELECT page_index,reader_version,text,text_sha256 FROM rfp_pdf_ocr_page_receipts '
+            'WHERE pdf_sha256=? AND reader_version IN (?,?)',
+            (digest,PDF_OCR_PAGE_CACHE_VERSION,SPARSE_OCR_PAGE_CACHE_VERSION)).fetchall()
+        cached={index:value for index,version,value,signature in previous
             if hashlib.sha256(value.encode('utf-8')).hexdigest()==signature
-            and sum(c.isalnum() for c in value)>=12}
+            and (sum(c.isalnum() for c in value)>=12
+                 or (version==SPARSE_OCR_PAGE_CACHE_VERSION
+                     and 4<=sum(c.isalnum() for c in value)<12))}
         return connection,digest,cached
     except BaseException:
         connection.close()
@@ -1246,7 +1288,10 @@ def _extract_pdf_with_audit(raw):
                     'reason':'ocr_timeout_22s' if isinstance(error,subprocess.TimeoutExpired)
                     else str(error)[:120]})
                 continue
-            if sum(c.isalnum() for c in value)<12:
+            sparse_verified=any(
+                item.get('page')==i+1 and item.get('sparseOcrConsensusVerified')
+                for item in render_cache.get('pageProfiles',[]))
+            if sum(c.isalnum() for c in value)<12 and not sparse_verified:
                 # A SHA-verified government contract PDF has a genuinely
                 # empty page 45: no rendered marks in 500,395 white pixels.
                 # Failed OCR on pure white is not missing legal source text.
@@ -1265,7 +1310,8 @@ def _extract_pdf_with_audit(raw):
                 connection.execute('''INSERT OR IGNORE INTO rfp_pdf_ocr_page_receipts
                     (pdf_sha256,page_index,reader_version,text,text_sha256,stored_at)
                     VALUES(?,?,?,?,?,?)''',
-                    (digest,i,PDF_OCR_PAGE_CACHE_VERSION,value,
+                    (digest,i,(SPARSE_OCR_PAGE_CACHE_VERSION if sparse_verified
+                               else PDF_OCR_PAGE_CACHE_VERSION),value,
                      hashlib.sha256(encoded).hexdigest(),
                      dt.datetime.now(dt.timezone.utc).isoformat()))
                 connection.commit()
