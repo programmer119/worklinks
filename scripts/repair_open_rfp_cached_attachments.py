@@ -27,7 +27,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='real-byte-recursive-office-v16-20261116'
+READER_ATTEMPT_VERSION='framed-isolated-extract-v17-20261116'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -100,6 +100,11 @@ def repair_file_priority(f):
     """Prioritize reader-fixable, already downloaded files over repeated HWP failures."""
     category=str(f.get('errorCategory') or '')
     suffix=Path(str(f.get('name') or '')).suffix.lower()
+    # Repair parser output framing for sources whose child emitted diagnostics
+    # alongside JSON; these errors are often not failures of the source bytes.
+    if category in ('isolated_extraction_worker_reply_invalid',
+                    'isolated_extraction_worker_failed'):
+        return -4
     # Image-only HWPX members in two verified nine-document ZIP notices used
     # to make the entire archive no_searchable_text. Reader v7 recognizes
     # BinData/BMP OCR: recheck these saved ZIPs promptly, without any GET.
@@ -193,12 +198,30 @@ def repair_completion_score(scan,pending):
 
 
 def reader_retry_files(scan):
-    """Resume OCR page slices until done; do not loop over unchanging failures."""
+    """Resume OCR progress and one bounded retry for transient child failures.
+
+    Stable unreadable bytes never create a forever-retrying OCR queue.
+    """
     selected=[]
+    transient={'isolated_extraction_worker_reply_invalid',
+               'isolated_extraction_worker_failed',
+               'source_extraction_timeout_deferred',
+               'file_extract_failure'}
     for f in failed_files(scan):
         if f.get('lastReaderAttemptVersion')!=READER_ATTEMPT_VERSION:
             selected.append(f)
             continue
+        if (str(f.get('errorCategory') or '') in transient
+                and int(f.get('lastReaderTransientRetryCount') or 0)<1):
+            try:
+                stamp=dt.datetime.fromisoformat(
+                    str(f.get('lastReaderAttemptAt') or '').replace('Z','+00:00'))
+                aged=(dt.datetime.now(dt.timezone.utc)-stamp).total_seconds()
+            except (ValueError,TypeError,OverflowError):
+                aged=300
+            if aged>=120:
+                selected.append(f)
+                continue
         evidence=f.get('extractionEvidence') or {}
         if (str(f.get('errorCategory') or '')=='pdf_ocr_incomplete'
                 and int(evidence.get('ocrBatchDeferredPages') or 0)>0
@@ -385,6 +408,11 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
               if isinstance(f,dict) and f.get('url') and f.get('sha256')}
     for f in scan['files']:
         if f not in pending:continue
+        previous_version=str(f.get('lastReaderAttemptVersion') or '')
+        if previous_version==READER_ATTEMPT_VERSION:
+            f['lastReaderTransientRetryCount']=int(f.get('lastReaderTransientRetryCount') or 0)+1
+        else:
+            f['lastReaderTransientRetryCount']=0
         f['lastReaderAttemptVersion']=READER_ATTEMPT_VERSION
         f['lastReaderAttemptAt']=dt.datetime.now(dt.timezone.utc).isoformat()
         counts['reader_attempt_recorded']+=1
