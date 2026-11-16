@@ -1331,6 +1331,8 @@ def extract_with_source_status(name,raw):
     previous_extract_stack=getattr(_DOCUMENT_SCAN,'extract_stack',None)
     previous_zip_depth=getattr(_DOCUMENT_SCAN,'zip_depth',None)
     previous_zip_expanded=getattr(_DOCUMENT_SCAN,'zip_expanded_bytes',None)
+    previous_protected=getattr(_DOCUMENT_SCAN,'protected_archive_members',None)
+    _DOCUMENT_SCAN.protected_archive_members=[]
     _DOCUMENT_SCAN.format_times={}
     _DOCUMENT_SCAN.extract_stack=[]
     _DOCUMENT_SCAN.zip_depth=0
@@ -1341,8 +1343,13 @@ def extract_with_source_status(name,raw):
     try:
         data=extract(name,raw)
         pdf_stats=list(_DOCUMENT_SCAN.pdf)
-        complete=all(x.get('sourceComplete') is True for x in pdf_stats)
-        return data,{'sourceComplete':complete,'pdfFiles':len(pdf_stats),
+        protected_members=list(_DOCUMENT_SCAN.protected_archive_members)
+        complete=(all(x.get('sourceComplete') is True for x in pdf_stats)
+                  and not protected_members)
+        return data,{'sourceComplete':complete,
+                     'protectedArchiveMembers':protected_members[:30],
+                     'protectedMemberCount':len(protected_members),
+                     'pdfFiles':len(pdf_stats),
                      'pdfPages':sum(x['pdfPages'] for x in pdf_stats),
                      'ocrAttemptedPages':sum(x['ocrAttemptedPages'] for x in pdf_stats),
                      'ocrRecoveredPages':sum(x['ocrRecoveredPages'] for x in pdf_stats),
@@ -1409,6 +1416,10 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.zip_expanded_bytes
             except AttributeError:pass
         else:_DOCUMENT_SCAN.zip_expanded_bytes=previous_zip_expanded
+        if previous_protected is None:
+            try:del _DOCUMENT_SCAN.protected_archive_members
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.protected_archive_members=previous_protected
 
 
 def classify_failure(error):
@@ -2132,7 +2143,16 @@ def _extract_dispatch(name,raw):
                               '.hml','.htm','.html','.cell',
                               '.png','.jpg','.jpeg','.bmp','.webp','.tif','.tiff'}:
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
-                    value=extract(inner,archive.read(entry))
+                    try:
+                        value=extract(inner,archive.read(entry))
+                    except ValueError as err:
+                        if str(err)=='drm_protected_original_requires_authorized_decryption':
+                            # Keep extracting every *unprotected* original in
+                            # this verified ZIP. Still fail full source coverage
+                            # until the protected member is authorized.
+                            _DOCUMENT_SCAN.protected_archive_members.append(inner[:200])
+                            continue
+                        raise
                     if not value.strip():raise ValueError('no_searchable_text')
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix=='.zip':
@@ -2164,7 +2184,10 @@ def _extract_dispatch(name,raw):
                 elif suffix not in {'.png','.jpg','.jpeg','.gif','.bmp','.webp','.xml',
                                      '.rels','.md'}:
                     raise ValueError('unknown_archive_member_requires_review:'+inner[:100])
-        if not parts:raise ValueError('archive_no_searchable_documents')
+        if not parts:
+            if getattr(_DOCUMENT_SCAN,'protected_archive_members',None):
+                raise ValueError('drm_protected_original_requires_authorized_decryption')
+            raise ValueError('archive_no_searchable_documents')
         return '\n'.join(parts)
     if n.endswith(('.docx','.xlsx','.pptx')):
         return extract_office_xml_stream(raw,n)
