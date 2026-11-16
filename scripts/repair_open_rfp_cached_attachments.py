@@ -213,6 +213,17 @@ def reader_retry_files(scan):
                'file_extract_failure'}
     for f in failed_files(scan):
         evidence=f.get('extractionEvidence') or {}
+        # Manual, source-scoped dense-image OCR recheck. The opt-in is set only
+        # for one SHA-verified original and does NOT bump the global reader
+        # version or invalidate previously successful public bid cards.
+        if (os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR')=='1'
+                and f.get('errorCategory')=='pdf_ocr_incomplete'
+                and str(f.get('name') or '').lower().endswith('.pdf')
+                and 0<int(evidence.get('pdfPages') or 0)<=25
+                and 0<int(evidence.get('ocrFailedPages') or 0)<=2
+                and int(evidence.get('ocrBatchDeferredPages') or 0)==0):
+            selected.append(f)
+            continue
         if (f.get('errorCategory')=='pdf_ocr_incomplete'
                 and f.get('lastPerimeterAttemptVersion')!=EMPTY_PERIMETER_READER_VERSION
                 and 0<int(evidence.get('pdfPages') or 0)<=80
