@@ -11,7 +11,7 @@ fake={
     'ok':True,'schemaVersion':1,'scope':'actionable_saved_sw_bid_notices_24h',
     'asOf':'2026-11-14T12:00:00+09:00',
     'remainingPercent':83.3,'rescanPercent':33.3,
-    'counts':{'total':6,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
+    'counts':{'total':6,'eligible':6,'excluded':0,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
               'unscanned':1,'failed':1,'incomplete':1,'unknownDeadline':2},
     'stages':{'classification':{'total':6,'done':3,'remaining':3},
               'roles':{'total':6,'done':2,'remaining':4},
