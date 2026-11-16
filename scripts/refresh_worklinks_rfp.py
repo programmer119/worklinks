@@ -1430,7 +1430,8 @@ def classify_failure(error):
            'hwp_record_fallback_invalid_ole','hwp_record_fallback_missing_sections',
            'hwp_record_fallback_timeout','hwp_record_fallback_failed',
            'hwp_record_fallback_invalid_record_list','hwp_record_fallback_invalid_record',
-           'hwp_record_fallback_no_text',
+           'hwp_record_fallback_no_text','hwp_record_fallback_protected',
+           'hwp_record_fallback_expanded_limit','hwp_record_fallback_too_many_records',
            'source_extraction_timeout_deferred','isolated_extraction_worker_failed',
            'isolated_extraction_worker_reply_invalid','source_extraction_output_too_large',
            'large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
@@ -1759,6 +1760,77 @@ def decode_hwp_paragraph_bytes(payload):
     return ''.join(pieces).strip()
 
 
+def decode_hwp_bodytext_records_from_ole(raw, sections):
+    """Strict HWP5 BodyText record fallback using SHA-verified original bytes.
+
+    pyhwp hwp5proc can return exit=0 with a two-byte invalid JSON payload.
+    Read actual OLE BodyText records instead, preserving ALL sections. Never
+    use PreviewText, binary strings or other incomplete text as proof.
+    """
+    import olefile
+    import struct
+    import zlib
+    paragraphs=[]
+    text_record_count=0
+    with olefile.OleFileIO(io.BytesIO(raw)) as src:
+        header=src.openstream('FileHeader').read()
+        if len(header)<40 or not header.startswith(b'HWP Document File'):
+            raise ValueError('hwp_record_fallback_invalid_ole')
+        flags=struct.unpack_from('<I',header,36)[0]
+        # Password-protected and distribution copies need authorized HWP
+        # readers, not silently decoded control records.
+        if flags & 0b110:
+            raise ValueError('hwp_record_fallback_protected')
+        compressed=bool(flags & 1)
+        for section in sections:
+            if not src.exists(section):
+                raise ValueError('hwp_record_fallback_missing_sections')
+            data=src.openstream(section).read()
+            if compressed:
+                try:
+                    inflate=zlib.decompressobj(-15)
+                    stream=inflate.decompress(data,45_000_001)
+                    if (len(stream)>45_000_000 or inflate.unconsumed_tail or
+                            not inflate.eof):
+                        raise ValueError('hwp_record_fallback_expanded_limit')
+                    stream+=inflate.flush()
+                except zlib.error as exc:
+                    raise ValueError('hwp_record_fallback_invalid_record') from exc
+            else:
+                stream=data
+            if len(stream)>45_000_000:
+                raise ValueError('hwp_record_fallback_expanded_limit')
+            offset=0
+            records=0
+            while offset<len(stream):
+                if len(stream)-offset<4:
+                    raise ValueError('hwp_record_fallback_invalid_record')
+                block=struct.unpack_from('<I',stream,offset)[0]
+                offset+=4
+                tag=block & 0x3ff
+                size=block >> 20
+                if size==0xfff:
+                    if len(stream)-offset<4:
+                        raise ValueError('hwp_record_fallback_invalid_record')
+                    size=struct.unpack_from('<I',stream,offset)[0]
+                    offset+=4
+                if size>20_000_000 or size>len(stream)-offset:
+                    raise ValueError('hwp_record_fallback_invalid_record')
+                if tag==67:
+                    text_record_count+=1
+                    paragraph=decode_hwp_paragraph_bytes(
+                        stream[offset:offset+size])
+                    if paragraph:paragraphs.append(paragraph)
+                offset+=size
+                records+=1
+                if records>250_000:
+                    raise ValueError('hwp_record_fallback_too_many_records')
+    if not text_record_count or sum(
+            ch.isalnum() for paragraph in paragraphs for ch in paragraph)<12:
+        raise ValueError('hwp_record_fallback_no_text')
+    return '\n'.join(paragraphs)
+
+
 def extract_hwp_record_paragraphs(raw):
     """Fall back to all actual HWP5 text records if pyhwp XML model fails.
 
@@ -1805,7 +1877,10 @@ def extract_hwp_record_paragraphs(raw):
                     fragment=decode_hwp_paragraph_bytes(payload)
                     if fragment:paragraphs.append(fragment)
             except (TypeError,ValueError,KeyError) as exc:
-                raise ValueError('hwp_record_fallback_invalid_record') from exc
+                # hwp5proc --json can exit 0 with just "\\n]" instead of
+                # records. Decode the real OLE sections with the HWP5 record
+                # headers; never treat that broken CLI response as source loss.
+                return decode_hwp_bodytext_records_from_ole(raw,sections)
     if not text_records or sum(ch.isalnum() for line in paragraphs for ch in line)<12:
         raise ValueError('hwp_record_fallback_no_text')
     return '\n'.join(paragraphs)
