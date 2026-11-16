@@ -1,0 +1,26 @@
+name: WorkLinks real-byte attachment format and large OOXML regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/refresh_worklinks_rfp.py
+      - tests/test_rfp_real_byte_and_streamed_office_20261116.py
+      - .github/workflows/worklinks-real-file-format-ci-20261116.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install extraction dependencies
+        run: python3 -m pip install -q 'pypdf<7' pymupdf pillow olefile xlrd
+      - name: Verify real signatures and zipped member handling
+        run: |
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py
+          python3 tests/test_rfp_real_byte_and_streamed_office_20261116.py
+          python3 tests/test_rfp_magic.py
+          python3 tests/test_rfp_sparse_and_misnamed_hwpx_20261116.py
+          python3 tests/test_rfp_original_format_and_short_text_20261115.py
