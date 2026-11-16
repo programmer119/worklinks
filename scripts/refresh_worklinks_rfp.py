@@ -1433,12 +1433,21 @@ def _extract_pdf_with_audit(raw,name=''):
             # exhaust this bounded pass before reaching deferred pages.
             # They stay unresolved (never enter the successful OCR cache).
             if i in cached_failures:
-                missing.append(i+1)
-                failed.append(i+1)
-                cached_failed.append(i+1)
-                failure_details.append({'page':i+1,'reason':cached_failures[i],
-                                        'cachedFailureCooldown':True})
-                continue
+                # A source-scoped, newly proven dense-image OCR strategy must
+                # be allowed to test pages which failed under the old PSM3
+                # strategy. Do NOT clear global failure history or disable
+                # cooldown for any other source. Successful SHA+page receipts
+                # always take precedence at the top of this loop.
+                retry_with_dense=(os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR')=='1'
+                    and os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_FAST_ONLY')=='1'
+                    and len(document.pages)<=25)
+                if not retry_with_dense:
+                    missing.append(i+1)
+                    failed.append(i+1)
+                    cached_failed.append(i+1)
+                    failure_details.append({'page':i+1,'reason':cached_failures[i],
+                                            'cachedFailureCooldown':True})
+                    continue
             # On long verified PDFs, native MuPDF text is much cheaper than
             # running a complete pypdf text decoder on every page. The sample
             # gate above verifies nonwhitespace content, including order.
