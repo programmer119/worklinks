@@ -1020,6 +1020,36 @@ def _pdf_native_text_objects_present(raw,index,cache):
     return any(str(entry[0]).endswith('text') for entry in page.get_bboxlog())
 
 
+def _pdf_verified_completely_white_page(raw,index,cache):
+    """True rendered-white page only: no PDF drawing objects and all pixels white.
+
+    Do not excuse a low-confidence OCR result unless the actual page display
+    has zero visible objects AND a complete, bounded grayscale render is 255.
+    This protects diagrams, tiny text and image-only bid requirements.
+    """
+    try:
+        import pymupdf
+        document=cache.get('document')
+        if document is None:
+            started=time.perf_counter()
+            document=pymupdf.open(stream=raw,filetype='pdf')
+            cache['document']=document
+            cache['pdfOpenSeconds']+=time.perf_counter()-started
+        page=document.load_page(index)
+        if page.get_bboxlog():
+            return False
+        if page.rect.width<=0 or page.rect.height<=0 or page.rect.width*page.rect.height>2_000_000:
+            return False
+        image=page.get_pixmap(matrix=pymupdf.Matrix(1,1),
+                              colorspace=pymupdf.csGRAY,alpha=False)
+        if image.n!=1 or image.width*image.height>2_000_000:
+            return False
+        values=image.samples
+        return bool(values) and all(v==255 for v in values)
+    except Exception:
+        return False
+
+
 def _extract_pdf_with_audit(raw):
     """OCR at most 24 NEW pages per pass; resume from SHA-verified page cache.
 
@@ -1211,6 +1241,12 @@ def _extract_pdf_with_audit(raw):
                     else str(error)[:120]})
                 continue
             if sum(c.isalnum() for c in value)<12:
+                # A SHA-verified government contract PDF has a genuinely
+                # empty page 45: no rendered marks in 500,395 white pixels.
+                # Failed OCR on pure white is not missing legal source text.
+                if _pdf_verified_completely_white_page(raw,i,render_cache):
+                    untouched_blanks.append(i+1)
+                    continue
                 missing.append(i+1)
                 failed.append(i+1)
                 failure_details.append({'page':i+1,'reason':'ocr_text_below_12_alphanumeric'})
