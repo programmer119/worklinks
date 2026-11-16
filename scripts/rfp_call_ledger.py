@@ -334,7 +334,7 @@ class CallLedger:
             try:val=int(os.environ.get(name,str(default)))
             except ValueError:val=default
             return min(max(val,minimum),maximum)
-        return (number('WORKLINKS_RFP_LEDGER_MAX_MB',8192,256,16384)*1048576,
+        return (number('WORKLINKS_RFP_LEDGER_MAX_MB',16384,256,16384)*1048576,
                 number('WORKLINKS_RFP_DISK_RESERVE_MB',5120,512,32768)*1048576)
 
     def prune_expired(self, deadline_by_notice=None, *, today=None, grace_days=0,
