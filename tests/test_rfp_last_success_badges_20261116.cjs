@@ -69,6 +69,23 @@ for(const [name,previous,expected] of [
  assert(html.includes('이전 판독 결과 · 재검증 중'),
    'tooltip must distinguish stale-but-successful '+name);
 }
+// Even if the old WHOLE notice was incomplete, three individually cited
+// positives should survive; uncited negative statuses must NOT be borrowed.
+const partialOld={...positiveOld,scanComplete:false,complete:false,
+ staffingRoleScanComplete:false};
+const partialView=render({...failed,lastSuccessfulState:partialOld})
+ .jobRequirementEvidence(bid);
+assert.equal(partialView.insurance.status.key,'required_at_bid');
+assert.equal(partialView.onsite.status.key,'onsite');
+assert.equal(partialView.roles.status.key,'role_found');
+assert.deepEqual(partialView.meta.lastSuccessfulFields,
+ ['insurance','onsite','roles']);
+const partialNegative=render({...failed,
+  lastSuccessfulState:{...oldNoRequirement,scanComplete:false,complete:false,
+     staffingRoleScanComplete:false}}).jobRequirementEvidence(bid);
+assert.equal(partialNegative.meta.lastSuccessfulFields,undefined,
+ 'unverified old omissions must not overwrite currently unknown values');
+
 // When a new source-verified current-version scan finishes, replace the old
 // result rather than showing outdated success indefinitely.
 const nowComplete={...oldBase,versionSource:'checkpoint',
