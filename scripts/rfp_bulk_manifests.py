@@ -21,7 +21,12 @@ MAX_FETCH_PER_PASS=18
 # Keep rare per-notice recovery bounded, but let a 23-notice backlog drain
 # instead of allowing only two notices per day.
 MAX_EXCEPTIONS_PER_PASS=4
-MAX_EXCEPTIONS_PER_UTC_DAY=32
+# Each exceptional notice consumes three official source calls. A separate
+# 32-notice cap exhausted after only 96 calls and blocked the remaining live
+# notices until UTC midnight, despite the shared 1000-call official budget.
+# Keep a bounded per-notice exception guard; the durable shared daily budget
+# below still prevents any call beyond the provider's official allocation.
+MAX_EXCEPTIONS_PER_UTC_DAY=128
 EXCEPTION_RETRY_SECONDS=300
 # A02 is allocated 1000 daily requests. The former internal cap 180
 # stopped essential bulk attachment-list collection at 1924/2315, even while
