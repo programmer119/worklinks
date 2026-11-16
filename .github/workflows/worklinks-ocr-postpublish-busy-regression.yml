@@ -1,0 +1,26 @@
+name: WorkLinks OCR postpublish SQLite lock recovery regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/worklinks-server123-pipeline.py'
+      - 'tests/test_rfp_ocr_postpublish_busy_20261116.py'
+      - '.github/workflows/worklinks-ocr-postpublish-busy-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify isolated safe retry semantics
+        run: |
+          python -m py_compile server/worklinks-server123-pipeline.py
+          python tests/test_rfp_ocr_postpublish_busy_20261116.py
+      - name: Verify existing standalone scheduler no-network semantics
+        run: python tests/test_worklinks_server123_pipeline.py
