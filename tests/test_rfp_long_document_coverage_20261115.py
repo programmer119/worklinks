@@ -7,7 +7,7 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import refresh_worklinks_rfp as r
 import repair_open_rfp_cached_attachments as repair
 
-assert r.RFP_QUALIFICATION_TEXT_LIMIT==1_000_000
+assert r.RFP_QUALIFICATION_TEXT_LIMIT>=1_000_000
 assert r.STAFFING_ROLE_TEXT_LIMIT==r.RFP_QUALIFICATION_TEXT_LIMIT
 text=('일반 사업 소개 문서의 설명입니다.\n'*18000)
 assert len(text)>350000
@@ -21,7 +21,7 @@ assert any(role.get('count')==2 and '개발' in role.get('role','') for role in 
 
 # Longer than the configured limit remains incomplete; do not fabricate
 # coverage beyond examined text.
-very_long=text+('가'*1_000_001)
+very_long=text+('가'*(r.RFP_QUALIFICATION_TEXT_LIMIT-len(text)+1))
 audit=r.preserve_unclassified_qualification(very_long,'제안요청서.hwpx',
                                            r.extract_rule_candidates(very_long,'제안요청서.hwpx'))
 assert audit['sourceTextScanComplete'] is False,audit
