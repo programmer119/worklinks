@@ -112,7 +112,7 @@ with sync_playwright() as p:
       "() => document.querySelector('#rfpRescanContent')?.textContent.includes('작업 실행 확인 · 완료 미확정')",
       timeout=12000)
     body=page.locator('#rfpRescanContent').text_content()
-    for term in ('관리 대상','6','최신 판독 완료','1','구버전',
+    for term in ('판독 대상','6','최신 판독 완료','1','구버전',
                  '최초 미판독','역할·인원','16.67%','작업 실행 확인 · 완료 미확정','파일 다운로드 8개','판독 시도 4건'):
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '4 / 6건' in body,body
