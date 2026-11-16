@@ -89,4 +89,17 @@ selected,used=repair.choose_repair_batch([
     minimum_old_ocr=2,minimum_format_fixes=1)
 assert [x[0] for x in selected]==['legacy-B','legacy-A','format-source'],selected
 assert used==3
+# A 153-page PDF restored 31 existing OCR receipts but found no NEW
+# text pages. Repeated 150-second runs must not monopolize the repair lane.
+def ocr_retry(restored, recovered, deferred):
+    return {'files':[{'name':'long-scanned.pdf',
+      'errorCategory':'pdf_ocr_incomplete','readable':False,
+      'lastReaderAttemptVersion':repair.READER_ATTEMPT_VERSION,
+      'extractionEvidence':{'ocrRestoredPages':restored,
+        'ocrRecoveredPages':recovered,'ocrBatchDeferredPages':deferred}}]}
+assert not repair.reader_retry_files(ocr_retry(31,31,118)), 'cached pages are NOT new progress'
+assert len(repair.reader_retry_files(ocr_retry(31,34,115)))==1, 'three NEW pages merit a next slice'
+assert not repair.reader_retry_files(ocr_retry(31,34,0)), 'no deferred pages means no loop'
+assert len(repair.reader_retry_files(ocr_retry(31,31,118) | {}))==0
+print('RFP_OCR_RETRY_REQUIRES_NEW_RECOVERED_PAGES=PASS')
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
