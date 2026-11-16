@@ -34,6 +34,11 @@ assert r.detected_source_format('renamed.hwp',z)=='zip_or_ooxml'
 html=b'<html xmlns:o="urn:schemas-microsoft-com:office:office"><body><p>Official procurement pledge</p></body></html>'
 assert r.detected_source_format('pledge.xls',html)=='html'
 assert 'Official procurement pledge' in r.extract('pledge.xls',html)
+# The actual official XLS is HTML, not well-formed XML: empty HTML tags
+# and unclosed paragraph tags must still be parsed as ordinary HTML.
+html_legacy=b'<html><head><meta charset=ks_c_5601-1987><body><p>Vendor pledge<p>Proof of qualification'
+assert r.detected_source_format('bad.xls',html_legacy)=='html'
+assert 'Proof of qualification' in r.extract('bad.xls',html_legacy)
 
 with_cell=archive({'xl/workbook.xml':'<workbook/>',
                    'xl/worksheets/sheet1.xml':'<worksheet><sheetData><row><c t="inlineStr"><is><t>Genuine price list</t></is></c></row></sheetData></worksheet>'})
