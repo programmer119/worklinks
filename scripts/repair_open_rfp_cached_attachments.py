@@ -202,9 +202,12 @@ def reader_retry_files(scan):
         evidence=f.get('extractionEvidence') or {}
         if (str(f.get('errorCategory') or '')=='pdf_ocr_incomplete'
                 and int(evidence.get('ocrBatchDeferredPages') or 0)>0
-                and int(evidence.get('ocrRecoveredPages') or 0)>0):
-            # The completed page receipts are durable by PDF SHA. Each next
-            # repair reads them back and scans 24 *new* pages, not page 1.
+                and (int(evidence.get('ocrRecoveredPages') or 0)-
+                     int(evidence.get('ocrRestoredPages') or 0))>0):
+            # OCR recovered includes SHA receipts restored from past passes.
+            # Re-queue ONLY if this pass actually added a new page receipt;
+            # otherwise an unchanged, expensive PDF loops forever without
+            # reducing the missing page count. Keep the failure on record.
             selected.append(f)
     return selected
 
