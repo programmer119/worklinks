@@ -129,6 +129,26 @@ with sync_playwright() as p:
     assert '판독 시도 중 · 완료 증가 없음' in page.locator('#rfpRescanContent').text_content()
     assert '신규 완료 0건' in page.locator('#rfpRescanContent').text_content()
     assert '실제 작업 진행 중' not in page.locator('#rfpRescanContent').text_content()
+    # Scan worker may be quiet when the scheduler is intentionally waiting
+    # for verified originals; never claim its server history disconnected.
+    page.evaluate("""() => {
+      rfpRescanProgress.worker.tasks.rfpUpgrade.status='waiting_for_download';
+      rfpRescanProgress.lanes.scan.active=0;
+      rfpRescanProgress.activity.workers.scan.stale=true;
+      rfpRescanProgress.activity.items=rfpRescanProgress.activity.items.filter(x=>x.lane!=='scan');
+      paintRfpRescanProgress();
+    }""")
+    scan_card=page.locator('[data-rfp-stage="scan"]')
+    assert '원본 다운로드 완료 대기' in scan_card.text_content(),scan_card.text_content()
+    assert '서버 작업 기록 갱신 끊김' not in scan_card.text_content()
+    assert '원본 다운로드 대기' in scan_card.text_content()
+    # A real scanner job is not the same state as download waiting.
+    page.evaluate("""() => {
+      rfpRescanProgress.worker.tasks.rfpUpgrade.status='started';
+      rfpRescanProgress.lanes.scan.active=4;
+      rfpRescanProgress.activity.workers.scan.stale=false;
+      paintRfpRescanProgress();
+    }""")
     # Restore the live attempt fixture before the remaining active-lane checks.
     page.evaluate("() => {rfpRescanLastChangeAt=Date.now();paintRfpRescanProgress();}")
     assert '원본 다운로드' in body and '정상 3 · 오류 0건 · 전체 6건' in body,body
