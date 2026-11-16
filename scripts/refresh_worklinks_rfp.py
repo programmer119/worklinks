@@ -807,7 +807,23 @@ def verified_sparse_ocr_text(psm6,psm11,nonwhite_ratio,display_objects):
     return str(psm6)
 
 
-def _ocr_pdf_page(raw,index):
+def verified_sparse_title_page(psm6,source_name,page_index,nonwhite_ratio,display_objects):
+    """A one-image first-page title may legitimately contain only 3 Korean
+    characters. Accept only if OCR exactly matches the SOURCE filename stem,
+    the rendered page has almost no ink, and no other visual objects exist.
+    Never waive low-confidence body or multi-object qualification pages.
+    """
+    if page_index!=0 or display_objects!=1 or not (0<=nonwhite_ratio<=0.004):
+        return ''
+    title=''.join(re.findall(r'[가-힣]+',Path(source_name).stem))
+    extracted=''.join(re.findall(r'[가-힣]+',str(psm6 or '')))
+    chars=sum(c.isalnum() for c in str(psm6 or ''))
+    if 3<=len(title)<=12 and 3<=chars<12 and extracted==title:
+        return str(psm6)
+    return ''
+
+
+def _ocr_pdf_page(raw,index,name=''):
     """OCR a page with one reusable PyMuPDF handle per verified PDF source.
 
     Cached page receipts are written independently by the calling PDF reader.
@@ -936,6 +952,17 @@ def _ocr_pdf_page(raw,index):
                     page_profile['sparseOcrVisualInkRatio']=round(ratio,6)
                     page_profile['sparseOcrDisplayObjects']=display_count
                     page_profile['sparseOcrSelectedPsm']=6
+                elif name:
+                    title_only=verified_sparse_title_page(
+                        sparse_candidates['6'],name,index,ratio,display_count)
+                    if title_only:
+                        best=title_only
+                        best_chars=sum(ch.isalnum() for ch in title_only)
+                        page_profile['sparseOcrConsensusVerified']=True
+                        page_profile['sparseOcrTitleOnlyVerified']=True
+                        page_profile['sparseOcrVisualInkRatio']=round(ratio,6)
+                        page_profile['sparseOcrDisplayObjects']=display_count
+                        page_profile['sparseOcrSelectedPsm']=6
             # Without verified consensus, a sparse page remains incomplete.
             baseline=best
             page_profile['sparseOcrFinalAlnum']=best_chars
@@ -1133,7 +1160,7 @@ def _pdf_verified_completely_white_page(raw,index,cache):
         return False
 
 
-def _extract_pdf_with_audit(raw):
+def _extract_pdf_with_audit(raw,name=''):
     """OCR at most 24 NEW pages per pass; resume from SHA-verified page cache.
 
     A page cap is a work-slice boundary, never a permanent document cutoff.
@@ -1327,7 +1354,7 @@ def _extract_pdf_with_audit(raw):
                 continue
             attempted.append(i+1)
             try:
-                value=_ocr_pdf_page(raw,i)
+                value=_ocr_pdf_page(raw,i,name)
             except (ValueError,subprocess.TimeoutExpired) as error:
                 missing.append(i+1)
                 failed.append(i+1)
@@ -2385,7 +2412,7 @@ def _extract_dispatch(name,raw):
                     return '\n'.join(extracted)
             return native_text
     if n.endswith('.pdf'):
-        text,details=_extract_pdf_with_audit(raw)
+        text,details=_extract_pdf_with_audit(raw,name)
         details['sourceFile']=str(name)[:200]
         attached=getattr(_DOCUMENT_SCAN,'pdf',None)
         if attached is not None:attached.append(details)
