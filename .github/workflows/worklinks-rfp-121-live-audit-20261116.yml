@@ -61,6 +61,13 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Verify PDF OCR repair priority and scheduler without network
+        shell: bash
+        run: |
+          python3 -m py_compile scripts/repair_open_rfp_cached_attachments.py server/worklinks-server123-pipeline.py
+          python3 tests/test_rfp_ocr_repair_prioritization_20261115.py
+          python3 tests/test_worklinks_server123_pipeline.py
+          echo OCR_PDF_PRIORITY_AND_SCHEDULER_REGRESSION_PASS
       - name: Read server123 RFP live diagnosis and publish compact results to audit branch
         shell: bash
         run: |
@@ -133,7 +140,7 @@ jobs:
                     if k in ('pdfPages','ocrAttemptedPages','ocrRecoveredPages','ocrRestoredPages',
                        'ocrBatchDeferredPages','ocrFailedPages','unresolvedPages','ocrFailureDetails')}
                 } for f in files]})
-          target=Path('diagnostics/rfp-pdf-ocr-resume-20261116.json')
+          target=Path('diagnostics/rfp-pdf-ocr-verified-20261116.json')
           target.parent.mkdir(exist_ok=True)
           target.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print('AUDIT_COUNTS',json.dumps(report.get('progress',{}).get('counts'),ensure_ascii=False),flush=True)
@@ -142,6 +149,6 @@ jobs:
           PY
           git config user.name "worklinks-audit-bot"
           git config user.email "worklinks-audit-bot@users.noreply.github.com"
-          git add diagnostics/rfp-pdf-ocr-resume-20261116.json
+          git add diagnostics/rfp-pdf-ocr-verified-20261116.json
           git commit -m "audit: save read-only production RFP diagnosis"
-          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-resume-20261116
+          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-verified-20261116
