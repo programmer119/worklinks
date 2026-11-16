@@ -121,6 +121,7 @@
   if(!panel||panel.dataset.ready!=='1')return;
   const info=rfpRescanProgress,activity=info?.activity;
   const now=Date.now()/1000,stale=Boolean(rfpRescanProgressError);
+  const number=rfpProgressNumber;
   const fmt=n=>(Math.max(0,Number(n)||0)/1048576).toFixed(2)+'MB';
   for(const [key] of laneKeys){
    const node=panel.querySelector('[data-rfp-stage="'+key+'"]');
