@@ -129,6 +129,8 @@ with sync_playwright() as p:
     assert '판독 시도 중 · 완료 증가 없음' in page.locator('#rfpRescanContent').text_content()
     assert '신규 완료 0건' in page.locator('#rfpRescanContent').text_content()
     assert '실제 작업 진행 중' not in page.locator('#rfpRescanContent').text_content()
+    # Restore the live attempt fixture before the remaining active-lane checks.
+    page.evaluate("() => {rfpRescanLastChangeAt=Date.now();paintRfpRescanProgress();}")
     assert '원본 다운로드' in body and '정상 3 · 오류 0건 · 전체 6건' in body,body
     assert '사업제안요청서.pdf' in body and '외 7개' in body,body
     assert '다운로드 중 00:' in body,body
