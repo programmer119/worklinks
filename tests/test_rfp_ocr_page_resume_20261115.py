@@ -30,7 +30,7 @@ def text_for(page):
     return '입찰자격 확인과 기술지원 문서의 실제 OCR 페이지 '+str(page+1)
 
 assert reader.MAX_PDF_OCR_PAGES==24
-assert repair.READER_ATTEMPT_VERSION.endswith('v15-20261116')
+assert repair.READER_ATTEMPT_VERSION.endswith('v16-20261116')
 with tempfile.TemporaryDirectory() as tmp:
     cache=str(Path(tmp)/'rfp-ocr-page-cache.sqlite3')
     with patch.dict(os.environ,{'WORKLINKS_RFP_OCR_PAGE_CACHE_DB':cache,
