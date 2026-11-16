@@ -1,0 +1,86 @@
+name: WorkLinks GitHub Pages source versus deployed JS diagnosis
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/worklinks-pages-source-diagnose-20261116.yml]
+permissions:
+  contents: write
+  actions: read
+  pages: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect actual Pages source, deployment queue, and live JavaScript
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.request,urllib.error
+          base='https://api.github.com/repos/'+os.environ['REPO']
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+            'Accept':'application/vnd.github+json',
+            'User-Agent':'WorkLinks-pages-live-source-diagnostic'}
+          for label,url in [('pages',base+'/pages'),
+            ('latest_build',base+'/pages/builds/latest'),
+            ('recent_runs',base+'/actions/runs?per_page=30'),
+            ('pages_deployments',base+'/pages/deployments')]:
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=20) as r:
+                d=json.load(r)
+              if label=='recent_runs':
+                data=[{'name':x.get('name'),'id':x.get('id'),
+                  'status':x.get('status'),'conclusion':x.get('conclusion'),
+                  'created':x.get('created_at'),'head_sha':str(x.get('head_sha') or '')[:10]}
+                  for x in d.get('workflow_runs') or []]
+                print('PAGES_RECENT_RUNS',json.dumps(data[:25],ensure_ascii=False),flush=True)
+              else:print('PAGES_'+label.upper(),json.dumps(d,ensure_ascii=False)[:2400],flush=True)
+            except urllib.error.HTTPError as e:print('PAGES_'+label.upper()+'_HTTP',e.code,flush=True)
+            except Exception as e:print('PAGES_'+label.upper()+'_ERROR',type(e).__name__,str(e)[:120],flush=True)
+          path='startup-support/rfp-progress-live.js'
+          raw=open(path,'rb').read()
+          print('PAGES_GITHUB_WORKTREE',json.dumps({'size':len(raw),
+            'sha256':hashlib.sha256(raw).hexdigest(),
+            'hasWaiting':b'waitingForOriginal' in raw,
+            'hasOCR':b'recentOcrRepair' in raw},ensure_ascii=False),flush=True)
+          url='https://worklinks.suaveforge.com/startup-support/rfp-progress-live.js?pages_audit=20261116_1652'
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'Cache-Control':'no-cache','User-Agent':'WorkLinks-pages-diagnosis'}),timeout=25) as r:
+            data=r.read()
+            h=dict(r.headers)
+          print('PAGES_LIVE_JS',json.dumps({'size':len(data),'sha256':hashlib.sha256(data).hexdigest(),
+            'hasWaiting':b'waitingForOriginal' in data,
+            'hasOCR':b'recentOcrRepair' in data,
+            'headers':{k:v for k,v in h.items() if k.lower() in ('server','last-modified','etag','age','cache-control')}},ensure_ascii=False),flush=True)
+          print('PAGES_HEAD',data[:160].decode('utf8','replace'),flush=True)
+          PY
+  index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Index Pages diagnosis run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os,json,pathlib,urllib.request
+          req=urllib.request.Request('https://api.github.com/repos/'+os.environ['REPO']+'/actions/runs/'+os.environ['RUN']+'/jobs?per_page=100',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','User-Agent':'WorkLinks-page-index'})
+          with urllib.request.urlopen(req,timeout=20) as r:jobs=json.load(r).get('jobs') or []
+          target=pathlib.Path('diagnostics/worklinks-pages-source-run-20261116.json')
+          target.parent.mkdir(exist_ok=True)
+          target.write_text(json.dumps({'runId':int(os.environ['RUN']),'jobs':[{'name':j.get('name'),'id':j.get('id'),'status':j.get('status')} for j in jobs]},indent=2)+'\n')
+          PY
+          git config user.name worklinks-audit-bot
+          git config user.email worklinks-audit-bot@users.noreply.github.com
+          git add diagnostics/worklinks-pages-source-run-20261116.json
+          git commit -m "audit: pages serving source diagnosis"
+          git push origin HEAD:refs/heads/diagnostics/worklinks-pages-source-run-20261116
