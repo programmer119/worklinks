@@ -851,6 +851,63 @@ def _ocr_pdf_page(raw,index,name=''):
     try:
         start=time.perf_counter()
         page=document.load_page(index)
+        # Scoped recovery of dense image-only engineering drawings. Verified
+        # actual public bid PDF pages 3/4 with the same SHA: original 300-DPI
+        # PSM3 hit the 22s limit; 120-DPI grayscale PSM11 recovered 3222 and
+        # 2821 alphanumerics respectively in 21/18 seconds. A successful
+        # subprocess alone is not enough: require substantial Korean content
+        # and reject every uncertain page without writing a successful receipt.
+        if (os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR')=='1'
+                and document.page_count<=25):
+            try:
+                objects=[str(o[0]) for o in page.get_bboxlog()]
+            except Exception:
+                objects=[]
+            if (objects and len(objects)<=10
+                    and 'fill-image' in objects
+                    and all(o in ('fill-image','fill-path','stroke-path') for o in objects)):
+                start_fast=time.perf_counter()
+                scale=min(120/72.0,(MAX_PDF_OCR_PIXELS/
+                        max(1.0,page.rect.width*page.rect.height))**.5)
+                pix=page.get_pixmap(matrix=pymupdf.Matrix(scale,scale),
+                    colorspace=pymupdf.csGRAY,alpha=False)
+                png=pix.tobytes('png')
+                render_elapsed=time.perf_counter()-start_fast
+                if reusable:
+                    context['renderSeconds']+=render_elapsed
+                    context['renderPixels']+=pix.width*pix.height
+                started_fast=time.perf_counter()
+                try:
+                    candidate_run=subprocess.run(
+                        ['tesseract','stdin','stdout','-l','kor+eng','--psm','11',
+                         '--dpi',str(int(scale*72))],
+                        input=png,capture_output=True,timeout=35,
+                        check=False,env=dict(os.environ,OMP_THREAD_LIMIT='1'))
+                    candidate=(candidate_run.stdout.decode('utf-8','replace')
+                               if candidate_run.returncode==0 else '')
+                    alnum=sum(c.isalnum() for c in candidate)
+                    hangul=sum('가'<=c<='힣' for c in candidate)
+                    accepted=candidate_run.returncode==0 and alnum>=100 and hangul>=50
+                    reason='accepted' if accepted else 'insufficient_verifiable_text'
+                except subprocess.TimeoutExpired:
+                    candidate=''
+                    alnum=0
+                    hangul=0
+                    accepted=False
+                    reason='dense_image_psm11_timeout_35s'
+                elapsed=time.perf_counter()-started_fast
+                if reusable:
+                    context['tesseractSeconds']+=elapsed
+                    context.setdefault('pageProfiles',[]).append({
+                        'page':index+1,'strategy':'verified_dense_image_psm11_120dpi',
+                        'effectiveDpi':round(scale*72,2),
+                        'renderSeconds':round(render_elapsed,3),
+                        'tesseractSeconds':round(elapsed,3),
+                        'alnum':alnum,'hangul':hangul,
+                        'verified':accepted,'reason':reason})
+                if accepted:return candidate
+                if os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_FAST_ONLY')=='1':
+                    raise ValueError('pdf_ocr_dense_image_unreadable')
         # Opt-in only for a long, verified engineering drawing consisting
         # almost entirely of vector geometry, with no native text operators.
         # Actual 153-page G2B drawing page 37 timed out at default 300 DPI,
