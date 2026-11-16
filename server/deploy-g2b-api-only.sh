@@ -32,6 +32,10 @@ dk run --rm \
   -v "$NEXT:/app/api.py:ro" \
   -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_rfp_saved_list_version_20261116.py:/app/test_rfp_saved_list_version_20261116.py:ro" \
   "$IMG" python /app/test_rfp_saved_list_version_20261116.py
+dk run --rm \
+  -v "$NEXT:/app/api.py:ro" \
+  -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_rfp_saved_last_success_20261116.py:/app/test_rfp_saved_last_success_20261116.py:ro" \
+  "$IMG" python /app/test_rfp_saved_last_success_20261116.py
 dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_award_cache_api.py:/app/test_award_cache_api.py:ro" "$IMG" python /app/test_award_cache_api.py
 dk run --rm -v "$NEXT:/app/api.py:ro" -v "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tests/test_contract_evidence.py:/app/test_contract_evidence.py:ro" "$IMG" python /app/test_contract_evidence.py
 dk run --rm \
