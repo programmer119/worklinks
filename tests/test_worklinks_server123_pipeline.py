@@ -186,6 +186,7 @@ with tempfile.TemporaryDirectory() as temporary:
     repair_calls=[]
     def count_repair(args,**kwargs):
         if 'repair_open_rfp_cached_attachments.py' in args[1]:
+            assert args[args.index('--minimum-old-ocr')+1]=='3',args
             repair_calls.append('ocr')
         return mock_runner(args,**kwargs)
     deferred=m.iteration(now+5,count_repair)
@@ -224,6 +225,22 @@ with tempfile.TemporaryDirectory() as temporary:
     m.iteration(now+9,nonblocking_runner)
     assert not repair_blockers, 'OCR must not block each following scan batch'
     print('WORKLINKS_CONTINUOUS_SCAN_FAIR_LOCAL_OCR_REPAIR=PASS')
+
+    # A verified backlog from the last OCR slice must not wait four more
+    # expensive scanner batches. Three OCR slots target never-run readers.
+    backlog=m.read_state()
+    backlog['rfpUpgradeActive']=True
+    backlog['rfpUpgrade']={'status':'failed','attemptEpoch':now+9,
+                           'retryAfterEpoch':time.time()+3600}
+    backlog['rfpOpenRepairHasMore']=True
+    backlog['rfpUpgradeBatchesCompleted']=102
+    backlog['rfpOpenRepairUpgradeBatch']=101
+    m.publish_state(backlog)
+    repair_blockers.clear()
+    prioritized=m.iteration(now+9,nonblocking_runner)
+    assert len(repair_blockers)==1,repair_blockers
+    assert prioritized['rfpOpenRepairUpgradeBatch']==102
+    print('WORKLINKS_OCR_ACTIVE_BACKLOG_ONE_SCAN_BATCH_FAIRNESS=PASS')
 
     # The scanner may have processed every currently eligible original and
     # be waiting on 1-hour retry cooldown; OCR still needs to drain its
