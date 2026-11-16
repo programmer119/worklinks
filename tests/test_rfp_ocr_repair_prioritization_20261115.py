@@ -102,4 +102,25 @@ assert len(repair.reader_retry_files(ocr_retry(31,34,115)))==1, 'three NEW pages
 assert not repair.reader_retry_files(ocr_retry(31,34,0)), 'no deferred pages means no loop'
 assert not repair.reader_retry_files(ocr_retry(31,31,118))
 print('RFP_OCR_RETRY_REQUIRES_NEW_RECOVERED_PAGES=PASS')
+# After v17 fixes noisy isolated child JSON, previously failed PDFs that
+# extract in 2-5 seconds must not starve behind two long legacy OCRs and a
+# reserved format job. Retain one OCR slot, use two for fast verified sources.
+fast_reply={'name':'unreadable-before-framing.pdf',
+            'errorCategory':'isolated_extraction_worker_reply_invalid',
+            'readable':False}
+quick1=(repair.repair_file_priority(fast_reply),now,'v17-quick-1',{},
+        'verified_download_queue',1,(0,1,4),False,False)
+quick2=(repair.repair_file_priority(fast_reply),now,'v17-quick-2',{},
+        'verified_download_queue',1,(0,1,5),False,False)
+long_ocr_a=(0,now,'slow-pdf-A',{},'verified_download_queue',1,(0,1,58),True,False)
+long_ocr_b=(0,now,'slow-pdf-B',{},'verified_download_queue',1,(0,1,91),True,False)
+picked,count=repair.choose_repair_batch(
+    [long_ocr_a,long_ocr_b,quick1,quick2],limit=3,max_files=3,
+    per_notice_cap=1,minimum_old_ocr=1,minimum_format_fixes=0)
+assert [item[0] for item in picked]==[
+    'slow-pdf-A','v17-quick-1','v17-quick-2'
+],picked
+assert count==3
+print('RFP_V17_FAST_CHILD_REPLY_FIX_NOT_STARVED_BY_LEGACY_OCR=PASS')
+
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
