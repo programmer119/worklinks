@@ -72,4 +72,21 @@ assert not repair.legacy_pdf_ocr_failure({
     **prioritized[0],'lastReaderAttemptVersion':repair.READER_ATTEMPT_VERSION})
 print('RFP_RESERVED_PDF_OCR_SLOT_SELECTS_ACTUAL_PDF_ERROR=PASS')
 
+# While 26 official HWP filenames actually contained XML or ZIP, all three
+# repair slots were reserved for PDF OCR. Reserve one per batch for format bugs.
+format_failed={'name':'terms.hwp','errorCategory':'invalid_hwp','readable':False,
+               'lastReaderAttemptVersion':'pdf25-blank-hwpml-strict-v14-20261116'}
+assert repair.legacy_format_failure(format_failed)
+mixed={'files':[
+    {'name':'old-pdf.pdf','errorCategory':'pdf_ocr_incomplete','readable':False,
+     'lastReaderAttemptVersion':''},format_failed]}
+assert repair.ordered_retry_files(mixed,prioritize_format=True)[0]['name']=='terms.hwp'
+format_item=(5,now,'format-source',{},'verified_download_queue',2,(0,2,12),False,True)
+normal_item=(1,now,'normal',{},'verified_download_queue',1,(0,1,1),False,False)
+selected,used=repair.choose_repair_batch([
+    legacy_b+ (False,),legacy_a+(False,),format_item,normal_item],
+    limit=3,max_files=3,per_notice_cap=1,
+    minimum_old_ocr=2,minimum_format_fixes=1)
+assert [x[0] for x in selected]==['legacy-B','legacy-A','format-source'],selected
+assert used==3
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
