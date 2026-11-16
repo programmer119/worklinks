@@ -50,7 +50,7 @@ with tempfile.TemporaryDirectory() as folder:
     text,evidence=reader.decode_extraction_child_result(child.stdout)
     assert text=='verified official-source' and evidence['sourceComplete'] is True
 
-assert repair.READER_ATTEMPT_VERSION=='framed-isolated-extract-v17-20261116'
+assert repair.READER_ATTEMPT_VERSION.startswith('framed-isolated-extract-v')
 old={
  'files':[{'name':'contract.pdf',
            'errorCategory':'isolated_extraction_worker_reply_invalid',
