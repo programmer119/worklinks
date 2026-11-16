@@ -14,6 +14,139 @@ KST=dt.timezone(dt.timedelta(hours=9))
 VERSIONS=('classificationVersion','staffingRoleScanVersion',
           'staffingFactScanVersion','hwpxReaderVersion')
 
+
+# UI history is a separate, source-backed record, NOT a statement that
+# the current parser revision passed. It is bounded to one prior success per
+# notice; failed rechecks must not erase the last successful thumbnail.
+THUMBNAIL_FIELDS=('name','readable','sourceSha256','alternatePdfEvidence',
+    'alternatePdfSourceSha256','skippedDuplicateFormat',
+    'sourceTextScanComplete','qualificationScanTruncated',
+    'staffingRoleScanVersion','staffingFactScanVersion',
+    'staffingRoleScanTruncated','staffingScopeExcluded')
+
+
+def same_thumbnail_original(a,b):
+    """Do not reuse an old verdict across changed official source identities."""
+    if not isinstance(a,dict) or not isinstance(b,dict):
+        return False
+    if a.get('manifestChangePending') or b.get('manifestChangePending'):
+        return False
+    left=[v for v in (a.get('files') or []) if isinstance(v,dict)]
+    right=[v for v in (b.get('files') or []) if isinstance(v,dict)]
+    if not left or len(left)!=len(right):
+        return False
+    if [str(f.get('name') or '') for f in left]!=[
+            str(f.get('name') or '') for f in right]:
+        return False
+    sig_a=str(a.get('manifestSignature') or '')
+    sig_b=str(b.get('manifestSignature') or '')
+    if sig_a or sig_b:
+        if not sig_a or sig_a!=sig_b:
+            return False
+    else:
+        # No signed manifest: only exact hashes for ALL original files.
+        for x,y in zip(left,right):
+            hx=str(x.get('sourceSha256') or x.get('alternatePdfSourceSha256') or '')
+            hy=str(y.get('sourceSha256') or y.get('alternatePdfSourceSha256') or '')
+            if len(hx)!=64 or hx!=hy:
+                return False
+    # Even a matching URL/name manifest cannot override a known byte mismatch.
+    for x,y in zip(left,right):
+        hx=str(x.get('sourceSha256') or '')
+        hy=str(y.get('sourceSha256') or '')
+        if hx and hy and hx!=hy:
+            return False
+    return True
+
+
+def completed_thumbnail_source(row):
+    """A proven 4-insurance/onsite/staffing negative needs full source coverage.
+
+    If any applicable source was unresolved, retain only individually cited
+    positives through the regular evidence index; do not make up negatives.
+    """
+    if not isinstance(row,dict) or row.get('status')!='text_extracted_requires_review':
+        return False
+    if row.get('manifestComplete') is not True or (
+            row.get('staffingRoleScanComplete') is not True):
+        return False
+    files=[f for f in (row.get('files') or []) if isinstance(f,dict)]
+    if not files:
+        return False
+    usable=0
+    for f in files:
+        if f.get('staffingScopeExcluded') is True:
+            continue
+        if f.get('readable') is True:
+            if (f.get('sourceTextScanComplete') is not True or
+                    f.get('qualificationScanTruncated') is True or
+                    f.get('staffingRoleScanTruncated') is True or
+                    int(f.get('staffingRoleScanVersion') or 0)<=0 or
+                    int(f.get('staffingFactScanVersion') or 0)<=0):
+                return False
+            usable+=1
+            continue
+        if f.get('skippedDuplicateFormat') is True and (
+                f.get('alternatePdfEvidence') and
+                len(str(f.get('alternatePdfSourceSha256') or ''))==64):
+            matching=next((other for other in files
+                if other.get('name')==f.get('alternatePdfEvidence') and
+                other.get('readable') is True and
+                other.get('sourceTextScanComplete') is True and
+                other.get('sourceSha256')==f.get('alternatePdfSourceSha256')),None)
+            if matching:
+                continue
+        return False
+    return usable>0
+
+
+def last_success_thumbnail(row):
+    """Return bounded, nonrecursive, evidenced historical source or None."""
+    if not completed_thumbnail_source(row):
+        return None
+    fields=('status','checkedAt','classificationVersion','hwpxReaderVersion',
+            'manifestSignature','manifestComplete','staffingRoleScanComplete',
+            'manifestChangePending')
+    saved={k:row.get(k) for k in fields if row.get(k) is not None}
+    saved['files']=[{k:f.get(k) for k in THUMBNAIL_FIELDS if k in f}
+                    for f in row.get('files') or [] if isinstance(f,dict)][:24]
+    saved['staffingRoles']=(row.get('staffingRoles') or [])[:24]
+    saved['staffingFacts']=(row.get('staffingFacts') or [])[:35]
+    # Preserve only official quoted requirements used by the three badges.
+    snippets=[]
+    for entry in row.get('thumbnailClauses') or []:
+        if isinstance(entry,dict) and entry.get('text'):
+            snippets.append({k:str(entry.get(k) or '')[:330]
+                for k in ('type','text','sourceFile')})
+        if len(snippets)>=14:break
+    for typ,items in ((row.get('changcomClauseEvidence') or {}).get(
+            'clauseCandidates') or {}).items():
+        for item in items if isinstance(items,list) else []:
+            if isinstance(item,dict) and item.get('text') and len(snippets)<14:
+                snippets.append({'type':str(typ)[:40],
+                    'text':str(item['text'])[:330],
+                    'sourceFile':str(item.get('sourceFile') or '')[:140]})
+    saved['thumbnailClauses']=snippets
+    return saved
+
+
+def preserve_last_success_thumbnail(candidate,previous):
+    """Carry one old verified snapshot only across unchanged originals."""
+    if not isinstance(candidate,dict) or not isinstance(previous,dict):
+        return candidate
+    if completed_thumbnail_source(candidate):
+        candidate.pop('lastSuccessfulThumbnail',None)
+        return candidate
+    archived=previous.get('lastSuccessfulThumbnail')
+    snapshot=(archived if isinstance(archived,dict) and
+              completed_thumbnail_source(archived) else
+              last_success_thumbnail(previous))
+    if snapshot and same_thumbnail_original(candidate,snapshot):
+        candidate['lastSuccessfulThumbnail']=snapshot
+    else:
+        candidate.pop('lastSuccessfulThumbnail',None)
+    return candidate
+
 def deadline_kst(value):
     match=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})(?:[T\s]*(\d{1,2}):?(\d{2}))?',
                     str(value or '').strip())
