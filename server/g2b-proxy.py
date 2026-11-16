@@ -1312,6 +1312,13 @@ def saved_rfp_search_state(row, compact=False):
                 if not quote:continue
                 labels.append({'type':typ,'text':quote,
                     'sourceFile':str(item.get('sourceFile') or '')[:140]})
+        for snippet in (row.get('thumbnailClauses') or []):
+            if not isinstance(snippet,dict) or not snippet.get('text'):continue
+            quote=str(snippet['text'])[:330]
+            if quote not in [x['text'] for x in labels]:
+                labels.append({'type':str(snippet.get('type') or '')[:40],
+                    'text':quote,'sourceFile':str(snippet.get('sourceFile') or '')[:140]})
+            if len(labels)>=14:break
         return {'sourceAvailable':True,'seen':True,'complete':good,
             'scanComplete':scan_complete,
             'status':str(row.get('status') or 'unknown')[:48],
@@ -1319,7 +1326,7 @@ def saved_rfp_search_state(row, compact=False):
             'readableCount':sum(x.get('readable') is True for x in files),
             'pdfCoveredCount':len(covered),
             'effectiveReadableCount':effective_readable,
-            'excerpts':labels[:3],
+            'excerpts':labels[:14],
             'staffingRoles':role_rows,'staffingFacts':facts,
             'staffingRoleScanComplete':role_scan_complete}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
@@ -1342,6 +1349,15 @@ def saved_rfp_search_state(row, compact=False):
                     'codes':[str(v)[:16] for v in (item.get('codes') or [])[:5]]})
                 if len(excerpts)>=12:break
             if len(excerpts)>=12:break
+    for snippet in (row.get('thumbnailClauses') or []):
+        if not isinstance(snippet,dict) or not snippet.get('text'):continue
+        quote=str(snippet['text'])[:330]
+        if quote not in seen:
+            seen.add(quote)
+            excerpts.append({'type':str(snippet.get('type') or '')[:40],
+                'text':quote,'sourceFile':str(snippet.get('sourceFile') or '')[:140],
+                'sourceUrl':''})
+        if len(excerpts)>=20:break
     return {'sourceAvailable':True,'seen':True,'complete':good,
             'staffingRoles':role_rows,'staffingFacts':facts,
             'staffingRoleScanComplete':role_scan_complete,
