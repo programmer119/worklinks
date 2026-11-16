@@ -28,6 +28,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 try:
     from rfp_call_ledger import CallLedger, cache_key
+    from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
 except ModuleNotFoundError as exc:
     if exc.name!='rfp_call_ledger':raise
     # importlib.spec_from_file_location/runpy do not put the source
@@ -35,6 +36,7 @@ except ModuleNotFoundError as exc:
     import sys
     sys.path.insert(0,str(Path(__file__).resolve().parent))
     from rfp_call_ledger import CallLedger, cache_key
+    from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
@@ -1814,7 +1816,8 @@ def _eligible_prefetch_positions(manifest,processing_order,reusable):
         if (retained and
                 int(retained.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
                 int(retained.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
-                retained.get('staffingRoleScanTruncated') is not True):
+                retained.get('staffingRoleScanTruncated') is not True and
+                int(retained.get('submissionScanVersion') or 0)>=SUBMISSION_SCAN_VERSION):
             continue
         if (os.environ.get('WORKLINKS_RFP_DEFER_OCR')=='1' and
                 name.lower().endswith(('.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp'))):
@@ -3380,6 +3383,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             candidate_rules=extract_rule_candidates(content,name)
             staffing_roles=extract_staffing_roles(content,name,url)
             staffing_facts=extract_staffing_facts(content,name,url)
+            submission_items,submission_complete=extract_submission_items(content,name)
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
             phase['analysisSeconds']+=time.perf_counter()-timer
             record.update({'readable':True,'textChars':len(content),
@@ -3397,6 +3401,9 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                            'staffingRoleScanTruncated':len(content)>STAFFING_ROLE_TEXT_LIMIT,
                            'staffingRoles':staffing_roles,
                            'staffingFacts':staffing_facts,
+                           'submissionItems':submission_items,
+                           'submissionScanVersion':SUBMISSION_SCAN_VERSION,
+                           'submissionScanComplete':submission_complete and source_evidence['sourceComplete'],
                            'topics':triggers,'snippets':snippets,
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
@@ -3534,7 +3541,8 @@ def backfill_cached_staffing(records, max_files=24):
         for f in notice.get('files') or []:
             if not isinstance(f,dict) or f.get('readable') is not True:continue
             if (int(f.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
-                    int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION):
+                    int(f.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
+                    int(f.get('submissionScanVersion') or 0)>=SUBMISSION_SCAN_VERSION):
                 continue
             name=str(f.get('name') or '')
             url=str(f.get('sourceUrl') or '')
@@ -3554,6 +3562,9 @@ def backfill_cached_staffing(records, max_files=24):
                         raise ValueError('cached_source_scan_incomplete')
                     f['staffingRoles']=extract_staffing_roles(content,name,url)
                     f['staffingFacts']=extract_staffing_facts(content,name,url)
+                    f['submissionItems'],submission_complete=extract_submission_items(content,name)
+                    f['submissionScanVersion']=SUBMISSION_SCAN_VERSION
+                    f['submissionScanComplete']=submission_complete and bool(evidence.get('sourceComplete'))
                     f['staffingRoleScanVersion']=STAFFING_ROLE_SCAN_VERSION
                     f['staffingFactScanVersion']=STAFFING_FACT_SCAN_VERSION
                     f['staffingRoleScanTruncated']=len(content)>STAFFING_ROLE_TEXT_LIMIT
@@ -3610,9 +3621,16 @@ def compact_coverage(item):
             'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') is True,
             'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
             'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
-            'clauseCandidateCount':len(f.get('clauseCandidates') or [])
+            'clauseCandidateCount':len(f.get('clauseCandidates') or []),
+            'submissionScanComplete':f.get('submissionScanComplete') is True,
+            'submissionScanVersion':int(f.get('submissionScanVersion') or 0)
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
     }
+    compact['submissionItems']=submission_summary(item)
+    compact['submissionScanComplete']=bool(item.get('manifestComplete') is True and
+        item.get('files') and all(f.get('submissionScanComplete') is True or
+            (f.get('skippedDuplicateFormat') is True and f.get('alternatePdfEvidence'))
+            for f in item.get('files') or []))
     compact['staffingRoles']=staffing_summary(item)
     compact['staffingFacts']=staffing_fact_summary(item)
     # Keep bounded source quotes for previous successful badge decisions when

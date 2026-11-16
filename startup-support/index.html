@@ -500,6 +500,20 @@
  #jobCards .job-bid-method-cell{font-size:13px}
 }
 
+/* Keep submission documents inside the existing thumbnail content flow. */
+#jobCards .job-submit{display:flex;gap:9px;align-items:flex-start;min-width:0;padding:5px 0;border-top:1px solid #e9eef5}
+#jobCards .job-submit-label{flex:none;padding-top:4px;font-size:13px;font-weight:850;color:#475569}
+#jobCards .job-submit-items{display:flex;gap:5px;flex-wrap:wrap;min-width:0}
+#jobCards .job-submit-chip{padding:4px 8px;border-radius:7px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4e82;font-size:13px;line-height:1.3;font-weight:750;word-break:keep-all}
+#jobCards .job-submit-chip.presentation{background:#f2edff;border-color:#ddd2fd;color:#593c93}
+#jobCards .job-submit-chip.post_award{background:#f1f5f9;border-color:#cbd5e1;color:#64748b}
+#jobCards .job-submit-chip.unknown,#jobCards .job-submit-chip.review{background:#fff7ed;border-color:#fed7aa;color:#9a5312}
+#jobCards .job-submit-chip.pending{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+#jobCards .job-submit-more{border:0;background:transparent;padding:5px 2px;color:#285b90;font-size:13px;font-weight:800;text-decoration:underline;cursor:pointer}
+#jobDetailModal .job-submission-evidence{padding:9px 0;border-bottom:1px solid #e2e8f0}
+#jobDetailModal .job-submission-evidence strong{font-size:15px;color:#17365c}
+#jobDetailModal .job-submission-evidence small{display:block;font-size:13px;color:#64748b;margin-top:4px}
+
 /* Tender thumbnail: only personal action points, never partner-managed performance/production checks. */
 #jobCards .job-req-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 2px;min-width:0}
 #jobCards .job-req-item{position:relative;display:inline-flex;align-items:center}
@@ -3563,7 +3577,7 @@ function ensureVisibleRfpCardEvidence(rows){
   // A scanned row is not enough: onsite '비상주' requires verified CURRENT
   // scanner versions. Query missing versions even when /saved provided a row.
   const state=rfpBestCardScan(key);
-  if(rfpCardHasCurrentVersion(state)||rfpCardEvidenceRequested.has(key))continue;
+  if((rfpCardHasCurrentVersion(state)&&Array.isArray(state?.submissionItems))||rfpCardEvidenceRequested.has(key))continue;
   rfpCardEvidenceRequested.add(key);
   pending.push(key);
  }
@@ -4333,6 +4347,47 @@ async function loadStandardBidEvidence(x){
  if(activeDetailJobId===x.id)renderJobDetail(x);
 }
 
+function jobSubmissionEvidence(x){
+ const id=jobBidIdentity(x);if(!id)return null;
+ const key=id.bidNo+':'+id.order,saved=rfpBestCardScan(key);
+ if(Array.isArray(saved?.submissionItems))return saved;
+ const snapshot=rfpSnapshotForJob(x);
+ return Array.isArray(snapshot?.submissionItems)?snapshot:null;
+}
+function jobSubmissionItems(x){
+ const items=jobSubmissionEvidence(x)?.submissionItems||[];
+ const unique=new Set();
+ return items.filter(v=>{
+  if(!v||typeof v.label!=='string'||!v.label.trim())return false;
+  const key=v.label+'|'+v.stage;
+  if(unique.has(key))return false;unique.add(key);return true;
+ }).slice(0,24);
+}
+function jobSubmissionCardMarkup(x){
+ if(!jobBidIdentity(x))return '';
+ const state=jobSubmissionEvidence(x),items=jobSubmissionItems(x),shown=items.filter(v=>v.stage!=='post_award').slice(0,3);
+ const stageName={bid:'입찰 시',presentation:'발표 시',post_award:'낙찰 후',unknown:'제출 시점 확인 필요'};
+ let markup=shown.map(v=>{
+   const stage=['bid','presentation','post_award'].includes(v.stage)?v.stage:'unknown';
+   const tip=(stageName[stage]||stageName.unknown)+' · '+(v.confidence==='source'?'원문 제출 문구':'제출 여부 확인 필요')+' · '+(v.sourceFile||'')+' · '+(v.sourceText||'');
+   return '<span class="job-submit-chip '+stage+(v.confidence==='source'?'':' review')+'" tabindex="0" title="'+htmlEscape(tip)+'">'+htmlEscape(v.label)+'</span>';
+ }).join('');
+ if(items.length>shown.length)markup+='<button type="button" class="job-submit-more" data-job-detail="'+htmlEscape(x.id)+'">+'+(items.length-shown.length)+'건</button>';
+ if(!markup)markup='<span class="job-submit-chip pending" title="제출물 별도 판독 결과 확인 필요">'+
+  (state?.submissionScanComplete===true?'제출물 미검출':'제출물 확인 필요')+'</span>';
+ return '<div class="job-submit"><span class="job-submit-label">제출물</span><div class="job-submit-items">'+markup+'</div></div>';
+}
+function jobSubmissionDetailMarkup(x){
+ if(!jobBidIdentity(x))return '';
+ const items=jobSubmissionItems(x);
+ if(!items.length)return '<section class="job-detail-section"><h3>제출물</h3><p>명시적으로 판독된 제출물이 없습니다. 원문 확인이 필요합니다.</p></section>';
+ const stageName={bid:'입찰 시',presentation:'발표 시',post_award:'낙찰 후',unknown:'시점 확인 필요'};
+ return '<section class="job-detail-section"><h3>제출물 · 원문 근거</h3>'+
+ items.map(v=>'<div class="job-submission-evidence"><strong>'+htmlEscape(v.label)+' · '+htmlEscape(stageName[v.stage]||stageName.unknown)+(v.confidence==='source'?'':' · 확인 필요')+'</strong>'+
+ '<small>'+htmlEscape(v.sourceFile||'출처 확인 필요')+(v.sourceLine?' · '+htmlEscape(String(v.sourceLine))+'행':'')+'</small>'+
+ '<small>'+htmlEscape(v.sourceText||'원문 인용 확인 필요')+'</small></div>').join('')+'</section>';
+}
+
 function renderJobDetail(x){
  if(activeDetailJobId!==x.id)return;
  const time=jobTimeInfo(x),partnerList=worklinksPartnerAccess()?partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)}):[];
@@ -4413,7 +4468,7 @@ function renderJobDetail(x){
  const actions='<div class="job-detail-actions"><a class="job-external-link" href="'+htmlEscape(orig)+'" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>'+
   (repeatYears(x)>1?'<button class="job-repeat" type="button" data-history-id="'+htmlEscape(x.id)+'">'+repeatYears(x)+'년 연속 · 연도별 업체</button>':'')+'</div>';
  const confirmedHistory=standardBidMarkup(x);
- document.getElementById('jobDetailBody').innerHTML=jobDetailRequirementGrid(x)+base+reviewNote+savedResearchMarkup(x)+docLinks+
+ document.getElementById('jobDetailBody').innerHTML=jobDetailRequirementGrid(x)+base+reviewNote+savedResearchMarkup(x)+jobSubmissionDetailMarkup(x)+docLinks+
   (extractHTML&&!jobSearchText?'<details class="job-detail-advanced"><summary>첨부문서 발췌 보기</summary>'+extractHTML+'</details>':'')+
   (confirmedHistory?'<section class="job-detail-section"><h3>개찰·낙찰·계약 이력</h3>'+confirmedHistory+'</section>':'')+
   bidChangePriceMarkup(x)+variantLinks+actions;
@@ -5946,6 +6001,7 @@ function renderJobs(){
        '<span class="job-amount" title="'+htmlEscape(jobAmountLabel(x.amount))+'">'+jobCardAmountMarkup(x)+'</span></div></div>'+
        bidMethodCardMarkup(x,member&&partnerMode)+
        jobCollectionMarkup(x)+
+       jobSubmissionCardMarkup(x)+
        '<div class="job-eligibility-row"><div class="job-eligibility-content">'+qualification+jobRequirementBadges(x)+partner+'</div></div>'+
        (member&&partnerMode?participationStrip(x,comparisonCompanies)+changcomOriginalReviewMarkup(x,comparisonCompanies,true):'')+
        '<div class="job-highlights">'+historyMarkup+

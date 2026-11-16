@@ -1,0 +1,38 @@
+name: WorkLinks tender submission documents regression
+on:
+  pull_request:
+    paths:
+      - 'scripts/rfp_submission.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_submission.py'
+      - '.github/workflows/worklinks-submission-docs-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/rfp_submission.py'
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_submission.py'
+      - '.github/workflows/worklinks-submission-docs-ci.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python compile and document parser checks
+        run: |
+          python -m py_compile scripts/rfp_submission.py scripts/refresh_worklinks_rfp.py server/g2b-proxy.py
+          python tests/test_rfp_submission.py
+      - name: Existing RFP evidence contract
+        run: python tests/test_rfp_card_evidence_batch.py
+      - name: JavaScript check from existing frontend regression
+        run: node tests/worklinks-jobs-regression.cjs
