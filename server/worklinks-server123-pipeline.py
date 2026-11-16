@@ -545,6 +545,40 @@ def retry_published_ocr_reconcile(attempts=3):
     return False
 
 
+def run_child_with_heartbeat(runner, command, cwd, env, timeout, *, pulse=None, interval=15):
+    """Keep telemetry alive ONLY while the child job is actually executing.
+
+    A 150s OCR pass must not be reported as a disconnected scan worker just
+    because subprocess.run is blocking the scheduler. Heartbeats report worker
+    liveness, never file-level progress or a successful scan result.
+    """
+    if pulse is None:
+        return runner(command, cwd=cwd, env=env,
+                      capture_output=True, text=True, timeout=timeout)
+    stop=threading.Event()
+    def heartbeat():
+        while not stop.is_set():
+            try:pulse()
+            except Exception as exc:
+                log('PIPELINE_SCAN_HEARTBEAT_ERROR',type(exc).__name__)
+            if stop.wait(interval):break
+    thread=threading.Thread(target=heartbeat,
+        name='rfp-child-execution-heartbeat',daemon=True)
+    thread.start()
+    try:
+        return runner(command, cwd=cwd, env=env,
+                      capture_output=True, text=True, timeout=timeout)
+    finally:
+        stop.set()
+        thread.join(timeout=2)
+
+
+def scan_child_heartbeat_pulse():
+    sys.path.insert(0,str(SCRIPTS))
+    import rfp_live_activity as live_trace
+    live_trace.worker('scan','running')
+
+
 def run_once(kind, runner=None, _single=False):
     """Run one job in an isolated writable workspace, atomic publish on success."""
     dual_enabled=(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE')=='1')
@@ -633,10 +667,13 @@ def run_once(kind, runner=None, _single=False):
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_open_award_fallback.py')]
         else:
             command = [sys.executable, str(root / 'scripts' / 'refresh_worklinks_actionable.py')]
+        real_worker=(runner is None)
         if runner is None:
             runner = subprocess.run
-        completed = runner(command, cwd=str(root), env=env,
-                           capture_output=True, text=True, timeout=TIMEOUT[kind])
+        completed = run_child_with_heartbeat(
+            runner,command,cwd=str(root),env=env,timeout=TIMEOUT[kind],
+            pulse=(scan_child_heartbeat_pulse if
+                   real_worker and kind in ('rfpUpgrade','rfpOpenRepair') else None))
         for line in (completed.stdout or '').splitlines()[-15:]:
             log('PIPELINE_LOG', kind, line[:400])
         # Capture aggregate on-server OCR phase timings without source text,
