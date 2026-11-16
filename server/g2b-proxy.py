@@ -1308,6 +1308,20 @@ def saved_rfp_search_state(row, compact=False, historical=False):
         if urlparse(url).hostname=='www.g2b.go.kr' and urlparse(url).scheme=='https':
             datum['sourceUrl']=url
         facts.append(datum)
+    submission_items=[]
+    for item in (row.get('submissionItems') or [])[:24]:
+        if not isinstance(item,dict):continue
+        stage=str(item.get('stage') or 'unknown')
+        if stage not in ('bid','presentation','post_award','unknown'):continue
+        label=str(item.get('label') or '').strip()[:44]
+        if not label:continue
+        submission_items.append({
+            'label':label,'stage':stage,
+            'confidence':'source' if item.get('confidence')=='source' else 'review',
+            'sourceFile':str(item.get('sourceFile') or '')[:160],
+            'sourceLine':int(item.get('sourceLine') or 0),
+            'sourceText':str(item.get('sourceText') or '')[:260]})
+    submission_complete=row.get('submissionScanComplete') is True
     # Scanner and public saved API must use the SAME narrow staffing scope.
     # Source-verified RFP files are already scanned; a blank, unrelated
     # bid-application/pledge form can retain its text-extraction failure without
@@ -1354,7 +1368,9 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'effectiveReadableCount':effective_readable,
             'excerpts':labels[:14],
             'staffingRoles':role_rows,'staffingFacts':facts,
-            'staffingRoleScanComplete':role_scan_complete}
+            'staffingRoleScanComplete':role_scan_complete,
+            'submissionItems':submission_items,
+            'submissionScanComplete':submission_complete}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
     # NOT an interpretation that the bidder is qualified.
     excerpts=[]
@@ -1387,6 +1403,8 @@ def saved_rfp_search_state(row, compact=False, historical=False):
     return {'sourceAvailable':True,'seen':True,'complete':good,
             'staffingRoles':role_rows,'staffingFacts':facts,
             'staffingRoleScanComplete':role_scan_complete,
+            'submissionItems':submission_items,
+            'submissionScanComplete':submission_complete,
             'scanComplete':scan_complete,
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
