@@ -2198,8 +2198,13 @@ async function refreshRfpRescanProgress(force=false){
     throw Error('집계 데이터 형식 오류');
    const previous=rfpRescanProgress;
    const prevCount=previous?.counts?.completed;
-   rfpRescanLastDelta=Number.isFinite(Number(prevCount))&&previous?Number(report.counts.completed)-Number(prevCount):0;
-   if(rfpRescanLastDelta!==0||!rfpRescanLastChangeAt)rfpRescanLastChangeAt=Date.now();
+   // A cohort change (new/expired bid) can change the completed number
+   // without a newly finished scan. Only same-cohort increases are progress.
+   const sameCohort=previous&&Number(previous.counts.eligible)===Number(report.counts.eligible)
+     &&Number(previous.counts.total)===Number(report.counts.total);
+   rfpRescanLastDelta=sameCohort&&Number.isFinite(Number(prevCount))
+     ?Math.max(0,Number(report.counts.completed)-Number(prevCount)):0;
+   if(rfpRescanLastDelta>0||!rfpRescanLastChangeAt)rfpRescanLastChangeAt=Date.now();
    if(previous&&String(previous.asOf||'')===String(report.asOf||''))rfpRescanSameSnapshotSince=rfpRescanSameSnapshotSince||Date.now();
    else rfpRescanSameSnapshotSince=0;
    rfpRescanProgress=report;rfpRescanProgressError='';rfpRescanLastRead=Date.now();rfpRescanLastSuccessAt=Date.now();
