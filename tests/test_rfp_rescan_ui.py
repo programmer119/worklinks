@@ -109,13 +109,26 @@ with sync_playwright() as p:
     modal=page.locator('#rfpRescanModal')
     assert modal.get_attribute('aria-hidden')=='false' and page.evaluate("() => document.getElementById('rfpRescanModal').classList.contains('open')")
     page.wait_for_function(
-      "() => document.querySelector('#rfpRescanContent')?.textContent.includes('실제 작업 진행 중')",
+      "() => document.querySelector('#rfpRescanContent')?.textContent.includes('작업 실행 확인 · 완료 미확정')",
       timeout=12000)
     body=page.locator('#rfpRescanContent').text_content()
     for term in ('관리 대상','6','최신 판독 완료','1','구버전',
-                 '최초 미판독','역할·인원','16.67%','실제 작업 진행 중','파일 다운로드 8개','판독 4건'):
+                 '최초 미판독','역할·인원','16.67%','작업 실행 확인 · 완료 미확정','파일 다운로드 8개','판독 시도 4건'):
         assert term in body,(term,body)
     assert '첨부목록 확보' in body and '4 / 6건' in body,body
+    # An in-flight scan must never be mislabeled as completed progress.
+    # Filename selection must not rotate every four seconds by a fake carousel.
+    before_name=page.locator('[data-rfp-stage="scan"] .rfp-stage-focus-name').text_content()
+    page.evaluate("""() => {
+      const now=Date.now;
+      try { Date.now=()=>now()+4200; paintRfpLaneFocus(); }
+      finally { Date.now=now; }
+    }""")
+    assert page.locator('[data-rfp-stage="scan"] .rfp-stage-focus-name').text_content()==before_name
+    page.evaluate("() => {rfpRescanLastChangeAt=Date.now()-65000;paintRfpRescanProgress();}")
+    assert '판독 시도 중 · 완료 증가 없음' in page.locator('#rfpRescanContent').text_content()
+    assert '신규 완료 0건' in page.locator('#rfpRescanContent').text_content()
+    assert '실제 작업 진행 중' not in page.locator('#rfpRescanContent').text_content()
     assert '원본 다운로드' in body and '정상 3 · 오류 0건 · 전체 6건' in body,body
     assert '사업제안요청서.pdf' in body and '외 7개' in body,body
     assert '다운로드 중 00:' in body,body
