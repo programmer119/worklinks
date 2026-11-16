@@ -263,11 +263,14 @@
    const recent=allItems.filter(x=>x.status==='done'&&now-Number(x.updatedEpoch||0)<=30);
    const choices=working.length?[...working.slice(0,8),...broken.slice(0,2)]
     :broken.length?broken.slice(0,5):recent.slice(0,3);
-   const selected=choices.length?choices[Math.floor(Date.now()/4000)%choices.length]:null;
+   // Never rotate fake 'progress' by the clock. Show one real, latest
+   // server-reported file and change it only when the server data changes.
+   const selected=choices.length?choices[0]:null;
    const active=Math.max(0,Number(lane?.active||0));
    const failed=Math.max(0,Number(lane?.failed||0));
    const problems=Math.max(failed,broken.length);
-   let badge=active?'진행 '+active+'건':problems?'재시도 '+problems+'건':'';
+   let badge=active?(key==='scan'?'판독 시도 '+active+'건':'진행 '+active+'건'):
+      problems?'재시도 '+problems+'건':'';
    if(active&&problems)badge+=' · 오류 '+problems+'건';
    if(worker?.status==='retry'&&Number(worker.retryEpoch)>now)
     badge=retryRfpText(worker.retryEpoch,now);
@@ -307,7 +310,7 @@
    }
    if(key==='scan'&&Number(lane?.notQueued||0)>0)
     bits.push('작업 큐 미편입 '+Number(lane.notQueued)+'건');
-   if(selected&&choices.length>1)bits.push((choices.indexOf(selected)+1)+'/'+choices.length);
+   // No '1/8' carousel counter: that was just a display index, not work.
    detail=bits.join(' · ');
    const filePct=selected?.bytesTotal>0?
     Math.max(0,Math.min(100,100*Number(selected.bytesDone||0)/Number(selected.bytesTotal))):0;
@@ -357,6 +360,8 @@
   const dlFiles=downloadGroup?.available?Math.max(0,Number(downloadGroup.activeCount||0)):null;
   const scanActive=Math.max(0,Number(lanes?.scan?.active||0));
   const active=!delayed&&(dlNotices>0||dlFiles>0||scanActive>0||scanWorkerActive);
+  const noCompletionFor=Math.max(0,Math.floor((Date.now()-Number(rfpRescanLastChangeAt||Date.now()))/1000));
+  const noNewCompletion=Boolean(!delayed&&(scanActive>0||scanWorkerActive)&&noCompletionFor>=30);
   for(const [name,value] of Object.entries({
    total:number(eligible),allNotices:number(all),complete:number(done),rescanRequired:number(Math.max(0,Number(counts.remaining??(eligible-done)))),
    excluded:number(excluded),unscanned:number(counts.unscanned),legacy:number(counts.legacy),
@@ -366,14 +371,17 @@
   totalBar.setAttribute('aria-valuenow',pct.toFixed(1));
   totalBar.firstElementChild.style.width=pct.toFixed(2)+'%';
   const live=panel.querySelector('.rfp-rescan-livebar');
-  live.classList.toggle('is-active',active);
+  // Do not pulse like successful progress when the server only retries failures.
+  live.classList.toggle('is-active',active&&!noNewCompletion);
   live.classList.toggle('is-stale',delayed);
   updateField(panel,'liveText',delayed?'서버 집계 갱신 지연':
-   active?'실제 작업 진행 중':worker?.upgradeActive?'판독 작업 확인 중':'현재 처리 중인 공고 없음');
+   noNewCompletion?'판독 시도 중 · 완료 증가 없음':
+   active?'작업 실행 확인 · 완료 미확정':worker?.upgradeActive?'판독 작업 확인 중':'현재 처리 중인 공고 없음');
   const activeParts=[];
   if(dlFiles>0)activeParts.push('파일 다운로드 '+number(dlFiles)+'개');
   else if(dlNotices>0)activeParts.push('원본 준비 '+number(dlNotices)+'건');
-  if(scanActive)activeParts.push('판독 '+number(scanActive)+'건');
+  if(scanActive)activeParts.push('판독 시도 '+number(scanActive)+'건');
+  if(noNewCompletion)activeParts.push('신규 완료 0건 · '+noCompletionFor+'초');
   if(scanWorkerActive&&!scanActive)activeParts.push('판독 배치 실행');
   const delta=Number(rfpRescanLastDelta||0);
   if(delta>0)activeParts.push('최근 판독 +'+number(delta)+'건');
@@ -401,7 +409,9 @@
    let state=available?(total?progress.toFixed(1)+'%':'해당 없음'):'집계 미제공';
    if(key==='download'&&errors>0)state='원본 오류 '+number(errors)+'건';
    else if(key==='manifest'&&available&&total&&completed===total)state='확보 완료';
-   else if(stageActive)state='진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
+   else if(stageActive)state=key==='scan'
+    ?(noNewCompletion?'완료 증가 없음':'판독 시도 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':''))
+    :'진행 중'+(Number(stage.active||0)>0?' '+number(stage.active)+'건':'');
    else if(available&&total&&processed===total)state='처리 완료';
    else if(key==='download'&&errors)state='오류 '+number(errors)+'건';
    else if(key==='manifest'&&available&&total&&completed<total)state='순차 확보';
