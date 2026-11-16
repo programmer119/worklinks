@@ -18,6 +18,15 @@ assert not checked('기계설비 시방서','기계설비 시방서',0.002,8)
 assert not checked('Hello','Hello',0.001,1)
 assert not checked('','',0.001,1)
 
+# Visually checked actual official SHA-verified PDF page 1: only
+# "3. 시 방 서" on one full-page image, ink ratio 0.00222. A filename-exact
+# title may be accepted even if PSM11 garbles the same sparse title.
+assert rfp.verified_sparse_title_page('3. 시 방 서','시방서.pdf',0,0.00222,1).strip()=='3. 시 방 서'
+assert not rfp.verified_sparse_title_page('3. 시 방 서','다른문서.pdf',0,0.00222,1)
+assert not rfp.verified_sparse_title_page('3. 시 방 서','시방서.pdf',1,0.00222,1)
+assert not rfp.verified_sparse_title_page('3. 시 방 서','시방서.pdf',0,0.02,1)
+assert not rfp.verified_sparse_title_page('3. 시 방 서','시방서.pdf',0,0.00222,2)
+
 f={'name':'verified-cover.pdf','readable':False,
    'sourceTextScanComplete':False,'errorCategory':'pdf_ocr_incomplete',
    'lastReaderAttemptVersion':R.READER_ATTEMPT_VERSION,
