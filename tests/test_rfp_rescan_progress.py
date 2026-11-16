@@ -220,3 +220,33 @@ with tempfile.TemporaryDirectory() as temp:
     assert stage['scan']['staleQueueComplete']==1,stage
     assert stage['scan']['active']==0,stage
 print('RFP_NO_FILE_SKIPPED_NOT_FAILED_OR_STALE=PASS')
+
+
+# Regression from live server123 (2026-11-16): a confirmed HTTP 422 notice
+# had six previously verified receipts and a completed scan checkpoint. It
+# must NOT count both as a successful full download and a confirmed failure.
+with tempfile.TemporaryDirectory() as tmp:
+    path=Path(tmp)/'confirmed-overlap.sqlite3'
+    ids=['R26BK00009301:000','R26BK00009302:000','R26BK00009303:000']
+    missing={'downloadErrorFiles':[{
+        'name':'긴급입찰 사유서.hwp',
+        'reason':'official_attachment_reference_missing_422',
+        'httpStatus':422}],
+        'downloadVerifiedFiles':[{'name':'other.pdf','sha256':'a'*64}]}
+    with sqlite3.connect(path) as db:
+        db.execute('CREATE TABLE rfp_dual_notices (notice_key TEXT PRIMARY KEY, download_status TEXT, scan_status TEXT, metadata_json TEXT, updated_at TEXT)')
+        db.execute('CREATE TABLE rfp_bulk_manifests (notice_key TEXT PRIMARY KEY)')
+        db.executemany('INSERT INTO rfp_dual_notices VALUES (?,?,?,?,?)', [
+            (ids[0],'error_confirmed','done',json.dumps(missing,ensure_ascii=False),''),
+            (ids[1],'ready','done','{}',''),
+            (ids[2],'no_attachments','skipped','{}','')])
+        db.executemany('INSERT INTO rfp_bulk_manifests VALUES (?)',
+                       [(key,) for key in ids])
+    lanes=p['rfp_cohort_lanes'](str(path),set(ids),{ids[0],ids[1]})
+    download=lanes['download']
+    assert download['total']==3 and download['done']==2,lanes
+    assert download['errors']==1 and download['processed']==3,lanes
+    assert download['done']+download['errors']==download['total'],lanes
+    assert download['errorDetails'][0]['noticeKey']==ids[0],lanes
+    assert download['errorDetails'][0]['files'][0]['httpStatus']==422,lanes
+print('WORKLINKS_CONFIRMED_ORIGINAL_NOT_DOUBLE_COUNTED_AS_SUCCESS=PASS')
