@@ -53,3 +53,62 @@ jobs:
 # v13 postdeploy live audit after OCR fairness + XML HWPML + sparse-page fallback
 
 # v14 after verified production deployment, 20261116
+
+  export-current-diagnosis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read server123 RFP live diagnosis and publish compact results to audit branch
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import datetime,gzip,json,urllib.request
+          from pathlib import Path
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          report={'checkedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'mode':'read_only','upstreamCalls':0}
+          for key,url in [
+            ('progress','rfp-rescan-progress'),
+            ('causes','rfp-rescan-causes?limit=150&offset=0'),
+            ('attribution','rfp-ocr-repair-attribution')]:
+              try:
+                req=urllib.request.Request(base+url,headers={'Accept-Encoding':'gzip',
+                  'User-Agent':'WorkLinks-Live-RFP-Cause-Audit/1.0','Cache-Control':'no-cache'})
+                with urllib.request.urlopen(req,timeout=65) as response:
+                  raw=response.read()
+                  if response.headers.get('Content-Encoding')=='gzip':raw=gzip.decompress(raw)
+                data=json.loads(raw)
+                if key=='progress':
+                  report[key]={k:data.get(k) for k in ('asOf','counts','worker','lanes','activity','stages')}
+                elif key=='causes':
+                  report[key]={k:data.get(k) for k in ('asOf','counts','actualIssueNoticeCount',
+                    'primaryCauseCounts','categoryCounts','overlappingIssueNoticeCounts','problemFileErrorCounts','upstreamCalls')}
+                  report['problemNotices']=[
+                    {'noticeKey':row.get('noticeKey'),'rootCause':row.get('rootCause'),
+                     'scanStatus':row.get('scanStatus'),'reason':row.get('reason'),
+                     'files':[{'name':file.get('name'),'errorCategory':file.get('errorCategory'),
+                       'reason':file.get('reason'),'errorDetail':file.get('errorDetail'),
+                       'lastReaderAttemptVersion':file.get('lastReaderAttemptVersion'),
+                       'detectedFormat':file.get('detectedFormat'),
+                       'ocrBatchDeferredPages':file.get('ocrBatchDeferredPages'),
+                       'ocrFailedPages':file.get('ocrFailedPages')}
+                       for file in (row.get('files') or [])]}
+                    for row in (data.get('records') or [])]
+                else:
+                  report[key]=data
+              except Exception as e:
+                report[key+'Error']=type(e).__name__+': '+str(e)[:500]
+          target=Path('diagnostics/rfp-rescan-live-20261116.json')
+          target.parent.mkdir(exist_ok=True)
+          target.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('AUDIT_COUNTS',json.dumps(report.get('progress',{}).get('counts'),ensure_ascii=False),flush=True)
+          print('AUDIT_ROOT',json.dumps(report.get('causes',{}).get('primaryCauseCounts'),ensure_ascii=False),flush=True)
+          print('AUDIT_ERRORS',json.dumps({k:v for k,v in report.items() if k.endswith('Error')},ensure_ascii=False),flush=True)
+          PY
+          git config user.name "worklinks-audit-bot"
+          git config user.email "worklinks-audit-bot@users.noreply.github.com"
+          git add diagnostics/rfp-rescan-live-20261116.json
+          git commit -m "audit: save read-only production RFP diagnosis"
+          git push origin HEAD:refs/heads/diagnostics/rfp-live-20261116
