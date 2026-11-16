@@ -719,6 +719,28 @@ def verified_complete_for_early_checkpoint(record,metadata):
     return True
 
 
+def source_verified_current_repair_rows(root,snapshot_rows):
+    """Use the newest authoritative scan evidence for repair, not an older
+    successful snapshot shadowed by a later OCR-failure checkpoint.
+
+    Never merge records from a changed official manifest. A failing new
+    extraction is kept incomplete; an old successful record cannot be made
+    'newly successful' by a mere timestamp bump.
+    """
+    from rfp_management_reconcile import read_evidence, same_thumbnail_original
+    _versions,authoritative=read_evidence(root)
+    rows=dict(snapshot_rows)
+    for key,previous in snapshot_rows.items():
+        latest=authoritative.get(key)
+        if (not isinstance(previous,dict) or not isinstance(latest,dict)
+                or str(latest.get('checkedAt') or '')<=
+                   str(previous.get('checkedAt') or '')):
+            continue
+        if same_thumbnail_original(previous,latest):
+            rows[key]=latest
+    return rows
+
+
 def run(data_dir,limit,execute=False,max_files=400,workers=1,
         per_notice_cap=3,minimum_old_ocr=0,minimum_format_fixes=0):
     root=Path(data_dir)
@@ -738,7 +760,8 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
     queue_path=Path(os.environ.get('WORKLINKS_RFP_DUAL_QUEUE_DB') or
                     root/'rfp-dual-queue.sqlite3')
     ready_downloads=verified_download_queue(queue_path)
-    entries=read_json(coverage_path).get('byNotice') or {}
+    entries=source_verified_current_repair_rows(
+        root,read_json(coverage_path).get('byNotice') or {})
     now=dt.datetime.now(dt.timezone.utc)
     open_rows=open_candidates(root,now)
     candidates=[];categories=Counter();selected_file_count=0
@@ -797,10 +820,11 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
         # Rebase every patch on the latest index so other notices are preserved.
         latest_doc=read_json(coverage_path)
         current_rows=latest_doc.get('byNotice') or {}
+        current_views=source_verified_current_repair_rows(root,current_rows)
         timestamp=dt.datetime.now(dt.timezone.utc).isoformat()
         applied={}
         for key,(work,additions) in pending.items():
-            current=current_rows.get(key)
+            current=current_views.get(key)
             if not isinstance(current,dict):
                 tally['changed_while_repairing']+=1;continue
             live_files=current.get('files') or []
@@ -812,6 +836,9 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
             for i,entry in enumerate(fixed_files):
                 merge_verified_repair_attempt(live_files[i],entry)
             update_counts(current,timestamp,additions)
+            # Publish the newest verified checkpoint plus this attempt, never
+            # an obsolete all-readable snapshot that hides later PDF errors.
+            current_rows[key]=current
             applied[key]={'readable':current['readableDocumentCount'],
                           'total':len(live_files),'repaired':len(additions)}
         if applied:
@@ -839,7 +866,8 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
                     'reconciledOldStatus':reconciled}
         # The snapshot belongs to this isolated stage; concurrent threads only
         # read it. The downloader's current SHA receipt is checked per notice.
-        latest_index=read_json(coverage_path).get('byNotice') or {}
+        latest_index=source_verified_current_repair_rows(
+            root,read_json(coverage_path).get('byNotice') or {})
         tasks=[]
         for key,deadline,meta,src,file_limit in selected:
             if deadline.astimezone(dt.timezone.utc)<=dt.datetime.now(dt.timezone.utc)+dt.timedelta(hours=24):
