@@ -147,7 +147,10 @@ class RfpDualQueue:
                         added+=1
                     elif cur[0]!=fingerprint:
                         db.execute('''UPDATE rfp_dual_notices
-                            SET reader_fingerprint=?,scan_status='pending',scan_retry_epoch=0,
+                            SET reader_fingerprint=?,
+                                scan_status=CASE WHEN download_status='no_attachments'
+                                    THEN 'skipped' ELSE 'pending' END,
+                                scan_retry_epoch=0,
                                 scan_repeat_count=0,scan_failure_signature='',
                                 closes_on=?,updated_at=? WHERE notice_key=?''',
                             (fingerprint,val,now_utc(),key))
@@ -155,6 +158,43 @@ class RfpDualQueue:
                         db.execute('''UPDATE rfp_dual_notices SET closes_on=?
                             WHERE notice_key=? AND closes_on<>?''',(val,key,val))
         return added
+
+    def restore_verified_empty_skips(self):
+        """Correct stale empty manifests accidentally made pending by reader upgrades.
+
+        Every selected row must carry a complete, source-verified empty
+        attachment manifest and a stored bulk manifest. Never fake success,
+        and never discard any downloaded original or incomplete scan.
+        """
+        repaired=0
+        with self.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            rows=db.execute("""SELECT notice_key,metadata_json FROM rfp_dual_notices
+                WHERE download_status='no_attachments' AND scan_status='pending'
+                  AND EXISTS(SELECT 1 FROM rfp_bulk_manifests m
+                             WHERE m.notice_key=rfp_dual_notices.notice_key)""").fetchall()
+            for key,payload in rows:
+                try:meta=json.loads(payload)
+                except (TypeError,ValueError):continue
+                if not isinstance(meta,dict):continue
+                attachments=meta.get('attachments') or {}
+                notice=meta.get('noticeDocuments') or {}
+                if not (isinstance(attachments,dict) and isinstance(notice,dict)
+                        and attachments.get('ok') is True
+                        and attachments.get('complete') is True
+                        and notice.get('ok') is True
+                        and notice.get('complete') is True
+                        and isinstance(attachments.get('items'),list)
+                        and len(attachments['items'])==0):
+                    continue
+                db.execute("""UPDATE rfp_dual_notices SET
+                    scan_status='skipped',scan_retry_epoch=0,
+                    scan_repeat_count=0,scan_failure_signature='',
+                    last_error='',updated_at=?
+                    WHERE notice_key=? AND download_status='no_attachments'
+                      AND scan_status='pending'""",(now_utc(),key))
+                repaired+=db.execute('SELECT changes()').fetchone()[0]
+        return repaired
 
     def reconcile_management(self,managed,latest_valid,fingerprint):
         """Idempotently restore the real known-deadline cohort.
@@ -168,6 +208,7 @@ class RfpDualQueue:
             raise ValueError('invalid_management_cohort')
         if not isinstance(fingerprint,str) or not fingerprint:
             raise ValueError('invalid_reader_fingerprint')
+        restored_empty=self.restore_verified_empty_skips()
         with self.connect() as db:
             old={key:(download,scan,version,closes)
                 for key,download,scan,version,closes in db.execute('''
@@ -176,6 +217,7 @@ class RfpDualQueue:
         tally={'managed':len(managed),'latestValid':len(valid),
                'missingAdded':0,'previouslyValidAdded':0,
                'obsoleteDoneRequeued':0,'verifiedEmptyBlocked':0,
+               'verifiedEmptyRestored':restored_empty,
                'completedEvidenceReconciled':0,
                'outsideScopePreserved':len(set(old)-set(managed))}
         entries=sorted(managed.items())
