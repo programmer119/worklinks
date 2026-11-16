@@ -100,9 +100,36 @@ def completed_thumbnail_source(row):
     return usable>0
 
 
+def positive_thumbnail_source(row):
+    """Allow independent, source-cited successes even on an incomplete RFP.
+
+    An unread PDF never licenses an inferred absence. Only a readable and
+    SHA-identifiable PDF/HWP source carrying a positive finding is eligible.
+    """
+    if not isinstance(row,dict) or row.get('manifestChangePending'):
+        return False
+    readable={str(f.get('name') or '') for f in (row.get('files') or [])
+        if isinstance(f,dict) and f.get('readable') is True and
+        f.get('sourceTextScanComplete') is True and
+        len(str(f.get('sourceSha256') or ''))==64}
+    if not readable:return False
+    records=list(row.get('staffingRoles') or [])+list(row.get('staffingFacts') or [])+list(row.get('thumbnailClauses') or [])
+    for item in records:
+        if not isinstance(item,dict):
+            continue
+        source=str(item.get('sourceFile') or '')
+        quote=str(item.get('sourceText') or item.get('text') or '')
+        if source in readable and quote.strip():
+            if item.get('role') or item.get('kind') or re.search(
+                    r'4\s*대\s*보험|사대\s*보험|건강\s*보험|고용\s*보험|상주|현장\s*근무|인력|인원',
+                    quote,re.I):
+                return True
+    return False
+
+
 def last_success_thumbnail(row):
-    """Return bounded, nonrecursive, evidenced historical source or None."""
-    if not completed_thumbnail_source(row):
+    """Return bounded previous verified full scan OR individual cited positives."""
+    if not (completed_thumbnail_source(row) or positive_thumbnail_source(row)):
         return None
     fields=('status','checkedAt','classificationVersion','hwpxReaderVersion',
             'manifestSignature','manifestComplete','staffingRoleScanComplete',
@@ -131,21 +158,41 @@ def last_success_thumbnail(row):
 
 
 def preserve_last_success_thumbnail(candidate,previous):
-    """Carry one old verified snapshot only across unchanged originals."""
+    """Carry last individual successes only across the SAME original source."""
     if not isinstance(candidate,dict) or not isinstance(previous,dict):
         return candidate
     if completed_thumbnail_source(candidate):
         candidate.pop('lastSuccessfulThumbnail',None)
         return candidate
     archived=previous.get('lastSuccessfulThumbnail')
-    snapshot=(archived if isinstance(archived,dict) and
-              completed_thumbnail_source(archived) else
-              last_success_thumbnail(previous))
+    if not (isinstance(archived,dict) and
+            (completed_thumbnail_source(archived) or positive_thumbnail_source(archived))):
+        archived=None
+    recent=last_success_thumbnail(previous)
+    if archived and recent and same_thumbnail_original(archived,recent):
+        # A previous partial recheck may have confirmed ANOTHER field. Keep
+        # all independently cited facts/roles/quotes until full success.
+        combined=dict(archived)
+        for field,cap in (('staffingRoles',24),('staffingFacts',35),
+                          ('thumbnailClauses',14)):
+            collected=[];seen=set()
+            for item in (archived.get(field) or [])+(recent.get(field) or []):
+                if not isinstance(item,dict):continue
+                identity=json.dumps(item,ensure_ascii=False,sort_keys=True)
+                if identity in seen:continue
+                seen.add(identity)
+                collected.append(item)
+                if len(collected)>=cap:break
+            combined[field]=collected
+        snapshot=combined
+    else:
+        snapshot=archived or recent
     if snapshot and same_thumbnail_original(candidate,snapshot):
         candidate['lastSuccessfulThumbnail']=snapshot
     else:
         candidate.pop('lastSuccessfulThumbnail',None)
     return candidate
+
 
 def deadline_kst(value):
     match=re.search(r'(20\d{2})[-./]?(\d{2})[-./]?(\d{2})(?:[T\s]*(\d{1,2}):?(\d{2}))?',
