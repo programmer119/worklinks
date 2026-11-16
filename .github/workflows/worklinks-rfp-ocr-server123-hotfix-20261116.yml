@@ -52,3 +52,58 @@ jobs:
                   print('OCR_REPAIR_REMAINING_FILES', (data.get('problemFileErrorCounts') or {}).get('pdf_ocr_incomplete'),flush=True)
           PY
           echo OCR_SERVER123_DEPLOY_INSTALLED_AND_WORKER_RUNNING=PASS
+
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect the production deployment job status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import datetime,json,os,time,urllib.request
+          url='https://api.github.com/repos/'+os.environ['GH_REPOSITORY']+'/actions/runs/'+os.environ['GH_RUN_ID']+'/jobs?per_page=100'
+          output={'checkedAt':None,'deploy':None,'runId':int(os.environ['GH_RUN_ID'])}
+          for attempt in range(7):
+              request=urllib.request.Request(url,headers={
+                  'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                  'Accept':'application/vnd.github+json','User-Agent':'WorkLinks-deploy-monitor'})
+              try:
+                  with urllib.request.urlopen(request,timeout=15) as response:
+                      obj=json.load(response)
+                  deployments=[j for j in obj.get('jobs',[]) if j.get('name')=='deploy']
+                  if deployments:
+                      job=deployments[0]
+                      output['deploy']={
+                          'id':job.get('id'),'status':job.get('status'),
+                          'conclusion':job.get('conclusion'),'startedAt':job.get('started_at'),
+                          'completedAt':job.get('completed_at'),
+                          'runnerName':job.get('runner_name'),
+                          'htmlUrl':job.get('html_url'),
+                          'steps':[{'name':x.get('name'),'status':x.get('status'),
+                            'conclusion':x.get('conclusion')} for x in (job.get('steps') or [])]}
+                  else:output['deploy']={'status':'job_not_listed'}
+              except Exception as exc:output['error']=type(exc).__name__+': '+str(exc)[:200]
+              output['checkedAt']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+              if output['deploy'] and output['deploy'].get('status')=='completed':break
+              if attempt<6:time.sleep(15)
+          import pathlib
+          target=pathlib.Path('diagnostics/rfp-ocr-server123-deployment-state-20261116.json')
+          target.parent.mkdir(exist_ok=True)
+          target.write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+          print('OCR_DEPLOY_JOB_STATUS',json.dumps(output,ensure_ascii=False),flush=True)
+          PY
+          git config user.name "worklinks-audit-bot"
+          git config user.email "worklinks-audit-bot@users.noreply.github.com"
+          git add diagnostics/rfp-ocr-server123-deployment-state-20261116.json
+          git commit -m "audit: record server123 PDF OCR deployment job state"
+          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-server123-deployment-20261116
