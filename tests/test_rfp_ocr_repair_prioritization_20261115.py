@@ -100,6 +100,6 @@ def ocr_retry(restored, recovered, deferred):
 assert not repair.reader_retry_files(ocr_retry(31,31,118)), 'cached pages are NOT new progress'
 assert len(repair.reader_retry_files(ocr_retry(31,34,115)))==1, 'three NEW pages merit a next slice'
 assert not repair.reader_retry_files(ocr_retry(31,34,0)), 'no deferred pages means no loop'
-assert len(repair.reader_retry_files(ocr_retry(31,31,118) | {}))==0
+assert not repair.reader_retry_files(ocr_retry(31,31,118))
 print('RFP_OCR_RETRY_REQUIRES_NEW_RECOVERED_PAGES=PASS')
 print('RFP_OCR_PRIORITY_AND_LARGE_MANIFEST_FILE_BUDGET=PASS')
