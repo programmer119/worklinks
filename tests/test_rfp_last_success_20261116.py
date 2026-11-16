@@ -59,4 +59,14 @@ unsigned={**old,'manifestSignature':''}
 uncertain={**new,'manifestSignature':'',
            'files':[dict(new['files'][0],sourceSha256='')]}
 assert not same_thumbnail_original(uncertain,unsigned)
+# One successful badge must survive even when a different PDF failed and
+# the notice never became fully current. Never promote a negative from this.
+partial={**old,'manifestComplete':False,'staffingRoleScanComplete':False}
+assert not completed_thumbnail_source(partial)
+assert last_success_thumbnail(partial),'source-cited partial positives are valid'
+recheck=dict(new,'lastSuccessfulThumbnail':{})
+retained=preserve_last_success_thumbnail(recheck,partial)
+assert retained['lastSuccessfulThumbnail']['staffingRoles'][0]['role']=='개발자'
+assert retained['lastSuccessfulThumbnail']['thumbnailClauses'][0]['text'].startswith('입찰 참가')
+print('RFP_INDIVIDUAL_POSITIVE_SURVIVES_INCOMPLETE_WHOLE_NOTICE=PASS')
 print('RFP_LAST_SUCCESS_PRESERVED_AND_SHA_GUARDED=PASS')
