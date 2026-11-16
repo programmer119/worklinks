@@ -64,7 +64,7 @@ assert not same_thumbnail_original(uncertain,unsigned)
 partial={**old,'manifestComplete':False,'staffingRoleScanComplete':False}
 assert not completed_thumbnail_source(partial)
 assert last_success_thumbnail(partial),'source-cited partial positives are valid'
-recheck=dict(new,'lastSuccessfulThumbnail':{})
+recheck=dict(new,lastSuccessfulThumbnail={})
 retained=preserve_last_success_thumbnail(recheck,partial)
 assert retained['lastSuccessfulThumbnail']['staffingRoles'][0]['role']=='개발자'
 assert retained['lastSuccessfulThumbnail']['thumbnailClauses'][0]['text'].startswith('입찰 참가')
