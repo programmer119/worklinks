@@ -147,7 +147,7 @@ jobs:
                     if k in ('pdfPages','ocrAttemptedPages','ocrRecoveredPages','ocrRestoredPages',
                        'ocrBatchDeferredPages','ocrFailedPages','unresolvedPages','ocrFailureDetails')}
                 } for f in files]})
-          target=Path('diagnostics/rfp-pdf-ocr-regression-state-20261116.json')
+          target=Path('diagnostics/rfp-pdf-ocr-latest-20261116.json')
           target.parent.mkdir(exist_ok=True)
           target.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print('AUDIT_COUNTS',json.dumps(report.get('progress',{}).get('counts'),ensure_ascii=False),flush=True)
@@ -156,6 +156,6 @@ jobs:
           PY
           git config user.name "worklinks-audit-bot"
           git config user.email "worklinks-audit-bot@users.noreply.github.com"
-          git add diagnostics/rfp-pdf-ocr-regression-state-20261116.json diagnostics/rfp-pdf-ocr-regression.log
+          git add diagnostics/rfp-pdf-ocr-latest-20261116.json diagnostics/rfp-pdf-ocr-regression.log
           git commit -m "audit: save read-only production RFP diagnosis"
-          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-regression-state-20261116
+          git push origin HEAD:refs/heads/diagnostics/rfp-ocr-latest-20261116
