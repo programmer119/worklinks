@@ -51,3 +51,5 @@ jobs:
           PY
 
 # Verify remaining unresolved RFP problems after source signature and cache integrity repairs.
+
+# Confirm v3 retained established successful evidence, only failed originals retry under v16.
