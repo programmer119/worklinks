@@ -31,6 +31,7 @@ READER_ATTEMPT_VERSION='framed-isolated-extract-v19-hwp-record-unicode-pdf750-20
 NESTED_ZIP_READER_VERSION='two-nested-levels-cumulative-250mb-v1'
 PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
 SPARSE_COVER_READER_VERSION='sha-psm6-11-and-source-title-20261117'
+EMPTY_PERIMETER_READER_VERSION='four-thin-frame-strokes-no-content-v1'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
         'attachment_unavailable','still_scan_incomplete','changed_while_repairing')
 
@@ -212,6 +213,13 @@ def reader_retry_files(scan):
                'file_extract_failure'}
     for f in failed_files(scan):
         evidence=f.get('extractionEvidence') or {}
+        if (f.get('errorCategory')=='pdf_ocr_incomplete'
+                and f.get('lastPerimeterAttemptVersion')!=EMPTY_PERIMETER_READER_VERSION
+                and 0<int(evidence.get('pdfPages') or 0)<=80
+                and int(evidence.get('ocrFailedPages') or 0)==1
+                and int(evidence.get('ocrBatchDeferredPages') or 0)==0):
+            selected.append(f)
+            continue
         if (f.get('errorCategory')=='pdf_ocr_incomplete'
                 and f.get('lastSparseCoverAttemptVersion')!=SPARSE_COVER_READER_VERSION
                 and int(evidence.get('ocrBatchDeferredPages') or 0)==0
@@ -432,6 +440,7 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
         previous_version=str(f.get('lastReaderAttemptVersion') or '')
         if f.get('errorCategory')=='pdf_ocr_incomplete':
             f['lastSparseCoverAttemptVersion']=SPARSE_COVER_READER_VERSION
+            f['lastPerimeterAttemptVersion']=EMPTY_PERIMETER_READER_VERSION
         if f.get('errorCategory')=='nested_archive_requires_review':
             f['lastNestedZipAttemptVersion']=NESTED_ZIP_READER_VERSION
         if f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption':
@@ -691,7 +700,7 @@ def merge_verified_repair_attempt(live,entry):
                       'partialTextChars','detectedFormat','textChars',
                       'lastReaderAttemptVersion','lastReaderAttemptAt',
                       'lastNestedZipAttemptVersion','lastPartialDrmZipAttemptVersion',
-                      'lastSparseCoverAttemptVersion'):
+                      'lastSparseCoverAttemptVersion','lastPerimeterAttemptVersion'):
             if field in entry:live[field]=entry[field]
         if entry.get('errorCategory')!='official_attachment_reference_missing_422':
             live.pop('lastHttpStatus',None)
