@@ -616,6 +616,39 @@ class RfpDualQueue:
                 WHERE download_status='ready' AND scan_status IN ('pending','retry')
                 AND scan_retry_epoch<=?''',(time.time(),)).fetchone()[0]
 
+    def scan_wait_reason(self):
+        """Distinguish a blocked reader from an unfinished downloader.
+
+        Repeated failures held for source repair must not be mislabeled
+        waiting_for_download when every source is already downloaded.
+        This is status reporting only; it must NOT reset a failure guard.
+        """
+        now=time.time()
+        with self.connect() as db:
+            rows=db.execute('''SELECT download_status,scan_status,
+                scan_retry_epoch,COUNT(*) FROM rfp_dual_notices
+                GROUP BY download_status,scan_status,scan_retry_epoch''').fetchall()
+        ready=0
+        source_repair=0
+        downloading=0
+        missing_sources=0
+        for download,scan,retry,count in rows:
+            if scan in ('done','skipped'):continue
+            if download=='ready':
+                if scan in ('pending','retry') and float(retry or 0)<=now:
+                    ready+=count
+                elif scan=='retry' and float(retry or 0)>now:
+                    source_repair+=count
+            elif download in ('pending','retry','fetching'):
+                downloading+=count
+            elif download in ('no_attachments','error_confirmed'):
+                missing_sources+=count
+        if ready:return 'ready'
+        if source_repair:return 'source_repair_wait'
+        if downloading:return 'download_wait'
+        if missing_sources:return 'source_missing_wait'
+        return 'no_eligible_now'
+
     def stats(self):
         with self.connect() as db:
             rows=db.execute('''SELECT download_status,scan_status,COUNT(*)
