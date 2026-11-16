@@ -564,7 +564,7 @@ def run_once(kind, runner=None, _single=False):
             command = [sys.executable, str(root / 'scripts' / 'repair_open_rfp_cached_attachments.py'),
                        '--data-dir', str(root), '--limit', '3',
                        '--max-files', '3', '--workers', '3',
-                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '2',
+                       '--per-notice-file-cap', '1', '--minimum-old-ocr', '3',
                        '--execute']
         elif kind == 'rfpRepair':
             command = [sys.executable, str(root / 'scripts' / 'repair_changcom_top500_rfp.py'),
@@ -788,7 +788,9 @@ def iteration(current=None, runner=None):
                 continue
             completed=int(state.get('rfpUpgradeBatchesCompleted') or 0)
             previous_repair=int(state.get('rfpOpenRepairUpgradeBatch') or 0)
-            ocr_due_to_batches=(completed-previous_repair>=RFP_OCR_SCAN_BATCH_INTERVAL)
+            ocr_interval=(1 if state.get('rfpOpenRepairHasMore') is True
+                          else RFP_OCR_SCAN_BATCH_INTERVAL)
+            ocr_due_to_batches=(completed-previous_repair>=ocr_interval)
             last_attempt=float(prior.get('attemptEpoch') or 0)
             # One verified notice/file is published per pass. When work is
             # known to remain, resume quickly instead of pausing two minutes
