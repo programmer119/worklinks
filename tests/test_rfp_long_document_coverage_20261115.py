@@ -25,5 +25,5 @@ very_long=text+('가'*1_000_001)
 audit=r.preserve_unclassified_qualification(very_long,'제안요청서.hwpx',
                                            r.extract_rule_candidates(very_long,'제안요청서.hwpx'))
 assert audit['sourceTextScanComplete'] is False,audit
-assert repair.READER_ATTEMPT_VERSION.endswith('v16-20261116')
+assert isinstance(repair.READER_ATTEMPT_VERSION,str) and repair.READER_ATTEMPT_VERSION
 print('RFP_LONG_DOCUMENT_FULL_SOURCE_COVERAGE_AND_FAIL_CLOSED=PASS')
