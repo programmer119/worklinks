@@ -30,4 +30,11 @@ else:
 # A rejected source must not leak its nesting depth into later sources.
 again,evidence=reader.extract_with_source_status('public.zip',outer)
 assert again==extracted and evidence['sourceComplete'] is True
-print('KOICA_TWO_ZIP_LAYERS_AND_DEPTH_BOUND_SAFE=PASS')
+import repair_open_rfp_cached_attachments as repair
+failed={'files':[{'name':'koica.zip','readable':False,
+   'sourceTextScanComplete':False,'errorCategory':'nested_archive_requires_review',
+   'lastReaderAttemptVersion':repair.READER_ATTEMPT_VERSION}]}
+assert len(repair.reader_retry_files(failed))==1
+failed['files'][0]['lastNestedZipAttemptVersion']=repair.NESTED_ZIP_READER_VERSION
+assert len(repair.reader_retry_files(failed))==0
+print('KOICA_TWO_ZIP_LAYERS_AND_DEPTH_BOUND_AND_ONE_SHOT_RETRY_SAFE=PASS')
