@@ -49,3 +49,5 @@ jobs:
                  'exceptions':dict(detail),'attemptVersions':dict(versions),
                  'items':files[:35]},ensure_ascii=False),flush=True)
           PY
+
+# Verify remaining unresolved RFP problems after source signature and cache integrity repairs.
