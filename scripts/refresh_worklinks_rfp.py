@@ -2022,8 +2022,10 @@ def _extract_dispatch(name,raw):
         # the detected XML MIME while choosing the strict HML paragraph
         # reader, not the permissive HTML parser. The HTML path would
         # accidentally ingest embedded <BINDATA> base64 as source text.
-        markup_name=(name if Path(str(name)).suffix.lower() in ('.hml','.htm','.html')
-                     else 'official-source.hml')
+        # Use the type proven by bytes, not the misleading original suffix:
+        # official .xls files can be malformed-for-XML but valid HTML.
+        markup_name=('official-source.hml' if n.endswith('.hml')
+                     else 'official-source.html')
         return extract_markup_document(markup_name,raw)
     if n.endswith('.hwp'):
         if not raw.startswith(_OLE_HEADER):raise ValueError('invalid_hwp')
