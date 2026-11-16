@@ -1,0 +1,51 @@
+name: WorkLinks current problematic RFP file-error breakdown 20261116
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-rfp-error-root-20261116.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Read current RFP problem-file errors, all files, no upstream G2B requests
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections,datetime,json,urllib.request,gzip
+          api='https://api-suaveforge.suaveforge.com:18458/api/g2b/rfp-rescan-causes?limit=150&offset=0'
+          req=urllib.request.Request(api,headers={'Accept-Encoding':'gzip','Cache-Control':'no-cache',
+               'User-Agent':'WorkLinks-Actual-RootCause-ReadOnly/20261116'})
+          with urllib.request.urlopen(req,timeout=80) as rsp:
+              raw=rsp.read()
+              if rsp.headers.get('Content-Encoding')=='gzip':raw=gzip.decompress(raw)
+          data=json.loads(raw)
+          assert data.get('upstreamCalls')==0, 'unexpected upstream access'
+          print('LIVE_ERROR_BASELINE',json.dumps({'asOf':data.get('asOf'),
+             'counts':data.get('counts'),'fileErrorCounts':data.get('problemFileErrorCounts'),
+             'rows':len(data.get('records') or []),'total':data.get('totalResults'),
+             'actualIssueNoticeCount':data.get('actualIssueNoticeCount')},ensure_ascii=False),flush=True)
+          grouped=collections.defaultdict(list)
+          for bid in data.get('records') or []:
+              for f in bid.get('files') or []:
+                  code=str(f.get('errorCategory') or 'incomplete')
+                  if code in {'invalid_hwp','file_extract_failure','source_extraction_timeout_deferred',
+                        'large_xml_section','hwp_record_fallback_invalid_ole',
+                        'archive_many_xml_files','unknown_archive_member_requires_review',
+                        'nested_archive_requires_review','hml_xml_truncated','invalid_legacy_xls',
+                        'source_text_incomplete','source_scan_incomplete'}:
+                      grouped[code].append({'bid':bid.get('noticeKey'),'file':f.get('name'),
+                       'error':f.get('errorDetail'),'readable':f.get('readable'),
+                       'attempt':f.get('lastReaderAttemptVersion'),
+                       'attemptAt':f.get('lastReaderAttemptAt'),'reason':f.get('reason'),
+                       'category':bid.get('category')})
+          for code,files in sorted(grouped.items(),key=lambda x:-len(x[1])):
+              detail=collections.Counter(x['error'] for x in files)
+              versions=collections.Counter(str(x['attempt'] or '<none>') for x in files)
+              print('ERROR_DETAILED',json.dumps({'code':code,'count':len(files),
+                 'exceptions':dict(detail),'attemptVersions':dict(versions),
+                 'items':files[:35]},ensure_ascii=False),flush=True)
+          PY
