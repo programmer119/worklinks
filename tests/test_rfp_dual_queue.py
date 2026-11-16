@@ -179,8 +179,19 @@ with tempfile.TemporaryDirectory() as tmp:
         assert held==('retry',2147483647.0,2),held
     assert q.claim_ready(1)==[], 'unchanged failure must never endlessly reparse'
     assert q.reopen_changed_scan_evidence({key:row})==0
+    # Error-classification churn without new verified source is NOT progress.
     changed=dict(row,files=[dict(row['files'][0],errorCategory='file_extract_failure')])
-    assert q.reopen_changed_scan_evidence({key:changed})==1
+    assert scan_evidence_signature(row)==scan_evidence_signature(changed)
+    assert q.reopen_changed_scan_evidence({key:changed})==0
+    status_only=dict(changed,status='text_unavailable')
+    assert q.reopen_changed_scan_evidence({key:status_only})==0
+    assert q.claim_ready(1)==[]
+    # A newly SHA-verified fully parsed source may reopen a held scan ONCE.
+    improved=dict(row,files=[dict(row['files'][0],readable=True,
+        sourceTextScanComplete=True,sourceSha256='c'*64,errorCategory='')])
+    assert scan_evidence_signature(improved)!=scan_evidence_signature(row)
+    assert q.reopen_changed_scan_evidence({key:improved})==1
+    assert q.reopen_changed_scan_evidence({key:improved})==0
     assert q.claim_ready(1)[0][0]==key
     q.scan_finished(key,True)
     with q.connect() as db:
