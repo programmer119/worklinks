@@ -28,6 +28,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 try:
     from rfp_call_ledger import CallLedger, cache_key
+    from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
 except ModuleNotFoundError as exc:
     if exc.name!='rfp_call_ledger':raise
     # importlib.spec_from_file_location/runpy do not put the source
@@ -3261,6 +3262,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             candidate_rules=extract_rule_candidates(content,name)
             staffing_roles=extract_staffing_roles(content,name,url)
             staffing_facts=extract_staffing_facts(content,name,url)
+            submission_items,submission_complete=extract_submission_items(content,name)
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
             phase['analysisSeconds']+=time.perf_counter()-timer
             record.update({'readable':True,'textChars':len(content),
@@ -3278,6 +3280,9 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                            'staffingRoleScanTruncated':len(content)>STAFFING_ROLE_TEXT_LIMIT,
                            'staffingRoles':staffing_roles,
                            'staffingFacts':staffing_facts,
+                           'submissionItems':submission_items,
+                           'submissionScanVersion':SUBMISSION_SCAN_VERSION,
+                           'submissionScanComplete':submission_complete and source_evidence['sourceComplete'],
                            'topics':triggers,'snippets':snippets,
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
@@ -3491,9 +3496,16 @@ def compact_coverage(item):
             'staffingRoleScanTruncated':f.get('staffingRoleScanTruncated') is True,
             'qualificationScanTruncated':f.get('qualificationScanTruncated') is True,
             'unmatchedQualificationAnchorCount':f.get('unmatchedQualificationAnchorCount',0),
-            'clauseCandidateCount':len(f.get('clauseCandidates') or [])
+            'clauseCandidateCount':len(f.get('clauseCandidates') or []),
+            'submissionScanComplete':f.get('submissionScanComplete') is True,
+            'submissionScanVersion':int(f.get('submissionScanVersion') or 0)
         } for f in (item.get('files') or [])[:MAX_DOCUMENTS]]
     }
+    compact['submissionItems']=submission_summary(item)
+    compact['submissionScanComplete']=bool(item.get('manifestComplete') is True and
+        item.get('files') and all(f.get('submissionScanComplete') is True or
+            (f.get('skippedDuplicateFormat') is True and f.get('alternatePdfEvidence'))
+            for f in item.get('files') or []))
     compact['staffingRoles']=staffing_summary(item)
     compact['staffingFacts']=staffing_fact_summary(item)
     # Keep bounded source quotes for previous successful badge decisions when
