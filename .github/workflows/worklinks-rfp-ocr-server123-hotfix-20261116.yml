@@ -1,0 +1,54 @@
+name: WorkLinks server123 PDF OCR hotfix deployment
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/worklinks-rfp-ocr-server123-hotfix-20261116.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restrict deployment to original server123 environment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s /home/worklinks/g2b/data/bids.sqlite3
+          test -x /home/ggul-docker/bin/docker
+          test -S /home/ggul-docker/run/docker.sock
+          test -s /home/worklinks/g2b/pipeline/worklinks-server123-pipeline.py
+          echo WORKLINKS_SERVER123_DEPLOY_GUARD_PASS
+      - name: Deploy PDF OCR fix using existing server123 script
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          bash server/deploy-worklinks-server123-pipeline.sh
+      - name: Confirm installed scripts, live worker, and read-only OCR status
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          cmp -s scripts/repair_open_rfp_cached_attachments.py /home/worklinks/g2b/pipeline/scripts/repair_open_rfp_cached_attachments.py
+          cmp -s server/worklinks-server123-pipeline.py /home/worklinks/g2b/pipeline/worklinks-server123-pipeline.py
+          /home/ggul-docker/bin/docker -H unix:///home/ggul-docker/run/docker.sock inspect -f '{{.State.Running}}' worklinks-g2b-pipeline | grep -qx true
+          python3 - <<'PY'
+          import json,urllib.request
+          base='http://127.0.0.1:18192/api/g2b/'
+          for endpoint in ('pipeline-status','rfp-rescan-progress','rfp-rescan-causes?limit=150&offset=0'):
+              with urllib.request.urlopen(base+endpoint,timeout=30) as response:
+                  data=json.load(response)
+              if endpoint=='pipeline-status':
+                  scheduler=data.get('scheduler') or {}
+                  print('OCR_REPAIR_SCHEDULER',json.dumps({
+                      'status':(scheduler.get('rfpOpenRepair') or {}).get('status'),
+                      'hasMore':scheduler.get('rfpOpenRepairHasMore'),
+                      'version':scheduler.get('rfpOpenReaderVersion')},ensure_ascii=False),flush=True)
+              elif endpoint=='rfp-rescan-progress':
+                  print('OCR_REPAIR_PROGRESS',json.dumps(data.get('counts'),ensure_ascii=False),flush=True)
+              else:
+                  print('OCR_REPAIR_REMAINING_FILES', (data.get('problemFileErrorCounts') or {}).get('pdf_ocr_incomplete'),flush=True)
+          PY
+          echo OCR_SERVER123_DEPLOY_INSTALLED_AND_WORKER_RUNNING=PASS
