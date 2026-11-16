@@ -1143,6 +1143,15 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                     if (old_state.get('scanComplete') is True and
                             old_state.get('staffingRoleScanComplete') is True):
                         old_state['checkedAt']=str(old.get('checkedAt') or '')
+                        old_state['classificationVersion']=int(old.get('classificationVersion') or 0)
+                        old_state['hwpxReaderVersion']=int(old.get('hwpxReaderVersion') or 0)
+                        old_readable=[f for f in old.get('files') or [] if
+                            isinstance(f,dict) and f.get('readable') is True and
+                            f.get('staffingScopeExcluded') is not True]
+                        old_state['staffingRoleVersions']=sorted({
+                            int(f.get('staffingRoleScanVersion') or 0) for f in old_readable})
+                        old_state['staffingFactVersions']=sorted({
+                            int(f.get('staffingFactScanVersion') or 0) for f in old_readable})
                         old_state['parserCurrent']=True  # historical verdict only
                         old_state['versionSource']='last_success'
                         state['lastSuccessfulState']=old_state
