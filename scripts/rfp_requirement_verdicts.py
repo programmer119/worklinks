@@ -42,10 +42,16 @@ def _windows(text):
         else:
             left=' '.join(lines[max(0,i-1):i]).strip()
             right=' '.join(lines[i+1:i+2]).strip()
-            if len(trimmed)<150 and len(left)<130 and len(right)<130:
-                yield i+1,' '.join((left,trimmed,right)).strip()
-            else:
-                yield i+1,trimmed
+            # Only bridge a visual line wrap. Joining two independent
+            # sentences makes an explicit waiver cancel a mandatory clause
+            # from a different paragraph, producing a dangerous false no.
+            join_left=bool(left and len(left)<130 and
+                           not left.rstrip().endswith(('.', '!', '?', '。', ';')))
+            join_right=bool(right and len(right)<130 and
+                            not trimmed.rstrip().endswith(('.', '!', '?', '。', ';')))
+            parts=([left] if join_left else [])+[trimmed]+(
+                [right] if join_right else [])
+            yield i+1,' '.join(parts)[:460]
 
 
 def _classify(topic,window):
