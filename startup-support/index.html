@@ -5307,8 +5307,37 @@ function jobDetailRequirementGrid(x){
   return out;
  });
  const uniqHints=[...new Set(perfHints)].slice(0,3);
- const stPerf=status(perfRows,mandatoryPerf,evaluationPerf);
- const stDirect=status(directRows,mandatoryDirect,null);
+ // The scanner's source-wide, versioned verdict takes priority over
+ // excerpt-only heuristics. No negative verdict can come from a partial scan.
+ const fullVerdicts=full?.requirementVerdicts||{};
+ const savedVerdicts=saved?.requirementVerdicts||{};
+ function sourceVerdict(kind){
+  const fullValue=fullVerdicts[kind];
+  const savedValue=savedVerdicts[kind];
+  const choice=fullValue&&(!savedValue||
+    String(full?.checkedAt||'')>=String(saved?.checkedAt||''))?fullValue:savedValue;
+  if(!choice||Number(choice.scanVersion)!==1)return null;
+  const docsDone=choice.sourceComplete===true&&
+    (choice===fullValue?full?.requirementScanComplete:saved?.requirementScanComplete)===true;
+  if(choice.status==='required'&&Array.isArray(choice.evidence)&&
+    choice.evidence.some(v=>v.kind==='required'))
+   return {key:'required',label:'필요',source:choice};
+  if(choice.status==='not_required'&&docsDone)
+   return {key:'not_required',label:'불필요',source:choice};
+  if(choice.status==='review')return {key:'review',label:'판정 보류',source:choice};
+  return null;
+ }
+ const officialPerf=sourceVerdict('performance');
+ const officialDirect=sourceVerdict('directProduction');
+ const stPerf=officialPerf||status(perfRows,mandatoryPerf,evaluationPerf);
+ const stDirect=officialDirect||status(directRows,mandatoryDirect,null);
+ for(const [code,record] of [['performance_proof',officialPerf],['direct_production',officialDirect]]){
+  for(const v of record?.source?.evidence||[])
+   add(v.sourceText,code,v.kind==='required',v.sourceFile,v.sourceUrl);
+ }
+ // Full-source evidence may have added lines that compact excerpt limits omit.
+ const finalPerfRows=all.filter(c=>c.type==='performance_proof'||perf.test(c.text));
+ const finalDirectRows=all.filter(c=>c.type==='direct_production'||direct.test(c.text));
  const p=worklinksPartnerAccess()?partners.find(v=>v.id==='changcom'):null;
  let prodCompany='';
  if(p&&directRows.length){
@@ -5345,7 +5374,12 @@ function jobDetailRequirementGrid(x){
   },
   performance:{
    name:'수행실적',code:'performance',s:stPerf,
-   primary:mandatoryPerf?'입찰 필수조건 문구 검출'+(uniqHints.length?' · '+uniqHints.join(' · '):''):
+   primary:officialPerf?
+    (stPerf.key==='required'?'필수 수행실적 요구'+(uniqHints.length?' · '+uniqHints.join(' · '):''):
+     stPerf.key==='not_required'?'입찰 필수 수행실적 요구 없음'+
+       (officialPerf.source.hasEvaluation?' · 평가용 실적 언급':''):
+     '원문 근거 불충분 · 필수 수행실적 판정 보류'):
+    mandatoryPerf?'입찰 필수조건 문구 검출'+(uniqHints.length?' · '+uniqHints.join(' · '):''):
     evaluationPerf?'제안 평가용 실적 언급 · 입찰 필수실적과 별개':
     perfRows.length?'실적 제출·요건 문구 확인 · 필수 여부 검토 필요':
     (stPerf.key==='not_required'?'필수 실적 요건 없음 확인':
@@ -5354,18 +5388,23 @@ function jobDetailRequirementGrid(x){
       '최소 실적·금액·기간 미확정'),
    sub:p?'창컴 증빙: 해당 사업의 실적증명서·수행완료 여부 별도 대조 필요':
     '계약·낙찰이력은 수행완료 실적증명서를 대체하지 않음',
-   rows:perfRows.slice(0,5)
+   rows:finalPerfRows.slice(0,5)
   },
   production:{
    name:'직접생산',code:'production',s:stDirect,
-   primary:prodCodes.length?'요구 관련 세부품명번호 '+prodCodes.join(' / '):
+   primary:officialDirect?
+    (stDirect.key==='required'?'직접생산확인증명서 필요'+
+      (prodCodes.length?' · 세부품명번호 '+prodCodes.join(' / '):''):
+     stDirect.key==='not_required'?'입찰 필수 직접생산 요구 없음':
+     '원문 근거 불충분 · 직접생산 판정 보류'):
+    prodCodes.length?'요구 관련 세부품명번호 '+prodCodes.join(' / '):
     directRows.length?'직접생산 관련 원문 확인 · 필수 품목번호 검토 필요':
     stDirect.key==='not_required'?'요구 없음 확인':
       stDirect.key==='review'&&e.meta.saved?.scanComplete===true?
       '원문 판독 완료 · 직접생산 요구 문구 미검출 · 최종 확인 필요':
       '요구 품목·세부품명번호 미확정',
    sub:prodCompany||'업체 발급이력과 현재 유효 여부는 별도 확인',
-   rows:directRows.slice(0,5)
+   rows:finalDirectRows.slice(0,5)
   }
  };
  // Scan metadata is honest about documents that could not be read.
