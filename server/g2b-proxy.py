@@ -1924,6 +1924,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             attempt=str(f.get('lastReaderAttemptVersion') or '')
             if err in ocr_errors:
                 detail_code='ocr_old_reader_version' if attempt!=v12 else 'ocr_v12_attempt_still_incomplete'
+            elif err=='drm_protected_original_requires_authorized_decryption':
+                detail_code='official_attachment_drm_access_restricted'
             elif err:
                 detail_code='source_error:'+err
             elif not read_done:
@@ -1964,6 +1966,9 @@ def rfp_rescan_cause_report(limit=40,offset=0):
                 'staffingRoleVersion':int(f.get('staffingRoleScanVersion') or 0),
                 'staffingFactVersion':int(f.get('staffingFactScanVersion') or 0)
                 })
+        protected_only=bool(problems) and all(
+            p['errorCategory']=='drm_protected_original_requires_authorized_decryption'
+            for p in problems)
         if not isinstance(doc,dict) or status in ('','not_scanned','unscanned'):
             category='unscanned'
         elif any(str(f.get('errorCategory') or '') in ocr_errors
@@ -1974,6 +1979,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             category='legacy'
         elif status!='text_extracted_requires_review':
             category='failed'
+        elif protected_only:
+            category='source_restricted'
         elif all(v is not False for v in checks.values()) and all(
                 v is True for v in (checks['classification'],checks['roles'],checks['facts'])):
             category='completed'
@@ -2004,7 +2011,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             issues.add('hwpx_reader_incomplete')
         for code in issues:issue_counts[code]+=1
         root=(
-            'ocr_reader_not_retried' if 'ocr_old_reader_version' in issues
+            'official_attachment_drm_access_restricted' if protected_only
+            else 'ocr_reader_not_retried' if 'ocr_old_reader_version' in issues
             else 'ocr_retried_still_incomplete' if 'ocr_v12_attempt_still_incomplete' in issues
             else 'other_file_extraction_failure' if any(x.startswith('source_error:') for x in issues)
             else 'unreadable_file' if 'unreadable_without_error_category' in issues
@@ -2021,6 +2029,9 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             'title':str(bid.get('title') or bid.get('bidNtceNm') or '')[:160],
             'deadline':str(bid.get('closes') or '')[:35],
             'category':category,'rootCause':root,
+            'sourceAccess':('restricted' if protected_only else
+                'mixed' if 'official_attachment_drm_access_restricted' in issues
+                else 'none'),
             'issues':sorted(issues),'stagePassed':checks,
             'scanStatus':status,'manifestComplete':doc.get('manifestComplete') is True,
             'classificationVersion':int(doc.get('classificationVersion') or 0),
