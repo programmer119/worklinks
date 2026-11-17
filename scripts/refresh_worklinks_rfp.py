@@ -43,7 +43,7 @@ _DOCUMENT_SCAN=threading.local()
 _LEDGER_INSTANCE=None
 _LEDGER_PATH=None
 
-RFP_TEXT_CACHE_VERSION=6
+RFP_TEXT_CACHE_VERSION=7
 # A child reader or a native library may print to stdout during PDF/HWP/ZIP
 # parsing. Its diagnostic text must not corrupt the structured extraction
 # result; the final sentinel is emitted AFTER all parsing has completed.
@@ -1756,6 +1756,8 @@ def classify_failure(error):
            'hwp_record_fallback_no_text','hwp_record_fallback_protected',
            'hwp_record_fallback_expanded_limit','hwp_record_fallback_too_many_records',
            'source_extraction_timeout_deferred','isolated_extraction_worker_failed',
+           'official_bundle_requested_member_missing',
+           'official_bundle_requested_member_ambiguous',
            'isolated_extraction_worker_reply_invalid','source_extraction_output_too_large',
            'large_file','invalid_hwp','hwp5txt_failed','archive_many_xml_files',
            'pdf_over_100_pages','pdf_over_page_limit','pdf_unreadable_page','no_searchable_text','unsupported_format',
