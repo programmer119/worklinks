@@ -61,4 +61,15 @@ assert old_hml['alternatePdfSourceSha256']==pdf['sourceSha256']
 assert 'errorCategory' not in old_hml
 assert reader.staffing_effective_file_complete(old_hml,[old_hml,pdf])
 
+# Regression from live server123: alternate name and SHA had been stored,
+# but skippedDuplicateFormat was still false and hml_xml_truncated persisted.
+prior,pdf=sample()
+prior['alternatePdfEvidence']=pdf['name']
+prior['alternatePdfSourceSha256']=pdf['sourceSha256']
+prior['alternatePdfEvidenceMode']='same_basename_not_proven_identical'
+prior['skippedDuplicateFormat']=False
+assert reader.annotate_official_pdf_siblings([prior,pdf])==1
+assert prior['skippedDuplicateFormat'] is True
+assert 'errorCategory' not in prior
+
 print('RFP_HML_SAME_STEM_VERIFIED_PDF_ONLY=PASS')
