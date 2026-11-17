@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - .github/workflows/worklinks-rfp-ocr-server123-hotfix-20261116.yml
+      - server/worklinks-server123-pipeline.py
+      - scripts/refresh_worklinks_rfp.py
+      - scripts/rfp_submission.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,6 +25,11 @@ jobs:
           test -S /home/ggul-docker/run/docker.sock
           test -s /home/worklinks/g2b/pipeline/worklinks-server123-pipeline.py
           echo WORKLINKS_SERVER123_DEPLOY_GUARD_PASS
+      - name: Verify staged RFP submission module regression
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 tests/test_worklinks_server123_pipeline.py
       - name: Deploy PDF OCR fix using existing server123 script
         shell: bash
         run: |
@@ -32,6 +40,8 @@ jobs:
         run: |
           set -Eeuo pipefail
           cmp -s scripts/repair_open_rfp_cached_attachments.py /home/worklinks/g2b/pipeline/scripts/repair_open_rfp_cached_attachments.py
+          cmp -s scripts/rfp_submission.py /home/worklinks/g2b/pipeline/scripts/rfp_submission.py
+          cmp -s scripts/refresh_worklinks_rfp.py /home/worklinks/g2b/pipeline/scripts/refresh_worklinks_rfp.py
           cmp -s server/worklinks-server123-pipeline.py /home/worklinks/g2b/pipeline/worklinks-server123-pipeline.py
           /home/ggul-docker/bin/docker -H unix:///home/ggul-docker/run/docker.sock inspect -f '{{.State.Running}}' worklinks-g2b-pipeline | grep -qx true
           python3 - <<'PY'
