@@ -7,6 +7,7 @@ from unittest.mock import patch
 import importlib.util
 import json
 import sqlite3
+import subprocess
 from pathlib import Path
 import tempfile
 import time
@@ -19,6 +20,24 @@ source=Path(__file__).resolve().parents[1]/'server'/'worklinks-server123-pipelin
 spec=importlib.util.spec_from_file_location('worklinks_pipeline',str(source))
 m=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
+# Verify the REAL staged scanner imports in an isolated child, not only
+# fixture placeholders. This reproduces the missing rfp_submission regression.
+with tempfile.TemporaryDirectory() as staging_dir:
+    root = Path(staging_dir)
+    with patch.object(m, 'SCRIPTS', source.parents[1] / 'scripts'), \\
+         patch.object(m, 'SEEDS', root / 'seeds'), \\
+         patch.object(m, 'DATA', root / 'data'):
+        staged = m.stage_workspace(root)
+    scanner = staged / 'scripts' / 'refresh_worklinks_rfp.py'
+    for program in (
+        'import runpy,sys; runpy.run_path(sys.argv[1]); print("STAGED_RFP_RUNPY_IMPORT_PASS")',
+        'import importlib.util,sys; s=importlib.util.spec_from_file_location("staged_reader",sys.argv[1]); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print("STAGED_RFP_IMPORTLIB_IMPORT_PASS")',
+    ):
+        proc = subprocess.run([sys.executable, '-I', '-c', program, str(scanner)],
+                              cwd=str(staged), capture_output=True, text=True, timeout=20)
+        assert proc.returncode == 0, proc.stderr[-1600:]
+        assert 'STAGED_RFP_' in proc.stdout, proc.stdout
+
 # The supervisor reports the actual saved parser/file failure, not one
 # generic reason shared by every retry.
 assert m.scan_failure_diagnosis({'status':'text_extracted_requires_review',
