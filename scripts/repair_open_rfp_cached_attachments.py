@@ -730,6 +730,19 @@ def merge_verified_repair_attempt(live,entry):
     for field in ('alternatePdfEvidence','alternatePdfSourceSha256',
                   'alternatePdfEvidenceMode'):
         if entry.get(field):live[field]=entry[field]
+    # Persist a fully verified same-stem PDF substitution into the live index.
+    # The broken HML remains unread, and no source bytes are declared identical.
+    if (entry.get('skippedDuplicateFormat') is True
+            and entry.get('readable') is not True
+            and entry.get('alternatePdfEvidenceMode')=='same_basename_not_proven_identical'
+            and len(str(entry.get('alternatePdfSourceSha256') or ''))==64
+            and rfp._document_stem(entry.get('name'))==
+                rfp._document_stem(entry.get('alternatePdfEvidence'))):
+        live['skippedDuplicateFormat']=True
+        live['readable']=False
+        live['sourceTextScanComplete']=False
+        for field in ('errorCategory','error','lastHttpStatus'):
+            live.pop(field,None)
     return complete
 
 
