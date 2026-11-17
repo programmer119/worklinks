@@ -93,7 +93,11 @@ def failed_files(scan):
     # Do not download or retry an HWP that a fully read, same-name official
     # PDF already covers. Keep the HWP binary explicitly unread.
     return [f for f in files if isinstance(f,dict)
-       and not rfp.hwp_covered_by_verified_pdf(f,files)
+       and (not rfp.hwp_covered_by_verified_pdf(f,files)
+            # One pending HML-to-PDF evidence reconciliation is needed so
+            # the stored notice's staffing completeness flag is recomputed.
+            or (str(f.get('name') or '').lower().endswith('.hml')
+                and f.get('skippedDuplicateFormat') is not True))
        and (false_hwpml_v13_success(f)
             or f.get('readable') is not True or f.get('sourceTextScanComplete') is not True
             or f.get('qualificationScanTruncated') is True
