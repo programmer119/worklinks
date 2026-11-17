@@ -47,8 +47,8 @@ with tempfile.TemporaryDirectory(prefix='drm-source-state-') as tmp:
     q_db=path/'rfp-dual-queue.sqlite3'
     key='R26BK01825441:000'
     with sqlite3.connect(bid_db) as conn:
-        conn.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER)')
-        conn.execute('INSERT INTO bid_notices VALUES (?,?,?,?)',
+        conn.execute('CREATE TABLE bid_notices (bid_no TEXT,bid_ord TEXT,payload TEXT,sw_candidate INTEGER,last_seen TEXT)')
+        conn.execute('INSERT INTO bid_notices (bid_no,bid_ord,payload,sw_candidate) VALUES (?,?,?,?)',
                      (key.split(':')[0],'000',json.dumps({'title':'상수도 모니터링','closes':'2026-11-30'}),1))
     with sqlite3.connect(q_db) as conn:
         conn.execute('CREATE TABLE rfp_dual_notices (notice_key TEXT,download_status TEXT,scan_status TEXT)')
