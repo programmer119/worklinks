@@ -212,6 +212,14 @@ def reader_retry_files(scan):
                'source_extraction_timeout_deferred',
                'file_extract_failure'}
     for f in failed_files(scan):
+        # One-time recovery: a truncated Hancom HML source may have a fully
+        # readable, same-title official PDF in the SAME verified manifest.
+        # Select the notice so annotate_official_pdf_siblings can record the
+        # PDF identity; never claim the broken XML was extracted or identical.
+        if (str(f.get('name') or '').lower().endswith('.hml')
+                and rfp.verified_pdf_companion(f,scan.get('files') or [])):
+            selected.append(f)
+            continue
         evidence=f.get('extractionEvidence') or {}
         # Manual, source-scoped dense-image OCR recheck. The opt-in is set only
         # for one SHA-verified original and does NOT bump the global reader
