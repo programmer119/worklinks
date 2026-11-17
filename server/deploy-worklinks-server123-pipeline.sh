@@ -44,12 +44,12 @@ test "$(dk inspect -f '{{.State.Running}}' worklinks-g2b-api)" = true
 test "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 8 \
     'http://127.0.0.1:18192/api/g2b/pipeline-status')" = 200
 # Unit test runs on a temporary directory only.
+# The regression stages the REAL scanner and sibling modules. Mount the
+# checkout read-only instead of a partial /app/scripts view, otherwise the
+# preflight fails before deploying even when production files are correct.
 dk run --rm \
     -e PYTHONPATH=/app/scripts \
-    -v "$SOURCE:/app/server/worklinks-server123-pipeline.py:ro" \
-    -v "$ROOT/scripts/rfp_dual_queue.py:/app/scripts/rfp_dual_queue.py:ro" \
-    -v "$ROOT/scripts/rfp_management_reconcile.py:/app/scripts/rfp_management_reconcile.py:ro" \
-    -v "$ROOT/tests/test_worklinks_server123_pipeline.py:/app/tests/test_worklinks_server123_pipeline.py:ro" \
+    -v "$ROOT:/app:ro" \
     python:3.11-alpine python /app/tests/test_worklinks_server123_pipeline.py
 dk run --rm -v "$ROOT:/work:ro" python:3.11-alpine \
   python /work/tests/test_worklinks_qualification_summary.py
