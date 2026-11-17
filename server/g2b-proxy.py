@@ -1191,6 +1191,31 @@ def rfp_card_evidence_batch(raw_keys):
             'count':len(keys),'upstreamCalls':0}
 
 
+def rfp_source_access_state(files):
+    """Distinguish published-but-DRM-protected originals from parser faults.
+
+    Detection comes from source-verified DRMONE magic (including protected
+    ZIP members), NOT from HTTP status, assumed passwords, or a failed OCR.
+    Being listed and downloadable does not mean the document is decryptable.
+    """
+    drm_code='drm_protected_original_requires_authorized_decryption'
+    actual=[f for f in files if isinstance(f,dict)
+            and f.get('staffingScopeExcluded') is not True
+            and not (f.get('skippedDuplicateFormat') is True and f.get('alternatePdfEvidence'))]
+    protected=[{'name':str(f.get('name') or '')[:140],
+                'reason':'DRMONE 원본 보호 · 권한 또는 해제된 문서 필요'}
+               for f in actual if f.get('errorCategory')==drm_code]
+    other_unreadable=sum(f.get('readable') is not True or
+                         f.get('sourceTextScanComplete') is not True
+                         for f in actual if f.get('errorCategory')!=drm_code)
+    return {'status':('restricted' if protected and not other_unreadable
+                      else 'mixed' if protected else 'none'),
+            'protectedFileCount':len(protected),
+            'protectedFiles':protected[:12],
+            'otherUnreadableCount':other_unreadable,
+            'isParserFailure':False if protected and not other_unreadable else None}
+
+
 def saved_rfp_search_state(row, compact=False, historical=False):
     """Expose persisted RFP scan provenance; never call official API on page load."""
     if not isinstance(row,dict):
@@ -1228,11 +1253,15 @@ def saved_rfp_search_state(row, compact=False, historical=False):
         for i,f in enumerate(files)))
     effective_readable=sum(f.get('readable') is True or i in covered
                            for i,f in enumerate(files))
+    source_access=rfp_source_access_state(files)
     file_statuses=[{
         'name':str(f.get('name') or '')[:140],
         'readable':f.get('readable') is True,
         'pdfAlternative':covered.get(i,'')[:140],
         'skippedDuplicateFormat':i in covered,
+        'accessStatus':('restricted' if f.get('errorCategory')==
+                       'drm_protected_original_requires_authorized_decryption'
+                       and i not in covered else 'none'),
         'errorCategory':('' if i in covered else str(f.get('errorCategory') or '')[:90]),
         'errorDetail':('' if i in covered else str(f.get('errorDetail') or '')[:180]),
         'pdfSources':[{'sourceFile':str(doc.get('sourceFile') or '')[:200],
@@ -1366,6 +1395,7 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'readableCount':sum(x.get('readable') is True for x in files),
             'pdfCoveredCount':len(covered),
             'effectiveReadableCount':effective_readable,
+            'sourceAccess':source_access,
             'excerpts':labels[:14],
             'staffingRoles':role_rows,'staffingFacts':facts,
             'staffingRoleScanComplete':role_scan_complete,
@@ -1411,6 +1441,7 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'readableCount':sum(x.get('readable') is True for x in files),
             'pdfCoveredCount':len(covered),
             'effectiveReadableCount':effective_readable,
+            'sourceAccess':source_access,
             'excerptCount':len(excerpts),
             'excerpts':excerpts,'officialFiles':official_files,
             'fileStatuses':file_statuses}
