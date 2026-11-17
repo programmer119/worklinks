@@ -1830,6 +1830,8 @@ def rfp_cohort_lanes(path,managed,valid):
     skipped_missing={key for key in cohort if
                      entries.get(key)==('no_attachments','skipped') and
                      key in manifests}
+    source_restricted={key for key in cohort if
+                       entries.get(key,('',))[1]=='source_restricted'}
     verified_sources=valid|({key for key in cohort if key in manifests})
     confirmed_keys={key for key in cohort if entries.get(key,('',))[0]=='error_confirmed'}
     # A previously valid scan is not proof that EVERY original was downloaded.
@@ -1874,6 +1876,7 @@ def rfp_cohort_lanes(path,managed,valid):
                    'failed':retry_download},
        'scan':{'total':total-len(skipped_missing),
                'done':len(valid),'active':active_scan,
+               'sourceRestricted':len(source_restricted-valid),
                'failed':retry_scan,'blockedNoAttachments':len(skipped_missing-valid),
                'staleQueueComplete':len(stale_done),
                'notQueued':len(pending_missing)}}
@@ -1927,6 +1930,7 @@ def rfp_dual_lane_progress(path,cohort=None):
                 'done':sum(n for _,b,n in rows if b in ('done','skipped')),
                 'skipped':sum(n for _,b,n in rows if b=='skipped'),
                 'active':sum(n for _,b,n in rows if b=='scanning'),
+                'sourceRestricted':sum(n for _,b,n in rows if b=='source_restricted'),
                 'failed':sum(n for _,b,n in rows if b=='retry')}}
 
 
