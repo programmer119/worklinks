@@ -34,6 +34,7 @@ if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 from rfp_call_ledger import CallLedger, cache_key
 from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
+from rfp_requirement_verdicts import scan_file as scan_bid_requirements, summarize_notice as summarize_bid_requirements, VERSION as REQUIREMENT_SCAN_VERSION
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
@@ -179,7 +180,7 @@ MAX_HWPX_XML_TOTAL=90_000_000
 HWPX_READER_VERSION=3
 PARTNER_VERIFIED_CODES={'1426','1468','1469','1470'}
 TEXT_FORMATS=('.hwp','.hwpx','.hwtx','.pdf','.docx','.xls','.xlsx','.xlsm','.pptx','.zip','.png','.jpg','.jpeg','.bmp','.tif','.tiff','.webp','.hml','.html','.htm','.cell','.txt','.csv')
-CLASSIFICATION_VERSION=23
+CLASSIFICATION_VERSION=24
 EXTRA_QUALIFICATION_ANCHORS=re.compile(
     r'입찰\s*참가\s*(?:자격|요건|등록|가능|할\s*수)|참가\s*자격|업종\s*코드|소프트웨어사업자|직접\s*생산|'
     r'중소기업\s*확인|중소기업자|중소기업\s*(?:만|에\s*한정|이어야|이하)|'
@@ -3380,6 +3381,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
         if (retained and
                 int(retained.get('staffingRoleScanVersion') or 0)>=STAFFING_ROLE_SCAN_VERSION and
                 int(retained.get('staffingFactScanVersion') or 0)>=STAFFING_FACT_SCAN_VERSION and
+                int(retained.get('requirementScanVersion') or 0)>=REQUIREMENT_SCAN_VERSION and
                 retained.get('staffingRoleScanTruncated') is not True):
             saved_slots[position]=dict(retained)
             continue
@@ -3455,6 +3457,7 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             staffing_roles=extract_staffing_roles(content,name,url)
             staffing_facts=extract_staffing_facts(content,name,url)
             submission_items,submission_complete=extract_submission_items(content,name)
+            requirement_verdicts=scan_bid_requirements(content,name,url)
             scan=preserve_unclassified_qualification(content,name,candidate_rules)
             phase['analysisSeconds']+=time.perf_counter()-timer
             record.update({'readable':True,'textChars':len(content),
@@ -3475,6 +3478,8 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
                            'submissionItems':submission_items,
                            'submissionScanVersion':SUBMISSION_SCAN_VERSION,
                            'submissionScanComplete':submission_complete and source_evidence['sourceComplete'],
+                           'requirementScanVersion':REQUIREMENT_SCAN_VERSION,
+                           'requirementVerdicts':requirement_verdicts,
                            'topics':triggers,'snippets':snippets,
                            'clauseCandidates':candidate_rules,
                            'fullReviewPending':True})
@@ -3497,6 +3502,9 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
     # leave those or an interrupted partial file event marked 'working'.
     if live_trace:live_trace.finish_scan_notice(notice_key)
     notice=data.get('noticeDocuments') or {}
+    requirements=summarize_bid_requirements(
+        saved,docs.get('complete') is True and notice.get('ok') is True
+        and notice.get('complete') is True)
     return {'status':'download_not_verified' if original_missing else
                      'text_extracted_requires_review' if readable else 'text_unavailable',
             'reasonCode':'verified_original_missing' if original_missing else
@@ -3513,6 +3521,9 @@ def process(no,ordn,metadata=None,previous=None,prefetch=None):
             'readableDocumentCount':sum(int(f.get('readable') is True) for f in saved),
             'unreadableDocumentCount':sum(int(f.get('readable') is not True) for f in saved),
             'files':saved,
+            'requirementScanVersion':REQUIREMENT_SCAN_VERSION,
+            'requirementScanComplete':requirements['complete'],
+            'requirementVerdicts':requirements['verdicts'],
             'reviewComplete':False,'requiredConditionsComplete':False,
             'contractPerformanceVerified':False,
             'manifestSignature':official_manifest_signature(data),
@@ -3658,6 +3669,9 @@ def compact_coverage(item):
         'checkedAt':item.get('checkedAt') or '',
         'classificationVersion':item.get('classificationVersion',0),
         'hwpxReaderVersion':item.get('hwpxReaderVersion',0),
+        'requirementScanVersion':int(item.get('requirementScanVersion') or 0),
+        'requirementScanComplete':item.get('requirementScanComplete') is True,
+        'requirementVerdicts':item.get('requirementVerdicts') or {},
         'partialRetryCount':item.get('partialRetryCount',0),
         'reviewComplete':False,
         'attachmentManifestCount':item.get('attachmentManifestCount'),
@@ -3679,6 +3693,7 @@ def compact_coverage(item):
             'sourceTextScanComplete':f.get('sourceTextScanComplete') is True,
             'staffingRoleScanVersion':int(f.get('staffingRoleScanVersion') or 0),
             'staffingFactScanVersion':int(f.get('staffingFactScanVersion') or 0),
+            'requirementScanVersion':int(f.get('requirementScanVersion') or 0),
             'staffingScopeExcluded':bool(
                 staffing_ancillary_form_without_extractable_text(f) or
                 staffing_general_annex_file(f.get('name')) or
