@@ -2454,6 +2454,30 @@ def _extract_dispatch(name,raw):
             if len(members)>3000 or expanded>250_000_000 or total+expanded>250_000_000:
                 raise ValueError('archive_expanded_size_safety_limit')
             _DOCUMENT_SCAN.zip_expanded_bytes=total+expanded
+            # A G2B downloadRfpFile.do URL can return the whole ZIP package
+            # even when the official manifest labels ONE internal .pdf/.xlsx.
+            # Never scan unrelated siblings as evidence for that file. This
+            # also prevents DRMONE in a different sibling from hiding a fully
+            # accessible requested document.
+            official_suffix=Path(str(name)).suffix.lower()
+            if official_suffix not in ('.zip','.egg') and official_suffix in TEXT_FORMATS:
+                requested=Path(str(name).replace('\\','/')).name.casefold()
+                candidates=[member for member in members if not member.is_dir()
+                    and member.filename.replace('\\','/').rsplit('/',1)[-1].casefold()==requested]
+                if len(candidates)!=1:
+                    raise ValueError('official_bundle_requested_member_ambiguous'
+                                     if candidates else 'official_bundle_requested_member_missing')
+                chosen=candidates[0]
+                if chosen.file_size>MAX_FILE:raise ValueError('large_file')
+                if chosen.filename.startswith('/') or '..' in Path(chosen.filename).parts:
+                    raise ValueError('unsafe_archive_path')
+                depth=getattr(_DOCUMENT_SCAN,'zip_depth',0)
+                if depth>=2:raise ValueError('nested_archive_requires_review')
+                _DOCUMENT_SCAN.zip_depth=depth+1
+                try:
+                    return extract(chosen.filename,archive.read(chosen))
+                finally:
+                    _DOCUMENT_SCAN.zip_depth=depth
             for entry in members:
                 if entry.is_dir():continue
                 inner=entry.filename
