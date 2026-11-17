@@ -47,4 +47,18 @@ for failed_pdf in (
     assert bad.get('skippedDuplicateFormat') is not True
     assert not reader.staffing_effective_file_complete(bad,[bad,good])
 
+# The on-disk merger must publish the PDF evidence marker, not preserve the
+# old HML failure after its supported same-name PDF has been selected.
+old_hml,pdf=sample()
+new_hml=dict(old_hml)
+new_hml['lastReaderAttemptVersion']=repair.READER_ATTEMPT_VERSION
+old_hml['lastReaderAttemptVersion']=repair.READER_ATTEMPT_VERSION
+assert reader.annotate_official_pdf_siblings([new_hml,pdf])==1
+assert repair.merge_verified_repair_attempt(old_hml,new_hml) is False
+assert old_hml['skippedDuplicateFormat'] is True
+assert old_hml['readable'] is False and old_hml['sourceTextScanComplete'] is False
+assert old_hml['alternatePdfSourceSha256']==pdf['sourceSha256']
+assert 'errorCategory' not in old_hml
+assert reader.staffing_effective_file_complete(old_hml,[old_hml,pdf])
+
 print('RFP_HML_SAME_STEM_VERIFIED_PDF_ONLY=PASS')
