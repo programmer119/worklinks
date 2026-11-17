@@ -8,7 +8,7 @@ Evaluation scores alone are not mandatory pre-bid experience credentials.
 """
 import re
 
-VERSION=1
+VERSION=2
 MAX_TEXT_CHARS=6_000_000
 MAX_EVIDENCE=12
 P=re.compile(r'수행\s*실적|유사\s*(?:사업|용역|납품|구축)?\s*실적|실적\s*(?:증명|확인|자료|서류|기준|요건|조건|제출|평가|점수|배점)|(?:사업|계약|납품|용역|구축)\s*실적|실적\s*\d',re.I)
@@ -59,6 +59,19 @@ def _classify(topic,window):
     if not pattern.search(window):
         return None
     normalized=' '.join(window.split())[:450]
+    # Post-award compliance penalties are not a new bidder certificate.
+    if (topic=='directProduction' and
+        re.search(r'직접\s*생산\s*확인\s*기준|직접생산확인기준',normalized,re.I)
+        and re.search(r'위반|계약\s*해지|계약보증금|국고\s*귀속|제재',normalized,re.I)
+        and not re.search(r'확인\s*증명서.{0,55}(?:소지|제출|필수)|소지한\s*자',normalized,re.I)):
+        return None
+    # A supplier's quarterly maintenance/SLA reports are operational
+    # deliverables, not a bidder's historical performance qualification.
+    if (topic=='performance' and
+        re.search(r'정비\s*실적|수리부속\s*사용실적|SLA\s*달성률',normalized,re.I)
+        and re.search(r'공급자|계약상대자|수요기관|분기별|매년',normalized,re.I)
+        and not re.search(r'입찰\s*참가\s*자격|유사\s*사업\s*실적|실적\s*증명서',normalized,re.I)):
+        return None
     if EXPLICIT_WAIVER.search(normalized):
         return 'waived'
     if CONDITIONAL.search(normalized):
@@ -73,7 +86,8 @@ def _classify(topic,window):
                                           r'입찰\s*참가\s*(?:자격|조건).{0,80}실적',normalized,re.I))
     else:
         certain=bool(DIRECT_CERT.search(normalized) and
-                     (REQUIRED.search(normalized) or PROOF.search(normalized)))
+                     (REQUIRED.search(normalized) or
+                      re.search(r'제출|소지|보유|첨부|발급받은|확인서.{0,15}유효',normalized,re.I)))
         certain=certain or bool(re.search(
             r'입찰\s*참가\s*(?:자격|요건|조건).{0,90}직접\s*생산|'
             r'직접\s*생산.{0,90}(?:입찰\s*참가\s*(?:자격|요건|조건)|필수|제출\s*하여야)',normalized,re.I))
@@ -157,6 +171,7 @@ def summarize_notice(files,manifest_complete):
     complete=bool(files and manifest_complete is True and all(
         f.get('readable') is True and f.get('sourceTextScanComplete') is True
         and f.get('qualificationScanTruncated') is not True
+        and int(f.get('unmatchedQualificationAnchorCount') or 0)==0
         and int(f.get('requirementScanVersion') or 0)>=VERSION
         and isinstance(f.get('requirementVerdicts'),dict)
         for f in usable))
