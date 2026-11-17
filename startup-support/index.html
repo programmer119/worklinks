@@ -4604,6 +4604,22 @@ function jobRequirementEvidence(x){
    Number(b?.seen===true&&typeof b.parserCurrent==='boolean'&&!!b.versionSource)-
    Number(a?.seen===true&&typeof a.parserCurrent==='boolean'&&!!a.versionSource)||
    (Date.parse(b.checkedAt||'')||0)-(Date.parse(a.checkedAt||'')||0))[0]||null);
+ // A DRMONE wrapper inside an official attachment is an access restriction,
+ // not a scanner crash or proof that the entire bid notice was unpublished.
+ const fileAccess=saved?.sourceAccess||null;
+ const fullProtected=(Array.isArray(full?.files)?full.files:[])
+  .filter(f=>f?.errorCategory==='drm_protected_original_requires_authorized_decryption'&&
+    f?.skippedDuplicateFormat!==true&&f?.staffingScopeExcluded!==true);
+ const fullOther=(Array.isArray(full?.files)?full.files:[])
+  .filter(f=>f?.readable!==true&&
+    f?.errorCategory!=='drm_protected_original_requires_authorized_decryption'&&
+    f?.skippedDuplicateFormat!==true&&f?.staffingScopeExcluded!==true);
+ const sourceRestricted=fileAccess?.status==='restricted'||
+   (!fileAccess&&fullProtected.length>0&&fullOther.length===0);
+ const sourceRestrictedFiles=(fileAccess?.protectedFiles||fullProtected)
+   .map(f=>String(f.name||'')).filter(Boolean);
+ const sourceRestrictedReason='공개 첨부에 DRMONE 보안 잠금 적용 · 발주기관의 열람 권한 또는 해제본 필요 · 판독기 오류 아님'+
+   (sourceRestrictedFiles.length?' · '+sourceRestrictedFiles.slice(0,3).join(' / '):'');
  const publishedProvenance=typeof rfpScanProvenanceByNotice==='undefined'?null:
    rfpScanProvenanceByNotice.get(key)||null;
  const cardScan=saved;
@@ -4714,6 +4730,8 @@ function jobRequirementEvidence(x){
    return {key:'not_required',label:'필요없음',reason:mentioned.some(deferredToContract)?
     '전체 문서 정상 판독 · 입찰 시 필수요건은 확인되지 않음 (계약·수행 단계 조건은 원문 확인 후 준비)':
     '전체 문서 정상 판독 · 관련 문구는 있지만 입찰 시 명확한 필수요건은 확인되지 않음'};
+  if(sourceRestricted)return {key:'source_restricted',label:'보안문서',
+    reason:sourceRestrictedReason};
   return {key:'failed',label:'확인실패',reason:scanFailed?
     '원문·첨부 수집 또는 판독이 불완전해 미검출로 단정 불가':
     '공식 원문·첨부 전체 판독 미완료 · 필요 여부 미확정'};
@@ -4766,6 +4784,8 @@ function jobRequirementEvidence(x){
      reason:'공고 원문 API 수집·검증 호출 기록 없음'};
    if(scanNotRun)return {key:'checking',label:'확인중',reason:'공고 수집 후 첨부문서 판독 미실행 · 상주 조건 판독 필요'};
    if(!staffingSourceReadComplete){
+     if(sourceRestricted)return {key:'source_restricted',label:'보안문서',
+       reason:sourceRestrictedReason};
      if(saved?.status==='text_extracted_requires_review'||provenance?.status==='text_extracted_requires_review')
        return {key:'checking',label:'확인중',
          reason:'원문 추출은 되었으나 최신 상주·인력 판독 완료 근거가 없어 재검증 필요'};
@@ -4986,6 +5006,8 @@ function jobRequirementEvidence(x){
    {key:'role_unspecified',label:'인원 자율',
     reason:'공식 원문·첨부 정상 판독 · 발주처 지정 필수 투입 인원 수 없음 · 수행업체가 과업에 필요한 인원을 편성'}:
   sourceReadComplete&&!staffingScanComplete?{key:'not_checked',label:'인원표 미검증',reason:'기존 문서는 자격조건만 스캔한 자료로 인원표 전체 스캔 기록 없음'}:
+  sourceRestricted?{key:'source_restricted',label:'보안문서',
+    reason:sourceRestrictedReason}:
   {key:'failed',label:'확인실패',reason:'원문·첨부 판독이 불완전하여 인력 구성을 확정할 수 없음'};
  const roleLines=[
   roles.length?'역할별 인원: '+roles.join(' · '):
@@ -5025,7 +5047,8 @@ function jobRequirementEvidence(x){
    requirements:displayedRequirements,workloads:effortRows,
    totalManMonths:total?Number(total.manMonths):null,
    sourceFiles:[...new Set(effortRows.map(f=>String(f.sourceFile||'')).filter(Boolean))]},
-  meta:{full,saved,staff,provenance,clauses,tried,scanFailed,fullyReviewed}
+  meta:{full,saved,staff,provenance,clauses,tried,scanFailed,fullyReviewed,
+    sourceRestricted,sourceRestrictedReason,sourceRestrictedFiles}
  };
  const previous=priorOverride?null:saved?.lastSuccessfulState;
  const newestSucceeded=saved?.parserCurrent===true&&
