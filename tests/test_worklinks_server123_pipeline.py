@@ -97,6 +97,9 @@ with tempfile.TemporaryDirectory() as temporary:
         'R26BK01808709:000':{'status':'text_extracted_requires_review'}}}
     for filename in ('rfp-clauses.json','rfp-coverage-index.json'):
         (m.SEEDS/filename).write_text(json.dumps(original),encoding='utf-8')
+    (m.SEEDS/'rfp-scanner-versions.json').write_text(json.dumps({'ok':True,'schemaVersion':1,
+       'latest':{'classificationVersion':23,'staffingRoleScanVersion':4,
+                 'staffingFactScanVersion':2,'hwpxReaderVersion':3}}),encoding='utf-8')
     (m.SEEDS/'rfp-top500-batch-state-20261111.json').write_text(json.dumps(
         {'ok':True,'scans':{},'metadataCalls':47}),encoding='utf-8')
     (m.SEEDS/'rfp-top500-batch-metadata-20261111.json').write_text(json.dumps(
@@ -108,6 +111,11 @@ with tempfile.TemporaryDirectory() as temporary:
         staged=m.stage_workspace(Path(staging_dir),minimal=True)
         assert (staged/'snapshots'/'rfp-clauses.json').is_symlink()
         assert (staged/'snapshots'/'rfp-top500-batch-metadata-20261111.json').is_symlink()
+        assert (staged/'snapshots'/'rfp-scanner-versions.json').is_symlink()
+        from rfp_management_reconcile import read_evidence
+        staged_versions, staged_evidence=read_evidence(staged)
+        assert staged_versions['classificationVersion']==23
+        assert 'R26BK01808709:000' in staged_evidence
         assert not (staged/'snapshots'/'rfp-coverage-index.json').is_symlink()
         assert (staged/'scripts'/'staffing_facts.py').is_file(), 'RFP extractor must stage its dependency'
         assert (staged/'scripts'/'rfp_submission.py').is_file(), 'RFP extractor must stage submission reader'
