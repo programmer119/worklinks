@@ -4670,9 +4670,21 @@ function jobRequirementEvidence(x){
     (Number(saved.documentCount||0)===0&&saved.scanComplete===false&&
      saved.staffingRoleScanComplete!==true&&!saved.lastScannedAt&&!saved.scannedAt));
  const status=String(full?.status||saved?.status||'');
+ // Physical readableCount excludes unread HWPX copies covered by an
+ // independently SHA-verified, same-name official PDF. Use effective coverage
+ // for failure decisions or a fully completed 4/4 notice becomes false red 3/4.
+ const fullUnresolved=Array.isArray(full?.files)&&full.files.some(f=>
+   !(f?.skippedDuplicateFormat===true&&f?.alternatePdfEvidence&&
+     f?.alternatePdfSourceSha256&&full.files.some(pdf=>
+       String(pdf?.name||'')===String(f.alternatePdfEvidence)&&
+       pdf.readable===true&&pdf.sourceTextScanComplete===true&&
+       String(pdf.sourceSha256||'')===String(f.alternatePdfSourceSha256)))&&
+   (f.readable!==true||f.sourceTextScanComplete===false));
+ const savedEffectiveRead=Number(saved?.effectiveReadableCount??saved?.readableCount);
+ const savedUnresolved=Number(saved?.documentCount)>0&&
+   (!Number.isFinite(savedEffectiveRead)||savedEffectiveRead<Number(saved.documentCount));
  const scanFailed=tried&&(status!=='text_extracted_requires_review'||full?.manifestComplete===false||
-   (Array.isArray(full?.files)&&full.files.some(f=>f.readable!==true||f.sourceTextScanComplete===false))||
-   (saved?.documentCount>0&&saved.readableCount<saved.documentCount));
+   fullUnresolved||savedUnresolved);
  // A complete machine scan is sufficient to report "requirement not detected".
  // Manual reviewComplete flags are reserved for final eligibility judgements.
  const fullScanComplete=full?.status==='text_extracted_requires_review'&&
@@ -5336,7 +5348,10 @@ function jobDetailRequirementGrid(x){
    primary:mandatoryPerf?'입찰 필수조건 문구 검출'+(uniqHints.length?' · '+uniqHints.join(' · '):''):
     evaluationPerf?'제안 평가용 실적 언급 · 입찰 필수실적과 별개':
     perfRows.length?'실적 제출·요건 문구 확인 · 필수 여부 검토 필요':
-    (stPerf.key==='not_required'?'필수 실적 요건 없음 확인':'최소 실적·금액·기간 미확정'),
+    (stPerf.key==='not_required'?'필수 실적 요건 없음 확인':
+      stPerf.key==='review'&&e.meta.saved?.scanComplete===true?
+      '원문 판독 완료 · 필수 실적 문구 미검출 · 최종 확인 필요':
+      '최소 실적·금액·기간 미확정'),
    sub:p?'창컴 증빙: 해당 사업의 실적증명서·수행완료 여부 별도 대조 필요':
     '계약·낙찰이력은 수행완료 실적증명서를 대체하지 않음',
    rows:perfRows.slice(0,5)
@@ -5345,15 +5360,28 @@ function jobDetailRequirementGrid(x){
    name:'직접생산',code:'production',s:stDirect,
    primary:prodCodes.length?'요구 관련 세부품명번호 '+prodCodes.join(' / '):
     directRows.length?'직접생산 관련 원문 확인 · 필수 품목번호 검토 필요':
-    stDirect.key==='not_required'?'요구 없음 확인':'요구 품목·세부품명번호 미확정',
+    stDirect.key==='not_required'?'요구 없음 확인':
+      stDirect.key==='review'&&e.meta.saved?.scanComplete===true?
+      '원문 판독 완료 · 직접생산 요구 문구 미검출 · 최종 확인 필요':
+      '요구 품목·세부품명번호 미확정',
    sub:prodCompany||'업체 발급이력과 현재 유효 여부는 별도 확인',
    rows:directRows.slice(0,5)
   }
  };
  // Scan metadata is honest about documents that could not be read.
  const hasFiles=Array.isArray(full?.files)?full.files.length:Number(saved?.documentCount||0);
- const readable=Array.isArray(full?.files)?full.files.filter(f=>f.readable===true).length:Number(saved?.readableCount||0);
- const coverage=hasFiles?' · 판독 '+readable+'/'+hasFiles+'건':'';
+ const physicalRead=Array.isArray(full?.files)?full.files.filter(f=>f.readable===true).length:
+   Number(saved?.readableCount||0);
+ const pdfCovered=Array.isArray(full?.files)?full.files.filter(f=>
+    f?.skippedDuplicateFormat===true&&f?.alternatePdfEvidence&&
+    f?.alternatePdfSourceSha256&&full.files.some(pdf=>
+      String(pdf?.name||'')===String(f.alternatePdfEvidence)&&
+      pdf.readable===true&&pdf.sourceTextScanComplete===true&&
+      String(pdf.sourceSha256||'')===String(f.alternatePdfSourceSha256))).length:
+   Number(saved?.pdfCoveredCount||0);
+ const readable=Math.min(hasFiles,physicalRead+pdfCovered);
+ const coverage=hasFiles?' · 판독 '+readable+'/'+hasFiles+'건'+
+   (pdfCovered?' (공식 PDF 대체 '+pdfCovered+'건)':''):'';
  function card(item){
   const icon=({required:'!',required_at_bid:'!',not_required:'✓',failed:'?',source_restricted:'🔒',checking:'…',onsite:'●',offsite:'✓',evaluation:'~',review:'?',not_checked:'?',role_count_unspecified:'✓',role_unspecified:'✓'})[item.s.key]||'';
   const extra=item.rows.length?
