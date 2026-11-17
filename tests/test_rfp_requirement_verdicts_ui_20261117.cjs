@@ -15,14 +15,14 @@ const sourceState={
  scanComplete:true,complete:true,staffingRoleScanComplete:true,
  documentCount:1,readableCount:1,effectiveReadableCount:1,
  staffingRoles:[],staffingFacts:[],excerpts:[],
- requirementScanVersion:1,requirementScanComplete:true,
+ requirementScanVersion:2,requirementScanComplete:true,
  requirementVerdicts:{
-  performance:{scanVersion:1,status:'required',sourceComplete:true,
+  performance:{scanVersion:2,status:'required',sourceComplete:true,
    reason:'explicit_required',hasEvaluation:false,
    evidence:[{kind:'required',sourceFile:'공고문.pdf',sourceLine:8,
      sourceText:'입찰 참가 자격: 유사 용역 수행실적 3억원 이상 보유하여야 한다.',
      sourceUrl:'https://www.g2b.go.kr/example.pdf'}]},
-  directProduction:{scanVersion:1,status:'not_required',sourceComplete:true,
+  directProduction:{scanVersion:2,status:'not_required',sourceComplete:true,
    reason:'full_official_attachments_no_mandatory_clause',hasEvaluation:false,
    evidence:[]}
  }};
@@ -51,7 +51,7 @@ assert(!partial.includes('입찰 필수 직접생산 요구 없음'),
 assert(!partial.includes('요구 없음 확인'),partial);
 const reviewed={...sourceState,requirementVerdicts:{
  ...sourceState.requirementVerdicts,directProduction:{
-  scanVersion:1,status:'review',sourceComplete:true,evidence:[],
+  scanVersion:2,status:'review',sourceComplete:true,evidence:[],
   reason:'ambiguous_qualification_wording'}}};
 assert(render(reviewed).jobDetailRequirementGrid(bid).includes('직접생산 판정 보류'));
 console.log('WORKLINKS_RFP_SOURCE_VERIFIED_PERFORMANCE_DIRECT_VERDICTS_UI_PASS');
