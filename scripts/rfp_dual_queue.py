@@ -690,7 +690,7 @@ class RfpDualQueue:
         recovered=0
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
-            rows=db.execute('''SELECT notice_key,scan_failure_signature
+            rows=db.execute("""SELECT notice_key,scan_failure_signature
                 FROM rfp_dual_notices WHERE scan_status IN ('retry','source_restricted')
                 AND download_status='ready' AND scan_failure_signature<>''""").fetchall()
             for key,sig in rows:
