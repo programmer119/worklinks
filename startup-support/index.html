@@ -4535,7 +4535,8 @@ function jobCollectionFlags(x){
  const rfpDone=!!(rfp&&rfp.manifestComplete===true&&
   rfp.status==='text_extracted_requires_review'&&files&&files.length&&
   files.every(f=>f.readable===true&&f.sourceTextScanComplete!==false&&f.qualificationScanTruncated!==true));
- const rfpStatus=rfpFromSearch?
+ const accessSource=(jobListRfpState.get(key)||rfpFromSearch)?.sourceAccess;
+ const rfpStatus=accessSource?.status==='restricted'?'restricted':rfpFromSearch?
   (!rfpFromSearch.sourceAvailable?'partial':
    !rfpFromSearch.seen?'absent':rfpFromSearch.complete?'done':'partial'):
   !rfp?'absent':rfpDone?'done':'partial';
@@ -5087,9 +5088,9 @@ function jobRequirementBadges(x){
  const evidence=jobRequirementEvidence(x);
  if(!evidence)return '';
  function marker(name,v,code){
-  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 자율',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원 자율',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패'}[v.key]||name):
+  const label=code==='roles'?({role_found:v.label.startsWith('역할별 인원 ')?v.label:'역할별 인원',role_workload:v.label,role_recommended:v.label,role_count_unspecified:'인원 자율',role_requirements:'인력 조건 확인',role_mentioned:'인원 언급',role_unspecified:'인원 자율',not_checked:'인원 미검증',checking:'인원 확인중',failed:'인원 확인실패',source_restricted:'보안문서'}[v.key]||name):
    code==='insurance'?(v.key==='employment_proof'?v.label:name+' '+(v.key==='not_required'?'불필요':v.label)):
-   ((v.key==='failed'||v.key==='checking'||v.key==='not_checked')?name+' '+v.label:
+   ((v.key==='failed'||v.key==='checking'||v.key==='not_checked'||v.key==='source_restricted')?name+' '+v.label:
     (code==='onsite'&&['onsite','onsite_recommended','onsite_negotiable','offsite'].includes(v.key)?v.label:name));
   const roles=code==='roles'?evidence.roles.items:[];
   const genericRole=/^(?:운영\s*인력|관리\s*인력|지원\s*인력|기술\s*인력|개발\s*인력|유지\s*관리\s*인력)$/;
@@ -5114,7 +5115,7 @@ function jobRequirementBadges(x){
   });
   const remaining=Math.max(0,roles.length-roleRows.length);
   const messages={
-   insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',employment_proof:'건강보험 자격득실확인서 등 재직 증빙 요구 · 4대보험 전체 의무 확인과는 별도',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
+   insurance:{required:'사전 증빙 필요',required_at_bid:'입찰 시 증빙 필요',employment_proof:'건강보험 자격득실확인서 등 재직 증빙 요구 · 4대보험 전체 의무 확인과는 별도',not_required:'입찰 시 증빙 불필요',not_checked:'미검증',checking:'확인 중',failed:'확인 실패',source_restricted:'보안문서 · 열람제한',source_restricted:'보안문서 · 열람제한',source_restricted:'보안문서 · 열람제한'},
    onsite:{onsite:'발주처 상주 인력 배치 필요',onsite_recommended:'상주 근무인력 권고 · 필수 아님',onsite_negotiable:'발주기관과 상주 여부·인원 협의',offsite:'원문에 비상주 근무 명시',not_checked:'미검증',checking:'확인 중',failed:'확인 실패'},
    roles:{role_workload:'투입공수 확인 · 인원 수 아님',role_recommended:'권고 인원 · 필수 아님',role_requirements:'원문 근거가 있는 인력 요구사항',role_count_unspecified:'발주처 지정 필수 인원 수 없음 · 수행업체 자율 편성 (근무·자격 등 명시된 조건은 준수)',role_mentioned:'인원 언급 · 역할 미확정',role_unspecified:'원문 판독 완료 · 지정 필수 인원 수 없음 · 수행업체 자율 편성',not_checked:'인원 미검증',checking:'확인 중',failed:'확인 실패'}
   };
@@ -5214,8 +5215,8 @@ function jobRequirementBadges(x){
   return '<span class="job-req-item" data-requirement="'+code+'" data-state="'+v.key+'">'+
    '<button type="button" class="job-req-trigger" data-job-requirement="'+code+'" aria-label="'+
     htmlEscape(header+' · '+ariaSummary)+'" aria-expanded="false">'+
-    htmlEscape(label)+(['not_checked','checking','failed','required','required_at_bid','not_required','offsite','role_count_unspecified','role_unspecified'].includes(v.key)?
-     ' <span class="job-req-icon" aria-hidden="true">'+({not_checked:'?',checking:'…',failed:'?',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_count_unspecified:'✓',role_unspecified:'✓'})[v.key]+'</span>':'')+'</button>'+
+    htmlEscape(label)+(['not_checked','checking','failed','source_restricted','required','required_at_bid','not_required','offsite','role_count_unspecified','role_unspecified'].includes(v.key)?
+     ' <span class="job-req-icon" aria-hidden="true">'+({not_checked:'?',checking:'…',failed:'?',source_restricted:'🔒',required:'!',required_at_bid:'!',not_required:'✓',onsite:'●',offsite:'✓',role_count_unspecified:'✓',role_unspecified:'✓'})[v.key]+'</span>':'')+'</button>'+
    '<span class="job-req-tip" role="tooltip">'+tip+'</span></span>';
  }
  return '<div class="job-req-strip" aria-label="4대보험, 상주 여부, 역할별 인원">'+
@@ -5274,6 +5275,7 @@ function jobDetailRequirementGrid(x){
   if(rows.length)return {key:'review',label:'원문 판정 필요'};
   if(!tried)return {key:'not_checked',label:'확인안함'};
   if(fullyReviewed)return {key:'not_required',label:'요건 없음 확인'};
+  if(e.meta.sourceRestricted)return {key:'source_restricted',label:'보안문서'};
   return scanFailed?{key:'failed',label:'확인실패'}:{key:'review',label:'원문 검토 필요'};
  }
  const prodCodes=[...new Set(directRows.flatMap(c=>
@@ -5347,7 +5349,7 @@ function jobDetailRequirementGrid(x){
  const readable=Array.isArray(full?.files)?full.files.filter(f=>f.readable===true).length:Number(saved?.readableCount||0);
  const coverage=hasFiles?' · 판독 '+readable+'/'+hasFiles+'건':'';
  function card(item){
-  const icon=({required:'!',required_at_bid:'!',not_required:'✓',failed:'?',checking:'…',onsite:'●',offsite:'✓',evaluation:'~',review:'?',not_checked:'?',role_count_unspecified:'✓',role_unspecified:'✓'})[item.s.key]||'';
+  const icon=({required:'!',required_at_bid:'!',not_required:'✓',failed:'?',source_restricted:'🔒',checking:'…',onsite:'●',offsite:'✓',evaluation:'~',review:'?',not_checked:'?',role_count_unspecified:'✓',role_unspecified:'✓'})[item.s.key]||'';
   const extra=item.rows.length?
    '<details><summary>원문 근거 '+item.rows.length+'건 보기</summary>'+
    item.rows.map(r=>'<div class="job-key-source">'+htmlEscape(r.text)+
@@ -5361,8 +5363,11 @@ function jobDetailRequirementGrid(x){
    '<p class="job-key-secondary">'+htmlEscape(item.sub)+'</p>'+
    extra+'</article>';
  }
+ const sourceNotice=e.meta.sourceRestricted?
+   '<div class="job-source-restriction"><strong>공개 첨부 · 보안문서</strong>'+
+    '<span>'+htmlEscape(e.meta.sourceRestrictedReason)+'</span></div>':'';
  return '<section class="job-detail-section job-key-requirements">'+
-  '<h3>입찰 핵심조건</h3>'+
+  '<h3>입찰 핵심조건</h3>'+sourceNotice+
   '<p class="job-key-intro">공고별 원문 근거 기준'+coverage+' · 문구 검출과 최종 참가자격 판정은 구분합니다.</p>'+
   '<div class="job-key-grid">'+
   [synopsis.insurance,synopsis.onsite,synopsis.roles,synopsis.performance,synopsis.production].map(card).join('')+
@@ -5372,7 +5377,7 @@ function jobDetailRequirementGrid(x){
 function jobCollectionMarkup(x){
  if(!jobSearchText)return '';
  const flags=jobCollectionFlags(x);if(!flags)return '';
- const message={done:'수집 완료',partial:'부분·오류',absent:'저장 기록 없음'};
+ const message={done:'수집 완료',partial:'부분·오류',restricted:'보안문서',absent:'저장 기록 없음'};
  const badges=flags.statuses.map(t=>
   '<span class="api-state '+t.state+'" title="'+htmlEscape(t.label+' · '+message[t.state])+'">'+
   htmlEscape(t.label)+' '+htmlEscape(message[t.state])+'</span>').join('');
