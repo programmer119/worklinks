@@ -1,0 +1,34 @@
+name: WorkLinks verified zero attachment notice UI and API regression
+on:
+  pull_request:
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_verified_empty_card_20261117.py'
+      - 'tests/worklinks-verified-empty-card-20261117.cjs'
+      - '.github/workflows/worklinks-verified-empty-card-20261117.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'server/g2b-proxy.py'
+      - 'startup-support/index.html'
+      - 'tests/test_rfp_verified_empty_card_20261117.py'
+      - 'tests/worklinks-verified-empty-card-20261117.cjs'
+      - '.github/workflows/worklinks-verified-empty-card-20261117.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline API + UI verified-empty manifest tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile server/g2b-proxy.py
+          python3 tests/test_rfp_verified_empty_card_20261117.py
+          python3 tests/test_rfp_card_evidence_batch.py
+          node tests/worklinks-verified-empty-card-20261117.cjs
+          node tests/worklinks-jobs-regression.cjs
