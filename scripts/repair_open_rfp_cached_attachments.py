@@ -30,6 +30,7 @@ REPAIR_VERSION='signature-reader-20261112'
 READER_ATTEMPT_VERSION='framed-isolated-extract-v19-hwp-record-unicode-pdf750-20261117'
 NESTED_ZIP_READER_VERSION='two-nested-levels-cumulative-250mb-v1'
 PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
+TARGETED_ARCHIVE_RESUME_VERSION='archive-pdf-page-receipts-and-source-provenance-v1'
 SPARSE_COVER_READER_VERSION='sha-psm6-11-and-source-title-20261117'
 EMPTY_PERIMETER_READER_VERSION='four-thin-frame-strokes-no-content-v1'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
@@ -265,6 +266,13 @@ def reader_retry_files(scan):
                 and 0<int(evidence.get('pdfPages') or 0)<=80):
             selected.append(f)
             continue
+        # One opt-in local retry of byte-verified ZIP/PDF archive sources.
+        if (os.environ.get('WORKLINKS_RFP_TARGETED_ARCHIVE_RESUME')=='1'
+                and f.get('errorCategory')=='pdf_ocr_incomplete'
+                and str(f.get('detectedFormat') or '')=='zip_or_ooxml'
+                and f.get('lastTargetedArchiveResumeVersion')!=TARGETED_ARCHIVE_RESUME_VERSION):
+            selected.append(f)
+            continue
         if (f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption'
                 and f.get('lastPartialDrmZipAttemptVersion')!=PARTIAL_DRM_ZIP_READER_VERSION):
             selected.append(f)
@@ -479,6 +487,10 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
         if f.get('errorCategory')=='pdf_ocr_incomplete':
             f['lastSparseCoverAttemptVersion']=SPARSE_COVER_READER_VERSION
             f['lastPerimeterAttemptVersion']=EMPTY_PERIMETER_READER_VERSION
+        if (os.environ.get('WORKLINKS_RFP_TARGETED_ARCHIVE_RESUME')=='1'
+                and f.get('errorCategory')=='pdf_ocr_incomplete'
+                and f.get('detectedFormat')=='zip_or_ooxml'):
+            f['lastTargetedArchiveResumeVersion']=TARGETED_ARCHIVE_RESUME_VERSION
         if f.get('errorCategory')=='nested_archive_requires_review':
             f['lastNestedZipAttemptVersion']=NESTED_ZIP_READER_VERSION
         if f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption':
@@ -555,10 +567,14 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
                     f['errorCategory']='drm_protected_original_requires_authorized_decryption'
                     f['error']='protected member(s) remain in verified archive; readable siblings extracted separately'
                     counts['partial_drm_archive']+=1
-                else:
+                elif int(evidence.get('pdfFiles') or 0)>0:
                     f['errorCategory']='pdf_ocr_incomplete'
-                    f['error']='pdf_ocr_incomplete: unresolved PDF pages in source'
+                    f['error']='pdf_ocr_incomplete: unresolved embedded PDF pages'
                     counts['pdf_ocr_incomplete']+=1
+                else:
+                    f['errorCategory']='source_text_scan_incomplete'
+                    f['error']='source_text_scan_incomplete: non-PDF source incomplete'
+                    counts['source_text_scan_incomplete']+=1
                 continue
             if sum(ch.isalnum() for ch in text)<12:
                 raise ValueError('no_searchable_text')
@@ -743,7 +759,8 @@ def merge_verified_repair_attempt(live,entry):
                       'partialTextChars','detectedFormat','textChars',
                       'lastReaderAttemptVersion','lastReaderAttemptAt',
                       'lastNestedZipAttemptVersion','lastPartialDrmZipAttemptVersion',
-                      'lastSparseCoverAttemptVersion','lastPerimeterAttemptVersion'):
+                      'lastSparseCoverAttemptVersion','lastPerimeterAttemptVersion',
+                      'lastTargetedArchiveResumeVersion'):
             if field in entry:live[field]=entry[field]
         if entry.get('errorCategory')!='official_attachment_reference_missing_422':
             live.pop('lastHttpStatus',None)
@@ -1030,7 +1047,7 @@ def run(data_dir,limit,execute=False,max_files=400,workers=1,
                     counters.get(k) for k in (
                       'official_attachment_reference_missing_422',
                       'pdf_ocr_incomplete','alternate_pdf_evidence',
-                      'reader_attempt_recorded')))
+                      'reader_attempt_recorded','source_text_scan_incomplete')))
                 if not should_publish:continue
                 pending[key]=(work,additions)
                 # A newly completed full notice becomes authoritative NOW,

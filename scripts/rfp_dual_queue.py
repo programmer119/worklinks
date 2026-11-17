@@ -58,6 +58,35 @@ def scan_reopen_source_ready(evidence):
             return False
     return True
 
+def verified_protected_only_source(evidence):
+    """A source-access hold needs evidence, not a filename or generic failure.
+
+    Other official attachments must have fully readable source text (or a
+    verified identical-title PDF companion). Do not mark the RFP complete.
+    """
+    doc=evidence if isinstance(evidence,dict) else {}
+    if doc.get('manifestComplete') is not True:return False
+    files=[f for f in doc.get('files') or [] if isinstance(f,dict)]
+    if not files:return False
+    protected=0
+    for f in files:
+        if f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption':
+            protected+=1
+            continue
+        if f.get('readable') is True and f.get('sourceTextScanComplete') is True and len(str(f.get('sourceSha256') or ''))==64:
+            continue
+        if (f.get('skippedDuplicateFormat') is True and
+            len(str(f.get('alternatePdfSourceSha256') or ''))==64 and
+            any(other.get('name')==f.get('alternatePdfEvidence') and
+                other.get('readable') is True and
+                other.get('sourceTextScanComplete') is True and
+                other.get('sourceSha256')==f.get('alternatePdfSourceSha256')
+                for other in files)):
+            continue
+        return False
+    return protected>0
+
+
 class RfpDualQueue:
     def __init__(self,path):
         self.path=Path(path)
@@ -257,6 +286,11 @@ class RfpDualQueue:
                         new_scan='pending'
                         retry_reset=True
                         tally['obsoleteDoneRequeued']+=1
+                    elif scan=='source_restricted' and version!=fingerprint:
+                        # A changed reader can identify newly available
+                        # source evidence; a restriction is not permanent.
+                        new_scan='pending'
+                        retry_reset=True
                     elif scan in ('done','skipped'):
                         if download=='ready':
                             new_scan='pending'
@@ -603,17 +637,62 @@ class RfpDualQueue:
                  0 if success else repeats,sig,now_utc(),key))
             return True
 
+    def hold_verified_source_restrictions(self,evidence):
+        """Stop retrying unchanged, proven DRM originals; never fake success.
+
+        Requires matching official file names and SHA-256 download receipts.
+        Access is reopened on changed reader or complete authorized evidence.
+        """
+        if not isinstance(evidence,dict):return 0
+        held=0
+        with self.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            rows=db.execute("""SELECT notice_key,metadata_json,download_done,download_total
+                FROM rfp_dual_notices WHERE scan_status='retry'
+                AND download_status='ready'""").fetchall()
+            for key,meta_json,done,total in rows:
+                row=evidence.get(key)
+                if not verified_protected_only_source(row):continue
+                try:meta=json.loads(meta_json)
+                except (ValueError,TypeError):continue
+                originals=meta.get('downloadVerifiedFiles') or []
+                files=[f for f in row.get('files') or [] if isinstance(f,dict)]
+                if (not originals or len(originals)!=len(files) or
+                    int(done)!=int(total) or int(total)!=len(originals) or
+                    sorted(str(x.get('name') or '') for x in originals)!=
+                    sorted(str(x.get('name') or '') for x in files) or
+                    any(len(str(x.get('sha256') or ''))!=64 for x in originals)):
+                    continue
+                signature=scan_evidence_signature(row)
+                updated=db.execute("""UPDATE rfp_dual_notices
+                    SET scan_status='source_restricted',scan_retry_epoch=0,
+                        scan_failure_signature=?,scan_repeat_count=0,
+                        last_error='source_restricted:authorized_original_required',
+                        updated_at=?
+                    WHERE notice_key=? AND download_status='ready'
+                    AND scan_status='retry'""",(signature,now_utc(),key))
+                if updated.rowcount and db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='rfp_live_events'").fetchone():
+                    # A protected binary is not an active retry, and it is
+                    # never represented as a completed OCR result.
+                    db.execute("""UPDATE rfp_live_events
+                        SET status='blocked',phase='공식 보안문서 · 해제본 필요',
+                            retry_epoch=0,error_text='source_restricted',
+                            updated_epoch=?
+                        WHERE lane='scan' AND notice_key=? AND status='retry'""",
+                        (time.time(),key))
+                held+=updated.rowcount
+        return held
+
     def reopen_changed_scan_evidence(self,evidence):
         """Resume held failures only after their stored scan evidence changes."""
         if not isinstance(evidence,dict):return 0
         recovered=0
         with self.connect() as db:
             db.execute('BEGIN IMMEDIATE')
-            rows=db.execute('''SELECT notice_key,scan_failure_signature
-                FROM rfp_dual_notices WHERE scan_status='retry'
-                AND download_status='ready'
-                AND scan_failure_signature<>'' AND scan_retry_epoch>?''',
-                (time.time(),)).fetchall()
+            rows=db.execute("""SELECT notice_key,scan_failure_signature
+                FROM rfp_dual_notices WHERE scan_status IN ('retry','source_restricted')
+                AND download_status='ready' AND scan_failure_signature<>''""").fetchall()
             for key,sig in rows:
                 row=evidence.get(key)
                 if not isinstance(row,dict):continue
@@ -623,9 +702,10 @@ class RfpDualQueue:
                 if not scan_reopen_source_ready(row):continue
                 if scan_evidence_signature(row)==sig:continue
                 db.execute('''UPDATE rfp_dual_notices
-                    SET scan_retry_epoch=0,scan_repeat_count=0,
-                        scan_failure_signature='',updated_at=?
-                    WHERE notice_key=? AND scan_status='retry'
+                    SET scan_status='pending',scan_retry_epoch=0,
+                        scan_repeat_count=0,scan_failure_signature='',
+                        last_error='',updated_at=?
+                    WHERE notice_key=? AND scan_status IN ('retry','source_restricted')
                     AND scan_failure_signature=?''',
                     (now_utc(),key,sig))
                 recovered+=1

@@ -514,8 +514,10 @@ def reconcile_published_ocr_batch(keys, *, dual_enabled=True):
             ('classificationVersion','hwpxReaderVersion',
              'staffingRoleScanVersion','staffingFactScanVersion'))
         tally=queue.reconcile_management(managed,valid,fingerprint)
+        protected=queue.hold_verified_source_restrictions(evidence)
         log('RFP_SCAN_POST_REPAIR_RECONCILED',json.dumps({
             'newEvidenceReopened':reopened,
+            'protectedSourceHeld':protected,
             'validCompleted':tally['completedEvidenceReconciled']},
             separators=(',',':')))
 
@@ -848,6 +850,16 @@ def run_once(kind, runner=None, _single=False):
                             if committed:sync_scan_retry_activity(queue,key)
                             if not ok:
                                 log('RFP_SCAN_RETRY_CAUSE',key,reason)
+        if kind=='rfpUpgrade' and dual_enabled:
+            # Do not re-scan byte-identical, SHA-receipted DRM originals on
+            # every retry cycle. These remain INCOMPLETE and visible as
+            # access-restricted, never as successfully decoded source.
+            if authoritative_evidence is None:
+                from rfp_management_reconcile import read_evidence
+                _ver,authoritative_evidence=read_evidence(DATA)
+            protected=queue.hold_verified_source_restrictions(authoritative_evidence)
+            if protected:
+                log('RFP_SOURCE_ACCESS_RESTRICTED_HELD',protected)
         log('PIPELINE_PUBLISHED', kind,
             'outputs', ','.join(result.name for result in outputs))
         if kind=='rfpOpenRepair' and _single:

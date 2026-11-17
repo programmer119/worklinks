@@ -304,6 +304,8 @@
    else if(!badge)badge='진행 확인 중';
    if(key==='scan'&&Number(lane?.blockedNoAttachments||0)>0)
     badge+=' · 판독 제외 '+Number(lane.blockedNoAttachments)+'건';
+   if(key==='scan'&&Number(lane?.sourceRestricted||0)>0)
+    badge+=' · 보안원본 '+Number(lane.sourceRestricted)+'건';
    updateRfpText(state,badge);
    node.classList.toggle('has-rfp-error',Boolean(
      (worker?.status==='retry'&&!waitingForOriginal&&!waitingForEligibility&&!waitingForRepair&&!waitingForSource&&!recentOcrRepair)||
@@ -352,6 +354,8 @@
    }else if(active>0){
     name='진행 상태 확인 필요 · 세부 작업 정보 미제공';
    }
+   if(key==='scan'&&Number(lane?.sourceRestricted||0)>0)
+    bits.push('해제본 필요한 보안문서 '+Number(lane.sourceRestricted)+'건 · 판독 완료 아님');
    if(key==='scan'&&Number(lane?.notQueued||0)>0)
     bits.push('작업 큐 미편입 '+Number(lane.notQueued)+'건');
    // No '1/8' carousel counter: that was just a display index, not work.

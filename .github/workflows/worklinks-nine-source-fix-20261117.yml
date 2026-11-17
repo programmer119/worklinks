@@ -1,0 +1,46 @@
+name: WorkLinks real ZIP member and source restrictions regression
+on:
+  pull_request:
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'scripts/repair_open_rfp_cached_attachments.py'
+      - 'scripts/rfp_dual_queue.py'
+      - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'startup-support/rfp-progress-live.js'
+      - 'tests/test_rfp_official_zip_member_identity_20261117.py'
+      - 'tests/test_rfp_source_restricted_queue_20261117.py'
+      - '.github/workflows/worklinks-nine-source-fix-20261117.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'scripts/repair_open_rfp_cached_attachments.py'
+      - 'scripts/rfp_dual_queue.py'
+      - 'server/g2b-proxy.py'
+      - 'server/worklinks-server123-pipeline.py'
+      - 'startup-support/rfp-progress-live.js'
+      - 'tests/test_rfp_official_zip_member_identity_20261117.py'
+      - 'tests/test_rfp_source_restricted_queue_20261117.py'
+      - '.github/workflows/worklinks-nine-source-fix-20261117.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Syntax and verified archive identity
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py scripts/rfp_dual_queue.py scripts/repair_open_rfp_cached_attachments.py server/g2b-proxy.py server/worklinks-server123-pipeline.py
+          python3 tests/test_rfp_official_zip_member_identity_20261117.py
+          python3 tests/test_rfp_source_restricted_queue_20261117.py
+          python3 tests/test_rfp_dual_queue.py
+          python3 tests/test_rfp_card_evidence_batch.py
+          node tests/worklinks-jobs-regression.cjs
