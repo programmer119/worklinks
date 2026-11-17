@@ -216,6 +216,18 @@ def reader_retry_files(scan):
                'source_extraction_timeout_deferred',
                'file_extract_failure'}
     for f in failed_files(scan):
+        # Explicit opt-in after the exact original PDF SHA's five missing
+        # pages have received independently verified OCR receipts. This only
+        # allows revalidation of that ONE 153-page drawing; it cannot mark it
+        # source-complete or reopen other held notices.
+        if (os.environ.get('WORKLINKS_RFP_153_VERIFIED_RECEIPT_RECHECK')=='1'
+                and f.get('sourceSha256')==
+                    'a3a2a016e774ea9de16b670e28fd279d8556af01cdf9539b283737ae8c0d306e'
+                and str(f.get('name') or '').startswith('3. 공사도면_안산송산')
+                and f.get('errorCategory')=='pdf_ocr_incomplete'
+                and int((f.get('extractionEvidence') or {}).get('pdfPages') or 0)==153):
+            selected.append(f)
+            continue
         # One-time recovery: a truncated Hancom HML source may have a fully
         # readable, same-title official PDF in the SAME verified manifest.
         # Select the notice so annotate_official_pdf_siblings can record the
