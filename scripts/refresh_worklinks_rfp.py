@@ -1973,7 +1973,9 @@ def _document_stem(name):
 def verified_pdf_companion(hwp,files):
     """Return fully scanned same-stem PDF, otherwise None."""
     name=str(hwp.get('name') or '')
-    if not name.lower().endswith(('.hwp','.hwpx')):return None
+    # HML is Hancom XML; an official same-stem, fully scanned PDF can be
+    # selected instead, just as for HWP/HWPX. The XML remains explicitly unread.
+    if not name.lower().endswith(('.hwp','.hwpx','.hml')):return None
     stem=_document_stem(name)
     if not stem:return None
     for candidate in files:
