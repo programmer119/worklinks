@@ -1350,6 +1350,37 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'sourceFile':str(item.get('sourceFile') or '')[:160],
             'sourceLine':int(item.get('sourceLine') or 0),
             'sourceText':str(item.get('sourceText') or '')[:260]})
+    # Authoritative source-wide verdicts are stored with scanner provenance,
+    # not inferred from the 12 excerpts returned in compact search results.
+    requirement_version=int(row.get('requirementScanVersion') or 0)
+    raw_verdicts=row.get('requirementVerdicts') or {}
+    requirement_verdicts={}
+    for kind in ('performance','directProduction'):
+        finding=raw_verdicts.get(kind) if isinstance(raw_verdicts,dict) else None
+        if not isinstance(finding,dict):
+            continue
+        if requirement_version<1 or int(finding.get('scanVersion') or 0)<1:
+            continue
+        if finding.get('status') not in ('required','not_required','review'):
+            continue
+        if finding.get('status')=='not_required' and (
+            row.get('requirementScanComplete') is not True or
+            finding.get('sourceComplete') is not True):
+            continue
+        requirement_verdicts[kind]={
+            'status':finding['status'],
+            'reason':str(finding.get('reason') or '')[:100],
+            'sourceComplete':finding.get('sourceComplete') is True,
+            'scanVersion':1,
+            'hasEvaluation':finding.get('hasEvaluation') is True,
+            'evidence':[{
+                'kind':str(e.get('kind') or '')[:32],
+                'sourceFile':str(e.get('sourceFile') or '')[:160],
+                'sourceLine':int(e.get('sourceLine') or 0),
+                'sourceText':str(e.get('sourceText') or '')[:300],
+                'sourceUrl':str(e.get('sourceUrl') or '')[:400]}
+                for e in (finding.get('evidence') or [])[:12]
+                if isinstance(e,dict)]}
     submission_complete=row.get('submissionScanComplete') is True
     # Scanner and public saved API must use the SAME narrow staffing scope.
     # Source-verified RFP files are already scanned; a blank, unrelated
@@ -1400,7 +1431,10 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'staffingRoles':role_rows,'staffingFacts':facts,
             'staffingRoleScanComplete':role_scan_complete,
             'submissionItems':submission_items,
-            'submissionScanComplete':submission_complete}
+            'submissionScanComplete':submission_complete,
+            'requirementScanVersion':requirement_version,
+            'requirementScanComplete':row.get('requirementScanComplete') is True,
+            'requirementVerdicts':requirement_verdicts}
     # A compact, source-labelled excerpt. This is OCR/extraction evidence,
     # NOT an interpretation that the bidder is qualified.
     excerpts=[]
@@ -1435,6 +1469,9 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'staffingRoleScanComplete':role_scan_complete,
             'submissionItems':submission_items,
             'submissionScanComplete':submission_complete,
+            'requirementScanVersion':requirement_version,
+            'requirementScanComplete':row.get('requirementScanComplete') is True,
+            'requirementVerdicts':requirement_verdicts,
             'scanComplete':scan_complete,
             'status':str(row.get('status') or 'unknown')[:48],
             'documentCount':len(files),
