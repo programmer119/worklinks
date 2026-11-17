@@ -5324,7 +5324,7 @@ function jobDetailRequirementGrid(x){
   const savedValue=savedVerdicts[kind];
   const choice=fullValue&&(!savedValue||
     String(full?.checkedAt||'')>=String(saved?.checkedAt||''))?fullValue:savedValue;
-  if(!choice||Number(choice.scanVersion)!==1)return null;
+  if(!choice||Number(choice.scanVersion)!==2)return null;
   const docsDone=choice.sourceComplete===true&&
     (choice===fullValue?full?.requirementScanComplete:saved?.requirementScanComplete)===true;
   if(choice.status==='required'&&Array.isArray(choice.evidence)&&
@@ -5337,8 +5337,15 @@ function jobDetailRequirementGrid(x){
  }
  const officialPerf=sourceVerdict('performance');
  const officialDirect=sourceVerdict('directProduction');
- const stPerf=officialPerf||status(perfRows,mandatoryPerf,evaluationPerf);
- const stDirect=officialDirect||status(directRows,mandatoryDirect,null);
+ const oldVerdictVersion=Math.max(Number(saved?.requirementScanVersion||0),
+   Number(full?.requirementScanVersion||0));
+ // An outdated dedicated verdict must not fall back to the superseded keyword
+ // guess while the source is being rescanned under v2.
+ const oldNeedsUpgrade=oldVerdictVersion>0&&oldVerdictVersion<2;
+ const stPerf=officialPerf||(oldNeedsUpgrade?
+   {key:'review',label:'재판독 중'}:status(perfRows,mandatoryPerf,evaluationPerf));
+ const stDirect=officialDirect||(oldNeedsUpgrade?
+   {key:'review',label:'재판독 중'}:status(directRows,mandatoryDirect,null));
  for(const [code,record] of [['performance_proof',officialPerf],['direct_production',officialDirect]]){
   for(const v of record?.source?.evidence||[])
    add(v.sourceText,code,v.kind==='required',v.sourceFile,v.sourceUrl);
