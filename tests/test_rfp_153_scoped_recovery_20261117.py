@@ -29,7 +29,8 @@ with patch.dict(os.environ,{'WORKLINKS_RFP_153_VERIFIED_RECEIPT_RECHECK':'1'}):
     assert repair.reader_retry_files({'files':[item]})==[item]
     for mutate in (
        {'sourceSha256':'0'*64},{'name':'wrong.pdf'},
-       {'errorCategory':'drm_protected_original_requires_authorized_decryption'},
+       {'errorCategory':'drm_protected_original_requires_authorized_decryption',
+        'lastPartialDrmZipAttemptVersion':repair.PARTIAL_DRM_ZIP_READER_VERSION},
        {'extractionEvidence':{'pdfPages':152}}):
         candidate=dict(item,**mutate)
         assert repair.reader_retry_files({'files':[candidate]})==[]
