@@ -441,6 +441,7 @@ def stage_workspace(path,minimal=False):
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, dest)
     for name in ('rfp-clauses.json', 'rfp-coverage-index.json',
+                 'rfp-scanner-versions.json',
                  'rfp-top500-batch-state-20261111.json',
                  'rfp-top500-batch-metadata-20261111.json'):
         source = SEEDS / name
