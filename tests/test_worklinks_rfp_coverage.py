@@ -84,7 +84,11 @@ class QualificationCoverageTests(unittest.TestCase):
     def test_uncited_evidence_cannot_override_long_text_truncation(self):
         text = "입찰참가자격 세부 규정을 검토해야 합니다.\n" + "무관한 부연설명.\n" * 50000
         candidates = mod.extract_rule_candidates(text, "official.hwpx")
-        result = mod.preserve_unclassified_qualification(text, "official.hwpx", candidates)
+        # Test the truncation gate independently of the production-size cap.
+        # A fixed 50,000-line fixture is shorter than the current 6MB limit.
+        from unittest.mock import patch
+        with patch.object(mod, "RFP_QUALIFICATION_TEXT_LIMIT", len(text) - 1):
+            result = mod.preserve_unclassified_qualification(text, "official.hwpx", candidates)
         self.assertFalse(result["sourceTextScanComplete"], result)
 
     def test_hwpx_valid_large_xml_document_is_not_rejected(self):
