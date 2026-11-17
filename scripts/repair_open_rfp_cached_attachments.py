@@ -221,8 +221,11 @@ def reader_retry_files(scan):
         # allows revalidation of that ONE 153-page drawing; it cannot mark it
         # source-complete or reopen other held notices.
         if (os.environ.get('WORKLINKS_RFP_153_VERIFIED_RECEIPT_RECHECK')=='1'
-                and f.get('sourceSha256')==
-                    'a3a2a016e774ea9de16b670e28fd279d8556af01cdf9539b283737ae8c0d306e'
+                # An unreadable source intentionally has no successful
+                # sourceSha256 in the public evidence. The verified downloader
+                # receipt and original bytes are SHA-checked in process_one.
+                and str(f.get('sourceSha256') or '') in (
+                    '', 'a3a2a016e774ea9de16b670e28fd279d8556af01cdf9539b283737ae8c0d306e')
                 and str(f.get('name') or '').startswith('3. 공사도면_안산송산')
                 and f.get('errorCategory')=='pdf_ocr_incomplete'
                 and int((f.get('extractionEvidence') or {}).get('pdfPages') or 0)==153):
@@ -501,6 +504,11 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
             receipt=receipts.get(item['url'])
             if receipt is None:
                 raise VerifiedOriginalMissing('file_not_in_completed_download_receipt')
+            if (os.environ.get('WORKLINKS_RFP_153_VERIFIED_RECEIPT_RECHECK')=='1'
+                    and str(label).startswith('3. 공사도면_안산송산')
+                    and str(receipt.get('sha256') or '') !=
+                        'a3a2a016e774ea9de16b670e28fd279d8556af01cdf9539b283737ae8c0d306e'):
+                raise ValueError('scoped_153_original_receipt_sha_mismatch')
             raw,origin=fetch_verified_raw(item,ledger,str(receipt['sha256']))
             f['detectedFormat']=rfp.detected_source_format(label,raw)
             extract_started=time.perf_counter()
