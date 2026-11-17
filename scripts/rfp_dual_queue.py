@@ -671,6 +671,16 @@ class RfpDualQueue:
                         updated_at=?
                     WHERE notice_key=? AND download_status='ready'
                     AND scan_status='retry'""",(signature,now_utc(),key))
+                if updated.rowcount and db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='rfp_live_events'").fetchone():
+                    # A protected binary is not an active retry, and it is
+                    # never represented as a completed OCR result.
+                    db.execute("""UPDATE rfp_live_events
+                        SET status='blocked',phase='공식 보안문서 · 해제본 필요',
+                            retry_epoch=0,error_text='source_restricted',
+                            updated_epoch=?
+                        WHERE lane='scan' AND notice_key=? AND status='retry'""",
+                        (time.time(),key))
                 held+=updated.rowcount
         return held
 
