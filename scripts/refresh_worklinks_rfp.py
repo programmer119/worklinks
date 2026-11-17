@@ -26,17 +26,14 @@ import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
 import zipfile
-try:
-    from rfp_call_ledger import CallLedger, cache_key
-    from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
-except ModuleNotFoundError as exc:
-    if exc.name!='rfp_call_ledger':raise
-    # importlib.spec_from_file_location/runpy do not put the source
-    # directory on sys.path, although this script's sibling is present.
-    import sys
-    sys.path.insert(0,str(Path(__file__).resolve().parent))
-    from rfp_call_ledger import CallLedger, cache_key
-    from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
+# This file is also loaded with importlib/runpy during server diagnostics.
+# In those contexts Python does not automatically add this script's directory
+# to sys.path. Resolve sibling modules before importing either of them.
+_SCRIPT_DIR = str(Path(__file__).resolve().parent)
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
+from rfp_call_ledger import CallLedger, cache_key
+from rfp_submission import extract_submission_items, submission_summary, VERSION as SUBMISSION_SCAN_VERSION
 
 _LEDGER_LOCK=threading.Lock()
 _NOTICE_CONTEXT=threading.local()
