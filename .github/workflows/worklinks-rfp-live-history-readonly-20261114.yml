@@ -11,6 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Exact LX notice versus three unresolved RFPs (read-only)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,gzip,urllib.request
+          base='https://api-suaveforge.suaveforge.com:18458/api/g2b/'
+          key='R26BK01830918:000'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'User-Agent':'WorkLinks-LX-ReadOnly-Audit/1.0','Accept-Encoding':'gzip','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=35) as response:
+                  data=response.read()
+                  if 'gzip' in str(response.headers.get('Content-Encoding') or '').lower():data=gzip.decompress(data)
+              return json.loads(data)
+          progress=get('rfp-rescan-progress')
+          print('PROGRESS_COUNTS',json.dumps({'asOf':progress.get('asOf'),'counts':progress.get('counts')},ensure_ascii=False),flush=True)
+          cause=get('rfp-rescan-causes?limit=100&offset=0')
+          rows=cause.get('records') or []
+          print('ALL_UNRESOLVED',json.dumps([{'key':r.get('noticeKey'),'category':r.get('category'),'rootCause':r.get('rootCause'),'issues':r.get('issues')} for r in rows],ensure_ascii=False),flush=True)
+          print('LX_IN_UNRESOLVED',any(r.get('noticeKey')==key for r in rows),flush=True)
+          card=get('rfp-card-evidence?keys='+urllib.parse.quote(key,safe=''))
+          print('LX_CARD_STATE',json.dumps(card.get('byNotice',{}).get(key),ensure_ascii=False)[:6000],flush=True)
+          PY
       - name: Read and summarize server123 live RFP history (no writes or upstream G2B calls)
         shell: bash
         run: |
