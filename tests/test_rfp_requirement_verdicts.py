@@ -76,4 +76,24 @@ assert scan_file('제안서 정량 평가: 수행실적 증명서 제출 시 가
 # A numerical threshold with genuine admission terms is mandatory.
 assert scan_file('참가자격: 최근 3년간 수행실적 5억원 이상 보유한 업체',
                  '공고문.hwp')['performance']['status']=='required'
+# Confirmed from actual server123 documents: post-award penalty wording is
+# NOT a pre-bid direct-production certificate requirement.
+penalty=scan_file('계약담당공무원은 계약상대자가 직접생산 확인기준을 '
+                  '위반한 사실을 확인한 경우 계약해지, 계약보증금 국고 귀속, '
+                  '입찰 참가자격제한 등의 조치를 할 수 있습니다.',
+                  '일반계약조건.pdf')
+assert penalty['directProduction']['status']=='not_required',penalty
+operational=scan_file('공급자는 매년 12월 말까지 분기별 정비실적, 수리부속 '
+                      '사용실적, SLA 달성률을 포함한 실적자료를 수요기관에 제출한다.',
+                      '산출내역서.xlsx')
+assert operational['performance']['status']=='not_required',operational
+actual_qualification=scan_file('입찰참가자격: 직접생산확인증명서 '
+                               '[세부품명번호 8111189901]를 소지한 자.',
+                               '공고문.pdf')
+assert actual_qualification['directProduction']['status']=='required',actual_qualification
+bare_mention=scan_file('직접생산확인증명서란 공공구매정보망을 통해 발급하는 문서이다.',
+                       '안내문서.hwp')
+assert bare_mention['directProduction']['status']!='required',bare_mention
+assert summarize_notice([dict(absent,unmatchedQualificationAnchorCount=1)],True)['complete'] is False
+
 print('RFP_PERFORMANCE_DIRECT_PRODUCTION_FULL_SOURCE_VERDICTS_PASS')
