@@ -102,6 +102,7 @@
 .job-api-evidence .api-state{display:inline-flex;gap:5px;align-items:center;border:1px solid #cbd5e1;border-radius:8px;padding:5px 9px;font-size:13px;line-height:1.35;font-weight:850;white-space:nowrap;background:#f1f5f9;color:#475569}
 .job-api-evidence .api-state.done{background:#dcfce7;border-color:#86efac;color:#166534}
 .job-api-evidence .api-state.partial{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.job-api-evidence .api-state.restricted{background:#eef2ff;border-color:#a5b4fc;color:#3730a3}
 .job-api-evidence .api-state.absent{background:#f1f5f9;border-color:#cbd5e1;color:#64748b}
 .job-api-evidence .api-state.summary{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
 .job-api-evidence .api-state.summary.complete{background:#bbf7d0;border-color:#4ade80;color:#14532d}
@@ -522,6 +523,8 @@
 #jobCards .job-req-icon{font-weight:900;font-size:13px;line-height:19px;font-family:inherit;display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#e2e8f0;color:#475569}
 #jobCards .job-req-item[data-state="failed"] .job-req-icon{background:#fef3c7;color:#92400e}
 #jobCards .job-req-item[data-state="checking"] .job-req-icon{background:#e2e8f0;color:#475569}
+#jobCards .job-req-item[data-state="source_restricted"] .job-req-trigger{background:#eef2ff;border-color:#a5b4fc;color:#3730a3}
+#jobCards .job-req-item[data-state="source_restricted"] .job-req-icon{background:#e0e7ff;color:#3730a3}
 #jobCards .job-req-item[data-state="required"] .job-req-icon{background:#fef3c7;color:#92400e}
 #jobCards .job-req-item[data-state="required_at_bid"] .job-req-icon{background:#dcfce7;color:#166534}
 #jobCards .job-req-item[data-state="not_required"] .job-req-icon{background:#dcfce7;color:#166534}
@@ -653,6 +656,9 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobDetailModal .job-key-state[data-state="required"]{border-color:#fcd34d;background:#fffbeb;color:#92400e}
 #jobDetailModal .job-key-state[data-state="not_required"]{border-color:#86efac;background:#f0fdf4;color:#166534}
 #jobDetailModal .job-key-state[data-state="failed"]{border-color:#fca5a5;background:#fef2f2;color:#b91c1c}
+#jobDetailModal .job-key-state[data-state="source_restricted"]{border-color:#a5b4fc;background:#eef2ff;color:#3730a3}
+#jobDetailModal .job-source-restriction{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:8px 0 12px;padding:9px 11px;border:1px solid #c7d2fe;border-radius:9px;background:#f8faff;color:#334155;font-size:13px;line-height:1.45}
+#jobDetailModal .job-source-restriction strong{color:#3730a3}
 #jobDetailModal .job-key-state[data-state="onsite_present"],#jobDetailModal .job-key-state[data-state="role_workload"]{border-color:#c7ddf4;background:#eef5ff;color:#174375}
 #jobDetailModal .job-key-state[data-state="evaluation"]{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
 #jobDetailModal .job-key-requirements .job-key-primary{font-size:15.5px;font-weight:700;line-height:1.55;color:#1e293b;margin:0 0 6px;overflow-wrap:anywhere}
