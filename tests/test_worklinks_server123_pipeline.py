@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory() as temporary:
                    'batch_backfill_changcom_top500_rfp.py',
                    'repair_changcom_top500_rfp.py',
                    'repair_open_rfp_cached_attachments.py',
-                   'rfp_call_ledger.py','rfp_dual_queue.py','rfp_management_reconcile.py','rfp_live_activity.py','rfp_bulk_manifests.py'):
+                   'rfp_call_ledger.py','rfp_submission.py','rfp_dual_queue.py','rfp_management_reconcile.py','rfp_live_activity.py','rfp_bulk_manifests.py'):
         (m.SCRIPTS/script).write_text('# test fixture\n',encoding='utf-8')
     original={'ok':True,'generatedAt':'2026-11-01','byNotice':{
         'R26BK01808709:000':{'status':'text_extracted_requires_review'}}}
@@ -91,6 +91,7 @@ with tempfile.TemporaryDirectory() as temporary:
         assert (staged/'snapshots'/'rfp-top500-batch-metadata-20261111.json').is_symlink()
         assert not (staged/'snapshots'/'rfp-coverage-index.json').is_symlink()
         assert (staged/'scripts'/'staffing_facts.py').is_file(), 'RFP extractor must stage its dependency'
+        assert (staged/'scripts'/'rfp_submission.py').is_file(), 'RFP extractor must stage submission reader'
         assert not (staged/'startup-support').exists()
     def mock_runner(args,cwd,env,capture_output,text,timeout):
         assert env['WORKLINKS_G2B_API'].startswith('http://127.0.0.1:')
