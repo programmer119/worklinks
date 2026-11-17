@@ -1412,7 +1412,7 @@ def saved_rfp_search_state(row, compact=False, historical=False):
         finding=raw_verdicts.get(kind) if isinstance(raw_verdicts,dict) else None
         if not isinstance(finding,dict):
             continue
-        if requirement_version<1 or int(finding.get('scanVersion') or 0)<1:
+        if requirement_version<2 or int(finding.get('scanVersion') or 0)<2:
             continue
         if finding.get('status') not in ('required','not_required','review'):
             continue
@@ -1424,7 +1424,7 @@ def saved_rfp_search_state(row, compact=False, historical=False):
             'status':finding['status'],
             'reason':str(finding.get('reason') or '')[:100],
             'sourceComplete':finding.get('sourceComplete') is True,
-            'scanVersion':1,
+            'scanVersion':2,
             'hasEvaluation':finding.get('hasEvaluation') is True,
             'evidence':[{
                 'kind':str(e.get('kind') or '')[:32],
