@@ -15,6 +15,9 @@ on:
       - 'tests/test_rfp_live_telemetry.py'
       - 'tests/test_rfp_management_reconcile.py'
       - 'tests/test_rfp_rescan_progress.py'
+      - 'tests/test_worklinks_server123_pipeline.py'
+      - 'tests/test_worklinks_rfp_coverage.py'
+      - 'scripts/rfp_submission.py'
       - '.github/workflows/worklinks-rfp-live-telemetry-ci.yml'
   pull_request:
     paths:
@@ -42,3 +45,5 @@ jobs:
           python tests/test_rfp_live_telemetry.py
           python tests/test_rfp_management_reconcile.py
           python tests/test_rfp_rescan_progress.py
+          python tests/test_worklinks_server123_pipeline.py
+          python tests/test_worklinks_rfp_coverage.py
