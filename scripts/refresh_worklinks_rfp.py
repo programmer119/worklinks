@@ -2009,7 +2009,13 @@ def annotate_official_pdf_siblings(files):
             continue
         other=verified_pdf_companion(f,files)
         if not other:continue
-        if f.get('alternatePdfEvidence')!=other.get('name'):
+        # The alternate PDF name might already be saved from an older
+        # partial attempt while the HML is still flagged as an error. Updating
+        # only the name is NOT sufficient: publish the new verified skip state.
+        if (f.get('alternatePdfEvidence')!=other.get('name')
+                or f.get('alternatePdfSourceSha256')!=other.get('sourceSha256')
+                or f.get('skippedDuplicateFormat') is not True
+                or f.get('errorCategory') or f.get('error')):
             updated+=1
         f['alternatePdfEvidence']=other['name']
         f['alternatePdfSourceSha256']=other['sourceSha256']
