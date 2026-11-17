@@ -24,9 +24,9 @@ spec.loader.exec_module(m)
 # fixture placeholders. This reproduces the missing rfp_submission regression.
 with tempfile.TemporaryDirectory() as staging_dir:
     root = Path(staging_dir)
-    with patch.object(m, 'SCRIPTS', source.parents[1] / 'scripts'), \\
-         patch.object(m, 'SEEDS', root / 'seeds'), \\
-         patch.object(m, 'DATA', root / 'data'):
+    with (patch.object(m, 'SCRIPTS', source.parents[1] / 'scripts'),
+          patch.object(m, 'SEEDS', root / 'seeds'),
+          patch.object(m, 'DATA', root / 'data')):
         staged = m.stage_workspace(root)
     scanner = staged / 'scripts' / 'refresh_worklinks_rfp.py'
     for program in (
