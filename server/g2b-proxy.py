@@ -1054,6 +1054,56 @@ def rfp_same_thumbnail_source(now,prior):
                x['sourceSha256']==y['sourceSha256'] for x,y in zip(a,b))
 
 
+def read_verified_empty_rfp_manifest_states(keys):
+    """Classify proven zero-public-attachment notices without pretending they were scanned.
+
+    The empty state is based on the exact queue receipt AND its persisted
+    official manifest, not on a missing RFP scan index entry. No upstream calls.
+    """
+    if not keys:return {}
+    path=os.path.join(os.path.dirname(G2B_DB_PATH),'rfp-dual-queue.sqlite3')
+    records={}
+    try:
+        with sqlite3.connect('file:'+path+'?mode=ro',uri=True,timeout=3) as db:
+            params=','.join('?' for _ in keys)
+            rows=db.execute('''SELECT q.notice_key,q.metadata_json,m.metadata_json
+                FROM rfp_dual_notices q JOIN rfp_bulk_manifests m
+                ON m.notice_key=q.notice_key
+                WHERE q.download_status='no_attachments'
+                AND q.scan_status='skipped'
+                AND q.notice_key IN ('''+params+')',list(keys)).fetchall()
+    except (OSError,sqlite3.Error):
+        return records
+    def verified_empty(value):
+        if not isinstance(value,dict):return False
+        files=value.get('attachments')
+        detail=value.get('noticeDocuments')
+        return (isinstance(files,dict) and isinstance(detail,dict) and
+            files.get('ok') is True and files.get('complete') is True and
+            detail.get('ok') is True and detail.get('complete') is True and
+            isinstance(files.get('items'),list) and not files['items'] and
+            isinstance(detail.get('items'),list) and not detail['items'])
+    for key,queued_raw,manifest_raw in rows:
+        try:
+            queue=json.loads(queued_raw)
+            manifest=json.loads(manifest_raw)
+        except (TypeError,ValueError):
+            continue
+        if not (verified_empty(queue) and verified_empty(manifest)):
+            continue
+        records[key]={
+            'sourceAvailable':True,'seen':False,
+            'status':'verified_no_public_attachments',
+            'officialAttachmentState':'verified_empty',
+            'scanExcluded':True,'documentCount':0,'readableCount':0,
+            'submissionItems':[],'submissionScanComplete':False,
+            'staffingRoles':[],'staffingFacts':[],
+            'staffingRoleScanComplete':False,
+            'scanComplete':False,'complete':False,
+            'manifestOrigin':str(manifest.get('manifestOrigin') or '')[:75]}
+    return records
+
+
 def read_saved_rfp_card_states(keys,source,compact=True):
     """One current-version scan state per notice, shared by saved list and card API.
 
@@ -1097,6 +1147,7 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                 latest=v
     except (OSError,ValueError,TypeError):
         pass
+    verified_empty=read_verified_empty_rfp_manifest_states(keys)
     by_notice={}
     for key,row in rows.items():
         state=saved_rfp_search_state(row,compact=compact)
@@ -1172,7 +1223,9 @@ def read_saved_rfp_card_states(keys,source,compact=True):
                         old_state['parserCurrent']=True  # historical verdict only
                         old_state['versionSource']='last_success'
                         state['lastSuccessfulState']=old_state
-        by_notice[key]=state
+        # Do not obscure an existing source-backed successful scan with an
+        # old zero-file receipt for the same notice.
+        by_notice[key]=state if isinstance(row,dict) else verified_empty.get(key,state)
     return by_notice
 
 
