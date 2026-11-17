@@ -32,6 +32,17 @@ jobs:
           print('LX_IN_UNRESOLVED',any(r.get('noticeKey')==key for r in rows),flush=True)
           card=get('rfp-card-evidence?keys='+urllib.parse.quote(key,safe=''))
           print('LX_CARD_STATE',json.dumps(card.get('byNotice',{}).get(key),ensure_ascii=False)[:6000],flush=True)
+          for only_sw in (1,0):
+              saved=get('saved?limit=20&offset=0&sw='+str(only_sw)+'&q=R26BK01830918')
+              print('LX_SAVED_SW_'+str(only_sw),json.dumps({
+                  'totalCount':saved.get('totalCount'),'candidateTotal':saved.get('candidateTotal'),
+                  'records':[{
+                      'bidNo':i.get('bidNo'),'order':i.get('order'),
+                      'title':i.get('title'),'closes':i.get('closes'),
+                      'noticeKind':i.get('noticeKind'),'state':i.get('state'),
+                      'rfpSavedState':i.get('rfpSavedState')
+                  } for i in saved.get('items',[])[:5]]
+              },ensure_ascii=False)[:5500],flush=True)
           PY
       - name: Read and summarize server123 live RFP history (no writes or upstream G2B calls)
         shell: bash
