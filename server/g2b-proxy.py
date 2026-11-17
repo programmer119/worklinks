@@ -1971,6 +1971,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             for p in problems)
         if not isinstance(doc,dict) or status in ('','not_scanned','unscanned'):
             category='unscanned'
+        elif protected_only:
+            category='source_restricted'
         elif any(str(f.get('errorCategory') or '') in ocr_errors
                  and f.get('staffingScopeExcluded') is not True
                  and f.get('skippedDuplicateFormat') is not True
@@ -1979,8 +1981,6 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             category='legacy'
         elif status!='text_extracted_requires_review':
             category='failed'
-        elif protected_only:
-            category='source_restricted'
         elif all(v is not False for v in checks.values()) and all(
                 v is True for v in (checks['classification'],checks['roles'],checks['facts'])):
             category='completed'
