@@ -27,6 +27,8 @@ item={'name':'3. 공사도면_안산송산 예시.pdf',
       'ocrBatchDeferredPages':0}
 with patch.dict(os.environ,{'WORKLINKS_RFP_153_VERIFIED_RECEIPT_RECHECK':'1'}):
     assert repair.reader_retry_files({'files':[item]})==[item]
+    # Unreadable sources have no successful sourceSha256 in published evidence.
+    assert repair.reader_retry_files({'files':[dict(item,sourceSha256='')]})[0]['name']==item['name']
     for mutate in (
        {'sourceSha256':'0'*64},{'name':'wrong.pdf'},
        {'errorCategory':'drm_protected_original_requires_authorized_decryption',
