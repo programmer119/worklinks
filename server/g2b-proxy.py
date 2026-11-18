@@ -2067,6 +2067,12 @@ def rfp_rescan_cause_report(limit=40,offset=0):
                 'ocrBatchDeferredPages':int(evidence.get('ocrBatchDeferredPages') or 0),
                 'ocrFailedPages':int(evidence.get('ocrFailedPages') or 0),
                 'ocrRecoveredPages':int(evidence.get('ocrRecoveredPages') or 0),
+                'archiveFailedMembers':[
+                    {'name':str(m.get('name') or '')[:150],
+                     'reason':str(m.get('reason') or '')[:150],
+                     'errorCategory':str(m.get('errorCategory') or '')[:80]}
+                    for m in (evidence.get('archiveFailedMembers') or [])[:12]
+                    if isinstance(m,dict)],
                 'pdfSources':[{
                     'sourceFile':str(p.get('sourceFile') or '')[:150],
                     'pdfPages':int(p.get('pdfPages') or 0),
