@@ -2673,8 +2673,10 @@ def _extract_dispatch(name,raw):
                 raise ValueError('drm_protected_original_requires_authorized_decryption')
             failed=getattr(_DOCUMENT_SCAN,'archive_failed_members',[])
             if failed:
-                first=failed[0]
-                raise ValueError(first['reason'][:85]+'; zip_member='+first['name'][:100])
+                # The final record carries the outermost nested archive path;
+                # its reason already embeds the failing child filename.
+                outer=failed[-1]
+                raise ValueError(outer['reason'][:85]+'; zip_member='+outer['name'][:100])
             raise ValueError('archive_no_searchable_documents')
         return '\n'.join(parts)
     if n.endswith(('.docx','.xlsx','.pptx')):
