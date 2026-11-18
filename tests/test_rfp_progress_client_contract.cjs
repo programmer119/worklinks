@@ -21,6 +21,13 @@ assert.equal(check(null),false,'missing totals must fail');
 const withoutExclusions={total:100,eligible:100,excluded:0,completed:85,
  remaining:15,legacy:2,rescanRequired:2};
 assert.equal(check(withoutExclusions),true,'no-exclusions cohort must still pass');
+const protectedSources={total:2200,eligible:2179,excluded:18,sourceRestricted:3,
+ completed:2178,remaining:1,legacy:0,rescanRequired:0};
+assert.equal(check(protectedSources),true,'source holds separately counted');
+assert.equal(check({...protectedSources,sourceRestricted:0}),false,'cannot hide protected originals');
+assert.equal(check({...protectedSources,eligible:2182}),false,'protected originals not scan work');
+assert.equal(check({...protectedSources,completed:2181}),false,'protected originals never fake successes');
+assert.equal(check({...protectedSources,sourceRestricted:-1}),false,'negative source holds invalid');
 assert.ok(html.includes("!rfpProgressTotalsConsistent(report?.counts)"),
  'progress fetch must use the tested validator');
 assert.ok(!html.includes('report.counts.total!==report.counts.completed+report.counts.remaining'),
