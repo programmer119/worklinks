@@ -20,6 +20,9 @@ class FakeOle:
     def __enter__(self):return self
     def __exit__(self,*args):pass
     def listdir(self):return [['FileHeader'],['BodyText','Section0'],['BodyText','Section1']]
+    def openstream(self,name):
+        assert name=='FileHeader'
+        return io.BytesIO(b'HWP Document File'+b'\x00'*40)
 class FakeOleModule:
     OleFileIO=FakeOle
 
