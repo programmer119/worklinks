@@ -4619,18 +4619,27 @@ function jobRequirementEvidence(x){
  const noPublicRfp=saved?.officialAttachmentState==='verified_empty'&&!Array.isArray(full?.files);
  const noPublicRfpReason='공식 첨부목록 0건으로 문서 판독 제외 · 해당 조건이 불필요하다는 뜻은 아님 · 공고 원문 확인 필요';
  const fileAccess=saved?.sourceAccess||null;
+ const protectedSourceCodes=new Set([
+  'drm_protected_original_requires_authorized_decryption',
+  'hwp_record_fallback_protected']);
  const fullProtected=(Array.isArray(full?.files)?full.files:[])
-  .filter(f=>f?.errorCategory==='drm_protected_original_requires_authorized_decryption'&&
+  .filter(f=>protectedSourceCodes.has(f?.errorCategory)&&
     f?.skippedDuplicateFormat!==true&&f?.staffingScopeExcluded!==true);
  const fullOther=(Array.isArray(full?.files)?full.files:[])
   .filter(f=>f?.readable!==true&&
-    f?.errorCategory!=='drm_protected_original_requires_authorized_decryption'&&
+    !protectedSourceCodes.has(f?.errorCategory)&&
     f?.skippedDuplicateFormat!==true&&f?.staffingScopeExcluded!==true);
  const sourceRestricted=fileAccess?.status==='restricted'||
    (!fileAccess&&fullProtected.length>0&&fullOther.length===0);
  const sourceRestrictedFiles=(fileAccess?.protectedFiles||fullProtected)
    .map(f=>String(f.name||'')).filter(Boolean);
- const sourceRestrictedReason='공개 첨부에 DRMONE 보안 잠금 적용 · 발주기관의 열람 권한 또는 해제본 필요 · 판독기 오류 아님'+
+ const protectedReasons=(fileAccess?.protectedFiles||fullProtected)
+  .map(f=>f?.reason||(
+    f?.errorCategory==='hwp_record_fallback_protected'?
+    '배포용 HWP 원본 · 정식 HWP 열람/변환 환경 필요':
+    'DRMONE 원본 · 보안 권한 또는 해제본 필요')).filter(Boolean);
+ const sourceRestrictedReason='공개 첨부의 보안 원본으로 내용 추출 제한 · 판독기 오류 아님'+
+   (protectedReasons.length?' · '+[...new Set(protectedReasons)].slice(0,2).join(' / '):'')+
    (sourceRestrictedFiles.length?' · '+sourceRestrictedFiles.slice(0,3).join(' / '):'');
  const publishedProvenance=typeof rfpScanProvenanceByNotice==='undefined'?null:
    rfpScanProvenanceByNotice.get(key)||null;
