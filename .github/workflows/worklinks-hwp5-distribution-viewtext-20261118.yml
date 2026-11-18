@@ -1,0 +1,32 @@
+name: WorkLinks HWP5 distributable source ViewText verified regression
+on:
+  pull_request:
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_rfp_hwp_records_fallback_20261115.py'
+      - 'tests/test_rfp_hwp5_distribution_viewtext_20261118.py'
+      - '.github/workflows/worklinks-hwp5-distribution-viewtext-20261118.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'tests/test_rfp_hwp_records_fallback_20261115.py'
+      - 'tests/test_rfp_hwp5_distribution_viewtext_20261118.py'
+      - '.github/workflows/worklinks-hwp5-distribution-viewtext-20261118.yml'
+permissions: {contents: read}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: HWP5 source-only decoder regression and former fallback
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m py_compile scripts/refresh_worklinks_rfp.py
+          python3 tests/test_rfp_hwp5_distribution_viewtext_20261118.py
+          python3 tests/test_rfp_hwp_records_fallback_20261115.py
