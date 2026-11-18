@@ -2249,9 +2249,12 @@ def extract_hwp_record_paragraphs(raw):
                     fragment=decode_hwp_paragraph_bytes(payload)
                     if fragment:paragraphs.append(fragment)
             except (TypeError,ValueError,KeyError) as exc:
-                # hwp5proc --json can exit 0 with just "\\n]" instead of
-                # records. Decode the real OLE sections with the HWP5 record
-                # headers; never treat that broken CLI response as source loss.
+                # Distributable ViewText is encrypted/encoded in the raw
+                # container; never treat undecoded record bytes as legal text.
+                if section_root=='ViewText':
+                    raise ValueError('hwp_record_fallback_protected') from exc
+                # Plain BodyText can be decoded from raw HWP record headers
+                # if the pyhwp JSON converter itself emitted malformed output.
                 return decode_hwp_bodytext_records_from_ole(raw,sections)
     if not text_records or sum(ch.isalnum() for line in paragraphs for ch in line)<12:
         raise ValueError('hwp_record_fallback_no_text')
