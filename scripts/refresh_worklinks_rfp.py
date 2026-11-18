@@ -912,8 +912,11 @@ def _ocr_pdf_page(raw,index,name=''):
         # but 130-DPI grayscale PSM11 yielded 1618 alphanumerics in 9.71 s.
         # Fail closed on ambiguous OCR; a failed fast attempt is NEVER a
         # source-complete page. Enable only for a scoped verified-source repair.
-        if (os.environ.get('WORKLINKS_RFP_LONG_VECTOR_FAST_OCR')=='1'
-                and document.page_count>=120):
+        short_vector_scoped=(os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_OCR')=='1'
+                             and 0<document.page_count<=25)
+        long_vector_scoped=(os.environ.get('WORKLINKS_RFP_LONG_VECTOR_FAST_OCR')=='1'
+                            and document.page_count>=120)
+        if short_vector_scoped or long_vector_scoped:
             try:
                 display=page.get_bboxlog()
                 kinds=[str(v[0]) for v in display]
@@ -955,14 +958,19 @@ def _ocr_pdf_page(raw,index,name=''):
                 if reusable:
                     context['tesseractSeconds']+=ocr_seconds
                     context.setdefault('pageProfiles',[]).append({
-                        'page':index+1,'strategy':'verified_long_vector_psm11_130dpi',
+                        'page':index+1,'strategy':('verified_short_vector_psm11_130dpi' if short_vector_scoped
+                                     else 'verified_long_vector_psm11_130dpi'),
                         'effectiveDpi':round(quick_zoom*72,2),
                         'renderSeconds':round(render_seconds,3),
                         'tesseractSeconds':round(ocr_seconds,3),
                         'alnum':alnum,'hangul':hangul,
                         'verified':verified,'reason':reason})
                 if verified:return candidate
-                if os.environ.get('WORKLINKS_RFP_LONG_VECTOR_FAST_ONLY')=='1':
+                if (short_vector_scoped and
+                        os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_ONLY')=='1'):
+                    raise ValueError('pdf_ocr_short_vector_fast_unreadable')
+                if (long_vector_scoped and
+                        os.environ.get('WORKLINKS_RFP_LONG_VECTOR_FAST_ONLY')=='1'):
                     raise ValueError('pdf_ocr_long_vector_fast_unreadable')
         # RGB is the unchanged production default. Grayscale is opt-in only
         # after SHA-identical output is verified on actual Korean tender PDFs.
@@ -1439,7 +1447,11 @@ def _extract_pdf_with_audit(raw,name=''):
                 retry_with_dense=(os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_PSM11_OCR')=='1'
                     and os.environ.get('WORKLINKS_RFP_DENSE_IMAGE_FAST_ONLY')=='1'
                     and len(document.pages)<=25)
-                if not retry_with_dense:
+                retry_with_short_vector=(
+                    os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_OCR')=='1'
+                    and os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_ONLY')=='1'
+                    and len(document.pages)<=25)
+                if not (retry_with_dense or retry_with_short_vector):
                     missing.append(i+1)
                     failed.append(i+1)
                     cached_failed.append(i+1)
@@ -1776,7 +1788,8 @@ def classify_failure(error):
            'source_text_scan_limit','shared_strings_safety_limit','office_document_text_parts_missing',
            'office_shared_string_index_invalid',
             'image_ocr_incomplete','image_ocr_page_too_large','image_ocr_engine_failed',
-            'pdf_ocr_incomplete','pdf_ocr_engine_unavailable','pdf_ocr_renderer_unavailable')
+            'pdf_ocr_incomplete','pdf_ocr_engine_unavailable','pdf_ocr_renderer_unavailable',
+            'pdf_ocr_short_vector_fast_unreadable')
     return next((v for v in known if v in detail),'file_extract_failure')
 
 
