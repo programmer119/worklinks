@@ -73,4 +73,16 @@ with tempfile.TemporaryDirectory(prefix='drm-source-state-') as tmp:
     assert out['counts']['remaining']==1,out
     assert len(out['records'])==1 and out['records'][0]['sourceAccess']=='restricted',out
     assert out['records'][0]['problemFileCount']==1,out
+# A source-verified HWP5 distribution copy has its own protected-source
+# reason; it must never be reported as a broken extractor or DRMONE.
+hwp_protected=dict(protected,name='5. 청렴계약 이행 서약서.hwpx',
+    errorCategory='hwp_record_fallback_protected')
+hwp_state=state([good,hwp_protected])
+assert hwp_state['status']=='restricted' and hwp_state['isParserFailure'] is False
+assert hwp_state['protectedFileCount']==1 and hwp_state['otherUnreadableCount']==0
+assert 'HWP' in hwp_state['protectedFiles'][0]['reason']
+hwp_card=saved(dict(d,files=[good,hwp_protected]),compact=False)
+assert hwp_card['sourceAccess']['status']=='restricted'
+assert hwp_card['fileStatuses'][1]['accessStatus']=='restricted'
+
 print('WORKLINKS_DRM_OFFICIAL_SOURCE_RESTRICTION_NOT_PARSER_FAILURE=PASS')
