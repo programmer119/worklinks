@@ -1642,6 +1642,8 @@ def extract_with_source_status(name,raw):
     previous_zip_depth=getattr(_DOCUMENT_SCAN,'zip_depth',None)
     previous_zip_expanded=getattr(_DOCUMENT_SCAN,'zip_expanded_bytes',None)
     previous_protected=getattr(_DOCUMENT_SCAN,'protected_archive_members',None)
+    previous_zip_recovery=getattr(_DOCUMENT_SCAN,'zip_eocd_recovered',None)
+    _DOCUMENT_SCAN.zip_eocd_recovered=0
     _DOCUMENT_SCAN.protected_archive_members=[]
     _DOCUMENT_SCAN.format_times={}
     _DOCUMENT_SCAN.extract_stack=[]
@@ -1659,6 +1661,8 @@ def extract_with_source_status(name,raw):
         return data,{'sourceComplete':complete,
                      'protectedArchiveMembers':protected_members[:30],
                      'protectedMemberCount':len(protected_members),
+                     'verifiedTruncatedZipFooterRecoveries':int(
+                         getattr(_DOCUMENT_SCAN,'zip_eocd_recovered',0)),
                      'pdfFiles':len(pdf_stats),
                      'pdfPages':sum(x['pdfPages'] for x in pdf_stats),
                      'ocrAttemptedPages':sum(x['ocrAttemptedPages'] for x in pdf_stats),
@@ -1732,6 +1736,10 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.protected_archive_members
             except AttributeError:pass
         else:_DOCUMENT_SCAN.protected_archive_members=previous_protected
+        if previous_zip_recovery is None:
+            try:del _DOCUMENT_SCAN.zip_eocd_recovered
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.zip_eocd_recovered=previous_zip_recovery
 
 
 def classify_failure(error):
@@ -2381,11 +2389,58 @@ def extract_office_xml_stream(raw,format_name):
     return '\n'.join(text_chunks)
 
 
+
+def repair_truncated_zip_eocd(raw):
+    """Repair ONLY a 6-byte-truncated ZIP end record in-memory.
+
+    A real G2B HWPX carries all local records and the complete central
+    directory, but the last 6 EOCD bytes (central offset and comment length)
+    were lost. Never reconstruct member data or skip failed CRC verification.
+    The original SHA-verified download remains untouched.
+    """
+    if (not isinstance(raw,bytes) or not raw.startswith(b'PK\\x03\\x04')
+            or len(raw)>8_000_000 or len(raw)<50
+            or zipfile.is_zipfile(io.BytesIO(raw))):
+        return raw
+    eocd=raw.rfind(b'PK\\x05\\x06')
+    if eocd<0 or len(raw)-eocd!=16:
+        return raw
+    import struct
+    try:
+        sig,disk,central_disk,on_disk,total,central_size=struct.unpack_from(
+            '<4sHHHHI',raw,eocd)
+        central_offset=eocd-central_size
+        if (sig!=b'PK\\x05\\x06' or disk or central_disk or
+                not (1<=total<=80) or on_disk!=total or
+                central_size<46 or central_offset<30 or
+                raw[central_offset:central_offset+4]!=b'PK\\x01\\x02'):
+            return raw
+        fixed=raw+struct.pack('<IH',central_offset,0)
+        with zipfile.ZipFile(io.BytesIO(fixed)) as archive:
+            members=archive.infolist()
+            if (len(members)!=total or
+                    sum(x.file_size for x in members)>16_000_000 or
+                    any(x.file_size>8_000_000 or x.flag_bits & 1
+                        for x in members) or archive.testzip() is not None):
+                return raw
+        _DOCUMENT_SCAN.zip_eocd_recovered=(
+            getattr(_DOCUMENT_SCAN,'zip_eocd_recovered',0)+1)
+        return fixed
+    except (ValueError,OverflowError,OSError,RuntimeError,
+            zipfile.BadZipFile,struct.error):
+        return raw
+
+
 def _extract_dispatch(name,raw):
     # Never feed a SHA-verified DRMONE wrapper to a ZIP/Office parser.
     # It requires authorized source decryption, not repeated OCR attempts.
     if raw.startswith(bytes.fromhex('9b2044524d4f4e45')):
         raise ValueError('drm_protected_original_requires_authorized_decryption')
+    # Repair exactly one proven six-byte missing ZIP footer only when ALL
+    # central-directory members decompress with intact CRC. Never modify
+    # or relabel the byte-verified source in the download ledger.
+    if raw.startswith(b'PK\\x03\\x04'):
+        raw=repair_truncated_zip_eocd(raw)
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
     n=name.lower()
