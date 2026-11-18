@@ -31,6 +31,7 @@ READER_ATTEMPT_VERSION='framed-isolated-extract-v19-hwp-record-unicode-pdf750-20
 NESTED_ZIP_READER_VERSION='two-nested-levels-cumulative-250mb-v1'
 PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
 TARGETED_ARCHIVE_RESUME_VERSION='archive-pdf-page-receipts-and-source-provenance-v1'
+SHORT_VECTOR_READER_VERSION='verified-short-vector-130dpi-psm11-source-scoped-v1'
 SPARSE_COVER_READER_VERSION='sha-psm6-11-and-source-title-20261117'
 EMPTY_PERIMETER_READER_VERSION='four-thin-frame-strokes-no-content-v1'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
@@ -266,6 +267,18 @@ def reader_retry_files(scan):
                 and 0<int(evidence.get('pdfPages') or 0)<=80):
             selected.append(f)
             continue
+        # A SHA-specific retry of verified dense vector PDF pages. Never
+        # reopen a different source or repeat a failed fast strategy forever.
+        if (os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_OCR')=='1'
+                and os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_ONLY')=='1'
+                and str(f.get('errorCategory') or '')=='pdf_ocr_incomplete'
+                and str(f.get('name') or '').lower().endswith('.pdf')
+                and f.get('lastShortVectorAttemptVersion')!=SHORT_VECTOR_READER_VERSION
+                and 0<int(evidence.get('pdfPages') or 0)<=25
+                and 0<int(evidence.get('ocrFailedPages') or 0)<=2
+                and int(evidence.get('ocrBatchDeferredPages') or 0)==0):
+            selected.append(f)
+            continue
         # One opt-in local retry of byte-verified ZIP/PDF archive sources.
         if (os.environ.get('WORKLINKS_RFP_TARGETED_ARCHIVE_RESUME')=='1'
                 and f.get('errorCategory')=='pdf_ocr_incomplete'
@@ -487,6 +500,11 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
         if f.get('errorCategory')=='pdf_ocr_incomplete':
             f['lastSparseCoverAttemptVersion']=SPARSE_COVER_READER_VERSION
             f['lastPerimeterAttemptVersion']=EMPTY_PERIMETER_READER_VERSION
+        if (os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_OCR')=='1'
+                and os.environ.get('WORKLINKS_RFP_SHORT_VECTOR_FAST_ONLY')=='1'
+                and f.get('errorCategory')=='pdf_ocr_incomplete'
+                and str(f.get('name') or '').lower().endswith('.pdf')):
+            f['lastShortVectorAttemptVersion']=SHORT_VECTOR_READER_VERSION
         if (os.environ.get('WORKLINKS_RFP_TARGETED_ARCHIVE_RESUME')=='1'
                 and f.get('errorCategory')=='pdf_ocr_incomplete'
                 and f.get('detectedFormat')=='zip_or_ooxml'):
@@ -760,7 +778,7 @@ def merge_verified_repair_attempt(live,entry):
                       'lastReaderAttemptVersion','lastReaderAttemptAt',
                       'lastNestedZipAttemptVersion','lastPartialDrmZipAttemptVersion',
                       'lastSparseCoverAttemptVersion','lastPerimeterAttemptVersion',
-                      'lastTargetedArchiveResumeVersion'):
+                      'lastTargetedArchiveResumeVersion','lastShortVectorAttemptVersion'):
             if field in entry:live[field]=entry[field]
         if entry.get('errorCategory')!='official_attachment_reference_missing_422':
             live.pop('lastHttpStatus',None)
