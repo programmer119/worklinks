@@ -33,6 +33,7 @@ PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
 TARGETED_ARCHIVE_RESUME_VERSION='archive-pdf-page-receipts-and-source-provenance-v1'
 SHORT_VECTOR_READER_VERSION='verified-short-vector-130dpi-psm11-source-scoped-v1'
 TRUNCATED_HWPX_READER_VERSION='strict-six-byte-eocd-crc-verified-v1'
+DISTRIBUTION_HWP_SOURCE_VERSION='hwp-fileheader-distribution-flag-sha-verified-v1'
 SPARSE_COVER_READER_VERSION='sha-psm6-11-and-source-title-20261117'
 EMPTY_PERIMETER_READER_VERSION='four-thin-frame-strokes-no-content-v1'
 ERRORS=('metadata_missing','manifest_mismatch','url_missing','unrecognized_error',
@@ -240,6 +241,16 @@ def reader_retry_files(scan):
         # PDF identity; never claim the broken XML was extracted or identical.
         if (str(f.get('name') or '').lower().endswith('.hml')
                 and rfp.verified_pdf_companion(f,scan.get('files') or [])):
+            selected.append(f)
+            continue
+        # One confirmed HWP5 OLE distribution copy (flags=5) was previously
+        # saved as a generic parser failure. Source SHA from the downloader
+        # must match the proven file before this scoped retry is committed.
+        if (os.environ.get('WORKLINKS_RFP_DISTRIBUTION_HWP_SOURCE_RECHECK')=='1'
+                and f.get('name')==
+                    '5. 청렴계약 이행 서약서 [강남소방서 구급대 옷장 살균 소독 시스템 설치].hwpx'
+                and f.get('errorCategory')=='hwp_record_fallback_no_text'
+                and f.get('lastDistributionHwpSourceVersion')!=DISTRIBUTION_HWP_SOURCE_VERSION):
             selected.append(f)
             continue
         evidence=f.get('extractionEvidence') or {}
@@ -516,6 +527,11 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
                 and f.get('errorCategory')=='file_extract_failure'
                 and str(f.get('name') or '').lower().endswith('.zip')):
             f['lastTruncatedHwpxAttemptVersion']=TRUNCATED_HWPX_READER_VERSION
+        if (os.environ.get('WORKLINKS_RFP_DISTRIBUTION_HWP_SOURCE_RECHECK')=='1'
+                and str(f.get('name') or '')==
+                    '5. 청렴계약 이행 서약서 [강남소방서 구급대 옷장 살균 소독 시스템 설치].hwpx'
+                and f.get('errorCategory')=='hwp_record_fallback_no_text'):
+            f['lastDistributionHwpSourceVersion']=DISTRIBUTION_HWP_SOURCE_VERSION
         if (os.environ.get('WORKLINKS_RFP_TARGETED_ARCHIVE_RESUME')=='1'
                 and f.get('errorCategory')=='pdf_ocr_incomplete'
                 and f.get('detectedFormat')=='zip_or_ooxml'):
@@ -550,6 +566,11 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
                     and str(receipt.get('sha256') or '') !=
                         'a3a2a016e774ea9de16b670e28fd279d8556af01cdf9539b283737ae8c0d306e'):
                 raise ValueError('scoped_153_original_receipt_sha_mismatch')
+            if (os.environ.get('WORKLINKS_RFP_DISTRIBUTION_HWP_SOURCE_RECHECK')=='1'
+                    and label=='5. 청렴계약 이행 서약서 [강남소방서 구급대 옷장 살균 소독 시스템 설치].hwpx'
+                    and str(receipt.get('sha256') or '')!=
+                        '7ceb3bbaa1a4cceecbbf030aa41ec6e2cd6d355a7292731b1542ceb5b8df4002'):
+                raise ValueError('distribution_hwp_original_receipt_sha_mismatch')
             raw,origin=fetch_verified_raw(item,ledger,str(receipt['sha256']))
             f['detectedFormat']=rfp.detected_source_format(label,raw)
             extract_started=time.perf_counter()
@@ -790,7 +811,8 @@ def merge_verified_repair_attempt(live,entry):
                       'lastNestedZipAttemptVersion','lastPartialDrmZipAttemptVersion',
                       'lastSparseCoverAttemptVersion','lastPerimeterAttemptVersion',
                       'lastTargetedArchiveResumeVersion','lastShortVectorAttemptVersion',
-                      'lastTruncatedHwpxAttemptVersion'):
+                      'lastTruncatedHwpxAttemptVersion',
+                      'lastDistributionHwpSourceVersion'):
             if field in entry:live[field]=entry[field]
         if entry.get('errorCategory')!='official_attachment_reference_missing_422':
             live.pop('lastHttpStatus',None)
