@@ -1602,7 +1602,7 @@ def rfp_stage_checks(row,latest):
             'hwpx':hwpx}
 
 
-def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,excluded_keys=None):
+def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,excluded_keys=None,restricted_keys=None):
     """Count *all* unique unexpired saved SW notices, never a top-500 subset."""
     if not isinstance(index,dict) or not isinstance(latest,dict):
         raise ValueError('rfp_progress_missing_verified_inputs')
@@ -1624,7 +1624,8 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
     ocr_rescan_notices=0
     ocr_rescan_files=0
     verified_exclusions=set(excluded_keys or ())
-    summary={'total':0,'eligible':0,'excluded':0,
+    verified_restrictions=set(restricted_keys or ())-verified_exclusions
+    summary={'total':0,'eligible':0,'excluded':0,'sourceRestricted':0,
              'completed':0,'remaining':0,'legacy':0,
              'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0,
               'unknownDeadlineCompleted':0,'unknownDeadlinePending':0}
@@ -1661,6 +1662,10 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
         # a terminal scan exclusion, never an unscanned or failed scan.
         if key in verified_exclusions:
             summary['excluded']+=1
+            continue
+        # SHA-verified protected originals are kept separate, never successful.
+        if key in verified_restrictions:
+            summary['sourceRestricted']+=1
             continue
         summary['eligible']+=1
         row=index.get(key)
@@ -1708,7 +1713,8 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
     assert summary['unknownDeadlineCompleted']+summary['unknownDeadlinePending']==summary['unknownDeadline']
     summary['remaining']=summary['eligible']-summary['completed']
     summary['rescanRequired']=summary['legacy']
-    assert summary['total']==summary['eligible']+summary['excluded']
+    assert summary['total']==(summary['eligible']+summary['excluded']+
+                              summary['sourceRestricted'])
     assert summary['eligible']==summary['completed']+summary['remaining']
     assert summary['remaining']==sum(summary[k] for k in
                                     ('legacy','unscanned','failed','incomplete'))
@@ -1880,7 +1886,7 @@ def rfp_cohort_lanes(path,managed,valid):
                    'errors':len(confirmed_keys),'errorDetails':error_details,
                    'skipped':len(skipped_missing),'active':active_download,
                    'failed':retry_download},
-       'scan':{'total':total-len(skipped_missing),
+       'scan':{'total':total-len(skipped_missing)-len(source_restricted-valid),
                'done':len(valid),'active':active_scan,
                'sourceRestricted':len(source_restricted-valid),
                'failed':retry_scan,'blockedNoAttachments':len(skipped_missing-valid),
@@ -1968,6 +1974,9 @@ def rfp_rescan_cause_report(limit=40,offset=0):
                 WHERE q.download_status='no_attachments' AND q.scan_status='skipped'
                 AND EXISTS(SELECT 1 FROM rfp_bulk_manifests m
                            WHERE m.notice_key=q.notice_key)""")}
+            restricted={k for (k,) in db.execute("""
+                SELECT notice_key FROM rfp_dual_notices
+                WHERE download_status='ready' AND scan_status='source_restricted'""")}
     except (sqlite3.Error,OSError):
         raise ApiError('rfp_exclusion_queue_unavailable',503)
     con=open_bid_db()
@@ -1980,7 +1989,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
     finally:con.close()
     asof=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
     authoritative=rfp_progress_from_rows(bids,current,versions,asof=asof,
-                                          include_scope=True,excluded_keys=excluded)
+                                          include_scope=True,excluded_keys=excluded,
+                                          restricted_keys=restricted)
     managed,completed=authoritative.pop('_cohortKeys')
     latest_rows={}
     for bid_no,order,payload in bids:
@@ -2309,10 +2319,14 @@ def rfp_rescan_progress():
                 WHERE q.download_status='no_attachments' AND q.scan_status='skipped'
                 AND EXISTS(SELECT 1 FROM rfp_bulk_manifests m
                            WHERE m.notice_key=q.notice_key)''')}
+            restricted_keys={key for (key,) in scan_queue.execute('''
+                SELECT notice_key FROM rfp_dual_notices
+                WHERE download_status='ready' AND scan_status='source_restricted' ''')}
     except (sqlite3.Error,OSError,IOError):
         raise ApiError('rfp_scan_exclusion_queue_unavailable',503)
     report=rfp_progress_from_rows(bids,live_index,latest,
-           include_scope=True,excluded_keys=excluded_keys)
+           include_scope=True,excluded_keys=excluded_keys,
+           restricted_keys=restricted_keys)
     managed_keys,validated_keys=report.pop('_cohortKeys')
     report['noticeProgressMode']='per_notice_durable_checkpoint'
     report['recentNoticeUpdates']=recent_notices
