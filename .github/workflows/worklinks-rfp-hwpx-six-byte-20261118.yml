@@ -1,0 +1,31 @@
+name: WorkLinks verified HWPX six-byte ZIP and short-vector OCR regression
+on:
+  pull_request:
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'scripts/repair_open_rfp_cached_attachments.py'
+      - 'tests/test_rfp_truncated_hwpx_and_vector_20261118.py'
+      - '.github/workflows/worklinks-rfp-hwpx-six-byte-20261118.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_rfp.py'
+      - 'scripts/repair_open_rfp_cached_attachments.py'
+      - 'tests/test_rfp_truncated_hwpx_and_vector_20261118.py'
+      - '.github/workflows/worklinks-rfp-hwpx-six-byte-20261118.yml'
+permissions: {contents: read}
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python code and no-network-source regression
+        run: |
+          set -Eeuo pipefail
+          python -m py_compile scripts/refresh_worklinks_rfp.py scripts/repair_open_rfp_cached_attachments.py
+          python tests/test_rfp_truncated_hwpx_and_vector_20261118.py
+          python tests/test_rfp_official_zip_member_identity_20261117.py
