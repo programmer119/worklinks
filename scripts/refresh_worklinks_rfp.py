@@ -2421,7 +2421,24 @@ def repair_truncated_zip_eocd(raw):
             if (len(members)!=total or
                     sum(x.file_size for x in members)>16_000_000 or
                     any(x.file_size>8_000_000 or x.flag_bits & 1
-                        for x in members) or archive.testzip() is not None):
+                        for x in members)):
+                return raw
+            # CRC and sizes must agree between each LOCAL header and its
+            # independent central record, not merely the latter. Otherwise
+            # an altered local header could pass testzip() alone.
+            for item in members:
+                off=item.header_offset
+                if off<0 or off+30>central_offset:
+                    return raw
+                local=struct.unpack_from('<IHHHHHIIIHH',raw,off)
+                _,ver,flags,method,mtime,mdate,crc,size,usize,nlen,elen=local
+                if (local[0]!=0x04034b50 or flags & 8
+                        or crc!=item.CRC or size!=item.compress_size
+                        or usize!=item.file_size or method!=item.compress_type
+                        or flags!=item.flag_bits or
+                        off+30+nlen+elen+size>central_offset):
+                    return raw
+            if archive.testzip() is not None:
                 return raw
         _DOCUMENT_SCAN.zip_eocd_recovered=(
             getattr(_DOCUMENT_SCAN,'zip_eocd_recovered',0)+1)
