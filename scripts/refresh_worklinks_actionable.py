@@ -103,18 +103,33 @@ def canonical(row):
     return number,order.zfill(3)
 
 def all_indexed(fetch=get_json):
-    """Fetch all pages; an interrupted API response must NOT publish a partial shortlist."""
+    """Read all saved notices; halve only oversized local snapshot pages.
+
+    As source-backed RFP evidence grows, 500 G2B cards can exceed the local
+    3.5 MB response limit. Retry the SAME offset with a smaller page instead
+    of abandoning all new Changcom notices or silently publishing partial data.
+    No government API requests are issued by /saved.
+    """
     rows=[]
     totals=[]
-    for offset in range(0,100000,500):
-        data=fetch('/saved?sw=1&limit=500&offset='+str(offset))
+    offset=0
+    page_size=500
+    while offset<100000:
+        try:
+            data=fetch('/saved?sw=1&limit='+str(page_size)+'&offset='+str(offset))
+        except ValueError as error:
+            if str(error)!='public_g2b_page_too_large' or page_size<=1:
+                raise
+            page_size=max(1,page_size//2)
+            continue
         total=int(data.get('totalCount') or 0)
         values=data.get('items')
         if not isinstance(values,list):raise ValueError('missing_saved_items_page')
         totals.append(total)
         rows.extend(values)
         if offset+len(values)>=total:break
-        if len(values)!=500:raise ValueError('short_saved_page_before_end')
+        if len(values)!=page_size:raise ValueError('short_saved_page_before_end')
+        offset+=len(values)
     else:raise ValueError('saved_index_page_limit_reached')
     # Dynamic crawler may append a few rows mid-fetch. Never claim a perfect
     # full crawl if the API dataset moved while pages were being fetched.
