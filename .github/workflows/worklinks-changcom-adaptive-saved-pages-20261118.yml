@@ -1,0 +1,30 @@
+name: WorkLinks Changcom shortlist adaptive saved-page regression 20261118
+on:
+  pull_request:
+    paths:
+      - 'scripts/refresh_worklinks_actionable.py'
+      - 'tests/test_changcom_adaptive_page_20261118.py'
+      - '.github/workflows/worklinks-changcom-adaptive-saved-pages-20261118.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/refresh_worklinks_actionable.py'
+      - 'tests/test_changcom_adaptive_page_20261118.py'
+      - '.github/workflows/worklinks-changcom-adaptive-saved-pages-20261118.yml'
+permissions: {contents: read}
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test oversized saved pages shrink and all 5000+ bids retain
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python -m py_compile scripts/refresh_worklinks_actionable.py
+          python tests/test_changcom_adaptive_page_20261118.py
+          python tests/test_worklinks_actionable.py
