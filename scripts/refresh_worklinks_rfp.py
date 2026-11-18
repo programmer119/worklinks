@@ -2398,11 +2398,11 @@ def repair_truncated_zip_eocd(raw):
     were lost. Never reconstruct member data or skip failed CRC verification.
     The original SHA-verified download remains untouched.
     """
-    if (not isinstance(raw,bytes) or not raw.startswith(b'PK\\x03\\x04')
+    if (not isinstance(raw,bytes) or not raw.startswith(b'PK\x03\x04')
             or len(raw)>8_000_000 or len(raw)<50
             or zipfile.is_zipfile(io.BytesIO(raw))):
         return raw
-    eocd=raw.rfind(b'PK\\x05\\x06')
+    eocd=raw.rfind(b'PK\x05\x06')
     if eocd<0 or len(raw)-eocd!=16:
         return raw
     import struct
@@ -2410,10 +2410,10 @@ def repair_truncated_zip_eocd(raw):
         sig,disk,central_disk,on_disk,total,central_size=struct.unpack_from(
             '<4sHHHHI',raw,eocd)
         central_offset=eocd-central_size
-        if (sig!=b'PK\\x05\\x06' or disk or central_disk or
+        if (sig!=b'PK\x05\x06' or disk or central_disk or
                 not (1<=total<=80) or on_disk!=total or
                 central_size<46 or central_offset<30 or
-                raw[central_offset:central_offset+4]!=b'PK\\x01\\x02'):
+                raw[central_offset:central_offset+4]!=b'PK\x01\x02'):
             return raw
         fixed=raw+struct.pack('<IH',central_offset,0)
         with zipfile.ZipFile(io.BytesIO(fixed)) as archive:
@@ -2439,7 +2439,7 @@ def _extract_dispatch(name,raw):
     # Repair exactly one proven six-byte missing ZIP footer only when ALL
     # central-directory members decompress with intact CRC. Never modify
     # or relabel the byte-verified source in the download ledger.
-    if raw.startswith(b'PK\\x03\\x04'):
+    if raw.startswith(b'PK\x03\x04'):
         raw=repair_truncated_zip_eocd(raw)
     # G2B sometimes supplies an OLE HWP named .hwpx or a ZIP of several
     # PDFs named .pdf. Choose the reader from bytes, NOT the filename.
