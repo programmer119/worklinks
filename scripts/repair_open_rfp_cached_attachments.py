@@ -616,17 +616,22 @@ def process_one(key,scan,meta,ledger,file_limit=None,prioritize_legacy_pdf_ocr=F
             if not evidence['sourceComplete']:
                 f['extractionEvidence']=evidence
                 f['partialTextChars']=len(text)
-                if int(evidence.get('protectedMemberCount') or 0)>0:
+                archive_failures=[x for x in evidence.get('archiveFailedMembers') or [] if isinstance(x,dict)]
+                pdf_archive_failures=[x for x in archive_failures if x.get('errorCategory') in (
+                    'pdf_ocr_incomplete','ocr_deferred_to_repair','pdf_unreadable_page')]
+                failure_details='; '.join(str(x.get('name') or '')[:85]+': '+
+                    str(x.get('reason') or '')[:85] for x in archive_failures[:3])
+                if int(evidence.get('protectedMemberCount') or 0)>0 and not archive_failures:
                     f['errorCategory']='drm_protected_original_requires_authorized_decryption'
                     f['error']='protected member(s) remain in verified archive; readable siblings extracted separately'
                     counts['partial_drm_archive']+=1
-                elif int(evidence.get('pdfFiles') or 0)>0:
+                elif int(evidence.get('pdfFiles') or 0)>0 or pdf_archive_failures:
                     f['errorCategory']='pdf_ocr_incomplete'
-                    f['error']='pdf_ocr_incomplete: unresolved embedded PDF pages'
+                    f['error']='pdf_ocr_incomplete: '+(failure_details or 'unresolved embedded PDF pages')
                     counts['pdf_ocr_incomplete']+=1
                 else:
                     f['errorCategory']='source_text_scan_incomplete'
-                    f['error']='source_text_scan_incomplete: non-PDF source incomplete'
+                    f['error']='source_text_scan_incomplete: '+(failure_details or 'non-PDF source incomplete')
                     counts['source_text_scan_incomplete']+=1
                 continue
             if sum(ch.isalnum() for ch in text)<12:
