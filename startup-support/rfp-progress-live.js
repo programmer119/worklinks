@@ -32,7 +32,7 @@
     '<span>구버전 <b data-rfp-field="legacy">—</b></span>'+
     '<span>실패 <b data-rfp-field="failed">—</b></span>'+
     '<span>검증 미완료 <b data-rfp-field="incomplete">—</b></span></div>'+ 
-    '<details class="rfp-rescan-excluded-detail"><summary>집계 상세</summary><span>전체 관리 공고 <b data-rfp-field="allNotices">—</b>건 · 판독 제외 <b data-rfp-field="excluded">—</b>건</span></details>'+
+    '<details class="rfp-rescan-excluded-detail"><summary>집계 상세</summary><span>전체 관리 공고 <b data-rfp-field="allNotices">—</b>건 · 판독 제외 <b data-rfp-field="excluded">—</b>건 · 보호 원본 <b data-rfp-field="sourceRestricted">—</b>건 (별도 관리)</span></details>'+
    '<div class="rfp-rescan-section-header"><h3>작업 진행</h3>'+
     '<span>첨부목록 확보·원본 다운로드 → 별도 문서 판독</span></div>'+
    '<div class="rfp-rescan-lanes">'+laneKeys.map(pair=>row(pair[0],pair[1])).join('')+'</div>'+
@@ -395,7 +395,8 @@
   const all=Math.max(0,Number(counts.total||0));
   const done=Math.max(0,Number(counts.completed||0));
   const excluded=Math.max(0,Number(counts.excluded||0));
-  const eligible=Math.max(0,Number(counts.eligible??Math.max(0,all-excluded)));
+  const protectedSources=Math.max(0,Number(counts.sourceRestricted||0));
+  const eligible=Math.max(0,Number(counts.eligible??Math.max(0,all-excluded-protectedSources)));
   const pct=eligible?Math.max(0,Math.min(100,100*done/eligible)):0;
   const number=rfpProgressNumber;
   const delayed=Boolean(rfpRescanProgressError);
@@ -412,7 +413,7 @@
   const noNewCompletion=Boolean(!delayed&&(scanActive>0||scanWorkerActive)&&noCompletionFor>=30);
   for(const [name,value] of Object.entries({
    total:number(eligible),allNotices:number(all),complete:number(done),rescanRequired:number(Math.max(0,Number(counts.remaining??(eligible-done)))),
-   excluded:number(excluded),unscanned:number(counts.unscanned),legacy:number(counts.legacy),
+   excluded:number(excluded),sourceRestricted:number(protectedSources),unscanned:number(counts.unscanned),legacy:number(counts.legacy),
    failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
   }))updateField(panel,name,value);
   const totalBar=panel.querySelector('.rfp-rescan-big-track');
@@ -532,20 +533,20 @@
     else if(key==='scan')updateRfpText(state,'최신 판독 완료');
    }
   }
-  const completeNotice=done===all&&all>0;
+  const completeNotice=done===eligible&&eligible>0;
   totalBar.dataset.status=completeNotice?'success':'active';
   const mini=document.querySelector('#rfpRescanMiniFill');
   if(mini)mini.dataset.status=completeNotice?'success':'active';
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
   count.textContent='완료 '+number(done)+' / '+number(eligible)+'건';
-   count.title='관리 대상 '+number(all)+'건 · 판독 제외 '+number(excluded)+'건';
+   count.title='관리 대상 '+number(all)+'건 · 첨부 없음 '+number(excluded)+'건 · 보호 원본 '+number(protectedSources)+'건';
   label.textContent=pct.toFixed(2)+'%'+(delayed?' · 갱신 지연':'');
   fill.style.width=pct.toFixed(2)+'%';
   const next=document.getElementById('rfpRescanNext');
   if(next)next.textContent=delayed?'조회 오류':active?'작업 중':worker?.upgradeActive?'진행 확인 중':'현황';
   const launch=document.getElementById('rfpRescanLaunch');
-  if(launch)launch.title='판독 완료 '+number(done)+' / '+number(all)+'건 · '+
+  if(launch)launch.title='판독 완료 '+number(done)+' / '+number(eligible)+'건 · 보호 원본 '+number(protectedSources)+'건 · '
    (active?'작업 진행 중':'서버 집계 '+rfpClock(info.asOf));
   window.paintRfpLiveCountdown();
  };
