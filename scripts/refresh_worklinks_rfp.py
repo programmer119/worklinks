@@ -1658,9 +1658,11 @@ def extract_with_source_status(name,raw):
     previous_zip_depth=getattr(_DOCUMENT_SCAN,'zip_depth',None)
     previous_zip_expanded=getattr(_DOCUMENT_SCAN,'zip_expanded_bytes',None)
     previous_protected=getattr(_DOCUMENT_SCAN,'protected_archive_members',None)
+    previous_archive_failures=getattr(_DOCUMENT_SCAN,'archive_failed_members',None)
     previous_zip_recovery=getattr(_DOCUMENT_SCAN,'zip_eocd_recovered',None)
     _DOCUMENT_SCAN.zip_eocd_recovered=0
     _DOCUMENT_SCAN.protected_archive_members=[]
+    _DOCUMENT_SCAN.archive_failed_members=[]
     _DOCUMENT_SCAN.format_times={}
     _DOCUMENT_SCAN.extract_stack=[]
     _DOCUMENT_SCAN.zip_depth=0
@@ -1672,11 +1674,14 @@ def extract_with_source_status(name,raw):
         data=extract(name,raw)
         pdf_stats=list(_DOCUMENT_SCAN.pdf)
         protected_members=list(_DOCUMENT_SCAN.protected_archive_members)
+        archive_failures=list(_DOCUMENT_SCAN.archive_failed_members)
         complete=(all(x.get('sourceComplete') is True for x in pdf_stats)
-                  and not protected_members)
+                  and not protected_members and not archive_failures)
         return data,{'sourceComplete':complete,
                      'protectedArchiveMembers':protected_members[:30],
                      'protectedMemberCount':len(protected_members),
+                     'archiveFailedMembers':archive_failures[:30],
+                     'archiveFailedMemberCount':len(archive_failures),
                      'verifiedTruncatedZipFooterRecoveries':int(
                          getattr(_DOCUMENT_SCAN,'zip_eocd_recovered',0)),
                      'pdfFiles':len(pdf_stats),
@@ -1752,6 +1757,10 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.protected_archive_members
             except AttributeError:pass
         else:_DOCUMENT_SCAN.protected_archive_members=previous_protected
+        if previous_archive_failures is None:
+            try:del _DOCUMENT_SCAN.archive_failed_members
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.archive_failed_members=previous_archive_failures
         if previous_zip_recovery is None:
             try:del _DOCUMENT_SCAN.zip_eocd_recovered
             except AttributeError:pass
@@ -2608,10 +2617,17 @@ def _extract_dispatch(name,raw):
                             # until the protected member is authorized.
                             _DOCUMENT_SCAN.protected_archive_members.append(inner[:200])
                             continue
-                        # Do not lose which member caused ZIP failure. Keep the
-                        # recognized error prefix for existing classification.
-                        raise ValueError(str(err)[:85]+'; zip_member='+inner[:100]) from err
-                    if not value.strip():raise ValueError('no_searchable_text: zip_member='+inner[:100])
+                        # Preserve readable siblings and remember exactly which
+                        # archive member failed. Do NOT claim complete coverage.
+                        _DOCUMENT_SCAN.archive_failed_members.append({
+                            'name':inner[:160], 'reason':str(err)[:150],
+                            'errorCategory':classify_failure(err)})
+                        continue
+                    if not value.strip():
+                        _DOCUMENT_SCAN.archive_failed_members.append({
+                            'name':inner[:160], 'reason':'no_searchable_text',
+                            'errorCategory':'no_searchable_text'})
+                        continue
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix=='.zip':
                     # Verified KOICA archives contain an additional nested
@@ -2627,9 +2643,16 @@ def _extract_dispatch(name,raw):
                         try:
                             value=extract(inner,archive.read(entry))
                         except ValueError as err:
-                            raise ValueError(str(err)[:85]+'; zip_member='+inner[:100]) from err
+                            _DOCUMENT_SCAN.archive_failed_members.append({
+                                'name':inner[:160], 'reason':str(err)[:150],
+                                'errorCategory':classify_failure(err)})
+                            continue
                     finally:_DOCUMENT_SCAN.zip_depth=depth
-                    if not value.strip():raise ValueError('no_searchable_text: zip_member='+inner[:100])
+                    if not value.strip():
+                        _DOCUMENT_SCAN.archive_failed_members.append({
+                            'name':inner[:160], 'reason':'no_searchable_text',
+                            'errorCategory':'no_searchable_text'})
+                        continue
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix in {'.egg','.7z','.rar'}:
                     raise ValueError('nested_archive_requires_review')
@@ -2648,6 +2671,10 @@ def _extract_dispatch(name,raw):
         if not parts:
             if getattr(_DOCUMENT_SCAN,'protected_archive_members',None):
                 raise ValueError('drm_protected_original_requires_authorized_decryption')
+            failed=getattr(_DOCUMENT_SCAN,'archive_failed_members',[])
+            if failed:
+                first=failed[0]
+                raise ValueError(first['reason'][:85]+'; zip_member='+first['name'][:100])
             raise ValueError('archive_no_searchable_documents')
         return '\n'.join(parts)
     if n.endswith(('.docx','.xlsx','.pptx')):
