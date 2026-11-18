@@ -29,4 +29,14 @@ with patch.dict(os.environ,{'WORKLINKS_RFP_SHORT_VECTOR_FAST_OCR':'1',
     zipfile['lastTruncatedHwpxAttemptVersion']=repair.TRUNCATED_HWPX_READER_VERSION
     pdf['lastShortVectorAttemptVersion']=repair.SHORT_VECTOR_READER_VERSION
     assert repair.reader_retry_files({'files':[zipfile,pdf]})==[]
+pledge=candidate(
+    '5. 청렴계약 이행 서약서 [강남소방서 구급대 옷장 살균 소독 시스템 설치].hwpx',
+    'hwp_record_fallback_no_text')
+unrelated=candidate('무관한 제안서.hwpx','hwp_record_fallback_no_text')
+with patch.dict(os.environ,{'WORKLINKS_RFP_DISTRIBUTION_HWP_SOURCE_RECHECK':'0'}):
+    assert repair.reader_retry_files({'files':[pledge,unrelated]})==[]
+with patch.dict(os.environ,{'WORKLINKS_RFP_DISTRIBUTION_HWP_SOURCE_RECHECK':'1'}):
+    assert repair.reader_retry_files({'files':[pledge,unrelated]})==[pledge]
+    pledge['lastDistributionHwpSourceVersion']=repair.DISTRIBUTION_HWP_SOURCE_VERSION
+    assert repair.reader_retry_files({'files':[pledge,unrelated]})==[]
 print('TARGETED_RFP_SOURCE_REPAIR_GUARDS_PASS')
