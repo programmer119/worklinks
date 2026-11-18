@@ -1251,16 +1251,21 @@ def rfp_source_access_state(files):
     ZIP members), NOT from HTTP status, assumed passwords, or a failed OCR.
     Being listed and downloadable does not mean the document is decryptable.
     """
-    drm_code='drm_protected_original_requires_authorized_decryption'
+    source_protection_codes={
+        'drm_protected_original_requires_authorized_decryption',
+        'hwp_record_fallback_protected',
+    }
     actual=[f for f in files if isinstance(f,dict)
             and f.get('staffingScopeExcluded') is not True
             and not (f.get('skippedDuplicateFormat') is True and f.get('alternatePdfEvidence'))]
     protected=[{'name':str(f.get('name') or '')[:140],
-                'reason':'DRMONE 원본 보호 · 권한 또는 해제된 문서 필요'}
-               for f in actual if f.get('errorCategory')==drm_code]
+                'reason':('배포용 HWP 원본 보호 · 정식 HWP 열람/변환 환경 필요'
+                          if f.get('errorCategory')=='hwp_record_fallback_protected'
+                          else 'DRMONE 원본 보호 · 권한 또는 해제된 문서 필요')}
+               for f in actual if f.get('errorCategory') in source_protection_codes]
     other_unreadable=sum(f.get('readable') is not True or
                          f.get('sourceTextScanComplete') is not True
-                         for f in actual if f.get('errorCategory')!=drm_code)
+                         for f in actual if f.get('errorCategory') not in source_protection_codes)
     return {'status':('restricted' if protected and not other_unreadable
                       else 'mixed' if protected else 'none'),
             'protectedFileCount':len(protected),
@@ -1312,8 +1317,9 @@ def saved_rfp_search_state(row, compact=False, historical=False):
         'readable':f.get('readable') is True,
         'pdfAlternative':covered.get(i,'')[:140],
         'skippedDuplicateFormat':i in covered,
-        'accessStatus':('restricted' if f.get('errorCategory')==
-                       'drm_protected_original_requires_authorized_decryption'
+        'accessStatus':('restricted' if f.get('errorCategory') in
+                       ('drm_protected_original_requires_authorized_decryption',
+                        'hwp_record_fallback_protected')
                        and i not in covered else 'none'),
         'errorCategory':('' if i in covered else str(f.get('errorCategory') or '')[:90]),
         'errorDetail':('' if i in covered else str(f.get('errorDetail') or '')[:180]),
@@ -2020,6 +2026,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
                 detail_code='ocr_old_reader_version' if attempt!=v12 else 'ocr_v12_attempt_still_incomplete'
             elif err=='drm_protected_original_requires_authorized_decryption':
                 detail_code='official_attachment_drm_access_restricted'
+            elif err=='hwp_record_fallback_protected':
+                detail_code='official_attachment_hwp_distribution_restricted'
             elif err:
                 detail_code='source_error:'+err
             elif not read_done:
@@ -2061,7 +2069,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
                 'staffingFactVersion':int(f.get('staffingFactScanVersion') or 0)
                 })
         protected_only=bool(problems) and all(
-            p['errorCategory']=='drm_protected_original_requires_authorized_decryption'
+            p['errorCategory'] in ('drm_protected_original_requires_authorized_decryption',
+                                   'hwp_record_fallback_protected')
             for p in problems)
         if not isinstance(doc,dict) or status in ('','not_scanned','unscanned'):
             category='unscanned'
@@ -2105,7 +2114,9 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             issues.add('hwpx_reader_incomplete')
         for code in issues:issue_counts[code]+=1
         root=(
-            'official_attachment_drm_access_restricted' if protected_only
+            ('official_attachment_hwp_distribution_restricted' if
+             any(p['errorCategory']=='hwp_record_fallback_protected' for p in problems)
+             else 'official_attachment_drm_access_restricted') if protected_only
             else 'ocr_reader_not_retried' if 'ocr_old_reader_version' in issues
             else 'ocr_retried_still_incomplete' if 'ocr_v12_attempt_still_incomplete' in issues
             else 'other_file_extraction_failure' if any(x.startswith('source_error:') for x in issues)
@@ -2124,7 +2135,8 @@ def rfp_rescan_cause_report(limit=40,offset=0):
             'deadline':str(bid.get('closes') or '')[:35],
             'category':category,'rootCause':root,
             'sourceAccess':('restricted' if protected_only else
-                'mixed' if 'official_attachment_drm_access_restricted' in issues
+                'mixed' if ('official_attachment_drm_access_restricted' in issues or
+                             'official_attachment_hwp_distribution_restricted' in issues)
                 else 'none'),
             'issues':sorted(issues),'stagePassed':checks,
             'scanStatus':status,'manifestComplete':doc.get('manifestComplete') is True,
