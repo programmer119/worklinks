@@ -2198,11 +2198,28 @@ def extract_hwp_record_paragraphs(raw):
     import olefile
     try:
         with olefile.OleFileIO(io.BytesIO(raw)) as src:
+            header=src.openstream('FileHeader').read()
+            if (not header.startswith(b'HWP Document File') or len(header)<40):
+                raise ValueError('hwp_fileheader_invalid')
+            flags=int.from_bytes(header[36:40],'little')
+            if flags & 2:
+                # Password-encrypted HWP remains protected; no speculative
+                # decoding from preview text or unrelated OLE metadata.
+                raise ValueError('hwp_record_fallback_protected')
+            # HWP5 distribution copies keep their actual readable body in
+            # ViewText, not BodyText. pyhwp knows how to process the HWP5
+            # distribution record stream; a normal BodyText retry sees no
+            # records and falsely reports no_searchable_text.
+            section_root='ViewText' if flags & 4 else 'BodyText'
             sections=sorted(
                 ('/'.join(item) for item in src.listdir()
-                 if len(item)==2 and item[0]=='BodyText'
+                 if len(item)==2 and item[0]==section_root
                     and re.fullmatch(r'Section\d+',item[1])),
                 key=lambda path:int(path.rsplit('Section',1)[1]))
+    except ValueError as exc:
+        if str(exc)=='hwp_record_fallback_protected':
+            raise
+        raise ValueError('hwp_record_fallback_invalid_ole') from exc
     except Exception as exc:
         raise ValueError('hwp_record_fallback_invalid_ole') from exc
     if not sections or len(sections)>80:
