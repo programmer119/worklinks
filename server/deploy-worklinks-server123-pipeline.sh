@@ -246,7 +246,11 @@ for attempt in $(seq 1 30);do
 done
 test "$ready" = 1 || { echo 'PIPELINE_STARTUP_PREFLIGHT_TIMEOUT';exit 9; }
 for name in changcom-actionable g2b-award-fields-open rfp-clauses rfp-coverage-index;do
-  code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 \
+  # The source index can exceed 100MB as uncompressed JSON; browsers
+  # request gzip and the API correctly refuses oversized identity responses.
+  # Verify the same compressed endpoint actually used in production.
+  code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 \
+      -H 'Accept-Encoding: gzip' \
       "http://127.0.0.1:18192/api/g2b/snapshot?name=$name")"
   test "$code" = 200 || { echo "PIPELINE_LOCAL_SNAPSHOT_UNAVAILABLE=$name"; exit 9; }
 done
