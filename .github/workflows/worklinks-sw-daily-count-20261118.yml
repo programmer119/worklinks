@@ -1,0 +1,86 @@
+name: WorkLinks SW daily count diagnostic 20261118
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/worklinks-sw-daily-count-20261118.yml'
+permissions:
+  contents: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Read saved SW bid notices and count original notices by KST post date
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import collections, datetime, json, os, sys, time, urllib.parse, urllib.request
+          ROOT='https://api-suaveforge.suaveforge.com:18458/api/g2b'
+          first=datetime.date(2026,11,12)
+          last=datetime.date(2026,11,18)
+          offset=0
+          total=None
+          records=[]
+          size=200
+          started=time.monotonic()
+          while True:
+              for page_size in list(dict.fromkeys([size, 100, 50, 25])):
+                  try:
+                      url=ROOT+'/saved?'+urllib.parse.urlencode({'sw':1,'limit':page_size,'offset':offset})
+                      req=urllib.request.Request(url,headers={'User-Agent':'WorkLinks-SW-Daily-Stats-ReadOnly/1.0'})
+                      with urllib.request.urlopen(req,timeout=22) as response:
+                          obj=json.load(response)
+                      if not obj.get('ok') or not obj.get('persisted') or not isinstance(obj.get('items'),list):
+                          raise ValueError('invalid saved response '+str(obj.get('error')))
+                      if total is not None and int(obj['totalCount']) != total:
+                          raise ValueError('saved total changed during fetch')
+                      total=int(obj['totalCount'])
+                      if not obj['items'] and offset<total:
+                          raise ValueError('early short page')
+                      if not obj['items'] and offset>=total:
+                          break
+                      records.extend(obj['items'])
+                      offset+=len(obj['items'])
+                      size=page_size
+                      break
+                  except Exception as exc:
+                      print('page problem offset='+str(offset)+' size='+str(page_size)+' '+str(exc)[:260],flush=True)
+                      if page_size==25:
+                          raise
+                      time.sleep(.5)
+              if offset>=total:
+                  break
+              if len(records)>100000: raise ValueError('pagination safety cap')
+              if offset and offset%1000<250:
+                  print('progress '+str(offset)+'/'+str(total),flush=True)
+          print('FETCHED',len(records),'EXPECTED',total,'SECONDS',round(time.monotonic()-started,2),flush=True)
+          print('ROW_SAMPLES '+json.dumps([{k:x.get(k) for k in ('bidNo','order','posted','kind','title')} for x in records[:4]],ensure_ascii=False),flush=True)
+          seen=set()
+          by_date=collections.Counter()
+          revisions=collections.Counter()
+          sample_outside=collections.Counter()
+          undated=0
+          for x in records:
+              code=str(x.get('bidNo') or '').strip()
+              kind=str(x.get('kind') or '')
+              order=str(x.get('order') if x.get('order') is not None else '').strip()
+              posted=str(x.get('posted') or '').strip()
+              d=posted[:10].replace('.','-').replace('/','-')
+              if not code or not order or len(d)!=10 or not d[:4].isdigit():
+                  undated+=1
+                  continue
+              try: day=datetime.date.fromisoformat(d)
+              except ValueError: undated+=1;continue
+              key=(kind,code,order)
+              if key in seen: continue
+              seen.add(key)
+              if first<=day<=last:
+                  if order.isdigit() and int(order)==0: by_date[d]+=1
+                  else: revisions[d]+=1
+              else:
+                  sample_outside[d]+=1
+          for d in range(7):
+              day=(first+datetime.timedelta(days=d)).isoformat()
+              print('SW_DAILY '+json.dumps({'date':day,'sw_new':by_date[day],'sw_updates':revisions[day]},ensure_ascii=False),flush=True)
+          print('SW_TOTAL '+json.dumps({'sw_new':sum(by_date.values()),'sw_updates':sum(revisions.values()),'undated':undated,'records':len(records),'unique_revisions':len(seen)},ensure_ascii=False),flush=True)
+          PY
