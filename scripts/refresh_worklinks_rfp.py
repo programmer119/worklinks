@@ -1627,7 +1627,11 @@ def _extract_pdf_with_audit(raw,name=''):
               'sourceComplete':not missing,
               'extractionMethod':'pdf_native_ocr' if recovered or attempted else 'pdf_native'}
         if not text.strip():
-            raise ValueError('pdf_ocr_incomplete' if missing else 'no_searchable_text')
+            # Preserve exact unresolved pages when a PDF has no extractable text.
+            # This survives the ZIP wrapper without inventing a successful scan.
+            if missing:
+                raise ValueError('pdf_ocr_incomplete: pages='+','.join(map(str,missing[:24])))
+            raise ValueError('no_searchable_text')
         return text,info
     finally:
         try:
@@ -2604,8 +2608,10 @@ def _extract_dispatch(name,raw):
                             # until the protected member is authorized.
                             _DOCUMENT_SCAN.protected_archive_members.append(inner[:200])
                             continue
-                        raise
-                    if not value.strip():raise ValueError('no_searchable_text')
+                        # Do not lose which member caused ZIP failure. Keep the
+                        # recognized error prefix for existing classification.
+                        raise ValueError(str(err)[:85]+'; zip_member='+inner[:100]) from err
+                    if not value.strip():raise ValueError('no_searchable_text: zip_member='+inner[:100])
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix=='.zip':
                     # Verified KOICA archives contain an additional nested
@@ -2618,9 +2624,12 @@ def _extract_dispatch(name,raw):
                     if entry.file_size>MAX_FILE:raise ValueError('large_file')
                     _DOCUMENT_SCAN.zip_depth=depth+1
                     try:
-                        value=extract(inner,archive.read(entry))
+                        try:
+                            value=extract(inner,archive.read(entry))
+                        except ValueError as err:
+                            raise ValueError(str(err)[:85]+'; zip_member='+inner[:100]) from err
                     finally:_DOCUMENT_SCAN.zip_depth=depth
-                    if not value.strip():raise ValueError('no_searchable_text')
+                    if not value.strip():raise ValueError('no_searchable_text: zip_member='+inner[:100])
                     parts.append('FILE '+inner+'\n'+value)
                 elif suffix in {'.egg','.7z','.rar'}:
                     raise ValueError('nested_archive_requires_review')
