@@ -14,6 +14,7 @@ import json
 import os
 import shutil
 import sqlite3
+import struct
 import threading
 from pathlib import Path
 import re
@@ -1657,6 +1658,8 @@ def extract_with_source_status(name,raw):
     previous_zip_depth=getattr(_DOCUMENT_SCAN,'zip_depth',None)
     previous_zip_expanded=getattr(_DOCUMENT_SCAN,'zip_expanded_bytes',None)
     previous_protected=getattr(_DOCUMENT_SCAN,'protected_archive_members',None)
+    previous_recovered_eocd=getattr(_DOCUMENT_SCAN,'recovered_zip_eocd',None)
+    _DOCUMENT_SCAN.recovered_zip_eocd=[]
     _DOCUMENT_SCAN.protected_archive_members=[]
     _DOCUMENT_SCAN.format_times={}
     _DOCUMENT_SCAN.extract_stack=[]
@@ -1669,9 +1672,11 @@ def extract_with_source_status(name,raw):
         data=extract(name,raw)
         pdf_stats=list(_DOCUMENT_SCAN.pdf)
         protected_members=list(_DOCUMENT_SCAN.protected_archive_members)
+        recovered_archive_headers=list(_DOCUMENT_SCAN.recovered_zip_eocd)
         complete=(all(x.get('sourceComplete') is True for x in pdf_stats)
                   and not protected_members)
         return data,{'sourceComplete':complete,
+                     'crcVerifiedArchiveEndRecordRecovery':recovered_archive_headers[:12],
                      'protectedArchiveMembers':protected_members[:30],
                      'protectedMemberCount':len(protected_members),
                      'pdfFiles':len(pdf_stats),
@@ -1743,6 +1748,10 @@ def extract_with_source_status(name,raw):
             try:del _DOCUMENT_SCAN.zip_expanded_bytes
             except AttributeError:pass
         else:_DOCUMENT_SCAN.zip_expanded_bytes=previous_zip_expanded
+        if previous_recovered_eocd is None:
+            try:del _DOCUMENT_SCAN.recovered_zip_eocd
+            except AttributeError:pass
+        else:_DOCUMENT_SCAN.recovered_zip_eocd=previous_recovered_eocd
         if previous_protected is None:
             try:del _DOCUMENT_SCAN.protected_archive_members
             except AttributeError:pass
@@ -2397,6 +2406,42 @@ def extract_office_xml_stream(raw,format_name):
     return '\n'.join(text_chunks)
 
 
+def recover_crc_verified_truncated_hwpx_eocd(raw):
+    """Restore exactly 6 missing ZIP end-header bytes after full CRC verification.
+
+    Keep the SHA-verified original unchanged. Reconstruct ONLY an HWPX whose
+    central directory, member count, full source bytes, and CRCs remain intact.
+    """
+    if not (isinstance(raw,bytes) and len(raw)>=38 and
+            raw.startswith(b'PK\x03\x04') and raw[-16:-12]==b'PK\x05\x06'):
+        return None
+    try:
+        sig,disk,start_disk,on_disk,total,cd_size=struct.unpack('<4sHHHHI',raw[-16:])
+        if disk or start_disk or not (1<=total<=80) or on_disk!=total:
+            return None
+        cd_start=len(raw)-16-cd_size
+        if not (0<cd_start<len(raw)-16) or raw[cd_start:cd_start+4]!=b'PK\x01\x02':
+            return None
+        fixed=raw+struct.pack('<IH',cd_start,0)
+        with zipfile.ZipFile(io.BytesIO(fixed)) as archive:
+            members=archive.infolist()
+            names={x.filename for x in members}
+            if (len(members)!=total or 'mimetype' not in names or
+                    'Contents/header.xml' not in names or
+                    not any(n.startswith('Contents/section') and n.endswith('.xml')
+                            for n in names) or
+                    any(x.flag_bits & 1 or x.file_size>MAX_FILE for x in members) or
+                    sum(x.file_size for x in members)>MAX_HWPX_XML_TOTAL):
+                return None
+            if archive.read('mimetype').strip()!=b'application/hwp+zip':
+                return None
+            if archive.testzip() is not None:return None
+        return fixed,len(members)
+    except (ValueError,OverflowError,struct.error,zipfile.BadZipFile,
+            RuntimeError,OSError,KeyError):
+        return None
+
+
 def _extract_dispatch(name,raw):
     # Never feed a SHA-verified DRMONE wrapper to a ZIP/Office parser.
     # It requires authorized source decryption, not repeated OCR attempts.
@@ -2429,6 +2474,14 @@ def _extract_dispatch(name,raw):
             raise ValueError('unrecognized_hwpml_root')
         n='.hml'
     elif raw.startswith(b'PK\x03\x04'):
+        if n.endswith('.hwpx') and not zipfile.is_zipfile(io.BytesIO(raw)):
+            recovered=recover_crc_verified_truncated_hwpx_eocd(raw)
+            if recovered:
+                raw,count=recovered
+                rows=getattr(_DOCUMENT_SCAN,'recovered_zip_eocd',None)
+                if isinstance(rows,list):
+                    rows.append({'sourceFile':str(name)[:140],
+                                 'missingEndRecordBytes':6,'crcVerifiedMembers':count})
         # Identify Office XML formats by internal paths. Otherwise this is
         # an ordinary attachment archive, regardless of its .pdf/.hwp name.
         with zipfile.ZipFile(io.BytesIO(raw)) as probe:
