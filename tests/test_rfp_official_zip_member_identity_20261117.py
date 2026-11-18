@@ -49,4 +49,19 @@ zip_src=package([('one.txt',b'FIRST FORM SOURCE VALID'),('two.txt',b'SECOND FORM
 text,details=extract('official-bundle.zip',zip_src)
 assert 'FIRST FORM' in text and 'SECOND FORM' in text
 assert details['sourceComplete'] is True
+# A failed member must report its exact ZIP entry, not a generic ZIP OCR error.
+unreadable=package([('good.txt',b'NORMAL RELEVANT TEXT'),('unsupported.cell',b'not-convertible')])
+try:extract('technical-bundle.zip',unreadable)
+except ValueError as err:
+    assert 'hancom_cell_converter_required' in str(err),err
+    assert 'zip_member=unsupported.cell' in str(err),err
+else:raise AssertionError('ZIP member failure was silently accepted')
+
+nested=package([('inner.zip',package([('unsupported.cell',b'not-convertible')]))])
+try:extract('nested-technical-bundle.zip',nested)
+except ValueError as err:
+    assert 'zip_member=inner.zip' in str(err),err
+    assert 'zip_member=unsupported.cell' in str(err),err
+else:raise AssertionError('nested ZIP member failure had no provenance')
+
 print('OFFICIAL_ZIP_MEMBER_IDENTITY_PASS')
