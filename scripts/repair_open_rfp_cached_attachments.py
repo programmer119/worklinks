@@ -27,7 +27,7 @@ from rfp_call_ledger import cache_key
 
 KST=dt.timezone(dt.timedelta(hours=9))
 REPAIR_VERSION='signature-reader-20261112'
-READER_ATTEMPT_VERSION='framed-isolated-extract-v19-hwp-record-unicode-pdf750-20261117'
+READER_ATTEMPT_VERSION='framed-isolated-extract-v20-zip-member-pdf-page-provenance-20261118'
 NESTED_ZIP_READER_VERSION='two-nested-levels-cumulative-250mb-v1'
 PARTIAL_DRM_ZIP_READER_VERSION='complete-nonprotected-members-strict-drm-v1'
 TARGETED_ARCHIVE_RESUME_VERSION='archive-pdf-page-receipts-and-source-provenance-v1'
@@ -307,6 +307,9 @@ def reader_retry_files(scan):
         if (f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption'
                 and f.get('lastPartialDrmZipAttemptVersion')!=PARTIAL_DRM_ZIP_READER_VERSION):
             selected.append(f)
+            continue
+        # Parser-version upgrades do not repeatedly attempt proven DRM originals.
+        if f.get('errorCategory')=='drm_protected_original_requires_authorized_decryption':
             continue
         if (f.get('errorCategory')=='nested_archive_requires_review' and
                 f.get('lastNestedZipAttemptVersion')!=NESTED_ZIP_READER_VERSION):
