@@ -5892,6 +5892,10 @@ function renderJobs(){
  try {
  const member=worklinksPartnerAccess();
  const partnerMode=worklinksIsChangcomView();
+ if(member&&partnerMode){
+  const verdictFilters=document.getElementById('jobVerdictFilter');
+  if(verdictFilters)verdictFilters.hidden=false;
+ }
  if(!member){
   if(jobFilter==='partner')jobFilter='all';
   selectedPartnerId='all';jobVerdictFilter='all';
@@ -5901,8 +5905,9 @@ function renderJobs(){
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
  const partnerAllMode=member&&partnerMode&&partnerSwScope==='all'&&partnerNoticeStage==='bid';
- const fullFilterReady=member&&partnerMode&&!partnerAllMode&&!jobPartnerShowClosed&&!jobSearchText&&
-  g2bFilterInventoryState==='ready';
+ const fullFilterReady=member&&partnerMode&&!jobPartnerShowClosed&&!jobSearchText&&
+  (partnerAllMode?(partnerAllBids.state==='ready'&&partnerAllBids.loaded>=partnerAllBids.total):
+   g2bFilterInventoryState==='ready');
  const fullRows=partnerAllMode?partnerAllBids.items:(fullFilterReady?
   [...new Map(g2bFilterInventory.concat(g2bLiveJobs).map(x=>[x.id,x])).values()]:g2bLiveJobs);
  const keepMode=window.worklinksKeeps?.getMode?.()||'all';
