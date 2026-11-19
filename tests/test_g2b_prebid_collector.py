@@ -17,6 +17,9 @@ spec.loader.exec_module(prebid)
 
 with tempfile.TemporaryDirectory() as temp:
  prebid.DATA=pathlib.Path(temp)/'g2b-prebid.sqlite3'
+ prebid.KEY_PATH=pathlib.Path(temp)/'operating.env'
+ prebid.KEY_PATH.write_text('G2B_STANDARD_SERVICE_KEY=AUTHORIZED_TEST_KEY\n',encoding='utf-8')
+ assert prebid.key()=='AUTHORIZED_TEST_KEY'
  api_src=(ROOT/'server/g2b-proxy.py').read_text(encoding='utf-8')
  tree=ast.parse(api_src)
  func=next(n for n in tree.body if isinstance(n,ast.FunctionDef)
@@ -68,5 +71,14 @@ with tempfile.TemporaryDirectory() as temp:
  with mock.patch.object(prebid,'fetch_page',side_effect=fake_fetch) as call:
   assert prebid.collect_window(db,'FAKE','prespec','thng',today).startswith('ok:')
   assert call.call_count==1
+ # Deployment key rotation immediately unblocks old legacy 403 snapshots
+ # without deleting prior successful source windows or resetting call quota.
+ prebid.reset_auth_gates_on_key_change(db,'AUTHORIZED_TEST_KEY')
+ with mock.patch.object(prebid,'fetch_page',side_effect=fake_fetch) as retry:
+  assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','thng',today).startswith('ok:')
+  assert retry.call_count==1
+ # Future repeated startup with same key never alters saved success.
+ prebid.reset_auth_gates_on_key_change(db,'AUTHORIZED_TEST_KEY')
+ assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','thng',today)=='skipped'
  db.close()
 print('WORKLINKS_PREBID_COLLECTOR_API_CONTRACT_PASS')
