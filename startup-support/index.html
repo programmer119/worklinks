@@ -1949,7 +1949,7 @@ function openPartnerModal(partnerId,jobId){
  partnerLastFocus=document.activeElement;
  partnerScopedCompany=partnerId||null;partnerScopedJob=null;
  const p=partners.find(function(x){return x.id===partnerId});
- const job=jobs.concat(g2bLiveJobs).find(function(x){return x.id===jobId});
+ const job=jobs.concat(g2bLiveJobs,partnerAllBids.items).find(function(x){return x.id===jobId});
  partnerScopedJob=job||null;
  document.getElementById('partnersTitle').textContent=p?p.name+' · 파트너 상세':'협업 파트너';
  const subtitle=document.querySelector('#partnersSheet .partner-sheet-head p');
@@ -3394,7 +3394,7 @@ function repeatYears(x){
  return consecutive>=2?consecutive:0;
 }
 function openHistoryModal(jobId){
- const x=jobs.concat(g2bLiveJobs).find(function(x){return x.id===jobId});
+ const x=jobs.concat(g2bLiveJobs,partnerAllBids.items).find(function(x){return x.id===jobId});
  if(!x)return;
  const a=(x.repeatHistory||[]).filter(function(y){return y.verified===true}).slice().sort(function(p,q){return (+q.year)-(+p.year)});
  document.getElementById('jobHistoryTitle').textContent=x.title+' · 연도별 발주·낙찰';
@@ -3450,7 +3450,7 @@ if(typeof window!=='undefined')window.worklinksHydrateKeptJobs=async function(it
  for(const item of (Array.isArray(items)?items:[])){
   const id=String(item?.id||'');
   if(!id)continue;
-  const original=jobs.concat(g2bLiveJobs,jobSearchRemote,g2bFilterInventory).find(x=>x.id===id);
+  const original=jobs.concat(g2bLiveJobs,partnerAllBids.items,jobSearchRemote,g2bFilterInventory).find(x=>x.id===id);
   if(original){worklinksKeptFullRows.set(id,original);continue;}
   if(!worklinksKeptFullRows.has(id))worklinksKeptFullRows.set(id,worklinksKeptFallback(item));
   if(worklinksKeptPending.has(id)){pending.push(worklinksKeptPending.get(id));continue;}
@@ -3488,7 +3488,7 @@ if(typeof window!=='undefined')window.worklinksHydrateKeptJobs=async function(it
  if(pending.length)await Promise.all(pending);
 };
 function getJobById(id){
- const regular=jobs.concat(g2bLiveJobs,jobSearchRemote,g2bFilterInventory).find(function(x){return x.id===id});
+ const regular=jobs.concat(g2bLiveJobs,partnerAllBids.items,jobSearchRemote,g2bFilterInventory).find(function(x){return x.id===id});
  if(regular)return regular;
  if(worklinksKeptFullRows.has(id))return worklinksKeptFullRows.get(id);
  // Evidence-backed shortlist items can be shown before the paginated archive
