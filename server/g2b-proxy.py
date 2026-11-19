@@ -2446,6 +2446,42 @@ def rfp_rescan_progress():
     return report
 
 
+def query_prebid_records(stage,limit=500,offset=0):
+    """Read-only pre-tender plans/specifications; never query G2B on a page view."""
+    if stage not in ('plan','prespec'):
+        raise ApiError('invalid_prebid_stage',400)
+    if not (1<=limit<=500 and 0<=offset<=100000):
+        raise ApiError('invalid_prebid_pagination',400)
+    dbfile=os.path.join(os.path.dirname(G2B_DB_PATH),'g2b-prebid.sqlite3')
+    if not os.path.isfile(dbfile):
+        return {'ok':True,'ready':False,'stage':stage,'total':0,'items':[],
+                'error':'prebid_collector_not_initialized','noGovernmentApiCalls':True}
+    db=sqlite3.connect('file:'+dbfile+'?mode=ro',uri=True,timeout=8)
+    try:
+        ready=db.execute('SELECT COUNT(*),MAX(last_success) FROM prebid_windows WHERE stage=? AND last_success>0',(stage,)).fetchone()
+        if not ready or not ready[0]:
+            failed=db.execute('SELECT failed FROM prebid_windows WHERE stage=? AND failed<>\'\' ORDER BY day DESC LIMIT 1',(stage,)).fetchone()
+            return {'ok':True,'ready':False,'stage':stage,'total':0,'items':[],
+                    'error':(failed[0][:100] if failed else 'prebid_first_collect_pending'),
+                    'noGovernmentApiCalls':True}
+        total=db.execute('SELECT COUNT(*) FROM prebid_records WHERE stage=?',(stage,)).fetchone()[0]
+        rows=db.execute('''SELECT payload FROM prebid_records WHERE stage=?
+            ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',(stage,limit,offset)).fetchall()
+        items=[]
+        allowed=('id','stage','kind','title','org','posted','budget',
+                 'plannedMonth','opinionDeadline','url','files','bidLinked','swFlagSource')
+        for (payload,) in rows:
+            value=json.loads(payload)
+            if not isinstance(value,dict):continue
+            items.append({k:value[k] for k in allowed if k in value})
+        return {'ok':True,'ready':True,'stage':stage,'total':total,
+                'asOf':datetime.datetime.fromtimestamp(ready[1],datetime.timezone.utc).isoformat(),
+                'items':items,'noGovernmentApiCalls':True}
+    except (sqlite3.Error,ValueError,TypeError) as exc:
+        raise ApiError('prebid_saved_db_invalid',503) from exc
+    finally:db.close()
+
+
 def query_saved_open_inventory():
     """Read every saved SW notice eligible for an open/unknown-deadline filter.
     Never call procurement APIs or hide a failed/incomplete census as a total.
@@ -3397,6 +3433,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,rfp_ocr_repair_attribution())
             if u.path == '/api/g2b/rfp-card-evidence':
                 return self.reply(200,rfp_card_evidence_batch(get('keys')))
+            if u.path == '/api/g2b/prebid':
+                try:limit,offset=int(get('limit','500')),int(get('offset','0'))
+                except (TypeError,ValueError):raise ApiError('invalid_prebid_pagination',400)
+                return self.reply(200,query_prebid_records(get('stage',''),limit,offset))
             if u.path == '/api/g2b/saved-inventory':
                 return self.reply(200,query_saved_open_inventory())
             if u.path == '/api/g2b/saved':
