@@ -168,9 +168,12 @@ def collect_window(db,secret,stage,kind,day):
                   (stage,kind,day)).fetchone()
  # A missing permission is not a retryable parser error: never burn the
  # existing account quota every 30 minutes repeating a 401/403/429.
- blocked=db.execute("SELECT failed FROM prebid_windows WHERE failed LIKE 'prebid_official_http_40%' OR failed LIKE 'prebid_official_http_429' ORDER BY day DESC LIMIT 1").fetchone()
- if blocked:return 'blocked:'+str(blocked[0])
  today=dt.datetime.now(KST).strftime('%Y%m%d')
+ blocked=db.execute("""SELECT failed FROM prebid_windows
+  WHERE day>=? AND (failed LIKE 'prebid_official_http_40%'
+   OR failed LIKE 'prebid_official_http_429')
+  ORDER BY day DESC LIMIT 1""",(today,)).fetchone()
+ if blocked:return 'blocked:'+str(blocked[0])
  retry_after=4*3600 if day==today else 24*3600
  if prior and now-float(prior[0] or 0)<retry_after:return 'skipped'
  gathered=[]
@@ -223,11 +226,11 @@ def run_once():
    for stage,kind in SERVICE:
     result=collect_window(db,token,stage,kind,day.strftime('%Y%m%d'))
     results[stage+'/'+kind+'/'+day.isoformat()]=result
-    if result=='failed:prebid_daily_request_budget_exhausted':break
-   if any('prebid_daily_request_budget_exhausted' in x for x in results.values()):break
+    if result.startswith('blocked:') or result=='failed:prebid_daily_request_budget_exhausted':break
+   if any('prebid_daily_request_budget_exhausted' in x or x.startswith('blocked:') for x in results.values()):break
   summary={'at':dt.datetime.now(KST).isoformat(),'results':results}
   print('PREBID_COLLECTION '+json.dumps(summary,ensure_ascii=False),flush=True)
-  return not any(v.startswith('failed:') for v in results.values())
+  return not any(v.startswith(('failed:','blocked:')) for v in results.values())
  finally:db.close()
 
 def main():
