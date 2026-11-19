@@ -17,9 +17,9 @@ done
 test -S /home/ggul-docker/run/docker.sock
 dk image inspect "$IMG" >/dev/null
 # No API credentials and no outbound traffic during validation.
-dk run --rm --network none -v "$ROOT:/work:ro" "$IMG" \
+dk run --rm --network none -e PYTHONPYCACHEPREFIX=/tmp/prebid-pycache -v "$ROOT:/work:ro" "$IMG" \
  python -m py_compile /work/scripts/g2b_prebid_collector.py /work/server/g2b-proxy.py
-dk run --rm --network none -v "$ROOT:/work:ro" "$IMG" \
+dk run --rm --network none -e PYTHONPYCACHEPREFIX=/tmp/prebid-pycache -v "$ROOT:/work:ro" "$IMG" \
  python /work/tests/test_g2b_prebid_collector.py
 if cmp -s "$SOURCE" "$TARGET" && \
    test "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" = true;then
