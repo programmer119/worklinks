@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BASE=/home/worklinks/g2b
 SOURCE="$ROOT/scripts/g2b_prebid_collector.py"
 TARGET="$BASE/g2b-prebid-collector.py"
-SECRET="$BASE/secrets/g2b.env"
+SECRET="$BASE/secrets/g2b-standard.env"
 DOCKER=/home/ggul-docker/bin/docker
 SOCKET=unix:///home/ggul-docker/run/docker.sock
 WORKER=worklinks-g2b-prebid
@@ -40,12 +40,12 @@ rollback(){
 start(){
  dk rm -f "$WORKER" >/dev/null 2>&1 || true
  dk run -d --name "$WORKER" --restart unless-stopped --network host \
-   -e G2B_SECRET_PATH=/run/secrets/g2b.env \
+   -e G2B_OPERATING_KEY_PATH=/run/secrets/g2b-standard.env \
    -e G2B_PREBID_DB=/app/data/g2b-prebid.sqlite3 \
    -e WORKLINKS_PREBID_REQUESTS_PER_DAY=48 \
    -e WORKLINKS_PREBID_LOOP_SECONDS=1800 \
    -v "$TARGET:/app/g2b-prebid-collector.py:ro" \
-   -v "$SECRET:/run/secrets/g2b.env:ro" \
+   -v "$SECRET:/run/secrets/g2b-standard.env:ro" \
    -v "$BASE/data:/app/data" \
    "$IMG" python -u /app/g2b-prebid-collector.py >/dev/null
 }
