@@ -4,12 +4,14 @@ on:
     paths:
       - 'startup-support/index.html'
       - 'tests/test_rfp_progress_client_contract.cjs'
+      - 'tests/test_rfp_source_restricted_progress_compat.py'
       - '.github/workflows/worklinks-rfp-progress-ui-contract.yml'
   push:
     branches: [main]
     paths:
       - 'startup-support/index.html'
       - 'tests/test_rfp_progress_client_contract.cjs'
+      - 'tests/test_rfp_source_restricted_progress_compat.py'
       - '.github/workflows/worklinks-rfp-progress-ui-contract.yml'
 permissions:
   contents: read
@@ -22,5 +24,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Validate progress contract including excluded verified notices
-        run: node tests/test_rfp_progress_client_contract.cjs
+        run: |
+          node tests/test_rfp_progress_client_contract.cjs
+          python3 tests/test_rfp_source_restricted_progress_compat.py
