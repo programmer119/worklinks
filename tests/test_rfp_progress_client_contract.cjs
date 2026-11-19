@@ -28,6 +28,19 @@ assert.equal(check({...protectedSources,sourceRestricted:0}),false,'cannot hide 
 assert.equal(check({...protectedSources,eligible:2182}),false,'protected originals not scan work');
 assert.equal(check({...protectedSources,completed:2181}),false,'protected originals never fake successes');
 assert.equal(check({...protectedSources,sourceRestricted:-1}),false,'negative source holds invalid');
+// New response retains schema-v1 total=eligible+excluded so an already-open
+// browser can keep polling; protected holds remain an explicit subcategory.
+const liveCompatible={total:2041,eligible:2022,excluded:19,
+ excludedNoAttachments:16,sourceRestricted:3,completed:2022,remaining:0,
+ legacy:0,rescanRequired:0};
+assert.equal(check(liveCompatible),true,'schema-v1 compatible protected source split passes');
+assert.equal(liveCompatible.total,liveCompatible.eligible+liveCompatible.excluded,
+ 'legacy live-tab validation must accept a freshly deployed API');
+assert.equal(check({...liveCompatible,excluded:16}),false,'protected holds must remain accounted');
+assert.equal(check({...liveCompatible,sourceRestricted:0}),false,'protected breakdown must be consistent');
+assert.equal(check({...liveCompatible,excludedNoAttachments:-1}),false,'invalid excluded breakdown fails');
+assert.equal(check({...liveCompatible,excludedNoAttachments:19}),false,'cannot relabel protected files as empty');
+
 assert.ok(html.includes("!rfpProgressTotalsConsistent(report?.counts)"),
  'progress fetch must use the tested validator');
 assert.ok(!html.includes('report.counts.total!==report.counts.completed+report.counts.remaining'),
