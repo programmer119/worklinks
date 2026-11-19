@@ -7,6 +7,7 @@ const html=fs.readFileSync(path.join(__dirname,'../startup-support/index.html'),
 const ctx={
   g2bCardAwardMetadata:x=>({awardMethodCode:x.awardMethodCode,sourceVerified:x.awardFieldsVerified===true}),
   worklinksPartnerAccess:()=>true,renderJobs:()=>{},
+  jobSoftwareScope:x=>(/정보시스템|플랫폼/.test(String(x.title||''))?'candidate':'unknown'),
   document:{},Date,Map,Set,String,Number,Boolean,encodeURIComponent,
   htmlEscape:x=>String(x),jobSearchNormalized:x=>String(x).toLowerCase(),
   jobSearchText:'',jobRenderLimit:40
@@ -28,6 +29,13 @@ assert.equal(partnerBidMatchesNewFilters(bid('낙030022')),true);
 assert.equal(partnerBidMatchesNewFilters(bid('낙030029')),true);
 assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),false);
 assert.equal(partnerBidMatchesNewFilters(bid('낙030002')),false);
+vm.runInContext("partnerSwScope='all';partnerAwardFilter='all';",ctx);
+assert.equal(partnerBidMatchesNewFilters({id:'g2b-servc-nonsw',title:'사무실 책상 구매',kind:'servc'}),true,
+ '전체 공고는 비SW 공고를 숨기면 안 됨');
+vm.runInContext("partnerSwScope='sw';",ctx);
+assert.equal(partnerBidMatchesNewFilters({id:'g2b-servc-nonsw',title:'사무실 책상 구매',kind:'servc'}),false,
+ 'SW 관련 선택에서 비SW 제외');
+vm.runInContext("partnerSwScope='build';partnerAwardFilter='price';",ctx);
 assert.equal(partnerBidMatchesNewFilters({...bid('낙030021'),awardFieldsVerified:false}),false);
 vm.runInContext("partnerAwardFilter='qualification';",ctx);
 assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),true);
@@ -38,5 +46,16 @@ assert.ok(html.includes('id="partnerNoticeStage"'));
 assert.ok(html.includes('id="partnerAwardFilter"'));
 assert.ok(html.includes('id="partnerSwScope"'));
 assert.ok(html.includes('changcom-prebid.js'));
+assert.ok(html.includes('<option value="all">전체 공고</option>'));
+assert.ok(html.includes('<option value="sw">SW 관련</option>'));
+assert.ok(html.includes('<option value="build">SW 구축·개발</option>'));
+assert.ok(html.includes('<option value="price">가격낙찰형</option>'));
+assert.ok(html.includes("if(partnerAllBids.state==='loading')")===false,
+ 'UI scope code must be external, not duplicated in HTML');
+assert.ok(src.includes("'/saved?sw=0&limit=200&offset='"),
+ '전체 선택은 비SW 포함 서버 저장 DB에서 조회');
+assert.ok(src.includes("x.swFlagSource!=='none'"),
+ 'prebid SW 필터는 신규 비SW 저장 레코드를 제외');
+
 assert.ok(html.includes('partnerBidMatchesNewFilters(o.x)'));
 console.log('CHANGCOM_PREBID_FILTERS=PASS');
