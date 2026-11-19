@@ -78,7 +78,8 @@ def normalize(stage,kind,row):
  software_flag=_first(row,'swBizObjYn').upper()=='Y'
  subject=_first(row,'specCntnts','usgCntnts','dtilPrdctClsfcNoNm')
  sw=software_flag or bool(SW_RE.search(title+' '+subject))
- if not sw:return None
+ # Keep every identified official record. SW relevance is now an optional
+ # view filter, never a destructive collector-side selection.
  if stage=='plan':
   linked=_first(row,'bidNtceNoList')
  else:
@@ -87,7 +88,8 @@ def normalize(stage,kind,row):
          'org':org[:160],'posted':posted[:30], 'budget':budget[:24],
          'plannedMonth':planned_month[:12], 'opinionDeadline':opinion[:30],
          'url':url,'files':files,'bidLinked':bool(linked),
-         'swCandidate':True,'swFlagSource':'official' if software_flag else 'title'}
+         'swCandidate':bool(sw),
+         'swFlagSource':'official' if software_flag else 'title' if sw else 'none'}
 
 def connect():
  DATA.parent.mkdir(parents=True,exist_ok=True)
@@ -110,6 +112,13 @@ def connect():
  CREATE TABLE IF NOT EXISTS prebid_meta (
   name TEXT PRIMARY KEY,value TEXT NOT NULL);
  """)
+ # One-time additive migration. Revision 1 held only SW candidates; revision
+ # 2 also retains non-SW. Successful old windows must be re-read once, within
+ # the same existing 48-call daily cap, without deleting existing records.
+ cols={row[1] for row in db.execute('PRAGMA table_info(prebid_windows)')}
+ if 'scope_version' not in cols:
+  db.execute('ALTER TABLE prebid_windows ADD COLUMN scope_version INTEGER NOT NULL DEFAULT 1')
+  db.commit()
  return db
 
 def key():
@@ -181,7 +190,7 @@ def fetch_page(db,secret,stage,kind,day,page):
 
 def collect_window(db,secret,stage,kind,day):
  now=time.time()
- prior=db.execute('SELECT last_success,failed FROM prebid_windows WHERE stage=? AND kind=? AND day=?',
+ prior=db.execute('SELECT last_success,failed,scope_version FROM prebid_windows WHERE stage=? AND kind=? AND day=?',
                   (stage,kind,day)).fetchone()
  # A missing permission is not a retryable parser error: never burn the
  # existing account quota every 30 minutes repeating a 401/403/429.
@@ -192,7 +201,7 @@ def collect_window(db,secret,stage,kind,day):
   ORDER BY day DESC LIMIT 1""",(stage,today)).fetchone()
  if blocked:return 'blocked:'+str(blocked[0])
  retry_after=4*3600 if day==today else 24*3600
- if prior and now-float(prior[0] or 0)<retry_after:return 'skipped'
+ if prior and int(prior[2] or 1)>=2 and now-float(prior[0] or 0)<retry_after:return 'skipped'
  gathered=[]
  try:
   total=None
@@ -216,11 +225,11 @@ def collect_window(db,secret,stage,kind,day):
       ON CONFLICT(stage,kind,item_id) DO UPDATE
        SET payload=excluded.payload,last_seen=excluded.last_seen""",
        (stage,kind,ident,json.dumps(record,ensure_ascii=False),stamp,stamp))
-   db.execute("""INSERT INTO prebid_windows(stage,kind,day,last_success,source_total,stored,failed)
-      VALUES (?,?,?,?,?,?,'')
+   db.execute("""INSERT INTO prebid_windows(stage,kind,day,last_success,source_total,stored,failed,scope_version)
+      VALUES (?,?,?,?,?,?,'',2)
       ON CONFLICT(stage,kind,day) DO UPDATE SET
        last_success=excluded.last_success,source_total=excluded.source_total,
-       stored=excluded.stored,failed=''""",
+       stored=excluded.stored,failed='',scope_version=2""",
        (stage,kind,day,now,total,len(values)))
   return 'ok:'+str(total)+'/'+str(len(values))
  except (RuntimeError,sqlite3.Error) as exc:
