@@ -5933,7 +5933,8 @@ function renderJobs(){
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
  document.getElementById('closedJobCount').textContent='('+closed.length+')';
  if(member&&partnerMode){
- const candidateJobs=active.filter(o=>jobMatchesSelectedPartner(o.x,'all'));
+ const candidateJobs=active.filter(o=>jobMatchesSelectedPartner(o.x,'all')&&
+  partnerBidMatchesNewFilters(o.x));
  const statusTotal=type=>candidateJobs.filter(o=>partners.some(p=>verdict(o.x,p).type===type)).length;
  const considered=candidateJobs.filter(o=>jobSoftwareScope(o.x)==='candidate');
  const industryMatched=considered.filter(o=>partners.some(p=>jobQualificationVerdict(o.x,p).type==='industry_match')).length;
@@ -6051,7 +6052,7 @@ function renderJobs(){
     if(filter==='all'||filter==='closed')return true;
     if(filter==='partner')return jobMatchesSelectedPartner(x,selectedPartnerId);
     return x.entry===filter;
-  });
+  }).filter(o=>!partnerMode||!member||keepMode!=='all'||partnerBidMatchesNewFilters(o.x));
   if(member&&partnerMode)refreshVerdictFilters(scopeRows,selectedCompany);
   let list=keepMode!=='all'?scopeRows:scopeRows.filter(o=>
    matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&
