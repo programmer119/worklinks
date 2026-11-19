@@ -2469,7 +2469,8 @@ def query_prebid_records(stage,limit=500,offset=0):
             ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',(stage,limit,offset)).fetchall()
         items=[]
         allowed=('id','stage','kind','title','org','posted','budget',
-                 'plannedMonth','opinionDeadline','url','files','bidLinked','swFlagSource')
+                 'plannedMonth','opinionDeadline','url','files','bidLinked','swFlagSource',
+                 'subject','productName','productCode')
         for (payload,) in rows:
             value=json.loads(payload)
             if not isinstance(value,dict):continue
