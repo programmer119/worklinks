@@ -176,7 +176,7 @@ def is_sw(bid):
     if isinstance(subject,(list,dict)):
         subject=json.dumps(subject,ensure_ascii=False)
     txt=str(bid.get('title') or '')+' '+str(subject)
-    return int(bool(SW_TERMS.search(txt) or SW_BOUNDARY.search(txt)))
+    return int(str(bid.get('swBizObjYn') or '').upper()=='Y' or bool(SW_TERMS.search(txt) or SW_BOUNDARY.search(txt)))
 
 def compact(x,kind):
     def get(*names):
@@ -194,6 +194,7 @@ def compact(x,kind):
       'awardMethodCode':get('sucsfbidMthdCd'),'awardMethod':get('sucsfbidMthdNm'),
       'awardFloorRate':get('sucsfbidLwltRate'),'awardFieldsVerified':True,
       'purchsObjPrdctList':get('purchsObjPrdctList'),
+      'swBizObjYn':get('swBizObjYn'),
       'category':kind}
 
 def save(db,items):
