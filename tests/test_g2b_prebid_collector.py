@@ -64,5 +64,9 @@ with tempfile.TemporaryDirectory() as temp:
   assert prebid.collect_window(db,'FAKE','plan','thng',today)=='failed:prebid_official_http_403'
   assert prebid.collect_window(db,'FAKE','plan','thng',today)=='blocked:prebid_official_http_403'
   assert call.call_count==1,call.call_count
+ # Denied plan API must not prevent an independently authorized spec API.
+ with mock.patch.object(prebid,'fetch_page',side_effect=fake_fetch) as call:
+  assert prebid.collect_window(db,'FAKE','prespec','thng',today).startswith('ok:')
+  assert call.call_count==1
  db.close()
 print('WORKLINKS_PREBID_COLLECTOR_API_CONTRACT_PASS')
