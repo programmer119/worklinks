@@ -394,8 +394,13 @@
   const counts=info.counts;
   const all=Math.max(0,Number(counts.total||0));
   const done=Math.max(0,Number(counts.completed||0));
-  const excluded=Math.max(0,Number(counts.excluded||0));
   const protectedSources=Math.max(0,Number(counts.sourceRestricted||0));
+  const excludedAll=Math.max(0,Number(counts.excluded||0));
+  // New API: excluded includes source holds for older browser compatibility.
+  // Old API: excluded counted only missing attachments. Render both correctly.
+  const excluded=Math.max(0,Number(counts.excludedNoAttachments??
+   (all===Number(counts.eligible||0)+excludedAll
+    ?excludedAll-protectedSources:excludedAll)));
   const eligible=Math.max(0,Number(counts.eligible??Math.max(0,all-excluded-protectedSources)));
   const pct=eligible?Math.max(0,Math.min(100,100*done/eligible)):0;
   const number=rfpProgressNumber;
@@ -539,12 +544,14 @@
   if(mini)mini.dataset.status=completeNotice?'success':'active';
   updateField(panel,'serverTime','서버 집계 '+rfpClock(info.asOf));
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
-  count.textContent='완료 '+number(done)+' / '+number(eligible)+'건';
+  count.textContent='판독 '+number(done)+' / '+number(eligible)+'건';
    count.title='관리 대상 '+number(all)+'건 · 첨부 없음 '+number(excluded)+'건 · 보호 원본 '+number(protectedSources)+'건';
-  label.textContent=pct.toFixed(2)+'%'+(delayed?' · 갱신 지연':'');
+  label.textContent=pct.toFixed(2)+'%';
   fill.style.width=pct.toFixed(2)+'%';
   const next=document.getElementById('rfpRescanNext');
-  if(next)next.textContent=delayed?'조회 오류':active?'작업 중':worker?.upgradeActive?'진행 확인 중':'현황';
+  if(next)next.textContent=delayed?'연결 지연':active?'판독 중':
+    Number(counts.remaining||0)>0?'남은 '+number(counts.remaining)+'건':
+    protectedSources>0?'보호 '+number(protectedSources)+'건':'완료';
   const launch=document.getElementById('rfpRescanLaunch');
   if(launch)launch.title='판독 완료 '+number(done)+' / '+number(eligible)+'건 · 보호 원본 '+number(protectedSources)+'건 · '
    (active?'작업 진행 중':'서버 집계 '+rfpClock(info.asOf));
