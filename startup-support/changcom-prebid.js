@@ -12,8 +12,11 @@ function swBuildTitle(x){
  const text=(raw+' '+subject).toLowerCase();
  // Building electrical, fire safety or telecom construction is not SW development.
  if(/^(cnstwk|frgcpt)$/.test(String(x?.kind||''))&&!/(sw|s\/w|소프트웨어|정보시스템|전산시스템|플랫폼|웹|앱|데이터베이스)/i.test(raw))return false;
- const development=/(구축|개발|고도화|개편|재구축|전환|정보화|시스템\s*개선|리뉴얼)/.test(raw);
- const software=/(소프트웨어|정보시스템|전산시스템|플랫폼|웹사이트|웹서비스|홈페이지|모바일\s*앱|응용sw|s\/w|\bsw\b|데이터베이스|통합시스템|전자정부|ai\s*시스템|인공지능\s*시스템|디지털\s*서비스)/i.test(text);
+ // Ancillary procurement must not masquerade as an SW-development contract.
+ if(/(감리|인력\s*지원|청소\s*용역|시설\s*관리|홍보\s*영상|기자재\s*(?:구매|구입|설치)|소모품|토너|구축\s*방안\s*연구|정보화\s*교육\s*운영)/.test(raw))return false;
+ // '인재개발원' and '개발제한구역' are not software development.
+ const development=/(구축|고도화|개편|재구축|전환|시스템\s*(?:기능\s*)?개선|기능\s*개선|리뉴얼|개발(?!원|제한구역))/.test(raw);
+ const software=/(소프트웨어|정보시스템|전산시스템|플랫폼|웹사이트|웹서비스|홈페이지|모바일\s*앱|응용sw|s\/w|\bsw\b|데이터베이스|통합시스템|(?:업무|보험|행정|학사|운영|관리)시스템|전자정부|ai\s*시스템|인공지능\s*시스템|디지털\s*서비스)/i.test(text);
  return development&&software;
 }
 function partnerBidMatchesNewFilters(x){
