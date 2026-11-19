@@ -58,4 +58,43 @@ assert.ok(src.includes("x.swFlagSource!=='none'"),
  'prebid SW 필터는 신규 비SW 저장 레코드를 제외');
 
 assert.ok(html.includes('partnerBidMatchesNewFilters(o.x)'));
-console.log('CHANGCOM_PREBID_FILTERS=PASS');
+// Exercise the actual isolated full-corpus query and the early-stage view.
+ctx.worklinksIsChangcomView=()=>true;
+ctx.bidEligibilityCache=new Map();
+ctx.g2bCardFromServer=row=>({id:row.bidNo,title:row.title,kind:row.kind});
+const calls=[];
+ctx.g2bFetch=async path=>{
+ calls.push(path);
+ if(path.endsWith('offset=0'))return {persisted:true,totalCount:3,items:[
+   {bidNo:'A',title:'사무실 의자 구매',kind:'thng'},
+   {bidNo:'B',title:'정보시스템 구축',kind:'servc'}]};
+ if(path.endsWith('offset=2'))return {persisted:true,totalCount:3,items:[
+   {bidNo:'C',title:'회의실 청소 용역',kind:'servc'}]};
+ throw Error('unexpected page '+path);
+};
+vm.runInContext("partnerNoticeStage='bid';partnerSwScope='all';partnerAwardFilter='all';",ctx);
+vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
+ assert.deepEqual(calls,["/saved?sw=0&limit=200&offset=0"]);
+ assert.equal(vm.runInContext('partnerAllBids.items.length',ctx),2);
+ await vm.runInContext('loadPartnerAllBids(true)',ctx);
+ assert.equal(vm.runInContext('partnerAllBids.items.length',ctx),3);
+ assert.deepEqual(calls,["/saved?sw=0&limit=200&offset=0","/saved?sw=0&limit=200&offset=2"]);
+ const elements=Object.fromEntries(['partnerSummary','jobDecisionSummary','g2bMore','jobVerdictFilter','partnerJobCount']
+  .map(k=>[k,{textContent:'',style:{},hidden:false}]));
+ ctx.document.getElementById=id=>elements[id]||null;
+ const el={innerHTML:'',querySelector:()=>null};
+ const rows=[{id:'P1',kind:'servc',stage:'plan',title:'정보시스템 구축',swFlagSource:'title'},
+             {id:'P2',kind:'thng',stage:'plan',title:'사무실 책상 구매',swFlagSource:'none'}];
+ vm.runInContext("prebidCache.plan.state='ready'",ctx);
+ ctx.__filter.prebidCache.plan.items=rows;
+ ctx.__filter.prebidCache.plan.total=2;
+ vm.runInContext("partnerNoticeStage='plan';partnerSwScope='all';",ctx);
+ vm.runInContext('renderPrebidJobs',ctx)(el);
+ assert.equal(elements.partnerJobCount.textContent,'2건');
+ assert.ok(el.innerHTML.includes('사무실 책상 구매'));
+ vm.runInContext("partnerSwScope='sw';",ctx);
+ vm.runInContext('renderPrebidJobs',ctx)(el);
+ assert.equal(elements.partnerJobCount.textContent,'1건');
+ assert.ok(!el.innerHTML.includes('사무실 책상 구매'));
+ console.log('CHANGCOM_PREBID_FILTERS=PASS');
+}).catch(error=>{console.error(error);process.exitCode=1;});
