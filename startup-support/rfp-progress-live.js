@@ -403,6 +403,7 @@
     ?excludedAll-protectedSources:excludedAll)));
   const eligible=Math.max(0,Number(counts.eligible??Math.max(0,all-excluded-protectedSources)));
   const pct=eligible?Math.max(0,Math.min(100,100*done/eligible)):0;
+  const pctText=pct>=99.995?'100%':pct.toFixed(2)+'%';
   const number=rfpProgressNumber;
   const delayed=Boolean(rfpRescanProgressError);
   const lanes=info.lanes?.available===true?info.lanes:null;
@@ -419,7 +420,7 @@
   for(const [name,value] of Object.entries({
    total:number(eligible),allNotices:number(all),complete:number(done),rescanRequired:number(Math.max(0,Number(counts.remaining??(eligible-done)))),
    excluded:number(excluded),sourceRestricted:number(protectedSources),unscanned:number(counts.unscanned),legacy:number(counts.legacy),
-   failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pct.toFixed(2)+'%'
+   failed:number(counts.failed),incomplete:number(counts.incomplete),pct:pctText
   }))updateField(panel,name,value);
   const totalBar=panel.querySelector('.rfp-rescan-big-track');
   totalBar.setAttribute('aria-valuenow',pct.toFixed(1));
@@ -546,7 +547,7 @@
   updateField(panel,'lastRead','최근 확인 '+rfpClock(rfpRescanLastSuccessAt));
   count.textContent='판독 '+number(done)+' / '+number(eligible)+'건';
    count.title='관리 대상 '+number(all)+'건 · 첨부 없음 '+number(excluded)+'건 · 보호 원본 '+number(protectedSources)+'건';
-  label.textContent=pct.toFixed(2)+'%';
+  label.textContent=pctText;
   fill.style.width=pct.toFixed(2)+'%';
   const next=document.getElementById('rfpRescanNext');
   if(next)next.textContent=delayed?'연결 지연':active?'판독 중':
