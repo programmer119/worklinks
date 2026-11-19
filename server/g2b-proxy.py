@@ -1625,7 +1625,8 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
     ocr_rescan_files=0
     verified_exclusions=set(excluded_keys or ())
     verified_restrictions=set(restricted_keys or ())-verified_exclusions
-    summary={'total':0,'eligible':0,'excluded':0,'sourceRestricted':0,
+    summary={'total':0,'eligible':0,'excluded':0,'excludedNoAttachments':0,
+             'sourceRestricted':0,
              'completed':0,'remaining':0,'legacy':0,
              'unscanned':0,'failed':0,'incomplete':0,'unknownDeadline':0,
               'unknownDeadlineCompleted':0,'unknownDeadlinePending':0}
@@ -1662,10 +1663,15 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
         # a terminal scan exclusion, never an unscanned or failed scan.
         if key in verified_exclusions:
             summary['excluded']+=1
+            summary['excludedNoAttachments']+=1
             continue
         # SHA-verified protected originals are kept separate, never successful.
         if key in verified_restrictions:
             summary['sourceRestricted']+=1
+            # Keep schema-v1 browser tabs polling after the protected-source
+            # split: excluded includes every non-actionable record, while
+            # excludedNoAttachments and sourceRestricted are disjoint details.
+            summary['excluded']+=1
             continue
         summary['eligible']+=1
         row=index.get(key)
@@ -1713,8 +1719,9 @@ def rfp_progress_from_rows(rows,index,latest,asof=None,include_scope=False,exclu
     assert summary['unknownDeadlineCompleted']+summary['unknownDeadlinePending']==summary['unknownDeadline']
     summary['remaining']=summary['eligible']-summary['completed']
     summary['rescanRequired']=summary['legacy']
-    assert summary['total']==(summary['eligible']+summary['excluded']+
-                              summary['sourceRestricted'])
+    assert summary['total']==summary['eligible']+summary['excluded']
+    assert summary['excluded']==(summary['excludedNoAttachments']+
+                                 summary['sourceRestricted'])
     assert summary['eligible']==summary['completed']+summary['remaining']
     assert summary['remaining']==sum(summary[k] for k in
                                     ('legacy','unscanned','failed','incomplete'))
