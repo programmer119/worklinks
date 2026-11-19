@@ -44,7 +44,9 @@ with tempfile.TemporaryDirectory() as temp:
            'specDocFileUrl2':'https://attacker.example/key'}
  assert prebid.normalize('plan','servc',plan)['plannedMonth']=='2027-02'
  assert prebid.normalize('prespec','servc',spec_row)['files']==['https://www.g2b.go.kr/file/spec.pdf']
- assert prebid.normalize('plan','servc',{'orderPlanUntyNo':'1','bizNm':'부지 정리 공사'}) is None
+ non_sw=prebid.normalize('plan','servc',{'orderPlanUntyNo':'NONSWSAMPLE','bizNm':'사무용 의자 구매'})
+ assert non_sw['swCandidate'] is False and non_sw['swFlagSource']=='none'
+ assert prebid.normalize('plan','servc',{'bizNm':'번호 없는 공고'}) is None
  assert prebid.normalize('plan','servc',{'orderPlanUntyNo':'1','bizNm':'일반 물품',
         'swBizObjYn':'Y'})['swFlagSource']=='official'
  db=prebid.connect()
@@ -80,5 +82,24 @@ with tempfile.TemporaryDirectory() as temp:
  # Future repeated startup with same key never alters saved success.
  prebid.reset_auth_gates_on_key_change(db,'AUTHORIZED_TEST_KEY')
  assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','thng',today)=='skipped'
+ # V1 SW-only windows must be recrawled once on upgrade despite a recent
+ # successful window, still using the existing daily quota counter.
+ db.execute("UPDATE prebid_windows SET scope_version=1 WHERE stage='plan' AND kind='servc' AND day=?",(today,))
+ db.commit()
+ with mock.patch.object(prebid,'fetch_page',side_effect=fake_fetch) as refresh:
+  assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','servc',today).startswith('ok:')
+  assert refresh.call_count==1
+ assert db.execute("SELECT scope_version FROM prebid_windows WHERE stage='plan' AND kind='servc' AND day=?",(today,)).fetchone()[0]==2
+ # Official non-SW rows remain accessible in the same stage without being
+ # mislabeled as SW candidates. Unrelated RFP tables are untouched.
+ plain={'orderPlanUntyNo':'NONSW0001','bizNm':'사무실 책상 구매',
+        'orderInsttNm':'가상기관','nticeDt':'202611191100'}
+ yesterday=(dt.datetime.now(prebid.KST).date()-dt.timedelta(days=1)).strftime('%Y%m%d')
+ with mock.patch.object(prebid,'fetch_page',return_value=(1,[plain])) as full:
+  assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','thng',yesterday).startswith('ok:')
+  assert full.call_count==1
+ current=read('plan')
+ assert current['total']==2, current
+ assert any(x['id']=='NONSW0001' and x['swFlagSource']=='none' for x in current['items'])
  db.close()
 print('WORKLINKS_PREBID_COLLECTOR_API_CONTRACT_PASS')
