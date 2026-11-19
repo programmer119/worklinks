@@ -7,6 +7,7 @@ Official services:
 No existing bids/RFP DB modifications; no false electronic-bid deadline.
 """
 import datetime as dt
+import hashlib
 import json
 import os
 import re
@@ -19,7 +20,7 @@ from pathlib import Path
 
 KST=dt.timezone(dt.timedelta(hours=9))
 DATA=Path(os.environ.get('G2B_PREBID_DB','/app/data/g2b-prebid.sqlite3'))
-KEY_PATH=Path(os.environ.get('G2B_SECRET_PATH','/run/secrets/g2b.env'))
+KEY_PATH=Path(os.environ.get('G2B_OPERATING_KEY_PATH','/run/secrets/g2b-standard.env'))
 SERVICE={
  ('plan','servc'):('https://apis.data.go.kr/1230000/ao/OrderPlanSttusService','getOrderPlanSttusListServc'),
  ('plan','thng'):('https://apis.data.go.kr/1230000/ao/OrderPlanSttusService','getOrderPlanSttusListThng'),
@@ -106,18 +107,34 @@ def connect():
   PRIMARY KEY(stage,kind,day));
  CREATE TABLE IF NOT EXISTS prebid_quota (
   day TEXT PRIMARY KEY,calls INTEGER NOT NULL DEFAULT 0);
+ CREATE TABLE IF NOT EXISTS prebid_meta (
+  name TEXT PRIMARY KEY,value TEXT NOT NULL);
  """)
  return db
 
 def key():
- value=os.environ.get('G2B_SERVICE_KEY','').strip()
- if value:return value
+ # The bid/legacy key is NOT registered for these services. Use the same
+ # operating G2B key proven live against both official endpoints.
  with KEY_PATH.open(encoding='utf-8') as fp:
   for line in fp:
-   if line.startswith('G2B_SERVICE_KEY='):
+   if line.startswith('G2B_STANDARD_SERVICE_KEY='):
     value=line.split('=',1)[1].strip()
     if value:return value
- raise RuntimeError('prebid_g2b_key_not_available')
+ raise RuntimeError('prebid_operating_key_not_available')
+
+def reset_auth_gates_on_key_change(db,secret):
+ # Never persist or print the key. A rotated key must immediately clear
+ # the old key's permanent 403 hold; preserve valid snapshots and quota.
+ fingerprint=hashlib.sha256(secret.encode('utf-8')).hexdigest()
+ with db:
+  old=db.execute("SELECT value FROM prebid_meta WHERE name='credential_sha256'").fetchone()
+  if old is None or old[0]!=fingerprint:
+   db.execute("""UPDATE prebid_windows SET failed=''
+      WHERE failed LIKE 'prebid_official_http_40%'
+         OR failed LIKE 'prebid_official_http_429'""")
+   db.execute("""INSERT INTO prebid_meta(name,value) VALUES('credential_sha256',?)
+      ON CONFLICT(name) DO UPDATE SET value=excluded.value""",(fingerprint,))
+
 
 def reserve(db):
  today=dt.datetime.now(KST).strftime('%Y%m%d')
@@ -219,6 +236,7 @@ def run_once():
  db=connect()
  try:
   token=key()
+  reset_auth_gates_on_key_change(db,token)
   today=dt.datetime.now(KST).date()
   # Today + prior day only. Each stage/kind window has a durable success clock.
   results={}
