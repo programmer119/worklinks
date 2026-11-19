@@ -154,14 +154,22 @@ def fetch_page(db,secret,stage,kind,day,page):
   if not isinstance(items,list) or (total>0 and not items):
    raise RuntimeError('prebid_official_page_incomplete')
   return total,items
+ except urllib.error.HTTPError as exc:
+  # Never log the signed URL or response body. HTTP status is enough to
+  # distinguish authorization from a transient source outage.
+  raise RuntimeError('prebid_official_http_'+str(exc.code)) from None
  except (urllib.error.URLError,ValueError,KeyError) as exc:
   # NEVER include URL or secret in logs or exceptions.
   raise RuntimeError('prebid_official_fetch_'+type(exc).__name__) from None
 
 def collect_window(db,secret,stage,kind,day):
  now=time.time()
- prior=db.execute('SELECT last_success FROM prebid_windows WHERE stage=? AND kind=? AND day=?',
+ prior=db.execute('SELECT last_success,failed FROM prebid_windows WHERE stage=? AND kind=? AND day=?',
                   (stage,kind,day)).fetchone()
+ # A missing permission is not a retryable parser error: never burn the
+ # existing account quota every 30 minutes repeating a 401/403/429.
+ blocked=db.execute("SELECT failed FROM prebid_windows WHERE failed LIKE 'prebid_official_http_40%' OR failed LIKE 'prebid_official_http_429' ORDER BY day DESC LIMIT 1").fetchone()
+ if blocked:return 'blocked:'+str(blocked[0])
  today=dt.datetime.now(KST).strftime('%Y%m%d')
  retry_after=4*3600 if day==today else 24*3600
  if prior and now-float(prior[0] or 0)<retry_after:return 'skipped'
