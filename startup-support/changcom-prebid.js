@@ -73,8 +73,12 @@ function renderPrebidJobs(el){
  const message=report.state==='loading'?'불러오는 중':report.state==='error'?'수집 확인 필요':report.state==='idle'?'조회 전':'';
  if(report.state!=='ready'){
   if(count)count.textContent='확인 중';
+  const detail=/prebid_official_http_403/.test(report.error)?'공식 API 접근 거부(403) · 해당 서비스 활용승인 확인 필요':
+   /prebid_official_http_429/.test(report.error)?'공식 API 요청 제한(429)':
+   /prebid_daily_request_budget_exhausted/.test(report.error)?'오늘의 수집 한도 도달':
+   report.error;
   el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · '+htmlEscape(message)+
-   (report.state==='error'?' ('+htmlEscape(report.error)+')':'')+
+   (report.state==='error'?' ('+htmlEscape(detail)+')':'')+
    ' <button type="button" id="prebidRetry" class="job-vf">다시 조회</button></div>';
   el.querySelector('#prebidRetry')?.addEventListener('click',()=>void loadPrebidJobs(stage,true));
   return;
