@@ -6368,7 +6368,8 @@ function setWorkspaceView(view){
    },0)});
   }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
-  if(partnerMode&&partnerNoticeStage==='bid')void loadPartnerAllBids();
+  if(partnerMode&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='bid'&&
+    typeof loadPartnerAllBids==='function')void loadPartnerAllBids();
   // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
  if(changed){
