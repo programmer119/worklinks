@@ -2393,10 +2393,10 @@ function g2bCardFromServer(x){
   url:x.url||'https://www.g2b.go.kr/',org:x.org||x.agency||'발주기관 미확인',noticeOrg:x.org||'',demandOrg:x.agency||'',
   period:x.closes?'입찰마감 '+x.closes:'마감 원문 확인 필요',
   amount:x.budget||'예산 원문 확인 필요',fit:'파트너 협업 검토',
-  reason:'나라장터 공식 API에서 자동 수집 후 서버123 DB에 저장한 SW·DB·AI 관련 후보',
+  reason:'나라장터 공식 API에서 수집해 서버123 DB에 저장한 공고 · SW 여부와 입찰참가자격 별도 확인',
   condition:savedCondition,
   partnerBidMode:'공동수급 허용 여부는 별도 공식 원문 확인 필요',
-  partnerScope:'SW·데이터·AI 관련 제목 또는 발주품목 후보',partnerVerified:false};
+  partnerScope:'나라장터 공고 · 사업분야 확인 필요',partnerVerified:false};
 }
 var g2bLinkedEligibility=null;
 var g2bSupplementalCache=new Map();
