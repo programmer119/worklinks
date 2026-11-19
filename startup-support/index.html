@@ -905,6 +905,9 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
  #jobsView[data-job-mode="partner"] .job-sort-row select{max-width:135px}
 }
 
+#jobsView[data-job-mode="partner"] #changcomJobFilters>select{max-width:125px;min-width:92px;height:36px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#233f5a;padding:5px 7px;font-size:13px;font-weight:700}
+#jobsView[data-job-mode="partner"] #changcomJobFilters>select:focus-visible{outline:2px solid #6b97bd}
+@media(max-width:730px){#jobsView[data-job-mode="partner"] #changcomJobFilters>select{max-width:115px;min-width:0;font-size:12px}}
 /* Procurement: one real inline toolbar; never allocate a full-width search row.
    The top navigation already supplies the screen title. */
 #jobsView[data-job-mode="partner"]>.panel{
@@ -1429,6 +1432,9 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
       <span class="partner-count-label">공고 <span id="partnerJobCount"></span></span>
       <button type="button" class="partner-period on" data-partner-period="open" aria-pressed="true">진행중</button>
       <button type="button" class="partner-period" data-partner-period="closed" aria-pressed="false">마감</button>
+      <select id="partnerSwScope" aria-label="소프트웨어 사업 범위" title="SW 구축·개발은 제목의 구축·개발 등 명시된 사업만 선별"><option value="all">SW 전체</option><option value="build">구축·개발</option></select>
+      <select id="partnerAwardFilter" aria-label="공식 낙찰방식 필터" title="나라장터 공식 낙찰방식 코드로 분류. 적격심사와 규격·가격은 가격만으로 결정되지 않음"><option value="all">낙찰 전체</option><option value="price">가격 중심</option><option value="qualification">적격심사</option><option value="spec-price">규격·가격</option><option value="negotiation">협상</option></select>
+      <select id="partnerNoticeStage" aria-label="조달 단계 선택"><option value="bid">입찰공고</option><option value="plan">발주계획</option><option value="prespec">사전규격</option></select>
       <label class="partner-filter-control" for="partnerFilter">협업 업체
         <select id="partnerFilter" aria-label="협업 업체별 입찰 공고 선택"><option value="all">모두</option></select>
       </label>
@@ -5857,6 +5863,10 @@ function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
+ if(worklinksPartnerAccess()&&worklinksIsChangcomView()&&partnerNoticeStage!=='bid'){
+  renderPrebidJobs(el);
+  return;
+ }
  if(!jobsInitialDataReady&&!(jobSearchText&&jobSearchServerTotal!==null)&&
   !(window.worklinksKeeps?.getMode?.()!=='all'&&window.worklinksKeeps?.activeItems?.().length)){
   jobRenderDirty=true;
@@ -6045,6 +6055,9 @@ function renderJobs(){
   let list=keepMode!=='all'?scopeRows:scopeRows.filter(o=>
    matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&
    (!jobSearchText||jobSearchMatches(o.x,jobSearchNormalized(jobSearchText))));
+  if(partnerMode&&member&&keepMode==='all'){
+   list=list.filter(o=>partnerBidMatchesNewFilters(o.x));
+  }
   if(keepMode==='all')list.sort(function(a,b){
     if(filter==='closed'||(partnerMode&&jobPartnerShowClosed))return (b.time.end||0)-(a.time.end||0)||a.x.title.localeCompare(b.x.title,'ko');
     if(sort==='qualified'){
@@ -6334,6 +6347,15 @@ document.querySelectorAll('.jobf').forEach(b=>b.addEventListener('click',functio
  jobGeneralFilter=this.dataset.jobf;jobFilter=jobGeneralFilter;
  jobRenderLimit=jobPageStep();
  localStorage.setItem('worklinks_job_filter_v1',jobGeneralFilter);
+ renderJobs();
+}));
+document.querySelectorAll(['#partnerSwScope','#partnerAwardFilter','#partnerNoticeStage'].join(',')).forEach(el=>el.addEventListener('change',function(){
+ if(!worklinksIsChangcomView()||!worklinksPartnerAccess())return;
+ partnerSwScope=document.getElementById('partnerSwScope').value;
+ partnerAwardFilter=document.getElementById('partnerAwardFilter').value;
+ partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
+ jobRenderLimit=jobPageStep();
+ if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
  renderJobs();
 }));
 document.querySelectorAll('[data-partner-period]').forEach(b=>b.addEventListener('click',function(){
