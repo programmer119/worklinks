@@ -59,5 +59,10 @@ with tempfile.TemporaryDirectory() as temp:
  assert valid['noGovernmentApiCalls'] is True
  assert read('prespec')['items'][0]['opinionDeadline']=='202611251800'
  assert read('plan',limit=1,offset=1)['items']==[]
+ # Access-denied source must be retained and never hammered every 30 minutes.
+ with mock.patch.object(prebid,'fetch_page',side_effect=RuntimeError('prebid_official_http_403')) as call:
+  assert prebid.collect_window(db,'FAKE','plan','thng',today)=='failed:prebid_official_http_403'
+  assert prebid.collect_window(db,'FAKE','plan','thng',today)=='blocked:prebid_official_http_403'
+  assert call.call_count==1,call.call_count
  db.close()
 print('WORKLINKS_PREBID_COLLECTOR_API_CONTRACT_PASS')
