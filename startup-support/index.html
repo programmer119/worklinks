@@ -1533,7 +1533,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261119-all-tender-scope-v3"></script>
+<script src="./changcom-prebid.js?v=20261120-sw-build-recall-v1"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -5564,7 +5564,7 @@ async function jobRunRemoteSearch(query){
  status.textContent='서버 저장 DB 검색 중…';
  try{
   // Searches saved SQLite only. No new official procurement API request.
-  const searchSw=worklinksIsChangcomView()&&partnerSwScope==='all'?'0':'1';
+  const searchSw=worklinksIsChangcomView()?'0':'1';
   const result=await g2bFetch('/saved?sw='+searchSw+'&limit=250&offset=0&q='+encodeURIComponent(query));
   if(requestId!==jobSearchSerial||query!==jobSearchText)return;
   if(result.searchMode!=='saved_only')throw Error('서버 검색 기능 미배포');
@@ -5940,7 +5940,7 @@ function renderJobs(){
  }
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
- const partnerAllMode=member&&partnerMode&&partnerSwScope==='all'&&partnerNoticeStage==='bid';
+ const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';
  const fullFilterReady=member&&partnerMode&&!jobPartnerShowClosed&&!jobSearchText&&
   (partnerAllMode?(partnerAllBids.state==='ready'&&partnerAllBids.loaded>=partnerAllBids.total):
    g2bFilterInventoryState==='ready');
@@ -5977,7 +5977,7 @@ function renderJobs(){
  }
  const rejected=raw.filter(x=>x.kind&&jobSoftwareScope(x)==='out').length;
  const all=keepMode==='all'?
-  collapseSimilarNotices(raw.filter(x=>!(x.kind&&jobSoftwareScope(x)==='out'))):
+  collapseSimilarNotices(raw.filter(x=>partnerAllMode||!(x.kind&&jobSoftwareScope(x)==='out'))):
   [...new Map(raw.filter(x=>keepOrder.has(x.id)).map(x=>[x.id,x])).values()];
  const active=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key!=='closed'});
  const closed=all.map(function(x){return {x,time:jobTimeInfo(x)}}).filter(function(o){return o.time.key==='closed'});
@@ -6368,9 +6368,8 @@ function setWorkspaceView(view){
    },0)});
   }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
-  if(partnerMode&&partnerSwScope==='all'&&partnerNoticeStage==='bid')void loadPartnerAllBids();
-  if(partnerMode&&partnerSwScope!=='all'&&typeof jobsInitialDataReady!=='undefined'&&jobsInitialDataReady&&
-    typeof loadG2bFilterInventory==='function')loadG2bFilterInventory();
+  if(partnerMode&&partnerNoticeStage==='bid')void loadPartnerAllBids();
+  // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
  if(changed){
   const url=new URL(window.location.href);
@@ -6432,8 +6431,7 @@ document.querySelectorAll(['#partnerSwScope','#partnerAwardFilter','#partnerNoti
   '가격투찰은 적격심사에도 포함되므로 공식 낙찰방식 코드로 구분';
  jobRenderLimit=jobPageStep();
  if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
- else if(partnerSwScope==='all')void loadPartnerAllBids();
- else if(previousScope==='all')void loadG2bFilterInventory();
+ else void loadPartnerAllBids();
  if(jobSearchText.length>=2&&previousScope!==partnerSwScope)void jobRunRemoteSearch(jobSearchText);
  renderJobs();
 }));
