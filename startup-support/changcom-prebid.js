@@ -13,7 +13,7 @@ function partnerSoftwareSignals(x){
  const official=x?.swFlagSource==='official'||String(x?.swBizObjYn||'').toUpperCase()==='Y';
  const productCode=String(x?.productCode||x?.dtilPrdctClsfcNo||'');
  const dev=/(개발|구축|고도화|재구축|전면.?개편|리뉴얼|커스터마이징|기능.?개선|기능.?추가|시스템.?전환|디지털.?전환|시스템화|연동.?개발|웹.?제작|앱.?제작)/i.test(text);
- const sw=/(소프트웨어|정보.?시스템|전산.?시스템|통합.?시스템|업무.?시스템|행정.?시스템|관리.?시스템|플랫폼|웹사이트|웹서비스|홈페이지|모바일.?앱|애플리케이션|데이터베이스|클라우드|인공지능|전자결재|전자문서|전자정부|erp|crm|\bsw\b|s\/w)/i.test(text);
+ const sw=/(소프트웨어|정보.?시스템|전산.?시스템|통합.?시스템|업무.?시스템|행정.?시스템|관리.?시스템|플랫폼|웹사이트|웹서비스|홈페이지|모바일.?앱|애플리케이션|데이터베이스|클라우드|인공지능|전자결재|전자문서|전자정부|행정서비스|전자서비스|온라인.?서비스|erp|crm|\bsw\b|s\/w)/i.test(text);
  const possible=/(시스템|전산|정보화|디지털|데이터|인터넷|웹|앱|자동화|ai\b|ict\b)/i.test(text);
  const noSw=/(전산.?소모품|토너|프린터.?소모품|사무용.?품|사무.?가구|청소.?용역|정보화.?교육|컴퓨터.?교육|전산.?교육|교육.?운영)/i.test(title);
  const equipment=/(서버|컴퓨터|프린터|복합기|스캐너|모니터|전산.?장비|기자재|cctv).{0,15}(구매|구입|납품|교체)/i.test(title);
@@ -23,7 +23,7 @@ function partnerSoftwareSignals(x){
  const code=productCode==='8111159901'||/8111159901/.test(String(x?.subject||''));
  const software=(official||code||sw||(possible&&dev))&&!(noSw&&!dev)&&!(equipment&&!dev&&!official&&!code);
  // 8111159901 can describe maintenance too: the code is a candidate, not proof.
- const build=software&&!noSw&&!onlyOperate&&!onlyPurchase&&!onlyPlan&&
+ const build=software&&!(noSw&&!dev)&&!onlyOperate&&!onlyPurchase&&!onlyPlan&&
    (dev||official||code||sw);
  return {software,build,review:build&&!dev};
 }
