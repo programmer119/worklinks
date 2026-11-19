@@ -1432,8 +1432,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
       <span class="partner-count-label">공고 <span id="partnerJobCount"></span></span>
       <button type="button" class="partner-period on" data-partner-period="open" aria-pressed="true">진행중</button>
       <button type="button" class="partner-period" data-partner-period="closed" aria-pressed="false">마감</button>
-      <select id="partnerSwScope" aria-label="소프트웨어 사업 범위" title="SW 구축·개발은 제목의 구축·개발 등 명시된 사업만 선별"><option value="all">SW 전체</option><option value="build">구축·개발</option></select>
-      <select id="partnerAwardFilter" aria-label="공식 낙찰방식 필터" title="나라장터 공식 낙찰방식 코드로 분류. 적격심사와 규격·가격은 가격만으로 결정되지 않음"><option value="all">낙찰 전체</option><option value="price">가격 중심</option><option value="qualification">적격심사</option><option value="spec-price">규격·가격</option><option value="negotiation">협상</option></select>
+      <select id="partnerSwScope" aria-label="공고 사업 범위" title="전체 공고는 비SW까지 포함. SW 관련·구축개발은 저장된 사업명 기준 후보 필터"><option value="all">전체 공고</option><option value="sw">SW 관련</option><option value="build">SW 구축·개발</option></select>
+      <select id="partnerAwardFilter" aria-label="공식 낙찰자 결정방식 필터" title="가격투찰은 입찰 행위이며 적격심사에서도 가격을 투찰함. 여기서는 공식 낙찰자 결정방식 코드로 분류"><option value="all">낙찰 전체</option><option value="price">가격낙찰형</option><option value="qualification">적격심사</option><option value="spec-price">규격·가격</option><option value="negotiation">협상</option></select>
       <select id="partnerNoticeStage" aria-label="조달 단계 선택"><option value="bid">입찰공고</option><option value="plan">발주계획</option><option value="prespec">사전규격</option></select>
       <label class="partner-filter-control" for="partnerFilter">협업 업체
         <select id="partnerFilter" aria-label="협업 업체별 입찰 공고 선택"><option value="all">모두</option></select>
@@ -1497,7 +1497,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261119-stage-pricing-v2"></script>
+<script src="./changcom-prebid.js?v=20261119-all-tender-scope-v3"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -2935,7 +2935,14 @@ async function g2bLoadBids(){
   document.getElementById('g2bApiStatus').textContent='서버 연결 확인 중…';g2bCheckStatus()
  });
  document.getElementById('g2bLoad').addEventListener('click',g2bLoadBids);
- document.getElementById('g2bMore').addEventListener('click',function(){resetSavedBidResume();g2bLoadSaved(true)});
+ document.getElementById('g2bMore').addEventListener('click',function(){
+  if(worklinksIsChangcomView()&&partnerSwScope==='all'&&partnerNoticeStage==='bid'){
+   if(jobRenderLimit<jobAvailableRows){jobRenderLimit+=jobPageStep();renderJobs()}
+   else void loadPartnerAllBids(true);
+   return;
+  }
+  resetSavedBidResume();g2bLoadSaved(true);
+ });
  // G2B boot is deferred until Jobs is opened, not on the startup-support homepage.
 })();
 
@@ -5521,7 +5528,8 @@ async function jobRunRemoteSearch(query){
  status.textContent='서버 저장 DB 검색 중…';
  try{
   // Searches saved SQLite only. No new official procurement API request.
-  const result=await g2bFetch('/saved?sw=1&limit=250&offset=0&q='+encodeURIComponent(query));
+  const searchSw=worklinksIsChangcomView()&&partnerSwScope==='all'?'0':'1';
+  const result=await g2bFetch('/saved?sw='+searchSw+'&limit=250&offset=0&q='+encodeURIComponent(query));
   if(requestId!==jobSearchSerial||query!==jobSearchText)return;
   if(result.searchMode!=='saved_only')throw Error('서버 검색 기능 미배포');
   const next=[];
@@ -5892,10 +5900,11 @@ function renderJobs(){
  }
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
- const fullFilterReady=member&&partnerMode&&!jobPartnerShowClosed&&!jobSearchText&&
+ const partnerAllMode=member&&partnerMode&&partnerSwScope==='all'&&partnerNoticeStage==='bid';
+ const fullFilterReady=member&&partnerMode&&!partnerAllMode&&!jobPartnerShowClosed&&!jobSearchText&&
   g2bFilterInventoryState==='ready';
- const fullRows=fullFilterReady?
-  [...new Map(g2bFilterInventory.concat(g2bLiveJobs).map(x=>[x.id,x])).values()]:g2bLiveJobs;
+ const fullRows=partnerAllMode?partnerAllBids.items:(fullFilterReady?
+  [...new Map(g2bFilterInventory.concat(g2bLiveJobs).map(x=>[x.id,x])).values()]:g2bLiveJobs);
  const keepMode=window.worklinksKeeps?.getMode?.()||'all';
  const keepItems=keepMode==='all'?[]:(window.worklinksKeeps?.activeItems?.()||[]);
  const keepOrder=new Map(keepItems.map((item,index)=>[String(item.id),index]));
@@ -5942,7 +5951,9 @@ function renderJobs(){
  const repeatCount=candidateJobs.filter(o=>repeatYears(o.x)>=2).length;
  const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>verdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
- const partialServerList=!fullFilterReady&&
+ const partialServerList=partnerAllMode?
+  (partnerAllBids.state!=='ready'||partnerAllBids.loaded<partnerAllBids.total):
+  !fullFilterReady&&
   (g2bSavedLoadRunning||!!g2bSavedLoadError||
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
    (!g2bServerAvailable&&g2bSavedKnownTotal>0));
@@ -5952,8 +5963,12 @@ function renderJobs(){
  if(partnerCountLabel)partnerCountLabel.title=partialServerList?
   '서버 공고 중 현재 불러온 목록만 집계했습니다. 자세한 조회 오류는 오른쪽 !에서 확인하세요.':
   '서버 DB에서 불러온 공고 중 현재 협업 후보로 분류된 건수';
- const knownServerCount=Math.max(g2bSavedKnownTotal,g2bSavedTotal);
- const listCoverageText=fullFilterReady?
+ const knownServerCount=partnerAllMode?partnerAllBids.total:Math.max(g2bSavedKnownTotal,g2bSavedTotal);
+ const listCoverageText=partnerAllMode?
+  '전체 저장 DB '+partnerAllBids.loaded.toLocaleString('ko-KR')+' / '+
+   (partnerAllBids.total?partnerAllBids.total.toLocaleString('ko-KR'):'집계 확인 중')+
+   '건 조회'+(partnerAllBids.error?' · '+partnerAllBids.error:'')+' · 현재 로드분만 집계 · ':
+  fullFilterReady?
   'DB 공고 '+g2bFilterInventoryCount.toLocaleString('ko-KR')+
   '건 전체 판정 (마감 미확인 '+g2bFilterUnknownDeadline.toLocaleString('ko-KR')+'건 포함) · ':
   partialServerList?
@@ -6125,12 +6140,20 @@ function renderJobs(){
     (selected?.registryError?' · 업체등록 오류: '+selected.registryError:'');
   }
   jobAvailableRows=list.length;
-  const serverMore=!fullFilterReady&&(!!g2bSavedLoadError||(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal));
+  const serverMore=partnerAllMode?
+   (partnerAllBids.state==='loading'||partnerAllBids.state==='error'||
+    partnerAllBids.loaded<partnerAllBids.total):
+   !fullFilterReady&&(!!g2bSavedLoadError||(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal));
   const more=document.getElementById('g2bMore');
   more.style.display=keepMode!=='all'?'none':(list.length>jobRenderLimit||serverMore?'inline-block':'none');
-  more.textContent=g2bSavedLoadError?'서버 공고 다시 불러오기 · 일부 목록만 표시':jobRenderLimit<list.length?
+  more.textContent=partnerAllMode?
+   (jobRenderLimit<list.length?'공고 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 더 보기':
+    partnerAllBids.state==='loading'?'전체 DB 공고 조회 중':
+    '전체 DB '+partnerAllBids.loaded.toLocaleString('ko-KR')+' / '+
+    partnerAllBids.total.toLocaleString('ko-KR')+'건 · '+(partnerAllBids.error?'다시 조회':'다음 페이지')):
+   (g2bSavedLoadError?'서버 공고 다시 불러오기 · 일부 목록만 표시':jobRenderLimit<list.length?
    '일감 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · '+jobPageStep()+'건 더 보기':
-   '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지';
+   '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지');
   ensureVisibleRfpCardEvidence(list.slice(0,jobRenderLimit));
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
@@ -6178,7 +6201,7 @@ function renderJobs(){
     keepMode==='watch'?'관전 대상의 킵 공고가 없습니다.':
     jobSearchText?'검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.':'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
  }
- if(!fullFilterReady&&g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal){
+ if(!partnerAllMode&&!fullFilterReady&&g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal){
   const progress=' · 현재 로드 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 기준 (더 보기 가능)';
   document.getElementById('partnerSummary').textContent+=progress;
   const summary=document.getElementById('jobDecisionSummary');
@@ -6186,10 +6209,14 @@ function renderJobs(){
  }
  if(member&&partnerMode&&!jobSearchText&&!fullFilterReady){
   // Hide incomplete counter buckets instead of calling the first 400 '전체'.
-  const msg=g2bFilterInventoryState==='error'?
-   '전체 DB 집계 실패 · '+g2bFilterInventoryError:
+  const msg=partnerAllMode?
+   '전체 저장 DB '+partnerAllBids.loaded.toLocaleString('ko-KR')+' / '+
+    (partnerAllBids.total?partnerAllBids.total.toLocaleString('ko-KR'):'확인 중')+
+    '건 조회 · 현재 표시 건수는 일부'+(partnerAllBids.error?' · '+partnerAllBids.error:''):
+   g2bFilterInventoryState==='error'?
+   'SW 후보 DB 집계 실패 · '+g2bFilterInventoryError:
    jobPartnerShowClosed?'마감 공고 전체 집계 미지원 · 현재 목록 일부':
-   '전체 공고 집계 중 · 일부 조회 결과는 전체 건수로 표시하지 않습니다.';
+   'SW 후보 공고 집계 중 · 일부 조회 결과는 전체 건수로 표시하지 않습니다.';
   document.querySelectorAll('#jobVerdictFilter [data-verdict-count]').forEach(node=>{node.textContent='—';});
   document.getElementById('partnerJobCount').textContent='집계 확인 중';
   document.getElementById('partnerSummary').textContent=msg;
@@ -6300,7 +6327,8 @@ function setWorkspaceView(view){
    },0)});
   }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
-  if(partnerMode&&typeof jobsInitialDataReady!=='undefined'&&jobsInitialDataReady&&
+  if(partnerMode&&partnerSwScope==='all'&&partnerNoticeStage==='bid')void loadPartnerAllBids();
+  if(partnerMode&&partnerSwScope!=='all'&&typeof jobsInitialDataReady!=='undefined'&&jobsInitialDataReady&&
     typeof loadG2bFilterInventory==='function')loadG2bFilterInventory();
  }
  if(changed){
@@ -6353,11 +6381,19 @@ document.querySelectorAll('.jobf').forEach(b=>b.addEventListener('click',functio
 }));
 document.querySelectorAll(['#partnerSwScope','#partnerAwardFilter','#partnerNoticeStage'].join(',')).forEach(el=>el.addEventListener('change',function(){
  if(!worklinksIsChangcomView()||!worklinksPartnerAccess())return;
+ const previousScope=partnerSwScope;
  partnerSwScope=document.getElementById('partnerSwScope').value;
  partnerAwardFilter=document.getElementById('partnerAwardFilter').value;
  partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
+ const award=document.getElementById('partnerAwardFilter');
+ award.disabled=partnerNoticeStage!=='bid';
+ award.title=award.disabled?'발주계획·사전규격에는 확정된 낙찰자 결정방식이 없어 입찰공고에서만 적용':
+  '가격투찰은 적격심사에도 포함되므로 공식 낙찰방식 코드로 구분';
  jobRenderLimit=jobPageStep();
  if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
+ else if(partnerSwScope==='all')void loadPartnerAllBids();
+ else if(previousScope==='all')void loadG2bFilterInventory();
+ if(jobSearchText.length>=2&&previousScope!==partnerSwScope)void jobRunRemoteSearch(jobSearchText);
  renderJobs();
 }));
 document.querySelectorAll('[data-partner-period]').forEach(b=>b.addEventListener('click',function(){
