@@ -21,6 +21,18 @@ assert.equal(swBuildTitle({kind:'cnstwk',title:'정보통신 전기공사'}),fal
 assert.equal(swBuildTitle({kind:'servc',title:'CCTV 카메라 단순 구매'}),false);
 assert.equal(swBuildTitle({kind:'servc',title:'청사 건축공사'}),false);
 assert.equal(swBuildTitle({kind:'servc',title:'AI 서버 공급'}),false);
+// Recall-first: build opportunities cannot vanish because of stage, terms or generic coding.
+assert.equal(swBuildTitle({kind:'servc',title:'차세대 행정서비스 전면 개편'}),true);
+assert.equal(swBuildTitle({kind:'servc',title:'전자결재 연동 개발'}),true);
+assert.equal(swBuildTitle({kind:'servc',title:'홈페이지 유지관리 및 기능 개선'}),true);
+assert.equal(swBuildTitle({kind:'servc',title:'정보화전략계획 수립(ISMP)'}),false);
+assert.equal(swBuildTitle({kind:'servc',title:'2027년 전산소모품(토너 등) 구매'}),false);
+assert.equal(swBuildTitle({kind:'servc',title:'2027년도 구민정보화교육 운영 용역'}),false);
+assert.equal(swBuildTitle({kind:'servc',title:'정보시스템 유지관리 용역'}),false);
+assert.equal(swBuildTitle({kind:'servc',title:'정보시스템 유지관리 및 기능 개발 용역'}),true);
+assert.equal(swBuildTitle({kind:'servc',title:'미분류 신행정 서비스',swBizObjYn:'Y'}),true);
+assert.equal(swBuildTitle({kind:'servc',title:'개인정보 처리 서비스',productCode:'8111159901'}),true);
+
 const bid=code=>({id:'g2b-servc-R26BK-test-000',kind:'servc',title:'정보시스템 구축',
  awardMethodCode:code,awardFieldsVerified:true});
 vm.runInContext("partnerSwScope='build';partnerAwardFilter='price';",ctx);
@@ -54,8 +66,8 @@ assert.ok(html.includes("if(partnerAllBids.state==='loading')")===false,
  'UI scope code must be external, not duplicated in HTML');
 assert.ok(src.includes("'/saved?sw=0&limit=200&offset='"),
  '전체 선택은 비SW 포함 서버 저장 DB에서 조회');
-assert.ok(src.includes("x.swFlagSource!=='none'"),
- 'prebid SW 필터는 신규 비SW 저장 레코드를 제외');
+assert.ok(src.includes('partnerSwRelated(x):swBuildTitle(x)'),
+ 'prebid scope uses shared conservative classification');
 
 assert.ok(html.includes('partnerBidMatchesNewFilters(o.x)'));
 // Exercise the actual isolated full-corpus query and the early-stage view.
@@ -79,6 +91,8 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  await vm.runInContext('loadPartnerAllBids(true)',ctx);
  assert.equal(vm.runInContext('partnerAllBids.items.length',ctx),3);
  assert.deepEqual(calls,["/saved?sw=0&limit=200&offset=0","/saved?sw=0&limit=200&offset=2"]);
+ vm.runInContext("partnerSwScope='build';",ctx);
+ assert.equal(vm.runInContext('partnerAllBids.items.length',ctx),3);
  const elements=Object.fromEntries(['partnerSummary','jobDecisionSummary','g2bMore','jobVerdictFilter','partnerJobCount']
   .map(k=>[k,{textContent:'',style:{},hidden:false}]));
  ctx.document.getElementById=id=>elements[id]||null;
@@ -96,5 +110,7 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  vm.runInContext('renderPrebidJobs',ctx)(el);
  assert.equal(elements.partnerJobCount.textContent,'1건');
  assert.ok(!el.innerHTML.includes('사무실 책상 구매'));
+ assert.equal(html.includes("const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';"),true);
+ assert.ok(html.includes("const searchSw=worklinksIsChangcomView()?'0':'1';"));
  console.log('CHANGCOM_PREBID_FILTERS=PASS');
 }).catch(error=>{console.error(error);process.exitCode=1;});

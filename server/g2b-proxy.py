@@ -954,7 +954,7 @@ def sw_candidate(bid):
     if isinstance(subjects,(list,dict)):
         subjects=json.dumps(subjects,ensure_ascii=False)
     title=u'%s %s'%(text,subjects)
-    return bool(SW_TERMS.search(title) or SW_BOUNDARY.search(title))
+    return str(bid.get('swBizObjYn') or '').upper()=='Y' or bool(SW_TERMS.search(title) or SW_BOUNDARY.search(title))
 
 def open_bid_db():
     parent = os.path.dirname(G2B_DB_PATH)
@@ -2469,7 +2469,8 @@ def query_prebid_records(stage,limit=500,offset=0):
             ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',(stage,limit,offset)).fetchall()
         items=[]
         allowed=('id','stage','kind','title','org','posted','budget',
-                 'plannedMonth','opinionDeadline','url','files','bidLinked','swFlagSource')
+                 'plannedMonth','opinionDeadline','url','files','bidLinked','swFlagSource',
+                 'subject','productName','productCode')
         for (payload,) in rows:
             value=json.loads(payload)
             if not isinstance(value,dict):continue

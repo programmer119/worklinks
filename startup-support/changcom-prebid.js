@@ -6,22 +6,32 @@ const prebidCache={plan:{state:'idle',items:[],total:0,error:'',at:''},
                    prespec:{state:'idle',items:[],total:0,error:'',at:''}};
 const PRICE_METHODS=new Set(['낙030021','낙030022','낙030029']);
 const SPEC_PRICE_METHODS=new Set(['낙030002','낙030003','낙030018']);
-function swBuildTitle(x){
- const raw=String(x?.title||x?.name||'').normalize('NFKC');
- const subject=String(x?.subject||x?.purchsObjPrdctList||'');
- const text=(raw+' '+subject).toLowerCase();
- // Building electrical, fire safety or telecom construction is not SW development.
- if(/^(cnstwk|frgcpt)$/.test(String(x?.kind||''))&&!/(sw|s\/w|소프트웨어|정보시스템|전산시스템|플랫폼|웹|앱|데이터베이스)/i.test(raw))return false;
- // Ancillary procurement must not masquerade as an SW-development contract.
- if(/(감리|인력\s*지원|청소\s*용역|시설\s*관리|홍보\s*영상|기자재\s*(?:구매|구입|설치)|소모품|토너|구축\s*방안\s*연구|정보화\s*교육\s*운영)/.test(raw))return false;
- // '인재개발원' and '개발제한구역' are not software development.
- const development=/(구축|고도화|개편|재구축|전환|시스템\s*(?:기능\s*)?개선|기능\s*개선|리뉴얼|개발(?!원|제한구역))/.test(raw);
- const software=/(소프트웨어|정보시스템|전산시스템|플랫폼|웹사이트|웹서비스|홈페이지|모바일\s*앱|응용sw|s\/w|\bsw\b|데이터베이스|통합시스템|(?:업무|보험|행정|학사|운영|관리)시스템|전자정부|ai\s*시스템|인공지능\s*시스템|디지털\s*서비스)/i.test(text);
- return development&&software;
+// Prefer recall: uncertain software work stays visible for manual review.
+function partnerSoftwareSignals(x){
+ const title=String(x?.title||x?.name||'').normalize('NFKC');
+ const text=(title+' '+String(x?.subject||x?.specContents||x?.purchsObjPrdctList||'')+' '+String(x?.productName||'')).normalize('NFKC');
+ const official=x?.swFlagSource==='official'||String(x?.swBizObjYn||'').toUpperCase()==='Y';
+ const productCode=String(x?.productCode||x?.dtilPrdctClsfcNo||'');
+ const dev=/(개발|구축|고도화|재구축|전면.?개편|리뉴얼|커스터마이징|기능.?개선|기능.?추가|시스템.?전환|디지털.?전환|시스템화|연동.?개발|웹.?제작|앱.?제작)/i.test(text);
+ const sw=/(소프트웨어|정보.?시스템|전산.?시스템|통합.?시스템|업무.?시스템|행정.?시스템|관리.?시스템|플랫폼|웹사이트|웹서비스|홈페이지|모바일.?앱|애플리케이션|데이터베이스|클라우드|인공지능|전자결재|전자문서|전자정부|행정서비스|전자서비스|온라인.?서비스|erp|crm|\bsw\b|s\/w)/i.test(text);
+ const possible=/(시스템|전산|정보화|디지털|데이터|인터넷|웹|앱|자동화|ai\b|ict\b)/i.test(text);
+ const noSw=/(전산.?소모품|토너|프린터.?소모품|사무용.?품|사무.?가구|청소.?용역|정보화.?교육|컴퓨터.?교육|전산.?교육|교육.?운영)/i.test(title);
+ const equipment=/(서버|컴퓨터|프린터|복합기|스캐너|모니터|전산.?장비|기자재|cctv).{0,15}(구매|구입|납품|교체)/i.test(title);
+ const onlyOperate=/(유지.?관리|유지.?보수|운영.?지원|정기.?점검|기술.?지원)/i.test(title)&&!dev;
+ const onlyPurchase=/(라이선스|라이센스|솔루션.?구매|소프트웨어.?구매|구독.?서비스)/i.test(title)&&!dev;
+ const onlyPlan=/(마스터.?플랜|isp\b|ismp\b|타당성.?조사|구축.?방안.?연구)/i.test(title)&&!dev;
+ const code=productCode==='8111159901'||/8111159901/.test(String(x?.subject||''));
+ const software=(official||code||sw||(possible&&dev))&&!(noSw&&!dev)&&!(equipment&&!dev&&!official&&!code);
+ // 8111159901 can describe maintenance too: the code is a candidate, not proof.
+ const build=software&&!(noSw&&!dev)&&!onlyOperate&&!onlyPurchase&&!onlyPlan&&
+   (dev||official||code||sw);
+ return {software,build,review:build&&!dev};
 }
+function swBuildTitle(x){return partnerSoftwareSignals(x).build}
+function partnerSwRelated(x){return partnerSoftwareSignals(x).software}
 function partnerBidMatchesNewFilters(x){
  if(partnerSwScope==='build'&&!swBuildTitle(x))return false;
- if(partnerSwScope==='sw'&&!['candidate','mixed'].includes(jobSoftwareScope(x)))return false;
+ if(partnerSwScope==='sw'&&!partnerSwRelated(x))return false;
  if(partnerAwardFilter==='all')return true;
  if(!/^g2b-/.test(String(x?.id||'')))return false;
  const m=g2bCardAwardMetadata(x);
@@ -40,9 +50,12 @@ function partnerBidMatchesNewFilters(x){
 const partnerAllBids={items:[],total:0,loaded:0,state:'idle',error:''};
 async function loadPartnerAllBids(more=false){
  if(!worklinksPartnerAccess()||!worklinksIsChangcomView()||
-    partnerNoticeStage!=='bid'||partnerSwScope!=='all')return;
+    partnerNoticeStage!=='bid')return;
  if(partnerAllBids.state==='loading')return;
- if(!more&&partnerAllBids.state==='ready')return;
+ if(!more&&partnerAllBids.state==='ready'){
+  if(partnerSwScope==='all'||partnerAllBids.loaded>=partnerAllBids.total)return;
+  more=true;
+ }
  const offset=more?partnerAllBids.loaded:0;
  partnerAllBids.state='loading';partnerAllBids.error='';
  renderJobs();
@@ -72,7 +85,11 @@ async function loadPartnerAllBids(more=false){
   partnerAllBids.error=String(error?.message||error).slice(0,140);
   partnerAllBids.state='error';
  }finally{
-  if(worklinksIsChangcomView()&&partnerNoticeStage==='bid'&&partnerSwScope==='all')renderJobs();
+  if(worklinksIsChangcomView()&&partnerNoticeStage==='bid'){
+   renderJobs();
+   if(partnerSwScope!=='all'&&partnerAllBids.state==='ready'&&partnerAllBids.loaded<partnerAllBids.total)
+    void loadPartnerAllBids(true);
+  }
  }
 }
 async function loadPrebidJobs(stage,force=false){
@@ -129,7 +146,7 @@ function renderPrebidJobs(el){
  }
  const word=jobSearchNormalized(jobSearchText);
  let rows=report.items.filter(x=>partnerSwScope==='all'||
-  (x.swFlagSource!=='none'&&(partnerSwScope==='sw'||swBuildTitle(x))));
+  (partnerSwScope==='sw'?partnerSwRelated(x):swBuildTitle(x)));
  if(word)rows=rows.filter(x=>jobSearchNormalized([x.title,x.org,x.id].join(' ')).includes(word));
  rows.sort((a,b)=>String(b.posted||'').localeCompare(String(a.posted||'')));
  if(count)count.textContent=rows.length+'건';

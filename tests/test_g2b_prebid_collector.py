@@ -49,6 +49,13 @@ with tempfile.TemporaryDirectory() as temp:
  assert prebid.normalize('plan','servc',{'bizNm':'번호 없는 공고'}) is None
  assert prebid.normalize('plan','servc',{'orderPlanUntyNo':'1','bizNm':'일반 물품',
         'swBizObjYn':'Y'})['swFlagSource']=='official'
+ prebid_row=prebid.normalize('prespec','servc',{'bfSpecRgstNo':'EV001',
+   'bizNm':'차세대 플랫폼 구축','prdctClsfcNoNm':'정보시스템개발서비스',
+   'dtilPrdctClsfcNo':'8111159901','specCntnts':'기능 구현'})
+ assert prebid_row['title']=='차세대 플랫폼 구축'
+ assert prebid_row['productCode']=='8111159901'
+ assert prebid_row['subject']=='기능 구현'
+ assert prebid_row['swCandidate'] is True
  db=prebid.connect()
  today=dt.datetime.now(prebid.KST).strftime('%Y%m%d')
  def fake_fetch(db,key,stage,kind,day,page):
@@ -89,7 +96,7 @@ with tempfile.TemporaryDirectory() as temp:
  with mock.patch.object(prebid,'fetch_page',side_effect=fake_fetch) as refresh:
   assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','servc',today).startswith('ok:')
   assert refresh.call_count==1
- assert db.execute("SELECT scope_version FROM prebid_windows WHERE stage='plan' AND kind='servc' AND day=?",(today,)).fetchone()[0]==2
+ assert db.execute("SELECT scope_version FROM prebid_windows WHERE stage='plan' AND kind='servc' AND day=?",(today,)).fetchone()[0]==3
  # Official non-SW rows remain accessible in the same stage without being
  # mislabeled as SW candidates. Unrelated RFP tables are untouched.
  plain={'orderPlanUntyNo':'NONSW0001','bizNm':'사무실 책상 구매',

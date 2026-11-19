@@ -63,7 +63,7 @@ def normalize(stage,kind,row):
   url=official_url(_first(row,'orderPlanInfoUrl','orderPlanDtlUrl'))
  else:
   ident=_first(row,'bfSpecRgstNo')
-  title=_first(row,'prdctClsfcNoNm','bizNm','bfSpecNm','prdctNm')
+  title=_first(row,'bizNm','bfSpecNm','prdctNm','prdctClsfcNoNm')
   org=_first(row,'orderInsttNm','rlDminsttNm')
   posted=_first(row,'rgstDt','rcptDt')
   budget=_first(row,'asignBdgtAmt')
@@ -77,7 +77,9 @@ def normalize(stage,kind,row):
  # whether the procurement is *software development* rather than SW equipment.
  software_flag=_first(row,'swBizObjYn').upper()=='Y'
  subject=_first(row,'specCntnts','usgCntnts','dtilPrdctClsfcNoNm')
- sw=software_flag or bool(SW_RE.search(title+' '+subject))
+ product_name=_first(row,'prdctClsfcNoNm','dtilPrdctClsfcNoNm','prdctNm')
+ product_code=_first(row,'dtilPrdctClsfcNo','prdctClsfcNo')
+ sw=software_flag or bool(SW_RE.search(title+' '+subject+' '+product_name)) or product_code=='8111159901'
  # Keep every identified official record. SW relevance is now an optional
  # view filter, never a destructive collector-side selection.
  if stage=='plan':
@@ -89,7 +91,9 @@ def normalize(stage,kind,row):
          'plannedMonth':planned_month[:12], 'opinionDeadline':opinion[:30],
          'url':url,'files':files,'bidLinked':bool(linked),
          'swCandidate':bool(sw),
-         'swFlagSource':'official' if software_flag else 'title' if sw else 'none'}
+         'swFlagSource':'official' if software_flag else 'title' if sw else 'none',
+         'subject':subject[:400], 'productName':product_name[:200],
+         'productCode':product_code[:30]}
 
 def connect():
  DATA.parent.mkdir(parents=True,exist_ok=True)
@@ -201,7 +205,7 @@ def collect_window(db,secret,stage,kind,day):
   ORDER BY day DESC LIMIT 1""",(stage,today)).fetchone()
  if blocked:return 'blocked:'+str(blocked[0])
  retry_after=4*3600 if day==today else 24*3600
- if prior and int(prior[2] or 1)>=2 and now-float(prior[0] or 0)<retry_after:return 'skipped'
+ if prior and int(prior[2] or 1)>=3 and now-float(prior[0] or 0)<retry_after:return 'skipped'
  gathered=[]
  try:
   total=None
@@ -226,10 +230,10 @@ def collect_window(db,secret,stage,kind,day):
        SET payload=excluded.payload,last_seen=excluded.last_seen""",
        (stage,kind,ident,json.dumps(record,ensure_ascii=False),stamp,stamp))
    db.execute("""INSERT INTO prebid_windows(stage,kind,day,last_success,source_total,stored,failed,scope_version)
-      VALUES (?,?,?,?,?,?,'',2)
+      VALUES (?,?,?,?,?,?,'',3)
       ON CONFLICT(stage,kind,day) DO UPDATE SET
        last_success=excluded.last_success,source_total=excluded.source_total,
-       stored=excluded.stored,failed='',scope_version=2""",
+       stored=excluded.stored,failed='',scope_version=3""",
        (stage,kind,day,now,total,len(values)))
   return 'ok:'+str(total)+'/'+str(len(values))
  except (RuntimeError,sqlite3.Error) as exc:
