@@ -21,6 +21,7 @@ function swBuildTitle(x){
 }
 function partnerBidMatchesNewFilters(x){
  if(partnerSwScope==='build'&&!swBuildTitle(x))return false;
+ if(partnerSwScope==='sw'&&!['candidate','mixed'].includes(jobSoftwareScope(x)))return false;
  if(partnerAwardFilter==='all')return true;
  if(!/^g2b-/.test(String(x?.id||'')))return false;
  const m=g2bCardAwardMetadata(x);
@@ -34,6 +35,46 @@ function partnerBidMatchesNewFilters(x){
  default:return true;
  }
 }
+// The full tender corpus is read from existing saved SQLite only. It must not
+// replace the SW-only dataset used by the unrelated general jobs workspace.
+const partnerAllBids={items:[],total:0,loaded:0,state:'idle',error:''};
+async function loadPartnerAllBids(more=false){
+ if(!worklinksPartnerAccess()||!worklinksIsChangcomView()||
+    partnerNoticeStage!=='bid'||partnerSwScope!=='all')return;
+ if(partnerAllBids.state==='loading')return;
+ if(!more&&partnerAllBids.state==='ready')return;
+ const offset=more?partnerAllBids.loaded:0;
+ partnerAllBids.state='loading';partnerAllBids.error='';
+ renderJobs();
+ try{
+  const result=await g2bFetch('/saved?sw=0&limit=200&offset='+offset);
+  if(!Array.isArray(result.items)||!result.persisted||
+     !Number.isSafeInteger(Number(result.totalCount))||
+     Number(result.totalCount)<offset+result.items.length)
+   throw Error('전체 저장 공고 페이지 응답 불완전');
+  if(offset<Number(result.totalCount)&&!result.items.length)
+   throw Error('전체 저장 공고 페이지 누락');
+  if(more&&partnerAllBids.total&&partnerAllBids.total!==Number(result.totalCount))
+   throw Error('조회 도중 전체 건수 변경 · 새로고침 필요');
+  const cards=[];
+  for(const row of result.items){
+   const card=g2bCardFromServer(row);
+   if(!card)throw Error('전체 공고의 공고번호 누락');
+   cards.push(card);
+   if(row.bidEligibility?.ok&&row.bidNo)
+    bidEligibilityCache.set(String(row.bidNo)+':'+String(row.order||'000').padStart(3,'0'),row.bidEligibility);
+  }
+  partnerAllBids.items=more?partnerAllBids.items.concat(cards):cards;
+  partnerAllBids.loaded=offset+cards.length;
+  partnerAllBids.total=Number(result.totalCount);
+  partnerAllBids.state='ready';
+ }catch(error){
+  partnerAllBids.error=String(error?.message||error).slice(0,140);
+  partnerAllBids.state='error';
+ }finally{
+  if(worklinksIsChangcomView()&&partnerNoticeStage==='bid'&&partnerSwScope==='all')renderJobs();
+ }
+}
 async function loadPrebidJobs(stage,force=false){
  if(!['plan','prespec'].includes(stage)||!worklinksPartnerAccess())return;
  const state=prebidCache[stage];
@@ -43,7 +84,7 @@ async function loadPrebidJobs(stage,force=false){
  renderJobs();
  try{
   let data=[],offset=0,total=null,at='',ready=false,complete=false;
-  for(let page=0;page<10;page++){
+  for(let page=0;page<40;page++){
    const res=await g2bFetch('/prebid?stage='+stage+'&limit=500&offset='+offset);
    if(!res||res.ok!==true)throw Error(res?.error||'사전 단계 목록 응답 오류');
    if(!res.ready)throw Error(res.error||'사전 단계 수집 자료 없음');
@@ -87,13 +128,15 @@ function renderPrebidJobs(el){
   return;
  }
  const word=jobSearchNormalized(jobSearchText);
- let rows=report.items.filter(x=>partnerSwScope!=='build'||swBuildTitle(x));
+ let rows=report.items.filter(x=>partnerSwScope==='all'||
+  (x.swFlagSource!=='none'&&(partnerSwScope==='sw'||swBuildTitle(x))));
  if(word)rows=rows.filter(x=>jobSearchNormalized([x.title,x.org,x.id].join(' ')).includes(word));
  rows.sort((a,b)=>String(b.posted||'').localeCompare(String(a.posted||'')));
  if(count)count.textContent=rows.length+'건';
- if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 해당 조건의 저장된 SW 후보가 없습니다. ('+
-  '전체 수집 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
- el.innerHTML=rows.slice(0,Math.max(20,Math.min(250,jobRenderLimit||40))).map(x=>{
+ if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. ('+
+  '저장된 공고 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
+ const visible=Math.max(20,jobRenderLimit||40);
+ el.innerHTML=rows.slice(0,visible).map(x=>{
   const url=String(x.url||'');
   const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
   const fileLinks=(x.files||[]).filter(y=>/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(y)).slice(0,4);
@@ -107,5 +150,10 @@ function renderPrebidJobs(el){
    '<span class="tag">등록번호 '+htmlEscape(x.id||'미기재')+'</span>')+
    (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
    (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</article>';
- }).join('');
+ }).join('')+
+  (rows.length>visible?'<button type="button" id="prebidMore" class="job-vf">목록 '+visible.toLocaleString('ko-KR')+
+  ' / '+rows.length.toLocaleString('ko-KR')+'건 · 더 보기</button>':'');
+ el.querySelector('#prebidMore')?.addEventListener('click',()=>{
+  jobRenderLimit+=jobPageStep();renderJobs();
+ });
 }
