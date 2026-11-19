@@ -11,6 +11,15 @@ on:
       - 'tests/test_g2b_prebid_collector.py'
       - 'tests/test_changcom_prebid_filters.cjs'
       - '.github/workflows/worklinks-prebid-stage-and-award-filter.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/g2b_prebid_collector.py'
+      - 'server/g2b-proxy.py'
+      - 'startup-support/changcom-prebid.js'
+      - 'startup-support/index.html'
+      - 'tests/test_g2b_prebid_collector.py'
+      - 'tests/test_changcom_prebid_filters.cjs'
   workflow_dispatch:
 permissions:
   contents: read
