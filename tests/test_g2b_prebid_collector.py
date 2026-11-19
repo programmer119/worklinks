@@ -99,7 +99,7 @@ with tempfile.TemporaryDirectory() as temp:
   assert prebid.collect_window(db,'AUTHORIZED_TEST_KEY','plan','thng',yesterday).startswith('ok:')
   assert full.call_count==1
  current=read('plan')
- assert current['total']==2, current
+ assert current['total']==3, current
  assert any(x['id']=='NONSW0001' and x['swFlagSource']=='none' for x in current['items'])
  db.close()
 print('WORKLINKS_PREBID_COLLECTOR_API_CONTRACT_PASS')
