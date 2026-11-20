@@ -5636,35 +5636,68 @@ function jobCollectionMarkup(x){
   '<span class="api-state summary'+(flags.done===3?' complete':'')+'">수집 '+flags.done+'/3</span>'+
   badges+'</div>';
 }
+// Client-facing search spans the entire saved bid corpus; one page is NOT a
+// complete result when a keyword matches more than 250 bid notices.
+var jobSearchRemoteLoading=false,jobSearchRemoteError='';
 async function jobRunRemoteSearch(query){
  const requestId=++jobSearchSerial;
  const status=document.getElementById('jobSearchStatus');
- if(query.length<2){jobSearchRemote=[];jobSearchServerTotal=null;status.textContent=query?'두 글자 이상 입력':'';
-  scheduleJobsRender();return}
+ jobSearchRemoteError='';
+ if(query.length<2){
+  jobSearchRemoteLoading=false;jobSearchRemote=[];jobSearchServerTotal=null;
+  status.textContent=query?'두 글자 이상 입력':'';
+  scheduleJobsRender();return;
+ }
+ if(worklinksIsChangcomView()&&['plan','prespec'].includes(partnerNoticeStage)){
+  // Individual early-stage views use their own complete saved SQLite caches.
+  jobSearchRemoteLoading=false;jobSearchRemote=[];jobSearchServerTotal=0;
+  status.textContent='선택한 조달 단계의 저장 DB 검색';
+  scheduleJobsRender();return;
+ }
+ jobSearchRemoteLoading=true;
  status.textContent='서버 저장 DB 검색 중…';
  try{
-  // Searches saved SQLite only. No new official procurement API request.
   const searchSw=worklinksIsChangcomView()?'0':'1';
-  const result=await g2bFetch('/saved?sw='+searchSw+'&limit=250&offset=0&q='+encodeURIComponent(query));
-  if(requestId!==jobSearchSerial||query!==jobSearchText)return;
-  if(result.searchMode!=='saved_only')throw Error('서버 검색 기능 미배포');
-  const next=[];
-  for(const row of result.items||[]){
-   const key=String(row.bidNo||'')+':'+String(row.order||'000').padStart(3,'0');
-   if(row.bidEligibility)bidEligibilityCache.set(key,row.bidEligibility);
-   if(row.supplementalBidFacts)g2bSupplementalCache.set(key,row.supplementalBidFacts);
-   if(row.rfpSavedState)jobSearchRfpState.set(key,row.rfpSavedState);
-   const item=g2bCardFromServer(row);
-   if(item)next.push(item);
+  const allPages=worklinksIsChangcomView()&&partnerNoticeStage==='all';
+  const next=[],seen=new Set();
+  let offset=0,total=null,completed=false;
+  for(let page=0;page<(allPages?120:1);page++){
+   const result=await g2bFetch('/saved?sw='+searchSw+'&limit=250&offset='+offset+'&q='+encodeURIComponent(query));
+   if(requestId!==jobSearchSerial||query!==jobSearchText)return;
+   if(result.searchMode!=='saved_only'||!Array.isArray(result.items))
+    throw Error('서버 검색 기능 미배포 또는 불완전');
+   const count=Number(result.totalCount);
+   if(!Number.isSafeInteger(count)||count<offset+result.items.length)
+    throw Error('서버 검색 결과 건수 불일치');
+   if(total!==null&&total!==count)throw Error('검색 도중 DB 목록 변경 · 다시 검색 필요');
+   total=count;
+   if(offset<total&&!result.items.length)throw Error('검색 다음 페이지 누락');
+   for(const row of result.items){
+    const key=String(row.bidNo||'')+':'+String(row.order||'000').padStart(3,'0');
+    if(row.bidEligibility)bidEligibilityCache.set(key,row.bidEligibility);
+    if(row.supplementalBidFacts)g2bSupplementalCache.set(key,row.supplementalBidFacts);
+    if(row.rfpSavedState)jobSearchRfpState.set(key,row.rfpSavedState);
+    const item=g2bCardFromServer(row);
+    if(item&&!seen.has(item.id)){next.push(item);seen.add(item.id)}
+   }
+   offset+=result.items.length;
+   if(offset>=total){completed=true;break}
+   if(!allPages)break; // Existing single-stage behavior remains unchanged.
   }
+  if(allPages&&!completed)throw Error('전체 검색 페이지 미완료');
   jobSearchRemote=next;
-  jobSearchServerTotal=Number(result.totalCount||0);
-  status.textContent='서버 DB '+next.length+' / '+jobSearchServerTotal+'건 · 신규 정부 API 호출 없음';
+  jobSearchServerTotal=total;
+  status.textContent='입찰공고 저장 DB '+next.length+' / '+total+'건 검색 · 발주계획·사전규격 함께 검색';
  }catch(error){
   if(requestId!==jobSearchSerial)return;
-  status.textContent='서버 검색 실패 · 불러온 목록에서 검색';
+  jobSearchRemoteError=String(error?.message||error).slice(0,120);
+  status.textContent='서버 검색 실패 · '+jobSearchRemoteError+' · 수집된 목록만 표시';
   jobSearchRemote=[];jobSearchServerTotal=null;
- }finally{if(requestId===jobSearchSerial)scheduleJobsRender()}
+ }finally{
+  if(requestId===jobSearchSerial){
+   jobSearchRemoteLoading=false;scheduleJobsRender();
+  }
+ }
 }
 function updateJobSearchInput(){
  const input=document.getElementById('jobQuickSearch');
@@ -5673,7 +5706,7 @@ function updateJobSearchInput(){
  jobSearchSerial++;
  jobSearchText=next;
  jobRenderLimit=jobPageStep();
- jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRfpState.clear();
+ jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRemoteError='';jobSearchRemoteLoading=false;jobSearchRfpState.clear();
  document.getElementById('jobSearchClear').hidden=!next;
  if(!next&&jobsBootstrapStarted&&!g2bServerAvailable&&!g2bSavedLoadRunning){
   g2bLoadSaved(false);
@@ -6406,7 +6439,7 @@ function restoreJobSearchForWorkspace(view){
  if(jobSearchTimer!==null){clearTimeout(jobSearchTimer);jobSearchTimer=null}
  jobSearchSerial++;
  jobSearchText=next;input.value=next;
- jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRfpState.clear();
+ jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRemoteError='';jobSearchRemoteLoading=false;jobSearchRfpState.clear();
  jobRenderLimit=jobPageStep();
  document.getElementById('jobSearchClear').hidden=!next;
  document.getElementById('jobSearchStatus').textContent=next.length>=2?'저장된 공고 검색 중':next?'두 글자 이상 입력':'';
