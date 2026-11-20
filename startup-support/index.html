@@ -6339,8 +6339,12 @@ function renderJobs(){
   }).filter(o=>exactBidQuery||!partnerMode||!member||keepMode!=='all'||partnerBidMatchesNewFilters(o.x));
   if(member&&partnerMode)refreshVerdictFilters(scopeRows,selectedCompany);
   let list=keepMode!=='all'?scopeRows:scopeRows.filter(o=>
-   (exactBidQuery||matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter))&&
+   matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&
    (!jobSearchText||jobSearchMatches(o.x,jobSearchNormalized(jobSearchText))));
+  // Exact official bid ID is a locator, not a shortlist filter. This branch
+  // does not modify the established default/kept verdict filtering contract.
+  if(exactBidQuery&&keepMode==='all')
+   list=scopeRows.filter(o=>jobSearchMatches(o.x,jobSearchNormalized(jobSearchText)));
   if(partnerMode&&member&&keepMode==='all'&&!exactBidQuery){
    list=list.filter(o=>partnerBidMatchesNewFilters(o.x));
   }
