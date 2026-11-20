@@ -5724,7 +5724,6 @@ function updateJobSearchInput(){
  scheduleJobsRender();
  const url=new URL(window.location.href);
  if(next)url.searchParams.set('q',next);else url.searchParams.delete('q');
- history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  // Exact-number inference remains available in individual views, never in
  // ALL: a typed number must not silently narrow a three-stage search.
  if(worklinksIsChangcomView()&&partnerNoticeStage!=='all'){
@@ -5739,6 +5738,11 @@ function updateJobSearchInput(){
    else void loadPartnerAllBids();
   }
  }
+ if(worklinksIsChangcomView()){
+  if(partnerNoticeStage!=='all')url.searchParams.set('stage',partnerNoticeStage);
+  else url.searchParams.delete('stage');
+ }
+ history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  if(next.length>=2&&(!worklinksIsChangcomView()||['all','bid'].includes(partnerNoticeStage)))
   jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),240);
  else document.getElementById('jobSearchStatus').textContent=next?'두 글자 이상 입력':'';
@@ -6523,6 +6527,9 @@ function setWorkspaceView(view){
    const text=jobSearchByWorkspace[view]||'';
    if(text)url.searchParams.set('q',text);else url.searchParams.delete('q');
   }else url.searchParams.delete('q');
+  if(view==='changcom'&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage!=='all')
+   url.searchParams.set('stage',partnerNoticeStage);
+  else url.searchParams.delete('stage');
   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  }
 }
@@ -6569,6 +6576,12 @@ document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.
  const previousScope=partnerSwScope,previousStage=partnerNoticeStage;
  partnerSwScope=document.getElementById('partnerSwScope').value;
  partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
+ if(previousStage!==partnerNoticeStage){
+  const url=new URL(window.location.href);
+  if(partnerNoticeStage==='all')url.searchParams.delete('stage');
+  else url.searchParams.set('stage',partnerNoticeStage);
+  history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+ }
  syncPartnerAwardControl();
  if(previousStage!==partnerNoticeStage){
   const sorter=document.getElementById('jobSort');
