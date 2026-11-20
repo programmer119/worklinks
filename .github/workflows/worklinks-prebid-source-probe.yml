@@ -38,4 +38,20 @@ jobs:
                   except (urllib.error.URLError,TimeoutError,OSError) as exc:
                       print('PROBE',seq,method,'ERROR',type(exc).__name__,
                             str(getattr(exc,'code',''))[:20])
+          import urllib.request
+          for site in ('https://www.g2b.go.kr/','https://www.g2b.go.kr/pn/'):
+              try:
+                  req=urllib.request.Request(site,headers={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/132.0 Safari/537.36'})
+                  with urllib.request.urlopen(req,timeout=12) as resp:
+                      data=resp.read(200000).decode('utf-8','replace')
+                      import re
+                      title=re.search(r'<title[^>]*>(.*?)</title>',data,re.I|re.S)
+                      scripts=re.findall(r'<script[^>]+src=["\\\']([^"\\\']+)',data,re.I)
+                      anchors=re.findall(r'<a[^>]+href=["\\\']([^"\\\']+)',data,re.I)
+                      print('OFFICIAL_SITE',site,'STATUS',resp.status,'FINAL',resp.geturl(),'TITLE',(title.group(1) if title else '')[:100])
+                      print('SCRIPTS',scripts[:25])
+                      print('NAV_HREFS',anchors[:25])
+                      print('SNIPPET',re.sub(r'\\s+',' ',data[:300])[:250])
+              except Exception as exc:
+                  print('OFFICIAL_SITE',site,'ERROR',type(exc).__name__,str(getattr(exc,'code',''))[:30])
           PY
