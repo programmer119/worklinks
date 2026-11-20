@@ -1599,7 +1599,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-multi-award-v2"></script>
+<script src="./changcom-prebid.js?v=20261120-real-notice-link-v1"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -5689,7 +5689,20 @@ function updateJobSearchInput(){
  const url=new URL(window.location.href);
  if(next)url.searchParams.set('q',next);else url.searchParams.delete('q');
  history.replaceState(history.state,'',url.pathname+url.search+url.hash);
- if(next.length>=2)jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),240);
+ if(worklinksIsChangcomView()){
+  const id=next.toUpperCase();
+  const inferred=/^R\d{2}BD\d{8}$/.test(id)?'prespec':
+    /^R\d{2}BK\d{8}$/.test(id)?'bid':null;
+  if(inferred&&inferred!==partnerNoticeStage){
+   partnerNoticeStage=inferred;
+   document.getElementById('partnerNoticeStage').value=inferred;
+   syncPartnerAwardControl();
+   if(inferred==='prespec')void loadPrebidJobs('prespec');
+   else void loadPartnerAllBids();
+  }
+ }
+ if(next.length>=2&&(!worklinksIsChangcomView()||partnerNoticeStage==='bid'))
+  jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),240);
  else document.getElementById('jobSearchStatus').textContent=next?'두 글자 이상 입력':'';
 }
 document.getElementById('jobQuickSearch').addEventListener('input',updateJobSearchInput);
@@ -5697,7 +5710,8 @@ document.getElementById('jobSearchClear').addEventListener('click',function(){
  const input=document.getElementById('jobQuickSearch');input.value='';
  updateJobSearchInput();input.focus()
 });
-const initialJobSearch=new URLSearchParams(location.search).get('q');
+const initialJobSearch=new URLSearchParams(location.search).get('q')||
+ new URLSearchParams(location.search).get('notice');
 if(initialJobSearch)jobSearchByWorkspace[new URLSearchParams(location.search).get('view')==='changcom'?'changcom':'jobs']=initialJobSearch.slice(0,80);
 
 localStorage.setItem("worklinks_job_filter_v1","all");
@@ -6403,7 +6417,7 @@ function restoreJobSearchForWorkspace(view){
  jobRenderLimit=jobPageStep();
  document.getElementById('jobSearchClear').hidden=!next;
  document.getElementById('jobSearchStatus').textContent=next.length>=2?'저장된 공고 검색 중':next?'두 글자 이상 입력':'';
- if(next.length>=2)jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),120);
+ if(next.length>=2&&(!worklinksIsChangcomView()||partnerNoticeStage==='bid'))jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),120);
 }
 function setWorkspaceView(view){
  // The confidential partner filters remain unavailable before AuthHub grants access.
@@ -6451,8 +6465,10 @@ function setWorkspaceView(view){
    },0)});
   }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
-  if(partnerMode&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='bid'&&
-    typeof loadPartnerAllBids==='function')void loadPartnerAllBids();
+  if(partnerMode&&typeof partnerNoticeStage!=='undefined'){
+   if(partnerNoticeStage==='bid'&&typeof loadPartnerAllBids==='function')void loadPartnerAllBids();
+   else if(typeof loadPrebidJobs==='function')void loadPrebidJobs(partnerNoticeStage);
+  }
   // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
  if(changed){
@@ -6512,7 +6528,7 @@ document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.
  jobRenderLimit=jobPageStep();
  if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
  else void loadPartnerAllBids();
- if(jobSearchText.length>=2&&previousScope!==partnerSwScope)void jobRunRemoteSearch(jobSearchText);
+ if(jobSearchText.length>=2&&partnerNoticeStage==='bid'&&previousScope!==partnerSwScope)void jobRunRemoteSearch(jobSearchText);
  renderJobs();
 }));
 document.getElementById('partnerAwardFilter')?.addEventListener('change',function(event){
