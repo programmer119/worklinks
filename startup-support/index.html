@@ -6566,8 +6566,12 @@ function restoreJobSearchForWorkspace(view){
  if(next.length>=2&&(!worklinksIsChangcomView()||['all','bid'].includes(partnerNoticeStage)))jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),120);
 }
 function setWorkspaceView(view){
- // The confidential partner filters remain unavailable before AuthHub grants access.
- if(view==='changcom'&&!worklinksPartnerAccess()){
+ // Lock confidential controls, but never destroy the original procurement URL
+ // when authentication is temporarily unreachable.
+ const deferredPartnerRoute=view==='changcom'&&!worklinksPartnerAccess();
+ const pendingSharedNotice=!worklinksPartnerAccess()&&
+  /^R[0-9]{2}(?:BD|BK)[0-9]{8}$/i.test(String(new URLSearchParams(location.search).get('open')||''));
+ if(deferredPartnerRoute){
   requestedPartnerViewOnAuth=true;view='jobs';
  }
  const target=document.getElementById((view==='changcom'?'jobs':view)+'View');
@@ -6620,7 +6624,7 @@ function setWorkspaceView(view){
   }
   // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
- if(changed){
+ if(changed&&!deferredPartnerRoute&&!pendingSharedNotice){
   const url=new URL(window.location.href);
   url.searchParams.set('view',view);
   if(view==='jobs'||view==='changcom'){
