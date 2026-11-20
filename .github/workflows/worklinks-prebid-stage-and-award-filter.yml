@@ -10,6 +10,7 @@ on:
       - 'startup-support/index.html'
       - 'tests/test_g2b_prebid_collector.py'
       - 'tests/test_changcom_prebid_filters.cjs'
+      - 'tests/test_worklinks_prebid_source_ui.cjs'
       - 'tests/test_worklinks_prebid_real_file_names.py'
       - 'tests/test_worklinks_transient_api_recovery.cjs'
       - 'tests/test_worklinks_social_share.cjs'
@@ -24,6 +25,7 @@ on:
       - 'startup-support/index.html'
       - 'tests/test_g2b_prebid_collector.py'
       - 'tests/test_changcom_prebid_filters.cjs'
+      - 'tests/test_worklinks_prebid_source_ui.cjs'
       - 'tests/test_worklinks_prebid_real_file_names.py'
       - 'tests/test_worklinks_transient_api_recovery.cjs'
       - 'tests/test_worklinks_social_share.cjs'
@@ -51,6 +53,7 @@ jobs:
           python tests/test_worklinks_prebid_real_file_names.py
           node --check startup-support/changcom-prebid.js
           node tests/test_changcom_prebid_filters.cjs
+          node tests/test_worklinks_prebid_source_ui.cjs
           node tests/test_worklinks_transient_api_recovery.cjs
           node tests/test_worklinks_social_share.cjs
           node tests/test_worklinks_exact_bid_link.cjs
