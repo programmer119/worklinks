@@ -172,6 +172,7 @@ function refreshCards(){
     });
 }
 let mineLoadPromise=null;
+let keepNetworkRetryPending=false;
 function keepFailureReason(error){
   const code=Number(error?.status)||0;
   if(code===401||code===403||String(error?.message)==='auth_required')
@@ -209,10 +210,15 @@ async function loadMine(){
     }
     if(owner!==currentUser())return false;
     if(!data){
+      const code=Number(lastError?.status)||0;
+      keepNetworkRetryPending=[408,429,500,502,503,504].includes(code)||
+        lastError?.name==='TimeoutError'||lastError?.name==='AbortError'||
+        lastError instanceof TypeError;
       status('내 킵 조회 실패 · '+keepFailureReason(lastError),true);
       return false;
     }
     state.mine=data.items;
+    keepNetworkRetryPending=false;
     state.ownLoaded=true;
     state.shareEnabled=Boolean(data.shareEnabled);
     state.shareAlias=String(data.shareAlias||'');
@@ -335,6 +341,7 @@ function modeChange(mode){
 }
 function accountChanged(){
   const next=currentUser();
+  keepNetworkRetryPending=false;
   if(!next){
     state.user='';state.mine=[];state.watch=[];state.members=[];
     state.watchId='';state.mode='all';state.ownLoaded=false;
@@ -390,3 +397,15 @@ window.addEventListener('focus',()=>{
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&state.watchId)syncWatch(state.watchId).catch(()=>{});
 });
+
+// The Keep DB is authoritative. A transient read failure must not become a
+// permanent '0 keeps' view until the user manually refreshes the entire page.
+function recoverKeepNetworkRead(){
+ if(!keepNetworkRetryPending||document.hidden||!currentUser()||
+    document.documentElement.dataset.worklinksAuthState!=='granted')return;
+ loadMine().catch(()=>{});
+}
+window.addEventListener('online',recoverKeepNetworkRead);
+window.addEventListener('focus',recoverKeepNetworkRead);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)recoverKeepNetworkRead()});
+setInterval(recoverKeepNetworkRead,45000);
