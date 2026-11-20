@@ -2430,7 +2430,7 @@ async function g2bFetch(path){
  // query fails; never fall back to a fabricated zero-result response.
  const at=async base=>{
   const c=new AbortController(),timeout=setTimeout(function(){c.abort()},
-   path==='/saved-inventory'?35000:path.startsWith('/saved?')?22000:14000);
+   path==='/saved-inventory'||path.startsWith('/prebid-file-names?')?35000:path.startsWith('/saved?')?22000:14000);
   try{
    const resp=await fetch(base+path,{signal:c.signal,cache:'no-store'});
    const json=await resp.json().catch(function(){throw Error('JSON 응답 아님 (HTTP '+resp.status+')')});
