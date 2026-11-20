@@ -22,4 +22,22 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
     css+'</style></head><body><div id="jobSearchStatus"></div><div class="cards" id="jobCards"></div>'+modal+'</body></html>'
    }));
    await page.goto('https://worklinks.suaveforge.com/startup-support/?view=changcom&open=R26BK01843011&q=R26BK01843011&stage=bid');
-   await page.addScriptTag({content:
+   await page.addScriptTag({content:"\nvar activeDetailJobId=null,jobDetailPriorFocus=null,partners=[],jobSearchText='R26BK01843011';\nvar jobSearchRemote=[],jobSearchServerTotal=null,g2bLiveJobs=[],partnerAllBids={items:[],loaded:0,total:0,state:'error'};\nvar jobSearchByWorkspace={changcom:''},prebidCache={prespec:{state:'idle',items:[]},plan:{state:'idle',items:[]}};\nvar __calls=[],__evidence=0,__opened=0;\nfunction worklinksPartnerAccess(){return true}\nfunction worklinksIsChangcomView(){return true}\nfunction jobSearchNormalized(x){return String(x||'').toLowerCase()}\nfunction scheduleJobsRender(){}\nfunction g2bCardFromServer(x){return {id:'g2b-'+x.kind+'-'+x.bidNo+'-'+x.order,noticeNumber:x.bidNo,title:x.title,kind:x.kind,type:'나라장터 · DB 저장',org:x.org}}\nasync function g2bFetch(p){__calls.push(p);return {ok:true,searchMode:'saved_only',totalCount:1,items:[{bidNo:'R26BK01843011',kind:'servc',order:'000',title:'2026학년도 혁신지원사업 학사행정시스템 고도화 구축',org:'충북보건과학대학교',closes:'2026-12-01 14:00:00'}]}}\nfunction getJobById(id){return jobSearchRemote.find(x=>x.id===id)||(worklinksShareExactBidRow&&worklinksShareExactBidRow.id===id?worklinksShareExactBidRow:null)}\nfunction renderJobDetail(x){__opened++;document.getElementById('jobDetailTitle').textContent=x.title;document.getElementById('jobDetailSub').textContent=x.noticeNumber;document.getElementById('jobDetailBody').textContent=x.org}\nfunction loadStandardBidEvidence(){__evidence++}\nfunction loadJobEligibility(){__evidence++}\nfunction loadJobEvidence(){__evidence++}\nfunction partnerIdsOfJob(){return []}\nfunction openPartnerModal(){}\nfunction openHistoryModal(){}\nfunction g2bCheckStatus(){}\n"});
+   await page.addScriptTag({content:openCode+'\n'+closeCode+'\n'+shareCode});
+   await page.evaluate(()=>scheduleWorklinksShareOpen());
+   await page.waitForSelector('#jobDetailModal.open',{timeout:4000});
+   assert.match(await page.locator('#jobDetailTitle').innerText(),/학사행정시스템 고도화 구축/);
+   assert.equal(await page.locator('#jobDetailSub').innerText(),'R26BK01843011');
+   const state=await page.evaluate(()=>({calls:__calls,opened:__opened,cards:jobSearchRemote.length,count:jobSearchServerTotal}));
+   assert.deepEqual(state.calls,['/saved?sw=0&limit=10&offset=0&q=R26BK01843011']);
+   assert.equal(state.opened,1);
+   assert.equal(state.cards,1);
+   assert.equal(state.count,1);
+   await page.screenshot({path:path.join(root,'artifacts','exact-bid-'+name+'.png')});
+   await page.locator('#jobDetailClose').click();
+   assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'true');
+   console.log('WORKLINK_EXACT_BID_BROWSER_'+name.toUpperCase()+'=PASS');
+   await page.close();
+  }
+ }finally{await browser.close()}
+})().catch(err=>{console.error(err);process.exitCode=1});
