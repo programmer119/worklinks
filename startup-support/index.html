@@ -1604,7 +1604,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-stage-modal-safe-v4"></script>
+<script src="./changcom-prebid.js?v=20261120-auth-shared-link-safe-v5"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -6566,8 +6566,12 @@ function restoreJobSearchForWorkspace(view){
  if(next.length>=2&&(!worklinksIsChangcomView()||['all','bid'].includes(partnerNoticeStage)))jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),120);
 }
 function setWorkspaceView(view){
- // The confidential partner filters remain unavailable before AuthHub grants access.
- if(view==='changcom'&&!worklinksPartnerAccess()){
+ // Lock confidential controls, but never destroy the original procurement URL
+ // when authentication is temporarily unreachable.
+ const deferredPartnerRoute=view==='changcom'&&!worklinksPartnerAccess();
+ const pendingSharedNotice=!worklinksPartnerAccess()&&
+  /^R[0-9]{2}(?:BD|BK)[0-9]{8}$/i.test(String(new URLSearchParams(location.search).get('open')||''));
+ if(deferredPartnerRoute){
   requestedPartnerViewOnAuth=true;view='jobs';
  }
  const target=document.getElementById((view==='changcom'?'jobs':view)+'View');
@@ -6620,7 +6624,7 @@ function setWorkspaceView(view){
   }
   // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
- if(changed){
+ if(changed&&!deferredPartnerRoute&&!pendingSharedNotice){
   const url=new URL(window.location.href);
   url.searchParams.set('view',view);
   if(view==='jobs'||view==='changcom'){
