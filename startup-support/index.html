@@ -5688,8 +5688,6 @@ function updateJobSearchInput(){
  scheduleJobsRender();
  const url=new URL(window.location.href);
  if(next)url.searchParams.set('q',next);else url.searchParams.delete('q');
- if(worklinksIsChangcomView())url.searchParams.set('stage',partnerNoticeStage);
- history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  if(worklinksIsChangcomView()){
   const id=next.toUpperCase();
   const inferred=/^R\d{2}BD\d{8}$/.test(id)?'prespec':
@@ -5701,7 +5699,9 @@ function updateJobSearchInput(){
    if(inferred==='prespec')void loadPrebidJobs('prespec');
    else void loadPartnerAllBids();
   }
+  url.searchParams.set('stage',partnerNoticeStage);
  }
+ history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  if(next.length>=2&&(!worklinksIsChangcomView()||partnerNoticeStage==='bid'))
   jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),240);
  else document.getElementById('jobSearchStatus').textContent=next?'두 글자 이상 입력':'';
