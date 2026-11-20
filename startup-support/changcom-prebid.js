@@ -1,6 +1,23 @@
 /* Changcom: source-backed procurement stage and SW award filters.
  * Existing bid records require no new G2B requests; prebid reads local server DB.
  */
+// A temporary AuthHub lock once changed a shared R26BD/R26BK URL from
+// changcom into jobs, dropping its stage and query. Recover only verified
+// procurement-number deep links, never a general jobs navigation.
+if(typeof window!=='undefined'&&typeof URLSearchParams!=='undefined'&&
+   typeof history!=='undefined'){
+ const original=new URLSearchParams(window.location?.search||'');
+ const bidNo=String(original.get('open')||'').trim().toUpperCase();
+ const stage=/^R\d{2}BD\d{8}$/.test(bidNo)?'prespec':
+   /^R\d{2}BK\d{8}$/.test(bidNo)?'bid':'';
+ if(stage&&original.get('view')!=='changcom'){
+  const url=new URL(window.location.href);
+  url.searchParams.set('view','changcom');
+  url.searchParams.set('stage',stage);
+  url.searchParams.set('q',bidNo);
+  history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+ }
+}
 // Preserve explicit links to individual stages; ordinary search opens ALL.
 const partnerDeepLinkParams=typeof URLSearchParams!=='undefined'?
  new URLSearchParams(typeof window!=='undefined'?(window.location?.search||''):''):{get:()=>null};
