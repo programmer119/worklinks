@@ -1086,8 +1086,11 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
 .prebid-keep-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
 .prebid-keep-actions .job-keep-button{flex:none}
-#jobCards [data-combined-bid] .job-card-title{border:0;background:transparent;padding:0;text-align:left;color:#123765;font:inherit;font-weight:800;cursor:pointer}
-#jobCards [data-combined-bid] .job-card-title:hover{text-decoration:underline}
+#jobCards [data-combined-bid] .job-card-title,
+#jobCards [data-prebid-id] .job-card-title{border:0;background:transparent;padding:0;text-align:left;color:#123765;font:inherit;font-weight:800;cursor:pointer}
+#jobCards [data-combined-bid] .job-card-title:hover,
+#jobCards [data-prebid-id] .job-card-title:hover{text-decoration:underline}
+#jobCards [data-job-card][tabindex="0"]:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
 .keep-job-link{color:#174b80;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap}
 .keep-empty{padding:24px 12px;border:1px dashed #cad5e4;border-radius:12px;color:#64748b;font-size:15px;text-align:center;grid-column:1/-1}
 #jobsView[data-keep-mode=mine] #g2bMore,#jobsView[data-keep-mode=watch] #g2bMore,
@@ -1601,7 +1604,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-prebid-link-overfetch-fix-v2"></script>
+<script src="./changcom-prebid.js?v=20261120-kakao-share-detail-v3"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -4553,6 +4556,7 @@ function jobSubmissionDetailMarkup(x){
 
 function renderJobDetail(x){
  if(activeDetailJobId!==x.id)return;
+ if(typeof renderPrebidSourceDetail==='function'&&renderPrebidSourceDetail(x))return;
  const time=jobTimeInfo(x),partnerList=worklinksPartnerAccess()?partners.filter(function(p){return partnerIdsOfJob(x).includes(p.id)}):[];
  const orig=jobOriginUrl(x);
  document.getElementById('jobDetailTitle').textContent=x.title||'일감 상세';
@@ -4643,6 +4647,7 @@ function openJobDetail(id){
  const m=document.getElementById('jobDetailModal');m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
  renderJobDetail(x);
  document.getElementById('jobDetailClose').focus();
+ if(/^g2b-prebid-/.test(String(id)))return; // Early-stage records have no RFP bid-evidence contract.
  const p=partners.find(function(p){return partnerIdsOfJob(x).includes(p.id)});
  // Company qualification data belongs in company management, not the tender detail.
  loadStandardBidEvidence(x);
@@ -5754,6 +5759,37 @@ document.getElementById('jobSearchClear').addEventListener('click',function(){
 });
 const initialJobSearch=new URLSearchParams(location.search).get('q')||
  new URLSearchParams(location.search).get('notice');
+// Exact shared public notice URLs must open the existing WORKLINK detail sheet,
+// not merely leave a search term in the input.
+const sharedQuery=new URLSearchParams(location.search);
+const sharedValue=String(sharedQuery.get('open')||initialJobSearch||'').trim().toUpperCase();
+let worklinksSharePendingId=/^R[0-9]{2}(?:BD|BK)[0-9]{8}$/.test(sharedValue)&&
+ sharedQuery.get('view')==='changcom'?sharedValue:'';
+let worklinksShareScheduled=false;
+function scheduleWorklinksShareOpen(){
+ if(!worklinksSharePendingId||worklinksShareScheduled)return;
+ worklinksShareScheduled=true;
+ setTimeout(function(){
+  worklinksShareScheduled=false;
+  if(!worklinksSharePendingId||!worklinksPartnerAccess()||!worklinksIsChangcomView())return;
+  const id=worklinksSharePendingId;
+  let job=null;
+  if(/^R[0-9]{2}BD/.test(id)){
+   for(const stage of ['prespec','plan']){
+    if(prebidCache[stage].state!=='ready')continue;
+    const row=prebidCache[stage].items.find(x=>String(x.id).toUpperCase()===id);
+    if(row){job=prebidKeepId(row);break}
+   }
+  }else{
+   const row=jobSearchRemote.concat(partnerAllBids.items,g2bLiveJobs).find(x=>
+    String(x.noticeNumber||'').toUpperCase()===id);
+   if(row)job=row.id;
+  }
+  if(!job)return; // Wait for saved DB and authentication; never substitute a search-results page.
+  worklinksSharePendingId='';
+  openJobDetail(job);
+ },30);
+}
 if(initialJobSearch)jobSearchByWorkspace[new URLSearchParams(location.search).get('view')==='changcom'?'changcom':'jobs']=initialJobSearch.slice(0,80);
 
 localStorage.setItem("worklinks_job_filter_v1","all");
