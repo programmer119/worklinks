@@ -215,7 +215,7 @@ function prebidKeptCardMarkup(x){
  const url=String(x.url||'');
  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
  const keep=typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(x.id)||''):'';
- return '<article class="card" data-prebid-id="'+htmlEscape(match[3])+'"><div class="cardtop">'+
+ return '<article class="card" tabindex="0" style="cursor:pointer" data-prebid-detail="'+htmlEscape(x.id)+'" data-prebid-id="'+htmlEscape(match[3])+'"><div class="cardtop">'+
   '<span class="tag">'+name+'</span><span class="tag">'+(match[2]==='servc'?'용역':'물품')+'</span></div>'+
   '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
   '<p>'+htmlEscape(x.org||'발주기관 미기재')+'</p>'+
@@ -232,8 +232,7 @@ function prebidNoticeCardMarkup(x){
  const url=String(x.url||'');
  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
  const fileLinks=(x.files||[]).filter(y=>/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(y)).slice(0,4);
- const deepLink='./?view=changcom&stage='+encodeURIComponent(stage)+'&q='+encodeURIComponent(x.id);
- return '<article class="card" data-prebid-id="'+htmlEscape(x.id)+'"><div class="cardtop">'+
+ return '<article class="card" tabindex="0" style="cursor:pointer" data-prebid-detail="'+htmlEscape(prebidKeepId(x))+'" data-prebid-id="'+htmlEscape(x.id)+'"><div class="cardtop">'+
    '<span class="tag">'+htmlEscape(name)+'</span><span class="tag">'+htmlEscape(x.kind==='servc'?'용역':'물품')+'</span></div>'+
    '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
    '<p>'+htmlEscape(x.org||'발주기관 미기재')+' · '+htmlEscape(x.posted||'등록일 미기재')+'</p>'+
@@ -244,14 +243,102 @@ function prebidNoticeCardMarkup(x){
    (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
    '<span class="tag">등록번호 '+htmlEscape(x.id||'미기재')+'</span>')+
    (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
-   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+
-   ' · <a href="'+htmlEscape(deepLink)+'" title="저장된 공고를 WORKLINK에서 다시 열기">공유 링크</a></div></article>';
+   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</div></article>';
 }
+// Early procurement stages reuse the existing detail MODAL, not bid-only
+// qualification, participation, RFP, award, or deadline logic. No bid API call.
+function prebidDetailSourceUrl(value){
+ const url=String(value||'').trim();
+ return /^https:\/\/(?:[a-z0-9-]+\.)*g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
+}
+function prebidDetailDate(value){
+ const raw=String(value||'').trim();
+ const compact=raw.match(/^(20\d{2})(\d{2})(\d{2})(\d{2})?(\d{2})?$/);
+ return compact?compact[1]+'-'+compact[2]+'-'+compact[3]+(compact[4]?' '+compact[4]+':'+(compact[5]||'00'):''):raw;
+}
+function prebidDetailRecord(key){
+ const matched=String(key||'').match(/^g2b-prebid-(plan|prespec)-(servc|thng)-([A-Za-z0-9_.:-]{1,120})$/);
+ if(!matched)return null;
+ const [_,stage,kind,number]=matched;
+ const source=prebidCache[stage].items.find(x=>x.kind===kind&&x.id===number);
+ if(source)return source;
+ // Kept cards can be opened even while the original source cache reloads.
+ const saved=typeof getJobById==='function'?getJobById(key):null;
+ if(!saved||saved.id!==key)return null;
+ return {id:number,stage,kind,title:saved.title,org:saved.org,
+  budget:saved.amount,posted:saved.startAt||'',period:saved.period||saved.deadline||'',
+  url:saved.url,files:[],subject:''};
+}
+function openPrebidDetail(key){
+ const x=prebidDetailRecord(key);
+ if(!x)return false;
+ const modal=document.getElementById('jobDetailModal');
+ const title=document.getElementById('jobDetailTitle');
+ const sub=document.getElementById('jobDetailSub');
+ const body=document.getElementById('jobDetailBody');
+ const close=document.getElementById('jobDetailClose');
+ if(!modal||!title||!sub||!body||!close)return false;
+ const stage=x.stage, stageLabel=stage==='plan'?'발주계획':'사전규격';
+ const meta=(label,value)=>String(value||'').trim()?
+   '<div class="job-detail-meta-item"><span>'+htmlEscape(label)+'</span><strong>'+htmlEscape(String(value))+'</strong></div>':'';
+ const month=stage==='plan'?String(x.plannedMonth||'').trim():'';
+ const opinion=stage==='prespec'?prebidDetailDate(x.opinionDeadline):'';
+ const period=stage==='plan'?(month?'발주 예정 '+month:'발주 예정시기 미기재'):
+  (opinion?'의견등록 마감 '+opinion:'의견마감 미기재');
+ const official=prebidDetailSourceUrl(x.url);
+ const docs=[...new Set((Array.isArray(x.files)?x.files:[]).map(prebidDetailSourceUrl).filter(Boolean))].slice(0,5);
+ const subject=String(x.subject||'').trim();
+ title.textContent=x.title||'사업명 미기재';
+ sub.textContent=stageLabel+' · '+(x.org||'발주기관 미기재')+' · 등록번호 '+x.id;
+ body.innerHTML='<div class="job-detail-overview"><div class="job-detail-status">'+
+  '<span class="jobmatch-chip pending">'+stageLabel+'</span></div>'+
+  '<div class="job-detail-meta-grid">'+
+  meta('구분',x.kind==='servc'?'용역':'물품')+
+  meta('등록일',prebidDetailDate(x.posted))+
+  meta('배정예산',prebidWon(x.budget))+
+  meta(stage==='plan'?'발주예정':'의견등록 마감',stage==='plan'?(month||'미기재'):(opinion||'미기재'))+
+  meta('등록번호',x.id)+'</div></div>'+
+  (subject?'<section class="job-detail-section"><h3>사업 개요</h3><p>'+htmlEscape(subject)+'</p></section>':'')+
+  (docs.length?'<section class="job-detail-section"><h3>규격서·첨부문서</h3>'+
+   '<div class="job-source-files">'+docs.map((url,i)=>
+    '<a class="job-source-file" href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">공식 규격서 '+(i+1)+' 열기 ↗</a>').join('')+
+   '</div></section>':'')+
+  '<div class="job-detail-actions">'+
+  (official?'<a class="job-external-link" href="'+htmlEscape(official)+
+   '" target="_blank" rel="noopener noreferrer">원문 공고 열기 ↗</a>':
+   '<span class="job-detail-secondary">나라장터 원문 직접 주소 미확인 · 등록번호 '+htmlEscape(x.id)+'</span>')+
+  '</div>';
+ // Share the original dialog/close/backdrop/Escape behavior. Never invoke
+ // openJobDetail(): it is explicitly for R26BK bid evidence and checks.
+ jobDetailPriorFocus=document.activeElement;
+ activeDetailJobId=key;
+ modal.classList.add('open');
+ modal.setAttribute('aria-hidden','false');
+ document.body.style.overflow='hidden';
+ close.focus();
+ return true;
+}
+function prebidCardClick(event){
+ const card=event.target.closest('[data-prebid-detail]');
+ if(!card||event.target.closest('a,button,input,select,textarea,[data-keep-toggle]'))return;
+ if(openPrebidDetail(card.dataset.prebidDetail))event.preventDefault();
+}
+function prebidCardKeydown(event){
+ if((event.key!=='Enter'&&event.key!==' ')||
+  !event.target.matches('[data-prebid-detail]'))return;
+ if(openPrebidDetail(event.target.dataset.prebidDetail))event.preventDefault();
+}
+// Delegated handlers are registered ONLY for early-stage cards. Ordinary
+// [data-job-card] cards remain handled by the untouched main-page handlers.
+const prebidCardsRoot=typeof document!=='undefined'?document.getElementById('jobCards'):null;
+prebidCardsRoot?.addEventListener('click',prebidCardClick);
+prebidCardsRoot?.addEventListener('keydown',prebidCardKeydown);
+
 function combinedBidCardMarkup(x){
  const link=String(jobOriginUrl(x)||'');
  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(link)?link:'';
  const when=String(x.endAt||'');
- return '<article class="card" data-combined-bid="'+htmlEscape(x.id)+'">'+
+ return '<article class="card" tabindex="0" style="cursor:pointer" data-job-card="'+htmlEscape(x.id)+'" data-combined-bid="'+htmlEscape(x.id)+'">'+
   '<div class="cardtop"><span class="tag">입찰공고</span>'+
   '<span class="tag">'+htmlEscape(x.kind==='thng'?'물품':x.kind==='servc'?'용역':'공사')+'</span></div>'+
   '<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+
