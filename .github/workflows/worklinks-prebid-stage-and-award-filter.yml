@@ -47,6 +47,7 @@ jobs:
           node --check startup-support/changcom-prebid.js
           node tests/test_changcom_prebid_filters.cjs
           node tests/test_worklinks_social_share.cjs
+          node tests/test_worklinks_exact_bid_link.cjs
           bash -n server/deploy-g2b-prebid-only.sh
           echo WORKLINKS_PREBID_AND_PRICE_SW_FILTERS_PASS
       - name: Real Chrome desktop/mobile regressions using current main handlers
@@ -54,11 +55,12 @@ jobs:
           set -Eeuo pipefail
           npm install --prefix "$RUNNER_TEMP/worklinks-stage-browser" --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1
           NODE_PATH="$RUNNER_TEMP/worklinks-stage-browser/node_modules" node tests/test_worklinks_stage_browser.cjs
+          NODE_PATH="$RUNNER_TEMP/worklinks-stage-browser/node_modules" node tests/test_worklinks_exact_bid_browser.cjs
           echo WORKLINK_FINAL_STAGE_BROWSER_PASS
       - name: Keep actual desktop/mobile dialog evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: worklinks-stage-final-dialogs
-          path: artifacts/stage-final-*.png
+          path: artifacts/*.png
           if-no-files-found: ignore

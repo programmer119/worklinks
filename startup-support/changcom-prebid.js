@@ -98,7 +98,8 @@ async function loadPartnerAllBids(more=false){
     !['bid','all'].includes(partnerNoticeStage))return;
  // An exact/search query must use the server's indexed q= endpoint. Never
  // download 73,000+ unrelated bid records just to find one prebid record.
- if(partnerNoticeStage==='all'&&String(jobSearchText||'').trim().length>=2)return;
+ if((partnerNoticeStage==='all'&&String(jobSearchText||'').trim().length>=2)||
+    /^R\d{2}BK\d{8}$/i.test(String(jobSearchText||'').trim()))return;
  if(partnerAllBids.state==='loading')return;
  if(!more&&partnerAllBids.state==='ready'){
   if(partnerNoticeStage==='all'||partnerSwScope==='all'||partnerAllBids.loaded>=partnerAllBids.total)return;

@@ -2423,14 +2423,28 @@ function g2bSetEndpoint(s){
  }catch{return false}
 }
 async function g2bFetch(path){
- const c=new AbortController(),timeout=setTimeout(function(){c.abort()},
-  path==='/saved-inventory'?35000:path.startsWith('/saved?')?22000:14000);
- try{
-  const resp=await fetch(G2B_PROXY_URL+path,{signal:c.signal,cache:'no-store'});
-  const json=await resp.json().catch(function(){throw Error('JSON 응답 아님 (HTTP '+resp.status+')')});
-  if(!resp.ok||!json.ok)throw Error(json.error||('HTTP '+resp.status));
-  return json;
- }finally{clearTimeout(timeout)}
+ // A previously saved custom API origin must never make verified saved bid
+ // searches disappear. Revert to the built-in WORKLINK API only if a saved
+ // query fails; never fall back to a fabricated zero-result response.
+ const at=async base=>{
+  const c=new AbortController(),timeout=setTimeout(function(){c.abort()},
+   path==='/saved-inventory'?35000:path.startsWith('/saved?')?22000:14000);
+  try{
+   const resp=await fetch(base+path,{signal:c.signal,cache:'no-store'});
+   const json=await resp.json().catch(function(){throw Error('JSON 응답 아님 (HTTP '+resp.status+')')});
+   if(!resp.ok||!json.ok)throw Error(json.error||('HTTP '+resp.status));
+   return json;
+  }finally{clearTimeout(timeout)}
+ };
+ const selected=G2B_PROXY_URL;
+ try{return await at(selected)}
+ catch(err){
+  if(selected===G2B_DEFAULT_URL||!path.startsWith('/saved?'))throw err;
+  const data=await at(G2B_DEFAULT_URL);
+  G2B_PROXY_URL=G2B_DEFAULT_URL;
+  try{localStorage.setItem('worklinks_g2b_base_v1',G2B_DEFAULT_URL)}catch(_){}
+  return data;
+ }
 }
 async function g2bCheckStatus(){
  const el=document.getElementById('g2bApiStatus');
@@ -3607,6 +3621,7 @@ if(typeof window!=='undefined')window.worklinksHydrateKeptJobs=async function(it
 function getJobById(id){
  const prebid=typeof prebidKeepJobFromId==='function'?prebidKeepJobFromId(id):null;
  if(prebid)return prebid;
+ if(typeof worklinksShareExactBidRow!=='undefined'&&worklinksShareExactBidRow?.id===id)return worklinksShareExactBidRow;
  const regular=jobs.concat(g2bLiveJobs,partnerAllBids.items,jobSearchRemote,g2bFilterInventory).find(function(x){return x.id===id});
  if(regular)return regular;
  if(worklinksKeptFullRows.has(id))return worklinksKeptFullRows.get(id);
@@ -5767,6 +5782,7 @@ const sharedValue=String(sharedQuery.get('open')||initialJobSearch||'').trim().t
 let worklinksSharePendingId=/^R[0-9]{2}(?:BD|BK)[0-9]{8}$/.test(sharedValue)&&
  sharedQuery.get('view')==='changcom'?sharedValue:'';
 let worklinksShareScheduled=false;
+let worklinksShareExactBidBusy=false,worklinksShareExactBidError='',worklinksShareExactBidRow=null;
 function scheduleWorklinksShareOpen(){
  if(!worklinksSharePendingId||worklinksShareScheduled)return;
  worklinksShareScheduled=true;
@@ -5785,8 +5801,38 @@ function scheduleWorklinksShareOpen(){
    const row=jobSearchRemote.concat(partnerAllBids.items,g2bLiveJobs).find(x=>
     String(x.noticeNumber||'').toUpperCase()===id);
    if(row)job=row.id;
+   // A single shared notice must resolve from the saved DB even when broad
+   // pagination or the regular keyword request is slow/failed. No G2B calls.
+   if(!job&&!worklinksShareExactBidBusy&&!worklinksShareExactBidError){
+    worklinksShareExactBidBusy=true;
+    const wanted=id;
+    void g2bFetch('/saved?sw=0&limit=10&offset=0&q='+encodeURIComponent(wanted))
+     .then(result=>{
+      if(result.searchMode!=='saved_only'||!Array.isArray(result.items))throw Error('저장 검색 응답 오류');
+      const found=result.items.find(row=>String(row.bidNo||'').toUpperCase()===wanted);
+      if(!found){worklinksShareExactBidError='저장 DB에 공고번호 미확인';return}
+      const card=g2bCardFromServer(found);
+      if(!card)throw Error('저장 공고 변환 실패');
+      worklinksShareExactBidRow=card;
+      if(jobSearchNormalized(jobSearchText)===jobSearchNormalized(wanted)){
+       jobSearchRemote=[card,...jobSearchRemote.filter(x=>x.id!==card.id)];
+       jobSearchServerTotal=Math.max(1,Number(result.totalCount)||1);
+      }
+      scheduleJobsRender();
+      if(worklinksSharePendingId===wanted){
+       worklinksSharePendingId='';
+       openJobDetail(card.id);
+      }
+     }).catch(error=>{
+      worklinksShareExactBidError=String(error?.message||error).slice(0,120);
+      const status=document.getElementById('jobSearchStatus');
+      if(status)status.textContent='공고번호 직접 조회 실패 · '+worklinksShareExactBidError;
+      scheduleJobsRender();
+     }).finally(()=>{worklinksShareExactBidBusy=false});
+    return;
+   }
   }
-  if(!job)return; // Wait for saved DB and authentication; never substitute a search-results page.
+  if(!job)return; // A failed saved-DB lookup must not open an unrelated page.
   worklinksSharePendingId='';
   openJobDetail(job);
  },30);
@@ -6118,15 +6164,19 @@ function renderJobs(){
  syncPartnerFilterChoices();
  const verdict=participationVerdict;
  const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';
+ const exactBidQuery=partnerAllMode&&/^R\d{2}BK\d{8}$/i.test(String(jobSearchText||'').trim());
  const fullFilterReady=member&&partnerMode&&!jobPartnerShowClosed&&!jobSearchText&&
   (partnerAllMode?(partnerAllBids.state==='ready'&&partnerAllBids.loaded>=partnerAllBids.total):
    g2bFilterInventoryState==='ready');
- const fullRows=partnerAllMode?partnerAllBids.items:(fullFilterReady?
+ const fullRows=partnerAllMode?(exactBidQuery?[]:partnerAllBids.items):(fullFilterReady?
   [...new Map(g2bFilterInventory.concat(g2bLiveJobs).map(x=>[x.id,x])).values()]:g2bLiveJobs);
  const keepMode=window.worklinksKeeps?.getMode?.()||'all';
  const keepItems=keepMode==='all'?[]:(window.worklinksKeeps?.activeItems?.()||[]);
  const keepOrder=new Map(keepItems.map((item,index)=>[String(item.id),index]));
- const raw=jobs.concat(fullRows,jobSearchText?jobSearchRemote:[]);
+ const raw=exactBidQuery?
+  [...new Map(jobSearchRemote.concat(worklinksShareExactBidRow?[worklinksShareExactBidRow]:[])
+    .filter(x=>jobSearchMatches(x,jobSearchNormalized(jobSearchText))).map(x=>[x.id,x])).values()]:
+  jobs.concat(fullRows,jobSearchText?jobSearchRemote:[]);
  if(keepMode!=='all'){
   for(const item of keepItems){
    if(!item?.id)continue;
@@ -6170,7 +6220,8 @@ function renderJobs(){
  const lowBidCount=considered.filter(o=>pastCompetitionSummary(o.x).low&&partners.some(p=>verdict(o.x,p).type==='ready')).length;
  const registryFailures=partners.filter(p=>p.registryError).length;
  const partialServerList=partnerAllMode?
-  (partnerAllBids.state!=='ready'||partnerAllBids.loaded<partnerAllBids.total):
+  (exactBidQuery?(jobSearchServerTotal===null||jobSearchRemoteLoading||!!jobSearchRemoteError):
+   (partnerAllBids.state!=='ready'||partnerAllBids.loaded<partnerAllBids.total)):
   !fullFilterReady&&
   (g2bSavedLoadRunning||!!g2bSavedLoadError||
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
@@ -6184,6 +6235,11 @@ function renderJobs(){
   '서버 DB에서 불러온 공고 중 현재 협업 후보로 분류된 건수';
  const knownServerCount=partnerAllMode?partnerAllBids.total:Math.max(g2bSavedKnownTotal,g2bSavedTotal);
  const listCoverageText=partnerAllMode?
+  exactBidQuery?
+   ('공고번호 저장 DB '+(jobSearchRemoteLoading?'조회 중':
+     jobSearchServerTotal!==null?
+      jobSearchRemote.length.toLocaleString('ko-KR')+' / '+jobSearchServerTotal.toLocaleString('ko-KR')+'건 확인':
+      '조회 확인 필요')+' · '):
   '전체 저장 DB '+partnerAllBids.loaded.toLocaleString('ko-KR')+' / '+
    (partnerAllBids.total?partnerAllBids.total.toLocaleString('ko-KR'):'집계 확인 중')+
    '건 조회'+(partnerAllBids.error?' · '+partnerAllBids.error:'')+' · 현재 로드분만 집계 · ':
@@ -6281,17 +6337,21 @@ function renderJobs(){
   const scopeRows=(keepMode!=='all'?all.map(function(x){return {x,time:jobTimeInfo(x)}}):
    jobSearchText?all.map(function(x){return {x,time:jobTimeInfo(x)}}):
    partnerMode&&jobPartnerShowClosed?closed:filter==='closed'?closed:active).filter(function(o){
-    if(keepMode!=='all')return true;
+    if(keepMode!=='all'||exactBidQuery)return true;
     const x=o.x;
     if(filter==='all'||filter==='closed')return true;
     if(filter==='partner')return jobMatchesSelectedPartner(x,selectedPartnerId);
     return x.entry===filter;
-  }).filter(o=>!partnerMode||!member||keepMode!=='all'||partnerBidMatchesNewFilters(o.x));
+  }).filter(o=>exactBidQuery||!partnerMode||!member||keepMode!=='all'||partnerBidMatchesNewFilters(o.x));
   if(member&&partnerMode)refreshVerdictFilters(scopeRows,selectedCompany);
   let list=keepMode!=='all'?scopeRows:scopeRows.filter(o=>
    matchesVerdictFilter(o.x,selectedCompany,jobVerdictFilter)&&
    (!jobSearchText||jobSearchMatches(o.x,jobSearchNormalized(jobSearchText))));
-  if(partnerMode&&member&&keepMode==='all'){
+  // Exact official bid ID is a locator, not a shortlist filter. This branch
+  // does not modify the established default/kept verdict filtering contract.
+  if(exactBidQuery&&keepMode==='all')
+   list=scopeRows.filter(o=>jobSearchMatches(o.x,jobSearchNormalized(jobSearchText)));
+  if(partnerMode&&member&&keepMode==='all'&&!exactBidQuery){
    list=list.filter(o=>partnerBidMatchesNewFilters(o.x));
   }
   if(keepMode==='all')list.sort(function(a,b){
@@ -6364,7 +6424,7 @@ function renderJobs(){
     partnerAllBids.loaded<partnerAllBids.total):
    !fullFilterReady&&(!!g2bSavedLoadError||(g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal));
   const more=document.getElementById('g2bMore');
-  more.style.display=keepMode!=='all'?'none':(list.length>jobRenderLimit||serverMore?'inline-block':'none');
+  more.style.display=keepMode!=='all'||exactBidQuery?'none':(list.length>jobRenderLimit||serverMore?'inline-block':'none');
   more.textContent=partnerAllMode?
    (jobRenderLimit<list.length?'공고 '+Math.min(jobRenderLimit,list.length)+' / '+list.length+'건 · 더 보기':
     partnerAllBids.state==='loading'?'전체 DB 공고 조회 중':
@@ -6420,7 +6480,10 @@ function renderJobs(){
   }).join(''):'<div class="emptycard">'+
    (keepMode==='mine'?'킵한 공고가 없습니다. 공고 카드에서 ☆ 킵으로 추가하세요.':
     keepMode==='watch'?'관전 대상의 킵 공고가 없습니다.':
-    jobSearchText?'검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.':'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
+    jobSearchText?(jobSearchRemoteError?'공고번호 서버 검색 실패 · '+htmlEscape(jobSearchRemoteError):
+      worklinksShareExactBidError?'공고번호 직접 조회 실패 · '+htmlEscape(worklinksShareExactBidError):
+      exactBidQuery&&(jobSearchRemoteLoading||jobSearchServerTotal===null)?'공고번호 저장 DB 조회 중입니다.':
+      '검색된 공고가 없습니다. 공고번호 또는 공고명으로 다시 검색하세요.'):'이 상태의 일감이 없습니다. 다른 참가 상태를 선택하세요.')+'</div>';
  }
  if(!partnerAllMode&&!fullFilterReady&&g2bServerAvailable&&g2bLoadedOffset<g2bSavedTotal){
   const progress=' · 현재 로드 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 기준 (더 보기 가능)';
