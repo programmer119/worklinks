@@ -14,7 +14,7 @@ const ctx={
   jobSearchText:'',jobRenderLimit:40
 };
 vm.createContext(ctx);
-vm.runInContext(src+'\nthis.__filter={swBuildTitle,partnerBidMatchesNewFilters,prebidCache};',ctx);
+vm.runInContext(src+'\nthis.__filter={swBuildTitle,partnerBidMatchesNewFilters,partnerAwardMethodGroup,partnerAwardSummaryText,prebidCache};',ctx);
 const {swBuildTitle,partnerBidMatchesNewFilters}=ctx.__filter;
 assert.equal(swBuildTitle({kind:'servc',title:'교육정보시스템 구축'}),true);
 assert.equal(swBuildTitle({kind:'servc',title:'데이터베이스 고도화'}),true);
@@ -36,33 +36,53 @@ assert.equal(swBuildTitle({kind:'servc',title:'개인정보 처리 서비스',pr
 
 const bid=code=>({id:'g2b-servc-R26BK-test-000',kind:'servc',title:'정보시스템 구축',
  awardMethodCode:code,awardFieldsVerified:true});
-vm.runInContext("partnerSwScope='build';partnerAwardFilter='price';",ctx);
-assert.equal(partnerBidMatchesNewFilters(bid('낙030021')),true);
-assert.equal(partnerBidMatchesNewFilters(bid('낙030022')),true);
-assert.equal(partnerBidMatchesNewFilters(bid('낙030029')),true);
-assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),false);
-assert.equal(partnerBidMatchesNewFilters(bid('낙030002')),false);
-vm.runInContext("partnerSwScope='all';partnerAwardFilter='all';",ctx);
-assert.equal(partnerBidMatchesNewFilters({id:'g2b-servc-nonsw',title:'사무실 책상 구매',kind:'servc'}),true,
- '전체 공고는 비SW 공고를 숨기면 안 됨');
-vm.runInContext("partnerSwScope='sw';",ctx);
-assert.equal(partnerBidMatchesNewFilters({id:'g2b-servc-nonsw',title:'사무실 책상 구매',kind:'servc'}),false,
- 'SW 관련 선택에서 비SW 제외');
-vm.runInContext("partnerSwScope='build';partnerAwardFilter='price';",ctx);
-assert.equal(partnerBidMatchesNewFilters({...bid('낙030021'),awardFieldsVerified:false}),false);
-vm.runInContext("partnerAwardFilter='qualification';",ctx);
+// Default means every award category, including missing official data.
+vm.runInContext("partnerSwScope='all';partnerAwardFilters.clear();",ctx);
+const nonsw={id:'g2b-servc-nonsw',title:'사무실 책상 구매',kind:'servc'};
+assert.equal(partnerBidMatchesNewFilters(nonsw),true,'전체 공고에서 비SW도 표시');
 assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),true);
-vm.runInContext("partnerAwardFilter='spec-price';",ctx);
+assert.equal(partnerBidMatchesNewFilters({...bid('낙030021'),awardFieldsVerified:false}),true);
+assert.equal(ctx.__filter.partnerAwardSummaryText(),'낙찰 전체');
+vm.runInContext("partnerSwScope='sw';",ctx);
+assert.equal(partnerBidMatchesNewFilters(nonsw),false,'SW 필터에서 비SW 제외');
+// Multiple selections OR: price and suitability are shown together.
+vm.runInContext("partnerSwScope='build';partnerAwardFilters.add('price');partnerAwardFilters.add('qualification');",ctx);
+for(const code of ['낙030021','낙030022','낙030029','낙030001'])
+ assert.equal(partnerBidMatchesNewFilters(bid(code)),true,'selected method '+code);
+for(const code of ['낙030002','낙030005','낙999999'])
+ assert.equal(partnerBidMatchesNewFilters(bid(code)),false,'unselected method '+code);
+assert.equal(ctx.__filter.partnerAwardSummaryText(),'가격낙찰형 + 적격심사');
+// Unknown official codes and unverified codes are selectable, not misclassified.
+vm.runInContext("partnerAwardFilters.clear();partnerAwardFilters.add('other');",ctx);
+assert.equal(partnerBidMatchesNewFilters({...bid('낙030021'),awardFieldsVerified:false}),true);
+assert.equal(partnerBidMatchesNewFilters(bid('낙999999')),true);
+assert.equal(partnerBidMatchesNewFilters(bid('')),true);
+assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),false);
+vm.runInContext("partnerAwardFilters.clear();partnerAwardFilters.add('spec-price');partnerAwardFilters.add('negotiation');",ctx);
 assert.equal(partnerBidMatchesNewFilters(bid('낙030018')),true);
 assert.equal(partnerBidMatchesNewFilters(bid('낙030002')),true);
+assert.equal(partnerBidMatchesNewFilters(bid('낙030005')),true);
+assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),false);
+// Removing all checks means reset to ALL.
+vm.runInContext("partnerAwardFilters.clear();",ctx);
+assert.equal(partnerBidMatchesNewFilters(bid('낙030001')),true);
+assert.equal(ctx.__filter.partnerAwardSummaryText(),'낙찰 전체');
 assert.ok(html.includes('id="partnerNoticeStage"'));
 assert.ok(html.includes('id="partnerAwardFilter"'));
+assert.ok(html.includes('id="partnerAwardSummary"'));
+for(const category of ['all','price','qualification','spec-price','negotiation','other'])
+ assert.ok(html.includes('data-award-filter="'+category+'"'),'missing checkbox '+category);
+assert.ok(html.includes("partnerAwardFilters.add(choice)"),'checkbox should modify shared OR-set');
+assert.ok(html.includes("partnerAwardFilters.delete(choice)"),'checkbox should remove from OR-set');
+assert.ok(html.includes("partnerAwardFilters.clear()"),'all checkbox must clear selections');
+assert.ok(html.includes('syncPartnerAwardControl()'),'stage changes must sync award control');
+assert.ok(!html.includes('<select id="partnerAwardFilter"'),'single-select should be removed');
 assert.ok(html.includes('id="partnerSwScope"'));
 assert.ok(html.includes('changcom-prebid.js'));
 assert.ok(html.includes('<option value="all">전체 공고</option>'));
 assert.ok(html.includes('<option value="sw">SW 관련</option>'));
 assert.ok(html.includes('<option value="build">SW 구축·개발</option>'));
-assert.ok(html.includes('<option value="price">가격낙찰형</option>'));
+assert.ok(html.includes('data-award-filter="price">가격낙찰형</label>'));
 assert.ok(html.includes("if(partnerAllBids.state==='loading')")===false,
  'UI scope code must be external, not duplicated in HTML');
 assert.ok(src.includes("'/saved?sw=0&limit=200&offset='"),
@@ -85,7 +105,7 @@ ctx.g2bFetch=async path=>{
    {bidNo:'C',title:'회의실 청소 용역',kind:'servc'}]};
  throw Error('unexpected page '+path);
 };
-vm.runInContext("partnerNoticeStage='bid';partnerSwScope='all';partnerAwardFilter='all';",ctx);
+vm.runInContext("partnerNoticeStage='bid';partnerSwScope='all';partnerAwardFilters.clear();",ctx);
 vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  assert.deepEqual(calls,["/saved?sw=0&limit=200&offset=0"]);
  assert.equal(vm.runInContext('partnerAllBids.items.length',ctx),2);
