@@ -247,5 +247,93 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  assert.equal(hugeCalls.length,1,'specific prebid lookup must not fetch unrelated bids');
  assert.equal(html.includes("const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';"),true);
  assert.ok(html.includes("const searchSw=worklinksIsChangcomView()?'0':'1';"));
+ // Regression: keep the ordinary bid click route entirely intact.
+ const ordinaryMarkup=vm.runInContext("combinedBidCardMarkup({id:'g2b-servc-R26BK01830000-000',kind:'servc',title:'공공 플랫폼 구축',org:'기획기관',amount:'100000000'})",ctx);
+ assert.ok(ordinaryMarkup.includes('data-job-card="g2b-servc-R26BK01830000-000"'),
+  'unified ordinary bid must use original [data-job-card] handler');
+ assert.ok(ordinaryMarkup.includes('data-job-detail="g2b-servc-R26BK01830000-000"'));
+
+ // Regression: prespec and plan open the SAME dialog with stage-specific facts,
+ // never the original bid-only RFP/qualification/award/close logic.
+ const target='R26BD00301798';
+ const key='g2b-prebid-prespec-servc-'+target;
+ ctx.__filter.prebidCache.prespec.items=[{
+  id:target,stage:'prespec',kind:'servc',title:'학생관리 시스템 구축 용역',
+  org:'연세대학교 미래캠퍼스',posted:'2026-11-17 16:37:24',
+  budget:'39930000',opinionDeadline:'202611191800',subject:'학생관리 시스템 구축',
+  files:[],url:''
+ }];
+ const shown=vm.runInContext('prebidNoticeCardMarkup(prebidCache.prespec.items[0])',ctx);
+ assert.ok(shown.includes('data-prebid-detail="'+key+'"'),'prespec clickable card key');
+ assert.ok(shown.includes('tabindex="0"'),'keyboard-focusable stage card');
+ assert.ok(!shown.includes('공유 링크'),'no redundant share button on thumbnail');
+ assert.ok(!shown.includes('data-job-card'),'early stage may not run bid-only detail handler');
+ const seen=new Set();
+ const modal={classList:{add:x=>seen.add(x)},setAttribute:(k,v)=>{modal[k]=v}};
+ const nodes={
+  jobDetailModal:modal,
+  jobDetailTitle:{textContent:''},
+  jobDetailSub:{textContent:''},
+  jobDetailBody:{innerHTML:''},
+  jobDetailClose:{focus:()=>{nodes.jobDetailClose.focused=true}}
+ };
+ ctx.document.getElementById=id=>nodes[id]||null;
+ ctx.document.activeElement={focus:()=>{}};
+ ctx.document.body={style:{}};
+ ctx.activeDetailJobId=null;
+ ctx.jobDetailPriorFocus=null;
+ const priorCalls=hugeCalls.length;
+ assert.equal(vm.runInContext("openPrebidDetail('"+key+"')",ctx),true);
+ assert.equal(ctx.activeDetailJobId,key);
+ assert.ok(seen.has('open')&&modal['aria-hidden']==='false');
+ assert.equal(nodes.jobDetailTitle.textContent,'학생관리 시스템 구축 용역');
+ assert.ok(nodes.jobDetailSub.textContent.includes('사전규격'));
+ assert.ok(nodes.jobDetailBody.innerHTML.includes('의견등록 마감'));
+ assert.ok(nodes.jobDetailBody.innerHTML.includes('2026-11-19 18:00'));
+ assert.ok(!nodes.jobDetailBody.innerHTML.includes('입찰마감'));
+ assert.ok(!nodes.jobDetailBody.innerHTML.includes('참가자격 확인'));
+ assert.ok(!nodes.jobDetailBody.innerHTML.includes('원문 공고 열기'),
+  'missing source URL must never become a fake original link');
+ assert.ok(nodes.jobDetailBody.innerHTML.includes('원문 직접 주소 미확인'));
+ assert.equal(hugeCalls.length,priorCalls,'opening a prespec cannot call bid APIs');
+ assert.equal(nodes.jobDetailClose.focused,true);
+
+ // Plan retains verified official original/attachments and correct stage labels.
+ const planKey='g2b-prebid-plan-servc-R26DD20928584';
+ ctx.__filter.prebidCache.plan.items=[{
+  id:'R26DD20928584',stage:'plan',kind:'servc',title:'교육지원 시스템 발주',
+  org:'발주기관',posted:'2026-11-17 10:00',budget:'120000000',
+  plannedMonth:'2026-12',url:'https://www.g2b.go.kr/link/PRPA015_01/single/?oderPlanNo=R26DD20928584',
+  files:['https://www.g2b.go.kr/official/doc','javascript:alert(1)']
+ }];
+ assert.equal(vm.runInContext("openPrebidDetail('"+planKey+"')",ctx),true);
+ assert.ok(nodes.jobDetailSub.textContent.includes('발주계획'));
+ assert.ok(nodes.jobDetailBody.innerHTML.includes('발주예정'));
+ assert.ok(nodes.jobDetailBody.innerHTML.includes('원문 공고 열기'));
+ assert.ok(nodes.jobDetailBody.innerHTML.includes('https://www.g2b.go.kr/link/PRPA015_01/single/'));
+ assert.ok(!nodes.jobDetailBody.innerHTML.includes('javascript:alert'));
+ assert.equal(hugeCalls.length,priorCalls,'opening plan cannot call bid APIs');
+
+ // Kept early-stage cards remain clickable using the same stable keep identity.
+ const keptClickable=vm.runInContext("prebidKeptCardMarkup({id:'"+key+"',title:'학생관리 시스템 구축 용역',amount:'3993만원'})",ctx);
+ assert.ok(keptClickable.includes('data-prebid-detail="'+key+'"'));
+ assert.ok(!keptClickable.includes('공유 링크'));
+ const cardNode={dataset:{prebidDetail:key}};
+ let prevented=0;
+ const ev={target:{closest:selector=>selector==='[data-prebid-detail]'?cardNode:null},
+  preventDefault:()=>{prevented++}};
+ vm.runInContext('prebidCardClick',ctx)(ev);
+ assert.equal(prevented,1,'card click must open stage detail');
+ const keeping={target:{closest:selector=>selector==='[data-prebid-detail]'?cardNode:
+  selector==='a,button,input,select,textarea,[data-keep-toggle]'?{}:null},
+  preventDefault:()=>{prevented++}};
+ vm.runInContext('prebidCardClick',ctx)(keeping);
+ assert.equal(prevented,1,'keep button must not open detail');
+ const keyboard={key:'Enter',target:{matches:selector=>selector==='[data-prebid-detail]',
+  dataset:{prebidDetail:key}},preventDefault:()=>{prevented++}};
+ vm.runInContext('prebidCardKeydown',ctx)(keyboard);
+ assert.equal(prevented,2,'Enter key must open stage detail');
+ assert.ok(html.includes("const card=e.target.closest('[data-job-card]')"),
+  'do not touch normal bid delegated event logic');
  console.log('CHANGCOM_PREBID_FILTERS=PASS');
 }).catch(error=>{console.error(error);process.exitCode=1;});
