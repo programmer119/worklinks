@@ -186,9 +186,10 @@ function prebidKeepSource(id){
  if(!match)return null;
  return prebidCache[match[1]].items.find(x=>x.kind===match[2]&&prebidKeepId(x)===id)||null;
 }
+const prebidVisibleKeptRows=new Map();
 function prebidKeepSnapshotFor(id){
  const x=prebidKeepSource(id);
- if(!x)return null;
+ if(!x)return prebidVisibleKeptRows.get(id)||null;
  const name=x.stage==='plan'?'발주계획':'사전규격';
  const url=String(x.url||'');
  return {
@@ -211,18 +212,21 @@ function prebidKeepJobFromId(id){
 function prebidKeptCardMarkup(x){
  const match=String(x?.id||'').match(/^g2b-prebid-(plan|prespec)-(servc|thng)-(.+)$/);
  if(!match)return '';
+ prebidVisibleKeptRows.set(x.id,x);
  const name=match[1]==='plan'?'발주계획':'사전규격';
  const url=String(x.url||'');
  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
  const keep=typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(x.id)||''):'';
- return '<article class="card" data-prebid-id="'+htmlEscape(match[3])+'"><div class="cardtop">'+
+ return '<article class="card" data-prebid-id="'+htmlEscape(match[3])+
+  '" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title||'공고 상세보기')+'"><div class="cardtop">'+
   '<span class="tag">'+name+'</span><span class="tag">'+(match[2]==='servc'?'용역':'물품')+'</span></div>'+
-  '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
+  '<h3><button class="job-card-title" type="button" data-job-detail="'+htmlEscape(x.id)+'">'+
+   htmlEscape(x.title||'(사업명 없음)')+'</button></h3>'+
   '<p>'+htmlEscape(x.org||'발주기관 미기재')+'</p>'+
   '<p><strong>'+htmlEscape(x.amount||'예산 미기재')+'</strong> · '+
   htmlEscape(x.period||x.deadline||(match[1]==='plan'?'발주 예정':'의견마감 미기재'))+'</p>'+
   '<div class="prebid-keep-actions">'+keep+
-  (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
+  (safe?'<a data-external-source="1" href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
    '<span class="tag">등록번호 '+htmlEscape(x.noticeNumber||match[3])+'</span>')+
   '</div></article>';
 }
