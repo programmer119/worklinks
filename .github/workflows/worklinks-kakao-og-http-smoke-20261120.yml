@@ -1,0 +1,39 @@
+name: WorkLinks public Kakao OG HTTP smoke
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-kakao-og-http-smoke-20261120.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Validate five publicly served OG pages and PNG without authentication
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base='https://worklinks.suaveforge.com/startup-support/share'
+          ids=(R26BD00301798 R26BD00303409 R26BD00302593 R26BD00301029 R26BK01843011)
+          # GitHub Pages can take a moment to propagate its latest success.
+          for attempt in $(seq 1 15); do
+            ok=1
+            for id in "${ids[@]}"; do
+              if ! curl -fsSL --connect-timeout 10 --max-time 20 \
+                -A 'KAKAOTALK/10.0 (og-scraper)' "$base/$id/" -o "/tmp/og-$id.html"; then ok=0;break;fi
+              if ! grep -Fq 'property="og:title"' "/tmp/og-$id.html" || \
+                 ! grep -Fq 'property="og:image"' "/tmp/og-$id.html" || \
+                 ! grep -Fq "$base/$id/" "/tmp/og-$id.html" || \
+                 ! grep -Fq "open=$id" "/tmp/og-$id.html"; then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]] && curl -fsSL --connect-timeout 10 --max-time 20 "$base/og-worklinks.png" -o /tmp/og-worklinks.png &&
+               [[ "$(head -c 8 /tmp/og-worklinks.png | od -An -tx1 | tr -d ' \n')" == "89504e470d0a1a0a" ]]; then
+              echo WORKLINK_KAKAO_FIVE_PUBLIC_META_AND_PNG=PASS
+              exit 0
+            fi
+            sleep 8
+          done
+          echo WORKLINK_KAKAO_FIVE_PUBLIC_META_AND_PNG=FAIL
+          exit 7
