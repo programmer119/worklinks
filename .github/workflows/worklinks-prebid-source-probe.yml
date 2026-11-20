@@ -1,0 +1,41 @@
+name: WorkLinks prebid official file header read-only probe
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-prebid-source-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-only-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect actual G2B attachment response headers only
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, urllib.parse
+          import re
+          base='https://www.g2b.go.kr/pn/pnz/pnza/UntyAtchFile/downloadFile.do'
+          for seq in (1,2,3):
+              url=base+'?'+urllib.parse.urlencode({'bfSpecRegNo':'R26BD00302593','fileType':'BFDTL','fileSeq':seq})
+              for method in ('HEAD','GET'):
+                  req=urllib.request.Request(url,method=method,headers={
+                      'User-Agent':'Mozilla/5.0 (compatible; WorkLinksReadOnlyProbe/1.0)',
+                      'Accept':'*/*','Range':'bytes=0-2047'})
+                  try:
+                      with urllib.request.urlopen(req,timeout=12) as res:
+                          final=urllib.parse.urlsplit(res.geturl())
+                          ctype=res.headers.get('Content-Type','')[:150]
+                          disposition=res.headers.get('Content-Disposition','')[:500]
+                          # Never print download bytes. Read only a small prefix.
+                          prefix=res.read(96) if method=='GET' else b''
+                          print('PROBE',seq,method,'STATUS',res.status,
+                                'HOST',final.hostname,'PATH',final.path,
+                                'TYPE',repr(ctype),
+                                'DISPOSITION',repr(disposition),
+                                'PREFIX',repr(prefix[:24]))
+                  except (urllib.error.URLError,TimeoutError,OSError) as exc:
+                      print('PROBE',seq,method,'ERROR',type(exc).__name__,
+                            str(getattr(exc,'code',''))[:20])
+          PY
