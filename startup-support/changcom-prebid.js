@@ -1,7 +1,14 @@
 /* Changcom: source-backed procurement stage and SW award filters.
  * Existing bid records require no new G2B requests; prebid reads local server DB.
  */
-let partnerSwScope='all', partnerNoticeStage='bid';
+// Only real saved records populate the list. URL parameters select search context.
+const partnerDeepLinkParams=new URLSearchParams(window.location.search);
+const partnerDeepLinkId=String(partnerDeepLinkParams.get('notice')||partnerDeepLinkParams.get('q')||'').trim().toUpperCase();
+const explicitPartnerStage=partnerDeepLinkParams.get('stage');
+let partnerSwScope='all', partnerNoticeStage=['bid','plan','prespec'].includes(explicitPartnerStage)
+ ? explicitPartnerStage : /^R\d{2}BD\d{8}$/.test(partnerDeepLinkId)?'prespec':'bid';
+const initialPartnerStageSelect=document.getElementById('partnerNoticeStage');
+if(initialPartnerStageSelect)initialPartnerStageSelect.value=partnerNoticeStage;
 // Empty selection means all award methods. Multiple checks are combined with OR.
 const partnerAwardFilters=new Set();
 const prebidCache={plan:{state:'idle',items:[],total:0,error:'',at:''},
@@ -243,6 +250,7 @@ function renderPrebidJobs(el){
   const url=String(x.url||'');
   const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
   const fileLinks=(x.files||[]).filter(y=>/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(y)).slice(0,4);
+  const deepLink='./?view=changcom&stage='+encodeURIComponent(stage)+'&q='+encodeURIComponent(x.id);
   return '<article class="card" data-prebid-id="'+htmlEscape(x.id)+'"><div class="cardtop">'+
    '<span class="tag">'+htmlEscape(name)+'</span><span class="tag">'+htmlEscape(x.kind==='servc'?'용역':'물품')+'</span></div>'+
    '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
@@ -254,7 +262,8 @@ function renderPrebidJobs(el){
    (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
    '<span class="tag">등록번호 '+htmlEscape(x.id||'미기재')+'</span>')+
    (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
-   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</div></article>';
+   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+
+   ' · <a href="'+htmlEscape(deepLink)+'" title="저장된 공고를 WORKLINK에서 다시 열기">공유 링크</a></div></article>';
  }).join('')+
   (rows.length>visible?'<button type="button" id="prebidMore" class="job-vf">목록 '+visible.toLocaleString('ko-KR')+
   ' / '+rows.length.toLocaleString('ko-KR')+'건 · 더 보기</button>':'');
