@@ -235,15 +235,23 @@ function prebidOfficialFileEntries(x,limit=8){
   return {url,name};
  }).filter(Boolean).slice(0,limit);
 }
-function prebidSourceMarkup(x,safe,fileEntries){
- const id=String(x.id||'');
- const source=safe||(fileEntries.length?fileEntries[0].url:'https://www.g2b.go.kr/');
- const label=safe?'원문 보기':fileEntries.length?'원본문서 보기':'나라장터에서 조회';
- const title=safe?'나라장터 원문 열기':fileEntries.length?
-  '나라장터에 등록된 첫 번째 원본문서 열기':
-  '나라장터에서 등록번호 '+id+' 검색 · 상세 직링크 미확인';
- return '<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(source)+
-  '" target="_blank" rel="noopener noreferrer" title="'+htmlEscape(title)+'">'+label+'</a>';
+// Use the verified official plan detail route; the older prespec-number
+// deep-link mechanism is not reliable on the current G2B portal.
+function prebidOfficialDetailUrl(x){
+ const url=String(x?.url||'').trim();
+ if(/^https:\/\/(?:www\.)?g2b\.go\.kr\//i.test(url))return url;
+ const id=String(x?.id||'');
+ if(x?.stage==='plan'&&/^R\d{2}DD\d{8}$/.test(id))
+  return 'https://www.g2b.go.kr/link/PRPA015_01/single/?oderPlanNo='+encodeURIComponent(id);
+ return '';
+}
+function prebidSourceMarkup(x,_safe,fileEntries){
+ const source=prebidOfficialDetailUrl(x);
+ if(source)return '<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(source)+
+  '" target="_blank" rel="noopener noreferrer">나라장터 원문 보기</a>';
+ if(fileEntries.length)return '<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(fileEntries[0].url)+
+  '" target="_blank" rel="noopener noreferrer" title="나라장터의 공식 원본 첨부파일입니다. 공고 상세페이지가 아닙니다">원본문서 보기</a>';
+ return '<a class="prebid-source-action" data-external-source="1" href="https://www.g2b.go.kr/" target="_blank" rel="noopener noreferrer" title="나라장터에서 등록번호 '+htmlEscape(x?.id||'')+'로 검색">나라장터 공고조회</a>';
 }
 const prebidMetaRetryAfter=new Map(),prebidMetaQueue=[],prebidMetaPending=new Set();
 let prebidMetaActive=0;
@@ -379,7 +387,7 @@ function renderPrebidSourceDetail(item){
   url:item.url||'',files:[],plannedMonth:'',opinionDeadline:''};
  const stage=row.stage==='plan'?'발주계획':'사전규격';
  const safeUrl=url=>/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(String(url||''));
- const external=safeUrl(row.url)?row.url:'';
+ const external=prebidOfficialDetailUrl(row);
  const fileLinks=prebidOfficialFileEntries(row,8);
  const number=String(row.id||''),org=String(row.org||'발주기관 미기재');
  const subject=String(row.subject||'').trim();
