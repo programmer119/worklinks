@@ -47,6 +47,7 @@ jobs:
           node --check startup-support/changcom-prebid.js
           node tests/test_changcom_prebid_filters.cjs
           node tests/test_worklinks_social_share.cjs
+          node tests/test_worklinks_exact_bid_link.cjs
           bash -n server/deploy-g2b-prebid-only.sh
           echo WORKLINKS_PREBID_AND_PRICE_SW_FILTERS_PASS
       - name: Real Chrome desktop/mobile regressions using current main handlers
