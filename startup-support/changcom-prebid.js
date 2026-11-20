@@ -505,6 +505,7 @@ function renderCombinedProcurementJobs(el){
   (incomplete?'<div class="emptycard">입찰공고·발주계획·사전규격 통합 조회 일부 미확인'+
     (failures.length?' · '+htmlEscape(failures.join(' / ')):'')+
     (failures.length?' <button type="button" id="combinedRetry" class="job-vf">다시 조회</button>':'')+'</div>':'');
+ queuePrebidFileMetadata(rows.slice(0,visible).filter(item=>item.stage==='prespec').map(item=>item.row));
  const more=document.getElementById('g2bMore');
  if(more){
   more.style.display=rows.length>visible||(!searchingBid&&partnerAllBids.loaded<partnerAllBids.total)?'inline-block':'none';
@@ -550,6 +551,7 @@ function renderPrebidJobs(el){
  el.innerHTML=rows.slice(0,visible).map(prebidNoticeCardMarkup).join('')+
   (rows.length>visible?'<button type="button" id="prebidMore" class="job-vf">목록 '+visible.toLocaleString('ko-KR')+
   ' / '+rows.length.toLocaleString('ko-KR')+'건 · 더 보기</button>':'');
+ queuePrebidFileMetadata(rows.slice(0,visible));
  if(typeof scheduleWorklinksShareOpen==='function')scheduleWorklinksShareOpen();
  el.querySelector('#prebidMore')?.addEventListener('click',()=>{
   jobRenderLimit+=jobPageStep();renderJobs();
