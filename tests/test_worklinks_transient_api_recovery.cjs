@@ -5,7 +5,7 @@ const path=require('node:path');
 const prebid=fs.readFileSync(path.join(__dirname,'../startup-support/changcom-prebid.js'),'utf8');
 const keep=fs.readFileSync(path.join(__dirname,'../startup-support/worklinks-keep.js'),'utf8');
 const html=fs.readFileSync(path.join(__dirname,'../startup-support/index.html'),'utf8');
-assert.ok(html.includes('changcom-prebid.js?v=20261120-transient-read-recovery-v1'));
+assert.ok(html.includes('changcom-prebid.js?v=20261121-g2b-source-realname-v1'));
 assert.ok(html.includes('worklinks-keep.js?v=20261120-transient-read-recovery-v1'));
 assert.ok(keep.includes('keepNetworkRetryPending'));
 assert.ok(keep.includes("window.addEventListener('online',recoverKeepNetworkRead)"));
