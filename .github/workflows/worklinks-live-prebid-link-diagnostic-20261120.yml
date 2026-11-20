@@ -1,0 +1,57 @@
+name: Temporary WorkLinks live five-link read-only diagnostic
+on:
+  push:
+    branches: [verify/worklinks-live-five-notices-20261120]
+    paths: ['.github/workflows/worklinks-live-prebid-link-diagnostic-20261120.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe PUBLIC WorkLinks saved DB (no official G2B calls)
+        env:
+          API_BASE: https://api-suaveforge.suaveforge.com:18458/api/g2b
+        run: |
+          python3 - <<'PY'
+          import json,os,urllib.request,urllib.parse,time
+          base=os.environ['API_BASE']
+          target={'prespec':{'R26BD00301798','R26BD00303409','R26BD00302593','R26BD00301029'},
+                  'bid':{'R26BK01843011'}}
+          def read(path):
+              req=urllib.request.Request(base+path,headers={'Origin':'https://worklinks.suaveforge.com','Accept':'application/json'})
+              begin=time.monotonic()
+              with urllib.request.urlopen(req,timeout=18) as resp:
+                  data=resp.read()
+                  print('HTTP',resp.status,'cors',resp.headers.get('Access-Control-Allow-Origin'),
+                        'seconds',round(time.monotonic()-begin,2),'bytes',len(data),'path',path,flush=True)
+                  return json.loads(data)
+          try:
+              status=read('/status')
+              print('API_STATUS',str(status.get('ok')),flush=True)
+          except Exception as exc:
+              print('PUBLIC_API_STATUS_ERROR',type(exc).__name__,str(exc),flush=True)
+          for stage in ['prespec','plan']:
+              wanted=target.get(stage,set())
+              found={}
+              try:
+                  offset=0
+                  while offset<20000:
+                      q=f'/prebid?stage={stage}&limit=500&offset={offset}'
+                      data=read(q)
+                      if not data.get('ok') or not data.get('ready'):print('NOT_READY',stage,data.get('error'));break
+                      items=data.get('items',[])
+                      for item in items:
+                          id=str(item.get('id',''))
+                          if id in wanted: found[id]=(item.get('title'),item.get('kind'))
+                      offset+=len(items)
+                      if offset>=data.get('total',0) or not items: break
+                  print('STAGE_RESULT',stage,'fetched',offset,'found',json.dumps(found,ensure_ascii=False),'missing',sorted(wanted-found.keys()),flush=True)
+              except Exception as exc:print('STAGE_ERROR',stage,type(exc).__name__,str(exc),flush=True)
+          try:
+              data=read('/saved?sw=0&limit=50&offset=0&q=R26BK01843011')
+              print('BID_RESULT',data.get('totalCount'),[(x.get('bidNo'),x.get('title')) for x in data.get('items',[])],flush=True)
+          except Exception as exc:print('BID_ERROR',type(exc).__name__,str(exc),flush=True)
+          PY
