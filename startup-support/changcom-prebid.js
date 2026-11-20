@@ -210,6 +210,80 @@ function prebidWon(value){
   Math.round(n/10000).toLocaleString('ko-KR')+'만원';
 }
 // Stable, stage-scoped IDs prevent plan/prespec/ordinary-bid keep collisions.
+// The official API supplies attachment download URLs but no display names.
+// Never fabricate "규격서 1/2/3"; exact names are fetched from G2B GET headers
+// by the server and persisted separately from the government API snapshot.
+const prebidObservedFileNames={
+ 'R26BD00302593':['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx']
+}; // Verified GET Content-Disposition, Actions #44762273373.
+function prebidOfficialFileEntries(x,limit=8){
+ const names=Array.isArray(x?.fileNames)?x.fileNames:[];
+ const files=Array.isArray(x?.files)?x.files:[];
+ return files.map((url,i)=>{
+  if(!/^https:\/\/(?:www\.)?g2b\.go\.kr\/pn\/pnz\/pnza\/UntyAtchFile\/downloadFile\.do\?/i.test(url))return null;
+  let name=String(names[i]||'').trim();
+  if(!name&&x.id==='R26BD00302593'&&x.stage==='prespec'){
+   try{
+    const u=new URL(url);
+    if(u.searchParams.get('bfSpecRegNo')===x.id &&
+       u.searchParams.get('fileType')==='BFDTL'){
+      const n=Number(u.searchParams.get('fileSeq'));
+      if(n>=1&&n<=3)name=prebidObservedFileNames[x.id][n-1];
+    }
+   }catch(_){}
+  }
+  return {url,name};
+ }).filter(Boolean).slice(0,limit);
+}
+function prebidSourceMarkup(x,safe,fileEntries){
+ const id=String(x.id||'');
+ const source=safe||(fileEntries.length?fileEntries[0].url:'https://www.g2b.go.kr/');
+ const label=safe?'원문 보기':fileEntries.length?'원본문서 보기':'나라장터에서 조회';
+ const title=safe?'나라장터 원문 열기':fileEntries.length?
+  '나라장터에 등록된 첫 번째 원본문서 열기':
+  '나라장터에서 등록번호 '+id+' 검색 · 상세 직링크 미확인';
+ return '<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(source)+
+  '" target="_blank" rel="noopener noreferrer" title="'+htmlEscape(title)+'">'+label+'</a>';
+}
+const prebidMetaRetryAfter=new Map(),prebidMetaQueue=[],prebidMetaPending=new Set();
+let prebidMetaActive=0;
+function queuePrebidFileMetadata(rows){
+ for(const x of rows||[]){
+  if(!x||x.stage!=='prespec'||!Array.isArray(x.files)||!x.files.length)continue;
+  const id=prebidKeepId(x);
+  if(!id||prebidMetaPending.has(id)||Date.now()<(prebidMetaRetryAfter.get(id)||0))continue;
+  const entries=prebidOfficialFileEntries(x,5);
+  if(entries.length&&entries.every(entry=>entry.name))continue;
+  prebidMetaPending.add(id);
+  prebidMetaQueue.push({x,id});
+ }
+ pumpPrebidFileMetadata();
+}
+function pumpPrebidFileMetadata(){
+ while(prebidMetaActive<2&&prebidMetaQueue.length){
+  const {x,id}=prebidMetaQueue.shift();
+  prebidMetaActive++;
+  const path='/prebid-file-names?stage=prespec&kind='+encodeURIComponent(x.kind)+
+   '&id='+encodeURIComponent(x.id);
+  Promise.resolve().then(()=>g2bFetch(path)).then(result=>{
+   const received=result?.fileNames;
+   if(!Array.isArray(received))throw Error('prebid_filename_response_invalid');
+   const names=received.map(v=>String(v||'').trim());
+   x.fileNames=names;
+   // A visible record may have been replaced by a later saved-DB refresh.
+   const current=prebidCache.prespec.items.find(row=>row.id===x.id&&row.kind===x.kind);
+   if(current&&current!==x)current.fileNames=names;
+   prebidMetaRetryAfter.set(id,Date.now()+(names.every(Boolean)?172800000:1200000));
+   if(typeof renderJobs==='function')renderJobs();
+   if(typeof activeDetailJobId!=='undefined'&&activeDetailJobId===id)
+    renderPrebidSourceDetail({id});
+  }).catch(()=>{
+   prebidMetaRetryAfter.set(id,Date.now()+120000);
+  }).finally(()=>{
+   prebidMetaPending.delete(id);prebidMetaActive--;pumpPrebidFileMetadata();
+  });
+ }
+}
 function prebidKeepId(x){
  const stage=String(x?.stage||''),kind=String(x?.kind||''),id=String(x?.id||'').trim();
  if(!['plan','prespec'].includes(stage)||!['servc','thng'].includes(kind)||
