@@ -160,6 +160,66 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  assert.ok(html.includes("const early=typeof prebidKeepSnapshotFor==='function'?prebidKeepSnapshotFor(id):null;"));
  assert.ok(html.includes("return prebidKeptCardMarkup(o.x);"));
  assert.ok(html.includes("(window.worklinksKeeps?.getMode?.()||'all')==='all'"));
+
+ // Unified selection must actually combine all three sources, not just label a bid search.
+ assert.ok(html.includes('<option value="all" selected>전체</option>'));
+ assert.ok(html.includes("partnerNoticeStage==='all'"));
+ assert.ok(html.includes("renderCombinedProcurementJobs(el)"));
+ ctx.jobSearchMatches=(x,q)=>[x.title,x.org,x.id].join(' ').toLowerCase().includes(q);
+ ctx.jobOriginUrl=x=>x.url||'https://www.g2b.go.kr/link/PNPE027_01/single/';
+ ctx.jobAmountLabel=x=>String(x);
+ ctx.jobSearchRemote=[];
+ ctx.jobSearchServerTotal=1;
+ ctx.jobSearchRemoteLoading=false;
+ ctx.jobSearchRemoteError='';
+ ctx.jobSearchText='구축';
+ vm.runInContext("partnerNoticeStage='all';partnerSwScope='all';",ctx);
+ vm.runInContext("partnerAllBids.items=[{id:'g2b-servc-R26BK01830000-000',kind:'servc',title:'공공 플랫폼 구축',startAt:'2026-11-20',amount:'100000000',org:'기획기관',endAt:'2026-11-25'}];partnerAllBids.loaded=1;partnerAllBids.total=1;partnerAllBids.state='ready';",ctx);
+ vm.runInContext("prebidCache.plan.state='ready';prebidCache.prespec.state='ready';",ctx);
+ const united=vm.runInContext('combinedProcurementRows()',ctx);
+ assert.equal(united.result.length,3,'one matching notice in each stage');
+ assert.equal(united.counts.bid,1);
+ assert.equal(united.counts.plan,1);
+ assert.equal(united.counts.prespec,1);
+ vm.runInContext('renderCombinedProcurementJobs',ctx)(el);
+ assert.ok(el.innerHTML.includes('입찰공고'));
+ assert.ok(el.innerHTML.includes('발주계획'));
+ assert.ok(el.innerHTML.includes('사전규격'));
+ assert.ok(el.innerHTML.includes('g2b-prebid-plan-servc-P1'));
+ assert.ok(el.innerHTML.includes('g2b-prebid-prespec-servc-P1'));
+ assert.equal(elements.partnerJobCount.textContent,'3건');
+ ctx.jobSearchText='존재하지않는공고';
+ assert.equal(vm.runInContext('combinedProcurementRows().result.length',ctx),0);
+ ctx.jobSearchText='구축';ctx.jobSearchServerTotal=null;ctx.jobSearchRemoteLoading=true;
+ vm.runInContext('renderCombinedProcurementJobs',ctx)(el);
+ assert.ok(elements.partnerJobCount.textContent.includes('일부'),'unverified search cannot claim completeness');
+ // The saved-bid search must page beyond 250 matching results, not truncate.
+ const start=html.indexOf('var jobSearchRemoteLoading=false,jobSearchRemoteError');
+ const stop=html.indexOf('function updateJobSearchInput(){',start);
+ assert.ok(start>0&&stop>start,'paged saved search implementation must exist');
+ const searchCalls=[];
+ const searchCtx={
+  jobSearchSerial:0,jobSearchText:'시스템',partnerNoticeStage:'all',
+  worklinksIsChangcomView:()=>true,
+  document:{getElementById:()=>({textContent:''})},
+  g2bFetch:async url=>{
+   searchCalls.push(url);
+   const offset=Number(new URL('https://example.test'+url).searchParams.get('offset'));
+   const count=offset===0?250:50;
+   return {searchMode:'saved_only',totalCount:300,
+    items:Array.from({length:count},(_,i)=>({bidNo:'N'+(offset+i),order:'000',title:'시스템 구축'}))};
+  },
+  g2bCardFromServer:row=>({id:row.bidNo,title:row.title}),
+  bidEligibilityCache:new Map(),g2bSupplementalCache:new Map(),jobSearchRfpState:new Map(),
+  jobSearchRemote:[],jobSearchServerTotal:null,
+  scheduleJobsRender:()=>{},encodeURIComponent,Number,String,Map,Set,Date
+ };
+ vm.createContext(searchCtx);
+ vm.runInContext(html.slice(start,stop),searchCtx);
+ await vm.runInContext("jobRunRemoteSearch('시스템')",searchCtx);
+ assert.equal(searchCalls.length,2,'full query pages fetched');
+ assert.equal(searchCtx.jobSearchRemote.length,300,'all 300 matches returned');
+ assert.equal(searchCtx.jobSearchServerTotal,300);
  assert.equal(html.includes("const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';"),true);
  assert.ok(html.includes("const searchSw=worklinksIsChangcomView()?'0':'1';"));
  console.log('CHANGCOM_PREBID_FILTERS=PASS');
