@@ -5688,6 +5688,7 @@ function updateJobSearchInput(){
  scheduleJobsRender();
  const url=new URL(window.location.href);
  if(next)url.searchParams.set('q',next);else url.searchParams.delete('q');
+ if(worklinksIsChangcomView())url.searchParams.set('stage',partnerNoticeStage);
  history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  if(worklinksIsChangcomView()){
   const id=next.toUpperCase();
@@ -6471,12 +6472,13 @@ function setWorkspaceView(view){
   }
   // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
- if(changed){
+ if(changed&&!requestedPartnerViewOnAuth){
   const url=new URL(window.location.href);
   url.searchParams.set('view',view);
   if(view==='jobs'||view==='changcom'){
    const text=jobSearchByWorkspace[view]||'';
    if(text)url.searchParams.set('q',text);else url.searchParams.delete('q');
+   if(view==='changcom')url.searchParams.set('stage',partnerNoticeStage);
   }else url.searchParams.delete('q');
   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  }
@@ -6524,6 +6526,9 @@ document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.
  const previousScope=partnerSwScope;
  partnerSwScope=document.getElementById('partnerSwScope').value;
  partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
+ const stageUrl=new URL(window.location.href);
+ stageUrl.searchParams.set('stage',partnerNoticeStage);
+ history.replaceState(history.state,'',stageUrl.pathname+stageUrl.search+stageUrl.hash);
  syncPartnerAwardControl();
  jobRenderLimit=jobPageStep();
  if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
