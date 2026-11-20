@@ -256,17 +256,23 @@ function combinedProcurementRows(){
  }
  const result=[],counts={bid:0,plan:0,prespec:0};
  for(const x of bidMap.values()){
-  if(!keep(x)||normalized&&!jobSearchMatches(x,normalized))continue;
+  if(!keep(x)||normalized&&!jobSearchNormalized([x.title,x.org,x.id,x.noticeNumber,x.subject,x.type].join(' ')).includes(normalized))continue;
+  if(!normalized&&typeof jobPartnerShowClosed==='boolean'&&
+     (jobTimeInfo(x).key==='closed')!==jobPartnerShowClosed)continue;
   result.push({stage:'bid',row:x,posted:String(x.startAt||'')});counts.bid++;
  }
  for(const stage of ['plan','prespec']){
+  if(!normalized&&typeof jobPartnerShowClosed==='boolean'&&jobPartnerShowClosed)continue;
   if(prebidCache[stage].state!=='ready')continue;
   for(const x of prebidCache[stage].items){
    if(!keep(x)||normalized&&!jobSearchNormalized([x.title,x.org,x.id,x.subject,x.productName].join(' ')).includes(normalized))continue;
    result.push({stage,row:x,posted:String(x.posted||'')});counts[stage]++;
   }
  }
- result.sort((a,b)=>b.posted.localeCompare(a.posted)||String(a.row.id).localeCompare(String(b.row.id)));
+ const sort=document.getElementById('jobSort')?.value||'recent';
+ const budget=item=>Number(item.stage==='bid'?item.row.amount:item.row.budget)||0;
+ result.sort((a,b)=>(sort==='budget'?budget(b)-budget(a):0)||
+  b.posted.localeCompare(a.posted)||String(a.row.id).localeCompare(String(b.row.id)));
  return {result,counts};
 }
 function renderCombinedProcurementJobs(el){
@@ -281,11 +287,13 @@ function renderCombinedProcurementJobs(el){
  const failures=['plan','prespec'].filter(stage=>prebidCache[stage].state==='error')
   .map(stage=>names[stage]+' 조회 실패 · '+String(prebidCache[stage].error||''));
  if(partnerAllBids.state==='error')failures.unshift('입찰공고 조회 실패 · '+String(partnerAllBids.error||''));
+ if(jobSearchRemoteError)failures.unshift('입찰공고 키워드 검색 실패 · '+jobSearchRemoteError);
  const types='입찰공고 '+counts.bid+' · 발주계획 '+counts.plan+' · 사전규격 '+counts.prespec;
  const count=document.getElementById('partnerJobCount');
  if(count)count.textContent=rows.length+'건'+(incomplete?' · 일부':'');
  const summary=document.getElementById('partnerSummary');
- if(summary)summary.textContent=types+(incomplete?' · 수집된 목록 일부만 표시 중':'');
+ if(summary)summary.textContent=types+(incomplete?' · 수집된 목록 일부만 표시 중':'')+
+  (term?' · 세 단계 통합 키워드 검색':' · 등록 최신순');
  const detail=document.getElementById('jobDecisionSummary');
  if(detail)detail.textContent=incomplete?
   '입찰공고 '+partnerAllBids.loaded+' / '+partnerAllBids.total+'건 저장 DB 확인 · '+
