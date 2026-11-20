@@ -108,5 +108,19 @@ with tempfile.TemporaryDirectory() as temp:
  current=read('plan')
  assert current['total']==3, current
  assert any(x['id']=='NONSW0001' and x['swFlagSource']=='none' for x in current['items'])
+ # Confirm the 2026-11-16 prespec backlog receives first historic request,
+ # while already-successful old windows and the eight-call reserve are respected.
+ target_day=dt.date(2026,11,20)
+ with mock.patch.object(prebid,'collect_window',return_value='ok:1/1') as backfill:
+  results=prebid.run_backfill(db,'AUTHORIZED_TEST_KEY',target_day)
+  assert backfill.call_count<=prebid.BACKFILL_PER_CYCLE
+  assert backfill.call_args_list[0].args[2:]==('prespec','servc','20261116')
+  assert 'prespec/servc/20261116' in results
+ db.execute("INSERT INTO prebid_quota(day,calls) VALUES(?,?) ON CONFLICT(day) DO UPDATE SET calls=excluded.calls",
+            ('20261120',prebid.LIMIT_DAY-8))
+ db.commit()
+ with mock.patch.object(prebid,'collect_window',return_value='ok:1/1') as backfill:
+  assert prebid.run_backfill(db,'AUTHORIZED_TEST_KEY',target_day)=={}
+  assert backfill.call_count==0
  db.close()
 print('WORKLINKS_PREBID_COLLECTOR_API_CONTRACT_PASS')

@@ -6,8 +6,11 @@ const partnerDeepLinkParams=typeof URLSearchParams!=='undefined'?
  new URLSearchParams(typeof window!=='undefined'?(window.location?.search||''):''):{get:()=>null};
 const partnerDeepLinkId=String(partnerDeepLinkParams.get('notice')||partnerDeepLinkParams.get('q')||'').trim().toUpperCase();
 const explicitPartnerStage=partnerDeepLinkParams.get('stage');
+// Keep previously issued links working even if navigation stripped stage=.
+const inferredPartnerStage=/^R\d{2}BD\d{8}$/.test(partnerDeepLinkId)?'prespec':
+ /^R\d{2}BK\d{8}$/.test(partnerDeepLinkId)?'bid':null;
 let partnerSwScope='all', partnerNoticeStage=['all','bid','plan','prespec'].includes(explicitPartnerStage)?
- explicitPartnerStage:'all';
+ explicitPartnerStage:(inferredPartnerStage||'all');
 const initialPartnerStageSelect=typeof document!=='undefined'?document.getElementById?.('partnerNoticeStage'):null;
 if(initialPartnerStageSelect)initialPartnerStageSelect.value=partnerNoticeStage;
 // Empty selection means all award methods. Multiple checks are combined with OR.
@@ -93,9 +96,12 @@ const partnerAllBids={items:[],total:0,loaded:0,state:'idle',error:''};
 async function loadPartnerAllBids(more=false){
  if(!worklinksPartnerAccess()||!worklinksIsChangcomView()||
     !['bid','all'].includes(partnerNoticeStage))return;
+ // An exact/search query must use the server's indexed q= endpoint. Never
+ // download 73,000+ unrelated bid records just to find one prebid record.
+ if(partnerNoticeStage==='all'&&String(jobSearchText||'').trim().length>=2)return;
  if(partnerAllBids.state==='loading')return;
  if(!more&&partnerAllBids.state==='ready'){
-  if((partnerNoticeStage!=='all'&&partnerSwScope==='all')||partnerAllBids.loaded>=partnerAllBids.total)return;
+  if(partnerNoticeStage==='all'||partnerSwScope==='all'||partnerAllBids.loaded>=partnerAllBids.total)return;
   more=true;
  }
  const offset=more?partnerAllBids.loaded:0;
@@ -129,7 +135,10 @@ async function loadPartnerAllBids(more=false){
  }finally{
   if(worklinksIsChangcomView()&&['bid','all'].includes(partnerNoticeStage)){
    renderJobs();
-   if((partnerNoticeStage==='all'||partnerSwScope!=='all')&&partnerAllBids.state==='ready'&&partnerAllBids.loaded<partnerAllBids.total)
+   // Only the explicitly selected bid SW/build view performs a continuing
+   // full-corpus scan; the unified view pages on demand to avoid saturation.
+   if(partnerNoticeStage==='bid'&&partnerSwScope!=='all'&&
+      partnerAllBids.state==='ready'&&partnerAllBids.loaded<partnerAllBids.total)
     void loadPartnerAllBids(true);
   }
  }
@@ -261,7 +270,11 @@ function combinedProcurementRows(){
  const normalized=jobSearchNormalized(String(jobSearchText||''));
  const keep= x=>partnerSwScope==='all'||(partnerSwScope==='sw'?partnerSwRelated(x):swBuildTitle(x));
  const bidMap=new Map();
- for(const x of partnerAllBids.items.concat(jobSearchText?jobSearchRemote:[])){
+ // The server's complete keyword result is authoritative for bid matches.
+ // When that search is unavailable, partially loaded local rows are fallback.
+ const fromKeyword=normalized.length>=2&&jobSearchServerTotal!==null&&!jobSearchRemoteLoading;
+ const candidates=fromKeyword?jobSearchRemote:partnerAllBids.items;
+ for(const x of candidates){
   if(x?.id&&/^g2b-(servc|thng|cnstwk|frgcpt)-/.test(x.id))bidMap.set(x.id,x);
  }
  const result=[],counts={bid:0,plan:0,prespec:0};
@@ -287,11 +300,11 @@ function combinedProcurementRows(){
 }
 function renderCombinedProcurementJobs(el){
  const info=combinedProcurementRows(),rows=info.result,counts=info.counts;
- const term=String(jobSearchText||''),fullBid=partnerAllBids.state==='ready'&&
-  partnerAllBids.loaded>=partnerAllBids.total;
- const bidSearchComplete=!term||term.length<2||
-  (jobSearchServerTotal!==null&&!jobSearchRemoteLoading);
- const incomplete=!fullBid||!bidSearchComplete||
+ const term=String(jobSearchText||'').trim();
+ const searchingBid=term.length>=2;
+ const fullBid=searchingBid?(jobSearchServerTotal!==null&&!jobSearchRemoteLoading):
+  partnerAllBids.state==='ready'&&partnerAllBids.loaded>=partnerAllBids.total;
+ const incomplete=!fullBid||
   ['plan','prespec'].some(stage=>prebidCache[stage].state!=='ready');
  const names={plan:'발주계획',prespec:'사전규격'};
  const failures=['plan','prespec'].filter(stage=>prebidCache[stage].state==='error')
@@ -306,7 +319,8 @@ function renderCombinedProcurementJobs(el){
   (term?' · 세 단계 통합 키워드 검색':' · 등록 최신순');
  const detail=document.getElementById('jobDecisionSummary');
  if(detail)detail.textContent=incomplete?
-  '입찰공고 '+partnerAllBids.loaded+' / '+partnerAllBids.total+'건 저장 DB 확인 · '+
+  '입찰공고 '+(searchingBid?(jobSearchServerTotal===null?'검색 결과 미확인':jobSearchRemote.length+' / '+jobSearchServerTotal+'건 검색'):
+   partnerAllBids.loaded+' / '+partnerAllBids.total+'건 저장 DB 확인 (필요 시 더 보기)')+' · '+
   ['plan','prespec'].map(stage=>names[stage]+' '+(prebidCache[stage].state==='ready'?prebidCache[stage].total+'건 확인':'조회 '+prebidCache[stage].state)).join(' · '):
   '입찰공고·발주계획·사전규격 통합 목록 확인 완료 · '+types;
  for(const id of ['jobMissingInfo'])document.getElementById(id)?.replaceChildren();
@@ -317,12 +331,12 @@ function renderCombinedProcurementJobs(el){
  el.innerHTML=rows.slice(0,visible).map(item=>item.stage==='bid'?
   combinedBidCardMarkup(item.row):prebidNoticeCardMarkup(item.row)).join('')+
   (!rows.length&&!incomplete?'<div class="emptycard">세 종류의 저장 공고에서 검색 결과가 없습니다.</div>':'')+
-  (incomplete?'<div class="emptycard">입찰공고·발주계획·사전규격 통합 조회 중'+
+  (incomplete?'<div class="emptycard">입찰공고·발주계획·사전규격 통합 조회 일부 미확인'+
     (failures.length?' · '+htmlEscape(failures.join(' / ')):'')+
     (failures.length?' <button type="button" id="combinedRetry" class="job-vf">다시 조회</button>':'')+'</div>':'');
  const more=document.getElementById('g2bMore');
  if(more){
-  more.style.display=rows.length>visible||partnerAllBids.loaded<partnerAllBids.total?'inline-block':'none';
+  more.style.display=rows.length>visible||(!searchingBid&&partnerAllBids.loaded<partnerAllBids.total)?'inline-block':'none';
   more.textContent=rows.length>visible?'공고 '+visible+' / '+rows.length+'건 · 더 보기':
    '입찰공고 저장 DB '+partnerAllBids.loaded+' / '+partnerAllBids.total+'건 · 다음 조회';
  }
