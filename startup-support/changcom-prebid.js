@@ -161,6 +161,23 @@ async function loadPartnerAllBids(more=false){
   }
  }
 }
+// Read-only SQLite page requests may fail transiently while the API port recovers.
+// Retry only network/timeouts/5xx; never retry an official 403 or mutate the DB.
+const PREBID_READ_RETRY_DELAYS=[350,1100];
+function prebidTransientReadFailure(error){
+ const message=String(error?.message||error||'');
+ return ['AbortError','TimeoutError','TypeError'].includes(error?.name)||
+  /(?:Failed to fetch|fetch failed|NetworkError|network connection|Load failed|HTTP (?:429|50[0-9]))/i.test(message);
+}
+async function prebidReadPageWithRetry(stage,offset){
+ for(let attempt=0;;attempt++){
+  try{return await g2bFetch('/prebid?stage='+stage+'&limit=500&offset='+offset)}
+  catch(error){
+   if(attempt>=PREBID_READ_RETRY_DELAYS.length||!prebidTransientReadFailure(error))throw error;
+   await new Promise(resolve=>setTimeout(resolve,PREBID_READ_RETRY_DELAYS[attempt]));
+  }
+ }
+}
 async function loadPrebidJobs(stage,force=false){
  if(!['plan','prespec'].includes(stage)||!worklinksPartnerAccess())return;
  const state=prebidCache[stage];
@@ -171,7 +188,7 @@ async function loadPrebidJobs(stage,force=false){
  try{
   let data=[],offset=0,total=null,at='',ready=false,complete=false;
   for(let page=0;page<40;page++){
-   const res=await g2bFetch('/prebid?stage='+stage+'&limit=500&offset='+offset);
+   const res=await prebidReadPageWithRetry(stage,offset);
    if(!res||res.ok!==true)throw Error(res?.error||'사전 단계 목록 응답 오류');
    if(!res.ready)throw Error(res.error||'사전 단계 수집 자료 없음');
    ready=true;at=res.asOf||at;total=Number(res.total||0);
@@ -459,4 +476,19 @@ function renderPrebidJobs(el){
  el.querySelector('#prebidMore')?.addEventListener('click',()=>{
   jobRenderLimit+=jobPageStep();renderJobs();
  });
+}
+
+// The initial failed page is retried automatically after connectivity returns.
+// Keep existing failed-state banner until real DB pages have been read fully.
+function recoverVisiblePrebidAfterFailure(){
+ if(typeof document==='undefined'||document.hidden||!worklinksPartnerAccess()||!worklinksIsChangcomView())return;
+ for(const stage of ['plan','prespec']){
+  if(prebidCache[stage].state==='error'&&(partnerNoticeStage===stage||partnerNoticeStage==='all'))
+   void loadPrebidJobs(stage,true);
+ }
+}
+if(typeof window!=='undefined'){
+ window.addEventListener?.('online',recoverVisiblePrebidAfterFailure);
+ window.addEventListener?.('focus',recoverVisiblePrebidAfterFailure);
+ window.setInterval?.(recoverVisiblePrebidAfterFailure,45000);
 }
