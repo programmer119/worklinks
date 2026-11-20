@@ -1,7 +1,9 @@
 /* Changcom: source-backed procurement stage and SW award filters.
  * Existing bid records require no new G2B requests; prebid reads local server DB.
  */
-let partnerSwScope='all', partnerAwardFilter='all', partnerNoticeStage='bid';
+let partnerSwScope='all', partnerNoticeStage='bid';
+// Empty selection means all award methods. Multiple checks are combined with OR.
+const partnerAwardFilters=new Set();
 const prebidCache={plan:{state:'idle',items:[],total:0,error:'',at:''},
                    prespec:{state:'idle',items:[],total:0,error:'',at:''}};
 const PRICE_METHODS=new Set(['낙030021','낙030022','낙030029']);
@@ -29,21 +31,53 @@ function partnerSoftwareSignals(x){
 }
 function swBuildTitle(x){return partnerSoftwareSignals(x).build}
 function partnerSwRelated(x){return partnerSoftwareSignals(x).software}
+const PARTNER_AWARD_LABELS={
+ price:'가격낙찰형',qualification:'적격심사','spec-price':'규격·가격',
+ negotiation:'협상',other:'기타·미확인'
+};
+function partnerAwardMethodGroup(x){
+ if(!/^g2b-/.test(String(x?.id||'')))return 'other';
+ const m=g2bCardAwardMetadata(x);
+ if(!m?.sourceVerified)return 'other'; // Missing official data is not a confirmed award method.
+ const code=String(m.awardMethodCode||'');
+ if(PRICE_METHODS.has(code))return 'price';
+ if(code==='낙030001')return 'qualification';
+ if(SPEC_PRICE_METHODS.has(code))return 'spec-price';
+ if(code==='낙030005')return 'negotiation';
+ return 'other'; // Unmapped official code stays discoverable, not silently dropped.
+}
+function partnerAwardSummaryText(){
+ const keys=Object.keys(PARTNER_AWARD_LABELS).filter(k=>partnerAwardFilters.has(k));
+ if(!keys.length)return '낙찰 전체';
+ if(keys.length===1)return PARTNER_AWARD_LABELS[keys[0]];
+ if(keys.length===2)return keys.map(k=>PARTNER_AWARD_LABELS[k]).join(' + ');
+ return keys.length+'개 방식 선택';
+}
+function syncPartnerAwardControl(){
+ const panel=document.getElementById('partnerAwardFilter');
+ if(!panel)return;
+ const disabled=partnerNoticeStage!=='bid';
+ panel.classList.toggle('disabled',disabled);
+ if(disabled)panel.open=false;
+ const trigger=panel.querySelector('summary');
+ if(trigger){
+  trigger.setAttribute('aria-disabled',disabled?'true':'false');
+  trigger.title=disabled?'발주계획·사전규격은 낙찰방식 미확정 · 입찰공고에서만 사용':
+   (partnerAwardFilters.size?Object.keys(PARTNER_AWARD_LABELS).filter(k=>partnerAwardFilters.has(k)).map(k=>PARTNER_AWARD_LABELS[k]).join(', '):
+    '모든 낙찰방식 표시 · 여러 항목 동시 선택 가능');
+ }
+ const display=document.getElementById('partnerAwardSummary');
+ if(display)display.textContent=partnerAwardSummaryText();
+ panel.querySelectorAll('input[data-award-filter]').forEach(input=>{
+  input.disabled=disabled;
+  input.checked=input.dataset.awardFilter==='all'?partnerAwardFilters.size===0:
+   partnerAwardFilters.has(input.dataset.awardFilter);
+ });
+}
 function partnerBidMatchesNewFilters(x){
  if(partnerSwScope==='build'&&!swBuildTitle(x))return false;
  if(partnerSwScope==='sw'&&!partnerSwRelated(x))return false;
- if(partnerAwardFilter==='all')return true;
- if(!/^g2b-/.test(String(x?.id||'')))return false;
- const m=g2bCardAwardMetadata(x);
- if(!m.sourceVerified)return false; // never infer an award method from title
- const code=String(m.awardMethodCode||'');
- switch(partnerAwardFilter){
- case 'price':return PRICE_METHODS.has(code);
- case 'qualification':return code==='낙030001';
- case 'spec-price':return SPEC_PRICE_METHODS.has(code);
- case 'negotiation':return code==='낙030005';
- default:return true;
- }
+ return partnerAwardFilters.size===0||partnerAwardFilters.has(partnerAwardMethodGroup(x));
 }
 // The full tender corpus is read from existing saved SQLite only. It must not
 // replace the SW-only dataset used by the unrelated general jobs workspace.
