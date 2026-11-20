@@ -1,7 +1,7 @@
 /* Changcom: source-backed procurement stage and SW award filters.
  * Existing bid records require no new G2B requests; prebid reads local server DB.
  */
-let partnerSwScope='all', partnerNoticeStage='bid';
+let partnerSwScope='all', partnerNoticeStage='all';
 // Empty selection means all award methods. Multiple checks are combined with OR.
 const partnerAwardFilters=new Set();
 const prebidCache={plan:{state:'idle',items:[],total:0,error:'',at:''},
@@ -84,10 +84,10 @@ function partnerBidMatchesNewFilters(x){
 const partnerAllBids={items:[],total:0,loaded:0,state:'idle',error:''};
 async function loadPartnerAllBids(more=false){
  if(!worklinksPartnerAccess()||!worklinksIsChangcomView()||
-    partnerNoticeStage!=='bid')return;
+    !['bid','all'].includes(partnerNoticeStage))return;
  if(partnerAllBids.state==='loading')return;
  if(!more&&partnerAllBids.state==='ready'){
-  if(partnerSwScope==='all'||partnerAllBids.loaded>=partnerAllBids.total)return;
+  if((partnerNoticeStage!=='all'&&partnerSwScope==='all')||partnerAllBids.loaded>=partnerAllBids.total)return;
   more=true;
  }
  const offset=more?partnerAllBids.loaded:0;
@@ -119,9 +119,9 @@ async function loadPartnerAllBids(more=false){
   partnerAllBids.error=String(error?.message||error).slice(0,140);
   partnerAllBids.state='error';
  }finally{
-  if(worklinksIsChangcomView()&&partnerNoticeStage==='bid'){
+  if(worklinksIsChangcomView()&&['bid','all'].includes(partnerNoticeStage)){
    renderJobs();
-   if(partnerSwScope!=='all'&&partnerAllBids.state==='ready'&&partnerAllBids.loaded<partnerAllBids.total)
+   if((partnerNoticeStage==='all'||partnerSwScope!=='all')&&partnerAllBids.state==='ready'&&partnerAllBids.loaded<partnerAllBids.total)
     void loadPartnerAllBids(true);
   }
  }
@@ -149,7 +149,7 @@ async function loadPrebidJobs(stage,force=false){
   state.items=data;state.total=data.length;state.at=at;state.state='ready';state.cachedAt=Date.now();
  }catch(err){
   state.state='error';state.error=String(err?.message||err).slice(0,160);
- }finally{if(partnerNoticeStage===stage)renderJobs()}
+ }finally{if(partnerNoticeStage===stage||partnerNoticeStage==='all')renderJobs()}
 }
 function prebidWon(value){
  const n=Number(value);
@@ -209,6 +209,110 @@ function prebidKeptCardMarkup(x){
    '<span class="tag">등록번호 '+htmlEscape(x.noticeNumber||match[3])+'</span>')+
   '</div></article>';
 }
+// Shared cards keep their exact stage label in unified and per-stage results.
+function prebidNoticeCardMarkup(x){
+ const stage=x.stage,name=stage==='plan'?'발주계획':'사전규격';
+ const url=String(x.url||'');
+ const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
+ const fileLinks=(x.files||[]).filter(y=>/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(y)).slice(0,4);
+ return '<article class="card" data-prebid-id="'+htmlEscape(x.id)+'"><div class="cardtop">'+
+   '<span class="tag">'+htmlEscape(name)+'</span><span class="tag">'+htmlEscape(x.kind==='servc'?'용역':'물품')+'</span></div>'+
+   '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
+   '<p>'+htmlEscape(x.org||'발주기관 미기재')+' · '+htmlEscape(x.posted||'등록일 미기재')+'</p>'+
+   '<p><strong>'+htmlEscape(prebidWon(x.budget))+'</strong> · '+
+   htmlEscape(stage==='plan'?'예정 '+(x.plannedMonth||'시기 미기재'):'의견마감 '+(x.opinionDeadline||'미기재'))+'</p>'+
+   '<div class="prebid-keep-actions">'+
+   (typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(prebidKeepId(x))||''):'')+
+   (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
+   '<span class="tag">등록번호 '+htmlEscape(x.id||'미기재')+'</span>')+
+   (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
+   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</div></article>';
+}
+function combinedBidCardMarkup(x){
+ const link=String(jobOriginUrl(x)||'');
+ const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(link)?link:'';
+ const when=String(x.endAt||'');
+ return '<article class="card" data-combined-bid="'+htmlEscape(x.id)+'">'+
+  '<div class="cardtop"><span class="tag">입찰공고</span>'+
+  '<span class="tag">'+htmlEscape(x.kind==='thng'?'물품':x.kind==='servc'?'용역':'공사')+'</span></div>'+
+  '<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+
+   htmlEscape(x.title||'(공고명 없음)')+'</button></h3>'+
+  '<p>'+htmlEscape(x.org||'발주기관 미기재')+' · '+htmlEscape(x.startAt||'등록일 미기재')+'</p>'+
+  '<p><strong>'+htmlEscape(jobAmountLabel(x.amount))+'</strong> · '+
+   htmlEscape(when?'입찰마감 '+when:'입찰마감 원문 확인 필요')+'</p>'+
+  '<div class="prebid-keep-actions">'+
+  (typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(x.id)||''):'')+
+  (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':'')+
+  '</div></article>';
+}
+// The unified view is a real union, never a selected-stage search in disguise.
+// A source still loading or errored is marked partial rather than showing "0".
+function combinedProcurementRows(){
+ const normalized=jobSearchNormalized(String(jobSearchText||''));
+ const keep= x=>partnerSwScope==='all'||(partnerSwScope==='sw'?partnerSwRelated(x):swBuildTitle(x));
+ const bidMap=new Map();
+ for(const x of partnerAllBids.items.concat(jobSearchText?jobSearchRemote:[])){
+  if(x?.id&&/^g2b-(servc|thng|cnstwk|frgcpt)-/.test(x.id))bidMap.set(x.id,x);
+ }
+ const result=[],counts={bid:0,plan:0,prespec:0};
+ for(const x of bidMap.values()){
+  if(!keep(x)||normalized&&!jobSearchMatches(x,normalized))continue;
+  result.push({stage:'bid',row:x,posted:String(x.startAt||'')});counts.bid++;
+ }
+ for(const stage of ['plan','prespec']){
+  if(prebidCache[stage].state!=='ready')continue;
+  for(const x of prebidCache[stage].items){
+   if(!keep(x)||normalized&&!jobSearchNormalized([x.title,x.org,x.id,x.subject,x.productName].join(' ')).includes(normalized))continue;
+   result.push({stage,row:x,posted:String(x.posted||'')});counts[stage]++;
+  }
+ }
+ result.sort((a,b)=>b.posted.localeCompare(a.posted)||String(a.row.id).localeCompare(String(b.row.id)));
+ return {result,counts};
+}
+function renderCombinedProcurementJobs(el){
+ const info=combinedProcurementRows(),rows=info.result,counts=info.counts;
+ const term=String(jobSearchText||''),fullBid=partnerAllBids.state==='ready'&&
+  partnerAllBids.loaded>=partnerAllBids.total;
+ const bidSearchComplete=!term||term.length<2||
+  (jobSearchServerTotal!==null&&!jobSearchRemoteLoading);
+ const incomplete=!fullBid||!bidSearchComplete||
+  ['plan','prespec'].some(stage=>prebidCache[stage].state!=='ready');
+ const names={plan:'발주계획',prespec:'사전규격'};
+ const failures=['plan','prespec'].filter(stage=>prebidCache[stage].state==='error')
+  .map(stage=>names[stage]+' 조회 실패 · '+String(prebidCache[stage].error||''));
+ if(partnerAllBids.state==='error')failures.unshift('입찰공고 조회 실패 · '+String(partnerAllBids.error||''));
+ const types='입찰공고 '+counts.bid+' · 발주계획 '+counts.plan+' · 사전규격 '+counts.prespec;
+ const count=document.getElementById('partnerJobCount');
+ if(count)count.textContent=rows.length+'건'+(incomplete?' · 일부':'');
+ const summary=document.getElementById('partnerSummary');
+ if(summary)summary.textContent=types+(incomplete?' · 수집된 목록 일부만 표시 중':'');
+ const detail=document.getElementById('jobDecisionSummary');
+ if(detail)detail.textContent=incomplete?
+  '입찰공고 '+partnerAllBids.loaded+' / '+partnerAllBids.total+'건 저장 DB 확인 · '+
+  ['plan','prespec'].map(stage=>names[stage]+' '+(prebidCache[stage].state==='ready'?prebidCache[stage].total+'건 확인':'조회 '+prebidCache[stage].state)).join(' · '):
+  '입찰공고·발주계획·사전규격 통합 목록 확인 완료 · '+types;
+ for(const id of ['jobMissingInfo'])document.getElementById(id)?.replaceChildren();
+ const filter=document.getElementById('jobVerdictFilter');if(filter)filter.hidden=true;
+ const closed=document.getElementById('closedJobCount');if(closed)closed.textContent='';
+ const visible=Math.max(20,jobRenderLimit||40);
+ jobAvailableRows=rows.length;
+ el.innerHTML=rows.slice(0,visible).map(item=>item.stage==='bid'?
+  combinedBidCardMarkup(item.row):prebidNoticeCardMarkup(item.row)).join('')+
+  (!rows.length&&!incomplete?'<div class="emptycard">세 종류의 저장 공고에서 검색 결과가 없습니다.</div>':'')+
+  (incomplete?'<div class="emptycard">입찰공고·발주계획·사전규격 통합 조회 중'+
+    (failures.length?' · '+htmlEscape(failures.join(' / ')):'')+
+    (failures.length?' <button type="button" id="combinedRetry" class="job-vf">다시 조회</button>':'')+'</div>':'');
+ const more=document.getElementById('g2bMore');
+ if(more){
+  more.style.display=rows.length>visible||partnerAllBids.loaded<partnerAllBids.total?'inline-block':'none';
+  more.textContent=rows.length>visible?'공고 '+visible+' / '+rows.length+'건 · 더 보기':
+   '입찰공고 저장 DB '+partnerAllBids.loaded+' / '+partnerAllBids.total+'건 · 다음 조회';
+ }
+ el.querySelector('#combinedRetry')?.addEventListener('click',()=>{
+  for(const stage of ['plan','prespec'])if(prebidCache[stage].state==='error')void loadPrebidJobs(stage,true);
+  if(partnerAllBids.state==='error')void loadPartnerAllBids(partnerAllBids.loaded>0);
+ });
+}
 function renderPrebidJobs(el){
  const stage=partnerNoticeStage,report=prebidCache[stage],name=stage==='plan'?'발주계획':'사전규격';
  const summary=document.getElementById('partnerSummary'),decision=document.getElementById('jobDecisionSummary');
@@ -239,23 +343,7 @@ function renderPrebidJobs(el){
  if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. ('+
   '저장된 공고 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
  const visible=Math.max(20,jobRenderLimit||40);
- el.innerHTML=rows.slice(0,visible).map(x=>{
-  const url=String(x.url||'');
-  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
-  const fileLinks=(x.files||[]).filter(y=>/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(y)).slice(0,4);
-  return '<article class="card" data-prebid-id="'+htmlEscape(x.id)+'"><div class="cardtop">'+
-   '<span class="tag">'+htmlEscape(name)+'</span><span class="tag">'+htmlEscape(x.kind==='servc'?'용역':'물품')+'</span></div>'+
-   '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
-   '<p>'+htmlEscape(x.org||'발주기관 미기재')+' · '+htmlEscape(x.posted||'등록일 미기재')+'</p>'+
-   '<p><strong>'+htmlEscape(prebidWon(x.budget))+'</strong> · '+
-   htmlEscape(stage==='plan'?'예정 '+(x.plannedMonth||'시기 미기재'):'의견마감 '+(x.opinionDeadline||'미기재'))+'</p>'+
-   '<div class="prebid-keep-actions">'+
-   (typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(prebidKeepId(x))||''):'')+
-   (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
-   '<span class="tag">등록번호 '+htmlEscape(x.id||'미기재')+'</span>')+
-   (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
-   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</div></article>';
- }).join('')+
+ el.innerHTML=rows.slice(0,visible).map(prebidNoticeCardMarkup).join('')+
   (rows.length>visible?'<button type="button" id="prebidMore" class="job-vf">목록 '+visible.toLocaleString('ko-KR')+
   ' / '+rows.length.toLocaleString('ko-KR')+'건 · 더 보기</button>':'');
  el.querySelector('#prebidMore')?.addEventListener('click',()=>{
