@@ -168,7 +168,7 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  ctx.jobSearchMatches=(x,q)=>[x.title,x.org,x.id].join(' ').toLowerCase().includes(q);
  ctx.jobOriginUrl=x=>x.url||'https://www.g2b.go.kr/link/PNPE027_01/single/';
  ctx.jobAmountLabel=x=>String(x);
- ctx.jobSearchRemote=[];
+ ctx.jobSearchRemote=[{id:'g2b-servc-R26BK01830000-000',kind:'servc',title:'공공 플랫폼 구축',startAt:'2026-11-20',amount:'100000000',org:'기획기관',endAt:'2026-11-25'}];
  ctx.jobSearchServerTotal=1;
  ctx.jobSearchRemoteLoading=false;
  ctx.jobSearchRemoteError='';
@@ -220,6 +220,31 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  assert.equal(searchCalls.length,2,'full query pages fetched');
  assert.equal(searchCtx.jobSearchRemote.length,300,'all 300 matches returned');
  assert.equal(searchCtx.jobSearchServerTotal,300);
+ // LIVE REPRO: querying one R26BD... notice must NOT crawl 73,331 bid pages.
+ const linkSelect={value:'all'};
+ const linkContext={...ctx,
+  window:{location:{search:'?view=changcom&q=R26BD00301798'},worklinksKeeps:ctx.window.worklinksKeeps},
+  document:{getElementById:id=>id==='partnerNoticeStage'?linkSelect:null}
+ };
+ vm.createContext(linkContext);
+ vm.runInContext(src,linkContext);
+ assert.equal(vm.runInContext('partnerNoticeStage',linkContext),'prespec');
+ assert.equal(linkSelect.value,'prespec','original stage-stripped link must still open prespec');
+ assert.ok(html.includes("url.searchParams.set('stage',partnerNoticeStage)"),
+  'workspace navigation must preserve stage in shared URL');
+ ctx.jobSearchText='';
+ vm.runInContext("partnerNoticeStage='all';partnerSwScope='all';partnerAllBids.state='idle';partnerAllBids.items=[];partnerAllBids.loaded=0;partnerAllBids.total=0;partnerAllBids.error='';",ctx);
+ const hugeCalls=[];
+ ctx.g2bCardFromServer=row=>({id:'g2b-servc-'+row.bidNo+'-000',title:row.title,kind:'servc'});
+ ctx.g2bFetch=async url=>{hugeCalls.push(url);return {persisted:true,totalCount:73331,items:[{bidNo:'R26BK01843011',title:'학사행정시스템 구축',kind:'servc'}]};};
+ await vm.runInContext('loadPartnerAllBids()',ctx);
+ await Promise.resolve();
+ assert.equal(hugeCalls.length,1,'unified first page must not recursively fetch 73,331 bids');
+ await vm.runInContext('loadPartnerAllBids()',ctx);
+ assert.equal(hugeCalls.length,1,'rerender must not restart a full database crawl');
+ ctx.jobSearchText='R26BD00301798';
+ await vm.runInContext('loadPartnerAllBids(true)',ctx);
+ assert.equal(hugeCalls.length,1,'specific prebid lookup must not fetch unrelated bids');
  assert.equal(html.includes("const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';"),true);
  assert.ok(html.includes("const searchSw=worklinksIsChangcomView()?'0':'1';"));
  console.log('CHANGCOM_PREBID_FILTERS=PASS');
