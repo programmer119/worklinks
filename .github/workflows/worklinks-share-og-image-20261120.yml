@@ -1,0 +1,98 @@
+name: WorkLinks social preview PNG
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/worklinks-share-og-image-20261120.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  png:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Produce 1200x630 static WORKLINK PNG with no external image API
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os,struct,zlib
+          width,height=1200,630
+          pixels=[]
+          for y in range(height):
+           row=bytearray()
+           for x in range(width):
+            row.extend((max(0,16+y//90-x//350), max(0,43+y//55-x//180), min(255,82+y//30+x//120)))
+           pixels.append(row)
+          def rect(x,y,w,h,rgb):
+           block=bytes(rgb)*max(0,w)
+           for yy in range(max(0,y),min(height,y+h)):
+            if x>=0 and x+w<=width:pixels[yy][3*x:3*(x+w)]=block
+          rect(0,0,14,height,(33,189,207))
+          rect(94,107,310,6,(63,199,218))
+          rect(92,486,1010,3,(44,131,165))
+          rect(975,114,95,95,(27,113,152))
+          rect(991,130,62,62,(49,181,197))
+          for i in range(12):rect(970+i*11,382+i*8,5,42,(25,87+i*6,131+i*4))
+          glyph={
+           'A':['01110','10001','10001','11111','10001','10001','10001'],
+           'B':['11110','10001','10001','11110','10001','10001','11110'],
+           'C':['01111','10000','10000','10000','10000','10000','01111'],
+           'D':['11110','10001','10001','10001','10001','10001','11110'],
+           'E':['11111','10000','10000','11110','10000','10000','11111'],
+           'F':['11111','10000','10000','11110','10000','10000','10000'],
+           'G':['01111','10000','10000','10111','10001','10001','01111'],
+           'I':['11111','00100','00100','00100','00100','00100','11111'],
+           'K':['10001','10010','10100','11000','10100','10010','10001'],
+           'L':['10000','10000','10000','10000','10000','10000','11111'],
+           'M':['10001','11011','10101','10101','10001','10001','10001'],
+           'N':['10001','11001','10101','10011','10001','10001','10001'],
+           'O':['01110','10001','10001','10001','10001','10001','01110'],
+           'P':['11110','10001','10001','11110','10000','10000','10000'],
+           'R':['11110','10001','10001','11110','10100','10010','10001'],
+           'S':['01111','10000','10000','01110','00001','00001','11110'],
+           'T':['11111','00100','00100','00100','00100','00100','00100'],
+           'U':['10001','10001','10001','10001','10001','10001','01110'],
+           'V':['10001','10001','10001','10001','10001','01010','00100'],
+           'W':['10001','10001','10001','10101','10101','10101','01010'],
+           ' ':['00000']*7
+          }
+          def write(s,x,y,scale,color):
+           for char in s.upper():
+            for gy,bits in enumerate(glyph[char]):
+             for gx,b in enumerate(bits):
+              if b=='1':rect(x+gx*scale,y+gy*scale,scale-1,scale-1,color)
+            x+=6*scale
+          write('SUAVEFORGE',95,135,5,(157,222,232))
+          write('WORKLINK',90,233,15,(247,253,255))
+          write('PUBLIC PROCUREMENT',98,426,5,(161,213,229))
+          def chunk(tag,data):
+           return struct.pack('>I',len(data))+tag+data+struct.pack('>I',zlib.crc32(tag+data)&0xffffffff)
+          raw=b''.join(b'\x00'+bytes(row) for row in pixels)
+          png=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>2I5B',width,height,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(raw,9))+chunk(b'IEND',b'')
+          os.makedirs('startup-support/share',exist_ok=True)
+          with open('startup-support/share/og-worklinks.png','wb') as stream:stream.write(png)
+          print('WORKLINK_SOCIAL_PREVIEW_PNG='+str(len(png))+' bytes, 1200x630')
+          PY
+      - name: Commit generated PNG without touching existing site files
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name "worklinks-preview-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add startup-support/share/og-worklinks.png
+          if git diff --cached --quiet;then
+            echo 'WORKLINK_SOCIAL_PREVIEW_PNG_ALREADY_CURRENT=PASS'
+            exit 0
+          fi
+          git commit -m "assets(worklinks): add native 1200x630 Kakao preview image"
+          for n in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main;then
+              echo 'WORKLINK_SOCIAL_PREVIEW_PNG_PUSHED=PASS'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'WORKLINK_SOCIAL_PREVIEW_PNG_PUSH_FAILED'
+          exit 1
