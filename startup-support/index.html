@@ -1114,6 +1114,60 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .sw-proposal-group small{display:block;margin-top:4px;font-size:11px;line-height:1.5;color:#657387;font-weight:500}
 .sw-proposal-note{font-size:11px;line-height:1.55;color:#64748b;margin:12px 0 0}
 @media(max-width:650px){.sw-proposal-account-row{gap:5px}.sw-proposal-menu>summary{padding:7px 9px;font-size:12px}.sw-proposal-popover{position:fixed;top:72px;left:12px;right:12px;width:auto;max-height:calc(100dvh - 86px);padding:14px}}
+
+/* Compact multi-select, in the existing procurement-toolbar slot. */
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi{
+ position:relative;flex:0 0 auto;min-width:0;z-index:20
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi[open]{z-index:160}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi>summary{
+ display:flex;align-items:center;justify-content:space-between;gap:6px;
+ box-sizing:border-box;min-width:110px;max-width:215px;height:36px;
+ border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#233f5a;
+ padding:5px 9px;font-size:13px;font-weight:750;line-height:1.3;
+ cursor:pointer;list-style:none;white-space:nowrap
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi>summary::-webkit-details-marker{display:none}
+#jobsView[data-job-mode="partner"] #changcomJobFilters #partnerAwardSummary{
+ overflow:hidden;max-width:180px;text-overflow:ellipsis;white-space:nowrap
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .award-chevron{font-size:13px;flex:none}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi>summary:focus-visible{
+ outline:2px solid #2563eb;outline-offset:2px
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi[open]>summary{
+ border-color:#6895c5;background:#f3f8ff
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi.disabled>summary{
+ color:#94a3b8;background:#f1f5f9;cursor:not-allowed
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-menu{
+ position:absolute;top:calc(100% + 5px);left:0;
+ width:210px;max-width:calc(100vw - 24px);max-height:min(360px,70dvh);overflow:auto;
+ padding:6px;background:#fff;border:1px solid #cbd5e1;
+ border-radius:10px;box-shadow:0 14px 32px #0f172a24;
+ white-space:normal
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-option{
+ display:flex;align-items:center;gap:9px;min-height:39px;
+ padding:8px 10px;border-radius:6px;color:#1e293b;
+ font-size:14px;font-weight:650;line-height:1.3;cursor:pointer
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-option:hover{background:#edf5ff}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-option input{
+ appearance:auto;accent-color:#2563eb;flex:none;width:17px;height:17px;margin:0;cursor:pointer
+}
+#jobsView[data-job-mode="partner"] #changcomJobFilters .award-all{
+ border-bottom:1px solid #e2e8f0;border-radius:6px 6px 0 0;margin-bottom:4px
+}
+@media(max-width:730px){
+ #jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-multi>summary{
+  max-width:195px;min-width:98px;font-size:12px;padding:5px 7px
+ }
+ #jobsView[data-job-mode="partner"] #changcomJobFilters .partner-award-menu{
+  left:auto;right:0
+ }
+}
 </style>
   <link rel="stylesheet" href="./rfp-progress-live.css?v=20261115-status-palette-v1">
   <script src="https://sitehub.suaveforge.com/analytics-loader.js" data-sitehub-project="p47" defer></script>
@@ -1471,7 +1525,17 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
       <button type="button" class="partner-period on" data-partner-period="open" aria-pressed="true">진행중</button>
       <button type="button" class="partner-period" data-partner-period="closed" aria-pressed="false">마감</button>
       <select id="partnerSwScope" aria-label="공고 사업 범위" title="전체 공고는 비SW까지 포함. SW 관련·구축개발은 저장된 사업명 기준 후보 필터"><option value="all">전체 공고</option><option value="sw">SW 관련</option><option value="build">SW 구축·개발</option></select>
-      <select id="partnerAwardFilter" aria-label="공식 낙찰자 결정방식 필터" title="가격투찰은 입찰 행위이며 적격심사에서도 가격을 투찰함. 여기서는 공식 낙찰자 결정방식 코드로 분류"><option value="all">낙찰 전체</option><option value="price">가격낙찰형</option><option value="qualification">적격심사</option><option value="spec-price">규격·가격</option><option value="negotiation">협상</option></select>
+      <details id="partnerAwardFilter" class="partner-award-multi" aria-label="낙찰방식 다중 선택">
+        <summary aria-label="낙찰방식 선택"><span id="partnerAwardSummary">낙찰 전체</span><span class="award-chevron" aria-hidden="true">▾</span></summary>
+        <div class="partner-award-menu" role="group" aria-label="낙찰방식 선택 항목">
+          <label class="partner-award-option award-all"><input type="checkbox" data-award-filter="all" checked>전체</label>
+          <label class="partner-award-option"><input type="checkbox" data-award-filter="price">가격낙찰형</label>
+          <label class="partner-award-option"><input type="checkbox" data-award-filter="qualification">적격심사</label>
+          <label class="partner-award-option"><input type="checkbox" data-award-filter="spec-price">규격·가격</label>
+          <label class="partner-award-option"><input type="checkbox" data-award-filter="negotiation">협상</label>
+          <label class="partner-award-option"><input type="checkbox" data-award-filter="other">기타·미확인</label>
+        </div>
+      </details>
       <select id="partnerNoticeStage" aria-label="조달 단계 선택"><option value="bid">입찰공고</option><option value="plan">발주계획</option><option value="prespec">사전규격</option></select>
       <label class="partner-filter-control" for="partnerFilter">협업 업체
         <select id="partnerFilter" aria-label="협업 업체별 입찰 공고 선택"><option value="all">모두</option></select>
@@ -1535,7 +1599,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-prebid-keep-v1"></script>
+<script src="./changcom-prebid.js?v=20261120-multi-award-v2"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -6439,22 +6503,42 @@ document.querySelectorAll('.jobf').forEach(b=>b.addEventListener('click',functio
  localStorage.setItem('worklinks_job_filter_v1',jobGeneralFilter);
  renderJobs();
 }));
-document.querySelectorAll(['#partnerSwScope','#partnerAwardFilter','#partnerNoticeStage'].join(',')).forEach(el=>el.addEventListener('change',function(){
+document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.addEventListener('change',function(){
  if(!worklinksIsChangcomView()||!worklinksPartnerAccess())return;
  const previousScope=partnerSwScope;
  partnerSwScope=document.getElementById('partnerSwScope').value;
- partnerAwardFilter=document.getElementById('partnerAwardFilter').value;
  partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
- const award=document.getElementById('partnerAwardFilter');
- award.disabled=partnerNoticeStage!=='bid';
- award.title=award.disabled?'발주계획·사전규격에는 확정된 낙찰자 결정방식이 없어 입찰공고에서만 적용':
-  '가격투찰은 적격심사에도 포함되므로 공식 낙찰방식 코드로 구분';
+ syncPartnerAwardControl();
  jobRenderLimit=jobPageStep();
  if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
  else void loadPartnerAllBids();
  if(jobSearchText.length>=2&&previousScope!==partnerSwScope)void jobRunRemoteSearch(jobSearchText);
  renderJobs();
 }));
+document.getElementById('partnerAwardFilter')?.addEventListener('change',function(event){
+ const input=event.target.closest('input[data-award-filter]');
+ if(!input)return;
+ if(!worklinksIsChangcomView()||!worklinksPartnerAccess()||partnerNoticeStage!=='bid'){
+  syncPartnerAwardControl();return;
+ }
+ const choice=input.dataset.awardFilter;
+ if(choice==='all')partnerAwardFilters.clear();
+ else if(input.checked)partnerAwardFilters.add(choice);
+ else partnerAwardFilters.delete(choice);
+ syncPartnerAwardControl();
+ jobRenderLimit=jobPageStep();
+ renderJobs();
+});
+document.querySelector('#partnerAwardFilter>summary')?.addEventListener('click',function(event){
+ if(partnerNoticeStage!=='bid'||!worklinksPartnerAccess()){
+  event.preventDefault();
+ }
+});
+document.addEventListener('click',function(event){
+ const award=document.getElementById('partnerAwardFilter');
+ if(award?.open&&!award.contains(event.target))award.open=false;
+});
+syncPartnerAwardControl();
 document.querySelectorAll('[data-partner-period]').forEach(b=>b.addEventListener('click',function(){
  if(!worklinksIsChangcomView()||!worklinksPartnerAccess())return;
  jobPartnerShowClosed=this.dataset.partnerPeriod==='closed';
