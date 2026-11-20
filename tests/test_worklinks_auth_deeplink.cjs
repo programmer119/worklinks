@@ -56,7 +56,7 @@ for(const [view,authenticated,open,expected] of [
 assert.ok(html.includes('if(changed&&!deferredPartnerRoute&&!pendingSharedNotice){'));
 assert.ok(html.includes('requestedPartnerViewOnAuth=false;\n  setWorkspaceView(\'changcom\');'),
  'only AuthHub grant restores the confidential workspace');
-assert.ok(html.includes('./changcom-prebid.js?v=20261120-transient-read-recovery-v1'));
+assert.ok(html.includes('./changcom-prebid.js?v=20261121-g2b-source-realname-v1'));
 assert.ok(html.includes("if(!worklinksSharePendingId||!worklinksPartnerAccess()||!worklinksIsChangcomView())return;"),
  'shared notice may never bypass membership validation');
 console.log('WORKLINK_AUTH_FAILCLOSED_SHARED_DEEPLINK=PASS');

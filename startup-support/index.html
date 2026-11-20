@@ -1086,6 +1086,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
 .prebid-keep-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
 .prebid-keep-actions .job-keep-button{flex:none}
+.prebid-keep-actions .prebid-source-action{flex:none}
+.prebid-keep-actions .prebid-doc-link{max-width:min(100%,340px);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #jobCards [data-combined-bid] .job-card-title,
 #jobCards [data-prebid-id] .job-card-title{border:0;background:transparent;padding:0;text-align:left;color:#123765;font:inherit;font-weight:800;cursor:pointer}
 #jobCards [data-combined-bid] .job-card-title:hover,
@@ -1604,7 +1606,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-transient-read-recovery-v1"></script>
+<script src="./changcom-prebid.js?v=20261121-g2b-source-realname-v1"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -2428,7 +2430,7 @@ async function g2bFetch(path){
  // query fails; never fall back to a fabricated zero-result response.
  const at=async base=>{
   const c=new AbortController(),timeout=setTimeout(function(){c.abort()},
-   path==='/saved-inventory'?35000:path.startsWith('/saved?')?22000:14000);
+   path==='/saved-inventory'||path.startsWith('/prebid-file-names?')?35000:path.startsWith('/saved?')?22000:14000);
   try{
    const resp=await fetch(base+path,{signal:c.signal,cache:'no-store'});
    const json=await resp.json().catch(function(){throw Error('JSON 응답 아님 (HTTP '+resp.status+')')});

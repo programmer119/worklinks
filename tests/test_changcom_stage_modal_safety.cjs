@@ -32,9 +32,9 @@ assert.equal(vm.runInContext("renderPrebidSourceDetail({id:'"+key+"'})",ctx),tru
 assert.ok(elements.jobDetailSub.textContent.includes('사전규격'));
 assert.ok(elements.jobDetailBody.innerHTML.includes('의견등록'));
 assert.ok(elements.jobDetailBody.innerHTML.includes('학생관리')); // subject not a false bid-specific eligibility
-assert.ok(elements.jobDetailBody.innerHTML.includes('원문 직접 주소 미확인'));
-assert.ok(!elements.jobDetailBody.innerHTML.includes('href="https://www.g2b.go.kr/"'),
- 'missing URL cannot masquerade as an original link');
+assert.ok(elements.jobDetailBody.innerHTML.includes('상세 직링크 미확인'));
+assert.ok(elements.jobDetailBody.innerHTML.includes('나라장터에서 조회'),
+ 'missing prespec direct link must be labelled lookup, not original detail');
 assert.ok(!elements.jobDetailBody.innerHTML.includes('입찰참가자격 확인'));
 const keepMarkup=vm.runInContext("prebidKeptCardMarkup({id:'"+key+"',title:'학생관리 시스템 구축 용역',org:'연세대학교 미래캠퍼스',amount:'3993만원',url:''})",ctx);
 assert.ok(keepMarkup.includes('data-job-card="'+key+'"'),'kept cards click using existing original handler');
@@ -44,7 +44,7 @@ assert.equal(fallback.id,key);
 assert.equal(fallback.title,'학생관리 시스템 구축 용역');
 assert.equal(vm.runInContext("renderPrebidSourceDetail(prebidKeepJobFromId('"+key+"'))",ctx),true,
  'offline kept cards stay on early-stage renderer, not ordinary bid renderer');
-assert.ok(elements.jobDetailBody.innerHTML.includes('원문 직접 주소 미확인'));
+assert.ok(elements.jobDetailBody.innerHTML.includes('상세 직링크 미확인'));
 const plan={id:'R26DD20928584',stage:'plan',kind:'servc',title:'정보시스템 구축 발주',
  org:'발주기관',posted:'2026-11-18',plannedMonth:'2026-12',budget:'120000000',
  url:'https://www.g2b.go.kr/link/PRPA015_01/single/?oderPlanNo=R26DD20928584',files:[]};

@@ -2446,6 +2446,88 @@ def rfp_rescan_progress():
     return report
 
 
+# Prebid official API provides URLs but not source filenames. Use GET headers
+# (HEAD on the original attachment endpoint returns HTTP 403). Never read body.
+_PREBID_FILE_META_LOCK=threading.Lock()
+_PREBID_FILE_META_NET=threading.BoundedSemaphore(2)
+_PREBID_FILE_META_PATH='/pn/pnz/pnza/UntyAtchFile/downloadFile.do'
+
+def prebid_official_attachment(url,notice):
+    try:
+        u=urlparse(str(url or ''))
+        p=parse_qs(u.query)
+        return (u.scheme=='https' and u.hostname in ('g2b.go.kr','www.g2b.go.kr')
+            and u.path==_PREBID_FILE_META_PATH and p.get('bfSpecRegNo')==[notice]
+            and p.get('fileType')==['BFDTL'] and
+            p.get('fileSeq',[None])[0] in ('1','2','3','4','5'))
+    except (ValueError,TypeError,KeyError):return False
+
+def prebid_original_filename(header):
+    text=str(header or '')
+    if not re.search(r'(^|;)\s*attachment\b',text,re.I):return ''
+    match=re.search(r'(?:^|;)\s*filename\*\s*=\s*([^;]+)',text,re.I)
+    if match:
+        raw=re.sub(r"^[^']*'[^']*'",'',match.group(1).strip().strip('"'))
+    else:
+        match=re.search(r'(?:^|;)\s*filename\s*=\s*([^;]+)',text,re.I)
+        if not match:return ''
+        raw=match.group(1).strip().strip('"')
+    try:
+        filename=re.split(r'[/\\]',unquote(raw))[-1].strip()
+        if (not filename or len(filename)>240 or
+            re.search(r'[\x00-\x1f\x7f<>:"|?*]',filename) or
+            filename in ('.','..') or filename.startswith('.') or '.' not in filename):
+            return ''
+        return filename
+    except (UnicodeError,ValueError,TypeError):return ''
+
+def prebid_probe_original_filename(url,notice):
+    if not prebid_official_attachment(url,notice):return ''
+    with _PREBID_FILE_META_NET:
+        try:
+            response=urlopen(Request(url,headers={'Accept':'*/*',
+                'User-Agent':'Mozilla/5.0 (compatible; WorkLinksSourceMeta/1.0)'}),timeout=6)
+            try:
+                if not prebid_official_attachment(response.geturl(),notice):return ''
+                return prebid_original_filename(response.headers.get('Content-Disposition',''))
+            finally:response.close()
+        except (HTTPError,URLError,IOError,OSError,ValueError):return ''
+
+def query_prebid_file_names(stage,kind,notice):
+    if (stage!='prespec' or kind not in ('servc','thng') or
+        not re.match(r'^R\d{2}BD\d{8}$',str(notice or ''))):
+        raise ApiError('invalid_prebid_file_identifier',400)
+    dbfile=os.path.join(os.path.dirname(G2B_DB_PATH),'g2b-prebid.sqlite3')
+    if not os.path.isfile(dbfile):raise ApiError('prebid_collector_not_initialized',503)
+    db=sqlite3.connect(dbfile,timeout=7)
+    try:
+        row=db.execute('SELECT payload FROM prebid_records WHERE stage=? AND kind=? AND item_id=?',
+                       (stage,kind,notice)).fetchone()
+        if not row:raise ApiError('prebid_not_found',404)
+        record=json.loads(row[0]); urls=record.get('files') or []
+        if not isinstance(urls,list):urls=[]
+        urls=urls[:5]
+        with _PREBID_FILE_META_LOCK:
+            db.execute('CREATE TABLE IF NOT EXISTS prebid_file_name_cache(url TEXT PRIMARY KEY, filename TEXT NOT NULL, checked_at REAL NOT NULL)')
+            db.commit()
+        now=time.time();names=[];checked=0
+        for url in urls:
+            if not prebid_official_attachment(url,notice):
+                names.append('');continue
+            hit=db.execute('SELECT filename,checked_at FROM prebid_file_name_cache WHERE url=?',(url,)).fetchone()
+            if hit and now-float(hit[1])<(172800 if hit[0] else 1200):
+                names.append(hit[0]);continue
+            name=prebid_probe_original_filename(url,notice);checked+=1
+            with _PREBID_FILE_META_LOCK:
+                db.execute('INSERT OR REPLACE INTO prebid_file_name_cache(url,filename,checked_at) VALUES(?,?,?)',(url,name,time.time()))
+                db.commit()
+            names.append(name)
+        return {'ok':True,'stage':stage,'kind':kind,'id':notice,'fileNames':names,
+            'complete':bool(urls) and all(names),
+            'officialApiCalls':0,'officialFileHeaderChecks':checked}
+    except sqlite3.Error:raise ApiError('prebid_file_metadata_unavailable',503)
+    finally:db.close()
+
 def query_prebid_records(stage,limit=500,offset=0):
     """Read-only pre-tender plans/specifications; never query G2B on a page view."""
     if stage not in ('plan','prespec'):
@@ -2467,6 +2549,9 @@ def query_prebid_records(stage,limit=500,offset=0):
         total=db.execute('SELECT COUNT(*) FROM prebid_records WHERE stage=?',(stage,)).fetchone()[0]
         rows=db.execute('''SELECT payload FROM prebid_records WHERE stage=?
             ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',(stage,limit,offset)).fetchall()
+        names_by_url={}
+        if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='prebid_file_name_cache'").fetchone():
+            names_by_url=dict(db.execute("SELECT url,filename FROM prebid_file_name_cache WHERE filename<>''").fetchall())
         items=[]
         allowed=('id','stage','kind','title','org','posted','budget',
                  'plannedMonth','opinionDeadline','url','files','bidLinked','swFlagSource',
@@ -2474,7 +2559,11 @@ def query_prebid_records(stage,limit=500,offset=0):
         for (payload,) in rows:
             value=json.loads(payload)
             if not isinstance(value,dict):continue
-            items.append({k:value[k] for k in allowed if k in value})
+            result={k:value[k] for k in allowed if k in value}
+            links=result.get('files') or []
+            if isinstance(links,list) and links:
+                result['fileNames']=[names_by_url.get(link,'') for link in links]
+            items.append(result)
         return {'ok':True,'ready':True,'stage':stage,'total':total,
                 'asOf':datetime.datetime.fromtimestamp(ready[1],datetime.timezone.utc).isoformat(),
                 'items':items,'noGovernmentApiCalls':True}
@@ -3434,6 +3523,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200,rfp_ocr_repair_attribution())
             if u.path == '/api/g2b/rfp-card-evidence':
                 return self.reply(200,rfp_card_evidence_batch(get('keys')))
+            if u.path == '/api/g2b/prebid-file-names':
+                return self.reply(200,query_prebid_file_names(get('stage'),get('kind'),get('id')))
             if u.path == '/api/g2b/prebid':
                 try:limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except (TypeError,ValueError):raise ApiError('invalid_prebid_pagination',400)
