@@ -208,9 +208,11 @@ function prebidKeepJobFromId(id){
  return {...snapshot,id,kind:match[2],period:snapshot.deadline};
 }
 // Kept prebid rows remain prebid cards. Never invent an electronic bid close.
+const prebidVisibleKeptRows=new Map();
 function prebidKeptCardMarkup(x){
  const match=String(x?.id||'').match(/^g2b-prebid-(plan|prespec)-(servc|thng)-(.+)$/);
  if(!match)return '';
+ prebidVisibleKeptRows.set(x.id,x); // Keep remains detail-clickable before the stage cache finishes loading.
  const name=match[1]==='plan'?'발주계획':'사전규격';
  const url=String(x.url||'');
  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
@@ -263,7 +265,7 @@ function prebidDetailRecord(key){
  const source=prebidCache[stage].items.find(x=>x.kind===kind&&x.id===number);
  if(source)return source;
  // Kept cards can be opened even while the original source cache reloads.
- const saved=typeof getJobById==='function'?getJobById(key):null;
+ const saved=prebidVisibleKeptRows.get(key)||(typeof getJobById==='function'?getJobById(key):null);
  if(!saved||saved.id!==key)return null;
  return {id:number,stage,kind,title:saved.title,org:saved.org,
   budget:saved.amount,posted:saved.startAt||'',period:saved.period||saved.deadline||'',
