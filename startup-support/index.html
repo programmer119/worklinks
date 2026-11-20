@@ -1084,6 +1084,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .keep-job-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:7px;min-width:92px}
 .job-keep-button{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#475569;padding:7px 10px;font-size:14px;font-weight:800;min-height:34px;cursor:pointer;white-space:nowrap}
 .job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
+.prebid-keep-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
+.prebid-keep-actions .job-keep-button{flex:none}
 .keep-job-link{color:#174b80;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap}
 .keep-empty{padding:24px 12px;border:1px dashed #cad5e4;border-radius:12px;color:#64748b;font-size:15px;text-align:center;grid-column:1/-1}
 #jobsView[data-keep-mode=mine] #g2bMore,#jobsView[data-keep-mode=watch] #g2bMore,
@@ -1533,7 +1535,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-sw-build-recall-v1"></script>
+<script src="./changcom-prebid.js?v=20261120-prebid-keep-v1"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -3471,6 +3473,14 @@ var worklinksKeptFullRows=new Map(),worklinksKeptResolveTime=new Map(),worklinks
 function worklinksKeptFallback(item){
  const id=String(item?.id||'');
  if(!id)return null;
+ const early=id.match(/^g2b-prebid-(plan|prespec)-(servc|thng)-(.+)$/);
+ if(early)return {id,title:String(item.title||early[3]),url:String(item.url||''),
+  org:String(item.org||'발주기관 미기재'),amount:String(item.amount||'예산 미기재'),
+  type:early[1]==='plan'?'발주계획':'사전규격',entry:'business',
+  noticeNumber:String(item.noticeNumber||early[3]),kind:early[2],
+  period:String(item.deadline||''),
+  reason:'킵한 사전 단계 공고 · 실제 입찰 마감일이 아닌 발주예정 또는 의견마감 정보입니다',
+  condition:'발주계획·사전규격 단계 · 입찰공고와 별개입니다'};
  const bid=String(item.noticeNumber|| (id.match(/R\d{2}BK\d{8}/)||[])[0]||'');
  const m=id.match(/^g2b-(servc|thng|cnstwk|frgcpt)-[^-]+-(\d{3})$/);
  const deadline=String(item.deadline||'');
@@ -3525,6 +3535,8 @@ if(typeof window!=='undefined')window.worklinksHydrateKeptJobs=async function(it
  if(pending.length)await Promise.all(pending);
 };
 function getJobById(id){
+ const prebid=typeof prebidKeepJobFromId==='function'?prebidKeepJobFromId(id):null;
+ if(prebid)return prebid;
  const regular=jobs.concat(g2bLiveJobs,partnerAllBids.items,jobSearchRemote,g2bFilterInventory).find(function(x){return x.id===id});
  if(regular)return regular;
  if(worklinksKeptFullRows.has(id))return worklinksKeptFullRows.get(id);
@@ -5895,6 +5907,8 @@ function bidMethodCardMarkup(x,showBusinessArea=false){
   }).join('')+(showBusinessArea&&bidBusinessArea(x)?'<div class="job-bid-method-cell job-business-meta">'+bidBusinessArea(x)+'</div>':'')+'</div>';
 }
 if(typeof window!=='undefined')window.worklinksKeepSnapshotFor=function(id){
+ const early=typeof prebidKeepSnapshotFor==='function'?prebidKeepSnapshotFor(id):null;
+ if(early)return early;
  const x=getJobById(id);
  if(!x)return null;
  const when=jobTimeInfo(x);
@@ -5909,7 +5923,8 @@ function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
- if(worklinksPartnerAccess()&&worklinksIsChangcomView()&&partnerNoticeStage!=='bid'){
+ if(worklinksPartnerAccess()&&worklinksIsChangcomView()&&partnerNoticeStage!=='bid'&&
+    (window.worklinksKeeps?.getMode?.()||'all')==='all'){
   renderPrebidJobs(el);
   return;
  }
@@ -6000,6 +6015,7 @@ function renderJobs(){
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
    (!g2bServerAvailable&&g2bSavedKnownTotal>0));
  document.getElementById('partnerJobCount').textContent=
+  keepMode!=='all'?(keepMode==='mine'?'내 킵 ':'관전 ')+all.length+'건':
   candidateJobs.length+'건'+(partialServerList?' · 일부':'');
  const partnerCountLabel=document.querySelector('#changcomJobFilters .partner-count-label');
  if(partnerCountLabel)partnerCountLabel.title=partialServerList?
@@ -6198,6 +6214,8 @@ function renderJobs(){
    '서버 공고 '+g2bLoadedOffset.toLocaleString('ko-KR')+' / '+g2bSavedTotal.toLocaleString('ko-KR')+'건 · 다음 페이지');
   ensureVisibleRfpCardEvidence(list.slice(0,jobRenderLimit));
   el.innerHTML=list.length?list.slice(0,jobRenderLimit).map(function(o){
+    if(keepMode!=='all'&&/^g2b-prebid-(plan|prespec)-/.test(String(o.x.id||'')))
+      return prebidKeptCardMarkup(o.x);
     const x=o.x,t=o.time,n=repeatYears(x),day=jobDayCounter(t);
     const historyCompetition=pastCompetitionSummary(x);
     const oldCount=historyCompetition.latest;

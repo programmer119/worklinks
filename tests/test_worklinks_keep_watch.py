@@ -41,6 +41,22 @@ assert len(own('p47','member-22222222')['items'])==0
 assert put('p47','member-11111111',{'id':record['id'],'value':False})['ok']
 assert own('p47','member-11111111')['items']==[]
 assert members('p47')['members'][0]['count']==0
+# Identical official numbers must not collide between plan and prespec.
+for stage, label in [('plan','발주계획'),('prespec','사전규격')]:
+    keep_id=f'g2b-prebid-{stage}-servc-R26DD01234567'
+    payload={'title':label+' 정보시스템 구축','url':'https://www.g2b.go.kr/notice',
+             'org':'공공기관','amount':'1억원','deadline':'발주예정 2027-01' if stage=='plan' else '의견마감 202611271800',
+             'entry':'business','type':label,'noticeNumber':'R26DD01234567'}
+    assert put('p47','member-11111111',{'id':keep_id,'value':True,'snapshot':payload})['ok']
+saved=own('p47','member-11111111')['items']
+assert len(saved)==2 and {x['type'] for x in saved}=={'발주계획','사전규격'}
+assert share('p47','member-11111111',{'enabled':True,'alias':'개발 1팀'})['ok']
+watched=watch('p47','member-22222222','member-11111111')
+assert watched['readOnly'] and {x['id'] for x in watched['items']}=={x['id'] for x in saved}
+assert put('p47','member-11111111',{'id':'g2b-prebid-plan-servc-R26DD01234567','value':False})['ok']
+assert [x['type'] for x in own('p47','member-11111111')['items']]==['사전규격']
+assert put('p47','member-11111111',{'id':'g2b-prebid-prespec-servc-R26DD01234567','value':False})['ok']
+assert own('p47','member-11111111')['items']==[]
 assert put('p47','member-11111111',record)['ok']
 assert share('p47','member-11111111',{'enabled':False,'alias':'개발 1팀'})['shareEnabled'] is False
 assert members('p47')['members']==[]

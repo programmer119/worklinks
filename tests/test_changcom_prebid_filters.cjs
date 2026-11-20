@@ -8,7 +8,8 @@ const ctx={
   g2bCardAwardMetadata:x=>({awardMethodCode:x.awardMethodCode,sourceVerified:x.awardFieldsVerified===true}),
   worklinksPartnerAccess:()=>true,renderJobs:()=>{},
   jobSoftwareScope:x=>(/정보시스템|플랫폼/.test(String(x.title||''))?'candidate':'unknown'),
-  document:{},Date,Map,Set,String,Number,Boolean,encodeURIComponent,
+  document:{},window:{worklinksKeeps:{keepButton:id=>'<button data-keep-toggle="'+id+'">☆ 킵</button>'}},
+  Date,Map,Set,String,Number,Boolean,encodeURIComponent,
   htmlEscape:x=>String(x),jobSearchNormalized:x=>String(x).toLowerCase(),
   jobSearchText:'',jobRenderLimit:40
 };
@@ -110,6 +111,35 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  vm.runInContext('renderPrebidJobs',ctx)(el);
  assert.equal(elements.partnerJobCount.textContent,'1건');
  assert.ok(!el.innerHTML.includes('사무실 책상 구매'));
+ // The two prebid stages share the same persistent keep API but never share IDs.
+ vm.runInContext("partnerSwScope='all';",ctx);
+ vm.runInContext('renderPrebidJobs',ctx)(el);
+ assert.ok(el.innerHTML.includes('data-keep-toggle="g2b-prebid-plan-servc-P1"'));
+ assert.ok(el.innerHTML.includes('data-keep-toggle="g2b-prebid-plan-thng-P2"'));
+ const planSnapshot=vm.runInContext("prebidKeepSnapshotFor('g2b-prebid-plan-servc-P1')",ctx);
+ assert.equal(planSnapshot.type,'발주계획');
+ assert.equal(planSnapshot.noticeNumber,'P1');
+ assert.equal(planSnapshot.entry,'business');
+ const prespec=[{id:'P1',stage:'prespec',kind:'servc',title:'새 전자정부 플랫폼 구축',
+                  org:'교육기관',opinionDeadline:'202611271800',budget:123000000,
+                  url:'https://www.g2b.go.kr/pn/spec'}];
+ ctx.__filter.prebidCache.prespec.items=prespec;
+ vm.runInContext("prebidCache.prespec.state='ready'; partnerNoticeStage='prespec';",ctx);
+ vm.runInContext('renderPrebidJobs',ctx)(el);
+ assert.ok(el.innerHTML.includes('data-keep-toggle="g2b-prebid-prespec-servc-P1"'));
+ assert.ok(!el.innerHTML.includes('data-keep-toggle="g2b-prebid-plan-servc-P1"'));
+ const specSnapshot=vm.runInContext("prebidKeepSnapshotFor('g2b-prebid-prespec-servc-P1')",ctx);
+ assert.equal(specSnapshot.type,'사전규격');
+ assert.equal(specSnapshot.deadline,'의견마감 202611271800');
+ assert.equal(specSnapshot.url,'https://www.g2b.go.kr/pn/spec');
+ const kept=vm.runInContext("prebidKeptCardMarkup({id:'g2b-prebid-prespec-servc-P1',title:'새 전자정부 플랫폼 구축',org:'교육기관',amount:'1.23억 원',period:'의견마감 202611271800',url:'https://www.g2b.go.kr/pn/spec'})",ctx);
+ assert.ok(kept.includes('사전규격'));
+ assert.ok(kept.includes('data-keep-toggle="g2b-prebid-prespec-servc-P1"'));
+ assert.ok(!kept.includes('입찰마감'));
+ assert.equal(vm.runInContext("prebidKeepSnapshotFor('g2b-prebid-plan-servc-P1')",ctx).type,'발주계획');
+ assert.ok(html.includes("const early=typeof prebidKeepSnapshotFor==='function'?prebidKeepSnapshotFor(id):null;"));
+ assert.ok(html.includes("return prebidKeptCardMarkup(o.x);"));
+ assert.ok(html.includes("(window.worklinksKeeps?.getMode?.()||'all')==='all'"));
  assert.equal(html.includes("const partnerAllMode=member&&partnerMode&&partnerNoticeStage==='bid';"),true);
  assert.ok(html.includes("const searchSw=worklinksIsChangcomView()?'0':'1';"));
  console.log('CHANGCOM_PREBID_FILTERS=PASS');
