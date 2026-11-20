@@ -266,6 +266,7 @@ function renderPrebidSourceDetail(item){
  const external=safeUrl(row.url)?row.url:'';
  const fileLinks=(Array.isArray(row.files)?row.files:[]).filter(safeUrl).slice(0,8);
  const number=String(row.id||''),org=String(row.org||'발주기관 미기재');
+ const subject=String(row.subject||'').trim();
  const meta=(label,value)=>'<div class="job-detail-meta-item"><span>'+label+'</span><strong>'+
   htmlEscape(String(value||'미기재'))+'</strong></div>';
  document.getElementById('jobDetailTitle').textContent=String(row.title||'(사업명 없음)');
@@ -287,7 +288,8 @@ function renderPrebidSourceDetail(item){
     meta(stage==='발주계획'?'발주시기':'의견등록',when)+'</div></div>'+
   '<section class="job-detail-section"><h3>공고 확인</h3><p>'+
    '나라장터 저장 DB 기준 '+stage+' 자료입니다. 입찰공고 마감일·낙찰방식·최종 참가자격을 의미하지 않습니다.'+
-   '</p></section>'+files+
+   '</p></section>'+
+  (subject?'<section class="job-detail-section"><h3>사업 개요</h3><p>'+htmlEscape(subject)+'</p></section>':'')+files+
   '<div class="job-detail-actions">'+source+'</div>';
  return true;
 }
