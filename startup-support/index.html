@@ -6015,6 +6015,7 @@ function renderJobs(){
    (g2bSavedTotal>0&&g2bLoadedOffset<g2bSavedTotal)||
    (!g2bServerAvailable&&g2bSavedKnownTotal>0));
  document.getElementById('partnerJobCount').textContent=
+  keepMode!=='all'?(keepMode==='mine'?'내 킵 ':'관전 ')+all.length+'건':
   candidateJobs.length+'건'+(partialServerList?' · 일부':'');
  const partnerCountLabel=document.querySelector('#changcomJobFilters .partner-count-label');
  if(partnerCountLabel)partnerCountLabel.title=partialServerList?
