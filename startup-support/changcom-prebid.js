@@ -123,6 +123,58 @@ function prebidWon(value){
  return n>=1e8?Number((n/1e8).toFixed(2)).toLocaleString('ko-KR')+'억 원':
   Math.round(n/10000).toLocaleString('ko-KR')+'만원';
 }
+// Stable, stage-scoped IDs prevent plan/prespec/ordinary-bid keep collisions.
+function prebidKeepId(x){
+ const stage=String(x?.stage||''),kind=String(x?.kind||''),id=String(x?.id||'').trim();
+ if(!['plan','prespec'].includes(stage)||!['servc','thng'].includes(kind)||
+    !/^[A-Za-z0-9_.:-]{1,120}$/.test(id))return '';
+ return 'g2b-prebid-'+stage+'-'+kind+'-'+id;
+}
+function prebidKeepSource(id){
+ const match=String(id||'').match(/^g2b-prebid-(plan|prespec)-(servc|thng)-(.+)$/);
+ if(!match)return null;
+ return prebidCache[match[1]].items.find(x=>x.kind===match[2]&&prebidKeepId(x)===id)||null;
+}
+function prebidKeepSnapshotFor(id){
+ const x=prebidKeepSource(id);
+ if(!x)return null;
+ const name=x.stage==='plan'?'발주계획':'사전규격';
+ const url=String(x.url||'');
+ return {
+  title:String(x.title||'(사업명 없음)'),
+  url:/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'',
+  org:String(x.org||'발주기관 미기재'),
+  amount:prebidWon(x.budget),
+  deadline:x.stage==='plan'?'발주예정 '+(x.plannedMonth||'시기 미기재'):
+   '의견마감 '+(x.opinionDeadline||'미기재'),
+  entry:'business',type:name,noticeNumber:String(x.id)
+ };
+}
+function prebidKeepJobFromId(id){
+ const snapshot=prebidKeepSnapshotFor(id);
+ if(!snapshot)return null;
+ const match=id.match(/^g2b-prebid-(plan|prespec)-(servc|thng)-/);
+ return {...snapshot,id,kind:match[2],period:snapshot.deadline};
+}
+// Kept prebid rows remain prebid cards. Never invent an electronic bid close.
+function prebidKeptCardMarkup(x){
+ const match=String(x?.id||'').match(/^g2b-prebid-(plan|prespec)-(servc|thng)-(.+)$/);
+ if(!match)return '';
+ const name=match[1]==='plan'?'발주계획':'사전규격';
+ const url=String(x.url||'');
+ const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(url)?url:'';
+ const keep=typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(x.id)||''):'';
+ return '<article class="card" data-prebid-id="'+htmlEscape(match[3])+'"><div class="cardtop">'+
+  '<span class="tag">'+name+'</span><span class="tag">'+(match[2]==='servc'?'용역':'물품')+'</span></div>'+
+  '<h3>'+htmlEscape(x.title||'(사업명 없음)')+'</h3>'+
+  '<p>'+htmlEscape(x.org||'발주기관 미기재')+'</p>'+
+  '<p><strong>'+htmlEscape(x.amount||'예산 미기재')+'</strong> · '+
+  htmlEscape(x.period||x.deadline||(match[1]==='plan'?'발주 예정':'의견마감 미기재'))+'</p>'+
+  '<div class="prebid-keep-actions">'+keep+
+  (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
+   '<span class="tag">등록번호 '+htmlEscape(x.noticeNumber||match[3])+'</span>')+
+  '</div></article>';
+}
 function renderPrebidJobs(el){
  const stage=partnerNoticeStage,report=prebidCache[stage],name=stage==='plan'?'발주계획':'사전규격';
  const summary=document.getElementById('partnerSummary'),decision=document.getElementById('jobDecisionSummary');
@@ -163,10 +215,12 @@ function renderPrebidJobs(el){
    '<p>'+htmlEscape(x.org||'발주기관 미기재')+' · '+htmlEscape(x.posted||'등록일 미기재')+'</p>'+
    '<p><strong>'+htmlEscape(prebidWon(x.budget))+'</strong> · '+
    htmlEscape(stage==='plan'?'예정 '+(x.plannedMonth||'시기 미기재'):'의견마감 '+(x.opinionDeadline||'미기재'))+'</p>'+
+   '<div class="prebid-keep-actions">'+
+   (typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(prebidKeepId(x))||''):'')+
    (safe?'<a href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':
    '<span class="tag">등록번호 '+htmlEscape(x.id||'미기재')+'</span>')+
    (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
-   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</article>';
+   (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</div></article>';
  }).join('')+
   (rows.length>visible?'<button type="button" id="prebidMore" class="job-vf">목록 '+visible.toLocaleString('ko-KR')+
   ' / '+rows.length.toLocaleString('ko-KR')+'건 · 더 보기</button>':'');
