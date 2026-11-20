@@ -252,6 +252,12 @@ function prebidNoticeCardMarkup(x){
    (fileLinks.length?' · '+fileLinks.map((url,i)=>'<a data-external-source="1" href="'+htmlEscape(url)+'" target="_blank" rel="noopener noreferrer">규격서 '+(i+1)+'</a>').join(' · '):'')+
    (x.bidLinked?' <span class="tag">입찰공고 연결됨</span>':'')+'</div></article>';
 }
+function prebidVerifiedShareUrl(stage,id){
+ // Preserve the existing published KakaoTalk/OG pages, without placing
+ // misleading duplicate share controls on every thumbnail.
+ const featured=new Set(['R26BD00301798','R26BD00303409','R26BD00302593','R26BD00301029']);
+ return stage==='prespec'&&featured.has(String(id))?'./share/'+encodeURIComponent(id)+'/':'';
+}
 function renderPrebidSourceDetail(item){
  const key=String(item?.id||'');
  const match=key.match(/^g2b-prebid-(plan|prespec)-(servc|thng)-([A-Za-z0-9_.:-]{1,120})$/);
@@ -267,6 +273,7 @@ function renderPrebidSourceDetail(item){
  const fileLinks=(Array.isArray(row.files)?row.files:[]).filter(safeUrl).slice(0,8);
  const number=String(row.id||''),org=String(row.org||'발주기관 미기재');
  const subject=String(row.subject||'').trim();
+ const share=prebidVerifiedShareUrl(row.stage,number);
  const meta=(label,value)=>'<div class="job-detail-meta-item"><span>'+label+'</span><strong>'+
   htmlEscape(String(value||'미기재'))+'</strong></div>';
  document.getElementById('jobDetailTitle').textContent=String(row.title||'(사업명 없음)');
@@ -290,7 +297,9 @@ function renderPrebidSourceDetail(item){
    '나라장터 저장 DB 기준 '+stage+' 자료입니다. 입찰공고 마감일·낙찰방식·최종 참가자격을 의미하지 않습니다.'+
    '</p></section>'+
   (subject?'<section class="job-detail-section"><h3>사업 개요</h3><p>'+htmlEscape(subject)+'</p></section>':'')+files+
-  '<div class="job-detail-actions">'+source+'</div>';
+  '<div class="job-detail-actions">'+
+  (share?'<a class="job-detail-secondary" href="'+htmlEscape(share)+'" target="_blank" rel="noopener noreferrer">공유</a>':'')+
+  source+'</div>';
  return true;
 }
 function combinedBidCardMarkup(x){
