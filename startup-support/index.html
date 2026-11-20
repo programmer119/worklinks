@@ -6478,8 +6478,10 @@ function setWorkspaceView(view){
   const sorter=document.getElementById('jobSort');
   if(sorter)sorter.value=partnerMode&&worklinksPartnerAccess()?
    jobSortByWorkspace.changcom:jobSortByWorkspace.jobs;
+  if(sorter&&partnerMode&&partnerNoticeStage==='all'&&
+     ['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
-   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess();option.disabled=option.hidden});
+   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||partnerNoticeStage==='all';option.disabled=option.hidden});
   if(changed){
    restoreJobSearchForWorkspace(view);
    jobRenderDirty=true;
@@ -6552,6 +6554,15 @@ document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.
  partnerSwScope=document.getElementById('partnerSwScope').value;
  partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
  syncPartnerAwardControl();
+ if(previousStage!==partnerNoticeStage){
+  const sorter=document.getElementById('jobSort');
+  document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
+   .forEach(option=>{option.hidden=partnerNoticeStage==='all';option.disabled=option.hidden});
+  if(sorter){
+   if(partnerNoticeStage==='all'&&['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
+   else if(previousStage==='all'&&partnerNoticeStage==='bid')sorter.value=jobSortByWorkspace.changcom;
+  }
+ }
  jobRenderLimit=jobPageStep();
  if(partnerNoticeStage==='all'){
   for(const stage of ['plan','prespec'])void loadPrebidJobs(stage);
