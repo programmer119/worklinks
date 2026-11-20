@@ -10,6 +10,8 @@ on:
       - 'startup-support/index.html'
       - 'tests/test_g2b_prebid_collector.py'
       - 'tests/test_changcom_prebid_filters.cjs'
+      - 'tests/test_worklinks_social_share.cjs'
+      - 'startup-support/share/**'
       - '.github/workflows/worklinks-prebid-stage-and-award-filter.yml'
   pull_request:
     branches: [main]
@@ -20,6 +22,8 @@ on:
       - 'startup-support/index.html'
       - 'tests/test_g2b_prebid_collector.py'
       - 'tests/test_changcom_prebid_filters.cjs'
+      - 'tests/test_worklinks_social_share.cjs'
+      - 'startup-support/share/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -42,5 +46,6 @@ jobs:
           python tests/test_g2b_prebid_collector.py
           node --check startup-support/changcom-prebid.js
           node tests/test_changcom_prebid_filters.cjs
+          node tests/test_worklinks_social_share.cjs
           bash -n server/deploy-g2b-prebid-only.sh
           echo WORKLINKS_PREBID_AND_PRICE_SW_FILTERS_PASS
