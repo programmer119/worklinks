@@ -318,6 +318,12 @@ vm.runInContext('loadPartnerAllBids()',ctx).then(async()=>{
  const keptClickable=vm.runInContext("prebidKeptCardMarkup({id:'"+key+"',title:'학생관리 시스템 구축 용역',amount:'3993만원'})",ctx);
  assert.ok(keptClickable.includes('data-prebid-detail="'+key+'"'));
  assert.ok(!keptClickable.includes('공유 링크'));
+ ctx.__filter.prebidCache.prespec.items=[]; // Simulate kept view before source cache loads.
+ ctx.getJobById=()=>undefined;
+ assert.equal(vm.runInContext("openPrebidDetail('"+key+"')",ctx),true,
+  'kept card remains detail-clickable before a stage API response');
+ assert.equal(nodes.jobDetailTitle.textContent,'학생관리 시스템 구축 용역');
+ assert.equal(hugeCalls.length,priorCalls,'kept fallback must not call bid APIs');
  const cardNode={dataset:{prebidDetail:key}};
  let prevented=0;
  const ev={target:{closest:selector=>selector==='[data-prebid-detail]'?cardNode:null},
