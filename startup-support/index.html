@@ -6494,10 +6494,10 @@ function setWorkspaceView(view){
   const sorter=document.getElementById('jobSort');
   if(sorter)sorter.value=partnerMode&&worklinksPartnerAccess()?
    jobSortByWorkspace.changcom:jobSortByWorkspace.jobs;
-  if(sorter&&partnerMode&&partnerNoticeStage==='all'&&
+  if(sorter&&partnerMode&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='all'&&
      ['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
-   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||partnerNoticeStage==='all';option.disabled=option.hidden});
+   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||(typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='all');option.disabled=option.hidden});
   if(changed){
    restoreJobSearchForWorkspace(view);
    jobRenderDirty=true;
