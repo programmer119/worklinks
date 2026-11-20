@@ -1086,6 +1086,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
 .prebid-keep-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
 .prebid-keep-actions .job-keep-button{flex:none}
+#jobCards [data-combined-bid] .job-card-title{border:0;background:transparent;padding:0;text-align:left;color:#123765;font:inherit;font-weight:800;cursor:pointer}
+#jobCards [data-combined-bid] .job-card-title:hover{text-decoration:underline}
 .keep-job-link{color:#174b80;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap}
 .keep-empty{padding:24px 12px;border:1px dashed #cad5e4;border-radius:12px;color:#64748b;font-size:15px;text-align:center;grid-column:1/-1}
 #jobsView[data-keep-mode=mine] #g2bMore,#jobsView[data-keep-mode=watch] #g2bMore,
@@ -1536,7 +1538,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
           <label class="partner-award-option"><input type="checkbox" data-award-filter="other">기타·미확인</label>
         </div>
       </details>
-      <select id="partnerNoticeStage" aria-label="조달 단계 선택"><option value="bid">입찰공고</option><option value="plan">발주계획</option><option value="prespec">사전규격</option></select>
+      <select id="partnerNoticeStage" aria-label="조달 단계 선택"><option value="all" selected>전체</option><option value="bid">입찰공고</option><option value="plan">발주계획</option><option value="prespec">사전규격</option></select>
       <label class="partner-filter-control" for="partnerFilter">협업 업체
         <select id="partnerFilter" aria-label="협업 업체별 입찰 공고 선택"><option value="all">모두</option></select>
       </label>
@@ -1599,7 +1601,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
   </div>
   <div class="cards" id="salesCards"></div>
 </section>
-<script src="./changcom-prebid.js?v=20261120-real-notice-link-v1"></script>
+<script src="./changcom-prebid.js?v=20261120-all-stages-search-v1"></script>
 <script src="./rfp-progress-live.js?v=20261119-compact-status-compat-v3"></script>
 <script src="./quickwin-ranking.js?v=20261104-1"></script>
 <script src="./kimse-fit.js?v=20261107-1"></script>
@@ -3039,9 +3041,10 @@ async function g2bLoadBids(){
  });
  document.getElementById('g2bLoad').addEventListener('click',g2bLoadBids);
  document.getElementById('g2bMore').addEventListener('click',function(){
-  if(worklinksIsChangcomView()&&partnerSwScope==='all'&&partnerNoticeStage==='bid'){
+  if(worklinksIsChangcomView()&&['all','bid'].includes(partnerNoticeStage)){
    if(jobRenderLimit<jobAvailableRows){jobRenderLimit+=jobPageStep();renderJobs()}
-   else void loadPartnerAllBids(true);
+   else if(partnerAllBids.state!=='loading'&&partnerAllBids.loaded<partnerAllBids.total)
+    void loadPartnerAllBids(true);
    return;
   }
   resetSavedBidResume();g2bLoadSaved(true);
@@ -5633,35 +5636,68 @@ function jobCollectionMarkup(x){
   '<span class="api-state summary'+(flags.done===3?' complete':'')+'">수집 '+flags.done+'/3</span>'+
   badges+'</div>';
 }
+// Client-facing search spans the entire saved bid corpus; one page is NOT a
+// complete result when a keyword matches more than 250 bid notices.
+var jobSearchRemoteLoading=false,jobSearchRemoteError='';
 async function jobRunRemoteSearch(query){
  const requestId=++jobSearchSerial;
  const status=document.getElementById('jobSearchStatus');
- if(query.length<2){jobSearchRemote=[];jobSearchServerTotal=null;status.textContent=query?'두 글자 이상 입력':'';
-  scheduleJobsRender();return}
+ jobSearchRemoteError='';
+ if(query.length<2){
+  jobSearchRemoteLoading=false;jobSearchRemote=[];jobSearchServerTotal=null;
+  status.textContent=query?'두 글자 이상 입력':'';
+  scheduleJobsRender();return;
+ }
+ if(worklinksIsChangcomView()&&['plan','prespec'].includes(partnerNoticeStage)){
+  // Individual early-stage views use their own complete saved SQLite caches.
+  jobSearchRemoteLoading=false;jobSearchRemote=[];jobSearchServerTotal=0;
+  status.textContent='선택한 조달 단계의 저장 DB 검색';
+  scheduleJobsRender();return;
+ }
+ jobSearchRemoteLoading=true;
  status.textContent='서버 저장 DB 검색 중…';
  try{
-  // Searches saved SQLite only. No new official procurement API request.
   const searchSw=worklinksIsChangcomView()?'0':'1';
-  const result=await g2bFetch('/saved?sw='+searchSw+'&limit=250&offset=0&q='+encodeURIComponent(query));
-  if(requestId!==jobSearchSerial||query!==jobSearchText)return;
-  if(result.searchMode!=='saved_only')throw Error('서버 검색 기능 미배포');
-  const next=[];
-  for(const row of result.items||[]){
-   const key=String(row.bidNo||'')+':'+String(row.order||'000').padStart(3,'0');
-   if(row.bidEligibility)bidEligibilityCache.set(key,row.bidEligibility);
-   if(row.supplementalBidFacts)g2bSupplementalCache.set(key,row.supplementalBidFacts);
-   if(row.rfpSavedState)jobSearchRfpState.set(key,row.rfpSavedState);
-   const item=g2bCardFromServer(row);
-   if(item)next.push(item);
+  const allPages=worklinksIsChangcomView()&&partnerNoticeStage==='all';
+  const next=[],seen=new Set();
+  let offset=0,total=null,completed=false;
+  for(let page=0;page<(allPages?120:1);page++){
+   const result=await g2bFetch('/saved?sw='+searchSw+'&limit=250&offset='+offset+'&q='+encodeURIComponent(query));
+   if(requestId!==jobSearchSerial||query!==jobSearchText)return;
+   if(result.searchMode!=='saved_only'||!Array.isArray(result.items))
+    throw Error('서버 검색 기능 미배포 또는 불완전');
+   const count=Number(result.totalCount);
+   if(!Number.isSafeInteger(count)||count<offset+result.items.length)
+    throw Error('서버 검색 결과 건수 불일치');
+   if(total!==null&&total!==count)throw Error('검색 도중 DB 목록 변경 · 다시 검색 필요');
+   total=count;
+   if(offset<total&&!result.items.length)throw Error('검색 다음 페이지 누락');
+   for(const row of result.items){
+    const key=String(row.bidNo||'')+':'+String(row.order||'000').padStart(3,'0');
+    if(row.bidEligibility)bidEligibilityCache.set(key,row.bidEligibility);
+    if(row.supplementalBidFacts)g2bSupplementalCache.set(key,row.supplementalBidFacts);
+    if(row.rfpSavedState)jobSearchRfpState.set(key,row.rfpSavedState);
+    const item=g2bCardFromServer(row);
+    if(item&&!seen.has(item.id)){next.push(item);seen.add(item.id)}
+   }
+   offset+=result.items.length;
+   if(offset>=total){completed=true;break}
+   if(!allPages)break; // Existing single-stage behavior remains unchanged.
   }
+  if(allPages&&!completed)throw Error('전체 검색 페이지 미완료');
   jobSearchRemote=next;
-  jobSearchServerTotal=Number(result.totalCount||0);
-  status.textContent='서버 DB '+next.length+' / '+jobSearchServerTotal+'건 · 신규 정부 API 호출 없음';
+  jobSearchServerTotal=total;
+  status.textContent='입찰공고 저장 DB '+next.length+' / '+total+'건 검색 · 발주계획·사전규격 함께 검색';
  }catch(error){
   if(requestId!==jobSearchSerial)return;
-  status.textContent='서버 검색 실패 · 불러온 목록에서 검색';
+  jobSearchRemoteError=String(error?.message||error).slice(0,120);
+  status.textContent='서버 검색 실패 · '+jobSearchRemoteError+' · 수집된 목록만 표시';
   jobSearchRemote=[];jobSearchServerTotal=null;
- }finally{if(requestId===jobSearchSerial)scheduleJobsRender()}
+ }finally{
+  if(requestId===jobSearchSerial){
+   jobSearchRemoteLoading=false;scheduleJobsRender();
+  }
+ }
 }
 function updateJobSearchInput(){
  const input=document.getElementById('jobQuickSearch');
@@ -5670,7 +5706,7 @@ function updateJobSearchInput(){
  jobSearchSerial++;
  jobSearchText=next;
  jobRenderLimit=jobPageStep();
- jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRfpState.clear();
+ jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRemoteError='';jobSearchRemoteLoading=false;jobSearchRfpState.clear();
  document.getElementById('jobSearchClear').hidden=!next;
  if(!next&&jobsBootstrapStarted&&!g2bServerAvailable&&!g2bSavedLoadRunning){
   g2bLoadSaved(false);
@@ -5688,7 +5724,10 @@ function updateJobSearchInput(){
  scheduleJobsRender();
  const url=new URL(window.location.href);
  if(next)url.searchParams.set('q',next);else url.searchParams.delete('q');
- if(worklinksIsChangcomView()){
+ history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+ // Exact-number inference remains available in individual views, never in
+ // ALL: a typed number must not silently narrow a three-stage search.
+ if(worklinksIsChangcomView()&&partnerNoticeStage!=='all'){
   const id=next.toUpperCase();
   const inferred=/^R\d{2}BD\d{8}$/.test(id)?'prespec':
     /^R\d{2}BK\d{8}$/.test(id)?'bid':null;
@@ -5699,10 +5738,8 @@ function updateJobSearchInput(){
    if(inferred==='prespec')void loadPrebidJobs('prespec');
    else void loadPartnerAllBids();
   }
-  url.searchParams.set('stage',partnerNoticeStage);
  }
- history.replaceState(history.state,'',url.pathname+url.search+url.hash);
- if(next.length>=2&&(!worklinksIsChangcomView()||partnerNoticeStage==='bid'))
+ if(next.length>=2&&(!worklinksIsChangcomView()||['all','bid'].includes(partnerNoticeStage)))
   jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),240);
  else document.getElementById('jobSearchStatus').textContent=next?'두 글자 이상 입력':'';
 }
@@ -6002,10 +6039,14 @@ function renderJobs(){
  const el=document.getElementById('jobCards');
  if(!el)return;
  if(!document.getElementById('jobsView').classList.contains('on')){jobRenderDirty=true;return}
- if(worklinksPartnerAccess()&&worklinksIsChangcomView()&&partnerNoticeStage!=='bid'&&
+ if(worklinksPartnerAccess()&&worklinksIsChangcomView()&&
     (window.worklinksKeeps?.getMode?.()||'all')==='all'){
-  renderPrebidJobs(el);
-  return;
+  if(partnerNoticeStage==='all'){
+   jobRenderDirty=false;renderCombinedProcurementJobs(el);return;
+  }
+  if(['plan','prespec'].includes(partnerNoticeStage)){
+   renderPrebidJobs(el);return;
+  }
  }
  if(!jobsInitialDataReady&&!(jobSearchText&&jobSearchServerTotal!==null)&&
   !(window.worklinksKeeps?.getMode?.()!=='all'&&window.worklinksKeeps?.activeItems?.().length)){
@@ -6414,11 +6455,11 @@ function restoreJobSearchForWorkspace(view){
  if(jobSearchTimer!==null){clearTimeout(jobSearchTimer);jobSearchTimer=null}
  jobSearchSerial++;
  jobSearchText=next;input.value=next;
- jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRfpState.clear();
+ jobSearchRemote=[];jobSearchServerTotal=null;jobSearchRemoteError='';jobSearchRemoteLoading=false;jobSearchRfpState.clear();
  jobRenderLimit=jobPageStep();
  document.getElementById('jobSearchClear').hidden=!next;
  document.getElementById('jobSearchStatus').textContent=next.length>=2?'저장된 공고 검색 중':next?'두 글자 이상 입력':'';
- if(next.length>=2&&(!worklinksIsChangcomView()||partnerNoticeStage==='bid'))jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),120);
+ if(next.length>=2&&(!worklinksIsChangcomView()||['all','bid'].includes(partnerNoticeStage)))jobSearchTimer=setTimeout(()=>jobRunRemoteSearch(next),120);
 }
 function setWorkspaceView(view){
  // The confidential partner filters remain unavailable before AuthHub grants access.
@@ -6453,8 +6494,10 @@ function setWorkspaceView(view){
   const sorter=document.getElementById('jobSort');
   if(sorter)sorter.value=partnerMode&&worklinksPartnerAccess()?
    jobSortByWorkspace.changcom:jobSortByWorkspace.jobs;
+  if(sorter&&partnerMode&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='all'&&
+     ['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
-   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess();option.disabled=option.hidden});
+   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||(typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='all');option.disabled=option.hidden});
   if(changed){
    restoreJobSearchForWorkspace(view);
    jobRenderDirty=true;
@@ -6467,18 +6510,18 @@ function setWorkspaceView(view){
   }else if(jobRenderDirty)scheduleJobsRender();
   startJobsDataWhenVisible();
   if(partnerMode&&typeof partnerNoticeStage!=='undefined'){
-   if(partnerNoticeStage==='bid'&&typeof loadPartnerAllBids==='function')void loadPartnerAllBids();
-   else if(typeof loadPrebidJobs==='function')void loadPrebidJobs(partnerNoticeStage);
+   if(['all','bid'].includes(partnerNoticeStage)&&typeof loadPartnerAllBids==='function')void loadPartnerAllBids();
+   if(partnerNoticeStage==='all')for(const stage of ['plan','prespec'])void loadPrebidJobs(stage);
+   else if(['plan','prespec'].includes(partnerNoticeStage))void loadPrebidJobs(partnerNoticeStage);
   }
   // Bid scope filtering reads the full saved index; never prefilter at server sw=1.
  }
- if(changed&&!requestedPartnerViewOnAuth){
+ if(changed){
   const url=new URL(window.location.href);
   url.searchParams.set('view',view);
   if(view==='jobs'||view==='changcom'){
    const text=jobSearchByWorkspace[view]||'';
    if(text)url.searchParams.set('q',text);else url.searchParams.delete('q');
-   if(view==='changcom')url.searchParams.set('stage',partnerNoticeStage);
   }else url.searchParams.delete('q');
   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
  }
@@ -6523,17 +6566,28 @@ document.querySelectorAll('.jobf').forEach(b=>b.addEventListener('click',functio
 }));
 document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.addEventListener('change',function(){
  if(!worklinksIsChangcomView()||!worklinksPartnerAccess())return;
- const previousScope=partnerSwScope;
+ const previousScope=partnerSwScope,previousStage=partnerNoticeStage;
  partnerSwScope=document.getElementById('partnerSwScope').value;
  partnerNoticeStage=document.getElementById('partnerNoticeStage').value;
- const stageUrl=new URL(window.location.href);
- stageUrl.searchParams.set('stage',partnerNoticeStage);
- history.replaceState(history.state,'',stageUrl.pathname+stageUrl.search+stageUrl.hash);
  syncPartnerAwardControl();
+ if(previousStage!==partnerNoticeStage){
+  const sorter=document.getElementById('jobSort');
+  document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
+   .forEach(option=>{option.hidden=partnerNoticeStage==='all';option.disabled=option.hidden});
+  if(sorter){
+   if(partnerNoticeStage==='all'&&['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
+   else if(previousStage==='all'&&partnerNoticeStage==='bid')sorter.value=jobSortByWorkspace.changcom;
+  }
+ }
  jobRenderLimit=jobPageStep();
- if(partnerNoticeStage!=='bid')void loadPrebidJobs(partnerNoticeStage);
+ if(partnerNoticeStage==='all'){
+  for(const stage of ['plan','prespec'])void loadPrebidJobs(stage);
+  void loadPartnerAllBids();
+ }else if(['plan','prespec'].includes(partnerNoticeStage))void loadPrebidJobs(partnerNoticeStage);
  else void loadPartnerAllBids();
- if(jobSearchText.length>=2&&partnerNoticeStage==='bid'&&previousScope!==partnerSwScope)void jobRunRemoteSearch(jobSearchText);
+ if(jobSearchText.length>=2&&['all','bid'].includes(partnerNoticeStage)&&
+   (previousScope!==partnerSwScope||previousStage!==partnerNoticeStage))
+  void jobRunRemoteSearch(jobSearchText);
  renderJobs();
 }));
 document.getElementById('partnerAwardFilter')?.addEventListener('change',function(event){
