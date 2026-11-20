@@ -44,3 +44,16 @@ jobs:
           node tests/test_changcom_prebid_filters.cjs
           bash -n server/deploy-g2b-prebid-only.sh
           echo WORKLINKS_PREBID_AND_PRICE_SW_FILTERS_PASS
+      - name: Real Chrome desktop and mobile UI regression in isolated test fixture
+        run: |
+          set -Eeuo pipefail
+          npm install --prefix "$RUNNER_TEMP/worklinks-browser-qa" --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1
+          NODE_PATH="$RUNNER_TEMP/worklinks-browser-qa/node_modules" node tests/test_worklinks_prebid_browser.cjs
+          echo WORKLINKS_PREBID_REAL_CHROME_PASS
+      - name: Preserve desktop and mobile dialog screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: worklinks-early-stage-dialog-evidence
+          path: artifacts/prespec-*.png
+          if-no-files-found: ignore
