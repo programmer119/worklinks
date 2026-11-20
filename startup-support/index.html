@@ -5701,6 +5701,7 @@ async function jobRunRemoteSearch(query){
  }finally{
   if(requestId===jobSearchSerial){
    jobSearchRemoteLoading=false;scheduleJobsRender();
+   if(typeof scheduleWorklinksShareOpen==='function')scheduleWorklinksShareOpen();
   }
  }
 }
