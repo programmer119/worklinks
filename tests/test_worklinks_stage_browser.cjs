@@ -86,6 +86,25 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
    assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'true');
    await page.locator('#jobCards [data-keep-toggle]').click();
    assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'true');
+   // Real observed G2B Content-Disposition: no fake "규격서 1/2/3".
+   await page.evaluate(()=>{
+    const id='R26BD00302593';
+    const files=[1,2,3].map(n=>'https://www.g2b.go.kr/pn/pnz/pnza/UntyAtchFile/downloadFile.do?bfSpecRegNo='+id+'&fileType=BFDTL&fileSeq='+n);
+    const record={id,stage:'prespec',kind:'servc',title:'원문 첨부 확인',
+     org:'인천테크노파크',posted:'2026-11-18',opinionDeadline:'2026-11-23',
+     files,fileNames:['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'],url:''};
+    prebidCache.prespec.items=[record];
+    document.getElementById('jobCards').innerHTML=prebidNoticeCardMarkup(record);
+   });
+   for(const name of ['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'])
+    assert.equal(await page.locator('#jobCards a.prebid-doc-link').filter({hasText:name}).count(),1);
+   await page.locator('#jobCards [data-job-card]').click();
+   for(const name of ['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'])
+    assert.equal(await page.locator('#jobDetailBody a.job-source-file').filter({hasText:name}).count(),1);
+   assert.equal(await page.locator('#jobDetailBody a.job-external-link').count(),0);
+   assert.equal(await page.locator('#jobDetailBody a.job-prebid-source-file').count(),1);
+   await page.screenshot({path:path.join(root,'artifacts','prespec-original-names-'+label+'.png')});
+   await page.locator('#jobDetailClose').click();
    await page.evaluate(()=>{
     document.getElementById('jobCards').innerHTML=combinedBidCardMarkup({
      id:'g2b-servc-R26BK01830000-000',kind:'servc',title:'일반 입찰공고',
