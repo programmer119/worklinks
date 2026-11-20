@@ -31,6 +31,9 @@ LIMIT_DAY=max(8,min(100,int(os.environ.get('WORKLINKS_PREBID_REQUESTS_PER_DAY','
 MAX_PAGES=max(1,min(20,int(os.environ.get('WORKLINKS_PREBID_MAX_PAGES','8'))))
 PAGE_SIZE=500
 INTERVAL=max(1800,int(os.environ.get('WORKLINKS_PREBID_LOOP_SECONDS','1800')))
+# Prevent silently missing notices published before this collector was installed.
+BACKFILL_DAYS=max(2,min(30,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_DAYS','14'))))
+BACKFILL_PER_CYCLE=max(1,min(8,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_PER_CYCLE','4'))))
 SW_RE=re.compile(r'소프트웨어|정보시스템|전산|정보화|홈페이지|웹사이트|플랫폼|데이터베이스|인공지능|AI\b|\bSW\b|S/W|ICT|응용시스템|모바일\s*앱|시스템\s*(?:개발|고도화|구축)|디지털\s*전환',re.I)
 
 def _first(row,*names):
@@ -245,6 +248,36 @@ def collect_window(db,secret,stage,kind,day):
        (stage,kind,day,message))
   return 'failed:'+message
 
+def run_backfill(db,secret,today):
+ """Backfill unseen historic publishing windows without changing daily quota."""
+ floor=today-dt.timedelta(days=BACKFILL_DAYS)
+ windows=[]
+ # Previously identified real missing SW prespec, published 2026-11-16.
+ special=dt.date(2026,11,16)
+ if floor<=special<=today-dt.timedelta(days=2):
+  if not db.execute("SELECT 1 FROM prebid_records WHERE stage='prespec' AND kind='servc' AND item_id=?",
+                    ('R26BD00301029',)).fetchone():
+   windows.append(('prespec','servc',special.strftime('%Y%m%d')))
+ for offset in range(2,BACKFILL_DAYS+1):
+  day=(today-dt.timedelta(days=offset)).strftime('%Y%m%d')
+  for stage,kind in SERVICE:
+   record=(stage,kind,day)
+   if record not in windows:windows.append(record)
+ results={};attempted=0
+ todaystr=today.strftime('%Y%m%d')
+ for stage,kind,day in windows:
+  quota=db.execute('SELECT calls FROM prebid_quota WHERE day=?',(todaystr,)).fetchone()
+  if quota and quota[0]>=LIMIT_DAY-8:break
+  prior=db.execute('SELECT last_success,scope_version FROM prebid_windows WHERE stage=? AND kind=? AND day=?',
+                   (stage,kind,day)).fetchone()
+  if prior and float(prior[0] or 0)>0 and int(prior[1] or 1)>=3:continue
+  result=collect_window(db,secret,stage,kind,day)
+  results[stage+'/'+kind+'/'+day]=result
+  attempted+=1
+  if 'prebid_daily_request_budget_exhausted' in result:break
+  if attempted>=BACKFILL_PER_CYCLE:break
+ return results
+
 def run_once():
  db=connect()
  try:
@@ -259,6 +292,7 @@ def run_once():
     results[stage+'/'+kind+'/'+day.isoformat()]=result
     if result=='failed:prebid_daily_request_budget_exhausted':break
    if any('prebid_daily_request_budget_exhausted' in x for x in results.values()):break
+  results.update(run_backfill(db,token,today))
   summary={'at':dt.datetime.now(KST).isoformat(),'results':results}
   print('PREBID_COLLECTION '+json.dumps(summary,ensure_ascii=False),flush=True)
   return not any(v.startswith(('failed:','blocked:')) for v in results.values())
