@@ -39,6 +39,17 @@ INTERVAL=max(1800,int(os.environ.get('WORKLINKS_PREBID_LOOP_SECONDS','1800')))
 # Prevent silently missing notices published before this collector was installed.
 BACKFILL_DAYS=max(2,min(30,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_DAYS','21'))))
 BACKFILL_PER_CYCLE=max(1,min(8,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_PER_CYCLE','4'))))
+# Pace official requests to avoid confusing daily budget with per-second 429s.
+MIN_REQUEST_INTERVAL=max(0.5,float(os.environ.get('WORKLINKS_PREBID_MIN_REQUEST_INTERVAL','1.0')))
+_LAST_REQUEST_START=0.0
+
+def pace_requests():
+ global _LAST_REQUEST_START
+ now=time.monotonic()
+ if _LAST_REQUEST_START:
+  delay=MIN_REQUEST_INTERVAL-(now-_LAST_REQUEST_START)
+  if delay>0:time.sleep(delay)
+ _LAST_REQUEST_START=time.monotonic()
 SW_RE=re.compile(r'소프트웨어|정보시스템|전산|정보화|홈페이지|웹사이트|플랫폼|데이터베이스|인공지능|AI\b|\bSW\b|S/W|ICT|응용시스템|모바일\s*앱|시스템\s*(?:개발|고도화|구축)|디지털\s*전환',re.I)
 
 def _first(row,*names):
@@ -173,6 +184,7 @@ def fetch_page(db,secret,stage,kind,day,page):
  # Plans support both publication ranges and ordering-month search criteria.
  if stage=='plan':
   params.update(orderBgnYm=day[:6],orderEndYm=day[:6])
+ pace_requests()
  reserve(db)
  url=base+'/'+operation+'?'+urllib.parse.urlencode(params)
  req=urllib.request.Request(url,headers={'Accept':'application/json',
