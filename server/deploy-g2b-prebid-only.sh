@@ -42,7 +42,11 @@ start(){
  dk run -d --name "$WORKER" --restart unless-stopped --network host \
    -e G2B_OPERATING_KEY_PATH=/run/secrets/g2b-standard.env \
    -e G2B_PREBID_DB=/app/data/g2b-prebid.sqlite3 \
-   -e WORKLINKS_PREBID_REQUESTS_PER_DAY=48 \
+   -e WORKLINKS_PREBID_REQUESTS_PER_DAY=400 \
+   -e WORKLINKS_PREBID_TODAY_RECHECK_SECONDS=3600 \
+   -e WORKLINKS_PREBID_YESTERDAY_RECHECK_SECONDS=21600 \
+   -e WORKLINKS_PREBID_BACKFILL_DAYS=21 \
+   -e WORKLINKS_PREBID_MIN_REQUEST_INTERVAL=1.0 \
    -e WORKLINKS_PREBID_LOOP_SECONDS=1800 \
    -v "$TARGET:/app/g2b-prebid-collector.py:ro" \
    -v "$SECRET:/run/secrets/g2b-standard.env:ro" \
