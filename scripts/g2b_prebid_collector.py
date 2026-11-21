@@ -27,12 +27,17 @@ SERVICE={
  ('prespec','servc'):('https://apis.data.go.kr/1230000/ao/HrcspSsstndrdInfoService','getPublicPrcureThngInfoServc'),
  ('prespec','thng'):('https://apis.data.go.kr/1230000/ao/HrcspSsstndrdInfoService','getPublicPrcureThngInfoThng'),
 }
-LIMIT_DAY=max(8,min(100,int(os.environ.get('WORKLINKS_PREBID_REQUESTS_PER_DAY','48'))))
+LIMIT_DAY=max(8,min(500,int(os.environ.get('WORKLINKS_PREBID_REQUESTS_PER_DAY','400'))))
+# The official service advertises 1000/day per development subscription, but
+# this is a *local combined* safety ceiling until actual key grants are verified.
+# Keep headroom for other consumers of the same operating key.
+TODAY_RECHECK_SECONDS=max(1800,min(14400,int(os.environ.get('WORKLINKS_PREBID_TODAY_RECHECK_SECONDS','3600'))))
+YESTERDAY_RECHECK_SECONDS=max(14400,min(86400,int(os.environ.get('WORKLINKS_PREBID_YESTERDAY_RECHECK_SECONDS','21600'))))
 MAX_PAGES=max(1,min(20,int(os.environ.get('WORKLINKS_PREBID_MAX_PAGES','8'))))
 PAGE_SIZE=500
 INTERVAL=max(1800,int(os.environ.get('WORKLINKS_PREBID_LOOP_SECONDS','1800')))
 # Prevent silently missing notices published before this collector was installed.
-BACKFILL_DAYS=max(2,min(30,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_DAYS','14'))))
+BACKFILL_DAYS=max(2,min(30,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_DAYS','21'))))
 BACKFILL_PER_CYCLE=max(1,min(8,int(os.environ.get('WORKLINKS_PREBID_BACKFILL_PER_CYCLE','4'))))
 SW_RE=re.compile(r'소프트웨어|정보시스템|전산|정보화|홈페이지|웹사이트|플랫폼|데이터베이스|인공지능|AI\b|\bSW\b|S/W|ICT|응용시스템|모바일\s*앱|시스템\s*(?:개발|고도화|구축)|디지털\s*전환',re.I)
 
@@ -207,8 +212,14 @@ def collect_window(db,secret,stage,kind,day):
    OR failed LIKE 'prebid_official_http_429')
   ORDER BY day DESC LIMIT 1""",(stage,today)).fetchone()
  if blocked:return 'blocked:'+str(blocked[0])
- retry_after=4*3600 if day==today else 24*3600
- if prior and int(prior[2] or 1)>=3 and now-float(prior[0] or 0)<retry_after:return 'skipped'
+ # Only current and previous publishing dates are rechecked after success.
+ # Already-completed older windows are immutable for ordinary cycling; explicit
+ # missing/failed windows are the only automatic historic backfill candidates.
+ yesterday=(dt.datetime.now(KST).date()-dt.timedelta(days=1)).strftime('%Y%m%d')
+ retry_after=(TODAY_RECHECK_SECONDS if day==today else
+              YESTERDAY_RECHECK_SECONDS if day==yesterday else None)
+ if prior and float(prior[0] or 0)>0 and int(prior[2] or 1)>=3:
+  if retry_after is None or now-float(prior[0])<retry_after:return 'skipped'
  gathered=[]
  try:
   total=None
@@ -225,20 +236,32 @@ def collect_window(db,secret,stage,kind,day):
   for raw in gathered:
    record=normalize(stage,kind,raw)
    if record is not None:values[record['id']]=record
+  # Hashless exact JSON comparison: rereading today's page must not rewrite
+  # hundreds of unchanged records or mislabel them as newly collected.
+  existing=dict(db.execute('SELECT item_id,payload FROM prebid_records WHERE stage=? AND kind=?',
+                           (stage,kind)).fetchall())
+  new_count=changed_count=unchanged_count=0
   with db:
    for ident,record in values.items():
+    payload=json.dumps(record,ensure_ascii=False)
+    if ident in existing and existing[ident]==payload:
+     unchanged_count+=1
+     continue
+    if ident in existing:changed_count+=1
+    else:new_count+=1
     db.execute("""INSERT INTO prebid_records
       (stage,kind,item_id,payload,first_seen,last_seen) VALUES (?,?,?,?,?,?)
       ON CONFLICT(stage,kind,item_id) DO UPDATE
        SET payload=excluded.payload,last_seen=excluded.last_seen""",
-       (stage,kind,ident,json.dumps(record,ensure_ascii=False),stamp,stamp))
+       (stage,kind,ident,payload,stamp,stamp))
    db.execute("""INSERT INTO prebid_windows(stage,kind,day,last_success,source_total,stored,failed,scope_version)
       VALUES (?,?,?,?,?,?,'',3)
       ON CONFLICT(stage,kind,day) DO UPDATE SET
        last_success=excluded.last_success,source_total=excluded.source_total,
        stored=excluded.stored,failed='',scope_version=3""",
        (stage,kind,day,now,total,len(values)))
-  return 'ok:'+str(total)+'/'+str(len(values))
+  return ('ok:'+str(total)+'/'+str(len(values))+
+          ' new='+str(new_count)+' changed='+str(changed_count)+' unchanged='+str(unchanged_count))
  except (RuntimeError,sqlite3.Error) as exc:
   message=str(exc)[:100]
   with db:
@@ -249,7 +272,7 @@ def collect_window(db,secret,stage,kind,day):
   return 'failed:'+message
 
 def run_backfill(db,secret,today):
- """Backfill unseen historic publishing windows without changing daily quota."""
+ """Backfill missing/failed publishing windows using leftover guarded quota."""
  floor=today-dt.timedelta(days=BACKFILL_DAYS)
  windows=[]
  # Previously identified real missing SW prespec, published 2026-11-16.
@@ -267,7 +290,10 @@ def run_backfill(db,secret,today):
  todaystr=today.strftime('%Y%m%d')
  for stage,kind,day in windows:
   quota=db.execute('SELECT calls FROM prebid_quota WHERE day=?',(todaystr,)).fetchone()
-  if quota and quota[0]>=LIMIT_DAY-8:break
+  # Reserve at least 25 percent of the day's budget for fresh publications.
+  # A page window may span MAX_PAGES requests: leave that extra guard too.
+  fresh_reserve=max(24,LIMIT_DAY//4)
+  if quota and quota[0]>=LIMIT_DAY-fresh_reserve-MAX_PAGES:break
   prior=db.execute('SELECT last_success,scope_version FROM prebid_windows WHERE stage=? AND kind=? AND day=?',
                    (stage,kind,day)).fetchone()
   if prior and float(prior[0] or 0)>0 and int(prior[1] or 1)>=3:continue
@@ -284,9 +310,10 @@ def run_once():
   token=key()
   reset_auth_gates_on_key_change(db,token)
   today=dt.datetime.now(KST).date()
-  # Today + prior day only. Each stage/kind window has a durable success clock.
+  # Always give newest publications first claim on the daily request budget.
+  # Yesterday comes second; old incomplete windows use remaining headroom.
   results={}
-  for day in (today-dt.timedelta(days=1),today):
+  for day in (today,today-dt.timedelta(days=1)):
    for stage,kind in SERVICE:
     result=collect_window(db,token,stage,kind,day.strftime('%Y%m%d'))
     results[stage+'/'+kind+'/'+day.isoformat()]=result
