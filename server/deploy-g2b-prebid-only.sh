@@ -11,7 +11,7 @@ SOCKET=unix:///home/ggul-docker/run/docker.sock
 WORKER=worklinks-g2b-prebid
 IMG=python:3.11-alpine
 dk(){ "$DOCKER" -H "$SOCKET" "$@"; }
-for f in "$SOURCE" "$ROOT/tests/test_g2b_prebid_collector.py" "$SECRET" "$DOCKER";do
+for f in "$SOURCE" "$ROOT/tests/test_g2b_prebid_collector.py" "$ROOT/tests/test_g2b_prebid_priority_and_quota.py" "$SECRET" "$DOCKER";do
  test -s "$f" || { echo "PREBID_REQUIRED_FILE_MISSING=$f";exit 5; }
 done
 test -S /home/ggul-docker/run/docker.sock
@@ -21,6 +21,8 @@ dk run --rm --network none -e PYTHONPYCACHEPREFIX=/tmp/prebid-pycache -v "$ROOT:
  python -m py_compile /work/scripts/g2b_prebid_collector.py /work/server/g2b-proxy.py
 dk run --rm --network none -e PYTHONPYCACHEPREFIX=/tmp/prebid-pycache -v "$ROOT:/work:ro" "$IMG" \
  python /work/tests/test_g2b_prebid_collector.py
+dk run --rm --network none -e PYTHONPYCACHEPREFIX=/tmp/prebid-pycache -v "$ROOT:/work:ro" "$IMG" \
+ python /work/tests/test_g2b_prebid_priority_and_quota.py
 if cmp -s "$SOURCE" "$TARGET" && \
    test "$(dk inspect -f '{{.State.Running}}' "$WORKER" 2>/dev/null || true)" = true;then
  echo 'WORKLINKS_PREBID_COLLECTOR_ALREADY_CURRENT=PASS'
@@ -42,7 +44,11 @@ start(){
  dk run -d --name "$WORKER" --restart unless-stopped --network host \
    -e G2B_OPERATING_KEY_PATH=/run/secrets/g2b-standard.env \
    -e G2B_PREBID_DB=/app/data/g2b-prebid.sqlite3 \
-   -e WORKLINKS_PREBID_REQUESTS_PER_DAY=48 \
+   -e WORKLINKS_PREBID_REQUESTS_PER_DAY=400 \
+   -e WORKLINKS_PREBID_TODAY_RECHECK_SECONDS=3600 \
+   -e WORKLINKS_PREBID_YESTERDAY_RECHECK_SECONDS=21600 \
+   -e WORKLINKS_PREBID_BACKFILL_DAYS=21 \
+   -e WORKLINKS_PREBID_MIN_REQUEST_INTERVAL=1.0 \
    -e WORKLINKS_PREBID_LOOP_SECONDS=1800 \
    -v "$TARGET:/app/g2b-prebid-collector.py:ro" \
    -v "$SECRET:/run/secrets/g2b-standard.env:ro" \
