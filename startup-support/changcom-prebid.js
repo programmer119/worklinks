@@ -235,23 +235,34 @@ function prebidOfficialFileEntries(x,limit=8){
   return {url,name};
  }).filter(Boolean).slice(0,limit);
 }
-// Use the verified official plan detail route; the older prespec-number
-// deep-link mechanism is not reliable on the current G2B portal.
+// Keep stage-specific government pages separate from download links.
+// The G2B prespec SPA route (PRVA004_02) is a candidate deep-link: live
+// browser robots can return only an empty shell. Always expose an independent
+// official search path, and never describe a downloaded file as the detail page.
 function prebidOfficialDetailUrl(x){
- const url=String(x?.url||'').trim();
- if(/^https:\/\/(?:www\.)?g2b\.go\.kr\//i.test(url))return url;
- const id=String(x?.id||'');
+ const id=String(x?.id||'').trim().toUpperCase();
  if(x?.stage==='plan'&&/^R\d{2}DD\d{8}$/.test(id))
   return 'https://www.g2b.go.kr/link/PRPA015_01/single/?oderPlanNo='+encodeURIComponent(id);
+ if(x?.stage==='prespec'&&/^R\d{2}BD\d{8}$/.test(id))
+  return 'https://www.g2b.go.kr/link/PRVA004_02/?bfSpecRegNo='+encodeURIComponent(id);
  return '';
 }
-function prebidSourceMarkup(x,_safe,fileEntries){
+function prebidOfficialSearchUrl(x){
+ if(x?.stage!=='prespec')return '';
+ const id=String(x?.id||'').trim().toUpperCase();
+ if(!/^R\d{2}BD\d{8}$/.test(id))return '';
+ return 'https://www.g2b.go.kr/link/PRCA001_04/single/?flag=cnrtSl&srch=0002&bfSpecRegNo='+
+   encodeURIComponent(id)+'&srchPreStdRgstNo='+encodeURIComponent(id);
+}
+function prebidSourceMarkup(x,_safe,_fileEntries){
  const source=prebidOfficialDetailUrl(x);
- if(source)return '<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(source)+
-  '" target="_blank" rel="noopener noreferrer">나라장터 원문 보기</a>';
- if(fileEntries.length)return '<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(fileEntries[0].url)+
-  '" target="_blank" rel="noopener noreferrer" title="나라장터의 공식 원본 첨부파일입니다. 공고 상세페이지가 아닙니다">원본문서 보기</a>';
- return '<a class="prebid-source-action" data-external-source="1" href="https://www.g2b.go.kr/" target="_blank" rel="noopener noreferrer" title="나라장터에서 등록번호 '+htmlEscape(x?.id||'')+'로 검색">나라장터 공고조회</a>';
+ const search=prebidOfficialSearchUrl(x);
+ const label=x?.stage==='prespec'?'나라장터 상세 열기':'나라장터 원문 보기';
+ const direct=source?'<a class="prebid-source-action" data-external-source="1" href="'+htmlEscape(source)+
+  '" target="_blank" rel="noopener noreferrer"'+(search?' title="나라장터 화면이 직접 열리지 않으면 옆의 나라장터 검색을 사용하세요"':'')+'>'+label+'</a>':'';
+ const fallback=search?'<a class="prebid-source-search" data-external-source="1" href="'+htmlEscape(search)+
+  '" target="_blank" rel="noopener noreferrer" title="나라장터 사전규격 검색 화면 (등록번호 '+htmlEscape(x?.id||'')+')">나라장터 검색</a>':'';
+ return direct+(direct&&fallback?' · ':'')+fallback;
 }
 const prebidMetaRetryAfter=new Map(),prebidMetaQueue=[],prebidMetaPending=new Set();
 let prebidMetaActive=0;
@@ -402,11 +413,13 @@ function renderPrebidSourceDetail(item){
   '<div class="job-source-files">'+fileLinks.map(file=>
    '<a class="job-source-file" href="'+htmlEscape(file.url)+'" target="_blank" rel="noopener noreferrer">'+
    '<span class="job-source-filename">'+htmlEscape(file.name||'첨부파일 내려받기')+'</span><span>열기 ↗</span></a>').join('')+'</div></section>':'';
- const source=external?'<a class="job-external-link" href="'+htmlEscape(external)+
-  '" target="_blank" rel="noopener noreferrer">나라장터 원문 열기 ↗</a>':
-  (fileLinks.length?'<a class="job-prebid-source-file" href="'+htmlEscape(fileLinks[0].url)+'" target="_blank" rel="noopener noreferrer">원본문서 보기 ↗</a>':'')+
-  '<a class="job-prebid-source-lookup" href="https://www.g2b.go.kr/" target="_blank" rel="noopener noreferrer" title="나라장터에서 등록번호를 검색하세요">나라장터에서 조회 ↗</a>'+
-  '<span class="job-detail-secondary">나라장터 상세 직링크 미확인 · 등록번호 '+htmlEscape(number)+'</span>';
+ const governmentSearch=prebidOfficialSearchUrl(row);
+ const source=(external?'<a class="job-external-link" href="'+htmlEscape(external)+
+  '" target="_blank" rel="noopener noreferrer">'+
+  (row.stage==='prespec'?'나라장터 상세 열기':'나라장터 원문 열기')+' ↗</a>':'')+
+  (governmentSearch?'<a class="job-prebid-source-lookup" href="'+htmlEscape(governmentSearch)+
+  '" target="_blank" rel="noopener noreferrer" title="나라장터 사전규격 검색·번호 '+htmlEscape(number)+'">나라장터 검색 ↗</a>'+
+  '<span class="job-detail-secondary">나라장터 상세 연결이 안 되면 등록번호 '+htmlEscape(number)+'로 검색하세요.</span>':'');
  document.getElementById('jobDetailBody').innerHTML=
   '<div class="job-detail-overview"><div class="job-detail-status">'+
    '<span class="jobmatch-chip pending">'+stage+' · 입찰조건 미확정</span></div>'+
