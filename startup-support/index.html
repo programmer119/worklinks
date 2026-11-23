@@ -970,6 +970,8 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobsView[data-job-mode="partner"] #changcomJobFilters .partner-count-label{
  display:none!important
 }
+/* Preserve sorting when verdict-only controls are hidden in combined/prebid views. */
+#jobsView[data-job-mode="partner"] #jobVerdictFilter.job-sort-only > :not(.job-sort-row){display:none!important}
 @media(max-width:1110px){
  #jobsView[data-job-mode="partner"] .job-quick-search{
   flex:0 1 225px!important;width:225px!important
@@ -6155,7 +6157,7 @@ function renderJobs(){
  const partnerMode=worklinksIsChangcomView();
  if(member&&partnerMode){
   const verdictFilters=document.getElementById('jobVerdictFilter');
-  if(verdictFilters)verdictFilters.hidden=false;
+  if(verdictFilters){verdictFilters.hidden=false;verdictFilters.classList.remove('job-sort-only');}
  }
  if(!member){
   if(jobFilter==='partner')jobFilter='all';
@@ -6604,10 +6606,12 @@ function setWorkspaceView(view){
   const sorter=document.getElementById('jobSort');
   if(sorter)sorter.value=partnerMode&&worklinksPartnerAccess()?
    jobSortByWorkspace.changcom:jobSortByWorkspace.jobs;
-  if(sorter&&partnerMode&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='all'&&
+  if(sorter&&partnerMode&&typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage!=='bid'&&
      ['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
-   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||(typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage==='all');option.disabled=option.hidden});
+   .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||(typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage!=='bid');option.disabled=option.hidden});
+  const deadlineOption=document.querySelector('#jobSort option[value="deadline"]');
+  if(deadlineOption){deadlineOption.hidden=partnerMode&&partnerNoticeStage!=='bid';deadlineOption.disabled=deadlineOption.hidden;}
   if(changed){
    restoreJobSearchForWorkspace(view);
    jobRenderDirty=true;
@@ -6651,7 +6655,9 @@ window.addEventListener('worklinks:partner-access',function(){
  }
  const partnerMode=worklinksIsChangcomView()&&allowed;
  document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
-  .forEach(option=>{option.hidden=!partnerMode;option.disabled=!partnerMode});
+  .forEach(option=>{option.hidden=!partnerMode||partnerNoticeStage!=='bid';option.disabled=option.hidden});
+  const deadlineOption=document.querySelector('#jobSort option[value="deadline"]');
+  if(deadlineOption){deadlineOption.hidden=partnerMode&&partnerNoticeStage!=='bid';deadlineOption.disabled=deadlineOption.hidden;}
  const sort=document.getElementById('jobSort');
  if(sort&&(!allowed||!partnerMode)&&['qualified','competition'].includes(sort.value))sort.value='deadline';
  if(allowed&&partnerMode&&sort)sort.value=jobSortByWorkspace.changcom;
@@ -6692,9 +6698,11 @@ document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.
  if(previousStage!==partnerNoticeStage){
   const sorter=document.getElementById('jobSort');
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
-   .forEach(option=>{option.hidden=partnerNoticeStage==='all';option.disabled=option.hidden});
+   .forEach(option=>{option.hidden=partnerNoticeStage!=='bid';option.disabled=option.hidden});
+   const deadlineOption=document.querySelector('#jobSort option[value="deadline"]');
+   if(deadlineOption){deadlineOption.hidden=partnerNoticeStage!=='bid';deadlineOption.disabled=deadlineOption.hidden;}
   if(sorter){
-   if(partnerNoticeStage==='all'&&['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
+   if(partnerNoticeStage!=='bid'&&['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
    else if(previousStage==='all'&&partnerNoticeStage==='bid')sorter.value=jobSortByWorkspace.changcom;
   }
  }
