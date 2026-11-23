@@ -2528,12 +2528,17 @@ def query_prebid_file_names(stage,kind,notice):
     except sqlite3.Error:raise ApiError('prebid_file_metadata_unavailable',503)
     finally:db.close()
 
-def query_prebid_records(stage,limit=500,offset=0):
+def query_prebid_records(stage,limit=500,offset=0,query=''):
     """Read-only pre-tender plans/specifications; never query G2B on a page view."""
     if stage not in ('plan','prespec'):
         raise ApiError('invalid_prebid_stage',400)
     if not (1<=limit<=500 and 0<=offset<=100000):
         raise ApiError('invalid_prebid_pagination',400)
+    exact_id=str(query or '').strip().upper()
+    if exact_id:
+        pattern=r'R\d{2}BD\d{8}' if stage=='prespec' else r'R\d{2}DD\d{8}'
+        if not re.fullmatch(pattern,exact_id):
+            raise ApiError('invalid_prebid_exact_query',400)
     dbfile=os.path.join(os.path.dirname(G2B_DB_PATH),'g2b-prebid.sqlite3')
     if not os.path.isfile(dbfile):
         return {'ok':True,'ready':False,'stage':stage,'total':0,'items':[],
@@ -2546,9 +2551,17 @@ def query_prebid_records(stage,limit=500,offset=0):
             return {'ok':True,'ready':False,'stage':stage,'total':0,'items':[],
                     'error':(failed[0][:100] if failed else 'prebid_first_collect_pending'),
                     'noGovernmentApiCalls':True}
-        total=db.execute('SELECT COUNT(*) FROM prebid_records WHERE stage=?',(stage,)).fetchone()[0]
-        rows=db.execute('''SELECT payload FROM prebid_records WHERE stage=?
-            ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',(stage,limit,offset)).fetchall()
+        if exact_id:
+            total=db.execute('SELECT COUNT(*) FROM prebid_records WHERE stage=? AND item_id=?',
+                             (stage,exact_id)).fetchone()[0]
+            rows=db.execute('''SELECT payload FROM prebid_records WHERE stage=? AND item_id=?
+                ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',
+                (stage,exact_id,limit,offset)).fetchall()
+        else:
+            total=db.execute('SELECT COUNT(*) FROM prebid_records WHERE stage=?',(stage,)).fetchone()[0]
+            rows=db.execute('''SELECT payload FROM prebid_records WHERE stage=?
+                ORDER BY last_seen DESC, item_id DESC LIMIT ? OFFSET ?''',
+                (stage,limit,offset)).fetchall()
         names_by_url={}
         if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='prebid_file_name_cache'").fetchone():
             names_by_url=dict(db.execute("SELECT url,filename FROM prebid_file_name_cache WHERE filename<>''").fetchall())
@@ -2566,7 +2579,7 @@ def query_prebid_records(stage,limit=500,offset=0):
             items.append(result)
         return {'ok':True,'ready':True,'stage':stage,'total':total,
                 'asOf':datetime.datetime.fromtimestamp(ready[1],datetime.timezone.utc).isoformat(),
-                'items':items,'noGovernmentApiCalls':True}
+                'items':items,'exactLookup':bool(exact_id),'noGovernmentApiCalls':True}
     except (sqlite3.Error,ValueError,TypeError) as exc:
         raise ApiError('prebid_saved_db_invalid',503) from exc
     finally:db.close()
@@ -3528,7 +3541,7 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == '/api/g2b/prebid':
                 try:limit,offset=int(get('limit','500')),int(get('offset','0'))
                 except (TypeError,ValueError):raise ApiError('invalid_prebid_pagination',400)
-                return self.reply(200,query_prebid_records(get('stage',''),limit,offset))
+                return self.reply(200,query_prebid_records(get('stage',''),limit,offset,get('q','')))
             if u.path == '/api/g2b/saved-inventory':
                 return self.reply(200,query_saved_open_inventory())
             if u.path == '/api/g2b/saved':
