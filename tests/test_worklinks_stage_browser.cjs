@@ -71,9 +71,9 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
    assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'false');
    assert.match(await page.locator('#jobDetailSub').innerText(),/사전규격/);
    assert.match(await page.locator('#jobDetailBody').innerText(),/학생관리/);
-   assert.match(await page.locator('#jobDetailBody').innerText(),/나라장터 상세 연결이 안 되면/);
+   assert.match(await page.locator('#jobDetailBody').innerText(),/원문 공고 열기/);
    assert.equal(await page.locator('#jobDetailBody a.job-external-link').count(),1);
-   assert.equal(await page.locator('#jobDetailBody a.job-prebid-source-lookup').count(),1);
+   assert.equal(await page.locator('#jobDetailBody details.job-detail-advanced a').count(),1);
    assert.equal(await page.locator('#jobDetailBody a[href="./share/R26BD00301798/"]').count(),1);
    assert.equal(await page.evaluate(()=>__record.evidence),0,'no bid-specific extra API path');
    await page.screenshot({path:path.join(root,'artifacts','stage-final-'+label+'.png')});
@@ -97,7 +97,7 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
     document.getElementById('jobCards').innerHTML=prebidNoticeCardMarkup(record);
    });
    for(const name of ['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'])
-    assert.equal(await page.locator('#jobCards a.prebid-doc-link').filter({hasText:name}).count(),1);
+    assert.equal(await page.locator('#jobCards a.prebid-doc-link').filter({hasText:name}).count(),0);
    await page.locator('#jobCards [data-job-card]').click();
    for(const name of ['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'])
     assert.equal(await page.locator('#jobDetailBody a.job-source-file').filter({hasText:name}).count(),1);
