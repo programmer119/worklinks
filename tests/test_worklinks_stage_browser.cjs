@@ -67,13 +67,34 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
     document.getElementById('jobCards').innerHTML=prebidNoticeCardMarkup(prebidCache.prespec.items[0]);
    });
    assert.equal(await page.getByText('공유 링크').count(),0);
+   // All stage cards reuse the exact card action slot from ordinary tenders.
+   const originalCard=page.locator('#jobCards .job-mini');
+   const originalSource=page.locator('#jobCards .job-highlights a.job-source-link');
+   assert.equal(await originalCard.count(),1);
+   assert.equal(await originalSource.count(),1);
+   assert.match(await originalSource.getAttribute('href'),/PRVA004_02\/\?bfSpecRegNo=R26BD00301798/);
+   assert.equal(await page.locator('#jobCards a.prebid-doc-link').count(),0);
+   const sourceBox=await originalSource.boundingBox(),cardBox=await originalCard.boundingBox();
+   assert.ok(sourceBox&&cardBox&&sourceBox.x>cardBox.x+cardBox.width/2,'source action should be at the right edge of card');
+   await page.screenshot({path:path.join(root,'artifacts','card-prespec-'+label+'.png')});
+   // External source action must not accidentally open our WorkLinks detail dialog.
+   await page.context().route('https://www.g2b.go.kr/**',route=>route.fulfill({
+    status:200,contentType:'text/html',body:'<h1>정부 원문 링크 라우팅 검사</h1>'}));
+   const popupPromise=page.waitForEvent('popup');
+   await originalSource.click();
+   const popup=await popupPromise;
+   await popup.waitForURL(/PRVA004_02/,{waitUntil:'domcontentloaded',timeout:13000});
+   await popup.close();
+   assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'true');
    await page.locator('#jobCards [data-job-card]').click();
    assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'false');
    assert.match(await page.locator('#jobDetailSub').innerText(),/사전규격/);
    assert.match(await page.locator('#jobDetailBody').innerText(),/학생관리/);
-   assert.match(await page.locator('#jobDetailBody').innerText(),/나라장터 상세 연결이 안 되면/);
+   assert.match(await page.locator('#jobDetailBody').innerText(),/원문 공고 열기/);
    assert.equal(await page.locator('#jobDetailBody a.job-external-link').count(),1);
-   assert.equal(await page.locator('#jobDetailBody a.job-prebid-source-lookup').count(),1);
+   assert.equal(await page.locator('#jobDetailBody a.job-external-link').innerText(),'원문 공고 열기 ↗');
+   assert.equal(await page.locator('#jobDetailBody .job-detail-actions').evaluate(el=>getComputedStyle(el).justifyContent),'flex-end');
+   assert.equal(await page.locator('#jobDetailBody details.job-detail-advanced a').count(),1);
    assert.equal(await page.locator('#jobDetailBody a[href="./share/R26BD00301798/"]').count(),1);
    assert.equal(await page.evaluate(()=>__record.evidence),0,'no bid-specific extra API path');
    await page.screenshot({path:path.join(root,'artifacts','stage-final-'+label+'.png')});
@@ -97,7 +118,7 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
     document.getElementById('jobCards').innerHTML=prebidNoticeCardMarkup(record);
    });
    for(const name of ['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'])
-    assert.equal(await page.locator('#jobCards a.prebid-doc-link').filter({hasText:name}).count(),1);
+    assert.equal(await page.locator('#jobCards a.prebid-doc-link').filter({hasText:name}).count(),0);
    await page.locator('#jobCards [data-job-card]').click();
    for(const name of ['붙임 제안요청서.hwpx','붙임 제출서식.hwpx','붙임 긴급입찰사유서.hwpx'])
     assert.equal(await page.locator('#jobDetailBody a.job-source-file').filter({hasText:name}).count(),1);
@@ -105,11 +126,28 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
    assert.equal(await page.locator('#jobDetailBody a.job-prebid-source-file').count(),0);
    await page.screenshot({path:path.join(root,'artifacts','prespec-original-names-'+label+'.png')});
    await page.locator('#jobDetailClose').click();
+   // Official plan uses the same card, modal placement, wording and CSS classes.
+   await page.evaluate(()=>{
+    const record={id:'R26DD20933570',stage:'plan',kind:'servc',title:'학생관리 시스템 발주계획',
+      org:'연세대학교 미래캠퍼스',budget:'39930000',plannedMonth:'2026-11',posted:'2026-11-16',files:[]};
+    prebidCache.plan.items=[record];
+    document.getElementById('jobCards').innerHTML=prebidNoticeCardMarkup(record);
+   });
+   assert.equal(await page.locator('#jobCards .job-mini .job-highlights a.job-source-link').count(),1);
+   assert.match(await page.locator('#jobCards a.job-source-link').getAttribute('href'),/PRPA015_01\/single\/\?oderPlanNo=R26DD20933570/);
+   await page.screenshot({path:path.join(root,'artifacts','card-plan-'+label+'.png')});
+   await page.locator('#jobCards [data-job-card]').click();
+   assert.match(await page.locator('#jobDetailSub').innerText(),/발주계획/);
+   assert.equal(await page.locator('#jobDetailBody a.job-external-link').innerText(),'원문 공고 열기 ↗');
+   assert.equal(await page.locator('#jobDetailBody .job-detail-actions').evaluate(el=>getComputedStyle(el).justifyContent),'flex-end');
+   await page.locator('#jobDetailClose').click();
    await page.evaluate(()=>{
     document.getElementById('jobCards').innerHTML=combinedBidCardMarkup({
      id:'g2b-servc-R26BK01830000-000',kind:'servc',title:'일반 입찰공고',
      org:'발주기관',amount:'100000000'});
    });
+   assert.equal(await page.locator('#jobCards .job-mini .job-highlights').count(),1);
+   await page.screenshot({path:path.join(root,'artifacts','card-bid-'+label+'.png')});
    await page.locator('#jobCards [data-job-card]').click();
    assert.ok(await page.evaluate(()=>__record.ordinary)>0,'ordinary bid renderer path preserved');
    assert.ok(await page.evaluate(()=>__record.evidence)>0,'ordinary bid APIs still reachable');

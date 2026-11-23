@@ -30,10 +30,10 @@ assert.ok(!markup.includes('공유 링크'),'no duplicate share link on thumbnai
 assert.ok(markup.includes('data-job-detail="'+key+'"'),'title uses same detail handler');
 assert.equal(vm.runInContext("renderPrebidSourceDetail({id:'"+key+"'})",ctx),true);
 assert.ok(elements.jobDetailSub.textContent.includes('사전규격'));
-assert.ok(elements.jobDetailBody.innerHTML.includes('의견등록'));
+assert.ok(elements.jobDetailBody.innerHTML.includes('의견마감'));
 assert.ok(elements.jobDetailBody.innerHTML.includes('학생관리')); // subject not a false bid-specific eligibility
-assert.ok(elements.jobDetailBody.innerHTML.includes('나라장터 상세 연결이 안 되면'));
-assert.ok(elements.jobDetailBody.innerHTML.includes('나라장터 검색'),
+assert.ok(elements.jobDetailBody.innerHTML.includes('원문 공고 열기 ↗'));
+assert.ok(elements.jobDetailBody.innerHTML.includes('나라장터에서 등록번호로 검색'),
  'prespec government search fallback must be explicit');
 assert.ok(elements.jobDetailBody.innerHTML.includes('PRVA004_02/?bfSpecRegNo=R26BD00301798'),
  'prespec government detail candidate must contain exact number');
@@ -46,7 +46,7 @@ assert.equal(fallback.id,key);
 assert.equal(fallback.title,'학생관리 시스템 구축 용역');
 assert.equal(vm.runInContext("renderPrebidSourceDetail(prebidKeepJobFromId('"+key+"'))",ctx),true,
  'offline kept cards stay on early-stage renderer, not ordinary bid renderer');
-assert.ok(elements.jobDetailBody.innerHTML.includes('나라장터 상세 연결이 안 되면'));
+assert.ok(elements.jobDetailBody.innerHTML.includes('원문 공고 열기 ↗'));
 const plan={id:'R26DD20928584',stage:'plan',kind:'servc',title:'정보시스템 구축 발주',
  org:'발주기관',posted:'2026-11-18',plannedMonth:'2026-12',budget:'120000000',
  url:'https://www.g2b.go.kr/link/PRPA015_01/single/?oderPlanNo=R26DD20928584',files:[]};
