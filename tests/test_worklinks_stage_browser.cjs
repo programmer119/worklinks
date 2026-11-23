@@ -83,7 +83,7 @@ fs.mkdirSync(path.join(root,'artifacts'),{recursive:true});
    const popupPromise=page.waitForEvent('popup');
    await originalSource.click();
    const popup=await popupPromise;
-   assert.match(popup.url(),/PRVA004_02/);
+   await popup.waitForURL(/PRVA004_02/,{waitUntil:'domcontentloaded',timeout:13000});
    await popup.close();
    assert.equal(await page.locator('#jobDetailModal').getAttribute('aria-hidden'),'true');
    await page.locator('#jobCards [data-job-card]').click();
