@@ -1,0 +1,27 @@
+name: WorkLinks official prespec link field probe
+on:
+  push:
+    branches: [fix/worklinks-official-prebid-links-20261123]
+    paths:
+      - 'tests/probe_worklinks_g2b_routes.cjs'
+      - '.github/workflows/worklinks-official-prespec-route-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test real official routes in Chromium (read only)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/worklinks-route-probe" --no-save --no-package-lock --ignore-scripts playwright-core@1.56.1
+          NODE_PATH="$RUNNER_TEMP/worklinks-route-probe/node_modules" node tests/probe_worklinks_g2b_routes.cjs
+      - name: Retain real G2B screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: g2b-official-route-probe
+          path: artifacts/g2b-route-*.png
+          if-no-files-found: ignore
