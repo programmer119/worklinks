@@ -161,9 +161,9 @@ async function loadPartnerAllBids(more=false){
   }
  }
 }
-// Read-only SQLite page requests may fail transiently while the API port recovers.
-// Retry only network/timeouts/5xx; never retry an official 403 or mutate the DB.
-const PREBID_READ_RETRY_DELAYS=[350,1100];
+// A full prebid snapshot is atomic: never throw away the last complete
+// records because one of ~20 pages suffers a temporary connection failure.
+const PREBID_READ_RETRY_DELAYS=[500,1300,2800];
 function prebidTransientReadFailure(error){
  const message=String(error?.message||error||'');
  return ['AbortError','TimeoutError','TypeError'].includes(error?.name)||
@@ -178,30 +178,57 @@ async function prebidReadPageWithRetry(stage,offset){
   }
  }
 }
+async function prebidReadCompleteStage(stage){
+ const first=await prebidReadPageWithRetry(stage,0);
+ if(!first||first.ok!==true)throw Error(first?.error||'사전 단계 목록 응답 오류');
+ if(!first.ready)throw Error(first.error||'사전 단계 수집 자료 없음');
+ const total=Number(first.total);
+ if(!Number.isSafeInteger(total)||total<0||total>100000||
+    !Array.isArray(first.items)||first.items.length!==Math.min(total,500))
+  throw Error('사전 단계 첫 페이지 불완전');
+ const results=[first],offsets=[];
+ for(let offset=500;offset<total;offset+=500)offsets.push(offset);
+ let cursor=0;
+ async function worker(){
+  while(cursor<offsets.length){
+   const index=cursor++,offset=offsets[index];
+   const page=await prebidReadPageWithRetry(stage,offset);
+   if(!page||page.ok!==true||page.ready!==true||
+      Number(page.total)!==total||!Array.isArray(page.items)||
+      page.items.length!==Math.min(500,total-offset))
+    throw Error('사전 단계 페이지 조회 중 자료 변경 또는 누락');
+   results[index+1]=page;
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(4,offsets.length)},()=>worker()));
+ const items=results.flatMap(page=>page.items);
+ if(items.length!==total)throw Error('사전 단계 전체 목록 일부 누락');
+ return {items,total,at:first.asOf||''};
+}
 async function loadPrebidJobs(stage,force=false){
  if(!['plan','prespec'].includes(stage)||!worklinksPartnerAccess())return;
  const state=prebidCache[stage];
  if(state.state==='loading')return;
  if(!force&&state.state==='ready'&&Date.now()-Number(state.cachedAt||0)<60000)return;
- state.state='loading';state.error='';
- renderJobs();
+ const hadComplete=state.state==='ready'&&Array.isArray(state.items);
+ state.state='loading';state.refreshing=hadComplete;state.error='';
+ if(!hadComplete)renderJobs();
  try{
-  let data=[],offset=0,total=null,at='',ready=false,complete=false;
-  for(let page=0;page<40;page++){
-   const res=await prebidReadPageWithRetry(stage,offset);
-   if(!res||res.ok!==true)throw Error(res?.error||'사전 단계 목록 응답 오류');
-   if(!res.ready)throw Error(res.error||'사전 단계 수집 자료 없음');
-   ready=true;at=res.asOf||at;total=Number(res.total||0);
-   if(!Number.isSafeInteger(total)||total<0||!Array.isArray(res.items))throw Error('사전 단계 DB 집계 오류');
-   data.push(...res.items);offset=data.length;
-   if(offset>=total){complete=true;break}
-   if(!res.items.length)throw Error('사전 단계 목록 페이지 불완전');
-  }
-  if(!ready||!complete)throw Error('사전 단계 목록 일부만 수신, 전체 판정 보류');
-  state.items=data;state.total=data.length;state.at=at;state.state='ready';state.cachedAt=Date.now();
+  const complete=await prebidReadCompleteStage(stage);
+  state.items=complete.items;state.total=complete.total;state.at=complete.at;
+  state.state='ready';state.cachedAt=Date.now();state.staleError='';
  }catch(err){
-  state.state='error';state.error=String(err?.message||err).slice(0,160);
- }finally{if(partnerNoticeStage===stage||partnerNoticeStage==='all')renderJobs()}
+  const error=String(err?.message||err).slice(0,160);
+  if(hadComplete){
+   state.state='ready';state.staleError=error;
+   state.cachedAt=Date.now()-45000;
+  }else{
+   state.state='error';state.error=error;
+  }
+ }finally{
+  state.refreshing=false;
+  if(partnerNoticeStage===stage||partnerNoticeStage==='all')renderJobs();
+ }
 }
 function prebidWon(value){
  const n=Number(value);
@@ -547,8 +574,8 @@ function renderPrebidJobs(el){
  const more=document.getElementById('g2bMore');if(more)more.style.display='none';
  const filt=document.getElementById('jobVerdictFilter');if(filt){filt.hidden=false;filt.classList?.add?.('job-sort-only');}
  const count=document.getElementById('partnerJobCount');
- const message=report.state==='loading'?'불러오는 중':report.state==='error'?'수집 확인 필요':report.state==='idle'?'조회 전':'';
- if(report.state!=='ready'){
+ const message=report.state==='loading'?'불러오는 중':report.state==='error'?'조회 연결 실패':report.state==='idle'?'조회 전':'';
+ if(report.state!=='ready'&&!report.refreshing){
   if(count)count.textContent='확인 중';
   const detail=/prebid_official_http_403/.test(report.error)?'공식 API 접근 거부(403) · 해당 서비스 활용승인 확인 필요':
    /prebid_official_http_429/.test(report.error)?'공식 API 요청 제한(429)':
@@ -567,13 +594,17 @@ function renderPrebidJobs(el){
  const sort=document.getElementById('jobSort')?.value||'recent';
   rows.sort((a,b)=>(sort==='budget'?(Number(b.budget)||0)-(Number(a.budget)||0):0)||
    String(b.posted||'').localeCompare(String(a.posted||''))||String(a.id).localeCompare(String(b.id)));
- if(count)count.textContent=rows.length+'건';
+ if(count)count.textContent=rows.length+'건'+(report.staleError?' · 이전 확인 자료':'');
  if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. ('+
   '저장된 공고 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
  const visible=Math.max(20,jobRenderLimit||40);
- el.innerHTML=rows.slice(0,visible).map(prebidNoticeCardMarkup).join('')+
+ el.innerHTML=(report.staleError?'<div class="emptycard" role="status">'+
+  '최신 조회 연결 실패 · 이전 전체 확인 자료 표시 ('+htmlEscape(report.staleError)+
+  ') <button type="button" id="prebidStaleRetry" class="job-vf">다시 조회</button></div>':'')+
+  rows.slice(0,visible).map(prebidNoticeCardMarkup).join('')+
   (rows.length>visible?'<button type="button" id="prebidMore" class="job-vf">목록 '+visible.toLocaleString('ko-KR')+
   ' / '+rows.length.toLocaleString('ko-KR')+'건 · 더 보기</button>':'');
+ el.querySelector('#prebidStaleRetry')?.addEventListener('click',()=>void loadPrebidJobs(stage,true));
  queuePrebidFileMetadata(rows.slice(0,visible));
  if(typeof scheduleWorklinksShareOpen==='function')scheduleWorklinksShareOpen();
  el.querySelector('#prebidMore')?.addEventListener('click',()=>{
