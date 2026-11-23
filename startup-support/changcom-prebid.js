@@ -503,7 +503,7 @@ function renderCombinedProcurementJobs(el){
   ['plan','prespec'].map(stage=>names[stage]+' '+(prebidCache[stage].state==='ready'?prebidCache[stage].total+'건 확인':'조회 '+prebidCache[stage].state)).join(' · '):
   '입찰공고·발주계획·사전규격 통합 목록 확인 완료 · '+types;
  for(const id of ['jobMissingInfo'])document.getElementById(id)?.replaceChildren();
- const filter=document.getElementById('jobVerdictFilter');if(filter){filter.hidden=false;filter.classList.add('job-sort-only');}
+ const filter=document.getElementById('jobVerdictFilter');if(filter){filter.hidden=false;filter.classList?.add?.('job-sort-only');}
  const closed=document.getElementById('closedJobCount');if(closed)closed.textContent='';
  const visible=Math.max(20,jobRenderLimit||40);
  jobAvailableRows=rows.length;
@@ -532,7 +532,7 @@ function renderPrebidJobs(el){
  if(summary)summary.textContent='';
  if(decision)decision.textContent='';
  const more=document.getElementById('g2bMore');if(more)more.style.display='none';
- const filt=document.getElementById('jobVerdictFilter');if(filt){filt.hidden=false;filt.classList.add('job-sort-only');}
+ const filt=document.getElementById('jobVerdictFilter');if(filt){filt.hidden=false;filt.classList?.add?.('job-sort-only');}
  const count=document.getElementById('partnerJobCount');
  const message=report.state==='loading'?'불러오는 중':report.state==='error'?'수집 확인 필요':report.state==='idle'?'조회 전':'';
  if(report.state!=='ready'){
