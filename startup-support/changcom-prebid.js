@@ -503,7 +503,7 @@ function renderCombinedProcurementJobs(el){
   ['plan','prespec'].map(stage=>names[stage]+' '+(prebidCache[stage].state==='ready'?prebidCache[stage].total+'건 확인':'조회 '+prebidCache[stage].state)).join(' · '):
   '입찰공고·발주계획·사전규격 통합 목록 확인 완료 · '+types;
  for(const id of ['jobMissingInfo'])document.getElementById(id)?.replaceChildren();
- const filter=document.getElementById('jobVerdictFilter');if(filter)filter.hidden=true;
+ const filter=document.getElementById('jobVerdictFilter');if(filter){filter.hidden=false;filter.classList?.add?.('job-sort-only');}
  const closed=document.getElementById('closedJobCount');if(closed)closed.textContent='';
  const visible=Math.max(20,jobRenderLimit||40);
  jobAvailableRows=rows.length;
@@ -532,7 +532,7 @@ function renderPrebidJobs(el){
  if(summary)summary.textContent='';
  if(decision)decision.textContent='';
  const more=document.getElementById('g2bMore');if(more)more.style.display='none';
- const filt=document.getElementById('jobVerdictFilter');if(filt)filt.hidden=true;
+ const filt=document.getElementById('jobVerdictFilter');if(filt){filt.hidden=false;filt.classList?.add?.('job-sort-only');}
  const count=document.getElementById('partnerJobCount');
  const message=report.state==='loading'?'불러오는 중':report.state==='error'?'수집 확인 필요':report.state==='idle'?'조회 전':'';
  if(report.state!=='ready'){
@@ -551,7 +551,9 @@ function renderPrebidJobs(el){
  let rows=report.items.filter(x=>partnerSwScope==='all'||
   (partnerSwScope==='sw'?partnerSwRelated(x):swBuildTitle(x)));
  if(word)rows=rows.filter(x=>jobSearchNormalized([x.title,x.org,x.id].join(' ')).includes(word));
- rows.sort((a,b)=>String(b.posted||'').localeCompare(String(a.posted||'')));
+ const sort=document.getElementById('jobSort')?.value||'recent';
+  rows.sort((a,b)=>(sort==='budget'?(Number(b.budget)||0)-(Number(a.budget)||0):0)||
+   String(b.posted||'').localeCompare(String(a.posted||''))||String(a.id).localeCompare(String(b.id)));
  if(count)count.textContent=rows.length+'건';
  if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. ('+
   '저장된 공고 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
