@@ -57,6 +57,7 @@ jobs:
           node --check startup-support/changcom-prebid.js
           node tests/test_changcom_prebid_filters.cjs
           node tests/test_worklinks_prebid_source_ui.cjs
+          node tests/test_worklinks_prebid_fetch_availability.cjs
           node tests/test_worklinks_transient_api_recovery.cjs
           node tests/test_worklinks_social_share.cjs
           node tests/test_worklinks_exact_bid_link.cjs
