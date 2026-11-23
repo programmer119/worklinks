@@ -469,22 +469,29 @@ function renderPrebidSourceDetail(item){
 function combinedBidCardMarkup(x){
  const link=String(jobOriginUrl(x)||'');
  const safe=/^https:\/\/(?:www\.)?g2b\.go\.kr(?:\/|$)/i.test(link)?link:'';
- const when=String(x.endAt||'');
- return '<article class="card" data-combined-bid="'+htmlEscape(x.id)+
-  '" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title||'공고 상세보기')+'">'+
-  '<div class="cardtop"><span class="tag">입찰공고</span>'+
-  '<span class="tag">'+htmlEscape(x.kind==='thng'?'물품':x.kind==='servc'?'용역':'공사')+'</span></div>'+
-  '<h3><button class="job-card-title" data-job-detail="'+htmlEscape(x.id)+'" type="button">'+
-   htmlEscape(x.title||'(공고명 없음)')+'</button></h3>'+
-  '<p>'+htmlEscape(x.org||'발주기관 미기재')+' · '+htmlEscape(x.startAt||'등록일 미기재')+'</p>'+
-  '<p><strong>'+htmlEscape(jobAmountLabel(x.amount))+'</strong> · '+
-   htmlEscape(when?'입찰마감 '+when:'입찰마감 원문 확인 필요')+'</p>'+
-  '<div class="prebid-keep-actions">'+
-  (typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(x.id)||''):'')+
-  (safe?'<a data-external-source="1" href="'+htmlEscape(safe)+'" target="_blank" rel="noopener noreferrer">원문 보기</a>':'')+
-  (String(x.noticeNumber||'')==='R26BK01843011'?
-   ' · <a data-external-source="1" href="./share/R26BK01843011/" title="WORKLINK 공고 공유">공유 링크</a>':'')+
-  '</div></article>';
+ const time=typeof jobTimeInfo==='function'?jobTimeInfo(x):null;
+ const day=time&&typeof jobDayCounter==='function'?jobDayCounter(time):null;
+ const dayClass=day?.kind||'unknown';
+ const dayLabel=day?.label||'입찰공고';
+ const deadline=time&&typeof jobDeadlineStamp==='function'?jobDeadlineStamp(time):String(x.endAt||'마감 확인 필요');
+ return '<article class="card job-mini" data-combined-bid="'+htmlEscape(x.id)+
+  '" data-job-card="'+htmlEscape(x.id)+'" tabindex="0" aria-label="'+htmlEscape(x.title||'공고')+' 상세보기">'+
+  '<div class="job-day '+htmlEscape(dayClass)+'"><strong>'+htmlEscape(dayLabel)+
+   '</strong><span class="job-date">'+htmlEscape(deadline)+'</span></div>'+
+  '<div class="job-core"><div class="job-headline"><h3><button class="job-card-title"'+
+   ' data-job-detail="'+htmlEscape(x.id)+'" type="button">'+htmlEscape(x.title||'(공고명 없음)')+
+   '</button></h3><div class="job-headline-side"><div class="job-headline-badge">'+
+   '<span class="tag">입찰공고</span><span class="tag">'+
+   htmlEscape(x.kind==='thng'?'물품':x.kind==='servc'?'용역':'공사')+'</span></div>'+
+   '<span class="job-amount">'+htmlEscape(jobAmountLabel(x.amount))+'</span></div></div>'+
+   '<div class="job-meta-row"><span class="job-agency">'+htmlEscape(x.org||'발주기관 미기재')+
+   '</span> · '+htmlEscape(x.startAt?'등록 '+x.startAt:'등록일 미기재')+'</div>'+
+   '<div class="job-highlights"><div class="job-highlight-tags"></div>'+
+    (typeof window!=='undefined'?(window.worklinksKeeps?.keepButton(x.id)||''):'')+
+    (safe?'<a class="job-source-link" data-external-source="1" href="'+htmlEscape(safe)+
+      '" target="_blank" rel="noopener noreferrer" aria-label="'+htmlEscape(x.title||'공고')+
+      ' 공고 원문을 새 탭에서 열기" title="공고 원문 새 탭에서 열기">공고 원문 ↗</a>':'')+
+   '</div></div></article>';
 }
 // The unified view is a real union, never a selected-stage search in disguise.
 // A source still loading or errored is marked partial rather than showing "0".
