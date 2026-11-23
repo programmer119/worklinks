@@ -551,7 +551,9 @@ function renderPrebidJobs(el){
  let rows=report.items.filter(x=>partnerSwScope==='all'||
   (partnerSwScope==='sw'?partnerSwRelated(x):swBuildTitle(x)));
  if(word)rows=rows.filter(x=>jobSearchNormalized([x.title,x.org,x.id].join(' ')).includes(word));
- rows.sort((a,b)=>String(b.posted||'').localeCompare(String(a.posted||'')));
+ const sort=document.getElementById('jobSort')?.value||'recent';
+  rows.sort((a,b)=>(sort==='budget'?(Number(b.budget)||0)-(Number(a.budget)||0):0)||
+   String(b.posted||'').localeCompare(String(a.posted||''))||String(a.id).localeCompare(String(b.id)));
  if(count)count.textContent=rows.length+'건';
  if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. ('+
   '저장된 공고 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
