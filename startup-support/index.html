@@ -6610,7 +6610,7 @@ function setWorkspaceView(view){
      ['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
    .forEach(option=>{option.hidden=!partnerMode||!worklinksPartnerAccess()||(typeof partnerNoticeStage!=='undefined'&&partnerNoticeStage!=='bid');option.disabled=option.hidden});
-  const deadlineOption=document.querySelector('#jobSort option[value="deadline"]');
+  const deadlineOption=document.querySelector?.('#jobSort option[value="deadline"]');
   if(deadlineOption){deadlineOption.hidden=partnerMode&&partnerNoticeStage!=='bid';deadlineOption.disabled=deadlineOption.hidden;}
   if(changed){
    restoreJobSearchForWorkspace(view);
@@ -6656,7 +6656,7 @@ window.addEventListener('worklinks:partner-access',function(){
  const partnerMode=worklinksIsChangcomView()&&allowed;
  document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
   .forEach(option=>{option.hidden=!partnerMode||partnerNoticeStage!=='bid';option.disabled=option.hidden});
-  const deadlineOption=document.querySelector('#jobSort option[value="deadline"]');
+  const deadlineOption=document.querySelector?.('#jobSort option[value="deadline"]');
   if(deadlineOption){deadlineOption.hidden=partnerMode&&partnerNoticeStage!=='bid';deadlineOption.disabled=deadlineOption.hidden;}
  const sort=document.getElementById('jobSort');
  if(sort&&(!allowed||!partnerMode)&&['qualified','competition'].includes(sort.value))sort.value='deadline';
@@ -6699,7 +6699,7 @@ document.querySelectorAll('#partnerSwScope,#partnerNoticeStage').forEach(el=>el.
   const sorter=document.getElementById('jobSort');
   document.querySelectorAll('#jobSort option[value="qualified"],#jobSort option[value="competition"]')
    .forEach(option=>{option.hidden=partnerNoticeStage!=='bid';option.disabled=option.hidden});
-   const deadlineOption=document.querySelector('#jobSort option[value="deadline"]');
+   const deadlineOption=document.querySelector?.('#jobSort option[value="deadline"]');
    if(deadlineOption){deadlineOption.hidden=partnerNoticeStage!=='bid';deadlineOption.disabled=deadlineOption.hidden;}
   if(sorter){
    if(partnerNoticeStage!=='bid'&&['qualified','competition','deadline'].includes(sorter.value))sorter.value='recent';
