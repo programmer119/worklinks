@@ -23,8 +23,10 @@ assert.ok(html.includes("more.style.display=keepMode!=='all'||exactBidQuery?'non
  'Exact lookup cannot show a misleading DB 0/0 pagination button');
 assert.ok(html.includes("jobSearchRemoteError?'공고번호 서버 검색 실패"),
  'Failed search must not be represented as empty results');
-assert.ok(html.includes("if(selected===G2B_DEFAULT_URL||!path.startsWith('/saved?'))throw err;"),
- 'A broken stored API URL must fall back ONLY for saved DB reads');
+assert.ok(html.includes("const safeRead=path.startsWith('/saved?')||path.startsWith('/prebid?')||")&&
+ html.includes("path.startsWith('/prebid-file-names?');")&&
+ html.includes("if(selected===G2B_DEFAULT_URL||!safeRead)throw err;"),
+ 'A broken stored API URL must recover only the verified saved/plan/prespec read-only routes');
 assert.ok(html.includes("if(typeof worklinksShareExactBidRow!=='undefined'&&worklinksShareExactBidRow?.id===id)"),
  'Details must survive concurrent paginated search clearing its array');
 const start=html.indexOf('const initialJobSearch=');
