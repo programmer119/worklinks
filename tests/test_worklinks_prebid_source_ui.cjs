@@ -12,7 +12,7 @@ const ctx={
  jobSearchText:'',jobRenderLimit:40,renderJobs(){},
 };
 vm.createContext(ctx);
-vm.runInContext(src+'\nthis.__source={prebidOfficialFileEntries,prebidSourceMarkup,prebidOfficialDetailUrl,prebidNoticeCardMarkup,renderPrebidSourceDetail,prebidCache};',ctx);
+vm.runInContext(src+'\nthis.__source={prebidOfficialFileEntries,prebidSourceMarkup,prebidOfficialDetailUrl,prebidOfficialSearchUrl,prebidNoticeCardMarkup,renderPrebidSourceDetail,prebidCache};',ctx);
 const t=ctx.__source;
 const id='R26BD00302593';
 const files=[1,2,3].map(seq=>'https://www.g2b.go.kr/pn/pnz/pnza/UntyAtchFile/downloadFile.do?bfSpecRegNo='+id+'&fileType=BFDTL&fileSeq='+seq);
@@ -22,7 +22,7 @@ assert.equal(Array.from(t.prebidOfficialFileEntries(spec),v=>v.name).join('|'),n
 const thumb=t.prebidNoticeCardMarkup(spec);
 for(const name of names)assert.ok(thumb.includes(name),name);
 assert.ok(!thumb.includes('규격서 1')&&!thumb.includes('규격서 2'),'no invented filenames');
-assert.ok(thumb.includes('원본문서 보기'));
+assert.ok(thumb.includes('나라장터 상세 열기'));\nassert.ok(thumb.includes('나라장터 검색'));\nassert.ok(thumb.includes('PRVA004_02/?bfSpecRegNo=R26BD00302593'));
 assert.ok(!thumb.includes('나라장터 원문 보기'),'prespec file is not a verified detail page');
 const updated={...spec,id:'R26BD00302578',fileNames:['RFP 최종본.pdf','지침.docx']};
 assert.equal(Array.from(t.prebidOfficialFileEntries(updated),v=>v.name).join('|'),['RFP 최종본.pdf','지침.docx',''].join('|'));
@@ -34,6 +34,6 @@ const url=t.prebidOfficialDetailUrl(plan);
 assert.equal(url,'https://www.g2b.go.kr/link/PRPA015_01/single/?oderPlanNo=R26DD20928584');
 assert.ok(t.prebidNoticeCardMarkup(plan).includes('나라장터 원문 보기'));
 assert.ok(t.prebidNoticeCardMarkup(plan).includes('PRPA015_01/single/'));
-assert.equal(t.prebidOfficialDetailUrl(spec),'','prespec direct route must not be invented');
-assert.ok(t.prebidNoticeCardMarkup({...spec,files:[]}).includes('나라장터 공고조회'));
+assert.equal(t.prebidOfficialDetailUrl(spec),'https://www.g2b.go.kr/link/PRVA004_02/?bfSpecRegNo=R26BD00302593');\nassert.ok(t.prebidOfficialSearchUrl(spec).includes('PRCA001_04/single/'));\nassert.ok(t.prebidNoticeCardMarkup(spec).includes('나라장터 검색'));
+assert.ok(t.prebidNoticeCardMarkup({...spec,files:[]}).includes('나라장터 상세 열기'));\nassert.ok(t.prebidNoticeCardMarkup({...spec,files:[]}).includes('나라장터 검색'));\nassert.ok(!t.prebidNoticeCardMarkup({...spec,files:[]}).includes('원본문서 보기'));
 console.log('WORKLINKS_PREBID_VERIFIED_FILENAMES_AND_SOURCE_LINKS_PASS');
