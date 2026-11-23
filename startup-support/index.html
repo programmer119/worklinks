@@ -644,7 +644,7 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 #jobDetailModal .job-detail-advanced{border-top:1px solid #e5e7eb;padding:15px 0}
 #jobDetailModal .job-detail-advanced>summary{font-size:15px;font-weight:750;color:#334155;cursor:pointer;line-height:1.6}
 #jobDetailModal .job-detail-advanced>.job-detail-section{margin-top:12px;border-top:0;padding-top:4px}
-#jobDetailModal .job-detail-actions{padding-top:14px;border-top:1px solid #e5e7eb;margin-top:8px}
+#jobDetailModal .job-detail-actions{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:10px;padding-top:14px;border-top:1px solid #e5e7eb;margin-top:8px}
 @media(max-width:620px){#jobDetailModal #jobDetailTitle{font-size:20px}#jobDetailModal .job-detail-meta-grid{grid-template-columns:1fr}#jobDetailModal .job-detail-meta-item{padding:12px 13px}}
 
 
@@ -1086,6 +1086,11 @@ html:not([data-worklinks-partner-access="granted"]) .worklinks-partner-only{disp
 .keep-job-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:7px;min-width:92px}
 .job-keep-button{border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#475569;padding:7px 10px;font-size:14px;font-weight:800;min-height:34px;cursor:pointer;white-space:nowrap}
 .job-keep-button.active{background:#fff7dd;border-color:#ecb85b;color:#9c570b}
+/* Plans/prespecs share the exact tender card hierarchy and action slot. */
+#jobCards .prebid-job-card .job-headline-side{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;margin-top:5px}
+#jobCards .prebid-job-card .job-headline-badge{display:flex;gap:5px;flex-wrap:wrap}
+#jobCards .prebid-job-card .job-eligibility-row .job-basic-signal{background:#f8fafc;color:#475569;border:1px solid #dbe3ed;border-radius:7px}
+#jobCards .prebid-job-card .job-highlights{margin-top:auto}
 .prebid-keep-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px}
 .prebid-keep-actions .job-keep-button{flex:none}
 .prebid-keep-actions .prebid-source-action{flex:none}
