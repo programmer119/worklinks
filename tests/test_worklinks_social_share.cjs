@@ -67,6 +67,6 @@ assert.ok(card.includes('data-job-detail='));
 assert.equal(vm.runInContext("renderPrebidSourceDetail({id:'g2b-prebid-prespec-servc-R26BD00301798'})",ctx),true);
 assert.ok(nodes.jobDetailBody.innerHTML.includes('3,993만원'));
 assert.ok(nodes.jobDetailBody.innerHTML.includes('입찰조건 미확정'));
-assert.ok(nodes.jobDetailBody.innerHTML.includes('상세 직링크 미확인'));
+assert.ok(nodes.jobDetailBody.innerHTML.includes('나라장터 상세 연결이 안 되면'));\nassert.ok(nodes.jobDetailBody.innerHTML.includes('PRVA004_02/?bfSpecRegNo=R26BD00301798'));\nassert.ok(nodes.jobDetailBody.innerHTML.includes('PRCA001_04/single/'));
 assert.ok(nodes.jobDetailBody.innerHTML.includes('./share/R26BD00301798/'),'published share URL still reachable from modal');
 console.log('WORKLINK_KAKAO_SOCIAL_SHARE_AND_DETAIL=PASS');
