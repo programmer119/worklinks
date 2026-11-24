@@ -11,34 +11,50 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     steps:
-      - name: Read live production API without touching DB
+      - name: Verify every production plan and prespec API page without writes
         shell: bash
         run: |
           python3 - <<'PY'
-          import datetime,json,urllib.request,urllib.error
+          import concurrent.futures,datetime,json,time,urllib.request
           base="https://api-suaveforge.suaveforge.com:18458/api/g2b"
-          now=datetime.datetime.now(datetime.timezone.utc).isoformat()
-          print("PROBE_UTC",now,flush=True)
-          for stage in ("prespec","plan"):
-            for offset in (0,500):
-              url=base+"/prebid?stage="+stage+"&limit=500&offset="+str(offset)
+          print("START_UTC",datetime.datetime.now(datetime.timezone.utc).isoformat(),flush=True)
+          def fetch(stage,offset):
+            url=base+"/prebid?stage="+stage+"&limit=500&offset="+str(offset)
+            for attempt in range(3):
               try:
-                req=urllib.request.Request(url,headers={"User-Agent":"WorkLinksPrebidReadOnlyAudit/20261124","Cache-Control":"no-cache"})
+                req=urllib.request.Request(url,headers={"User-Agent":"WorkLinksPrebidFullReadAudit/20261124","Cache-Control":"no-cache"})
                 with urllib.request.urlopen(req,timeout=30) as response:
-                  doc=json.load(response)
-                  code=response.status
-                if not isinstance(doc,dict):raise ValueError("not_object")
-                items=doc.get("items",[])
-                print("PREBID_CHECK",json.dumps({"stage":stage,"offset":offset,"http":code,"ok":doc.get("ok"),"ready":doc.get("ready"),"total":doc.get("total"),"asOf":doc.get("asOf"),"lastSuccess":doc.get("lastSuccess"),"error":doc.get("error"),"rowCount":len(items) if isinstance(items,list) else -1,"firstIds":[x.get("id") for x in items[:3]] if isinstance(items,list) else []},ensure_ascii=False),flush=True)
-              except Exception as e:
-                print("PREBID_ERROR",stage,offset,type(e).__name__,str(e)[:160],flush=True)
-                break
-          for endpoint in ("/crawl-status", "/pipeline-status"):
-            try:
-              req=urllib.request.Request(base+endpoint,headers={"User-Agent":"WorkLinksPrebidReadOnlyAudit/20261124","Cache-Control":"no-cache"})
-              with urllib.request.urlopen(req,timeout=20) as response:doc=json.load(response)
-              print("EXTRA_STATUS",endpoint,json.dumps(doc,ensure_ascii=False,default=str)[:2500],flush=True)
-            except Exception as e:print("EXTRA_STATUS_ERROR",endpoint,type(e).__name__,str(e)[:160],flush=True)
+                  data=json.load(response)
+                  if response.status!=200:raise RuntimeError("unexpected_http_"+str(response.status))
+                return data
+              except Exception:
+                if attempt==2:raise
+                time.sleep(0.5*(attempt+1))
+          for stage in ("prespec","plan"):
+            first=fetch(stage,0)
+            total=int(first.get("total") or -1)
+            if not(first.get("ok") is True and first.get("ready") is True and 0<total<100000 and isinstance(first.get("items"),list)):raise RuntimeError("stage_initial_not_ready_"+stage)
+            asof=first.get("asOf")
+            offsets=list(range(500,total,500))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              results=list(pool.map(lambda i:(i,fetch(stage,i)),offsets))
+            pages=[(0,first)]+results
+            issues=[];ids=set();received=0;latest=[]
+            for offset,page in pages:
+              items=page.get("items")
+              if page.get("ok") is not True or page.get("ready") is not True or page.get("total")!=total or page.get("asOf")!=asof or not isinstance(items,list) or len(items)!=min(500,total-offset):
+                issues.append({"offset":offset,"len":len(items) if isinstance(items,list) else None,"ok":page.get("ok"),"ready":page.get("ready"),"total":page.get("total"),"asOf":page.get("asOf")})
+              if isinstance(items,list):
+                received+=len(items)
+                for item in items:
+                  if not isinstance(item,dict) or not item.get("id"):
+                    issues.append("empty_row_id_"+str(offset));continue
+                  identifier=str(item["id"])
+                  if identifier in ids:issues.append("duplicate_id_"+identifier)
+                  ids.add(identifier)
+                if offset==0:latest=[{"id":x.get("id"),"posted":x.get("posted"),"title":str(x.get("title") or "")[:90]} for x in items[:3]]
+            print("STAGE_FULL_RESULT",json.dumps({"stage":stage,"total":total,"received":received,"pages":len(pages),"asOf":asof,"issuesCount":len(issues),"issues":issues[:12],"latest":latest},ensure_ascii=False),flush=True)
+          print("END_UTC",datetime.datetime.now(datetime.timezone.utc).isoformat(),flush=True)
           PY
