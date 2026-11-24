@@ -13,48 +13,49 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Verify every production plan and prespec API page without writes
+      - name: Inspect plan every page slowly and classify upstream errors
         shell: bash
         run: |
           python3 - <<'PY'
-          import concurrent.futures,datetime,json,time,urllib.request
+          import concurrent.futures,datetime,json,time,urllib.request,urllib.error
           base="https://api-suaveforge.suaveforge.com:18458/api/g2b"
-          print("START_UTC",datetime.datetime.now(datetime.timezone.utc).isoformat(),flush=True)
+          print("PROBE_START",datetime.datetime.now(datetime.timezone.utc).isoformat(),flush=True)
           def fetch(stage,offset):
             url=base+"/prebid?stage="+stage+"&limit=500&offset="+str(offset)
-            for attempt in range(3):
+            errors=[]
+            for attempt in range(5):
               try:
-                req=urllib.request.Request(url,headers={"User-Agent":"WorkLinksPrebidFullReadAudit/20261124","Cache-Control":"no-cache"})
+                req=urllib.request.Request(url,headers={"User-Agent":"WorkLinksPrebidSlowAudit/20261124","Cache-Control":"no-cache"})
                 with urllib.request.urlopen(req,timeout=30) as response:
-                  data=json.load(response)
-                  if response.status!=200:raise RuntimeError("unexpected_http_"+str(response.status))
-                return data
-              except Exception:
-                if attempt==2:raise
-                time.sleep(0.5*(attempt+1))
-          for stage in ("prespec","plan"):
-            first=fetch(stage,0)
-            total=int(first.get("total") or -1)
-            if not(first.get("ok") is True and first.get("ready") is True and 0<total<100000 and isinstance(first.get("items"),list)):raise RuntimeError("stage_initial_not_ready_"+stage)
-            asof=first.get("asOf")
-            offsets=list(range(500,total,500))
-            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
-              results=list(pool.map(lambda i:(i,fetch(stage,i)),offsets))
-            pages=[(0,first)]+results
-            issues=[];ids=set();received=0;latest=[]
-            for offset,page in pages:
-              items=page.get("items")
-              if page.get("ok") is not True or page.get("ready") is not True or page.get("total")!=total or page.get("asOf")!=asof or not isinstance(items,list) or len(items)!=min(500,total-offset):
-                issues.append({"offset":offset,"len":len(items) if isinstance(items,list) else None,"ok":page.get("ok"),"ready":page.get("ready"),"total":page.get("total"),"asOf":page.get("asOf")})
-              if isinstance(items,list):
-                received+=len(items)
-                for item in items:
-                  if not isinstance(item,dict) or not item.get("id"):
-                    issues.append("empty_row_id_"+str(offset));continue
-                  identifier=str(item["id"])
-                  if identifier in ids:issues.append("duplicate_id_"+identifier)
-                  ids.add(identifier)
-                if offset==0:latest=[{"id":x.get("id"),"posted":x.get("posted"),"title":str(x.get("title") or "")[:90]} for x in items[:3]]
-            print("STAGE_FULL_RESULT",json.dumps({"stage":stage,"total":total,"received":received,"pages":len(pages),"asOf":asof,"issuesCount":len(issues),"issues":issues[:12],"latest":latest},ensure_ascii=False),flush=True)
-          print("END_UTC",datetime.datetime.now(datetime.timezone.utc).isoformat(),flush=True)
+                  doc=json.load(response)
+                  if response.status!=200:raise RuntimeError("http_"+str(response.status))
+                return (offset,doc,errors)
+              except Exception as e:
+                errors.append(type(e).__name__+":"+str(getattr(e,"code",str(e)))[:65])
+                if attempt<4:time.sleep(min(1+attempt,4))
+            return (offset,None,errors)
+          stage="plan"
+          first=fetch(stage,0)
+          if first[1] is None:raise RuntimeError("first_page_unavailable:"+str(first[2]))
+          total=int(first[1]["total"]);asof=first[1].get("asOf")
+          offsets=list(range(500,total,500))
+          with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results=list(pool.map(lambda offset:fetch(stage,offset),offsets))
+          issues=[];retries=[];received=0;ids=set()
+          for offset,page,errs in [first]+results:
+            if errs:retries.append({"offset":offset,"errors":errs})
+            if page is None:
+              issues.append({"offset":offset,"reason":"unavailable","attempt_errors":errs})
+              continue
+            items=page.get("items")
+            if not (page.get("ok") is True and page.get("ready") is True and page.get("asOf")==asof and page.get("total")==total and isinstance(items,list) and len(items)==min(500,total-offset)):
+              issues.append({"offset":offset,"reason":"inconsistent_response","count":len(items) if isinstance(items,list) else None,"asOf":page.get("asOf"),"total":page.get("total")})
+            if isinstance(items,list):
+              received+=len(items)
+              for row in items:
+                if not isinstance(row,dict) or not row.get("id"):issues.append({"offset":offset,"reason":"missing_id"});continue
+                if row["id"] in ids:issues.append({"offset":offset,"reason":"duplicate_id","id":row["id"]})
+                ids.add(row["id"])
+          print("PLAN_FULL_RESULT",json.dumps({"total":total,"received":received,"pages":1+len(results),"asOf":asof,"issues":issues[:25],"issueCount":len(issues),"retriedPages":len(retries),"retryEvents":retries[:25]},ensure_ascii=False),flush=True)
+          print("PROBE_END",datetime.datetime.now(datetime.timezone.utc).isoformat(),flush=True)
           PY
