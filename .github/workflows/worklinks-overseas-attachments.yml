@@ -13,8 +13,8 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: worklinks-overseas-attachments
-  cancel-in-progress: false
+  group: worklinks-overseas-attachments-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   documents:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
@@ -37,6 +37,7 @@ jobs:
       - name: Install reader and verify local fixtures
         run: |
           python -m pip install 'pypdf==5.9.0'
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-eng
           python -m py_compile scripts/collect_overseas_attachments.py
           python -c 'from pathlib import Path; s=Path("overseas/index.html").read_text(); Path("/tmp/overseas-attachment-ui.js").write_text(s.split("<script>",1)[1].split("</script>",1)[0])'
           node --check /tmp/overseas-attachment-ui.js
@@ -49,7 +50,9 @@ jobs:
           restore-keys: overseas-documents-v1-
       - name: Inspect public document links and extract text
         run: |
-          python scripts/collect_overseas_attachments.py --notices source-data/overseas/notices.json --output doc-data/overseas/documents.json --cache "$RUNNER_TEMP/overseas-documents" --limit 80
+          limit=80
+          if [[ "$GITHUB_REF" != refs/heads/main ]]; then limit=5; fi
+          python scripts/collect_overseas_attachments.py --notices source-data/overseas/notices.json --output doc-data/overseas/documents.json --cache "$RUNNER_TEMP/overseas-documents" --limit "$limit"
       - name: Publish only public source links and evidence metadata
         if: github.ref == 'refs/heads/main'
         working-directory: doc-data
