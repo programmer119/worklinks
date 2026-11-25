@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Inspect public procurement attachment links without credentials."""
-import argparse, concurrent.futures, datetime as dt, hashlib, io, json, pathlib, re, time, zipfile
+import argparse, concurrent.futures, datetime as dt, hashlib, io, json, pathlib, re, time, zipfile, subprocess, tempfile, shutil
 from html.parser import HTMLParser
 from urllib.parse import urljoin,urlsplit,unquote
 from urllib.request import Request,build_opener,HTTPRedirectHandler
@@ -53,9 +53,19 @@ def extract(data,kind):
     if kind=="pdf":
         from pypdf import PdfReader
         reader=PdfReader(io.BytesIO(data));parts=[];missing=0
-        for p in reader.pages[:150]:
+        ocr_count=0
+        for index,p in enumerate(reader.pages[:150]):
             try:t=p.extract_text() or ""
             except Exception:t=""
+            if not t.strip() and ocr_count<5 and shutil.which("pdftoppm") and shutil.which("tesseract"):
+                ocr_count+=1
+                try:
+                    with tempfile.TemporaryDirectory() as folder:
+                        src=pathlib.Path(folder)/"page.pdf";src.write_bytes(data)
+                        target=str(pathlib.Path(folder)/"page")
+                        subprocess.run(["pdftoppm","-f",str(index+1),"-l",str(index+1),"-r","180","-png","-singlefile",str(src),target],check=True,timeout=12,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                        t=subprocess.run(["tesseract",target+".png","stdout","-l","eng","--psm","3"],check=True,timeout=12,capture_output=True).stdout.decode("utf-8",errors="replace")
+                except Exception:t=""
             if not t.strip():missing+=1
             parts.append(t)
         return "\n".join(parts),"partial" if missing or len(reader.pages)>150 else "complete"
@@ -99,7 +109,10 @@ def inspect(row,cache):
             kind=file_kind(data)
             if kind:
                 sha=hashlib.sha256(data).hexdigest()
-                dest=cache/(sha+"."+kind);dest.write_bytes(data)
+                dest=cache/(sha+"."+kind)
+                with tempfile.NamedTemporaryFile(dir=cache,delete=False) as tmp:
+                    tmp.write(data);temp=pathlib.Path(tmp.name)
+                temp.replace(dest)
                 state="unsupported";found=[]
                 try:
                     content,state=extract(data,kind)
@@ -114,7 +127,7 @@ def inspect(row,cache):
                 for h in found:result["hints"].append(dict(h,document=name or title))
                 continue
             html=data[:2_000_000].decode("utf-8",errors="replace")
-            login=bool(re.search(r'<input[^>]+type\s*=\s*["\']?password|(?:register|log\s*in|sign\s*in)\s+to\s+(?:access|download|view)|(?:/|=)(?:login|signin)(?:[/?&]|$)',html if "html" in ctype else final,re.I))
+            login=bool(re.search(r'<input[^>]+type\s*=\s*["\']?password|(?:register|log\s*in|sign\s*in)\s+to\s+(?:access|download|view)',html if "html" in ctype else final,re.I))
             if re.search(r"/(?:login|signin)(?:[/?]|$)",urlsplit(final).path,re.I):login=True
             result["portals"].append({"title":title,"url":url,"status":"registration_required" if login else "page_no_file"})
             if depth<1 and "html" in ctype:
