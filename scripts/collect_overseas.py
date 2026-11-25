@@ -4,6 +4,8 @@ import argparse, csv, datetime as dt, io, json, pathlib, re, sqlite3, time, subp
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urlencode, urljoin, urlsplit, quote
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+from email.utils import parsedate_to_datetime
 
 UK="https://www.find-tender.service.gov.uk/api/1.0/ocdsReleasePackages"
 TED="https://api.ted.europa.eu/v3/notices/search"
@@ -15,10 +17,24 @@ def utc():
 def request(url, body=None):
     headers={"User-Agent":"WorkLinks-Overseas/0.1","Accept":"application/json,text/csv"}
     if body is not None: headers["Content-Type"]="application/json"
-    with urlopen(Request(url, data=None if body is None else json.dumps(body).encode(),headers=headers),timeout=45) as r:
-        data=r.read(80_000_001)
-    if len(data)>80_000_000: raise ValueError("response exceeds byte cap")
-    return data
+    for attempt in range(3):
+        try:
+            with urlopen(Request(url, data=None if body is None else json.dumps(body).encode(),headers=headers),timeout=45) as r:
+                data=r.read(80_000_001)
+            if len(data)>80_000_000: raise ValueError("response exceeds byte cap")
+            return data
+        except HTTPError as e:
+            if e.code not in (429,503) or attempt==2: raise
+            header=e.headers.get("Retry-After","") if e.headers else ""
+            delay=60*(attempt+1)
+            if header:
+                try: delay=max(delay,int(header))
+                except ValueError:
+                    try: delay=max(delay,(parsedate_to_datetime(header)-utc()).total_seconds())
+                    except (ValueError,TypeError): pass
+            if delay>240: raise
+            print("Upstream",urlsplit(url).netloc,e.code,"retry in",round(delay),"s",flush=True)
+            time.sleep(delay)
 def js(url,body=None):
     return json.loads(request(url,body))
 def scalar(x):
@@ -56,7 +72,7 @@ def eu(days):
     start=(utc()-dt.timedelta(days=days)).strftime("%Y%m%d")
     body={"query":"buyer-country IN ("+" ".join(EU)+") AND (classification-cpv=72* OR classification-cpv=48*) AND publication-date>="+start,
           "fields":["publication-number","notice-title","buyer-name","buyer-country","publication-date","notice-type","deadline-receipt-tender-date-lot"],
-          "limit":100,"scope":"ALL","paginationMode":"ITERATION"}
+          "limit":250,"scope":"ALL","paginationMode":"ITERATION"}
     seen=set(); result=[]
     for _ in range(100):
         d=js(TED,body)
@@ -66,7 +82,7 @@ def eu(days):
         token=d.get("iterationNextToken")
         if not token:return result
         if token in seen:raise ValueError("repeated TED token")
-        seen.add(token); body["iterationNextToken"]=token
+        seen.add(token); body["iterationNextToken"]=token; time.sleep(3)
     raise ValueError("TED page cap reached; source not complete")
 def ca(days):
     csv.field_size_limit(20_000_000)
