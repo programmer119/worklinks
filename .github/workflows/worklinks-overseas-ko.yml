@@ -12,7 +12,6 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
-  models: read
 concurrency:
   group: worklinks-overseas-ko
   cancel-in-progress: false
@@ -20,7 +19,7 @@ jobs:
   translate:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -31,10 +30,20 @@ jobs:
         with:
           ref: overseas-ko-data
           path: overseas-ko-cache
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: worklinks-m2m100-int8-18e406c
+      - name: Install local translation runtime
+        run: python -m pip install --disable-pip-version-check 'ctranslate2>=4.5,<5' 'sentencepiece>=0.2,<0.3' 'huggingface_hub>=0.27,<2' 'langid==1.1.6' 'numpy<3'
       - name: Translate and publish Korean titles independently
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          HF_HUB_DISABLE_XET: '1'
+          OMP_NUM_THREADS: '2'
+          OPENBLAS_NUM_THREADS: '1'
         shell: bash
         run: |
           set -euo pipefail
@@ -46,8 +55,8 @@ jobs:
           git config user.email worklinks-overseas-ko@users.noreply.github.com
           git add overseas/ko.json
           if ! git diff --cached --quiet; then
-            git commit -m "Publish verified Korean procurement translations"
+            git commit -m "Publish machine-translated Korean procurement titles"
             git push origin HEAD:overseas-ko-data
           fi
           SH
-          python3 scripts/translate_overseas_ko.py --notices overseas-source/overseas/notices.json --output overseas-ko-cache/overseas/ko.json --publish "$RUNNER_TEMP/overseas-ko-publish.sh" --max-batches 100
+          python3 scripts/translate_overseas_ko.py --notices overseas-source/overseas/notices.json --output overseas-ko-cache/overseas/ko.json --publish "$RUNNER_TEMP/overseas-ko-publish.sh" --max-batches 200
