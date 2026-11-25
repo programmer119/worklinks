@@ -77,9 +77,12 @@ def eu_search(days):
           "fields":["publication-number","notice-title","buyer-name","buyer-country","publication-date","notice-type","deadline-receipt-tender-date-lot"],
           "limit":250,"scope":"ALL","paginationMode":"ITERATION"}
     seen=set(); result=[]
-    for _ in range(100):
+    for page in range(100):
         d=js(TED,body)
-        for n in d["notices"]:
+        notices=d["notices"]
+        print("TED page",page+1,"returned",len(notices),"total",d.get("totalNoticeCount"),flush=True)
+        if not notices:return result
+        for n in notices:
             id=scalar(n.get("publication-number")); country=scalar(n.get("buyer-country"))
             result.append(row("eu",id,country,scalar(n.get("notice-title")),scalar(n.get("buyer-name")),scalar(n.get("publication-date")),scalar(n.get("deadline-receipt-tender-date-lot")),scalar(n.get("notice-type")),"https://ted.europa.eu/en/notice/-/detail/"+quote(id,safe=""),n))
         token=d.get("iterationNextToken")
@@ -119,6 +122,7 @@ def main():
     p.add_argument("--days",type=int,default=7)
     p.add_argument("--seed",type=pathlib.Path)
     p.add_argument("--publish-script",type=pathlib.Path)
+    p.add_argument("--sources",default="uk,eu,ca")
     a=p.parse_args()
     if not 1<=a.days<=30:p.error("--days must be 1..30")
     a.db.parent.mkdir(parents=True,exist_ok=True)
@@ -143,11 +147,13 @@ def main():
         temp.replace(a.output)
         if a.publish_script:
             subprocess.run(["bash",str(a.publish_script.resolve())],check=True)
-    pending={"uk","eu","ca"}
+    pending=set(a.sources.split(","))
+    if not pending or not pending <= {"uk","eu","ca"}:p.error("invalid sources")
     events=Queue()
     with ThreadPoolExecutor(max_workers=3) as pool:
         futures={}
         for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]:
+            if key not in pending:continue
             future=pool.submit(fetch,a.days,lambda records:events.put(("partial","uk",records))) if key=="uk" and a.publish_script else pool.submit(fetch,a.days)
             futures[future]=key
             future.add_done_callback(lambda done,k=key:events.put(("done",k,done)))
