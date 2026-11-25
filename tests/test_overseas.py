@@ -61,4 +61,8 @@ class OverseasTests(unittest.TestCase):
         self.assertEqual(d["documents"][0]["url"],"https://example.org/docs")
         d=m.detail({"tenderDescription-descriptionAppelOffres-eng":"Build a new platform","selectionCriteria-criteresSelection-eng":"Best value"},"ca")
         self.assertEqual(len(d["sections"]),2)
+    def test_uk_notice_type_release_document(self):
+        raw={"id":"123456-2026","planning":{"documents":[{"id":"other","noticeType":"UK3"},{"id":"123456-2026","noticeType":"UK2"}]}}
+        self.assertEqual(m.uk_notice_type(raw),"UK2")
+        self.assertEqual(m.uk_notice_type({"id":"missing","planning":{"documents":[{"id":"other","noticeType":"UK3"}]}}),"")
 if __name__=="__main__":unittest.main()
