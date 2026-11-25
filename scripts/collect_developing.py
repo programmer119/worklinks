@@ -134,7 +134,7 @@ def ungm(allowed,names,days):
         print("UNGM title field",field.evaluate("e=>e.outerHTML"),flush=True)
         for term in TERMS[:12]:
             field.fill(term)
-            button=page.get_by_role("button",name=re.compile(r"^search\\s*$",re.I))
+            button=page.get_by_role("button",name=re.compile(r"^search\s*$",re.I))
             if not button.count():raise ValueError("UNGM search button not identified")
             button.first.click()
             page.wait_for_timeout(2500)
