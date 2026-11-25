@@ -1,5 +1,5 @@
 {
-  "generatedAt": null,
+  "generatedAt": "2026-11-25T03:02:00+00:00",
   "titles": {
     "Poland – Anti-virus software package – Zakup licencji subskrypcyjnych i wsparcia producenta Fortinet": "Fortinet 구독 라이선스 및 제조사 기술지원 구매",
     "Portugal – Software programming and consultancy services – 40/CLPQ/AT/2026 - Aquisição de serviços de desenvolvimento aplicacional no âmbito da Manutenção dos Sistemas de Gestão Declarativa, componente batch e Pilar II": "40/CLPQ/AT/2026 - 신고 관리 시스템 유지보수(배치 처리 및 필라 2)를 위한 애플리케이션 개발 용역",
@@ -8,7 +8,11 @@
     "Construction Project Delivery Platform": "건설 프로젝트 수행 관리 플랫폼",
     "AI Voice, Audio and Accessibility RFP": "AI 음성·오디오 및 접근성 솔루션 제안요청서",
     "Emergency Alert SaaS Solution": "긴급 경보 SaaS 솔루션",
-    "Digital Twin Workplace Inventory and Asset Management Solution": "디지털 트윈 기반 업무공간 재고 및 자산 관리 솔루션"
+    "Digital Twin Workplace Inventory and Asset Management Solution": "디지털 트윈 기반 업무공간 재고 및 자산 관리 솔루션",
+    "Germany – Industry specific software package – Nuix Lizenzen nebst Pflegeleistungen": "Nuix 라이선스 및 유지보수 서비스",
+    "Finland – IT services: consulting, software development, Internet and support – Opiskelijahallintojärjestelmä Wilman lisäosan hankinta": "학생관리 시스템 Wilma의 추가 모듈 구매",
+    "Germany – Architectural, construction, engineering and inspection services – BG Klinikum Hamburg - Neubau Bergedorf - Allianzpartner 7 - BEWEGER | Logistik, Medizintechnik, Fördertechnik, digitale Innovation und Integration": "함부르크 BG 병원 베르게도르프 신축 사업 – 협력 파트너 7: 물류·의료기술·이송설비·디지털 혁신 및 통합",
+    "Romania – Software development services – Achiziție SERVICII DE DEZVOLTARE A SOLUȚIEI PROPUSE ȘI ECHIPAMENTE AFERENTE în cadrul proiectului #ReghinSmart: Oraș Inteligent, Comunitate Conectată - 2 Loturi": "#ReghinSmart 스마트시티·연결형 지역사회 프로젝트 솔루션 개발 용역 및 관련 장비 구매 (2개 분할 사업)"
   },
   "buyers": {
     "Szpital Głogowski sp. z o.o.": "그워구프 병원",
@@ -17,7 +21,11 @@
     "Syndicat intercommunal de la périphérie de Paris pour les énergies et les réseaux de communication (Sipperec)": "파리 외곽 에너지·통신망 지방자치단체 연합(Sipperec)",
     "Farm Credit Canada (FCC)": "캐나다 농업금융공사(FCC)",
     "Department of Agriculture and Agri-Food (AAFC)": "캐나다 농업·농식품부(AAFC)",
-    "Canada Revenue Agency (CRA)": "캐나다 국세청(CRA)"
+    "Canada Revenue Agency (CRA)": "캐나다 국세청(CRA)",
+    "Generalzolldirektion Zentrale Beschaffungsstelle der Bundesfinanzverwaltung": "독일 관세총국 연방재정청 중앙조달기관",
+    "Pohjois-Karjalan koulutuskuntayhtymä, Riveria": "북카렐리아 교육연합 Riveria",
+    "BG Klinikum Hamburg gGmbH": "함부르크 BG 병원",
+    "PRIMARIA MUNICIPIULUI REGHIN": "레긴 시청"
   },
   "provider": "manual-seed"
 }
