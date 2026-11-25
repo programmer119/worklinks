@@ -34,6 +34,8 @@ if(initialPartnerStageSelect)initialPartnerStageSelect.value=partnerNoticeStage;
 const partnerAwardFilters=new Set();
 const prebidCache={plan:{state:'idle',items:[],total:0,error:'',at:''},
                    prespec:{state:'idle',items:[],total:0,error:'',at:''}};
+// An exact number uses one saved-DB lookup; never fetch all 10K+ records for one ID.
+const prebidExactCache={stage:'',id:'',serial:0,state:'idle',items:[],total:0,error:'',at:''};
 const PRICE_METHODS=new Set(['낙030021','낙030022','낙030029']);
 const SPEC_PRICE_METHODS=new Set(['낙030002','낙030003','낙030018']);
 // Prefer recall: uncertain software work stays visible for manual review.
@@ -178,6 +180,31 @@ async function prebidReadPageWithRetry(stage,offset){
   }
  }
 }
+async function loadPrebidExact(stage,id,force=false){
+ if(stage!=='prespec'||!/^R\d{2}BD\d{8}$/.test(id)||!worklinksPartnerAccess())return;
+ if(!force&&prebidExactCache.stage===stage&&prebidExactCache.id===id&&
+    ['loading','ready'].includes(prebidExactCache.state))return;
+ const serial=++prebidExactCache.serial;
+ Object.assign(prebidExactCache,{stage,id,state:'loading',error:'',items:[],total:0,at:''});
+ if(partnerNoticeStage===stage)renderJobs();
+ try{
+  const result=await g2bFetch('/prebid?stage='+stage+'&q='+encodeURIComponent(id)+'&limit=10&offset=0');
+  if(result?.ok!==true||result?.ready!==true)
+   throw Error(result?.error||'사전규격 저장 자료 접근 불가');
+  if(result.exactLookup!==true)
+   throw Error('서버의 공고번호 단건조회 API가 아직 배포되지 않았습니다');
+  if(!Array.isArray(result.items)||!Number.isSafeInteger(Number(result.total))||
+     result.items.length!==Number(result.total)||result.items.some(x=>x.id!==id))
+   throw Error('공고번호 단건조회 응답 불완전');
+  if(serial!==prebidExactCache.serial)return;
+  Object.assign(prebidExactCache,{state:'ready',items:result.items,total:Number(result.total),at:result.asOf||''});
+ }catch(error){
+  if(serial!==prebidExactCache.serial)return;
+  Object.assign(prebidExactCache,{state:'error',error:String(error?.message||error).slice(0,180)});
+ }finally{
+  if(serial===prebidExactCache.serial&&partnerNoticeStage===stage)renderJobs();
+ }
+}
 async function prebidReadCompleteStage(stage){
  const first=await prebidReadPageWithRetry(stage,0);
  if(!first||first.ok!==true)throw Error(first?.error||'사전 단계 목록 응답 오류');
@@ -207,6 +234,10 @@ async function prebidReadCompleteStage(stage){
 }
 async function loadPrebidJobs(stage,force=false){
  if(!['plan','prespec'].includes(stage)||!worklinksPartnerAccess())return;
+ const exactId=String(jobSearchText||'').trim().toUpperCase();
+ if(stage==='prespec'&&partnerNoticeStage===stage&&/^R\d{2}BD\d{8}$/.test(exactId)){
+  void loadPrebidExact(stage,exactId,force);return;
+ }
  const state=prebidCache[stage];
  if(state.state==='loading')return;
  if(!force&&state.state==='ready'&&Date.now()-Number(state.cachedAt||0)<60000)return;
@@ -577,7 +608,17 @@ function renderCombinedProcurementJobs(el){
  });
 }
 function renderPrebidJobs(el){
- const stage=partnerNoticeStage,report=prebidCache[stage],name=stage==='plan'?'발주계획':'사전규격';
+ const stage=partnerNoticeStage,name=stage==='plan'?'발주계획':'사전규격';
+ let report=prebidCache[stage];
+ const query=String(jobSearchText||'').trim().toUpperCase();
+ const exactId=stage==='prespec'&&/^R\d{2}BD\d{8}$/.test(query)?query:'';
+ if(exactId){
+  if(prebidExactCache.stage!==stage||prebidExactCache.id!==exactId)
+   void loadPrebidExact(stage,exactId);
+  report=prebidExactCache;
+ }else if(report.state==='idle'){
+  void loadPrebidJobs(stage);
+ }
  const summary=document.getElementById('partnerSummary'),decision=document.getElementById('jobDecisionSummary');
  if(summary)summary.textContent='';
  if(decision)decision.textContent='';
@@ -605,8 +646,17 @@ function renderPrebidJobs(el){
   rows.sort((a,b)=>(sort==='budget'?(Number(b.budget)||0)-(Number(a.budget)||0):0)||
    String(b.posted||'').localeCompare(String(a.posted||''))||String(a.id).localeCompare(String(b.id)));
  if(count)count.textContent=rows.length+'건'+(report.staleError?' · 이전 확인 자료':'');
- if(!rows.length){el.innerHTML='<div class="emptycard">'+htmlEscape(name)+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. ('+
-  '저장된 공고 '+report.total.toLocaleString('ko-KR')+'건)</div>';return}
+ if(!rows.length){
+  const reason=exactId?(report.items.length?
+   '공고는 저장되어 있지만 현재 SW·개발 범위 필터에서 숨겨졌습니다. 범위를 전체 공고로 변경하세요.':
+   '해당 번호는 서버 저장 DB에서 아직 조회되지 않습니다. 공식 공고가 없다는 뜻은 아니며 수집 지연·누락을 점검해야 합니다.'):
+   name+' · 현재 저장된 자료에 해당 조건의 공고가 없습니다. (저장된 공고 '+
+   report.total.toLocaleString('ko-KR')+'건)';
+  el.innerHTML='<div class="emptycard">'+htmlEscape(reason)+
+   (exactId?' <a href="https://www.g2b.go.kr/link/PRVA004_02/?bfSpecRegNo='+encodeURIComponent(exactId)+
+    '" target="_blank" rel="noopener noreferrer">나라장터 원문 ↗</a>':'')+'</div>';
+  return;
+ }
  const visible=Math.max(20,jobRenderLimit||40);
  el.innerHTML=(report.staleError?'<div class="emptycard" role="status">'+
   '최신 조회 연결 실패 · 이전 전체 확인 자료 표시 ('+htmlEscape(report.staleError)+
