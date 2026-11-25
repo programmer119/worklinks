@@ -1548,6 +1548,7 @@ def saved_rfp_search_state(row, compact=False, historical=False):
 # server123, not by the newest version that happens to exist on GitHub Pages.
 _RFP_PROGRESS_CACHE={'until':0,'signature':None,'result':None}
 _RFP_PROGRESS_LOCK=threading.Lock()
+_RFP_PROGRESS_CACHE_TTL=25  # Keep a verified aggregate for at most 25s; UI polls every 10s.
 
 
 def rfp_deadline_kst(value):
@@ -2286,7 +2287,13 @@ def rfp_ocr_repair_attribution():
 
 
 def rfp_rescan_progress():
-    """Read-only saved-data progress, cached <= 8s for the 10s UI cadence."""
+    """Read-only saved-data progress; reuse verified 25s snapshots across UI polls."""
+    # Read cached verified counts BEFORE opening the large RFP index and DBs.
+    # A new source/scan is reflected on the next short-lived cache refresh.
+    with _RFP_PROGRESS_LOCK:
+        if (_RFP_PROGRESS_CACHE["result"] is not None and
+                time.time()<_RFP_PROGRESS_CACHE["until"]):
+            return _RFP_PROGRESS_CACHE["result"]
     version_path=os.path.join(SNAPSHOT_ROOT,'rfp-scanner-versions.json')
     try:
         stamp=os.stat(version_path).st_mtime
@@ -2440,9 +2447,9 @@ def rfp_rescan_progress():
         else:report['activity']={'available':False}
     except (sqlite3.Error,OSError):
         report['activity']={'available':False}
-    report['progressCacheSeconds']=8
+    report['progressCacheSeconds']=_RFP_PROGRESS_CACHE_TTL
     with _RFP_PROGRESS_LOCK:
-        _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+8)
+        _RFP_PROGRESS_CACHE.update(signature=sig,result=report,until=time.time()+_RFP_PROGRESS_CACHE_TTL)
     return report
 
 
