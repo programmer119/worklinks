@@ -16,7 +16,7 @@ WORDS=re.compile(r"\b(software|application development|web development|website|d
 def utc():
     return dt.datetime.now(dt.timezone.utc)
 def request(url, body=None):
-    headers={"User-Agent":"WorkLinks-Overseas/0.1","Accept":"application/json,text/csv"}
+    headers={"User-Agent":"WorkLinks-Overseas/0.1","Accept":"*/*" if "/packages/" in url else "application/json,text/csv"}
     if body is not None: headers["Content-Type"]="application/json"
     for attempt in range(3):
         try:
@@ -71,7 +71,7 @@ def uk(days, progress=None):
         if not nxt:return result
         url=urljoin(UK,nxt); time.sleep(11)
     raise ValueError("UK page cap reached; source not complete")
-def eu(days):
+def eu_search(days):
     start=(utc()-dt.timedelta(days=days)).strftime("%Y%m%d")
     body={"query":"buyer-country IN ("+" ".join(EU)+") AND (classification-cpv=72* OR classification-cpv=48*) AND publication-date>="+start,
           "fields":["publication-number","notice-title","buyer-name","buyer-country","publication-date","notice-type","deadline-receipt-tender-date-lot"],
@@ -87,6 +87,18 @@ def eu(days):
         if token in seen:raise ValueError("repeated TED token")
         seen.add(token); body["iterationNextToken"]=token; time.sleep(3)
     raise ValueError("TED page cap reached; source not complete")
+def eu(days):
+    try:
+        return eu_search(days)
+    except HTTPError as e:
+        if e.code not in (429,503):raise
+        print("TED Search unavailable; using documented daily package service",flush=True)
+        # Import in normal script and importlib fixture contexts.
+        import sys
+        directory=str(pathlib.Path(__file__).resolve().parent)
+        if directory not in sys.path:sys.path.insert(0,directory)
+        import overseas_ted_bulk
+        return overseas_ted_bulk.collect(days,request,utc,EU,row)
 def ca(days):
     csv.field_size_limit(20_000_000)
     reader=csv.DictReader(io.StringIO(request(CA).decode("utf-8-sig")))
