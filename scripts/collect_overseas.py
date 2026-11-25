@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Independent overseas procurement preview. No domestic database or routes touched."""
 import argparse, csv, datetime as dt, io, json, pathlib, re, sqlite3, time, subprocess
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
+from queue import Queue
 from urllib.parse import urlencode, urljoin, urlsplit, quote
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+from email.utils import parsedate_to_datetime
 
 UK="https://www.find-tender.service.gov.uk/api/1.0/ocdsReleasePackages"
 TED="https://api.ted.europa.eu/v3/notices/search"
@@ -13,12 +16,26 @@ WORDS=re.compile(r"\b(software|application development|web development|website|d
 def utc():
     return dt.datetime.now(dt.timezone.utc)
 def request(url, body=None):
-    headers={"User-Agent":"WorkLinks-Overseas/0.1","Accept":"application/json,text/csv"}
+    headers={"User-Agent":"WorkLinks-Overseas/0.1","Accept":"*/*" if "/packages/" in url else "application/json,text/csv"}
     if body is not None: headers["Content-Type"]="application/json"
-    with urlopen(Request(url, data=None if body is None else json.dumps(body).encode(),headers=headers),timeout=45) as r:
-        data=r.read(80_000_001)
-    if len(data)>80_000_000: raise ValueError("response exceeds byte cap")
-    return data
+    for attempt in range(3):
+        try:
+            with urlopen(Request(url, data=None if body is None else json.dumps(body).encode(),headers=headers),timeout=45) as r:
+                data=r.read(80_000_001)
+            if len(data)>80_000_000: raise ValueError("response exceeds byte cap")
+            return data
+        except HTTPError as e:
+            if e.code not in (429,503) or attempt==2: raise
+            header=e.headers.get("Retry-After","") if e.headers else ""
+            delay=60*(attempt+1)
+            if header:
+                try: delay=max(delay,int(header))
+                except ValueError:
+                    try: delay=max(delay,(parsedate_to_datetime(header)-utc()).total_seconds())
+                    except (ValueError,TypeError): pass
+            if delay>240: raise
+            print("Upstream",urlsplit(url).netloc,e.code,"retry in",round(delay),"s",flush=True)
+            time.sleep(delay)
 def js(url,body=None):
     return json.loads(request(url,body))
 def scalar(x):
@@ -31,12 +48,12 @@ def https(url):
 def row(source,id,country,title,buyer,published,deadline,stage,url,raw,amount=None,currency=""):
     if not id or not title: raise ValueError("missing notice id or title")
     return dict(source=source,id=id,country=country,title=title,buyer=buyer,published=published,deadline=deadline,stage=stage,url=https(url),raw=raw,amount=amount,currency=currency)
-def uk(days):
+def uk(days, progress=None):
     end=utc(); start=end-dt.timedelta(days=days)
     fmt=lambda d:d.strftime("%Y-%m-%dT%H:%M:%S")
     url=UK+"?"+urlencode(dict(updatedFrom=fmt(start),updatedTo=fmt(end),limit=100))
     seen=set(); result=[]
-    for _ in range(100):
+    for page in range(100):
         if not url: return result
         if url in seen or urlsplit(url).netloc!=urlsplit(UK).netloc: raise ValueError("invalid UK cursor")
         seen.add(url)
@@ -48,15 +65,17 @@ def uk(days):
             id=str(r.get("id","")); notice=re.search(r"\b\d{6}-\d{4}\b",id)
             url_notice="https://www.find-tender.service.gov.uk/Notice/"+notice.group() if notice else "https://www.find-tender.service.gov.uk/Search"
             result.append(row("uk",r.get("ocid","")+":"+id,"GBR",title,scalar((r.get("buyer") or {}).get("name")),scalar(r.get("date")),scalar((t.get("tenderPeriod") or {}).get("endDate")),scalar(r.get("tag")),url_notice,r,(t.get("value") or {}).get("amount"),scalar((t.get("value") or {}).get("currency"))))
+        print("UK page",page+1,"candidates",len(result),flush=True)
+        if progress and (page==0 or (page+1)%5==0): progress(list(result))
         nxt=(d.get("links") or {}).get("next")
         if not nxt:return result
         url=urljoin(UK,nxt); time.sleep(11)
     raise ValueError("UK page cap reached; source not complete")
-def eu(days):
+def eu_search(days):
     start=(utc()-dt.timedelta(days=days)).strftime("%Y%m%d")
     body={"query":"buyer-country IN ("+" ".join(EU)+") AND (classification-cpv=72* OR classification-cpv=48*) AND publication-date>="+start,
           "fields":["publication-number","notice-title","buyer-name","buyer-country","publication-date","notice-type","deadline-receipt-tender-date-lot"],
-          "limit":100,"scope":"ALL","paginationMode":"ITERATION"}
+          "limit":250,"scope":"ALL","paginationMode":"ITERATION"}
     seen=set(); result=[]
     for _ in range(100):
         d=js(TED,body)
@@ -66,8 +85,20 @@ def eu(days):
         token=d.get("iterationNextToken")
         if not token:return result
         if token in seen:raise ValueError("repeated TED token")
-        seen.add(token); body["iterationNextToken"]=token
+        seen.add(token); body["iterationNextToken"]=token; time.sleep(3)
     raise ValueError("TED page cap reached; source not complete")
+def eu(days):
+    try:
+        return eu_search(days)
+    except HTTPError as e:
+        if e.code not in (429,503):raise
+        print("TED Search unavailable; using documented daily package service",flush=True)
+        # Import in normal script and importlib fixture contexts.
+        import sys
+        directory=str(pathlib.Path(__file__).resolve().parent)
+        if directory not in sys.path:sys.path.insert(0,directory)
+        import overseas_ted_bulk
+        return overseas_ted_bulk.collect(days,request,utc,EU,row)
 def ca(days):
     csv.field_size_limit(20_000_000)
     reader=csv.DictReader(io.StringIO(request(CA).decode("utf-8-sig")))
@@ -113,12 +144,23 @@ def main():
         if a.publish_script:
             subprocess.run(["bash",str(a.publish_script.resolve())],check=True)
     pending={"uk","eu","ca"}
+    events=Queue()
     with ThreadPoolExecutor(max_workers=3) as pool:
-        futures={pool.submit(fetch,a.days):key for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]}
+        futures={}
+        for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]:
+            future=pool.submit(fetch,a.days,lambda records:events.put(("partial","uk",records))) if key=="uk" and a.publish_script else pool.submit(fetch,a.days)
+            futures[future]=key
+            future.add_done_callback(lambda done,k=key:events.put(("done",k,done)))
         if a.publish_script:
             snapshot(pending)
-        for future in as_completed(futures):
-            key=futures[future];now=utc().isoformat()
+        while pending:
+            kind,key,value=events.get()
+            if kind=="partial":
+                with db:
+                    db.executemany("INSERT OR REPLACE INTO notices VALUES(?,?,?)",[(key,r["id"],json.dumps(r,ensure_ascii=False)) for r in value])
+                snapshot(pending)
+                continue
+            future=value;now=utc().isoformat()
             try:
                 records=future.result()
                 with db:

@@ -32,4 +32,20 @@ class OverseasTests(unittest.TestCase):
             self.assertEqual(data["notices"][0]["id"],"old")
             self.assertEqual(data["sources"]["uk"]["success"],"old")
             self.assertEqual(data["sources"]["uk"]["error"],"offline")
+    def test_ted_bulk_xml(self):
+        import sys,datetime as dt
+        sys.path.insert(0,str(P.parent))
+        import overseas_ted_bulk as b
+        data=b"""<ContractNotice><Publication><NoticePublicationID>00012345-2026</NoticePublicationID><PublicationDate>2026-11-24</PublicationDate></Publication><Organization><Company><PartyIdentification><ID>ORG-0001</ID></PartyIdentification><PartyName><Name languageID="ENG">Buyer</Name></PartyName><PostalAddress><Country><IdentificationCode>IRL</IdentificationCode></Country></PostalAddress></Company></Organization><ContractingParty><Party><PartyIdentification><ID>ORG-0001</ID></PartyIdentification></Party></ContractingParty><NoticeTypeCode>cn-standard</NoticeTypeCode><ProcurementProject><Name languageID="ENG">Software system</Name><MainCommodityClassification><ItemClassificationCode>72200000</ItemClassificationCode></MainCommodityClassification></ProcurementProject></ContractNotice>"""
+        r=b.parse("00012345_2026.xml",data,dt.date(2026,11,24),m.EU,m.row)
+        self.assertEqual((r["country"],r["buyer"],r["id"]),("IRL","Buyer","00012345-2026"))
+        self.assertEqual(b.calendar(b"Date;Issue\n24/11/2026;228",2026)[dt.date(2026,11,24)],228)
+    def test_rate_limit_retry(self):
+        from urllib.error import HTTPError
+        from unittest.mock import MagicMock
+        err=HTTPError("https://example.org",429,"rate limit",{"Retry-After":"60"},None)
+        resp=MagicMock();resp.__enter__.return_value.read.return_value=b"ok"
+        with patch.object(m,"urlopen",side_effect=[err,resp]),patch.object(m.time,"sleep") as sleep:
+            self.assertEqual(m.request("https://example.org"),b"ok")
+            sleep.assert_called_once_with(60)
 if __name__=="__main__":unittest.main()
