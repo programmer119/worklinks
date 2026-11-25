@@ -146,6 +146,9 @@ def inspect(row,cache):
 def main():
     p=argparse.ArgumentParser();p.add_argument("--notices",type=pathlib.Path,required=True);p.add_argument("--output",type=pathlib.Path,required=True);p.add_argument("--cache",type=pathlib.Path,required=True);p.add_argument("--limit",type=int,default=80);a=p.parse_args()
     rows=json.loads(a.notices.read_text())["notices"];a.cache.mkdir(parents=True,exist_ok=True)
+    # Track the explicitly selected official notice even after the rolling list drops it.
+    probe={"source":"uk","id":"tracked:108918-2026","title":"Redaction software demonstration","url":"https://www.find-tender.service.gov.uk/Notice/108918-2026"}
+    if not any("108918-2026" in r["id"] for r in rows):rows=[probe]+rows
     old=json.loads(a.output.read_text()) if a.output.exists() else {};records=old.get("records",{})
     key=lambda r:r["source"]+":"+r["id"]
     now=dt.datetime.now(dt.timezone.utc)
@@ -164,5 +167,6 @@ def main():
     records={key(r):records[key(r)] for r in rows if key(r) in records}
     out={"generatedAt":now.isoformat(),"totalNotices":len(rows),"records":records}
     a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(out,ensure_ascii=False),encoding="utf-8")
-    print("ATTACHMENTS",len(records),"/",len(rows),"verified files",sum(len(r.get("documents",[])) for r in records.values()),"registration",sum(r.get("status")=="registration_required" for r in records.values()),flush=True)
+    from collections import Counter
+    print("ATTACHMENTS",len(records),"/",len(rows),"verified files",sum(len(r.get("documents",[])) for r in records.values()),"registration",sum(r.get("status")=="registration_required" for r in records.values()),"portal states",dict(Counter(p["status"] for r in records.values() for p in r.get("portals",[]))),flush=True)
 if __name__=="__main__":main()
