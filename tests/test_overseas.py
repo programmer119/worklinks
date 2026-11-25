@@ -48,4 +48,17 @@ class OverseasTests(unittest.TestCase):
         with patch.object(m,"urlopen",side_effect=[err,resp]),patch.object(m.time,"sleep") as sleep:
             self.assertEqual(m.request("https://example.org"),b"ok")
             sleep.assert_called_once_with(60)
+    def test_notice_details(self):
+        raw={"tender":{"description":"<p>Develop software.</p><p>Provide support.</p>","eligibilityCriteria":"Five references","documents":[{"title":"Specification","url":"https://example.org/spec.pdf"},{"title":"Unsafe","url":"javascript:alert(1)"}]}}
+        d=m.detail(raw,"uk")
+        self.assertEqual(d["language"],"en")
+        self.assertIn("Develop software.",d["sections"][0]["text"])
+        self.assertNotIn("<p>",d["sections"][0]["text"])
+        self.assertEqual(len(d["documents"]),1)
+        d=m.detail({"description-proc":{"pol":["System"],"eng":["English project"]},"selection-criterion-description-lot":{"eng":["Experience"]},"document-url-lot":["https://example.org/docs"]},"eu")
+        self.assertEqual(d["sections"][0]["text"],"English project")
+        self.assertEqual(d["language"],"en")
+        self.assertEqual(d["documents"][0]["url"],"https://example.org/docs")
+        d=m.detail({"tenderDescription-descriptionAppelOffres-eng":"Build a new platform","selectionCriteria-criteresSelection-eng":"Best value"},"ca")
+        self.assertEqual(len(d["sections"]),2)
 if __name__=="__main__":unittest.main()

@@ -69,7 +69,7 @@ def parse(name,data,published,eu,row):
     if value is not None:
         try:amount=float(value.text);currency=value.get("currencyID","")
         except (ValueError,TypeError):pass
-    return row("eu",ident," | ".join(sorted(countries)),title," | ".join(dict.fromkeys(buyers)),date," | ".join(deadlines),stage,BASE+"/en/notice/-/detail/"+ident,{"format":"TED daily eForms XML"},amount,currency)
+    return row("eu",ident," | ".join(sorted(countries)),title," | ".join(dict.fromkeys(buyers)),date," | ".join(deadlines),stage,BASE+"/en/notice/-/detail/"+ident,{"format":"TED daily eForms XML","description-proc":preferred(x.findall("./{*}ProcurementProject/{*}Description")),"description-lot":[preferred(lot.findall("./{*}ProcurementProject/{*}Description")) for lot in x.findall("./{*}ProcurementProjectLot")]},amount,currency)
 def collect(days,request,utc,eu,row):
     end=utc().date();start=end-dt.timedelta(days=days)
     issues={};fallback=False
