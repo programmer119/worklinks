@@ -97,6 +97,20 @@ def detail(raw,source):
 def row(source,id,country,title,buyer,published,deadline,stage,url,raw,amount=None,currency=""):
     if not id or not title: raise ValueError("missing notice id or title")
     return dict(source=source,id=id,country=country,title=title,buyer=buyer,published=published,deadline=deadline,stage=stage,url=https(url),raw=raw,amount=amount,currency=currency,detail=detail(raw,source))
+def uk_notice_type(release):
+    # FTS OCDS uses the same planning tag for UK2 and UK3. Match
+    # noticeType on the document whose ID equals the release ID.
+    rid=str(release.get("id") or "")
+    groups=[release.get("planning") or {},release.get("tender") or {}]
+    groups.extend(release.get("awards") or [])
+    groups.extend(release.get("contracts") or [])
+    for group in groups:
+        for doc in group.get("documents") or []:
+            if str(doc.get("id") or "")==rid:
+                typ=scalar(doc.get("noticeType")).strip().upper()
+                if re.fullmatch(r"(?:UK\d{1,2}|F\d{2})",typ):
+                    return typ
+    return ""
 def uk(days, progress=None):
     end=utc(); start=end-dt.timedelta(days=days)
     fmt=lambda d:d.strftime("%Y-%m-%dT%H:%M:%S")
@@ -113,7 +127,9 @@ def uk(days, progress=None):
             if not (any(c.startswith(("48","72")) for c in codes) or WORDS.search(title+" "+str(t.get("description","")))): continue
             id=str(r.get("id","")); notice=re.search(r"\b\d{6}-\d{4}\b",id)
             url_notice="https://www.find-tender.service.gov.uk/Notice/"+notice.group() if notice else "https://www.find-tender.service.gov.uk/Search"
-            result.append(row("uk",r.get("ocid","")+":"+id,"GBR",title,scalar((r.get("buyer") or {}).get("name")),scalar(r.get("date")),scalar((t.get("tenderPeriod") or {}).get("endDate")),scalar(r.get("tag")),url_notice,r,(t.get("value") or {}).get("amount"),scalar((t.get("value") or {}).get("currency"))))
+            record=row("uk",r.get("ocid","")+":"+id,"GBR",title,scalar((r.get("buyer") or {}).get("name")),scalar(r.get("date")),scalar((t.get("tenderPeriod") or {}).get("endDate")),scalar(r.get("tag")),url_notice,r,(t.get("value") or {}).get("amount"),scalar((t.get("value") or {}).get("currency")))
+            record["noticeType"]=uk_notice_type(r)
+            result.append(record)
         print("UK page",page+1,"candidates",len(result),flush=True)
         if progress and (page==0 or (page+1)%5==0): progress(list(result))
         nxt=(d.get("links") or {}).get("next")
