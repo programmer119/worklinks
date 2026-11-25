@@ -39,7 +39,7 @@ class OverseasTests(unittest.TestCase):
         data=b"""<ContractNotice><Publication><NoticePublicationID>00012345-2026</NoticePublicationID><PublicationDate>2026-11-24</PublicationDate></Publication><Organization><Company><PartyIdentification><ID>ORG-0001</ID></PartyIdentification><PartyName><Name languageID="ENG">Buyer</Name></PartyName><PostalAddress><Country><IdentificationCode>IRL</IdentificationCode></Country></PostalAddress></Company></Organization><ContractingParty><Party><PartyIdentification><ID>ORG-0001</ID></PartyIdentification></Party></ContractingParty><NoticeTypeCode>cn-standard</NoticeTypeCode><ProcurementProject><Name languageID="ENG">Software system</Name><MainCommodityClassification><ItemClassificationCode>72200000</ItemClassificationCode></MainCommodityClassification></ProcurementProject></ContractNotice>"""
         r=b.parse("00012345_2026.xml",data,dt.date(2026,11,24),m.EU,m.row)
         self.assertEqual((r["country"],r["buyer"],r["id"]),("IRL","Buyer","00012345-2026"))
-        self.assertEqual(b.calendar(b"Date;Issue\u000a24/11/2026;228",2026)[dt.date(2026,11,24)],228)
+        self.assertEqual(b.calendar(b"Date;Issue\n24/11/2026;228",2026)[dt.date(2026,11,24)],228)
     def test_rate_limit_retry(self):
         from urllib.error import HTTPError
         from unittest.mock import MagicMock
