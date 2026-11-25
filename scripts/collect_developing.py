@@ -9,6 +9,7 @@ import pycountry
 
 SOURCES={
 "wb":"https://search.worldbank.org/api/v2/procnotices",
+"idlo":"https://www.idlo.int/procurements-and-tenders/opportunities",
 "ungm":"https://www.ungm.org/Public/Notice",
 "adb":"https://www.adb.org/business/project-procurement/business-opportunities",
 "afdb":"https://www.afdb.org/en/documents/project-related-procurement/procurement-notices/specific-procurement-notices",
@@ -206,6 +207,61 @@ def public_preview(source,allowed,names,days):
         browser.close()
     if not scanned:raise ValueError("No structured public notice links recognized; see source-specific actual DOM log")
     return list(out.values()),"partial: public listing preview, pagination and fields not fully verified",scanned
+def idlo(allowed,names,days):
+    """IDLO's own public procurement table, not UNGM. Collect every currently open row."""
+    from bs4 import BeautifulSoup
+    from zoneinfo import ZoneInfo
+    out={};scanned=0;seen=set()
+    root=SOURCES["idlo"]
+    for pg in range(110):
+        url=root+"?"+urlencode({"page":pg})
+        req=Request(url,headers={"User-Agent":"WorkLinks public procurement collector (contact@suaveforge.com)","Accept":"text/html"})
+        with urlopen(req,timeout=30) as resp:
+            soup=BeautifulSoup(resp.read(),"html.parser")
+        table=next((t for t in soup.find_all("table") if "Reference Nr." in t.get_text(" ",strip=True) and "Closing Date" in t.get_text(" ",strip=True)),None)
+        if table is None:raise ValueError("IDLO procurement table not recognized")
+        entries=[tr for tr in table.find_all("tr") if len(tr.find_all("td",recursive=False))>=4]
+        if not entries:raise ValueError("IDLO table has no records")
+        sig=tuple(tr.get_text(" ",strip=True) for tr in entries)
+        if sig in seen:raise ValueError("IDLO pagination repeated")
+        seen.add(sig);scanned+=len(entries)
+        open_count=0
+        for tr in entries:
+            cells=tr.find_all("td",recursive=False)
+            reference,country,title,deadline=[x.get_text(" ",strip=True) for x in cells[:4]]
+            if not re.search(r"\bOpen\b",deadline,re.I):continue
+            open_count+=1
+            title=re.sub(r"\s*Read full description\s*$","",title,flags=re.I).strip()
+            if not (WORDS.search(title) or re.search(r"digitiz|digitis|digital records|penetration testing",title,re.I)):continue
+            # Country column is sometimes empty; use country prefix in official title.
+            codes=country_codes(country or title.replace("_"," ").split(" - ")[0],names)
+            if not codes:continue
+            links=[urljoin(url,x["href"]) for x in cells[2].find_all("a",href=True)]
+            link=next((v for v in links if "/procurements-and-tenders/opportunities/" in v),None)
+            if not link:raise ValueError("IDLO notice link missing")
+            if not reference:
+                reference=hashlib.sha256(link.encode()).hexdigest()[:24]
+            ident=reference.strip()
+            closing=""
+            m=re.search(r"(\d{1,2}-[A-Za-z]{3}-\d{4}\s+\d{1,2}:\d{2}\s+[AP]M)",deadline,re.I)
+            if m:
+                try:closing=dt.datetime.strptime(m.group(1),"%d-%b-%Y %I:%M %p").replace(tzinfo=ZoneInfo("Europe/Rome")).isoformat()
+                except ValueError:pass
+            r=make("idlo",ident,title,codes,link,buyer="IDLO",published="",deadline=closing,stage="Open tender",reference=reference,description=tr.get_text(" ",strip=True),scope="official IDLO public tender table; closing time per listing")
+            if r:out[ident]=r
+        print("IDLO page",pg+1,"rows",len(entries),"open",open_count,"SW",len(out),flush=True)
+        # Official listing sorted by closing date descending; after all closed,
+        # verify next page is also closed before stopping.
+        if open_count==0 and pg>0:break
+        if not soup.select_one("li.pager__item--next, a[rel=next]"):
+            # Drupal installations may use plain numbered pagination.
+            nextlink=soup.find("a",href=re.compile(r"(?:[?&])page="+str(pg+1)+r"(?:&|$)"))
+            if not nextlink:break
+        time.sleep(1)
+    else:raise ValueError("IDLO pagination cap reached")
+    if not scanned:raise ValueError("IDLO no public rows")
+    return list(out.values()),"ok",scanned
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--output",type=pathlib.Path,required=True)
@@ -220,7 +276,7 @@ def main():
     else:
         for k in SOURCES:
             try:
-                fn=wb if k=="wb" else ungm if k=="ungm" else lambda x,y,z:public_preview(k,x,y,z)
+                fn=wb if k=="wb" else idlo if k=="idlo" else ungm if k=="ungm" else lambda x,y,z:public_preview(k,x,y,z)
                 rows,state,scanned=fn(allowed,names,a.days)
                 if state=="ok":saved[k]={}
                 saved[k].update({r["id"]:r for r in rows})

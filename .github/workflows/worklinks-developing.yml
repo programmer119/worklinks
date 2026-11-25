@@ -26,7 +26,7 @@ jobs:
           path: developing-data-checkout
       - name: Install collector dependencies
         run: |
-          python3 -m pip install playwright pycountry
+          python3 -m pip install playwright pycountry beautifulsoup4
           python3 -m playwright install --with-deps chromium
           python3 -m py_compile scripts/collect_developing.py
       - name: Collect official sources
