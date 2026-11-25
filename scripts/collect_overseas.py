@@ -27,9 +27,9 @@ def scalar(x):
     return str(x) if x is not None else ""
 def https(url):
     return url if isinstance(url,str) and urlsplit(url).scheme=="https" and urlsplit(url).netloc else ""
-def row(source,id,country,title,buyer,published,deadline,stage,url,raw):
+def row(source,id,country,title,buyer,published,deadline,stage,url,raw,amount=None,currency=""):
     if not id or not title: raise ValueError("missing notice id or title")
-    return dict(source=source,id=id,country=country,title=title,buyer=buyer,published=published,deadline=deadline,stage=stage,url=https(url),raw=raw)
+    return dict(source=source,id=id,country=country,title=title,buyer=buyer,published=published,deadline=deadline,stage=stage,url=https(url),raw=raw,amount=amount,currency=currency)
 def uk(days):
     end=utc(); start=end-dt.timedelta(days=days)
     fmt=lambda d:d.strftime("%Y-%m-%dT%H:%M:%S")
@@ -42,11 +42,11 @@ def uk(days):
         d=js(url)
         for r in d["releases"]:
             t=r.get("tender") or {}; title=t.get("title") or (r.get("planning") or {}).get("rationale") or ""
-            codes=[str((i.get("classification") or {}).get("id","")) for i in t.get("items",[])]
+            codes=[str((i.get("classification") or {}).get("id","")) for i in t.get("items",[])] + [str(c.get("id","")) for i in t.get("items",[]) for c in i.get("additionalClassifications",[])]
             if not (any(c.startswith(("48","72")) for c in codes) or WORDS.search(title+" "+str(t.get("description","")))): continue
             id=str(r.get("id","")); notice=re.search(r"\b\d{6}-\d{4}\b",id)
             url_notice="https://www.find-tender.service.gov.uk/Notice/"+notice.group() if notice else "https://www.find-tender.service.gov.uk/Search"
-            result.append(row("uk",r.get("ocid","")+":"+id,"GBR",title,scalar((r.get("buyer") or {}).get("name")),scalar(r.get("date")),scalar((t.get("tenderPeriod") or {}).get("endDate")),scalar(r.get("tag")),url_notice,r))
+            result.append(row("uk",r.get("ocid","")+":"+id,"GBR",title,scalar((r.get("buyer") or {}).get("name")),scalar(r.get("date")),scalar((t.get("tenderPeriod") or {}).get("endDate")),scalar(r.get("tag")),url_notice,r,(t.get("value") or {}).get("amount"),scalar((t.get("value") or {}).get("currency"))))
         nxt=(d.get("links") or {}).get("next")
         if not nxt:return result
         url=urljoin(UK,nxt); time.sleep(11)
@@ -85,12 +85,18 @@ def main():
     p.add_argument("--db",required=True,type=pathlib.Path)
     p.add_argument("--output",required=True,type=pathlib.Path)
     p.add_argument("--days",type=int,default=7)
+    p.add_argument("--seed",type=pathlib.Path)
     a=p.parse_args()
     if not 1<=a.days<=30:p.error("--days must be 1..30")
     a.db.parent.mkdir(parents=True,exist_ok=True)
     a.output.parent.mkdir(parents=True,exist_ok=True)
     db=sqlite3.connect(a.db)
     db.executescript("CREATE TABLE IF NOT EXISTS notices(source TEXT,id TEXT,record TEXT,PRIMARY KEY(source,id));CREATE TABLE IF NOT EXISTS status(source TEXT PRIMARY KEY,checked TEXT,success TEXT,error TEXT);")
+    if a.seed and a.seed.exists() and not db.execute("SELECT 1 FROM status LIMIT 1").fetchone():
+        seed=json.loads(a.seed.read_text(encoding="utf-8"))
+        with db:
+            db.executemany("INSERT OR REPLACE INTO notices VALUES(?,?,?)",[(r["source"],r["id"],json.dumps(r,ensure_ascii=False)) for r in seed.get("notices",[])])
+            db.executemany("INSERT OR REPLACE INTO status VALUES(?,?,?,?)",[(k,v.get("checked"),v.get("success"),v.get("error")) for k,v in seed.get("sources",{}).items()])
     for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]:
         now=utc().isoformat()
         try:
