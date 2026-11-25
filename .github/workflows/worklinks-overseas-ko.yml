@@ -1,0 +1,53 @@
+name: WorkLinks overseas Korean titles
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/translate_overseas_ko.py'
+      - '.github/workflows/worklinks-overseas-ko.yml'
+  workflow_run:
+    workflows: ["WorkLinks overseas collection"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+  models: read
+concurrency:
+  group: worklinks-overseas-ko
+  cancel-in-progress: false
+jobs:
+  translate:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: overseas-data
+          path: overseas-source
+      - uses: actions/checkout@v4
+        with:
+          ref: overseas-ko-data
+          path: overseas-ko-cache
+      - name: Translate and publish Korean titles independently
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/translate_overseas_ko.py
+          cat > "$RUNNER_TEMP/overseas-ko-publish.sh" <<'SH'
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE/overseas-ko-cache"
+          git config user.name worklinks-overseas-ko
+          git config user.email worklinks-overseas-ko@users.noreply.github.com
+          git add overseas/ko.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish verified Korean procurement translations"
+            git push origin HEAD:overseas-ko-data
+          fi
+          SH
+          python3 scripts/translate_overseas_ko.py --notices overseas-source/overseas/notices.json --output overseas-ko-cache/overseas/ko.json --publish "$RUNNER_TEMP/overseas-ko-publish.sh" --max-batches 100
