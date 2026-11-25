@@ -41,7 +41,8 @@ index={
 }
 result=calc(rows,index,latest,asof=now)
 counts=result['counts']
-assert counts=={'total':6,'eligible':6,'excluded':0,'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
+assert counts=={'total':6,'eligible':6,'excluded':0,'excludedNoAttachments':0,'sourceRestricted':0,
+                'completed':1,'remaining':5,'rescanRequired':2,'legacy':2,
                 'unscanned':1,'failed':1,'incomplete':1,'unknownDeadline':1,
                 'unknownDeadlineCompleted':0,'unknownDeadlinePending':1},counts
 assert result['stages']['classification']=={'total':6,'done':3,'remaining':3},result['stages']
@@ -251,3 +252,16 @@ with tempfile.TemporaryDirectory() as tmp:
     assert download['errorDetails'][0]['noticeKey']==ids[0],lanes
     assert download['errorDetails'][0]['files'][0]['httpStatus']==422,lanes
 print('WORKLINKS_CONFIRMED_ORIGINAL_NOT_DOUBLE_COUNTED_AS_SUCCESS=PASS')
+
+
+# A repeated UI read must reuse a previous source-verified aggregate immediately,
+# without reopening the live RFP index or database between polls.
+import time
+verified={'ok':True,'schemaVersion':1,'scope':'unexpired_saved_sw_bid_notices',
+          'counts':{'total':6,'eligible':6,'completed':1,'remaining':5}}
+p['_RFP_PROGRESS_CACHE'].update(result=verified,until=time.time()+20)
+started=time.monotonic()
+assert p['rfp_rescan_progress']() is verified
+assert time.monotonic()-started < 0.5
+assert p['_RFP_PROGRESS_CACHE_TTL']==25
+print('WORKLINKS_RFP_VERIFIED_PROGRESS_CACHE_FAST_HIT=PASS')
