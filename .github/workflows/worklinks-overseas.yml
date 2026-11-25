@@ -41,8 +41,10 @@ jobs:
             git push origin HEAD:overseas-data
           fi
           SH
+          sources="uk,eu,ca"
+          if [[ "${{ github.event_name }}" == "push" ]] && git log -1 --format=%B | grep -Fq "[eu-only]"; then sources="eu"; fi
           result=0
-          python3 scripts/collect_overseas.py --db "$RUNNER_TEMP/overseas.sqlite" --output overseas-data-checkout/overseas/notices.json --seed overseas-data-checkout/overseas/notices.json --publish-script "$RUNNER_TEMP/overseas-publish.sh" --days 7 || result=$?
+          python3 scripts/collect_overseas.py --db "$RUNNER_TEMP/overseas.sqlite" --output overseas-data-checkout/overseas/notices.json --seed overseas-data-checkout/overseas/notices.json --publish-script "$RUNNER_TEMP/overseas-publish.sh" --days 7 --sources "$sources" || result=$?
           test -s overseas-data-checkout/overseas/notices.json
           python3 - <<'PY'
           import json

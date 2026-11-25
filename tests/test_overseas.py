@@ -11,7 +11,7 @@ class OverseasTests(unittest.TestCase):
         self.assertEqual(len(rows),1);self.assertEqual(rows[0]["amount"],12000);self.assertEqual(rows[0]["country"],"GBR")
     def test_ted_pagination(self):
         r={"publication-number":"123456-2026","notice-title":{"eng":["Software"]},"buyer-country":["IRL"],"buyer-name":{"eng":["Example"]},"publication-date":"20261125","notice-type":"cn-standard"}
-        with patch.object(m,"js",side_effect=[{"notices":[r],"iterationNextToken":"next"},{"notices":[]}]) as call:
+        with patch.object(m,"js",side_effect=[{"notices":[r],"iterationNextToken":"next"},{"notices":[],"iterationNextToken":"still-present"}]) as call:
             rows=m.eu(7)
         self.assertEqual(len(rows),1);self.assertEqual(rows[0]["country"],"IRL");self.assertEqual(rows[0]["title"],"Software");self.assertEqual(call.call_count,2)
     def test_ca_csv(self):
