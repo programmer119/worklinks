@@ -380,12 +380,22 @@
   if(!label||!count||!fill||!panel)return;
   const info=rfpRescanProgress;
   if(!info||!info.counts||!Number.isFinite(Number(info.counts.total))){
-   label.textContent='—%';count.textContent='판독 현황 조회 불가';fill.style.width='0%';
-   if(panel.dataset.ready!=='error'){
-    panel.dataset.ready='error';
-    panel.innerHTML='<div class="rfp-rescan-service-error"><strong>운영 집계 연결 오류</strong><p>서버에서 진행 건수를 받지 못했습니다.</p>'+
-     '<button type="button" id="rfpRescanRetry" class="rfp-rescan-retry">다시 조회</button></div>';
-    panel.querySelector('#rfpRescanRetry').addEventListener('click',()=>void refreshRfpRescanProgress(true));
+   const failed=!!rfpRescanProgressError;
+   label.textContent=failed?'—%':'조회 중';
+   count.textContent=failed?'판독 집계 조회 실패':'판독 집계 불러오는 중';
+   fill.style.width='0%';
+   const state=failed?'error':'loading';
+   if(panel.dataset.ready!==state){
+    panel.dataset.ready=state;
+    if(failed){
+     panel.innerHTML='<div class="rfp-rescan-service-error"><strong>판독 집계 조회 실패</strong>'+
+      '<p>진행 현황 조회가 지연되거나 실패했습니다. 실제 공고 판독 중단을 의미하지는 않습니다.</p>'+
+      '<button type="button" id="rfpRescanRetry" class="rfp-rescan-retry">다시 조회</button></div>';
+     panel.querySelector('#rfpRescanRetry').addEventListener('click',()=>void refreshRfpRescanProgress(true));
+    }else{
+     panel.innerHTML='<div class="rfp-rescan-service-loading" role="status" aria-live="polite">'+
+      '<strong>운영 집계 조회 중</strong><p>서버에서 판독 진행 건수를 확인하고 있습니다.</p></div>';
+    }
    }
    window.paintRfpLiveCountdown();
    return;
