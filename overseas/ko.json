@@ -1,0 +1,23 @@
+{
+  "generatedAt": null,
+  "titles": {
+    "Poland – Anti-virus software package – Zakup licencji subskrypcyjnych i wsparcia producenta Fortinet": "Fortinet 구독 라이선스 및 제조사 기술지원 구매",
+    "Portugal – Software programming and consultancy services – 40/CLPQ/AT/2026 - Aquisição de serviços de desenvolvimento aplicacional no âmbito da Manutenção dos Sistemas de Gestão Declarativa, componente batch e Pilar II": "40/CLPQ/AT/2026 - 신고 관리 시스템 유지보수(배치 처리 및 필라 2)를 위한 애플리케이션 개발 용역",
+    "Poland – Desktop computer – Dostawa sprzętu informatycznego i akcesoriów komputerowych": "IT 장비 및 컴퓨터 주변기기 공급",
+    "France – Workstations – POSTES DE TRAVAIL, SOLUTIONS COLLABORATIVES ET PRESTATIONS DE SUPPORT AUX UTILISATEURS": "업무용 워크스테이션, 협업 솔루션 및 사용자 지원 서비스",
+    "Construction Project Delivery Platform": "건설 프로젝트 수행 관리 플랫폼",
+    "AI Voice, Audio and Accessibility RFP": "AI 음성·오디오 및 접근성 솔루션 제안요청서",
+    "Emergency Alert SaaS Solution": "긴급 경보 SaaS 솔루션",
+    "Digital Twin Workplace Inventory and Asset Management Solution": "디지털 트윈 기반 업무공간 재고 및 자산 관리 솔루션"
+  },
+  "buyers": {
+    "Szpital Głogowski sp. z o.o.": "그워구프 병원",
+    "Autoridade Tributária e Aduaneira": "포르투갈 국세·관세청",
+    "Instytut Matki i Dziecka": "모자보건 연구소",
+    "Syndicat intercommunal de la périphérie de Paris pour les énergies et les réseaux de communication (Sipperec)": "파리 외곽 에너지·통신망 지방자치단체 연합(Sipperec)",
+    "Farm Credit Canada (FCC)": "캐나다 농업금융공사(FCC)",
+    "Department of Agriculture and Agri-Food (AAFC)": "캐나다 농업·농식품부(AAFC)",
+    "Canada Revenue Agency (CRA)": "캐나다 국세청(CRA)"
+  },
+  "provider": "manual-seed"
+}
