@@ -1,0 +1,56 @@
+name: WorkLinks overseas collection
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/collect_overseas.py'
+      - '.github/workflows/worklinks-overseas.yml'
+      - 'overseas/index.html'
+  schedule:
+    - cron: '23 2,8,14,20 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-overseas-only
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: overseas-data
+          path: overseas-data-checkout
+      - name: Collect public procurement, isolated DB and snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/collect_overseas.py
+          python3 -m unittest discover -s tests -p test_overseas.py
+          result=0
+          python3 scripts/collect_overseas.py --db "$RUNNER_TEMP/overseas.sqlite" --output overseas-data-checkout/overseas/notices.json --seed overseas-data-checkout/overseas/notices.json --days 7 || result=$?
+          test -s overseas-data-checkout/overseas/notices.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('overseas-data-checkout/overseas/notices.json'))
+          assert set(d['sources']) == {'uk','eu','ca'}
+          assert all(r['source'] in d['sources'] and r['title'] and r['id'] for r in d['notices'])
+          for key,s in d['sources'].items():
+              print(key, sum(r['source']==key for r in d['notices']), 'OK' if not s['error'] else 'FAILED', s['error'] or '')
+          PY
+          echo "$result" > "$RUNNER_TEMP/overseas-status"
+      - name: Publish overseas-only public snapshot, no domestic changes
+        working-directory: overseas-data-checkout
+        run: |
+          git config user.name worklinks-overseas
+          git config user.email worklinks-overseas@users.noreply.github.com
+          git add overseas/notices.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh overseas procurement snapshot"
+            git push origin HEAD:overseas-data
+          fi
+      - name: Fail honestly if any upstream failed
+        run: test "$(cat "$RUNNER_TEMP/overseas-status")" = 0
