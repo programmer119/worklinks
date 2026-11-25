@@ -1,0 +1,46 @@
+name: WorkLinks developing countries
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/collect_developing.py'
+      - 'tests/verify_developing_live.py'
+      - '.github/workflows/worklinks-developing.yml'
+  schedule:
+    - cron: '41 1,7,13,19 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: worklinks-developing-only
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: developing-data
+          path: developing-data-checkout
+      - name: Install collector dependencies
+        run: |
+          python3 -m pip install playwright pycountry
+          python3 -m playwright install --with-deps chromium
+          python3 -m py_compile scripts/collect_developing.py
+      - name: Collect official sources
+        run: python3 scripts/collect_developing.py --output developing-data-checkout/developing/notices.json
+      - name: Publish isolated data branch
+        working-directory: developing-data-checkout
+        run: |
+          git config user.name worklinks-developing
+          git config user.email worklinks-developing@users.noreply.github.com
+          git add developing/notices.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh developing country procurement snapshot"
+            git push origin HEAD:developing-data
+          fi
+      - name: Initial live acceptance gate
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: python3 tests/verify_developing_live.py developing-data-checkout/developing/notices.json
