@@ -30,8 +30,19 @@ jobs:
           set -euo pipefail
           python3 -m py_compile scripts/collect_overseas.py
           python3 -m unittest discover -s tests -p test_overseas.py
+          cat > "$RUNNER_TEMP/overseas-publish.sh" <<'SH'
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE/overseas-data-checkout"
+          git config user.name worklinks-overseas
+          git config user.email worklinks-overseas@users.noreply.github.com
+          git add overseas/notices.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh overseas procurement source snapshot"
+            git push origin HEAD:overseas-data
+          fi
+          SH
           result=0
-          python3 scripts/collect_overseas.py --db "$RUNNER_TEMP/overseas.sqlite" --output overseas-data-checkout/overseas/notices.json --seed overseas-data-checkout/overseas/notices.json --days 7 || result=$?
+          python3 scripts/collect_overseas.py --db "$RUNNER_TEMP/overseas.sqlite" --output overseas-data-checkout/overseas/notices.json --seed overseas-data-checkout/overseas/notices.json --publish-script "$RUNNER_TEMP/overseas-publish.sh" --days 7 || result=$?
           test -s overseas-data-checkout/overseas/notices.json
           python3 - <<'PY'
           import json
