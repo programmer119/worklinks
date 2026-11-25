@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Independent overseas procurement preview. No domestic database or routes touched."""
-import argparse, csv, datetime as dt, io, json, pathlib, re, sqlite3, time
+import argparse, csv, datetime as dt, io, json, pathlib, re, sqlite3, time, subprocess
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urlencode, urljoin, urlsplit, quote
 from urllib.request import Request, urlopen
 
@@ -86,6 +87,7 @@ def main():
     p.add_argument("--output",required=True,type=pathlib.Path)
     p.add_argument("--days",type=int,default=7)
     p.add_argument("--seed",type=pathlib.Path)
+    p.add_argument("--publish-script",type=pathlib.Path)
     a=p.parse_args()
     if not 1<=a.days<=30:p.error("--days must be 1..30")
     a.db.parent.mkdir(parents=True,exist_ok=True)
@@ -97,27 +99,39 @@ def main():
         with db:
             db.executemany("INSERT OR REPLACE INTO notices VALUES(?,?,?)",[(r["source"],r["id"],json.dumps(r,ensure_ascii=False)) for r in seed.get("notices",[])])
             db.executemany("INSERT OR REPLACE INTO status VALUES(?,?,?,?)",[(k,v.get("checked"),v.get("success"),v.get("error")) for k,v in seed.get("sources",{}).items()])
-    for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]:
-        now=utc().isoformat()
-        try:
-            records=fetch(a.days)
-            with db:
-                db.execute("DELETE FROM notices WHERE source=?",(key,))
-                db.executemany("INSERT OR REPLACE INTO notices VALUES(?,?,?)",[(key,r["id"],json.dumps(r,ensure_ascii=False)) for r in records])
-                db.execute("INSERT OR REPLACE INTO status VALUES(?,?,?,NULL)",(key,now,now))
-            print(key,len(records),flush=True)
-        except Exception as e:
-            with db:
-                db.execute("INSERT INTO status VALUES(?,?,NULL,?) ON CONFLICT(source) DO UPDATE SET checked=excluded.checked,error=excluded.error",(key,now,str(e)))
-            print(key,"FAILED",str(e),flush=True)
-    sources={s:dict(checked=c,success=t,error=e) for s,c,t,e in db.execute("SELECT source,checked,success,error FROM status")}
-    rows=[]
-    for (record,) in db.execute("SELECT record FROM notices"):
-        r=json.loads(record);r.pop("raw",None);rows.append(r)
-    rows.sort(key=lambda r:r["published"],reverse=True)
-    temp=a.output.with_suffix(".tmp")
-    temp.write_text(json.dumps(dict(generatedAt=utc().isoformat(),days=a.days,sources=sources,notices=rows),ensure_ascii=False),encoding="utf-8")
-    temp.replace(a.output)
-    return int(any(s["error"] for s in sources.values()))
+    def snapshot(pending):
+        sources={s:dict(checked=c,success=t,error=e,pending=s in pending) for s,c,t,e in db.execute("SELECT source,checked,success,error FROM status")}
+        for k in pending:
+            sources.setdefault(k,dict(checked=None,success=None,error=None,pending=True))
+        rows=[]
+        for (record,) in db.execute("SELECT record FROM notices"):
+            r=json.loads(record);r.pop("raw",None);rows.append(r)
+        rows.sort(key=lambda r:r["published"],reverse=True)
+        temp=a.output.with_suffix(".tmp")
+        temp.write_text(json.dumps(dict(generatedAt=utc().isoformat(),days=a.days,sources=sources,notices=rows),ensure_ascii=False),encoding="utf-8")
+        temp.replace(a.output)
+        if a.publish_script:
+            subprocess.run(["bash",str(a.publish_script.resolve())],check=True)
+    pending={"uk","eu","ca"}
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures={pool.submit(fetch,a.days):key for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]}
+        if a.publish_script:
+            snapshot(pending)
+        for future in as_completed(futures):
+            key=futures[future];now=utc().isoformat()
+            try:
+                records=future.result()
+                with db:
+                    db.execute("DELETE FROM notices WHERE source=?",(key,))
+                    db.executemany("INSERT OR REPLACE INTO notices VALUES(?,?,?)",[(key,r["id"],json.dumps(r,ensure_ascii=False)) for r in records])
+                    db.execute("INSERT OR REPLACE INTO status VALUES(?,?,?,NULL)",(key,now,now))
+                print(key,len(records),flush=True)
+            except Exception as e:
+                with db:
+                    db.execute("INSERT INTO status VALUES(?,?,NULL,?) ON CONFLICT(source) DO UPDATE SET checked=excluded.checked,error=excluded.error",(key,now,str(e)))
+                print(key,"FAILED",str(e),flush=True)
+            pending.remove(key)
+            snapshot(pending)
+    return int(any(e for (e,) in db.execute("SELECT error FROM status")))
 if __name__=="__main__":
     raise SystemExit(main())
