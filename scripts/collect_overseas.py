@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Independent overseas procurement preview. No domestic database or routes touched."""
 import argparse, csv, datetime as dt, io, json, pathlib, re, sqlite3, time, subprocess
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
+from queue import Queue
 from urllib.parse import urlencode, urljoin, urlsplit, quote
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
@@ -47,12 +48,12 @@ def https(url):
 def row(source,id,country,title,buyer,published,deadline,stage,url,raw,amount=None,currency=""):
     if not id or not title: raise ValueError("missing notice id or title")
     return dict(source=source,id=id,country=country,title=title,buyer=buyer,published=published,deadline=deadline,stage=stage,url=https(url),raw=raw,amount=amount,currency=currency)
-def uk(days):
+def uk(days, progress=None):
     end=utc(); start=end-dt.timedelta(days=days)
     fmt=lambda d:d.strftime("%Y-%m-%dT%H:%M:%S")
     url=UK+"?"+urlencode(dict(updatedFrom=fmt(start),updatedTo=fmt(end),limit=100))
     seen=set(); result=[]
-    for _ in range(100):
+    for page in range(100):
         if not url: return result
         if url in seen or urlsplit(url).netloc!=urlsplit(UK).netloc: raise ValueError("invalid UK cursor")
         seen.add(url)
@@ -64,6 +65,8 @@ def uk(days):
             id=str(r.get("id","")); notice=re.search(r"\b\d{6}-\d{4}\b",id)
             url_notice="https://www.find-tender.service.gov.uk/Notice/"+notice.group() if notice else "https://www.find-tender.service.gov.uk/Search"
             result.append(row("uk",r.get("ocid","")+":"+id,"GBR",title,scalar((r.get("buyer") or {}).get("name")),scalar(r.get("date")),scalar((t.get("tenderPeriod") or {}).get("endDate")),scalar(r.get("tag")),url_notice,r,(t.get("value") or {}).get("amount"),scalar((t.get("value") or {}).get("currency"))))
+        print("UK page",page+1,"candidates",len(result),flush=True)
+        if progress and (page==0 or (page+1)%5==0): progress(list(result))
         nxt=(d.get("links") or {}).get("next")
         if not nxt:return result
         url=urljoin(UK,nxt); time.sleep(11)
@@ -129,12 +132,23 @@ def main():
         if a.publish_script:
             subprocess.run(["bash",str(a.publish_script.resolve())],check=True)
     pending={"uk","eu","ca"}
+    events=Queue()
     with ThreadPoolExecutor(max_workers=3) as pool:
-        futures={pool.submit(fetch,a.days):key for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]}
+        futures={}
+        for key,fetch in [("uk",uk),("eu",eu),("ca",ca)]:
+            future=pool.submit(fetch,a.days,lambda records:events.put(("partial","uk",records))) if key=="uk" and a.publish_script else pool.submit(fetch,a.days)
+            futures[future]=key
+            future.add_done_callback(lambda done,k=key:events.put(("done",k,done)))
         if a.publish_script:
             snapshot(pending)
-        for future in as_completed(futures):
-            key=futures[future];now=utc().isoformat()
+        while pending:
+            kind,key,value=events.get()
+            if kind=="partial":
+                with db:
+                    db.executemany("INSERT OR REPLACE INTO notices VALUES(?,?,?)",[(key,r["id"],json.dumps(r,ensure_ascii=False)) for r in value])
+                snapshot(pending)
+                continue
+            future=value;now=utc().isoformat()
             try:
                 records=future.result()
                 with db:
